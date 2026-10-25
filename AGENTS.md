@@ -1,0 +1,54 @@
+<!--injected-by-void-v1.1.12-->
+## Void
+
+- This project uses [Void](https://void.cloud), a full-stack Vite framework for Cloudflare Workers with file-based API routing, server-rendered pages, and typed backend services.
+- Use Void's CLI and typed APIs. Before working with Void, read the relevant Markdown docs in `node_modules/void/docs/`; start with `guide/quickstart.md` for setup and `reference/cli.md` for commands.
+
+<!--/injected-by-void-->
+
+## はじめに読むもの
+
+作業の前に `.docs/README.md` を読み、そこから作業に関係する仕様書を読む。言葉の意味は `.docs/glossary.md`、コードの各部分のつながりは `.docs/architecture.md` にある。仕様とコードが食い違っていたら、どちらが正しいかを確かめ、直したほうに合わせてもう一方も直す。仕様書にない決まりを作ったときは、その仕様書に書き足す。持ち主の確認を待たずに決めたことは `.docs/decisions.md` に、理由と一緒に残す。受けた指示でまだ終わっていないものは `.docs/backlog.md` にある。
+
+世界観と設定は `.docs/world/world.md` にある。ほかの仕様書とコードはこれに合わせる。この文書は持ち主が書くもので、持ち主に頼まれたときだけ書き換える。`.docs/world/` は git に入れない（未追跡のまま置く）。コミットはパスを指定して行い、`git add -A`、`git commit -a`、パスを付けない `--amend` は使わない。
+
+## 守ること
+
+この町のあらゆる物と人は、暮らしとして説明がつかなければならない（`.docs/README.md` の「完全な生活」）。物を一つ置くなら持ち主・使い道・出どころを、人を一人置くなら世帯・寝床・食事・仕事・その時刻にそこにいる理由を言えるようにする。迷ったら、派手な機能より生活の欠けを埋めるほうを先にやる。
+
+サーバーが正しい。位置、持ち物、お金、能力値、戦闘の結果はサーバーが決め、クライアントは表示して操作を送るだけにする。規則は `world/core/` の純粋な TypeScript で、状態とコマンドを受け取って受け入れるか断るかを返す。同じ関数をサーバーとクライアントで使う。
+
+Durable Objects の分け方は世界観と対応している（`.docs/world/world.md` の「世界の作りと Durable Objects」）。プレイヤー一人に `player` が一つ、マップのチャンネル一つに部屋が一つあり、町ごとに `directory` と `nature` が一つずつ、全部の町で `market` と `exchange` が一つずつある。この分け方を変えるときは、世界観の側と合うかを先に確かめる。
+
+言葉の決まりも守る。町を「村」と呼ばない。神は女神ひとりで、祀るのは修道士である。大きな組織（商会・修道会など）は出さない。ベトナムの地名は都市の名前だけに使い、人の名前はドイツ語圏風にする。ほかのゲームや製品の名前は、コード・文書・コミットメッセージ・画面のどこにも書かない。
+
+## 仕様書の書き方
+
+`.docs/` は主に AI が読む。見出しと文章で書き、前後のつながりで矛盾に気づけるようにする。箇条書きは順番そのものが中身のときだけ、表はどうしても文章で書けないときだけ使う。調子は淡々とした仕様の文にし、感傷的・詩的な言い回しは使わない。
+
+文書どうしは `[[名前]]`、節を指すときは `[[名前#見出し]]` でつなぐ。名前はファイル名から `.md` を除いたもの。コードのコメントは `game-system.md §9.1` や `town.md「世帯と建物」` の形で仕様書を指しているので、番号付きの見出しは番号も文言も変えない。見出しを変えたり消したりしたら、コメントの参照も直す。
+
+コードが決めている数・値段・式・時刻・品揃えは仕様書に写さず、どのファイルにあるかを書く。仕様書には、コードからは読めない狙いと決まりと理由を書く。同じことを二つの文書に書かない。
+
+## ディレクトリ構成
+
+Void の規約ディレクトリはルートに置く。`src/` は使わず、`#/*` はプロジェクトルートを指す。
+
+- `pages/` — ページとサーバーローダー
+- `routes/`, `middleware/`, `durable-objects/` — Void の API・ミドルウェア・永続状態の入口。中身は薄くし、処理は `world/server/` を呼ぶ
+- `lib/engine/` — ゲームに依存しない計算と基盤（経路探索、曲線・距離、地形の補間、ノイズ、乱数、ストア、計測）
+- `lib/graphics/` — 描画エンジン（ピクセルバッファ、メッシュ構築、テクスチャ・マテリアル、輪郭）
+- `world/core/` — このゲーム固有のルールと定義（アイテム、店、戦闘、時刻）
+- `world/town/`, `world/maps/` — 住民・建物・予定・台詞とマップデータ
+- `world/scene/`, `world/art/` — 世界の描画と素材。エンジンへマップやパレットを渡す
+- `world/server/` — ゲームのサーバー処理
+- `world/game.ts`, `world/client/`, `world/parts/` — UI フレームワークに依存しないゲームの組み立て、セッション、通信、操作
+- `components/hud/`, `components/game/`, `components/ui/`, `hooks/` — HUD・UI 部品・React とゲームの接続
+- `dev/` — 開発画面の実装、定義表ビューア、描画スタジオ
+- `scripts/` — マップ・素材の書き出しとスクショ（bun で動かす）
+
+依存の向きは必ず守る。`lib/engine/` と `lib/graphics/` は `world/`・UI・Void に依存させない。マップの大きさや障害物などはクラスの引数で渡し、ゲームの値・表・ブラウザの診断出力は `world/` に置く。ゲームの処理（`world/core/`、`world/town/`、`world/server/`）から Three.js を参照しない。`world/` は React や `components/`・`hooks/`・`dev/` を import せず、UI がゲームの状態を購読して操作を呼ぶ。テストは実装と同じディレクトリに `*.test.ts` で置く。
+
+## コマンド
+
+Node 24 以上。`npm run dev` で開発サーバー、`npm run typecheck` で型検査、`npm test` でテスト、`npm run lint` で lint を動かす。`scripts/` のスクリプトは bun で動かす。`/dev` には、ゲームの定義表（アイテム・住民・建物・マップなど）を一覧するページがある。変更したら、型検査と、関係するテストを通してから終える。見た目に関わる変更は、開発サーバーで実際の画面を見て確かめる。
