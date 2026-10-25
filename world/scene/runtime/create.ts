@@ -3,6 +3,7 @@ import { createPointer } from "./pointer.ts"
 import { PixelCamera } from "../../../lib/graphics/pixel-camera.ts"
 import { createWalkers } from "./walkers.ts"
 import { DioramaPostProcessing } from "../../../lib/graphics/post-processing.ts"
+import { mergeStatic } from "../../../lib/graphics/batch.ts"
 import * as THREE from "three"
 import { initWalk, walkH, isFree, setLayout } from "../world"
 import { updateCutaways } from "../interior"
@@ -10,13 +11,13 @@ import { REACH } from "../../core/gather.ts"
 import { burst, makeMonsters, standBy, updateMonsters } from "../monsters"
 import { MELEE_REACH, MONSTER_KINDS } from "../../core/monsters.ts"
 import { groundOf } from "../ground"
-import { updaters, occluders, resetRegistries, houseGlows, lamps, type V2 } from "../build"
+import { updaters, occluders, resetRegistries, houseGlows, lamps, stalls, type V2 } from "../build"
 import { daylight } from "../../core/clock.ts"
 import type { Anim } from "../figure"
 import { outlineShape } from "../outline"
 import { type Actor, critters, spawnAnimals, view, FIG_PPU } from "../actors"
 import { tickSprites } from "../sprite-pool"
-import { lap } from "../../diagnostics.ts"
+import { exposeScene, lap } from "../../diagnostics.ts"
 import { Ashfall, dustAll } from "../ash"
 import { findPath } from "../path"
 import { MAP_SCENES } from "./definitions.ts"
@@ -45,9 +46,13 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
   const renderer = new THREE.WebGLRenderer({ antialias: false })
   renderer.shadowMap.enabled = true
   renderer.shadowMap.type = THREE.BasicShadowMap
+  // shadows are redrawn a few times a second and when the sun moves (frame()), not every frame
+  renderer.shadowMap.autoUpdate = false
+  let shadowDirty = true
   renderer.outputColorSpace = THREE.SRGBColorSpace
   Object.assign(renderer.domElement.style, { display: "block", imageRendering: "pixelated", touchAction: "none" })
   const scene = new THREE.Scene()
+  exposeScene(scene)
 
   const post = new DioramaPostProcessing(renderer)
   const render = () => post.render(scene, cam, diorama, camera.scale)
@@ -55,6 +60,13 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
   const { groundCanvas, wm, terrain } = await createTerrain(scene, world, ground, progress, tick)
   const town = new THREE.Group()
   world.build(town)
+  // still things that share a material become one draw each; a house, a stall or a swaying crown
+  // keeps its own transform so it can still fade, hide or move as one
+  if (!world.indoor) {
+    const anchors = [...occluders.map((o) => o.obj), ...Object.values(stalls).flatMap((s) => [s.wares, s.cover, s.group ?? s.wares])]
+    const merged = mergeStatic(town, { anchors, step: (t) => updaters.forEach((u) => u(t, 1 / 60)) })
+    lap(`scene: merged ${merged.before} meshes into ${merged.after}`)
+  }
   scene.add(town)
   if (world.animals) spawnAnimals(scene)
 
@@ -103,7 +115,14 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
   const resize = camera.resize,
     zoom = camera.zoom
   const lighting = createLighting(scene, world, wm, applySchedule, environment)
-  const { setClock, setTod } = lighting
+  const setClock = (min: number) => {
+    lighting.setClock(min)
+    shadowDirty = true
+  }
+  const setTod = (k: number) => {
+    lighting.setTod(k)
+    shadowDirty = true
+  }
   // ---------------------------------------------------------------- movement
   let frozen = false
   function freeze(on: boolean) {
@@ -405,8 +424,24 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
   let frames = 0,
     fpsAt = performance.now(),
     fpsNow = 0
+  // pixel art needs no more than 30 frames a second, and a weak machine gets room to breathe
+  const FRAME_MS = 1000 / 30
+  const SHADOW_MS = 250
+  let frameAt = 0,
+    shadowAt = 0
   function frame() {
     if (!runtime.running) return
+    const at = performance.now()
+    if (at - frameAt < FRAME_MS - 2) {
+      requestAnimationFrame(frame)
+      return
+    }
+    frameAt = at
+    if (shadowDirty || at - shadowAt > SHADOW_MS) {
+      renderer.shadowMap.needsUpdate = true
+      shadowDirty = false
+      shadowAt = at
+    }
     const dt = Math.min(0.05, clock.getDelta())
     const t = clock.elapsedTime
     stepHeld()

@@ -45,16 +45,22 @@ export function resetRegistries() {
  * through it as a silhouette instead (`opaque`).
  */
 export function occluder(obj: THREE.Object3D, min = 0.22, opaque = false) {
+  // one copy per material, shared by every mesh of this object that had it: the fade is per
+  // object, and meshes that share a material can be merged into one draw (lib/graphics/batch.ts)
+  const copies = new Map<THREE.Material, THREE.MeshLambertMaterial>()
   obj.traverse((o) => {
     const m = o as THREE.Mesh
     if (!m.isMesh) return
-    const was = m.material as THREE.MeshLambertMaterial,
-      copy = was.clone()
+    const was = m.material as THREE.MeshLambertMaterial
+    let copy = copies.get(was)
+    if (!copy) {
+      copies.set(was, (copy = was.clone()))
+      // a glowing window is lit through its copy from now on
+      for (const g of houseGlows) if (g.mat === was) g.mat = copy
+      const k = glowMats.indexOf(was)
+      if (k >= 0) glowMats[k] = copy
+    }
     m.material = copy
-    // a glowing window is lit through its copy from now on
-    for (const g of houseGlows) if (g.mat === was) g.mat = copy
-    const k = glowMats.indexOf(was)
-    if (k >= 0) glowMats[k] = copy
   })
   occluders.push({ obj, box: new THREE.Box3().setFromObject(obj), fade: 1, min, opaque })
 }

@@ -9,3 +9,8 @@ export function lapEnd(step: string) {
   ;(globalThis as unknown as { __laps: Lap[][] }).__laps.push(laps)
   if (import.meta.env.DEV) console.table(laps)
 }
+
+/** Dev builds: leave the live scene where a profiling script can reach it (globalThis.__scene). */
+export function exposeScene(scene: unknown) {
+  if (import.meta.env.DEV) (globalThis as unknown as { __scene: unknown }).__scene = scene
+}

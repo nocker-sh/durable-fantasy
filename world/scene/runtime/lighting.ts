@@ -14,7 +14,7 @@ function createEnvironment(scene: THREE.Scene) {
   scene.add(hemi)
   const sun = new THREE.DirectionalLight(0xffe0b0, 2.4)
   sun.castShadow = true
-  sun.shadow.mapSize.set(4096, 4096)
+  sun.shadow.mapSize.set(2048, 2048)
   const sc = sun.shadow.camera as THREE.OrthographicCamera
   sc.left = -34
   sc.right = 34
