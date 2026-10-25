@@ -1,0 +1,293 @@
+/* Game screen theme (ui.md §6): quiet see-through dark panels with soft rounded corners, white
+   text in a plain gothic face, no heavy frames, wood or gold. The windows sit over the village
+   without hiding it. */
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@fontsource/dotgothic16/japanese-400.css";
+@import "@fontsource/dotgothic16/latin-400.css";
+@import "@fontsource/silkscreen/latin-400.css";
+
+@theme {
+  /* one plain gothic face for everything: headings, numbers, conversation */
+  --font-head: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Meiryo", sans-serif;
+  --font-body: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Meiryo", sans-serif;
+  --font-tiny: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+
+  --color-panel: rgb(10 12 22 / 0.7);
+  --color-panel-soft: rgb(10 12 22 / 0.55);
+  --color-panel-solid: #0e1018;
+  --color-title-hi: rgb(255 255 255 / 0.1);
+  --color-title-lo: rgb(255 255 255 / 0.04);
+  --color-raised: rgb(255 255 255 / 0.08);
+  --color-raised-hi: rgb(255 255 255 / 0.14);
+  --color-sunk: rgb(0 0 0 / 0.35);
+
+  /* what were brass fittings are now quiet whites */
+  --color-brass: rgb(255 255 255 / 0.32);
+  --color-brass-hi: #ffffff;
+  --color-brass-lo: rgb(255 255 255 / 0.12);
+
+  --color-text: #f2f3f6;
+  --color-text-dim: #b4b9c6;
+  --color-text-faint: #7b8090;
+
+  --color-hp-hi: #e0675e;
+  --color-hp: #c8403a;
+  --color-hp-lo: #7a1e1e;
+  --color-sp-hi: #7aa4e0;
+  --color-sp: #4a7cc8;
+  --color-sp-lo: #1e3a7a;
+  --color-exp: #5a9ae8;
+
+  --color-me: #ffffff;
+  --color-player: #8fd0e0;
+  --color-npc: #e8dcc0;
+  --color-system: #e8eaf0;
+  --color-good: #b8d890;
+  --color-bad: #f09a8a;
+
+  --color-rarity-common: #8a8a8a;
+  --color-rarity-fine: #5ea85e;
+  --color-rarity-rare: #4a8ad8;
+  --color-rarity-treasure: #e0b84a;
+
+  --animate-ui-in: ui-in 120ms ease-out both;
+  --animate-ui-notice: ui-notice 2500ms ease-out both;
+  --animate-ui-blink: ui-blink 1000ms steps(2) infinite;
+
+  @keyframes ui-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes ui-notice {
+    0% {
+      opacity: 0;
+    }
+    8% {
+      opacity: 1;
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes ui-blink {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0.15;
+    }
+  }
+}
+
+@layer base {
+  html,
+  body {
+    margin: 0;
+    background: #0b0c15;
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.55;
+    user-select: none;
+    overscroll-behavior: none;
+  }
+  img {
+    image-rendering: pixelated;
+  }
+  ::selection {
+    background: var(--color-brass);
+    color: var(--color-panel-solid);
+  }
+}
+
+@layer components {
+  /* A panel: a dark, see-through ground with rounded corners, a faint edge and a soft shadow. */
+  .ui-panel {
+    position: relative;
+    background: var(--color-panel);
+    color: var(--color-text);
+    border-radius: 8px;
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.06),
+      0 4px 16px rgb(0 0 0 / 0.22);
+    backdrop-filter: blur(3px);
+  }
+  .ui-panel--soft {
+    background: var(--color-panel-soft);
+  }
+  /* (the old corner fittings: none now) */
+  .ui-corners::before,
+  .ui-corners::after {
+    content: none;
+  }
+  /* a window's title bar: no bar at all, just the title */
+  .ui-titlebar {
+    background: transparent;
+  }
+  /* a sunken area inside a panel: a little darker, rounded */
+  .ui-well {
+    background: rgb(255 255 255 / 0.045);
+    border-radius: 6px;
+  }
+  .ui-rule {
+    height: 1px;
+    background: rgb(255 255 255 / 0.1);
+  }
+  .ui-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(255 255 255 / 0.2) transparent;
+  }
+  .ui-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+  .ui-scroll::-webkit-scrollbar-thumb {
+    background: rgb(255 255 255 / 0.2);
+    border-radius: 3px;
+  }
+  .ui-text-shadow {
+    text-shadow: 0 1px 2px rgb(0 0 0 / 0.6);
+  }
+  /* a round, see-through button: the menu column and the shortcuts */
+  .ui-round {
+    border-radius: 9999px;
+    background: rgb(10 12 22 / 0.62);
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.07),
+      0 2px 8px rgb(0 0 0 / 0.25);
+    backdrop-filter: blur(3px);
+  }
+  .ui-round:hover {
+    background: rgb(30 34 50 / 0.75);
+  }
+
+  /* ---- over the 3D scene: names and players' speech ---- */
+  .gx-nameplate {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 0 3px;
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 14px;
+    white-space: nowrap;
+    color: #ffffff;
+    text-shadow:
+      1px 0 #0b0c15,
+      -1px 0 #0b0c15,
+      0 1px #0b0c15,
+      0 -1px #0b0c15,
+      1px 1px #0b0c15,
+      -1px -1px #0b0c15;
+    pointer-events: none;
+  }
+  .gx-nameplate--me {
+    color: var(--color-me);
+  }
+  .gx-nameplate--npc {
+    color: #ffffff;
+    opacity: 0.85;
+  }
+  .gx-nameplate--hover {
+    opacity: 1;
+    color: #ffffff;
+    text-decoration: underline;
+  }
+  /* a creature's hurts: a thin bar under its name */
+  .gx-hp {
+    display: block;
+    width: 36px;
+    height: 3px;
+    margin: 1px auto 0;
+    background: #1a1420;
+    box-shadow: 0 0 0 1px #000;
+  }
+  .gx-hp > span {
+    display: block;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(#f2a08a, #c8403a);
+  }
+  /* a blow: the number floats up and fades */
+  .gx-hit {
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-family: var(--font-head);
+    font-size: 14px;
+    color: #fff2c0;
+    text-shadow:
+      0 1px 0 #000,
+      1px 0 0 #000,
+      -1px 0 0 #000,
+      0 -1px 0 #000;
+    pointer-events: none;
+    animation: gx-hit 0.9s ease-out forwards;
+  }
+  .gx-hit--miss {
+    color: #c8c0d8;
+    font-size: 12px;
+  }
+  .gx-hit--critical {
+    color: #ffd060;
+    font-size: 18px;
+  }
+  .gx-hit--taken {
+    color: #ff8a7a;
+  }
+  .gx-nameplate--player {
+    pointer-events: auto;
+    cursor: pointer;
+  }
+  .gx-nameplate--player:hover {
+    text-decoration: underline;
+  }
+  @keyframes gx-hit {
+    from {
+      opacity: 1;
+      translate: 0 0;
+    }
+    to {
+      opacity: 0;
+      translate: 0 -28px;
+    }
+  }
+  .gx-bubble {
+    position: absolute;
+    left: 0;
+    top: 0;
+    max-width: 15em;
+    padding: 3px 8px 4px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    line-height: 16px;
+    color: #1a1e33;
+    background: #f4ecd8;
+    box-shadow:
+      0 0 0 1px #1a1e33,
+      0 2px 0 1px rgb(0 0 0 / 0.3);
+    white-space: normal;
+    word-break: break-all;
+    pointer-events: none;
+  }
+  .gx-bubble::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -4px;
+    width: 6px;
+    height: 6px;
+    margin-left: -3px;
+    background: #f4ecd8;
+    box-shadow: 1px 1px 0 #1a1e33;
+    transform: rotate(45deg);
+  }
+}
