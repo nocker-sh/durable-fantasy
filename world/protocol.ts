@@ -83,7 +83,8 @@ const mapPlayer = z.object({
 })
 
 export const clientMessage = z.discriminatedUnion("type", [
-  /** Enter the map as this player. `at` is where to appear if the server has no better place. */
+  z.object({ type: z.literal("heartbeat") }),
+  /** Enter as the authenticated owner. `at` is a client prediction; the server chooses the position. */
   /** `time`: dev builds hold the clock at a time of day (?time=HH:MM); the server honours it only in dev */
   z.object({
     type: z.literal("join"),
@@ -165,7 +166,7 @@ export type ClientMessage = z.infer<typeof clientMessage>
 
 export const serverMessage = z.discriminatedUnion("type", [
   /** Sent when a player joins: their connection id, their data and everyone else on the map. */
-  z.object({ type: z.literal("snapshot"), you: z.string(), me: z.custom<PlayerState>(() => true), players: z.array(mapPlayer) }),
+  z.object({ type: z.literal("snapshot"), you: z.string(), me: z.custom<PlayerState>(() => true), players: z.array(mapPlayer), at: cellSchema.optional() }),
   /** Someone entered the map or changed their name, looks or weapon. */
   z.object({ type: z.literal("joined"), player: mapPlayer }),
   z.object({ type: z.literal("left"), id: z.string() }),
@@ -221,7 +222,7 @@ export const serverMessage = z.discriminatedUnion("type", [
     /** what it pays now for what you carry */ buys: z.record(z.string(), z.number()).optional(),
   }),
   /** The server turned the last request down (a bad path, too far from a warp…). */
-  z.object({ type: z.literal("refused"), what: z.string(), reason: z.string().optional() }),
+  z.object({ type: z.literal("refused"), what: z.string(), reason: z.string().optional(), at: cellSchema.optional() }),
 ])
 export type ServerMessage = z.infer<typeof serverMessage>
 

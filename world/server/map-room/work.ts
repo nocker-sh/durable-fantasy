@@ -69,6 +69,7 @@ async function command(roomCtx: Ctx, message: Message<"command">) {
   if (result.ok) {
     const next = mapPlayer(me.player.id, result.state, me.player.at)
     if (
+      me.ready === false ||
       next.name !== me.player.name ||
       next.look !== me.player.look ||
       next.neck !== me.player.neck ||
@@ -76,7 +77,7 @@ async function command(roomCtx: Ctx, message: Message<"command">) {
       next.neckStripe !== me.player.neckStripe ||
       next.weapon !== me.player.weapon
     ) {
-      save({ player: next })
+      save({ player: next, ready: result.state.profileComplete })
       await ctx.room.broadcast({ type: "joined", player: next }, [ctx.connection.id])
     }
   }

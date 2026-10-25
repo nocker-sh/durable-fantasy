@@ -13,6 +13,8 @@ const FADE_MS = 600
 export function Loading() {
   const loading = useGameState((s) => s.loading)
   const failed = useGameState((s) => s.failed)
+  const failureMessage = useGameState((s) => s.failureMessage)
+  const departed = useGameState((s) => s.departed)
   const map = useGameState((s) => s.map.id)
   // the last thing shown stays up while it fades
   const [shown, setShown] = useState(loading)
@@ -28,9 +30,17 @@ export function Loading() {
     return () => clearTimeout(t)
   }, [loading])
   const passage = useMemo(() => flavorFor(map).text, [map])
+  if (departed)
+    return (
+      <Between title="Durable Fantasy">
+        <button type="button" onClick={() => location.reload()} className="text-sm text-[#d8d4cc]">
+          町に戻る
+        </button>
+      </Between>
+    )
   if (failed)
     return (
-      <Between title="町を描けなかった">
+      <Between title={failureMessage ? "キャラクターを読み込めなかった" : "町を描けなかった"} passage={failureMessage}>
         <button type="button" onClick={() => location.reload()} className="text-[12px] tracking-[0.2em] text-[#9a968e] underline-offset-4 hover:underline">
           読み込み直す
         </button>

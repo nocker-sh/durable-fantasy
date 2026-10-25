@@ -7,7 +7,6 @@ import { REASON_TEXT } from "../core/commands.ts"
 import type { Stat } from "../core/growth.ts"
 import { ITEMS, type ItemId, type Slot } from "../core/items.ts"
 import type { NECK_RAMPS, HotbarEntry, NeckKind } from "../core/player.ts"
-import { LOOKS } from "../town/travellers.ts"
 import type { GameContext } from "./context.ts"
 
 export class PlayerActions {
@@ -148,8 +147,6 @@ export class PlayerActions {
   }
 
   setProfile(name: string, look: number, neck: NeckKind, neckRamp: (typeof NECK_RAMPS)[number]) {
-    const next = name.trim().slice(0, 16)
-    if (!next) return
-    void this.target.run({ type: "profile", name: next, look: ((look % LOOKS.length) + LOOKS.length) % LOOKS.length, neck, neckRamp })
+    return this.target.run({ type: "profile", name, look, neck, neckRamp })
   }
 }

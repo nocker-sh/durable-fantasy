@@ -18,7 +18,7 @@ function fixture() {
   const update = (patch: Partial<GameState> | ((state: GameState) => Partial<GameState>)) => session.state.set((state) => ({ ...state, ...(typeof patch === "function" ? patch(state) : patch) }))
   let client: RoomClient
   const callbacks: Parameters<typeof createSessionContext>[1] = {
-    getScene: () => ({ freeze }) as unknown as MapScene,
+    getScene: () => ({ freeze, clearRemotes: vi.fn(), stop: vi.fn() }) as unknown as MapScene,
     preview: vi.fn(() => null),
     onServer: vi.fn(),
     wayBeside: () => null,
@@ -38,6 +38,8 @@ function fixture() {
     enterMap: vi.fn(),
   }
   const context = createSessionContext(session, callbacks)
+  callbacks.update({ online: "online" })
+  session.others.welcome("test-connection", [])
   client = new RoomClient(context)
   return { session, context, callbacks, client, send, freeze }
 }
@@ -45,6 +47,70 @@ function fixture() {
 afterEach(() => vi.useRealTimers())
 
 describe("client controllers", () => {
+  it("settles an interrupted save immediately and does not queue a duplicate", async () => {
+    const { session, client, send } = fixture()
+    const listeners = new Map<string, (event: { code: number }) => void>()
+    const socket = {
+      send,
+      close: vi.fn(),
+      on: (event: string, callback: (event: { code: number }) => void) => {
+        listeners.set(event, callback)
+        return () => {}
+      },
+    } as unknown as VoidSocket<"/map/:mapId">
+    session.socket = socket
+    client.listen(socket)
+    session.engaged = "resident"
+    session.state.set((state) => ({ ...state, storage: true, tradeAsk: { from: "other", name: "Other" } }))
+    const pending = client.run({ type: "use", slot: 0 })
+    expect(await client.run({ type: "use", slot: 0 })).toBe(false)
+    expect(send).toHaveBeenCalledTimes(1)
+    listeners.get("close")!({ code: 1006 })
+    expect(await pending).toBe(false)
+    expect(session.waiting.size).toBe(0)
+    expect(session.state.get().busy).toBe(false)
+    expect(session.state.get().online).toBe("offline")
+    expect(session.state.get().tradeAsk).toBeNull()
+    expect(session.state.get().storage).toBe(false)
+    expect(session.engaged).toBeNull()
+  })
+
+  it("does not open a late channel response after leaving the game", async () => {
+    const { session, client } = fixture()
+    let finish!: (value: { channel: number; channels: Record<number, number> }) => void
+    session.rooms.askChannel = () =>
+      new Promise((resolve) => {
+        finish = resolve
+      })
+    session.rooms.open = vi.fn()
+    const connecting = client.connect("phanthiet")
+    client.cancel()
+    finish({ channel: 1, channels: {} })
+    await connecting
+    expect(session.rooms.open).not.toHaveBeenCalled()
+  })
+  it("does not send commands while disconnected or before the join snapshot", async () => {
+    const { session, client, callbacks, send } = fixture()
+    callbacks.update({ online: "offline" })
+    expect(await client.run({ type: "use", slot: 0 })).toBe(false)
+    callbacks.update({ online: "online" })
+    session.others.clear()
+    expect(await client.run({ type: "use", slot: 0 })).toBe(false)
+    expect(send).not.toHaveBeenCalled()
+    expect(session.waiting.size).toBe(0)
+  })
+
+  it("rejects invalid profiles and normalizes names before transmission", async () => {
+    const { session, client, send } = fixture()
+    const profile = { type: "profile" as const, name: "\u202Ehidden", look: 0, neck: "muffler" as const, neckRamp: "cRed" as const }
+    expect(await client.run(profile)).toBe(false)
+    expect(send).not.toHaveBeenCalled()
+    const saved = client.run({ ...profile, name: "  A\u0308nne  " })
+    expect(send).toHaveBeenCalledWith({ type: "command", seq: 1, command: { ...profile, name: "Änne" } })
+    session.waiting.get(1)!({ ok: false, reason: "OFFLINE" })
+    session.waiting.clear()
+    expect(await saved).toBe(false)
+  })
   it("keeps session references live when sockets and channel selections change", () => {
     const { session, context } = fixture()
     session.socket = null

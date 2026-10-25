@@ -11,6 +11,7 @@ export interface Channel {
 }
 /** A room got ready before arriving: its channel, its socket once opened, and whether it is open yet. */
 export interface Standby {
+  taken?: boolean
   map: MapId
   channel: Promise<Channel>
   socket: RoomSocket
@@ -22,6 +23,11 @@ export class Rooms {
   /** the parallel town we are in */
   world = 1
   private standby: Standby | null = null
+
+  close() {
+    this.standby?.socket?.close()
+    this.standby = null
+  }
 
   /** Which channel of a map to go into (the directory chooses; channel 1 if it cannot be reached). */
   async askChannel(id: MapId, want: number | null = null): Promise<Channel> {
@@ -52,7 +58,7 @@ export class Rooms {
     const entry: Standby = { map, channel, socket: null as unknown as RoomSocket, open: false, at: performance.now() }
     this.standby = entry
     void channel.then(({ channel: c }) => {
-      if (this.standby !== entry) return
+      if (this.standby !== entry && !entry.taken) return
       entry.socket = this.open(map, c)
       entry.socket.on("open", () => {
         entry.open = true
@@ -63,6 +69,7 @@ export class Rooms {
   /** The room got ready for `map`, taken as it is; any other one is closed. A channel asked for skips it. */
   take(map: MapId, want: number | null): Standby | null {
     const ready = !want && this.standby?.map === map ? this.standby : null
+    if (ready) ready.taken = true
     if (!ready) this.standby?.socket?.close()
     this.standby = null
     return ready

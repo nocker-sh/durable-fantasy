@@ -4,6 +4,15 @@ import { Between } from "./loading.tsx"
 
 export function Offline() {
   const lost = useGameState((s) => s.online === "offline" && !s.loading)
+  const replaced = useGameState((s) => s.connectionReplaced)
   if (!lost) return null
+  if (replaced)
+    return (
+      <Between title="別の画面で開かれました">
+        <button type="button" onClick={() => location.reload()} className="text-sm text-[#d8d4cc]">
+          この画面で再開
+        </button>
+      </Between>
+    )
   return <Between title="つなぎ直しています" />
 }

@@ -56,6 +56,7 @@ export class Game {
   private scene: MapScene | null = null
 
   private stopTick: (() => void) | null = null
+  private mountVersion = 0
 
   // ------------------------------------------------------------------ lifecycle
 
@@ -90,9 +91,17 @@ export class Game {
   }
 
   /** Start the game in a container element. Browser only. */
-  mount(container: HTMLElement) {
+  async mount(container: HTMLElement) {
+    const version = ++this.mountVersion
     this.container = container
-    this.session.playerId = this.loadId()
+    try {
+      this.session.playerId = await this.loadId()
+    } catch {
+      if (version === this.mountVersion)
+        this.update({ failed: true, failureMessage: "キャラクターを読み込めなかった。接続と、このキャラクターで遊んだブラウザかどうかを確かめてください。保存データは変更していません。" })
+      return
+    }
+    if (version !== this.mountVersion) return
     this.session.rooms.world = hometownOf(this.session.playerId)
     this.update({ homeTown: this.session.rooms.world })
     this.update({ windows: this.windows.load() })
@@ -113,6 +122,7 @@ export class Game {
     this.update({ clock: { min: held ?? jstMinutes(Date.now()), held: held !== null } })
     // how the party is doing: our own room reports us, and tells us of the others
     const partyTick = window.setInterval(() => {
+      if (this.session.others.you) this.session.socket?.send({ type: "heartbeat" })
       if (this.state.get().player?.party) this.session.socket?.send({ type: "party-look" })
     }, 5_000)
     const tick = window.setInterval(() => {
@@ -131,12 +141,19 @@ export class Game {
   }
 
   unmount() {
+    this.mountVersion++
+    this.session.rooms.close()
     this.keys.unlisten()
     this.stopTick?.()
     this.leaveMap()
     this.scene?.destroy()
     this.scene = null
     this.container = null
+  }
+
+  leave() {
+    this.unmount()
+    this.update({ departed: true, modal: null, loading: null, online: "offline" })
   }
 
   // ------------------------------------------------------------------ reading
@@ -347,6 +364,7 @@ export class Game {
   }
 
   openModal(modal: ModalId | null) {
+    if (this.state.get().player?.profileComplete === false) modal = "character"
     this.windows.openModal(modal)
   }
 
@@ -461,6 +479,7 @@ export class Game {
   }
 
   private leaveMap() {
+    this.roomClient.cancel()
     this.session.engaged = null
     this.scene?.freeze(false)
     this.session.socket?.close()
@@ -490,6 +509,7 @@ export class Game {
   private setPlayer(player: PlayerState) {
     const before = this.state.get().player
     this.update({ player, derived: { ...derive(player), weight: carried(player) } })
+    if (!player.profileComplete) this.openModal("character")
     this.scene?.setAttackDelay(derive(player).attackDelay)
     this.scene?.setDown(player.hp <= 0)
     this.scene?.setSitting(player.sitting && player.hp > 0)

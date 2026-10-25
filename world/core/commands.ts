@@ -3,7 +3,7 @@ import { z } from "zod"
 import { BAG_SIZE, type Stack } from "./bag.ts"
 import { STATS, type Stat } from "./growth.ts"
 import { SLOTS, type CraftSkill, type GatherSkill, type ItemId, type Quality, type Slot } from "./items.ts"
-import { HOTBAR_SIZE, LOOK_COUNT, NECK_KINDS, NECK_RAMPS, hotbarEntry, itemId, nameSchema } from "./player.ts"
+import { HOTBAR_SIZE, LOOK_COUNT, NECK_KINDS, NECK_RAMPS, hotbarEntry, itemId, profileNameSchema } from "./player.ts"
 import { isShopId, type ShopId } from "./shops.ts"
 import { SKILL_IDS, type SkillId } from "./skills.ts"
 import type { Thread } from "./threads.ts"
@@ -50,7 +50,7 @@ export const commandSchema = z.discriminatedUnion("type", [
   }),
   z.object({
     type: z.literal("profile"),
-    name: nameSchema,
+    name: profileNameSchema,
     look: z
       .number()
       .int()

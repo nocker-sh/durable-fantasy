@@ -15,46 +15,78 @@ import { TOWN, timeFor, presence, mapPlayer, reachable, near, atWarp } from "./p
 
 async function join(roomCtx: Ctx, message: Message<"join">) {
   const { ctx, key, map, me, save } = roomCtx
-  if (me.player) return
-  // count them in; a channel already over full sends them to another
-  // the count and the player's record are asked for at once
-  const [room, data] = await Promise.all([Directory.get(`town-${key.world}`).arrive(key.map, key.channel, !!message.following), Player.get(message.player).read()])
-  if (!room) {
-    await ctx.connection.send({ type: "refused", what: "join", reason: "FULL" })
+  if (me.player || me.joining || !me.owner || message.player !== me.owner) return
+  save({ joining: true })
+  let counted = false
+  let admitted = false
+  try {
+    // count them in; a channel already over full sends them to another
+    // Read first so a failed read cannot leave an incremented channel count.
+    const data = await Player.get(me.owner).read()
+    const room = await Directory.get(`town-${key.world}`).arrive(key.map, key.channel, !!message.following)
+    counted = !!room
+    if (!room) {
+      await ctx.connection.send({ type: "refused", what: "join", reason: "FULL" })
+      return
+    }
+    // only their own town, or a friend's whose thread they hold (dev builds may go anywhere, for checks)
+    if (!import.meta.env.DEV && !mayVisit(message.player, data.threads, key.world)) {
+      await ctx.connection.send({ type: "refused", what: "join", reason: "NOT_YOUR_TOWN" })
+      return
+    }
+    if (presence(ctx.connection).closed) return
+    const arrival = await Player.get(me.owner).arrive(key.world, key.map, ctx.connection.id)
+    if (presence(ctx.connection).closed) {
+      await Player.get(me.owner).leave(ctx.connection.id)
+      return
+    }
+    if (!arrival.accepted) {
+      await ctx.connection.send({ type: "warped", map: arrival.map, at: arrival.at })
+      return
+    }
+    const at: Cell = walkable(map, arrival.at) ? arrival.at : (map.spawn as Cell)
+    const player = mapPlayer(ctx.connection.id, data, at)
+    save({ player, ready: data.profileComplete, owner: message.player, route: [at], since: Date.now(), held: message.time ?? null, down: data.hp <= 0, party: data.party, sitting: data.sitting })
+    admitted = true
+    const players: MapPlayer[] = []
+    for (const other of ctx.room.getConnections()) {
+      const otherPresence = presence(other)
+      if (other.id !== ctx.connection.id && otherPresence.owner === me.owner && otherPresence.player) {
+        other.close(4001, "Character opened elsewhere")
+        continue
+      }
+      const them = otherPresence.ready === false ? null : otherPresence.player
+      if (them && other.id !== ctx.connection.id) players.push(them)
+    }
+    const wild = SPAWNS.some((s) => s.map === key.map)
+    const rest = Promise.all([Nature.get(`town-${key.world}`).left(key.map), wild ? Wild.get(ctx.params.mapId).state(key.map) : null])
+    await ctx.connection.send({ type: "snapshot", you: player.id, me: data, players, at })
+    const [left, monsters] = await rest
+    if (presence(ctx.connection).closed) return
+    await ctx.connection.send({ type: "nodes", left })
+    if (monsters) await ctx.connection.send({ type: "wild", monsters })
+    if (data.profileComplete) await ctx.room.broadcast({ type: "joined", player }, [ctx.connection.id])
     return
+  } finally {
+    if (counted && !admitted) await Directory.get(`town-${key.world}`).depart(key.map, key.channel)
+    save({ joining: false })
   }
-  // only their own town, or a friend's whose thread they hold (dev builds may go anywhere, for checks)
-  if (!import.meta.env.DEV && !mayVisit(message.player, data.threads, key.world)) {
-    await Directory.get(`town-${key.world}`).depart(key.map, key.channel)
-    await ctx.connection.send({ type: "refused", what: "join", reason: "NOT_YOUR_TOWN" })
-    return
-  }
-  const at: Cell = walkable(map, message.at) ? message.at : (map.spawn as Cell)
-  const player = mapPlayer(ctx.connection.id, data, at)
-  save({ player, owner: message.player, route: [at], since: Date.now(), held: message.time ?? null, down: data.hp <= 0, party: data.party, sitting: data.sitting })
-  const players: MapPlayer[] = []
-  for (const other of ctx.room.getConnections()) {
-    const them = presence(other).player
-    if (them && other.id !== ctx.connection.id) players.push(them)
-  }
-  const wild = SPAWNS.some((s) => s.map === key.map)
-  const rest = Promise.all([Nature.get(`town-${key.world}`).left(key.map), wild ? Wild.get(ctx.params.mapId).state(key.map) : null])
-  await ctx.connection.send({ type: "snapshot", you: player.id, me: data, players })
-  const [left, monsters] = await rest
-  await ctx.connection.send({ type: "nodes", left })
-  if (monsters) await ctx.connection.send({ type: "wild", monsters })
-  await ctx.room.broadcast({ type: "joined", player }, [ctx.connection.id])
-  return
 }
 
 async function move(roomCtx: Ctx, message: Message<"move">) {
   const { ctx, map, me, save, standUp } = roomCtx
   if (!me.player) return
   if (me.engaged || me.down || me.trade?.open || !validPath(reachable(me), message.path, (c) => walkable(map, c))) {
-    await ctx.connection.send({ type: "refused", what: "move" })
+    const at = reachable(me)[0]
+    if (me.owner && (await Player.get(me.owner).walk(ctx.connection.id, [at]))) {
+      save({ player: { ...me.player, at }, route: [at], since: Date.now() })
+      await ctx.room.broadcast({ type: "moved", id: me.player.id, path: [at] }, [ctx.connection.id])
+    }
+    await ctx.connection.send({ type: "refused", what: "move", at })
     return
   }
   await standUp()
+  if (!me.owner || !(await Player.get(me.owner).walk(ctx.connection.id, message.path))) return
   const at = message.path[message.path.length - 1]
   save({ player: { ...me.player, at }, route: message.path, since: Date.now() })
   await ctx.room.broadcast({ type: "moved", id: me.player.id, path: message.path }, [ctx.connection.id])
@@ -101,6 +133,7 @@ async function revive(roomCtx: Ctx, _message: Message<"revive">) {
   if (!result.ok) return
   save({ down: false })
   // they come to where they last made their home in town
+  if (!(await Player.get(me.owner).travel(ctx.connection.id, result.state.savePoint.map, result.state.savePoint.cell as Cell))) return
   await ctx.connection.send({ type: "warped", map: result.state.savePoint.map, at: result.state.savePoint.cell as Cell })
   return
 }
@@ -137,6 +170,7 @@ async function warp(roomCtx: Ctx, message: Message<"warp">) {
       return
     }
   }
+  if (!me.owner || !(await Player.get(me.owner).travel(ctx.connection.id, warp.to.map, warp.to.at as Cell))) return
   await ctx.connection.send({ type: "warped", map: warp.to.map, at: warp.to.at as Cell })
   return
 }
