@@ -1,55 +1,67 @@
 // Commands a player can send to change their own data, and why one can be refused.
-import * as v from "valibot";
-import { BAG_SIZE, type Stack } from "./bag.ts";
-import { STATS, type Stat } from "./growth.ts";
-import { SLOTS, type CraftSkill, type GatherSkill, type ItemId, type Quality, type Slot } from "./items.ts";
-import { HOTBAR_SIZE, LOOK_COUNT, NECK_KINDS, NECK_RAMPS, hotbarEntry, itemId, nameSchema } from "./player.ts";
-import { isShopId, type ShopId } from "./shops.ts";
-import { SKILL_IDS, type SkillId } from "./skills.ts";
-import type { Thread } from "./threads.ts";
+import { z } from "zod"
+import { BAG_SIZE, type Stack } from "./bag.ts"
+import { STATS, type Stat } from "./growth.ts"
+import { SLOTS, type CraftSkill, type GatherSkill, type ItemId, type Quality, type Slot } from "./items.ts"
+import { HOTBAR_SIZE, LOOK_COUNT, NECK_KINDS, NECK_RAMPS, hotbarEntry, itemId, nameSchema } from "./player.ts"
+import { isShopId, type ShopId } from "./shops.ts"
+import { SKILL_IDS, type SkillId } from "./skills.ts"
+import type { Thread } from "./threads.ts"
 
-const shopId = v.custom<ShopId>((value) => typeof value === "string" && isShopId(value), "unknown shop");
-const slotIndex = v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(BAG_SIZE - 1));
-const equipSlot = v.picklist(SLOTS);
-const count = v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(99));
+const shopId = z.custom<ShopId>((value) => typeof value === "string" && isShopId(value), "unknown shop")
+const slotIndex = z
+  .number()
+  .int()
+  .min(0)
+  .max(BAG_SIZE - 1)
+const equipSlot = z.enum(SLOTS)
+const count = z.number().int().min(1).max(99)
 
-export const commandSchema = v.variant("type", [
+export const commandSchema = z.discriminatedUnion("type", [
   /** made things: which quality (the maker is the shop's) */
-  v.object({
-    type: v.literal("buy"),
+  z.object({
+    type: z.literal("buy"),
     shop: shopId,
     item: itemId,
     count,
-    q: v.optional(v.picklist([0, 1, 2, 3] as const)),
-    /** the price the buyer saw; refused if it moved */ price: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1))),
+    q: z.literal([0, 1, 2, 3] as const).optional(),
+    /** the price the buyer saw; refused if it moved */ price: z.number().int().min(1).optional(),
   }),
-  v.object({ type: v.literal("sell"), shop: shopId, slot: slotIndex, count }),
-  v.object({ type: v.literal("use"), slot: slotIndex }),
-  v.object({ type: v.literal("use-item"), item: itemId }),
-  v.object({ type: v.literal("move"), from: slotIndex, to: slotIndex }),
+  z.object({ type: z.literal("sell"), shop: shopId, slot: slotIndex, count }),
+  z.object({ type: z.literal("use"), slot: slotIndex }),
+  z.object({ type: z.literal("use-item"), item: itemId }),
+  z.object({ type: z.literal("move"), from: slotIndex, to: slotIndex }),
   /** wear the item in a bag slot; `to` picks one of two accessory slots */
-  v.object({ type: v.literal("equip"), slot: slotIndex, to: v.optional(equipSlot) }),
-  v.object({ type: v.literal("unequip"), slot: equipSlot }),
-  v.object({ type: v.literal("raise"), stat: v.picklist(STATS) }),
+  z.object({ type: z.literal("equip"), slot: slotIndex, to: equipSlot.optional() }),
+  z.object({ type: z.literal("unequip"), slot: equipSlot }),
+  z.object({ type: z.literal("raise"), stat: z.enum(STATS) }),
   /** skills (core/skills.ts): first aid or a prayer on yourself, sit down to rest, get up */
-  v.object({ type: v.literal("cast"), skill: v.picklist(SKILL_IDS) }),
-  v.object({ type: v.literal("sit") }),
-  v.object({ type: v.literal("stand") }),
-  v.object({
-    type: v.literal("hotbar"),
-    index: v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(HOTBAR_SIZE - 1)),
-    item: v.nullable(hotbarEntry),
+  z.object({ type: z.literal("cast"), skill: z.enum(SKILL_IDS) }),
+  z.object({ type: z.literal("sit") }),
+  z.object({ type: z.literal("stand") }),
+  z.object({
+    type: z.literal("hotbar"),
+    index: z
+      .number()
+      .int()
+      .min(0)
+      .max(HOTBAR_SIZE - 1),
+    item: hotbarEntry.nullable(),
   }),
-  v.object({
-    type: v.literal("profile"),
+  z.object({
+    type: z.literal("profile"),
     name: nameSchema,
-    look: v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(LOOK_COUNT - 1)),
-    neck: v.picklist(NECK_KINDS),
-    neckRamp: v.picklist(NECK_RAMPS),
+    look: z
+      .number()
+      .int()
+      .min(0)
+      .max(LOOK_COUNT - 1),
+    neck: z.enum(NECK_KINDS),
+    neckRamp: z.enum(NECK_RAMPS),
   }),
-]);
+])
 
-export type Command = v.InferOutput<typeof commandSchema>;
+export type Command = z.infer<typeof commandSchema>
 
 /** What only the server does to a player: tire them on the road out of town (game-system.md §3.6). */
 export type ServerCommand =
@@ -88,10 +100,10 @@ export type ServerCommand =
   /** a share of a creature a party member beat */
   | { type: "share"; exp: number; monster: string }
   /** pay for an art's blow (SP and the wait) before the room rolls it (game-system.md §9.3) */
-  | { type: "art"; skill: SkillId };
+  | { type: "art"; skill: SkillId }
 
 /** Commands that are only allowed next to a particular NPC (checked by the map room). */
-export const shopOf = (command: Command): ShopId | null => (command.type === "buy" || command.type === "sell" ? command.shop : null);
+export const shopOf = (command: Command): ShopId | null => (command.type === "buy" || command.type === "sell" ? command.shop : null)
 
 export type Reason =
   | "NOT_SOLD_HERE"
@@ -140,7 +152,7 @@ export type Reason =
   | "NOT_STORABLE"
   | "NOT_TRADABLE"
   | "COOLDOWN"
-  | "SP_SHORT";
+  | "SP_SHORT"
 
 export type GameEvent =
   | { type: "bought"; item: ItemId; count: number; cost: number; by?: string }
@@ -175,7 +187,7 @@ export type GameEvent =
   | { type: "sat" }
   | { type: "stood" }
   | { type: "shared"; monster: string; exp: number; level: number; gained: number }
-  | { type: "errand-done"; errand: string; gold: number; friends: Readonly<Record<string, number>> };
+  | { type: "errand-done"; errand: string; gold: number; friends: Readonly<Record<string, number>> }
 
 /** Text the UI shows for a refusal. */
 export const REASON_TEXT: Record<Reason, string> = {
@@ -226,4 +238,4 @@ export const REASON_TEXT: Record<Reason, string> = {
   NOT_TRADABLE: "それは渡せない。",
   COOLDOWN: "まだ使えない。",
   SP_SHORT: "SP が足りない。",
-};
+}
