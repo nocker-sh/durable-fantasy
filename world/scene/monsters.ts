@@ -1,0 +1,96 @@
+// The creatures on screen (core/monsters.ts): each is drawn where the clock puts it, hopping from
+// rest to rest; what the server says of their hurts shows as a little bar, blows as numbers that
+// float up, and a beaten slime bursts into little ones that scatter.
+import type * as THREE from "three";
+import { MONSTER_KINDS, SPAWNS, monsterAt, type Spawn } from "../core/monsters.ts";
+import { hareBody, slimeBody } from "./fields";
+import { isFree, walkH, type V2 } from "./world";
+
+export interface MonsterView {
+  spawn: Spawn;
+  body: THREE.Group;
+  pos: V2;
+  hp: number;
+  back: number;
+  /** the burst of little slimes, while it plays */
+  burst: { bits: THREE.Group[]; until: number } | null;
+  label: HTMLDivElement;
+}
+
+export function makeMonsters(root: THREE.Group, map: string): MonsterView[] {
+  return SPAWNS.filter((s) => s.map === map).map((spawn) => {
+    const kind = MONSTER_KINDS[spawn.kind];
+    const body = kind.look === "slime" ? slimeBody(kind.color ?? 0x8ac06a) : hareBody();
+    if (spawn.kind === "blue-slime") body.scale.setScalar(1.2);
+    body.userData.monster = spawn.id;
+    root.add(body);
+    const label = document.createElement("div");
+    label.className = "gx-nameplate gx-nameplate--npc";
+    label.innerHTML = `<span>${kind.name}</span><span class="gx-hp"><span></span></span>`;
+    return { spawn, body, pos: [0, 0] as V2, hp: kind.hp, back: 0, burst: null, label };
+  });
+}
+
+/** Move each to where the clock puts it, hop it, hide it while it is off recovering. */
+/** `yaw`: where the camera looks from; a creature sitting still turns its face that way. */
+export function updateMonsters(list: MonsterView[], root: THREE.Group, now: number, yaw = 0) {
+  for (const m of list) {
+    const away = m.back > now || m.hp === 0;
+    const at = monsterAt(m.spawn, now, (x, z) => isFree(x, z));
+    m.pos = [at.x, at.z];
+    m.body.visible = !away;
+    if (!away) {
+      // shuffling: small hops; sitting: a slow quiver, each to its own beat
+      const beat = now / 700 + m.body.id;
+      const hop = at.moving ? Math.abs(Math.sin(now / 220)) * 0.09 : 0;
+      const squash = at.moving ? 1 - Math.sin(now / 110) * 0.07 : 1 + Math.sin(beat) * 0.035;
+      m.body.position.set(at.x, walkH(at.x, at.z) + 0.06 + hop, at.z);
+      if (MONSTER_KINDS[m.spawn.kind].look === "slime") {
+        const sz = m.spawn.kind === "blue-slime" ? 1.2 : 1;
+        m.body.scale.set(sz / Math.sqrt(squash), sz * squash, sz / Math.sqrt(squash));
+      }
+      if (at.moving) {
+        const ahead = monsterAt(m.spawn, now + 200);
+        m.body.rotation.y = Math.atan2(ahead.x - at.x, ahead.z - at.z);
+      } else {
+        const d = Math.atan2(Math.sin(yaw - m.body.rotation.y), Math.cos(yaw - m.body.rotation.y));
+        m.body.rotation.y += d * 0.08;
+      }
+    }
+    if (m.burst) {
+      const k = 1 - (m.burst.until - now) / 1200;
+      m.burst.bits.forEach((b, i) => {
+        const a = (i / m.burst!.bits.length) * Math.PI * 2;
+        b.position.set(m.pos[0] + Math.cos(a) * k * 1.6, walkH(m.pos[0], m.pos[1]) + 0.05 + Math.sin(k * Math.PI) * 0.4, m.pos[1] + Math.sin(a) * k * 1.6);
+        b.scale.setScalar(0.45 * (1 - k * 0.5));
+      });
+      if (now >= m.burst.until) {
+        m.burst.bits.forEach((b) => root.remove(b));
+        m.burst = null;
+      }
+    }
+  }
+}
+
+/** The creature was beaten: a slime bursts into little ones that run off; a hare just bolts. */
+export function burst(m: MonsterView, root: THREE.Group, now: number) {
+  const kind = MONSTER_KINDS[m.spawn.kind];
+  if (kind.look !== "slime") return;
+  const bits = [0, 1, 2, 3].map(() => {
+    const b = slimeBody(kind.color ?? 0x8ac06a);
+    root.add(b);
+    return b;
+  });
+  m.burst = { bits, until: now + 1200 };
+}
+
+/** A free spot within reach of the creature, on the side we come from. */
+export function standBy(m: MonsterView, from: V2, reach: number): V2 | null {
+  const ang = Math.atan2(from[1] - m.pos[1], from[0] - m.pos[0]);
+  for (let k = 0; k < 8; k++) {
+    const a = ang + (k % 2 ? 1 : -1) * Math.ceil(k / 2) * (Math.PI / 4);
+    const p: V2 = [m.pos[0] + Math.cos(a) * reach * 0.7, m.pos[1] + Math.sin(a) * reach * 0.7];
+    if (isFree(p[0], p[1])) return p;
+  }
+  return null;
+}

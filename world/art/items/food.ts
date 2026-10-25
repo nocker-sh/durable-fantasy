@@ -1,0 +1,58 @@
+const SKEWER = [
+  "................",
+  ".............kk.",
+  "............kbk.",
+  "..........kkkk..",
+  ".........khmsk..",
+  "........khmmsk..",
+  "......kkkmssk...",
+  ".....khmskkk....",
+  "....khmmsk......",
+  "...kkkssk.......",
+  "..khmskk........",
+  ".khmmsk.........",
+  ".kbsskk.........",
+  "kbkkk...........",
+  "kk..............",
+  "................",
+];
+
+const DRIEDFISH = [
+  "................",
+  "..........kk....",
+  ".........kbbk...",
+  "........kkkk....",
+  ".......khhmk....",
+  "......khmmmsk...",
+  ".....khmwmmsk...",
+  ".....khmmmmsk...",
+  ".....kmmmmssk...",
+  ".....kmmmmssk...",
+  "......kmmssk....",
+  "......kmmssk....",
+  ".......kssk.....",
+  "......kmkkmk....",
+  ".....kmk..kmk...",
+  ".....kk....kk...",
+];
+
+const PIE = [
+  "................",
+  "................",
+  "................",
+  "................",
+  ".....kkkkkk.....",
+  "...kkhhhhhhkk...",
+  "..khhmhmmhmmhk..",
+  ".khmmhmmhmmhmsk.",
+  ".kmcmmcmmcmmcsk.",
+  ".kccccccccccccsk",
+  ".kbbbbbbbbbbbbk.",
+  "..kbbbbbbbbbbk..",
+  "...kkkkkkkkkk...",
+  "................",
+  "................",
+  "................",
+];
+
+export { SKEWER, DRIEDFISH, PIE };

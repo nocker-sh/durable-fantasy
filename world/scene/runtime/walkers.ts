@@ -1,0 +1,185 @@
+import type * as THREE from "three";
+import { walkH } from "../world";
+import { ANIM_DUR, type Anim, type Look } from "../figure";
+import { type Actor, Figure, allFigures } from "../actors";
+import { wearable } from "../../town/residents.ts";
+import type { Avatar, Cell } from "./types.ts";
+import type { Walker } from "./walker.ts";
+import { snap, center, STEP_SPEED } from "./grid.ts";
+
+export function createWalkers(scene: THREE.Scene, onPickPlayer: (id: string) => void) {
+  // ---------------------------------------------------------------- walkers (the player and other players)
+  let layer: HTMLElement | null = null;
+  const plate = (cls: string, text: string) => {
+    const el = document.createElement("div");
+    el.className = cls;
+    el.textContent = text;
+    layer?.appendChild(el);
+    return el;
+  };
+  function makeFigure(a: Avatar) {
+    const fig = new Figure(wearable(a.look));
+    fig.hold(a.held);
+    scene.add(fig.root);
+    return fig;
+  }
+  function dropFigure(fig: Figure) {
+    scene.remove(fig.root);
+    const i = allFigures.indexOf(fig);
+    if (i >= 0) allFigures.splice(i, 1);
+  }
+  const lookId = (l: Look) => JSON.stringify(l);
+  const looks = new WeakMap<Walker, string>();
+
+  const me: Walker = {
+    id: "me",
+    name: "",
+    pos: snap([19.25, 40.25]),
+    path: [],
+    head: Math.PI,
+    t: 0,
+    fig: makeFigure({ name: "", held: null, look: { top: "cCream", bottom: "cGray", jacket: "cRed", sex: "m", skin: "skin1", hair: "hBrown", style: "curly", eye: "cBlue" } }),
+    label: plate("gx-nameplate gx-nameplate--me", ""),
+  };
+  const movement = {
+    get pos() {
+      return me.pos;
+    },
+    get path() {
+      return me.path;
+    },
+    yaw: Math.PI / 4,
+    yawTarget: Math.PI / 4,
+    talkTarget: null as Actor | null,
+  };
+  const remotes = new Map<string, Walker>();
+
+  function setAvatar(a: Avatar) {
+    me.name = a.name;
+    me.label.textContent = a.name;
+    if (looks.get(me) !== lookId(a.look)) {
+      dropFigure(me.fig);
+      me.fig = makeFigure(a);
+      looks.set(me, lookId(a.look));
+      me.fig.prefetch("idle", a.held);
+      me.fig.prefetch("walk", a.held);
+    } else if (me.fig.item !== a.held) {
+      me.fig.hold(a.held);
+      me.fig.prefetch("idle", a.held);
+      me.fig.prefetch("walk", a.held);
+    }
+  }
+  function addRemote(id: string, a: Avatar, at: Cell) {
+    if (remotes.has(id)) {
+      updateRemote(id, a);
+      moveRemote(id, [at]);
+      return;
+    }
+    const w: Walker = { id, name: a.name, fig: makeFigure(a), pos: center(at), path: [], head: Math.random() * Math.PI * 2, t: 0, label: plate("gx-nameplate gx-nameplate--player", a.name) };
+    // another player's name can be clicked (to trade with them)
+    w.label.addEventListener("click", (e) => {
+      e.stopPropagation();
+      onPickPlayer(id);
+    });
+    looks.set(w, lookId(a.look));
+    w.fig.prefetch("idle", a.held);
+    w.fig.prefetch("walk", a.held);
+    remotes.set(id, w);
+  }
+  function updateRemote(id: string, a: Avatar) {
+    const w = remotes.get(id);
+    if (!w) return;
+    w.name = a.name;
+    w.label.textContent = a.name;
+    if (looks.get(w) !== lookId(a.look)) {
+      dropFigure(w.fig);
+      w.fig = makeFigure(a);
+      looks.set(w, lookId(a.look));
+    } else w.fig.hold(a.held);
+    w.fig.prefetch("idle", a.held);
+    w.fig.prefetch("walk", a.held);
+  }
+  function removeRemote(id: string) {
+    const w = remotes.get(id);
+    if (!w) return;
+    dropFigure(w.fig);
+    w.label.remove();
+    remotes.delete(id);
+  }
+  function clearRemotes() {
+    for (const id of remotes.keys()) removeRemote(id);
+  }
+  function moveRemote(id: string, cells: Cell[]) {
+    const w = remotes.get(id);
+    if (!w || !cells.length) return;
+    const pts = cells.map(center);
+    // far from where the path starts (missed messages): appear there
+    if (Math.hypot(pts[0][0] - w.pos[0], pts[0][1] - w.pos[1]) > 2) w.pos = pts[0];
+    w.path = pts;
+  }
+  /** what the player is doing with their hands for a moment (chopping, picking, fishing) */
+  let action: { anim: Anim; until: number } | null = null;
+  /** Step along the path from cell centre to cell centre; returns true while walking. */
+  function stepWalker(w: Walker, dt: number) {
+    if (!w.path.length && w === me && action && performance.now() < action.until) {
+      w.t += (dt * Math.PI * 2) / ANIM_DUR[action.anim];
+      w.fig.pose(action.anim, w.t);
+      return false;
+    }
+    if (!w.path.length) {
+      w.t += (dt * Math.PI * 2) / ANIM_DUR.idle;
+      w.fig.pose("idle", w.t);
+      return false;
+    }
+    const [tx, tz] = w.path[0];
+    const dx = tx - w.pos[0],
+      dz = tz - w.pos[1],
+      d = Math.hypot(dx, dz),
+      sp = STEP_SPEED * dt;
+    if (d <= sp) {
+      w.pos = [tx, tz];
+      w.path.shift();
+    } else w.pos = [w.pos[0] + (dx / d) * sp, w.pos[1] + (dz / d) * sp];
+    if (d > 1e-4) {
+      let diff = Math.atan2(dx, dz) - w.head;
+      while (diff > Math.PI) diff -= Math.PI * 2;
+      while (diff < -Math.PI) diff += Math.PI * 2;
+      w.head += diff * Math.min(1, dt * 14);
+    }
+    w.t += dt * 13;
+    w.fig.pose("walk", w.t);
+    return true;
+  }
+  function placeWalker(w: Walker) {
+    w.fig.root.position.set(w.pos[0], walkH(w.pos[0], w.pos[1]), w.pos[1]);
+    w.fig.face(w.head);
+    w.fig.refresh();
+  }
+
+  return {
+    me,
+    movement,
+    remotes,
+    setAvatar,
+    addRemote,
+    updateRemote,
+    removeRemote,
+    clearRemotes,
+    moveRemote,
+    stepWalker,
+    placeWalker,
+    plate,
+    get layer() {
+      return layer;
+    },
+    set layer(value: HTMLElement | null) {
+      layer = value;
+    },
+    get action() {
+      return action;
+    },
+    set action(value: typeof action) {
+      action = value;
+    },
+  };
+}
