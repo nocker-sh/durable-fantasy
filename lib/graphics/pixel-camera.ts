@@ -1,0 +1,69 @@
+import * as THREE from "three";
+
+/** A pixel-scaled perspective camera that follows outside a still central region. */
+export class PixelCamera {
+  readonly camera = new THREE.PerspectiveCamera(32, 1, 0.5, 200);
+  readonly focus: THREE.Vector3;
+  private readonly pitch = 0.82;
+  private readonly deadZone = 0.4;
+  private readonly zooms = [1, 2];
+  private centring = false;
+  private level = 0;
+  width = 1;
+  height = 1;
+  distance = 13;
+  get scale() {
+    return this.zooms[this.level];
+  }
+  constructor(
+    position: THREE.Vector3,
+    private readonly pixelsPerUnit: number,
+    private readonly onResize: (width: number, height: number, scale: number) => void,
+  ) {
+    this.focus = position.clone();
+  }
+  resize = (width = this.width, height = this.height) => {
+    this.width = Math.max(1, width);
+    this.height = Math.max(1, height);
+    const renderHeight = Math.ceil(this.height / this.scale);
+    this.onResize(this.width, this.height, this.scale);
+    this.distance = renderHeight / (2 * Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2)) * this.pixelsPerUnit);
+    this.camera.aspect = this.width / this.height;
+    this.camera.updateProjectionMatrix();
+  };
+  zoom = (delta: number) => {
+    this.level = Math.min(this.zooms.length - 1, Math.max(0, this.level + Math.sign(delta)));
+    this.resize();
+  };
+  zoomLevel = () => ({ level: this.level, max: this.zooms.length - 1 });
+  update(meAt: THREE.Vector3, yaw: number, turned: boolean, dt: number) {
+    const cam = this.camera,
+      camFocus = this.focus,
+      dist = this.distance,
+      pitch = this.pitch,
+      DEAD = this.deadZone;
+    let centring = this.centring;
+    if (turned) centring = true;
+    const want = meAt.clone();
+    if (!centring) {
+      const halfH = dist * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)),
+        halfW = halfH * cam.aspect;
+      const rx = Math.cos(yaw),
+        rz = -Math.sin(yaw),
+        fx = -Math.sin(yaw),
+        fz = -Math.cos(yaw);
+      const dx = meAt.x - camFocus.x,
+        dz = meAt.z - camFocus.z;
+      const sx = (dx * rx + dz * rz) / halfW,
+        sy = ((dx * fx + dz * fz) * Math.sin(pitch)) / halfH;
+      const ex = Math.sign(sx) * Math.max(0, Math.abs(sx) - DEAD),
+        ey = Math.sign(sy) * Math.max(0, Math.abs(sy) - DEAD);
+      want.set(camFocus.x + rx * ex * halfW + (fx * ey * halfH) / Math.sin(pitch), meAt.y, camFocus.z + rz * ex * halfW + (fz * ey * halfH) / Math.sin(pitch));
+    }
+    camFocus.lerp(want, Math.min(1, dt * (centring ? 6 : 10)));
+    if (centring && camFocus.distanceTo(meAt) < 0.05) centring = false;
+    cam.position.set(camFocus.x + Math.sin(yaw) * Math.cos(pitch) * dist, camFocus.y + Math.sin(pitch) * dist, camFocus.z + Math.cos(yaw) * Math.cos(pitch) * dist);
+    cam.lookAt(camFocus);
+    this.centring = centring;
+  }
+}
