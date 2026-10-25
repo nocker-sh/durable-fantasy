@@ -57,6 +57,6 @@ export default defineConfig({
   lint: {
     ignorePatterns: [".void/**", "dist/**", "public/**"],
   },
-  server: { ...localServer, port },
+  server: { ...localServer, port, watch: { ignored: [/\.json$/] } },
   preview: { ...localServer, port: process.env.PORT ? port : 4173 },
 })
