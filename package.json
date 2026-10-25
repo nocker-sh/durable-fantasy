@@ -10,7 +10,7 @@
     "build": "vp build",
     "preview": "vp preview",
     "test": "vp test run",
-    "typecheck": "tsc --noEmit -p .",
+    "typecheck": "vp exec void prepare && tsc --noEmit -p .",
     "lint": "vp lint",
     "test:dev-pages": "bun scripts/dev-overflow.ts"
   },
