@@ -1,0 +1,16 @@
+node_modules
+dist
+.void
+.wrangler
+.void-wrangler.jsonc
+.env
+.env.*
+!.env.example
+*.tsbuildinfo
+.DS_Store
+
+# pictures for /dev, made by scripts/shoot-maps.ts (kept out of the deployed assets)
+public/dev/
+
+# Regenerable resident sprite cache
+public/tmp/sprites/

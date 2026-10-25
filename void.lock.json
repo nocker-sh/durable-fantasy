@@ -1,0 +1,105 @@
+{
+  "version": 1,
+  "source": {},
+  "resolved": {
+    "account_id": "5b7537bae3233beb7ebbcdb7f47c3ec0",
+    "compatibility_date": "2026-02-24",
+    "durable_objects": {
+      "bindings": [
+        {
+          "name": "PLAYER",
+          "class_name": "PlayerDurableObject"
+        },
+        {
+          "name": "TownRoomWs",
+          "class_name": "TownRoomWs"
+        },
+        {
+          "name": "MapRoomWs",
+          "class_name": "MapRoomWs"
+        },
+        {
+          "name": "MARKET",
+          "class_name": "MarketDurableObject"
+        },
+        {
+          "name": "DIRECTORY",
+          "class_name": "DirectoryDurableObject"
+        },
+        {
+          "name": "NATURE",
+          "class_name": "NatureDurableObject"
+        },
+        {
+          "name": "EXCHANGE",
+          "class_name": "ExchangeDurableObject"
+        },
+        {
+          "name": "WILD",
+          "class_name": "WildDurableObject"
+        },
+        {
+          "name": "PARTY",
+          "class_name": "PartyDurableObject"
+        }
+      ]
+    },
+    "migrations": [
+      {
+        "tag": "void-durable-player-v1",
+        "new_sqlite_classes": [
+          "PlayerDurableObject"
+        ]
+      },
+      {
+        "tag": "void-ws-v1",
+        "new_sqlite_classes": [
+          "TownRoomWs"
+        ]
+      },
+      {
+        "tag": "void-ws-v1-2",
+        "new_sqlite_classes": [
+          "MapRoomWs"
+        ]
+      },
+      {
+        "tag": "void-durable-market-v1",
+        "new_sqlite_classes": [
+          "MarketDurableObject"
+        ]
+      },
+      {
+        "tag": "void-durable-directory-v1",
+        "new_sqlite_classes": [
+          "DirectoryDurableObject"
+        ]
+      },
+      {
+        "tag": "void-durable-nature-v1",
+        "new_sqlite_classes": [
+          "NatureDurableObject"
+        ]
+      },
+      {
+        "tag": "void-durable-exchange-v1",
+        "new_sqlite_classes": [
+          "ExchangeDurableObject"
+        ]
+      },
+      {
+        "tag": "void-durable-wild-v1",
+        "new_sqlite_classes": [
+          "WildDurableObject"
+        ]
+      },
+      {
+        "tag": "void-durable-party-v1",
+        "new_sqlite_classes": [
+          "PartyDurableObject"
+        ]
+      }
+    ]
+  },
+  "text": "{\n  \"account_id\": \"5b7537bae3233beb7ebbcdb7f47c3ec0\",\n  \"compatibility_date\": \"2026-02-24\",\n  \"durable_objects\": {\n    \"bindings\": [\n      {\n        \"name\": \"PLAYER\",\n        \"class_name\": \"PlayerDurableObject\"\n      },\n      {\n        \"name\": \"TownRoomWs\",\n        \"class_name\": \"TownRoomWs\"\n      },\n      {\n        \"name\": \"MapRoomWs\",\n        \"class_name\": \"MapRoomWs\"\n      },\n      {\n        \"name\": \"MARKET\",\n        \"class_name\": \"MarketDurableObject\"\n      },\n      {\n        \"name\": \"DIRECTORY\",\n        \"class_name\": \"DirectoryDurableObject\"\n      },\n      {\n        \"name\": \"NATURE\",\n        \"class_name\": \"NatureDurableObject\"\n      },\n      {\n        \"name\": \"EXCHANGE\",\n        \"class_name\": \"ExchangeDurableObject\"\n      },\n      {\n        \"name\": \"WILD\",\n        \"class_name\": \"WildDurableObject\"\n      },\n      {\n        \"name\": \"PARTY\",\n        \"class_name\": \"PartyDurableObject\"\n      }\n    ]\n  },\n  \"migrations\": [\n    {\n      \"tag\": \"void-durable-player-v1\",\n      \"new_sqlite_classes\": [\n        \"PlayerDurableObject\"\n      ]\n    },\n    {\n      \"tag\": \"void-ws-v1\",\n      \"new_sqlite_classes\": [\n        \"TownRoomWs\"\n      ]\n    },\n    {\n      \"tag\": \"void-ws-v1-2\",\n      \"new_sqlite_classes\": [\n        \"MapRoomWs\"\n      ]\n    },\n    {\n      \"tag\": \"void-durable-market-v1\",\n      \"new_sqlite_classes\": [\n        \"MarketDurableObject\"\n      ]\n    },\n    {\n      \"tag\": \"void-durable-directory-v1\",\n      \"new_sqlite_classes\": [\n        \"DirectoryDurableObject\"\n      ]\n    },\n    {\n      \"tag\": \"void-durable-nature-v1\",\n      \"new_sqlite_classes\": [\n        \"NatureDurableObject\"\n      ]\n    },\n    {\n      \"tag\": \"void-durable-exchange-v1\",\n      \"new_sqlite_classes\": [\n        \"ExchangeDurableObject\"\n      ]\n    },\n    {\n      \"tag\": \"void-durable-wild-v1\",\n      \"new_sqlite_classes\": [\n        \"WildDurableObject\"\n      ]\n    },\n    {\n      \"tag\": \"void-durable-party-v1\",\n      \"new_sqlite_classes\": [\n        \"PartyDurableObject\"\n      ]\n    }\n  ]\n}\n"
+}
