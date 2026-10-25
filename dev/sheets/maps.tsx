@@ -1,8 +1,8 @@
-import { Table, TableBody, TableCell, TableRow } from "#/components/ui/table.tsx";
-import { GRID_SIZE, WORLD, across, squareAt, type Side, type Square } from "#/world/maps/grid.ts";
-import { MAPS } from "#/world/maps/index.ts";
-import { sheet } from "./schema.ts";
-import { MAP_KIND, mapName, ref } from "./shared.tsx";
+import { Table, TableBody, TableCell, TableRow } from "#/components/ui/table.tsx"
+import { GRID_SIZE, WORLD, across, squareAt, type Side, type Square } from "#/world/maps/grid.ts"
+import { MAPS } from "#/world/maps/index.ts"
+import { sheet } from "./schema.ts"
+import { MAP_KIND, mapName, ref } from "./shared.tsx"
 
 const maps = sheet({
   id: "maps",
@@ -38,7 +38,7 @@ const maps = sheet({
             ],
           },
         ],
-});
+})
 
 /** The world grid as one table: a map's square links to it. */
 function WorldGrid() {
@@ -48,7 +48,7 @@ function WorldGrid() {
         {Array.from({ length: GRID_SIZE.rows }, (_, row) => (
           <TableRow key={row}>
             {Array.from({ length: GRID_SIZE.cols }, (_, col) => {
-              const q = squareAt(col, row);
+              const q = squareAt(col, row)
               return (
                 <TableCell key={col} className="h-10 border px-2 py-1 text-xs">
                   {q?.map ? (
@@ -59,16 +59,16 @@ function WorldGrid() {
                     <span className="text-muted-foreground">{q.city}</span>
                   ) : null}
                 </TableCell>
-              );
+              )
             })}
           </TableRow>
         ))}
       </TableBody>
     </Table>
-  );
+  )
 }
 
-const SIDE_NAME: Record<Side, string> = { n: "北", e: "東", s: "南", w: "西" };
+const SIDE_NAME: Record<Side, string> = { n: "北", e: "東", s: "南", w: "西" }
 
 const world = sheet<Square>({
   id: "world",
@@ -92,6 +92,6 @@ const world = sheet<Square>({
     },
   ],
   refs: (q) => [...ref("maps", q.map, "マップ"), ...(["n", "e", "s", "w"] as Side[]).flatMap((d) => ref("world", across(q, d)?.at.join(","), `${SIDE_NAME[d]}隣`))],
-});
+})
 
-export { maps, world };
+export { maps, world }

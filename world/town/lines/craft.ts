@@ -1,11 +1,11 @@
-import { lines as armorer } from "./households/armorer.ts";
-import { lines as woodworker } from "./households/woodworker.ts";
-import { lines as leather } from "./households/leather.ts";
-import { lines as potter } from "./households/potter.ts";
-import { lines as baskets } from "./households/baskets.ts";
-import { lines as mason } from "./households/mason.ts";
-import { lines as sweep } from "./households/sweep.ts";
-import type { Line } from "./line.ts";
+import { lines as armorer } from "./households/armorer.ts"
+import { lines as woodworker } from "./households/woodworker.ts"
+import { lines as leather } from "./households/leather.ts"
+import { lines as potter } from "./households/potter.ts"
+import { lines as baskets } from "./households/baskets.ts"
+import { lines as mason } from "./households/mason.ts"
+import { lines as sweep } from "./households/sweep.ts"
+import type { Line } from "./line.ts"
 
 export const LINES: Record<string, readonly Line[]> = {
   ベアトリクス: armorer["ベアトリクス"],
@@ -27,4 +27,4 @@ export const LINES: Record<string, readonly Line[]> = {
   ベルンハルト: sweep["ベルンハルト"],
   モニカ: sweep["モニカ"],
   トビアス: sweep["トビアス"],
-};
+}

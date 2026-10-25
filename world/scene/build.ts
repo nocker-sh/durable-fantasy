@@ -1,19 +1,19 @@
 // Public entry points; implementation lives in focused modules.
-export { type V2, glowMats, fireLights, houseGlows, lamps, stalls, updaters, chimneys, places, occluders, resetRegistries, occluder } from "./construction/registry.ts";
-export { addSprite, flatDecal } from "./construction/sprites.ts";
-export { type HouseOpts, oriels, buildHouses, leanTos, house } from "./construction/houses.ts";
-export { chapel } from "./construction/chapel.ts";
-export { fence } from "./construction/fences.ts";
-export { barrel, crate, sack, woodpile, table, bench, bucket, well } from "./construction/furniture.ts";
-export { stall } from "./construction/stalls.ts";
-export { tree, bush } from "./construction/vegetation.ts";
-export { cart, haystack } from "./construction/cart.ts";
-export { laundryLine } from "./construction/laundry.ts";
-export { forge, anvil, oven, trough, lantern } from "./construction/workshops.ts";
-export { crops } from "./construction/crops.ts";
-export { pigMesh, sheepMesh } from "./construction/livestock.ts";
-export { buildTown } from "./construction/town.ts";
-export { windmill } from "./construction/windmill.ts";
-export { M } from "./construction/materials.ts";
-export { PPU } from "./textures";
-export { signTex } from "./textures";
+export { type V2, glowMats, fireLights, houseGlows, lamps, stalls, updaters, chimneys, places, occluders, resetRegistries, occluder } from "./construction/registry.ts"
+export { addSprite, flatDecal } from "./construction/sprites.ts"
+export { type HouseOpts, oriels, buildHouses, leanTos, house } from "./construction/houses.ts"
+export { chapel } from "./construction/chapel.ts"
+export { fence } from "./construction/fences.ts"
+export { barrel, crate, sack, woodpile, table, bench, bucket, well } from "./construction/furniture.ts"
+export { stall } from "./construction/stalls.ts"
+export { tree, bush } from "./construction/vegetation.ts"
+export { cart, haystack } from "./construction/cart.ts"
+export { laundryLine } from "./construction/laundry.ts"
+export { forge, anvil, oven, trough, lantern } from "./construction/workshops.ts"
+export { crops } from "./construction/crops.ts"
+export { pigMesh, sheepMesh } from "./construction/livestock.ts"
+export { buildTown } from "./construction/town.ts"
+export { windmill } from "./construction/windmill.ts"
+export { M } from "./construction/materials.ts"
+export { PPU } from "./textures"
+export { signTex } from "./textures"

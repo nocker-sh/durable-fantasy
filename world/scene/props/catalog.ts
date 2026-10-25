@@ -1,9 +1,9 @@
-import type { Thing } from "./types.ts";
-import { ashThings } from "./ash.ts";
-import { waterThings } from "./water.ts";
-import { eavesThings } from "./eaves.ts";
-import { animalsThings } from "./animals.ts";
-import { workThings } from "./work.ts";
+import type { Thing } from "./types.ts"
+import { ashThings } from "./ash.ts"
+import { waterThings } from "./water.ts"
+import { eavesThings } from "./eaves.ts"
+import { animalsThings } from "./animals.ts"
+import { workThings } from "./work.ts"
 
 export const THINGS: Readonly<Record<string, Thing>> = {
   "ash-broom": ashThings["ash-broom"],
@@ -47,7 +47,7 @@ export const THINGS: Readonly<Record<string, Thing>> = {
   "rope-coil": workThings["rope-coil"],
   "bird-feeder": animalsThings["bird-feeder"],
   cat: animalsThings["cat"],
-};
+}
 
 /** What a household keeps by its walls, by what it does and how it lives. */
 /** What each household keeps by its walls beyond what every house has (things.test.ts: every household is here, every thing is used). */
@@ -90,13 +90,13 @@ export const THINGS_BY_HOUSEHOLD: Record<string, readonly string[]> = {
   hunter: ["boots", "sawhorse", "log-basket", "wood-stack", "drying-hide"],
   teacher: ["stool", "boots", "cat", "bench", "bird-feeder"],
   retired: ["stool", "birdcage", "crock", "cat", "bench", "flower-box", "bird-feeder"],
-};
+}
 
 export function thingsFor(trade: string | undefined, living: string | undefined, vacant: boolean): string[] {
-  if (vacant) return ["ash-heap", "doormat"];
-  const out = ["ash-broom", "doormat", "lidded-bucket", "ash-heap", "kindling"];
-  if (living !== "慎ましい") out.push("water-butt", "postbox", "hand-lantern");
-  else out.push("ash-shovel", "log-basket");
-  out.push(...(THINGS_BY_HOUSEHOLD[trade ?? ""] ?? ["stool"]));
-  return out;
+  if (vacant) return ["ash-heap", "doormat"]
+  const out = ["ash-broom", "doormat", "lidded-bucket", "ash-heap", "kindling"]
+  if (living !== "慎ましい") out.push("water-butt", "postbox", "hand-lantern")
+  else out.push("ash-shovel", "log-basket")
+  out.push(...(THINGS_BY_HOUSEHOLD[trade ?? ""] ?? ["stool"]))
+  return out
 }

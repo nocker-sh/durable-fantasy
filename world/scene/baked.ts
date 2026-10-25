@@ -3,8 +3,8 @@
 
 /** sprites.json: which resident looks the strips were baked from. */
 export interface SpriteManifest {
-  frame: [number, number];
-  residents: { name: string; key: string; anims: Record<string, number> }[];
+  frame: [number, number]
+  residents: { name: string; key: string; anims: Record<string, number> }[]
 }
 
-export const stripFile = (resident: number, anim: string, view: number) => `${resident}-${anim}-${view}.webp`;
+export const stripFile = (resident: number, anim: string, view: number) => `${resident}-${anim}-${view}.webp`

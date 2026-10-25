@@ -1,5 +1,5 @@
-import { food, dish, medicine, tool, material, gear } from "./factories.ts";
-import type { ItemDefinition } from "./types.ts";
+import { food, dish, medicine, tool, material, gear } from "./factories.ts"
+import type { ItemDefinition } from "./types.ts"
 
 const DEFINITIONS = {
   // ---------------------------------------------------------------- food (shops on the market)
@@ -335,10 +335,10 @@ const DEFINITIONS = {
     icon: "bell",
     description: "羊の首に下げる鈴。振ると澄んだ音がする。",
   },
-} satisfies Record<string, ItemDefinition>;
+} satisfies Record<string, ItemDefinition>
 
-export type ItemId = keyof typeof DEFINITIONS;
+export type ItemId = keyof typeof DEFINITIONS
 
-export const ITEMS: Readonly<Record<ItemId, ItemDefinition>> = DEFINITIONS;
+export const ITEMS: Readonly<Record<ItemId, ItemDefinition>> = DEFINITIONS
 
-export const ITEM_IDS = Object.keys(ITEMS) as ItemId[];
+export const ITEM_IDS = Object.keys(ITEMS) as ItemId[]

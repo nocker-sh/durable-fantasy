@@ -1,15 +1,15 @@
-import { RowLink } from "./links.tsx";
-import { formatTime } from "#/world/core/clock.ts";
-import { RESIDENTS, RESIDENT_LOOKS } from "#/world/town/residents.ts";
-import { SIZES, TILE_M } from "#/world/town/fit.ts";
-import { HOUSEHOLDS, HOUSES, bedsOf, floorsOf, householdOf } from "#/world/town/houses.ts";
-import { INTERIORS } from "#/world/town/interiors.ts";
-import { buildInterior } from "#/world/scene/interior.ts";
-import { ALL_LINES } from "#/world/town/lines/index.ts";
-import { PEOPLE, RELATIONS } from "#/world/town/people.ts";
-import { ROUTINES } from "#/world/town/routines.ts";
-import { sheet } from "./schema.ts";
-import { AGE, residentIndex, homeOf, ref, mapName, HOUSE_KIND } from "./shared.tsx";
+import { RowLink } from "./links.tsx"
+import { formatTime } from "#/world/core/clock.ts"
+import { RESIDENTS, RESIDENT_LOOKS } from "#/world/town/residents.ts"
+import { SIZES, TILE_M } from "#/world/town/fit.ts"
+import { HOUSEHOLDS, HOUSES, bedsOf, floorsOf, householdOf } from "#/world/town/houses.ts"
+import { INTERIORS } from "#/world/town/interiors.ts"
+import { buildInterior } from "#/world/scene/interior.ts"
+import { ALL_LINES } from "#/world/town/lines/index.ts"
+import { PEOPLE, RELATIONS } from "#/world/town/people.ts"
+import { ROUTINES } from "#/world/town/routines.ts"
+import { sheet } from "./schema.ts"
+import { AGE, residentIndex, homeOf, ref, mapName, HOUSE_KIND } from "./shared.tsx"
 
 const npcs = sheet({
   id: "npcs",
@@ -23,14 +23,14 @@ const npcs = sheet({
     {
       label: "家",
       get: (r) => {
-        const h = homeOf(r.name);
+        const h = homeOf(r.name)
         return h ? (
           <RowLink sheet="houses" id={h.id}>
             {h.name}
           </RowLink>
         ) : (
           ""
-        );
+        )
       },
     },
   ],
@@ -41,7 +41,7 @@ const npcs = sheet({
     ...[...new Set((ROUTINES[r.name] ?? []).flatMap((s) => (typeof s.where === "object" ? [s.where.map] : [])))].map((m) => ({ sheet: "maps", id: m, as: "出かける先" })),
   ],
   more: (r) => {
-    const p = PEOPLE[r.name];
+    const p = PEOPLE[r.name]
     return [
       ...(p ? [{ title: "人柄", head: ["性格", "話し方", "口癖"], rows: [[p.traits.join("・"), p.speech, p.habit]] }] : []),
       {
@@ -56,9 +56,9 @@ const npcs = sheet({
         head: ["台詞", "時間帯", "していること", "近くに", "親しさ", "出来事"],
         rows: (ALL_LINES[r.name] ?? []).map((l) => [l.text, l.phase?.join("・") ?? "", l.doing ?? "", l.near ?? "", l.friend ?? "", l.event ?? ""]),
       },
-    ];
+    ]
   },
-});
+})
 
 const relations = sheet({
   id: "relations",
@@ -69,7 +69,7 @@ const relations = sheet({
   kind: (x) => x.kind,
   cols: [{ label: "こと", get: (x) => x.note }],
   refs: (x) => [...ref("npcs", x.a, x.kind), ...ref("npcs", x.b, x.kind)],
-});
+})
 
 const households = sheet({
   id: "households",
@@ -83,7 +83,7 @@ const households = sheet({
     { label: "暮らし", get: (h) => h.trade },
   ],
   refs: (h) => h.members.map((m) => ({ sheet: "npcs", id: m, as: "家族" })),
-});
+})
 
 const houses = sheet({
   id: "houses",
@@ -107,13 +107,13 @@ const houses = sheet({
   ],
   // the room you walk into, as the game draws it
   build: (h) => {
-    const it = INTERIORS.find((i) => i.house.id === h.id);
-    return it ? (root) => buildInterior(it)(root) : null;
+    const it = INTERIORS.find((i) => i.house.id === h.id)
+    return it ? (root) => buildInterior(it)(root) : null
   },
   more: (h) => [
     { title: "部屋", head: ["部屋", "階", "寝台"], rows: h.plan.rooms.map((r) => [r.name, r.floor + 1, r.beds ?? 0]) },
     { title: "家具", head: ["家具"], rows: h.plan.furniture.map((f) => [f]) },
   ],
-});
+})
 
-export { npcs, relations, households, houses };
+export { npcs, relations, households, houses }

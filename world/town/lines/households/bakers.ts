@@ -1,4 +1,4 @@
-import type { Line } from "../line.ts";
+import type { Line } from "../line.ts"
 
 const lines = {
   マルタ: [
@@ -153,6 +153,6 @@ const lines = {
     { text: "はじめましてなの。パン屋のローザ。籠を持つのが仕事なの。", first: true },
     { text: "お兄ちゃんに用？わたしに言ってくれたほうが早いの。", first: true },
   ],
-} satisfies Record<string, readonly Line[]>;
+} satisfies Record<string, readonly Line[]>
 
-export { lines };
+export { lines }

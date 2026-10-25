@@ -1,4 +1,4 @@
-import type { Line } from "../line.ts";
+import type { Line } from "../line.ts"
 
 const lines = {
   ヒルデ: [
@@ -96,6 +96,6 @@ const lines = {
     { text: "大きい手だろう。細かい結び目は、ヒルデにほどいてもらう。" },
     { text: "荷を担いで町を歩くと、みんな道を開けてくれる。悪いなあ。" },
   ],
-} satisfies Record<string, readonly Line[]>;
+} satisfies Record<string, readonly Line[]>
 
-export { lines };
+export { lines }

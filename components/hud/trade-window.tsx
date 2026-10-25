@@ -1,24 +1,24 @@
 // Trading face to face (game-system.md §11, core/trade.ts): pick a player by name to ask; what each
 // side puts up shows on both sides; both settle ("決定"), then both press "交換".
-import { useState } from "react";
-import { ITEMS } from "#/world/core/items.ts";
-import { displayName } from "#/world/core/makers.ts";
-import { TRADE_LOTS } from "#/world/core/trade.ts";
-import type { TradeSideView } from "#/world/protocol.ts";
-import { useGame, useGameState } from "#/components/game/context.tsx";
-import { Button } from "#/components/game/button.tsx";
-import { Gold } from "#/components/game/gold.tsx";
-import { Input } from "#/components/game/input.tsx";
-import { Panel } from "#/components/game/panel.tsx";
-import { Slot } from "#/components/game/slot.tsx";
-import { Window } from "#/components/game/window.tsx";
-import { ItemTooltip } from "./item-tooltip.tsx";
+import { useState } from "react"
+import { ITEMS } from "#/world/core/items.ts"
+import { displayName } from "#/world/core/makers.ts"
+import { TRADE_LOTS } from "#/world/core/trade.ts"
+import type { TradeSideView } from "#/world/protocol.ts"
+import { useGame, useGameState } from "#/components/game/context.tsx"
+import { Button } from "#/components/game/button.tsx"
+import { Gold } from "#/components/game/gold.tsx"
+import { Input } from "#/components/game/input.tsx"
+import { Panel } from "#/components/game/panel.tsx"
+import { Slot } from "#/components/game/slot.tsx"
+import { Window } from "#/components/game/window.tsx"
+import { ItemTooltip } from "./item-tooltip.tsx"
 
 /** A player picked by name: ask them to trade. */
 export function PlayerMenu() {
-  const game = useGame();
-  const menu = useGameState((s) => s.playerMenu);
-  if (!menu) return null;
+  const game = useGame()
+  const menu = useGameState((s) => s.playerMenu)
+  if (!menu) return null
   return (
     <Panel className="pointer-events-auto absolute top-24 left-1/2 flex -translate-x-1/2 items-center gap-2 p-2">
       <span className="font-head text-sm text-brass-hi">{menu.name}</span>
@@ -35,14 +35,14 @@ export function PlayerMenu() {
         閉じる
       </Button>
     </Panel>
-  );
+  )
 }
 
 /** Someone asks to trade. */
 export function TradeAsk() {
-  const game = useGame();
-  const ask = useGameState((s) => s.tradeAsk);
-  if (!ask) return null;
+  const game = useGame()
+  const ask = useGameState((s) => s.tradeAsk)
+  if (!ask) return null
   return (
     <Panel className="pointer-events-auto absolute top-24 left-1/2 flex -translate-x-1/2 items-center gap-2 p-2">
       <span className="font-body text-[13px]">{ask.name}から取引の申し込み</span>
@@ -53,11 +53,11 @@ export function TradeAsk() {
         断る
       </Button>
     </Panel>
-  );
+  )
 }
 
 function Side({ title, side, onPick }: { title: string; side: TradeSideView; onPick?: (i: number) => void }) {
-  const game = useGame();
+  const game = useGame()
   return (
     <div className="flex min-w-0 flex-1 flex-col gap-1.5">
       <div className="flex items-center justify-between font-head text-xs">
@@ -73,8 +73,8 @@ function Side({ title, side, onPick }: { title: string; side: TradeSideView; onP
               count={s?.count}
               aria-label={s ? `${displayName(s.item, s.by)} ×${s.count}` : "空き"}
               onContextMenu={(e) => {
-                e.preventDefault();
-                if (s && onPick) onPick(i);
+                e.preventDefault()
+                if (s && onPick) onPick(i)
               }}
             />
           </ItemTooltip>
@@ -82,17 +82,17 @@ function Side({ title, side, onPick }: { title: string; side: TradeSideView; onP
       </div>
       <Gold amount={side.gold} className="text-xs text-text-dim" />
     </div>
-  );
+  )
 }
 
 export function TradeWindow() {
-  const game = useGame();
-  const trade = useGameState((s) => s.trade);
-  const player = useGameState((s) => s.player);
-  const [gold, setGold] = useState("");
-  if (!trade || !player) return null;
-  const { mine, theirs, lots } = trade;
-  const g = Math.min(player.gold, Number(gold) || 0);
+  const game = useGame()
+  const trade = useGameState((s) => s.trade)
+  const player = useGameState((s) => s.player)
+  const [gold, setGold] = useState("")
+  if (!trade || !player) return null
+  const { mine, theirs, lots } = trade
+  const g = Math.min(player.gold, Number(gold) || 0)
   return (
     <Window id="trade" title={`${trade.name}との取引`} z={35} onClose={() => game.cancelTrade()} initial={(w) => ({ x: Math.max(12, w / 2 - 260), y: 110 })} className="w-[520px]">
       <div className="flex gap-3">
@@ -132,5 +132,5 @@ export function TradeWindow() {
         </div>
       </div>
     </Window>
-  );
+  )
 }

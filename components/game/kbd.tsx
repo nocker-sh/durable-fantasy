@@ -1,9 +1,9 @@
 // Copied from the dev shadcn Kbd: a small keycap for shortcut hints.
-import { cn } from "cn";
+import { cn } from "cn"
 
 function Kbd({ className, children, ...props }: React.ComponentProps<"kbd">) {
   // key names in Latin letters use the 8px pixel face; anything else the heading face
-  const latin = typeof children === "string" && /^[\x20-\x7e]+$/.test(children);
+  const latin = typeof children === "string" && /^[\x20-\x7e]+$/.test(children)
   return (
     <kbd
       data-slot="kbd"
@@ -16,7 +16,7 @@ function Kbd({ className, children, ...props }: React.ComponentProps<"kbd">) {
     >
       {children}
     </kbd>
-  );
+  )
 }
 
-export { Kbd };
+export { Kbd }

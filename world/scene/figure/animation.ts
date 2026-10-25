@@ -1,5 +1,5 @@
-import { poseSkel, clipDur, type Skel, type Proportions } from "../rig";
-import type { Look } from "./look.ts";
+import { poseSkel, clipDur, type Skel, type Proportions } from "../rig"
+import type { Look } from "./look.ts"
 
 export type Anim =
   | "idle"
@@ -22,17 +22,17 @@ export type Anim =
   | "play"
   | "pump"
   | "sword"
-  | "guard";
+  | "guard"
 
 /** Each villager action plays a stretch of a baked humanoid clip (see rig.ts). */
 export interface AnimSpec {
-  clip: string;
-  n: number;
-  t0?: number;
-  t1?: number;
-  still?: boolean;
-  seatY?: number;
-  blink?: number[] | true;
+  clip: string
+  n: number
+  t0?: number
+  t1?: number
+  still?: boolean
+  seatY?: number
+  blink?: number[] | true
 }
 
 // frame counts give every anim about 8 frames a second
@@ -58,31 +58,31 @@ export const ANIMS: Record<Anim, AnimSpec> = {
   peel: { clip: "PickUp_Table", n: 8 },
   sword: { clip: "Sword_Regular_Combo", n: 24, still: true },
   guard: { clip: "Idle_Sword", n: 17, blink: [5] },
-};
+}
 
-export const FRAMES = Object.fromEntries(Object.entries(ANIMS).map(([k, v]) => [k, v.n])) as Record<Anim, number>;
+export const FRAMES = Object.fromEntries(Object.entries(ANIMS).map(([k, v]) => [k, v.n])) as Record<Anim, number>
 
 /** Seconds one loop of the anim takes. */
-export const ANIM_DUR = Object.fromEntries(Object.entries(ANIMS).map(([k, v]) => [k, clipDur(v.clip) * ((v.t1 ?? 1) - (v.t0 ?? 0))])) as Record<Anim, number>;
+export const ANIM_DUR = Object.fromEntries(Object.entries(ANIMS).map(([k, v]) => [k, clipDur(v.clip) * ((v.t1 ?? 1) - (v.t0 ?? 0))])) as Record<Anim, number>
 
 // Character proportions: about 3.5 heads tall, narrow shoulders, long slender legs
-const SHW = (fem: boolean, S: number) => (fem ? 0.09 : 0.1) * S;
+const SHW = (fem: boolean, S: number) => (fem ? 0.09 : 0.1) * S
 
 function proportions(L: Look): Proportions {
   const fem = L.sex === "f",
-    S = L.age === "child" ? 0.74 : 1;
-  return { hipY: (fem ? 0.6 : 0.62) * S, shoulderY: (fem ? 0.39 : 0.41) * S, shW: SHW(fem, S), hipW: (fem ? 0.05 : 0.06) * S, S };
+    S = L.age === "child" ? 0.74 : 1
+  return { hipY: (fem ? 0.6 : 0.62) * S, shoulderY: (fem ? 0.39 : 0.41) * S, shW: SHW(fem, S), hipW: (fem ? 0.05 : 0.06) * S, S }
 }
 
 function skelFor(L: Look, a: Anim, f: number): Skel {
-  const A = ANIMS[a];
-  const t = (A.t0 ?? 0) + ((A.t1 ?? 1) - (A.t0 ?? 0)) * (f / A.n);
-  return poseSkel(A.clip, { t, still: A.still, seatY: A.seatY }, proportions(L));
+  const A = ANIMS[a]
+  const t = (A.t0 ?? 0) + ((A.t1 ?? 1) - (A.t0 ?? 0)) * (f / A.n)
+  return poseSkel(A.clip, { t, still: A.still, seatY: A.seatY }, proportions(L))
 }
 
 const blinks = (a: Anim, f: number) => {
-  const b = ANIMS[a].blink;
-  return b === true || !!b?.includes(f);
-};
+  const b = ANIMS[a].blink
+  return b === true || !!b?.includes(f)
+}
 
-export { SHW, skelFor, blinks };
+export { SHW, skelFor, blinks }

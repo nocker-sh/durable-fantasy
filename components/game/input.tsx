@@ -1,6 +1,6 @@
 // Copied from the dev shadcn Input and restyled: ecru text in a sunken strip.
-import { Input as InputPrimitive } from "@base-ui/react/input";
-import { cn } from "cn";
+import { Input as InputPrimitive } from "@base-ui/react/input"
+import { cn } from "cn"
 
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (
@@ -13,7 +13,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
       )}
       {...props}
     />
-  );
+  )
 }
 
-export { Input };
+export { Input }

@@ -1,31 +1,31 @@
 // The world map (ui.md §3.3): the maps as places joined by roads, where you are, and the cities
 // still beyond reach.
-import { useGameState } from "#/components/game/context.tsx";
-import { Window } from "#/components/game/window.tsx";
-import { MAPS, isOpen } from "#/world/maps/index.ts";
-import { GRID_SIZE, WORLD } from "#/world/maps/grid.ts";
-import { LOCKED_CITIES, WORLD_NODES, worldNodeOf, worldRoads } from "#/world/maps/world-map.ts";
-import { useWindow } from "./use-window.ts";
+import { useGameState } from "#/components/game/context.tsx"
+import { Window } from "#/components/game/window.tsx"
+import { MAPS, isOpen } from "#/world/maps/index.ts"
+import { GRID_SIZE, WORLD } from "#/world/maps/grid.ts"
+import { LOCKED_CITIES, WORLD_NODES, worldNodeOf, worldRoads } from "#/world/maps/world-map.ts"
+import { useWindow } from "./use-window.ts"
 
 const W = 360,
-  H = 300;
+  H = 300
 const CW = W / GRID_SIZE.cols,
-  CH = H / GRID_SIZE.rows;
-const px = (x: number) => (x / 100) * W;
-const py = (y: number) => (y / 100) * H;
+  CH = H / GRID_SIZE.rows
+const px = (x: number) => (x / 100) * W
+const py = (y: number) => (y / 100) * H
 /** A district's own name, without its city's. */
-const shortName = (id: string) => MAPS[id].name.split(" ― ").pop()!;
+const shortName = (id: string) => MAPS[id].name.split(" ― ").pop()!
 
 export function WorldmapWindow() {
-  const win = useWindow("worldmap");
-  const map = useGameState((s) => s.map);
-  if (!win.open) return null;
-  const here = worldNodeOf(map.id);
-  const roads = worldRoads();
+  const win = useWindow("worldmap")
+  const map = useGameState((s) => s.map)
+  if (!win.open) return null
+  const here = worldNodeOf(map.id)
+  const roads = worldRoads()
   // the town's squares, to ring them and name the town beside them
-  const town = WORLD_NODES.filter((n) => n.city);
+  const town = WORLD_NODES.filter((n) => n.city)
   const tx0 = Math.min(...town.map((n) => n.x)),
-    ty1 = Math.max(...town.map((n) => n.y));
+    ty1 = Math.max(...town.map((n) => n.y))
   return (
     <Window id="worldmap" title="地図" hotkey="M" {...win.props} key={win.key} initial={(w, h) => ({ x: Math.round(w / 2 - W / 2 - 12), y: Math.round(h / 2 - H / 2 - 40) })}>
       <div className="ui-well relative overflow-hidden bg-[radial-gradient(circle_at_45%_60%,#2a3a3a,#141a22_75%)]" style={{ width: W, height: H }}>
@@ -60,12 +60,12 @@ export function WorldmapWindow() {
             />
           ))}
           {LOCKED_CITIES.map((c) => {
-            const from = WORLD_NODES.find((n) => n.id === c.from)!;
-            return <line key={c.name} x1={px(from.x)} y1={py(from.y)} x2={px(c.x)} y2={py(c.y)} stroke="#6a6458" strokeWidth={2} strokeDasharray="2 4" />;
+            const from = WORLD_NODES.find((n) => n.id === c.from)!
+            return <line key={c.name} x1={px(from.x)} y1={py(from.y)} x2={px(c.x)} y2={py(c.y)} stroke="#6a6458" strokeWidth={2} strokeDasharray="2 4" />
           })}
         </svg>
         {WORLD_NODES.map((n) => {
-          const isHere = here?.id === n.id;
+          const isHere = here?.id === n.id
           return (
             <div
               key={n.id}
@@ -84,7 +84,7 @@ export function WorldmapWindow() {
               />
               <span className={`mt-0.5 text-center font-head text-[10px] leading-tight ui-text-shadow ${isHere ? "text-me" : "text-text-dim"}`}>{n.city ? shortName(n.id) : MAPS[n.id].name}</span>
             </div>
-          );
+          )
         })}
         {/* the town's name, just below its squares */}
         <span className="absolute whitespace-nowrap font-head text-xs text-brass-hi ui-text-shadow" style={{ left: px(tx0) - CW / 2 + 6, top: py(ty1) - CH / 2 + 6 }}>
@@ -103,5 +103,5 @@ export function WorldmapWindow() {
         現在地: <span className="text-me">{map.name}</span>
       </p>
     </Window>
-  );
+  )
 }

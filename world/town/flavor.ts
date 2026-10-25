@@ -4,8 +4,8 @@
 // A passage with `at` belongs to that map and is shown when going there; the rest go anywhere.
 
 export interface Flavor {
-  text: string;
-  at?: string;
+  text: string
+  at?: string
 }
 
 export const FLAVOR: readonly Flavor[] = [
@@ -61,10 +61,10 @@ export const FLAVOR: readonly Flavor[] = [
   { text: "知らない顔の旅人がいても、誰も驚かない。\n歪みは、ずっと前から日常のこと。" },
   { text: "同じ顔の住人が、自分のことを知らない日がある。\nそういう日は、少しだけ遠回りして帰る。" },
   { text: "終わりは、ゆっくり来るものだと皆が知っている。\nだから今夜のスープを、ちゃんと温める。" },
-];
+]
 
 /** A passage for going to `map`: one of that place's, or one from anywhere, at random. */
 export function flavorFor(map: string, random = Math.random): Flavor {
-  const here = FLAVOR.filter((f) => !f.at || f.at === map || map.startsWith(`${f.at}-in-`));
-  return here[Math.floor(random() * here.length)] ?? FLAVOR[0];
+  const here = FLAVOR.filter((f) => !f.at || f.at === map || map.startsWith(`${f.at}-in-`))
+  return here[Math.floor(random() * here.length)] ?? FLAVOR[0]
 }

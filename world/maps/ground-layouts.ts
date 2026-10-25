@@ -1,14 +1,14 @@
 // The ground plans (world.ts Layout) of the districts beyond the square, the fields and the
 // rooms: data and landforms only, with nothing drawn, so the workers that paint the ground can
 // load them without the scene.
-import { OFF, OFF_LINE, OFF_POINT, catmull, smooth, type Layout } from "./layout.ts";
-import { fbm } from "../../lib/engine/noise.ts";
+import { OFF, OFF_LINE, OFF_POINT, catmull, smooth, type Layout } from "./layout.ts"
+import { fbm } from "../../lib/engine/noise.ts"
 
-const N = 48;
+const N = 48
 
-type V2 = [number, number];
+type V2 = [number, number]
 
-const none = OFF;
+const none = OFF
 const base: Omit<Layout, "roads" | "plaza" | "plazaR" | "town" | "seed"> = {
   river: OFF_LINE,
   riverHW: 1.6,
@@ -25,7 +25,7 @@ const base: Omit<Layout, "roads" | "plaza" | "plazaR" | "town" | "seed"> = {
   gardens: [],
   dirtPatches: [],
   relief: [0.6, 1.4],
-};
+}
 
 // ---------------------------------------------------------------- the shopping street
 export const MARKET: Layout = {
@@ -68,7 +68,7 @@ export const MARKET: Layout = {
   plazaR: 3.6,
   town: [24, 24, 20, 14],
   seed: 11,
-};
+}
 
 // ---------------------------------------------------------------- the craftsmen's lane
 export const CRAFT: Layout = {
@@ -104,7 +104,7 @@ export const CRAFT: Layout = {
   ],
   town: [20, 24, 18, 14],
   seed: 13,
-};
+}
 
 // ---------------------------------------------------------------- the south gate
 export const GATE: Layout = {
@@ -139,7 +139,7 @@ export const GATE: Layout = {
   gardens: [{ x0: 13, z0: 10, x1: 17, z1: 13 }], // the guards' vegetable patch behind the guardhouse
   town: [24, 20, 16, 16],
   seed: 17,
-};
+}
 
 /** Flat ground with nothing on it: the room is all there is. */
 export const INDOOR: Layout = {
@@ -163,7 +163,7 @@ export const INDOOR: Layout = {
   town: [24, 24, 40, 40],
   seed: 1,
   relief: [0, 0],
-};
+}
 
 // ---------------------------------------------------------------- ground
 const open: Omit<Layout, "roads" | "seed" | "relief" | "biome" | "shape" | "fog"> = {
@@ -184,17 +184,17 @@ const open: Omit<Layout, "roads" | "seed" | "relief" | "biome" | "shape" | "fog"
   gardens: [],
   dirtPatches: [],
   town: [24, 24, 2, 2],
-};
-const dirt = (pts: V2[], w = 0.85) => ({ pts: catmull(pts), w, kind: "dirt" as const });
+}
+const dirt = (pts: V2[], w = 0.85) => ({ pts: catmull(pts), w, kind: "dirt" as const })
 /** ground that falls into the sea east of `x0` over `width` tiles */
 const seaward =
   (x0: number, width: number, depth = 2.4) =>
   (x: number, z: number, h: number) =>
-    h - smooth(x0, x0 + width, x + (fbm(x, z, 0.15, 7) - 0.5) * 3) * depth;
+    h - smooth(x0, x0 + width, x + (fbm(x, z, 0.15, 7) - 0.5) * 3) * depth
 
 /** Hills rising along the map's edges (not on the open sides), so the land seems to go on. */
 function rimmed(l: Layout, open = ""): Layout {
-  const inner = l.shape;
+  const inner = l.shape
   return {
     ...l,
     shape: (x, z, h, roadD) => {
@@ -203,12 +203,12 @@ function rimmed(l: Layout, open = ""): Layout {
         ["n", z],
         ["e", N - x],
         ["s", N - z],
-      ];
-      let rim = 0;
-      for (const [k, d] of sides) if (!open.includes(k)) rim = Math.max(rim, smooth(5, 0.5, d + (fbm(x, z, 0.2, 17) - 0.5) * 2));
-      return (inner ? inner(x, z, h, roadD) : h) + rim * 2.2;
+      ]
+      let rim = 0
+      for (const [k, d] of sides) if (!open.includes(k)) rim = Math.max(rim, smooth(5, 0.5, d + (fbm(x, z, 0.2, 17) - 0.5) * 2))
+      return (inner ? inner(x, z, h, roadD) : h) + rim * 2.2
     },
-  };
+  }
 }
 
 export const LAYOUTS: Record<string, Layout> = {
@@ -306,8 +306,8 @@ export const LAYOUTS: Record<string, Layout> = {
       ),
     ],
     shape: (x, z, h) => {
-      const edge = 34 + Math.sin(z * 0.21) * 2 + (fbm(x, z, 0.2, 11) - 0.5) * 2;
-      return x < edge ? h + smooth(4, 30, x) * 0.6 : h - 2.8 - smooth(edge, edge + 6, x) * 1.2;
+      const edge = 34 + Math.sin(z * 0.21) * 2 + (fbm(x, z, 0.2, 11) - 0.5) * 2
+      return x < edge ? h + smooth(4, 30, x) * 0.6 : h - 2.8 - smooth(edge, edge + 6, x) * 1.2
     },
   },
   // the beach where the net sheds stand, boats pulled up on the sand
@@ -493,8 +493,8 @@ export const LAYOUTS: Record<string, Layout> = {
     ],
     shape: (x, z, h, roadD) => {
       // the valley follows the road; the slopes rise steeply away from it
-      const d = Math.max(0, roadD - 2);
-      return h + Math.min(5, d * d * 0.06) + (fbm(x, z, 0.3, 13) - 0.5) * Math.min(1, d * 0.2);
+      const d = Math.max(0, roadD - 2)
+      return h + Math.min(5, d * d * 0.06) + (fbm(x, z, 0.3, 13) - 0.5) * Math.min(1, d * 0.2)
     },
   },
   // before the walls of Hue, chimneys smoking behind them
@@ -517,7 +517,7 @@ export const LAYOUTS: Record<string, Layout> = {
       ),
     ],
   },
-};
+}
 
-export const OPEN_SIDES: Record<string, string> = { "sea-cliff": "e", "net-sheds": "e", "quynhon-gate": "e" };
-export const FIELD_LAYOUTS: Record<string, Layout> = Object.fromEntries(Object.entries(LAYOUTS).map(([id, l]) => [id, rimmed(l, OPEN_SIDES[id])]));
+export const OPEN_SIDES: Record<string, string> = { "sea-cliff": "e", "net-sheds": "e", "quynhon-gate": "e" }
+export const FIELD_LAYOUTS: Record<string, Layout> = Object.fromEntries(Object.entries(LAYOUTS).map(([id, l]) => [id, rimmed(l, OPEN_SIDES[id])]))

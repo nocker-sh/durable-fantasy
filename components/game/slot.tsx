@@ -1,35 +1,35 @@
 // An item slot (ui.md §6.5): 48px, edged in the item's rarity colour, an icon, a count and a key.
-import { forwardRef } from "react";
-import { cn } from "cn";
-import type { Rarity } from "#/world/core/items.ts";
+import { forwardRef } from "react"
+import { cn } from "cn"
+import type { Rarity } from "#/world/core/items.ts"
 
 const RARITY: Record<Rarity, string> = {
   common: "var(--color-rarity-common)",
   fine: "var(--color-rarity-fine)",
   rare: "var(--color-rarity-rare)",
   treasure: "var(--color-rarity-treasure)",
-};
+}
 
 type SlotProps = React.ComponentProps<"button"> & {
-  icon?: string | null;
-  rarity?: Rarity;
-  count?: number;
+  icon?: string | null
+  rarity?: Rarity
+  count?: number
   /** key that uses this slot */
-  keyHint?: string;
+  keyHint?: string
   /** dim the icon (none left, or cannot be afforded) */
-  dim?: boolean;
+  dim?: boolean
   /** highlighted as a drop target or selected */
-  over?: boolean;
+  over?: boolean
   /** what an empty slot is for (装備欄: 頭, 武器…), as text */
-  placeholder?: string;
+  placeholder?: string
   /** …or as a dim silhouette */
-  emptyIcon?: string;
+  emptyIcon?: string
   /** a round, see-through shortcut (the bar along the bottom) */
-  round?: boolean;
-};
+  round?: boolean
+}
 
 const Slot = forwardRef<HTMLButtonElement, SlotProps>(function Slot({ icon, rarity, count, keyHint, dim, over, placeholder, emptyIcon, round, className, children, style, ...props }, ref) {
-  const edge = icon && rarity ? RARITY[rarity] : "rgb(255 255 255 / 0.08)";
+  const edge = icon && rarity ? RARITY[rarity] : "rgb(255 255 255 / 0.08)"
   return (
     <button
       ref={ref}
@@ -63,7 +63,7 @@ const Slot = forwardRef<HTMLButtonElement, SlotProps>(function Slot({ icon, rari
       )}
       {children}
     </button>
-  );
-});
+  )
+})
 
-export { Slot, RARITY };
+export { Slot, RARITY }

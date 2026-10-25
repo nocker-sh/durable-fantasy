@@ -1,29 +1,29 @@
 // Skills (game-system.md §9, ui.md §3.10): the life skills' levels and their next milestones, what
 // anyone can do (sit, first aid), and the arts of the weapon in hand. Drag an icon to the shortcut bar.
-import { STAT_NAME, type Stat } from "#/world/core/growth.ts";
-import { GATHER_SKILL_NAME, ITEMS, type Skill } from "#/world/core/items.ts";
-import { LIFE_CAP, LIFE_MILESTONE_TEXT, LIFE_SKILLS, LIFE_TOTAL_CAP, lifeExpAt, lifeLevel, lifeTotal, nextMilestone } from "#/world/core/life.ts";
-import type { PlayerState } from "#/world/core/player.ts";
-import { SKILLS, SKILL_IDS, artBlocked, artsOf, isArt, skillOf, type SkillId } from "#/world/core/skills.ts";
-import { standing } from "#/world/core/stats.ts";
-import { useGame, useGameState } from "#/components/game/context.tsx";
-import { Button } from "#/components/game/button.tsx";
-import { Meter } from "#/components/game/meter.tsx";
-import { Window } from "#/components/game/window.tsx";
-import { useWindow } from "./use-window.ts";
-import { startDrag } from "./drag.ts";
-import { skillIconUrl } from "./hotbar.tsx";
+import { STAT_NAME, type Stat } from "#/world/core/growth.ts"
+import { GATHER_SKILL_NAME, ITEMS, type Skill } from "#/world/core/items.ts"
+import { LIFE_CAP, LIFE_MILESTONE_TEXT, LIFE_SKILLS, LIFE_TOTAL_CAP, lifeExpAt, lifeLevel, lifeTotal, nextMilestone } from "#/world/core/life.ts"
+import type { PlayerState } from "#/world/core/player.ts"
+import { SKILLS, SKILL_IDS, artBlocked, artsOf, isArt, skillOf, type SkillId } from "#/world/core/skills.ts"
+import { standing } from "#/world/core/stats.ts"
+import { useGame, useGameState } from "#/components/game/context.tsx"
+import { Button } from "#/components/game/button.tsx"
+import { Meter } from "#/components/game/meter.tsx"
+import { Window } from "#/components/game/window.tsx"
+import { useWindow } from "./use-window.ts"
+import { startDrag } from "./drag.ts"
+import { skillIconUrl } from "./hotbar.tsx"
 
-const KIND = { action: "動作", strike: "戦技", spell: "術", prayer: "祈り" } as const;
-const needName = (k: string) => (k in STAT_NAME ? STAT_NAME[k as Stat] : GATHER_SKILL_NAME[k as Skill]);
+const KIND = { action: "動作", strike: "戦技", spell: "術", prayer: "祈り" } as const
+const needName = (k: string) => (k in STAT_NAME ? STAT_NAME[k as Stat] : GATHER_SKILL_NAME[k as Skill])
 
 export function SkillsWindow() {
-  const win = useWindow("skills");
-  const player = useGameState((s) => s.player);
-  if (!win.open || !player) return null;
-  const total = lifeTotal(player.life);
-  const held = artsOf(player.equipment.weapon);
-  const others = SKILL_IDS.filter((id) => isArt(skillOf(id)) && !held.includes(id));
+  const win = useWindow("skills")
+  const player = useGameState((s) => s.player)
+  if (!win.open || !player) return null
+  const total = lifeTotal(player.life)
+  const held = artsOf(player.equipment.weapon)
+  const others = SKILL_IDS.filter((id) => isArt(skillOf(id)) && !held.includes(id))
   return (
     <Window id="skills" title="スキル" hotkey="K" {...win.props} key={win.key} initial={(w) => ({ x: Math.max(12, w / 2 - 190), y: 96 })} className="w-[380px]">
       <div className="ui-scroll flex max-h-[480px] flex-col gap-3 overflow-y-auto pr-1">
@@ -37,10 +37,10 @@ export function SkillsWindow() {
           <ul className="flex flex-col gap-1">
             {LIFE_SKILLS.map((s) => {
               const exp = player.life[s] ?? 0,
-                lv = lifeLevel(exp);
+                lv = lifeLevel(exp)
               const from = lifeExpAt(lv),
-                to = lifeExpAt(lv + 1);
-              const next = nextMilestone(lv);
+                to = lifeExpAt(lv + 1)
+              const next = nextMilestone(lv)
               return (
                 <li key={s} className="ui-well flex flex-col gap-0.5 px-2 py-1">
                   <div className="flex items-baseline gap-2 font-head text-[12px]">
@@ -64,7 +64,7 @@ export function SkillsWindow() {
                     </p>
                   )}
                 </li>
-              );
+              )
             })}
           </ul>
           <p className="mt-1 font-body text-[11px] text-text-faint">道具があれば誰でもできる。採るほど、作るほど上がる。合計が {LIFE_TOTAL_CAP} に届くと、どれも上がらなくなる。</p>
@@ -99,15 +99,15 @@ export function SkillsWindow() {
         </section>
       </div>
     </Window>
-  );
+  )
 }
 
 function SkillRow({ id, player }: { id: SkillId; player: PlayerState }) {
-  const game = useGame();
-  const busy = useGameState((s) => s.busy);
-  const sk = skillOf(id);
-  const blocked = artBlocked(id, player);
-  const icon = skillIconUrl(id);
+  const game = useGame()
+  const busy = useGameState((s) => s.busy)
+  const sk = skillOf(id)
+  const blocked = artBlocked(id, player)
+  const icon = skillIconUrl(id)
   return (
     <li className="ui-well flex flex-col gap-1 p-2">
       <div className="flex items-center gap-2">
@@ -141,5 +141,5 @@ function SkillRow({ id, player }: { id: SkillId; player: PlayerState }) {
       )}
       <p className="font-body text-[12px] text-text-dim">{SKILLS[id].text}</p>
     </li>
-  );
+  )
 }

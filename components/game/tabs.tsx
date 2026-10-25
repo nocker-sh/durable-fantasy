@@ -1,13 +1,13 @@
 // Copied from the dev shadcn Tabs and restyled: tabs along the top edge, the chosen one lit.
-import { Tabs as TabsPrimitive } from "@base-ui/react/tabs";
-import { cn } from "cn";
+import { Tabs as TabsPrimitive } from "@base-ui/react/tabs"
+import { cn } from "cn"
 
 function Tabs({ className, ...props }: TabsPrimitive.Root.Props) {
-  return <TabsPrimitive.Root data-slot="tabs" className={cn("flex min-h-0 flex-col", className)} {...props} />;
+  return <TabsPrimitive.Root data-slot="tabs" className={cn("flex min-h-0 flex-col", className)} {...props} />
 }
 
 function TabsList({ className, ...props }: TabsPrimitive.List.Props) {
-  return <TabsPrimitive.List data-slot="tabs-list" className={cn("flex items-end gap-1", className)} {...props} />;
+  return <TabsPrimitive.List data-slot="tabs-list" className={cn("flex items-end gap-1", className)} {...props} />
 }
 
 function TabsTrigger({ className, ...props }: TabsPrimitive.Tab.Props) {
@@ -21,11 +21,11 @@ function TabsTrigger({ className, ...props }: TabsPrimitive.Tab.Props) {
       )}
       {...props}
     />
-  );
+  )
 }
 
 function TabsContent({ className, ...props }: TabsPrimitive.Panel.Props) {
-  return <TabsPrimitive.Panel data-slot="tabs-content" className={cn("min-h-0 flex-1 outline-none", className)} {...props} />;
+  return <TabsPrimitive.Panel data-slot="tabs-content" className={cn("min-h-0 flex-1 outline-none", className)} {...props} />
 }
 
-export { Tabs, TabsList, TabsTrigger, TabsContent };
+export { Tabs, TabsList, TabsTrigger, TabsContent }

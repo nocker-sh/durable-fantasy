@@ -1,31 +1,31 @@
-import { Thumb } from "../three-view.tsx";
-import { LATER_SPOTS } from "#/world/core/gather.ts";
-import { STAT_NAME } from "#/world/core/growth.ts";
-import { GATHER_SKILL_NAME, GATHER_SKILLS } from "#/world/core/items.ts";
-import { LIFE_MILESTONE_TEXT, LIFE_SKILLS, MILESTONES } from "#/world/core/life.ts";
-import { MONSTER_KINDS, SPAWNS } from "#/world/core/monsters.ts";
-import { SKILLS, type Art } from "#/world/core/skills.ts";
-import { hareBody, slimeBody } from "#/world/scene/fields.ts";
-import type { Build } from "../three-view.tsx";
-import { sheet } from "./schema.ts";
-import { needsText } from "./shared.tsx";
+import { Thumb } from "../three-view.tsx"
+import { LATER_SPOTS } from "#/world/core/gather.ts"
+import { STAT_NAME } from "#/world/core/growth.ts"
+import { GATHER_SKILL_NAME, GATHER_SKILLS } from "#/world/core/items.ts"
+import { LIFE_MILESTONE_TEXT, LIFE_SKILLS, MILESTONES } from "#/world/core/life.ts"
+import { MONSTER_KINDS, SPAWNS } from "#/world/core/monsters.ts"
+import { SKILLS, type Art } from "#/world/core/skills.ts"
+import { hareBody, slimeBody } from "#/world/scene/fields.ts"
+import type { Build } from "../three-view.tsx"
+import { sheet } from "./schema.ts"
+import { needsText } from "./shared.tsx"
 
-const monsterBuilds = new Map<string, Build>();
+const monsterBuilds = new Map<string, Build>()
 
 /** A creature as the meadow draws it. */
 function monsterBuild(id: string): Build {
-  let b = monsterBuilds.get(id);
+  let b = monsterBuilds.get(id)
   if (!b) {
-    const k = MONSTER_KINDS[id];
+    const k = MONSTER_KINDS[id]
     b = (root, x, z) => {
-      const body = k.look === "slime" ? slimeBody(k.color ?? 0x8ac06a) : hareBody();
-      if (id === "blue-slime") body.scale.setScalar(1.2);
-      body.position.set(x, 0.2, z);
-      root.add(body);
-    };
-    monsterBuilds.set(id, b);
+      const body = k.look === "slime" ? slimeBody(k.color ?? 0x8ac06a) : hareBody()
+      if (id === "blue-slime") body.scale.setScalar(1.2)
+      body.position.set(x, 0.2, z)
+      root.add(body)
+    }
+    monsterBuilds.set(id, b)
   }
-  return b;
+  return b
 }
 
 const monsters = sheet({
@@ -51,7 +51,7 @@ const monsters = sheet({
     ...[...new Set(SPAWNS.filter((s) => s.kind === id).map((s) => s.map))].map((m) => ({ sheet: "maps", id: m, as: `出る ×${SPAWNS.filter((s) => s.kind === id && s.map === m).length}` })),
   ],
   build: monsterBuild,
-});
+})
 
 const skills = sheet({
   id: "skills",
@@ -67,19 +67,19 @@ const skills = sheet({
     {
       label: "効き",
       get: (id) => {
-        const s: Partial<Omit<Art, "kind">> = SKILLS[id];
+        const s: Partial<Omit<Art, "kind">> = SKILLS[id]
         return s.power
           ? `×${s.power}${s.sure ? " 必ず会心" : ""}`
           : s.magic
             ? `${s.magic.base}+${STAT_NAME[s.magic.stat]}×${s.magic.per}`
             : s.heal
               ? `回復 ${s.heal.base}+${STAT_NAME[s.heal.stat]}×${s.heal.per}`
-              : "";
+              : ""
       },
     },
   ],
   refs: (id) => {
-    const s = SKILLS[id];
+    const s = SKILLS[id]
     return "weapons" in s
       ? [
           ...s.weapons.map((w) => ({ sheet: "items", id: w, as: "使える武器" })),
@@ -87,10 +87,10 @@ const skills = sheet({
             .filter((k) => (LIFE_SKILLS as readonly string[]).includes(k))
             .map((k) => ({ sheet: "life", id: k, as: "必要" })),
         ]
-      : [];
+      : []
   },
   more: (id) => [{ title: "説明", head: [], rows: [[SKILLS[id].text]] }],
-});
+})
 
 const life = sheet({
   id: "life",
@@ -101,6 +101,6 @@ const life = sheet({
   kind: (s) => ((GATHER_SKILLS as readonly string[]).includes(s) ? "採る" : "作る"),
   cols: MILESTONES.filter((m) => m <= 8).map((m) => ({ label: `Lv${m}`, get: (s: (typeof LIFE_SKILLS)[number]) => LIFE_MILESTONE_TEXT[s][m] ?? "" })),
   refs: (s) => LATER_SPOTS.filter((l) => l.skill === s).map((l) => ({ sheet: "items", id: l.item, as: `Lv${l.level} ${l.where}` })),
-});
+})
 
-export { monsters, skills, life };
+export { monsters, skills, life }

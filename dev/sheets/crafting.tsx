@@ -1,15 +1,15 @@
-import { Pixel } from "./shared.tsx";
-import { COMMISSIONS } from "#/world/core/commissions.ts";
-import { RECIPES } from "#/world/core/crafting.ts";
-import { STATIONS } from "#/world/town/stations.ts";
-import { ERRANDS } from "#/world/core/errands.ts";
-import { NODES } from "#/world/core/gather.ts";
-import { GATHER_SKILL_NAME, ITEMS } from "#/world/core/items.ts";
-import { iconUrl } from "#/world/art/icons.ts";
-import { mapName, NODE_KIND, ref, STATION_KIND } from "./shared.tsx";
-import { sheet } from "./schema.ts";
+import { Pixel } from "./shared.tsx"
+import { COMMISSIONS } from "#/world/core/commissions.ts"
+import { RECIPES } from "#/world/core/crafting.ts"
+import { STATIONS } from "#/world/town/stations.ts"
+import { ERRANDS } from "#/world/core/errands.ts"
+import { NODES } from "#/world/core/gather.ts"
+import { GATHER_SKILL_NAME, ITEMS } from "#/world/core/items.ts"
+import { iconUrl } from "#/world/art/icons.ts"
+import { mapName, NODE_KIND, ref, STATION_KIND } from "./shared.tsx"
+import { sheet } from "./schema.ts"
 
-const nodeName = (n: (typeof NODES)[number]) => `${mapName(n.map)}の${NODE_KIND[n.kind]} ${n.id.split("-").pop()}`;
+const nodeName = (n: (typeof NODES)[number]) => `${mapName(n.map)}の${NODE_KIND[n.kind]} ${n.id.split("-").pop()}`
 
 const nodes = sheet({
   id: "nodes",
@@ -26,14 +26,14 @@ const nodes = sheet({
     { label: "取れる物", get: (n) => n.yields.map((y) => ITEMS[y.item].name).join("、") },
   ],
   refs: (n) => {
-    const total = n.yields.reduce((a, y) => a + y.weight, 0);
+    const total = n.yields.reduce((a, y) => a + y.weight, 0)
     return [
       ...ref("maps", n.map, "場所"),
       ...ref("life", n.skill, "生活スキル"),
       ...n.yields.map((y) => ({ sheet: "items", id: y.item, as: `取れる ${Math.round((y.weight / total) * 100)}%${y.level ? ` Lv${y.level}〜` : ""}` })),
-    ];
+    ]
   },
-});
+})
 
 const stations = sheet({
   id: "stations",
@@ -47,7 +47,7 @@ const stations = sheet({
     { label: "料金", get: (s) => s.fee, w: "w-12" },
   ],
   refs: (s) => ref("maps", s.map, "場所"),
-});
+})
 
 const recipes = sheet({
   id: "recipes",
@@ -69,7 +69,7 @@ const recipes = sheet({
     ...STATIONS.filter((s) => s.kind === r.station).map((s) => ({ sheet: "stations", id: s.id, as: "作業場" })),
     ...ref("life", r.skill, "生活スキル"),
   ],
-});
+})
 
 const commissions = sheet({
   id: "commissions",
@@ -90,7 +90,7 @@ const commissions = sheet({
     { sheet: "items", id: c.output.item, as: `できる ×${c.output.count}` },
     ...c.inputs.map((x) => ({ sheet: "items", id: x.item, as: `材料 ×${x.count}` })),
   ],
-});
+})
 
 const errands = sheet({
   id: "errands",
@@ -107,6 +107,6 @@ const errands = sheet({
   ],
   refs: (e) => [...ref("npcs", e.from, "頼む人"), ...ref("npcs", e.to, "届け先"), ...(e.wants ? [{ sheet: "items", id: e.wants.item, as: `欲しい ×${e.wants.count}` }] : [])],
   more: (e) => [{ title: "台詞", head: ["頼むとき", "済んだとき"], rows: [[e.ask, e.thanks]] }],
-});
+})
 
-export { nodes, stations, recipes, commissions, errands };
+export { nodes, stations, recipes, commissions, errands }

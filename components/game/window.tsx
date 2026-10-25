@@ -2,20 +2,20 @@
 // title bar with －, resize it from the corner grip if it allows. It remembers position, size and
 // folding, stays at least 80px on screen (also when the browser window shrinks) and comes to the
 // front when touched. Which windows are open, and their order, belong to the Game.
-import { useEffect, useRef, useState, type ReactNode, type PointerEvent as ReactPointerEvent } from "react";
-import { cn } from "cn";
-import { Kbd } from "./kbd.tsx";
+import { useEffect, useRef, useState, type ReactNode, type PointerEvent as ReactPointerEvent } from "react"
+import { cn } from "cn"
+import { Kbd } from "./kbd.tsx"
 
-type Layout = { x: number; y: number; w?: number; h?: number; folded?: boolean };
+type Layout = { x: number; y: number; w?: number; h?: number; folded?: boolean }
 
 const keep = (l: Layout, el: HTMLElement | null): Layout => {
-  const w = el?.offsetWidth ?? l.w ?? 200;
+  const w = el?.offsetWidth ?? l.w ?? 200
   return {
     ...l,
     x: Math.round(Math.min(Math.max(l.x, 80 - w), window.innerWidth - 80)),
     y: Math.round(Math.min(Math.max(l.y, 0), window.innerHeight - 32)),
-  };
-};
+  }
+}
 
 function Window({
   id,
@@ -33,75 +33,75 @@ function Window({
   children,
   footer,
 }: {
-  id: string;
-  title: ReactNode;
-  hotkey?: string;
+  id: string
+  title: ReactNode
+  hotkey?: string
   /** stacking order */
-  z: number;
-  onClose?: () => void;
-  onFocus?: () => void;
+  z: number
+  onClose?: () => void
+  onFocus?: () => void
   /** first position, from the viewport size */
-  initial: (width: number, height: number) => { x: number; y: number };
+  initial: (width: number, height: number) => { x: number; y: number }
   /** resizable from the corner: first and smallest size */
-  size?: { initial: [number, number]; min: [number, number] };
+  size?: { initial: [number, number]; min: [number, number] }
   /** a lighter, see-through ground (the chat) */
-  tone?: "solid" | "soft";
+  tone?: "solid" | "soft"
   /** extra buttons in the title bar */
-  actions?: ReactNode;
-  className?: string;
-  bodyClassName?: string;
-  children: ReactNode;
-  footer?: ReactNode;
+  actions?: ReactNode
+  className?: string
+  bodyClassName?: string
+  children: ReactNode
+  footer?: ReactNode
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [layout, setLayout] = useState<Layout | null>(null);
-  const key = `ui-window/${id}`;
+  const ref = useRef<HTMLDivElement>(null)
+  const [layout, setLayout] = useState<Layout | null>(null)
+  const key = `ui-window/${id}`
 
   useEffect(() => {
-    let saved: Layout | null = null;
+    let saved: Layout | null = null
     try {
-      saved = JSON.parse(localStorage.getItem(key) ?? "null");
+      saved = JSON.parse(localStorage.getItem(key) ?? "null")
     } catch {
-      saved = null;
+      saved = null
     }
-    const first: Layout = { ...initial(window.innerWidth, window.innerHeight), ...(size ? { w: size.initial[0], h: size.initial[1] } : {}) };
-    setLayout(keep({ ...first, ...saved }, ref.current));
-    const onResize = () => setLayout((l) => (l ? keep(l, ref.current) : l));
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+    const first: Layout = { ...initial(window.innerWidth, window.innerHeight), ...(size ? { w: size.initial[0], h: size.initial[1] } : {}) }
+    setLayout(keep({ ...first, ...saved }, ref.current))
+    const onResize = () => setLayout((l) => (l ? keep(l, ref.current) : l))
+    window.addEventListener("resize", onResize)
+    return () => window.removeEventListener("resize", onResize)
     // initial and size are read once, when the window opens
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key]);
+  }, [key])
 
-  const save = (l: Layout) => localStorage.setItem(key, JSON.stringify(l));
+  const save = (l: Layout) => localStorage.setItem(key, JSON.stringify(l))
 
   const drag = (event: ReactPointerEvent, apply: (l: Layout, dx: number, dy: number) => Layout) => {
-    if (event.button !== 0 || !layout) return;
-    event.preventDefault();
-    event.stopPropagation();
-    const start = { x: event.clientX, y: event.clientY, layout };
-    let last = layout;
+    if (event.button !== 0 || !layout) return
+    event.preventDefault()
+    event.stopPropagation()
+    const start = { x: event.clientX, y: event.clientY, layout }
+    let last = layout
     const move = (e: PointerEvent) => {
-      last = keep(apply(start.layout, e.clientX - start.x, e.clientY - start.y), ref.current);
-      setLayout(last);
-    };
+      last = keep(apply(start.layout, e.clientX - start.x, e.clientY - start.y), ref.current)
+      setLayout(last)
+    }
     const up = () => {
-      window.removeEventListener("pointermove", move);
-      window.removeEventListener("pointerup", up);
-      save(last);
-    };
-    window.addEventListener("pointermove", move);
-    window.addEventListener("pointerup", up);
-  };
+      window.removeEventListener("pointermove", move)
+      window.removeEventListener("pointerup", up)
+      save(last)
+    }
+    window.addEventListener("pointermove", move)
+    window.addEventListener("pointerup", up)
+  }
 
   const fold = () => {
-    if (!layout) return;
-    const next = { ...layout, folded: !layout.folded };
-    setLayout(next);
-    save(next);
-  };
+    if (!layout) return
+    const next = { ...layout, folded: !layout.folded }
+    setLayout(next)
+    save(next)
+  }
 
-  const folded = !!layout?.folded;
+  const folded = !!layout?.folded
   return (
     <section
       ref={ref}
@@ -155,7 +155,7 @@ function Window({
         </>
       )}
     </section>
-  );
+  )
 }
 
 function TitleButton({ label, onClick, children }: { label: string; onClick: () => void; children: ReactNode }) {
@@ -169,7 +169,7 @@ function TitleButton({ label, onClick, children }: { label: string; onClick: () 
     >
       {children}
     </button>
-  );
+  )
 }
 
-export { Window, TitleButton };
+export { Window, TitleButton }

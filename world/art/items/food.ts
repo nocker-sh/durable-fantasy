@@ -15,7 +15,7 @@ const SKEWER = [
   "kbkkk...........",
   "kk..............",
   "................",
-];
+]
 
 const DRIEDFISH = [
   "................",
@@ -34,7 +34,7 @@ const DRIEDFISH = [
   "......kmkkmk....",
   ".....kmk..kmk...",
   ".....kk....kk...",
-];
+]
 
 const PIE = [
   "................",
@@ -53,6 +53,6 @@ const PIE = [
   "................",
   "................",
   "................",
-];
+]
 
-export { SKEWER, DRIEDFISH, PIE };
+export { SKEWER, DRIEDFISH, PIE }

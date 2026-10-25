@@ -3,11 +3,11 @@
 // floor; floorplan.ts lays them on the table, at the hearth, by the door, on the wall or the floor.
 
 export interface Trace {
-  what: string;
-  on: "卓" | "炉" | "戸口" | "壁" | "床";
+  what: string
+  on: "卓" | "炉" | "戸口" | "壁" | "床"
 }
 
-const t = (what: string, on: Trace["on"]): Trace => ({ what, on });
+const t = (what: string, on: Trace["on"]): Trace => ({ what, on })
 
 export const TRACES: Readonly<Record<string, readonly Trace[]>> = {
   // ---------------------------------------------------------------- the market square
@@ -57,4 +57,4 @@ export const TRACES: Readonly<Record<string, readonly Trace[]>> = {
   "h-g5": [t("子どもたちの石板", "卓"), t("ドロテアの産婆の鞄", "戸口"), t("読み聞かせの本", "炉"), t("ベンヤミンの木の馬", "床")],
   "h-g6": [t("壁に掛けた古い門番の槍", "壁"), t("二つの揺り椅子の膝掛け", "炉"), t("マルグリットの編み棒", "卓"), t("門番の頃の古い呼び子", "戸口")],
   "h-g3": [t("前の住人の割れた鉢", "床")],
-};
+}

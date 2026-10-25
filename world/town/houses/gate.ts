@@ -1,5 +1,5 @@
-import { home, bed, room } from "../house-plan.ts";
-import type { HouseDef } from "../house-types.ts";
+import { home, bed, room } from "../house-plan.ts"
+import type { HouseDef } from "../house-types.ts"
 
 const houses: readonly HouseDef[] = [
   {
@@ -133,6 +133,6 @@ const houses: readonly HouseDef[] = [
     seed: 95,
     plan: { rooms: [room("居間兼台所", 0), room("寝室", 0)], hearth: true, kitchen: true, furniture: [] },
   },
-];
+]
 
-export { houses };
+export { houses }

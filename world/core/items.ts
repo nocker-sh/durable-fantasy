@@ -19,8 +19,8 @@ export {
   SLOTS,
   type Slot,
   SLOT_NAME,
-} from "./items/kinds.ts";
-export { type EquipPart, type Equipment, type ItemDefinition } from "./items/types.ts";
-export { ITEM_ICONS, type ItemIcon } from "./items/icons.ts";
-export { type ItemId, ITEMS, ITEM_IDS } from "./items/catalog.ts";
-export { isItemId, sellPrice, sellable, slotsFor } from "./items/rules.ts";
+} from "./items/kinds.ts"
+export { type EquipPart, type Equipment, type ItemDefinition } from "./items/types.ts"
+export { ITEM_ICONS, type ItemIcon } from "./items/icons.ts"
+export { type ItemId, ITEMS, ITEM_IDS } from "./items/catalog.ts"
+export { isItemId, sellPrice, sellable, slotsFor } from "./items/rules.ts"

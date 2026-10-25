@@ -1,40 +1,40 @@
 // Skills (game-system.md §9) other than the life skills (core/life.ts): what anyone can do —
 // sit down to rest, see to a wound with a herb — and the arts that come with a weapon or a staff,
 // usable by whoever holds it and meets the art's needs. There are no jobs and no skill points.
-import type { Stat } from "./growth.ts";
-import type { ItemId, Skill as LifeSkill } from "./items.ts";
-import { lifeLevel, type LifeExp } from "./life.ts";
+import type { Stat } from "./growth.ts"
+import type { ItemId, Skill as LifeSkill } from "./items.ts"
+import { lifeLevel, type LifeExp } from "./life.ts"
 
 interface Base {
-  name: string;
+  name: string
   /** SP it takes */
-  sp: number;
+  sp: number
   /** ms before it can be used again */
-  cooldown: number;
-  text: string;
+  cooldown: number
+  text: string
 }
 
 /** Anyone, any time. */
 export interface Action extends Base {
-  kind: "action";
+  kind: "action"
 }
 
 /** Comes with a weapon: a blow at what you are fighting, or (a prayer) something done to yourself. */
 export interface Art extends Base {
-  kind: "strike" | "spell" | "prayer";
-  weapons: readonly ItemId[];
-  needs: Partial<Record<Stat | LifeSkill, number>>;
+  kind: "strike" | "spell" | "prayer"
+  weapons: readonly ItemId[]
+  needs: Partial<Record<Stat | LifeSkill, number>>
   /** a strike: times the usual blow */
-  power?: number;
+  power?: number
   /** a strike: always a critical */
-  sure?: boolean;
+  sure?: boolean
   /** a spell's attack: base, and per point of this stat; it never misses and armour counts half */
-  magic?: { base: number; per: number; stat: Stat };
+  magic?: { base: number; per: number; stat: Stat }
   /** a prayer's HP back: base, and per point of this stat */
-  heal?: { base: number; per: number; stat: Stat };
+  heal?: { base: number; per: number; stat: Stat }
 }
 
-export type SkillDef = Action | Art;
+export type SkillDef = Action | Art
 
 export const SKILLS = {
   sit: { kind: "action", name: "座る", sp: 0, cooldown: 0, text: "道ばたでも腰を下ろして休める。座っている間は HP と SP が倍の速さで戻る（Z キー）。" },
@@ -81,38 +81,38 @@ export const SKILLS = {
     heal: { base: 10, per: 2, stat: "fth" },
     text: "森の木に宿るものに呼びかける、木こりに伝わる祈り。傷がふさがる。",
   },
-} satisfies Record<string, SkillDef>;
+} satisfies Record<string, SkillDef>
 
-export type SkillId = keyof typeof SKILLS;
-export const SKILL_IDS = Object.keys(SKILLS) as SkillId[];
-export const isSkillId = (v: string): v is SkillId => Object.hasOwn(SKILLS, v);
-export const skillOf = (id: SkillId): SkillDef => SKILLS[id];
-export const isArt = (s: SkillDef): s is Art => s.kind !== "action";
+export type SkillId = keyof typeof SKILLS
+export const SKILL_IDS = Object.keys(SKILLS) as SkillId[]
+export const isSkillId = (v: string): v is SkillId => Object.hasOwn(SKILLS, v)
+export const skillOf = (id: SkillId): SkillDef => SKILLS[id]
+export const isArt = (s: SkillDef): s is Art => s.kind !== "action"
 
 /** HP first aid gives back, for alchemy's level and VIT (a herb chewed as it is gives 15). */
-export const firstAid = (alchemy: number, vit: number) => 15 + alchemy * 3 + Math.floor(vit / 2);
+export const firstAid = (alchemy: number, vit: number) => 15 + alchemy * 3 + Math.floor(vit / 2)
 
 /** Why an art cannot be used with what is held and what has been raised; null when it can. */
 export function artBlocked(id: SkillId, p: { equipment: { weapon: ItemId | null }; stats: Readonly<Record<Stat, number>>; life: LifeExp }): "NO_WEAPON" | "STAT_TOO_LOW" | "SKILL_TOO_LOW" | null {
-  const s = skillOf(id);
-  if (!isArt(s)) return null;
-  if (!p.equipment.weapon || !s.weapons.includes(p.equipment.weapon)) return "NO_WEAPON";
+  const s = skillOf(id)
+  if (!isArt(s)) return null
+  if (!p.equipment.weapon || !s.weapons.includes(p.equipment.weapon)) return "NO_WEAPON"
   for (const [k, n] of Object.entries(s.needs) as [string, number][]) {
     if (k in p.stats) {
-      if (p.stats[k as Stat] < n) return "STAT_TOO_LOW";
-    } else if (lifeLevel(p.life[k as LifeSkill] ?? 0) < n) return "SKILL_TOO_LOW";
+      if (p.stats[k as Stat] < n) return "STAT_TOO_LOW"
+    } else if (lifeLevel(p.life[k as LifeSkill] ?? 0) < n) return "SKILL_TOO_LOW"
   }
-  return null;
+  return null
 }
 
 /** The arts that come with a weapon. */
 export const artsOf = (weapon: ItemId | null) =>
   SKILL_IDS.filter((id) => {
-    const s = skillOf(id);
-    return isArt(s) && !!weapon && s.weapons.includes(weapon);
-  });
+    const s = skillOf(id)
+    return isArt(s) && !!weapon && s.weapons.includes(weapon)
+  })
 
 /** A skill on the shortcut bar is written "skill:<id>"; anything else there is an item. */
-export type SkillKey = `skill:${SkillId}`;
-export const skillKey = (id: SkillId): SkillKey => `skill:${id}`;
-export const skillOfKey = (key: string): SkillId | null => (key.startsWith("skill:") && isSkillId(key.slice(6)) ? (key.slice(6) as SkillId) : null);
+export type SkillKey = `skill:${SkillId}`
+export const skillKey = (id: SkillId): SkillKey => `skill:${id}`
+export const skillOfKey = (key: string): SkillId | null => (key.startsWith("skill:") && isSkillId(key.slice(6)) ? (key.slice(6) as SkillId) : null)

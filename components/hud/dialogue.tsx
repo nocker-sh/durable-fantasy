@@ -1,34 +1,34 @@
 // Bottom middle (ui.md §3.5): the conversation. The speaker's tag sits on the top edge; the text
 // types out; click or Space shows it all, then turns the page; the last page offers choices.
-import { useEffect, useState } from "react";
-import { revealed } from "#/world/game.ts";
-import { useGame, useGameState } from "#/components/game/context.tsx";
-import { Kbd } from "#/components/game/kbd.tsx";
-import { Panel } from "#/components/game/panel.tsx";
+import { useEffect, useState } from "react"
+import { revealed } from "#/world/game.ts"
+import { useGame, useGameState } from "#/components/game/context.tsx"
+import { Kbd } from "#/components/game/kbd.tsx"
+import { Panel } from "#/components/game/panel.tsx"
 
 export function DialogueBox() {
-  const game = useGame();
-  const dialogue = useGameState((s) => s.dialogue);
-  const [now, setNow] = useState(() => performance.now());
+  const game = useGame()
+  const dialogue = useGameState((s) => s.dialogue)
+  const [now, setNow] = useState(() => performance.now())
 
   // re-render each frame while the page is typing out
   useEffect(() => {
-    if (!dialogue) return;
-    let frame = 0;
+    if (!dialogue) return
+    let frame = 0
     const loop = () => {
-      const t = performance.now();
-      setNow(t);
-      if (revealed(dialogue, t) < dialogue.pages[dialogue.page].length) frame = requestAnimationFrame(loop);
-    };
-    frame = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(frame);
-  }, [dialogue]);
+      const t = performance.now()
+      setNow(t)
+      if (revealed(dialogue, t) < dialogue.pages[dialogue.page].length) frame = requestAnimationFrame(loop)
+    }
+    frame = requestAnimationFrame(loop)
+    return () => cancelAnimationFrame(frame)
+  }, [dialogue])
 
-  if (!dialogue) return null;
-  const text = dialogue.pages[dialogue.page];
-  const shown = revealed(dialogue, now);
-  const done = shown >= text.length;
-  const last = dialogue.page >= dialogue.pages.length - 1;
+  if (!dialogue) return null
+  const text = dialogue.pages[dialogue.page]
+  const shown = revealed(dialogue, now)
+  const done = shown >= text.length
+  const last = dialogue.page >= dialogue.pages.length - 1
 
   return (
     <Panel role="dialog" aria-label={`${dialogue.name}との会話`} className="absolute bottom-[86px] left-1/2 z-30 w-[min(620px,calc(100vw-2rem))] -translate-x-1/2 animate-ui-in p-[3px]">
@@ -62,5 +62,5 @@ export function DialogueBox() {
         </div>
       )}
     </Panel>
-  );
+  )
 }

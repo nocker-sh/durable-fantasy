@@ -1,4 +1,4 @@
-import type { Resident } from "../resident.ts";
+import type { Resident } from "../resident.ts"
 
 const residents = {
   フェルディナント: {
@@ -25,6 +25,6 @@ const residents = {
       eye: "cGreen",
     },
   },
-} satisfies Record<string, Resident>;
+} satisfies Record<string, Resident>
 
-export { residents };
+export { residents }

@@ -1,4 +1,4 @@
-import type { Line } from "../line.ts";
+import type { Line } from "../line.ts"
 
 const lines = {
   ゲルダ: [
@@ -146,6 +146,6 @@ const lines = {
     { text: "……料理番のゼップだ。腹が減ったら、来い。", first: true },
     { text: "……なんだ。……ああ、客か。座れ。", first: true },
   ],
-} satisfies Record<string, readonly Line[]>;
+} satisfies Record<string, readonly Line[]>
 
-export { lines };
+export { lines }

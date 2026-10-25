@@ -1,4 +1,4 @@
-import type { Line } from "../line.ts";
+import type { Line } from "../line.ts"
 
 const lines = {
   テオ: [
@@ -48,6 +48,6 @@ const lines = {
     { text: "やあ、はじめましてだね。案内人のテオだよ。道のことなら何でも聞いて。", first: true },
     { text: "迷ったら井戸を目指せ。……はじめて会う人には、必ずこれを言うんだ。", first: true },
   ],
-} satisfies Record<string, readonly Line[]>;
+} satisfies Record<string, readonly Line[]>
 
-export { lines };
+export { lines }

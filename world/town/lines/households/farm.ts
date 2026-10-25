@@ -1,4 +1,4 @@
-import type { Line } from "../line.ts";
+import type { Line } from "../line.ts"
 
 const lines = {
   フリッツ: [
@@ -287,6 +287,6 @@ const lines = {
     { text: "おらはヴァルター。畑と豚の係だなあ。よろしくなあ。", first: true },
     { text: "見ない顔だなあ。腹、減ってないか？", first: true },
   ],
-} satisfies Record<string, readonly Line[]>;
+} satisfies Record<string, readonly Line[]>
 
-export { lines };
+export { lines }

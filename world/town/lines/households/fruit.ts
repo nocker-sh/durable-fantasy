@@ -1,4 +1,4 @@
-import type { Line } from "../line.ts";
+import type { Line } from "../line.ts"
 
 const lines = {
   クララ: [
@@ -151,6 +151,6 @@ const lines = {
     { text: "はじめまして！ぼくヨナス！あなたで、きょう七人目だよ！", first: true },
     { text: "果物買う？ぼく、お釣り数えられるよ！", first: true },
   ],
-} satisfies Record<string, readonly Line[]>;
+} satisfies Record<string, readonly Line[]>
 
-export { lines };
+export { lines }

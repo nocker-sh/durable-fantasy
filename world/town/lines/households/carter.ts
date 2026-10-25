@@ -1,4 +1,4 @@
-import type { Line } from "../line.ts";
+import type { Line } from "../line.ts"
 
 const lines = {
   ベルタ: [
@@ -156,6 +156,6 @@ const lines = {
     { text: "おまつり、ねなくていいんだって。……ほんと？", event: "灯りの祭り" },
     { text: "……だあれ？ぼく、エミール。", first: true },
   ],
-} satisfies Record<string, readonly Line[]>;
+} satisfies Record<string, readonly Line[]>
 
-export { lines };
+export { lines }

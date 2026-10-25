@@ -1,13 +1,13 @@
-import { Pixel } from "./shared.tsx";
-import { STAT_NAME } from "#/world/core/growth.ts";
-import { ITEMS, ITEM_IDS, KIND_NAME, QUALITIES, RARITY_NAME, SLOT_NAME, sellPrice } from "#/world/core/items.ts";
-import { priceOf, qualitiesOf } from "#/world/core/makers.ts";
-import { SHOPS, shopBuys, type ShopId } from "#/world/core/shops.ts";
-import { iconUrl } from "#/world/art/icons.ts";
-import { ITEM_SPRITES } from "#/world/art/item-art.ts";
-import { sheet } from "./schema.ts";
-import { effects, needsText } from "./shared.tsx";
-import { texUrl } from "./art.tsx";
+import { Pixel } from "./shared.tsx"
+import { STAT_NAME } from "#/world/core/growth.ts"
+import { ITEMS, ITEM_IDS, KIND_NAME, QUALITIES, RARITY_NAME, SLOT_NAME, sellPrice } from "#/world/core/items.ts"
+import { priceOf, qualitiesOf } from "#/world/core/makers.ts"
+import { SHOPS, shopBuys, type ShopId } from "#/world/core/shops.ts"
+import { iconUrl } from "#/world/art/icons.ts"
+import { ITEM_SPRITES } from "#/world/art/item-art.ts"
+import { sheet } from "./schema.ts"
+import { effects, needsText } from "./shared.tsx"
+import { texUrl } from "./art.tsx"
 
 // ---------------------------------------------------------------- the sheets
 
@@ -27,7 +27,7 @@ const items = sheet({
     { label: "効果", get: (id) => effects(id).join(" ") },
   ],
   more: (id) => {
-    const d = ITEMS[id];
+    const d = ITEMS[id]
     return [
       { title: "説明", head: [], rows: [[d.description]] },
       ...(d.made ? [{ title: "品質ごとの値段", head: ["品質", "G"], rows: qualitiesOf(id).map((q) => [QUALITIES[q], priceOf(id, q)]) }] : []),
@@ -40,8 +40,8 @@ const items = sheet({
               rows: [...new Set((Object.keys(SHOPS) as ShopId[]).map((s) => shopBuys(s, id)))]
                 .sort((a, b) => b - a)
                 .map((g) => {
-                  const at = (Object.keys(SHOPS) as ShopId[]).filter((s) => shopBuys(s, id) === g);
-                  return [g, at.length === Object.keys(SHOPS).length ? "どの店も" : at.map((s) => SHOPS[s].name).join("、")];
+                  const at = (Object.keys(SHOPS) as ShopId[]).filter((s) => shopBuys(s, id) === g)
+                  return [g, at.length === Object.keys(SHOPS).length ? "どの店も" : at.map((s) => SHOPS[s].name).join("、")]
                 }),
             },
           ]),
@@ -63,9 +63,9 @@ const items = sheet({
             },
           ]
         : []),
-    ];
+    ]
   },
-});
+})
 
 const itemArt = sheet<string>({
   id: "item-art",
@@ -77,10 +77,10 @@ const itemArt = sheet<string>({
   icon: (k) => <img src={texOf2(k)} alt="" style={{ imageRendering: "pixelated" }} />,
   cols: [{ label: "大きさ", get: (k) => `${ITEM_SPRITES[k].w}×${ITEM_SPRITES[k].h}`, w: "w-20" }],
   refs: (k) => ITEM_IDS.filter((i) => ITEMS[i].icon === k).map((i) => ({ sheet: "items", id: i, as: "絵" })),
-});
+})
 
-const artCache = new Map<string, string>();
+const artCache = new Map<string, string>()
 
-const texOf2 = (k: string) => artCache.get(k) ?? (artCache.set(k, texUrl(ITEM_SPRITES[k])), artCache.get(k)!);
+const texOf2 = (k: string) => artCache.get(k) ?? (artCache.set(k, texUrl(ITEM_SPRITES[k])), artCache.get(k)!)
 
-export { items, itemArt };
+export { items, itemArt }

@@ -1,6 +1,6 @@
-import { DevPage } from "#/dev/catalog.tsx";
+import { DevPage } from "#/dev/catalog.tsx"
 
 /** The dev frame with nothing in it: the pages are in the list on the left. */
 export default function DevIndex() {
-  return <DevPage>{null}</DevPage>;
+  return <DevPage>{null}</DevPage>
 }

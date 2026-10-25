@@ -1,9 +1,9 @@
 // Every object the maps are dressed with, by name, for /dev/props: each builds itself at a spot on
 // flat ground, exactly as it is built on the maps.
-import type * as THREE from "three";
-import { GB } from "#/world/scene/gfx.ts";
-import { anvil, barrel, bench, bucket, bush, cart, crate, fence, forge, haystack, lantern, laundryLine, oven, sack, stall, table, tree, trough, well, woodpile } from "#/world/scene/build.ts";
-import { choppingBlock, flowerPot, hideFrame, netFrame, planks, rentSign, spearRack, wheel, woolSacks } from "#/world/scene/dressing.ts";
+import type * as THREE from "three"
+import { GB } from "#/world/scene/gfx.ts"
+import { anvil, barrel, bench, bucket, bush, cart, crate, fence, forge, haystack, lantern, laundryLine, oven, sack, stall, table, tree, trough, well, woodpile } from "#/world/scene/build.ts"
+import { choppingBlock, flowerPot, hideFrame, netFrame, planks, rentSign, spearRack, wheel, woolSacks } from "#/world/scene/dressing.ts"
 import {
   Hare,
   Slime,
@@ -27,23 +27,23 @@ import {
   signboard,
   stumps,
   tufts,
-} from "#/world/scene/fields.ts";
-import { critters } from "#/world/scene/actors.ts";
-import { THINGS } from "#/world/scene/things.ts";
+} from "#/world/scene/fields.ts"
+import { critters } from "#/world/scene/actors.ts"
+import { THINGS } from "#/world/scene/things.ts"
 
 export interface Prop {
-  id: string;
-  name: string;
-  group: string;
-  build: (root: THREE.Group, x: number, z: number) => void;
+  id: string
+  name: string
+  group: string
+  build: (root: THREE.Group, x: number, z: number) => void
 }
 
 const merged = (f: (gb: GB, x: number, z: number) => void) => (root: THREE.Group, x: number, z: number) => {
-  const gb = new GB();
-  f(gb, x, z);
-  root.add(gb.build());
-};
-const one = (x: number, z: number, s = 1, r = 0.4) => [{ x, z, s, r }];
+  const gb = new GB()
+  f(gb, x, z)
+  root.add(gb.build())
+}
+const one = (x: number, z: number, s = 1, r = 0.4) => [{ x, z, s, r }]
 
 export const PROPS: Prop[] = [
   // the town
@@ -53,8 +53,8 @@ export const PROPS: Prop[] = [
     name: "木箱",
     group: "町",
     build: merged((gb, x, z) => {
-      crate(gb, x, z, 0.55);
-      crate(gb, x, z, 0.4, 0.45);
+      crate(gb, x, z, 0.55)
+      crate(gb, x, z, 0.4, 0.45)
     }),
   },
   {
@@ -62,8 +62,8 @@ export const PROPS: Prop[] = [
     name: "袋",
     group: "町",
     build: merged((gb, x, z) => {
-      sack(gb, x, z);
-      sack(gb, x + 0.35, z + 0.1);
+      sack(gb, x, z)
+      sack(gb, x + 0.35, z + 0.1)
     }),
   },
   { id: "bucket", name: "桶", group: "町", build: merged((gb, x, z) => bucket(gb, x, z)) },
@@ -78,7 +78,7 @@ export const PROPS: Prop[] = [
     name: "屋台",
     group: "町",
     build: (root, x, z) => {
-      stall(root, x, z, ["apple", "pear", "plum"], ["cRed", "cLinen"], ["garlic", "herb"], 7, "s");
+      stall(root, x, z, ["apple", "pear", "plum"], ["cRed", "cLinen"], ["garlic", "herb"], 7, "s")
     },
   },
   {
@@ -86,7 +86,7 @@ export const PROPS: Prop[] = [
     name: "屋台（布をかけて閉めた）",
     group: "町",
     build: (root, x, z) => {
-      stall(root, x, z, [], ["cMustard", "cLinen"], [], 8, "s");
+      stall(root, x, z, [], ["cMustard", "cLinen"], [], 8, "s")
     },
   },
   { id: "cart", name: "荷車", group: "町", build: (root, x, z) => cart(root, x, z, 0.4, "barrels") },
@@ -118,9 +118,9 @@ export const PROPS: Prop[] = [
     name: "植木鉢",
     group: "軒先",
     build: (root, x, z) => {
-      const gb = new GB();
-      flowerPot(gb, root, x, z, 1);
-      root.add(gb.build());
+      const gb = new GB()
+      flowerPot(gb, root, x, z, 1)
+      root.add(gb.build())
     },
   },
   { id: "net-frame", name: "網干し（漁師）", group: "軒先", build: merged((gb, x, z) => netFrame(gb, x, z, true)) },
@@ -171,7 +171,7 @@ export const PROPS: Prop[] = [
     name: "スライム",
     group: "生き物",
     build: (root, x, z) => {
-      critters.push(new Slime(root, [x - 1, z - 1, x + 1, z + 1], 1, 0x6ab0a0));
+      critters.push(new Slime(root, [x - 1, z - 1, x + 1, z + 1], 1, 0x6ab0a0))
     },
   },
   {
@@ -179,9 +179,9 @@ export const PROPS: Prop[] = [
     name: "野うさぎ",
     group: "生き物",
     build: (root, x, z) => {
-      critters.push(new Hare(root, [x - 1, z - 1, x + 1, z + 1], 2));
+      critters.push(new Hare(root, [x - 1, z - 1, x + 1, z + 1], 2))
     },
   },
   // the small things of everyday life (things.ts), every one of them
   ...Object.entries(THINGS).map(([id, t]) => ({ id, name: t.name, group: t.group, build: merged((gb, x, z) => t.build(gb, x, z, 1, true)) })),
-];
+]

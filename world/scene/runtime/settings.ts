@@ -1,4 +1,4 @@
-export const TIMES_OF_DAY = ["昼", "夕方", "夜"] as const;
+export const TIMES_OF_DAY = ["昼", "夕方", "夜"] as const
 
 /**
  * A soft blur at the edges of the screen, in an ellipse that follows the screen's shape: the wide
@@ -15,4 +15,4 @@ export const diorama = {
   strength: 6,
   saturation: 1.05,
   contrast: 1.03,
-};
+}

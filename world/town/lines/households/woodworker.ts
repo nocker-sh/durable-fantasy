@@ -1,4 +1,4 @@
-import type { Line } from "../line.ts";
+import type { Line } from "../line.ts"
 
 const lines = {
   ゴットフリート: [
@@ -98,6 +98,6 @@ const lines = {
     { text: "祭りの夜は樽を叩いて太鼓にするんだ。いい音するんだよなあ。", event: "灯りの祭り" },
     { text: "よう、はじめましてだな。アントンだよ。樽屋。歌もやる。", first: true },
   ],
-} satisfies Record<string, readonly Line[]>;
+} satisfies Record<string, readonly Line[]>
 
-export { lines };
+export { lines }

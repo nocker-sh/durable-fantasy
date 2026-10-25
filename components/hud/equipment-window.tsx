@@ -1,31 +1,31 @@
 // What is worn (ui.md §3.8): seven slots around the figure. Drag from the bag onto a slot to wear
 // it, double-click a slot (or drag it back to the bag) to take it off.
-import { useState, type DragEvent } from "react";
-import { ITEMS, SLOT_NAME, slotsFor, type Slot as SlotId } from "#/world/core/items.ts";
-import { useGame, useGameState } from "#/components/game/context.tsx";
-import { Slot } from "#/components/game/slot.tsx";
-import { Window } from "#/components/game/window.tsx";
-import { uiIconUrl } from "#/world/art/icons.ts";
-import type { SpriteName } from "#/world/art/pixel-art.ts";
-import { ItemTooltip } from "./item-tooltip.tsx";
-import { carriesItem, readDrag, startDrag } from "./drag.ts";
-import { useWindow } from "./use-window.ts";
+import { useState, type DragEvent } from "react"
+import { ITEMS, SLOT_NAME, slotsFor, type Slot as SlotId } from "#/world/core/items.ts"
+import { useGame, useGameState } from "#/components/game/context.tsx"
+import { Slot } from "#/components/game/slot.tsx"
+import { Window } from "#/components/game/window.tsx"
+import { uiIconUrl } from "#/world/art/icons.ts"
+import type { SpriteName } from "#/world/art/pixel-art.ts"
+import { ItemTooltip } from "./item-tooltip.tsx"
+import { carriesItem, readDrag, startDrag } from "./drag.ts"
+import { useWindow } from "./use-window.ts"
 
-const LEFT: SlotId[] = ["head", "neck", "body", "feet"];
-const RIGHT: SlotId[] = ["weapon", "shield"];
-const BOTTOM: SlotId[] = ["accessory1", "accessory2"];
+const LEFT: SlotId[] = ["head", "neck", "body", "feet"]
+const RIGHT: SlotId[] = ["weapon", "shield"]
+const BOTTOM: SlotId[] = ["accessory1", "accessory2"]
 
 /** the silhouette an empty slot shows */
-const EMPTY: Record<SlotId, SpriteName> = { neck: "chat", head: "helm", body: "tunic", weapon: "sword", shield: "shield", feet: "boots", accessory1: "ring", accessory2: "ring" };
+const EMPTY: Record<SlotId, SpriteName> = { neck: "chat", head: "helm", body: "tunic", weapon: "sword", shield: "shield", feet: "boots", accessory1: "ring", accessory2: "ring" }
 
 export function EquipmentWindow() {
-  const win = useWindow("equipment");
-  const player = useGameState((s) => s.player);
-  const derived = useGameState((s) => s.derived);
-  const portrait = useGameState((s) => s.portrait);
-  if (!win.open || !player || !derived) return null;
-  const gearAtk = Object.values(player.equipment).reduce((n, id) => n + (id ? (ITEMS[id].equip?.atk ?? 0) : 0), 0);
-  const gearDef = Object.values(player.equipment).reduce((n, id) => n + (id ? (ITEMS[id].equip?.def ?? 0) : 0), 0);
+  const win = useWindow("equipment")
+  const player = useGameState((s) => s.player)
+  const derived = useGameState((s) => s.derived)
+  const portrait = useGameState((s) => s.portrait)
+  if (!win.open || !player || !derived) return null
+  const gearAtk = Object.values(player.equipment).reduce((n, id) => n + (id ? (ITEMS[id].equip?.atk ?? 0) : 0), 0)
+  const gearDef = Object.values(player.equipment).reduce((n, id) => n + (id ? (ITEMS[id].equip?.def ?? 0) : 0), 0)
   return (
     <Window
       id="equipment"
@@ -72,19 +72,19 @@ export function EquipmentWindow() {
         ))}
       </div>
     </Window>
-  );
+  )
 }
 
 function Worn({ slot }: { slot: SlotId }) {
-  const game = useGame();
-  const item = useGameState((s) => s.player?.equipment[slot] ?? null);
-  const [over, setOver] = useState(false);
+  const game = useGame()
+  const item = useGameState((s) => s.player?.equipment[slot] ?? null)
+  const [over, setOver] = useState(false)
   const drop = (event: DragEvent) => {
-    event.preventDefault();
-    setOver(false);
-    const drag = readDrag(event);
-    if (drag && "slot" in drag && slotsFor(drag.item).includes(slot)) game.equip(drag.slot, slot);
-  };
+    event.preventDefault()
+    setOver(false)
+    const drag = readDrag(event)
+    if (drag && "slot" in drag && slotsFor(drag.item).includes(slot)) game.equip(drag.slot, slot)
+  }
   return (
     <ItemTooltip item={item} side="left" hint="ダブルクリックで外す">
       <Slot
@@ -98,13 +98,13 @@ function Worn({ slot }: { slot: SlotId }) {
         onDoubleClick={() => item && game.unequip(slot)}
         onDragStart={(e) => item && startDrag(e, { item, worn: slot }, game.iconUrl(item))}
         onDragOver={(e) => {
-          if (!carriesItem(e)) return;
-          e.preventDefault();
-          setOver(true);
+          if (!carriesItem(e)) return
+          e.preventDefault()
+          setOver(true)
         }}
         onDragLeave={() => setOver(false)}
         onDrop={drop}
       />
     </ItemTooltip>
-  );
+  )
 }

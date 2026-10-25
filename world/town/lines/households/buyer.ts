@@ -1,4 +1,4 @@
-import type { Line } from "../line.ts";
+import type { Line } from "../line.ts"
 
 const lines = {
   ラインホルト: [
@@ -97,6 +97,6 @@ const lines = {
     { text: "荷の中に、子どもの靴があった。……片方だけだ。じいさんは黙って買った。" },
     { text: "……肩は、荷の形を覚える。樽なら樽の形に。" },
   ],
-} satisfies Record<string, readonly Line[]>;
+} satisfies Record<string, readonly Line[]>
 
-export { lines };
+export { lines }

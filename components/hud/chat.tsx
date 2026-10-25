@@ -1,37 +1,37 @@
 // Chat (ui.md §3.4): bottom right, what people say with the line to type in (Enter opens it); and
 // the system log on the left, what happens (arriving, buying, being refused). Both resizable.
-import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from "react";
-import type React from "react";
-import type { ChatLine } from "#/world/game.ts";
-import { useGame, useGameState } from "#/components/game/context.tsx";
-import { Input } from "#/components/game/input.tsx";
-import { Kbd } from "#/components/game/kbd.tsx";
-import { Window } from "#/components/game/window.tsx";
-import { useWindow } from "./use-window.ts";
+import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from "react"
+import type React from "react"
+import type { ChatLine } from "#/world/game.ts"
+import { useGame, useGameState } from "#/components/game/context.tsx"
+import { Input } from "#/components/game/input.tsx"
+import { Kbd } from "#/components/game/kbd.tsx"
+import { Window } from "#/components/game/window.tsx"
+import { useWindow } from "./use-window.ts"
 
-const NAME_COLOR = (line: ChatLine) => (line.self ? "text-white" : line.channel === "npc" ? "text-npc" : "text-player");
+const NAME_COLOR = (line: ChatLine) => (line.self ? "text-white" : line.channel === "npc" ? "text-npc" : "text-player")
 
 /** Keep a log scrolled to the newest line unless the reader has scrolled up. */
 function useStick(length: number) {
-  const log = useRef<HTMLDivElement>(null);
-  const stick = useRef(true);
+  const log = useRef<HTMLDivElement>(null)
+  const stick = useRef(true)
   useLayoutEffect(() => {
-    if (stick.current && log.current) log.current.scrollTop = log.current.scrollHeight;
-  }, [length]);
+    if (stick.current && log.current) log.current.scrollTop = log.current.scrollHeight
+  }, [length])
   const onScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const el = e.currentTarget;
-    stick.current = el.scrollHeight - el.scrollTop - el.clientHeight < 8;
-  };
-  return { log, onScroll };
+    const el = e.currentTarget
+    stick.current = el.scrollHeight - el.scrollTop - el.clientHeight < 8
+  }
+  return { log, onScroll }
 }
 
 /** The system log (left, middle): arriving, buying, being refused. */
 export function SystemLog() {
-  const win = useWindow("syslog");
-  const chat = useGameState((s) => s.chat);
-  const lines = chat.filter((l) => l.channel === "system");
-  const { log, onScroll } = useStick(lines.length);
-  if (!win.open) return null;
+  const win = useWindow("syslog")
+  const chat = useGameState((s) => s.chat)
+  const lines = chat.filter((l) => l.channel === "system")
+  const { log, onScroll } = useStick(lines.length)
+  if (!win.open) return null
   return (
     <Window
       id="syslog"
@@ -48,33 +48,33 @@ export function SystemLog() {
         ))}
       </div>
     </Window>
-  );
+  )
 }
 
 export function Chat() {
-  const game = useGame();
-  const win = useWindow("chat");
-  const chat = useGameState((s) => s.chat);
-  const typing = useGameState((s) => s.typing);
-  const [text, setText] = useState("");
-  const input = useRef<HTMLInputElement>(null);
-  const lines = chat.filter((l) => l.channel !== "system");
-  const { log, onScroll } = useStick(lines.length);
+  const game = useGame()
+  const win = useWindow("chat")
+  const chat = useGameState((s) => s.chat)
+  const typing = useGameState((s) => s.typing)
+  const [text, setText] = useState("")
+  const input = useRef<HTMLInputElement>(null)
+  const lines = chat.filter((l) => l.channel !== "system")
+  const { log, onScroll } = useStick(lines.length)
 
   useEffect(() => {
-    if (typing && !win.open) game.toggleWindow("chat");
-    if (typing) input.current?.focus();
-  }, [typing, win.open, game]);
+    if (typing && !win.open) game.toggleWindow("chat")
+    if (typing) input.current?.focus()
+  }, [typing, win.open, game])
 
   const send = (event: FormEvent) => {
-    event.preventDefault();
-    if (text.trim()) game.say(text);
-    setText("");
-    game.setTyping(false);
-    input.current?.blur();
-  };
+    event.preventDefault()
+    if (text.trim()) game.say(text)
+    setText("")
+    game.setTyping(false)
+    input.current?.blur()
+  }
 
-  if (!win.open) return null;
+  if (!win.open) return null
   return (
     <Window
       id="chat"
@@ -110,5 +110,5 @@ export function Chat() {
         )}
       </form>
     </Window>
-  );
+  )
 }

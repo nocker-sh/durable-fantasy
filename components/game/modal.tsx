@@ -1,6 +1,6 @@
 // A modal screen (ui.md §2.1): dims everything behind it and takes the input until closed.
-import type { ReactNode } from "react";
-import { cn } from "cn";
+import type { ReactNode } from "react"
+import { cn } from "cn"
 
 function Modal({ title, onClose, className, children }: { title: string; onClose?: () => void; className?: string; children: ReactNode }) {
   return (
@@ -12,7 +12,7 @@ function Modal({ title, onClose, className, children }: { title: string; onClose
         <div className="p-4">{children}</div>
       </section>
     </div>
-  );
+  )
 }
 
-export { Modal };
+export { Modal }

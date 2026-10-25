@@ -1,4 +1,4 @@
-import type { Line } from "../line.ts";
+import type { Line } from "../line.ts"
 
 const lines = {
   マティアス: [
@@ -58,6 +58,6 @@ const lines = {
     { text: "あ……こんにちは。羊飼いのマティアスです。この子たちは、えっと、たくさんいます。", first: true },
     { text: "あ、えっと……羊たちを驚かせないように、ゆっくりどうぞ。", first: true },
   ],
-} satisfies Record<string, readonly Line[]>;
+} satisfies Record<string, readonly Line[]>
 
-export { lines };
+export { lines }

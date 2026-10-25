@@ -1,4 +1,4 @@
-import type { Line } from "../line.ts";
+import type { Line } from "../line.ts"
 
 const lines = {
   マルクス: [
@@ -189,6 +189,6 @@ const lines = {
     { text: "あのね、イダっていうの。このいし、きれいでしょ。", first: true },
     { text: "いしはね、なげちゃだめなの。いしがいたいっていうから。" },
   ],
-} satisfies Record<string, readonly Line[]>;
+} satisfies Record<string, readonly Line[]>
 
-export { lines };
+export { lines }

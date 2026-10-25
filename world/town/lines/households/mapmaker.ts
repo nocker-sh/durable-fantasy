@@ -1,4 +1,4 @@
-import type { Line } from "../line.ts";
+import type { Line } from "../line.ts"
 
 const lines = {
   フェルディナント: [
@@ -50,6 +50,6 @@ const lines = {
     { text: "はじめまして。地図描きのフェルディナントと申します。", first: true },
     { text: "道にお迷いでしたら、私よりテオさんのほうが早いでしょうな。", first: true },
   ],
-} satisfies Record<string, readonly Line[]>;
+} satisfies Record<string, readonly Line[]>
 
-export { lines };
+export { lines }

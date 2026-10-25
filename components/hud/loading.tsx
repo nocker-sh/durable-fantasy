@@ -1,33 +1,33 @@
 // Between maps (ui.md §3.16): an ink-dark screen, the place's name in a quiet serif, a hairline of
 // progress, and a few lines of the world to read. When the map is ready it fades out over a
 // breath, so a passage is not snatched away half read.
-import { useEffect, useMemo, useState, type ReactNode } from "react";
-import "@fontsource/shippori-mincho/400.css";
-import { flavorFor } from "#/world/town/flavor.ts";
-import { useGameState } from "#/components/game/context.tsx";
+import { useEffect, useMemo, useState, type ReactNode } from "react"
+import "@fontsource/shippori-mincho/400.css"
+import { flavorFor } from "#/world/town/flavor.ts"
+import { useGameState } from "#/components/game/context.tsx"
 
 /** How far each step of building a map has got (scene/index.ts). */
-const STEPS: Record<string, number> = { "読み込んでいます…": 0.1, "地面を描いています…": 0.3, "街を建てています…": 0.55, "住民を描いています…": 0.8 };
-const FADE_MS = 600;
+const STEPS: Record<string, number> = { "読み込んでいます…": 0.1, "地面を描いています…": 0.3, "街を建てています…": 0.55, "住民を描いています…": 0.8 }
+const FADE_MS = 600
 
 export function Loading() {
-  const loading = useGameState((s) => s.loading);
-  const failed = useGameState((s) => s.failed);
-  const map = useGameState((s) => s.map.id);
+  const loading = useGameState((s) => s.loading)
+  const failed = useGameState((s) => s.failed)
+  const map = useGameState((s) => s.map.id)
   // the last thing shown stays up while it fades
-  const [shown, setShown] = useState(loading);
-  const [fading, setFading] = useState(false);
+  const [shown, setShown] = useState(loading)
+  const [fading, setFading] = useState(false)
   useEffect(() => {
     if (loading) {
-      setShown(loading);
-      setFading(false);
-      return;
+      setShown(loading)
+      setFading(false)
+      return
     }
-    setFading(true);
-    const t = setTimeout(() => setShown(null), FADE_MS);
-    return () => clearTimeout(t);
-  }, [loading]);
-  const passage = useMemo(() => flavorFor(map).text, [map]);
+    setFading(true)
+    const t = setTimeout(() => setShown(null), FADE_MS)
+    return () => clearTimeout(t)
+  }, [loading])
+  const passage = useMemo(() => flavorFor(map).text, [map])
   if (failed)
     return (
       <Between title="町を描けなかった">
@@ -35,9 +35,9 @@ export function Loading() {
           読み込み直す
         </button>
       </Between>
-    );
-  if (!shown) return null;
-  return <Between title={shown.map} progress={loading ? (STEPS[shown.text] ?? 0.92) : 1} passage={passage} fading={fading} />;
+    )
+  if (!shown) return null
+  return <Between title={shown.map} progress={loading ? (STEPS[shown.text] ?? 0.92) : 1} passage={passage} fading={fading} />
 }
 
 /** The quiet screen: a title, a hairline of progress, a passage, and whatever goes under them. */
@@ -59,12 +59,12 @@ export function Between({ title, progress, passage, fading, children }: { title:
         {children}
       </div>
     </div>
-  );
+  )
 }
 
 /** A few fine grains of ash drifting down, barely there. */
 function Ash() {
-  const grains = useMemo(() => Array.from({ length: 28 }, (_, k) => ({ left: (k * 37) % 100, delay: -((k * 53) % 40), dur: 26 + ((k * 17) % 18), size: k % 3 === 0 ? 2 : 1 })), []);
+  const grains = useMemo(() => Array.from({ length: 28 }, (_, k) => ({ left: (k * 37) % 100, delay: -((k * 53) % 40), dur: 26 + ((k * 17) % 18), size: k % 3 === 0 ? 2 : 1 })), [])
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
       {grains.map((g, k) => (
@@ -76,5 +76,5 @@ function Ash() {
       ))}
       <style>{"@keyframes ash-fall { from { transform: translate(0, 0); } to { transform: translate(24px, 104vh); } }"}</style>
     </div>
-  );
+  )
 }

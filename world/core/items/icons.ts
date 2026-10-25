@@ -90,6 +90,6 @@ export const ITEM_ICONS = [
   "sickle",
   "rod",
   "log",
-] as const;
+] as const
 
-export type ItemIcon = (typeof ITEM_ICONS)[number];
+export type ItemIcon = (typeof ITEM_ICONS)[number]

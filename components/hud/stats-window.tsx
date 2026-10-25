@@ -1,20 +1,20 @@
 // Stats (ui.md §3.9): name, level and experience, the six stats with a + each, and the
 // values that follow from them.
-import { STATS, STAT_NAME, MAX_LEVEL, MAX_STAT, expToNext, statCost } from "#/world/core/growth.ts";
-import { useGame, useGameState } from "#/components/game/context.tsx";
-import { Button } from "#/components/game/button.tsx";
-import { Meter } from "#/components/game/meter.tsx";
-import { Window } from "#/components/game/window.tsx";
-import { useWindow } from "./use-window.ts";
+import { STATS, STAT_NAME, MAX_LEVEL, MAX_STAT, expToNext, statCost } from "#/world/core/growth.ts"
+import { useGame, useGameState } from "#/components/game/context.tsx"
+import { Button } from "#/components/game/button.tsx"
+import { Meter } from "#/components/game/meter.tsx"
+import { Window } from "#/components/game/window.tsx"
+import { useWindow } from "./use-window.ts"
 
 export function StatsWindow() {
-  const game = useGame();
-  const win = useWindow("stats");
-  const player = useGameState((s) => s.player);
-  const d = useGameState((s) => s.derived);
-  const busy = useGameState((s) => s.busy);
-  if (!win.open || !player || !d) return null;
-  const need = expToNext(player.level);
+  const game = useGame()
+  const win = useWindow("stats")
+  const player = useGameState((s) => s.player)
+  const d = useGameState((s) => s.derived)
+  const busy = useGameState((s) => s.busy)
+  if (!win.open || !player || !d) return null
+  const need = expToNext(player.level)
   const derivedRows: [string, string | number][] = [
     ["最大 HP", d.maxHp],
     ["最大 SP", d.maxSp],
@@ -25,7 +25,7 @@ export function StatsWindow() {
     ["会心", `${d.crit}%`],
     ["攻撃間隔", `${(d.attackDelay / 1000).toFixed(2)} 秒`],
     ["持てる重さ", d.maxWeight],
-  ];
+  ]
   return (
     <Window id="stats" title="能力" hotkey="C" {...win.props} key={win.key} initial={() => ({ x: 12, y: 104 })} className="w-[340px]">
       <div className="flex items-baseline justify-between font-head">
@@ -45,9 +45,9 @@ export function StatsWindow() {
         <div>
           <ul className="flex flex-col gap-1">
             {STATS.map((stat) => {
-              const value = player.stats[stat];
-              const cost = statCost(value);
-              const can = value < MAX_STAT && player.statPoints >= cost;
+              const value = player.stats[stat]
+              const cost = statCost(value)
+              const can = value < MAX_STAT && player.statPoints >= cost
               return (
                 <li key={stat} className="flex h-6 items-center gap-1.5 font-head text-[13px]">
                   <span className="w-12 text-text-dim">{STAT_NAME[stat]}</span>
@@ -56,7 +56,7 @@ export function StatsWindow() {
                     +
                   </Button>
                 </li>
-              );
+              )
             })}
           </ul>
           <div className="mt-2 flex justify-between font-head text-xs">
@@ -74,5 +74,5 @@ export function StatsWindow() {
         </dl>
       </div>
     </Window>
-  );
+  )
 }

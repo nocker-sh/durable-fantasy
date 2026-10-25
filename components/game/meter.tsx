@@ -1,8 +1,8 @@
 // Copied from the dev shadcn Progress and restyled as a gem bar (ui.md §6.1): a rounded glass
 // tube filled with red or blue, the numbers beside it.
-import { Progress as ProgressPrimitive } from "@base-ui/react/progress";
-import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "cn";
+import { Progress as ProgressPrimitive } from "@base-ui/react/progress"
+import { cva, type VariantProps } from "class-variance-authority"
+import { cn } from "cn"
 
 const fill = cva("h-full rounded-full transition-[width] duration-300 ease-out", {
   variants: {
@@ -14,7 +14,7 @@ const fill = cva("h-full rounded-full transition-[width] duration-300 ease-out",
     },
   },
   defaultVariants: { tone: "hp" },
-});
+})
 
 function Meter({
   className,
@@ -39,7 +39,7 @@ function Meter({
         </span>
       )}
     </ProgressPrimitive.Root>
-  );
+  )
 }
 
-export { Meter };
+export { Meter }

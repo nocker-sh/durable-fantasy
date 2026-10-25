@@ -1,21 +1,21 @@
 // Every baked clip with a Japanese label, the item it is shown with and the prop that
 // explains it (a tree to chop, a well to draw from, water to swim in...).
-import type { Item } from "#/world/scene/figure.ts";
-import type { PropKind } from "./props.ts";
+import type { Item } from "#/world/scene/figure.ts"
+import type { PropKind } from "./props.ts"
 
 export interface Motion {
-  clip: string;
-  label: string;
-  cat: string;
-  item?: Item;
-  prop?: PropKind;
+  clip: string
+  label: string
+  cat: string
+  item?: Item
+  prop?: PropKind
   /** pelvis height when seated (the chibi legs are shorter than the seat) */
-  seatY?: number;
+  seatY?: number
   /** sprite px to sink the body (swimming sits low in the water) */
-  sink?: number;
+  sink?: number
 }
 
-export const CATEGORIES = ["基本", "移動", "暮らし", "剣・盾", "格闘", "魔法・道具", "やられ", "その他"] as const;
+export const CATEGORIES = ["基本", "移動", "暮らし", "剣・盾", "格闘", "魔法・道具", "やられ", "その他"] as const
 
 export const MOTIONS: Motion[] = [
   // 基本
@@ -113,4 +113,4 @@ export const MOTIONS: Motion[] = [
   { clip: "Zombie_Idle", label: "ゾンビ（待機）", cat: "その他", prop: "grave" },
   { clip: "Zombie_Walk", label: "ゾンビ（歩く）", cat: "その他", prop: "grave" },
   { clip: "Zombie_Scratch", label: "ゾンビ（ひっかく）", cat: "その他", prop: "grave" },
-];
+]

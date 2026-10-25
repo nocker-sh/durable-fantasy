@@ -1,5 +1,5 @@
-import { hex } from "../../scene/pix.ts";
-import { hexes, k } from "./palette.ts";
+import { hex } from "../../scene/pix.ts"
+import { hexes, k } from "./palette.ts"
 
 const BLOB = [
   "................",
@@ -18,7 +18,7 @@ const BLOB = [
   "....kkkkkkkk....",
   "................",
   "................",
-];
+]
 
 const CRYSTAL = [
   "................",
@@ -37,7 +37,7 @@ const CRYSTAL = [
   "................",
   "................",
   "................",
-];
+]
 
 const FUR = [
   "................",
@@ -56,7 +56,7 @@ const FUR = [
   "................",
   "................",
   "................",
-];
+]
 
 const FANG = [
   "................",
@@ -75,7 +75,7 @@ const FANG = [
   "..........k.....",
   "................",
   "................",
-];
+]
 
 const FEATHER = [
   "................",
@@ -94,7 +94,7 @@ const FEATHER = [
   ".kk.............",
   "................",
   "................",
-];
+]
 
 const SHELL = [
   "................",
@@ -113,7 +113,7 @@ const SHELL = [
   "................",
   "................",
   "................",
-];
+]
 
 const BONE = [
   "................",
@@ -132,7 +132,7 @@ const BONE = [
   "..........kmssk.",
   "...........kkk..",
   "................",
-];
+]
 
 const COG = [
   "................",
@@ -151,7 +151,7 @@ const COG = [
   "...kk..kkkk.kk..",
   "................",
   "................",
-];
+]
 
 const SCRAP = [
   "................",
@@ -170,7 +170,7 @@ const SCRAP = [
   "................",
   "................",
   "................",
-];
+]
 
 const THREAD = [
   "................",
@@ -189,10 +189,10 @@ const THREAD = [
   "................",
   "................",
   "................",
-];
+]
 
-const GLOW = hexes("#e8ffff", "#8fd0e0", "#3a6a88");
+const GLOW = hexes("#e8ffff", "#8fd0e0", "#3a6a88")
 
-const crystalWhite = { k, w: hex("#ffffff"), ...hexes("#f4f8ff", "#c8d4f0", "#6a7aa8") };
+const crystalWhite = { k, w: hex("#ffffff"), ...hexes("#f4f8ff", "#c8d4f0", "#6a7aa8") }
 
-export { BLOB, CRYSTAL, FUR, FANG, FEATHER, SHELL, BONE, COG, SCRAP, THREAD, GLOW, crystalWhite };
+export { BLOB, CRYSTAL, FUR, FANG, FEATHER, SHELL, BONE, COG, SCRAP, THREAD, GLOW, crystalWhite }

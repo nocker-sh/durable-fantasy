@@ -1,29 +1,29 @@
 // The system menu and the screens it opens (ui.md §3.14): character, controls, back to the game.
-import { useEffect, useState } from "react";
-import { LOOKS } from "#/world/game.ts";
-import { useGame, useGameState } from "#/components/game/context.tsx";
-import { Button } from "#/components/game/button.tsx";
-import { Input } from "#/components/game/input.tsx";
-import { Kbd } from "#/components/game/kbd.tsx";
-import { Modal } from "#/components/game/modal.tsx";
-import { NECK_KINDS, NECK_RAMPS, type NeckKind } from "#/world/core/player.ts";
-import { RAMPS } from "#/world/scene/pix.ts";
-import { CHANNEL_CAP } from "#/world/channels.ts";
+import { useEffect, useState } from "react"
+import { LOOKS } from "#/world/game.ts"
+import { useGame, useGameState } from "#/components/game/context.tsx"
+import { Button } from "#/components/game/button.tsx"
+import { Input } from "#/components/game/input.tsx"
+import { Kbd } from "#/components/game/kbd.tsx"
+import { Modal } from "#/components/game/modal.tsx"
+import { NECK_KINDS, NECK_RAMPS, type NeckKind } from "#/world/core/player.ts"
+import { RAMPS } from "#/world/scene/pix.ts"
+import { CHANNEL_CAP } from "#/world/channels.ts"
 
-const NECK_LABEL: Record<NeckKind, string> = { muffler: "マフラー", stole: "ストール", scarf: "スカーフ" };
-const rampColor = (ramp: string) => `rgb(${RAMPS[ramp][3].join(",")})`;
+const NECK_LABEL: Record<NeckKind, string> = { muffler: "マフラー", stole: "ストール", scarf: "スカーフ" }
+const rampColor = (ramp: string) => `rgb(${RAMPS[ramp][3].join(",")})`
 
 export function SystemModals() {
-  const modal = useGameState((s) => s.modal);
-  if (modal === "system") return <SystemMenu />;
-  if (modal === "character") return <CharacterScreen />;
-  if (modal === "help") return <Controls />;
-  if (modal === "channel") return <Channels />;
-  return null;
+  const modal = useGameState((s) => s.modal)
+  if (modal === "system") return <SystemMenu />
+  if (modal === "character") return <CharacterScreen />
+  if (modal === "help") return <Controls />
+  if (modal === "channel") return <Channels />
+  return null
 }
 
 function SystemMenu() {
-  const game = useGame();
+  const game = useGame()
   return (
     <Modal title="メニュー" onClose={() => game.openModal(null)} className="w-60">
       <div className="flex flex-col gap-2">
@@ -32,8 +32,8 @@ function SystemMenu() {
         <Button onClick={() => game.openModal("channel")}>チャンネル</Button>
         <Button
           onClick={() => {
-            game.resetLayout();
-            game.openModal(null);
+            game.resetLayout()
+            game.openModal(null)
           }}
         >
           ウィンドウの配置を戻す
@@ -44,20 +44,20 @@ function SystemMenu() {
         </Button>
       </div>
     </Modal>
-  );
+  )
 }
 
 /** Channels of this map in this town and how full they are; pick one to move there (channels.ts). */
 function Channels() {
-  const game = useGame();
-  const room = useGameState((s) => s.room);
-  const map = useGameState((s) => s.map);
+  const game = useGame()
+  const room = useGameState((s) => s.room)
+  const map = useGameState((s) => s.map)
   useEffect(() => {
-    void game.refreshChannels();
-  }, [game]);
-  if (!room) return null;
-  const listed = [...new Set([...Object.keys(room.channels).map(Number), room.channel])].sort((a, b) => a - b);
-  const next = listed.length ? Math.max(...listed) + 1 : 2;
+    void game.refreshChannels()
+  }, [game])
+  if (!room) return null
+  const listed = [...new Set([...Object.keys(room.channels).map(Number), room.channel])].sort((a, b) => a - b)
+  const next = listed.length ? Math.max(...listed) + 1 : 2
   return (
     <Modal title="チャンネル" onClose={() => game.openModal("system")} className="w-72">
       <p className="mb-2 font-body text-xs text-text-dim">
@@ -65,8 +65,8 @@ function Channels() {
       </p>
       <ul className="flex flex-col gap-1">
         {[...listed, next].map((ch) => {
-          const n = room.channels[ch] ?? 0;
-          const here = ch === room.channel;
+          const n = room.channels[ch] ?? 0
+          const here = ch === room.channel
           return (
             <li key={ch} className="ui-well flex items-center gap-2 px-2 py-1 font-head text-xs">
               <span className="w-16">ch.{ch}</span>
@@ -78,48 +78,48 @@ function Channels() {
                   size="sm"
                   disabled={n >= CHANNEL_CAP}
                   onClick={() => {
-                    game.changeChannel(ch);
-                    game.openModal(null);
+                    game.changeChannel(ch)
+                    game.openModal(null)
                   }}
                 >
                   移る
                 </Button>
               )}
             </li>
-          );
+          )
         })}
       </ul>
     </Modal>
-  );
+  )
 }
 
 function CharacterScreen() {
-  const game = useGame();
-  const player = useGameState((s) => s.player);
-  const portraits = useGameState((s) => s.portraits);
-  const busy = useGameState((s) => s.busy);
-  const [name, setName] = useState(player?.name ?? "");
-  const [look, setLook] = useState(player?.look ?? 0);
-  const [neck, setNeck] = useState<NeckKind>(player?.neck ?? "muffler");
-  const [ramp, setRamp] = useState<(typeof NECK_RAMPS)[number]>((player?.neckRamp as (typeof NECK_RAMPS)[number]) ?? "cRed");
-  const [preview, setPreview] = useState<string | null>(null);
+  const game = useGame()
+  const player = useGameState((s) => s.player)
+  const portraits = useGameState((s) => s.portraits)
+  const busy = useGameState((s) => s.busy)
+  const [name, setName] = useState(player?.name ?? "")
+  const [look, setLook] = useState(player?.look ?? 0)
+  const [neck, setNeck] = useState<NeckKind>(player?.neck ?? "muffler")
+  const [ramp, setRamp] = useState<(typeof NECK_RAMPS)[number]>((player?.neckRamp as (typeof NECK_RAMPS)[number]) ?? "cRed")
+  const [preview, setPreview] = useState<string | null>(null)
   useEffect(() => {
     if (player) {
-      setName(player.name);
-      setLook(player.look);
-      setNeck(player.neck);
-      setRamp(player.neckRamp as (typeof NECK_RAMPS)[number]);
+      setName(player.name)
+      setLook(player.look)
+      setNeck(player.neck)
+      setRamp(player.neckRamp as (typeof NECK_RAMPS)[number])
     }
-  }, [player]);
+  }, [player])
   useEffect(() => {
-    let live = true;
-    game.previewPortrait(look, neck, ramp, (url) => live && setPreview(url));
+    let live = true
+    game.previewPortrait(look, neck, ramp, (url) => live && setPreview(url))
     return () => {
-      live = false;
-    };
-  }, [game, look, neck, ramp]);
-  if (!player) return null;
-  const changed = name.trim() !== player.name || look !== player.look || neck !== player.neck || ramp !== player.neckRamp;
+      live = false
+    }
+  }, [game, look, neck, ramp])
+  if (!player) return null
+  const changed = name.trim() !== player.name || look !== player.look || neck !== player.neck || ramp !== player.neckRamp
   return (
     <Modal title="キャラクター" onClose={() => game.openModal("system")} className="w-[400px]">
       <div className="flex gap-4">
@@ -172,8 +172,8 @@ function CharacterScreen() {
               variant="primary"
               disabled={!changed || !name.trim() || busy}
               onClick={() => {
-                game.setProfile(name, look, neck, ramp);
-                game.openModal(null);
+                game.setProfile(name, look, neck, ramp)
+                game.openModal(null)
               }}
             >
               決める
@@ -182,7 +182,7 @@ function CharacterScreen() {
         </div>
       </div>
     </Modal>
-  );
+  )
 }
 
 const CONTROLS: [string[], string][] = [
@@ -200,10 +200,10 @@ const CONTROLS: [string[], string][] = [
   [["Tab"], "ミニマップ"],
   [["Alt+C"], "チャットのウィンドウ"],
   [["Esc"], "閉じる / メニュー"],
-];
+]
 
 function Controls() {
-  const game = useGame();
+  const game = useGame()
   return (
     <Modal title="操作一覧" onClose={() => game.openModal("system")} className="w-[380px]">
       <dl className="grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-1.5 font-body text-[13px]">
@@ -222,5 +222,5 @@ function Controls() {
         <Button onClick={() => game.openModal("system")}>戻る</Button>
       </div>
     </Modal>
-  );
+  )
 }

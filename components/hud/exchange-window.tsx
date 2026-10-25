@@ -1,50 +1,50 @@
 // The exchange board (economy.md §5): pick a thing, see who sells and buys at what price and how it
 // has gone these past days, put up an order, take yours down, collect what changed hands.
-import { useState } from "react";
-import { escrowFor, parseSymbol, symbolKey, TRADE_FEE } from "#/world/core/exchange.ts";
-import { ITEMS, QUALITIES, sellable, type ItemId } from "#/world/core/items.ts";
-import { displayName } from "#/world/core/makers.ts";
-import { useGame, useGameState } from "#/components/game/context.tsx";
-import { Button } from "#/components/game/button.tsx";
-import { Gold } from "#/components/game/gold.tsx";
-import { Input } from "#/components/game/input.tsx";
-import { Slot } from "#/components/game/slot.tsx";
-import { Stepper } from "#/components/game/stepper.tsx";
-import { Window } from "#/components/game/window.tsx";
+import { useState } from "react"
+import { escrowFor, parseSymbol, symbolKey, TRADE_FEE } from "#/world/core/exchange.ts"
+import { ITEMS, QUALITIES, sellable, type ItemId } from "#/world/core/items.ts"
+import { displayName } from "#/world/core/makers.ts"
+import { useGame, useGameState } from "#/components/game/context.tsx"
+import { Button } from "#/components/game/button.tsx"
+import { Gold } from "#/components/game/gold.tsx"
+import { Input } from "#/components/game/input.tsx"
+import { Slot } from "#/components/game/slot.tsx"
+import { Stepper } from "#/components/game/stepper.tsx"
+import { Window } from "#/components/game/window.tsx"
 
 /** Everything that can be traded: plain things as they are, made things by quality. */
 const SYMBOLS = (Object.keys(ITEMS) as ItemId[])
   .filter((id) => sellable(id) && !ITEMS[id].tool && ITEMS[id].kind !== "key")
-  .flatMap((id) => (ITEMS[id].made ? ([0, 1, 2, 3] as const).map((q) => symbolKey({ item: id, q })) : [id]));
+  .flatMap((id) => (ITEMS[id].made ? ([0, 1, 2, 3] as const).map((q) => symbolKey({ item: id, q })) : [id]))
 
 const label = (key: string) => {
-  const s = parseSymbol(key);
-  return s ? `${ITEMS[s.item].name}${s.q !== undefined ? `（${QUALITIES[s.q]}）` : ""}` : key;
-};
+  const s = parseSymbol(key)
+  return s ? `${ITEMS[s.item].name}${s.q !== undefined ? `（${QUALITIES[s.q]}）` : ""}` : key
+}
 
 export function ExchangeWindow() {
-  const game = useGame();
-  const board = useGameState((s) => s.board);
-  const player = useGameState((s) => s.player);
-  const busy = useGameState((s) => s.busy);
-  const [side, setSide] = useState<"buy" | "sell">("buy");
-  const [price, setPrice] = useState("");
-  const [qty, setQty] = useState(1);
-  const [filter, setFilter] = useState("");
-  if (!board || !player) return null;
-  const sym = parseSymbol(board.symbol);
-  const v = board.view;
+  const game = useGame()
+  const board = useGameState((s) => s.board)
+  const player = useGameState((s) => s.player)
+  const busy = useGameState((s) => s.busy)
+  const [side, setSide] = useState<"buy" | "sell">("buy")
+  const [price, setPrice] = useState("")
+  const [qty, setQty] = useState(1)
+  const [filter, setFilter] = useState("")
+  if (!board || !player) return null
+  const sym = parseSymbol(board.symbol)
+  const v = board.view
   const bestAsk = v?.book.asks[0]?.price,
-    bestBid = v?.book.bids[0]?.price;
-  const p = Number(price) || (side === "buy" ? bestAsk : bestBid) || (sym ? Math.max(1, Math.round(ITEMS[sym.item].price * 0.8)) : 1);
-  const slot = sym ? player.bag.findIndex((s) => s?.item === sym.item && s.q === sym.q) : -1;
-  const have = slot >= 0 ? player.bag[slot]!.count : 0;
-  const { gold: needs, fee } = escrowFor(side, p, qty);
-  const reason = side === "sell" ? (have < qty ? "手元に足りない" : player.gold < fee ? "出品料が足りない" : null) : player.gold < needs ? "所持金が足りない" : null;
-  const candles = (v?.history ?? []).slice(-14);
+    bestBid = v?.book.bids[0]?.price
+  const p = Number(price) || (side === "buy" ? bestAsk : bestBid) || (sym ? Math.max(1, Math.round(ITEMS[sym.item].price * 0.8)) : 1)
+  const slot = sym ? player.bag.findIndex((s) => s?.item === sym.item && s.q === sym.q) : -1
+  const have = slot >= 0 ? player.bag[slot]!.count : 0
+  const { gold: needs, fee } = escrowFor(side, p, qty)
+  const reason = side === "sell" ? (have < qty ? "手元に足りない" : player.gold < fee ? "出品料が足りない" : null) : player.gold < needs ? "所持金が足りない" : null
+  const candles = (v?.history ?? []).slice(-14)
   const hi = Math.max(1, ...candles.map((c) => c.high)),
-    lo = Math.min(hi, ...candles.map((c) => c.low));
-  const list = SYMBOLS.filter((k) => !filter || label(k).includes(filter)).slice(0, 60);
+    lo = Math.min(hi, ...candles.map((c) => c.low))
+  const list = SYMBOLS.filter((k) => !filter || label(k).includes(filter)).slice(0, 60)
   return (
     <Window id="exchange" title="取引の掲示板" z={30} onClose={() => game.closeBoard()} initial={(w) => ({ x: Math.max(12, w / 2 - 330), y: 90 })} className="w-[660px]">
       <div className="flex gap-3">
@@ -97,14 +97,14 @@ export function ExchangeWindow() {
             <svg width="100%" height="64" viewBox="0 0 280 64" preserveAspectRatio="none">
               {candles.map((c, i) => {
                 const x = (i + 0.5) * (280 / 14),
-                  y = (n: number) => 52 - ((n - lo) / Math.max(1, hi - lo)) * 44;
+                  y = (n: number) => 52 - ((n - lo) / Math.max(1, hi - lo)) * 44
                 return (
                   <g key={c.day}>
                     <line x1={x} x2={x} y1={y(c.high)} y2={y(c.low)} stroke="#a89878" strokeWidth={1} />
                     <rect x={x - 4} width={8} y={Math.min(y(c.open), y(c.close))} height={Math.max(1.5, Math.abs(y(c.open) - y(c.close)))} fill={c.close >= c.open ? "#7cba7c" : "#e08a7a"} />
                     <rect x={x - 4} width={8} y={64 - Math.min(10, c.volume)} height={Math.min(10, c.volume)} fill="#5a5470" />
                   </g>
-                );
+                )
               })}
               {!candles.length && (
                 <text x="140" y="36" textAnchor="middle" fill="#8a8494" fontSize="11">
@@ -181,5 +181,5 @@ export function ExchangeWindow() {
         </div>
       </div>
     </Window>
-  );
+  )
 }

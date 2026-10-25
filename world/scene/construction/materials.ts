@@ -1,7 +1,7 @@
-import * as THREE from "three";
-import { mat, toTex, colorMat } from "../gfx";
-import { PixBuf, pick, hash2 } from "../pix";
-import { stoneTex, woodTex, roofTex, thatchTex, leafTex, plainTex, rockTex } from "../textures";
+import * as THREE from "three"
+import { mat, toTex, colorMat } from "../gfx"
+import { PixBuf, pick, hash2 } from "../pix"
+import { stoneTex, woodTex, roofTex, thatchTex, leafTex, plainTex, rockTex } from "../textures"
 
 // ---------------------------------------------------------------- materials
 const M = {
@@ -30,12 +30,12 @@ const M = {
   rope: colorMat(0x8a7a5a),
   wool: mat(plainTex("wool", 0.7, 0.35, 11)),
   pig: mat(plainTex("pig", 0.6, 0.12, 12)),
-};
+}
 
-const coalBuf = new PixBuf(16, 16);
+const coalBuf = new PixBuf(16, 16)
 
-coalBuf.fill((x, y) => pick("fire", 0.3 + hash2(x, y, 3) * 0.7, x, y));
+coalBuf.fill((x, y) => pick("fire", 0.3 + hash2(x, y, 3) * 0.7, x, y))
 
-const coalMat = new THREE.MeshBasicMaterial({ map: toTex(coalBuf) });
+const coalMat = new THREE.MeshBasicMaterial({ map: toTex(coalBuf) })
 
-export { M, coalMat };
+export { M, coalMat }

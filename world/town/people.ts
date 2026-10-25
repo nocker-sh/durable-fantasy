@@ -5,11 +5,11 @@
 
 export interface Person {
   /** a few words of character */
-  traits: readonly string[];
+  traits: readonly string[]
   /** how they talk: first person, how they address you, endings */
-  speech: string;
+  speech: string
   /** a phrase they keep coming back to */
-  habit: string;
+  habit: string
 }
 
 export const PEOPLE: Record<string, Person> = {
@@ -108,15 +108,15 @@ export const PEOPLE: Record<string, Person> = {
   ベンヤミン: { traits: ["人懐っこい", "眠たがり", "木の馬が宝物"], speech: "ぼく。幼い口調", habit: "ぼくのおうまさん" },
   エドガー: { traits: ["昔気質", "門の話好き", "妻に優しい"], speech: "わし。元門番のかたい老人言葉。「〜であった」", habit: "わしが門に立っていた頃は" },
   マルグリット: { traits: ["にこやか", "編み物好き", "夫の話を聞き流す"], speech: "わたし。上品なおばあさん言葉。「〜ですよ」", habit: "あらあら、また門のお話？" },
-};
+}
 
-export type RelationKind = "夫婦" | "親子" | "姉妹" | "兄妹" | "祖父と孫" | "祖母と孫" | "兄弟" | "師弟" | "幼なじみ" | "友人" | "仕事仲間" | "取引相手" | "ぎこちない";
+export type RelationKind = "夫婦" | "親子" | "姉妹" | "兄妹" | "祖父と孫" | "祖母と孫" | "兄弟" | "師弟" | "幼なじみ" | "友人" | "仕事仲間" | "取引相手" | "ぎこちない"
 
 export interface Relation {
-  a: string;
-  b: string;
-  kind: RelationKind;
-  note: string;
+  a: string
+  b: string
+  kind: RelationKind
+  note: string
 }
 
 /** How they stand with each other. Each pair once; `a` is the elder or the one who leads, where that matters. */
@@ -271,11 +271,11 @@ export const RELATIONS: readonly Relation[] = [
   { a: "ハンナ", b: "ラウラ", kind: "友人", note: "教室の隣どうし" },
   { a: "ヨハン", b: "フェリックス", kind: "友人", note: "" },
   { a: "トビアス", b: "ダニエル", kind: "友人", note: "" },
-];
+]
 
 /**
  * Close pairs who never share an hour on purpose: their lives run at opposite times, and that is
  * part of who they are (lines speak of notes left on the table, of seeing each other asleep). Every
  * other family, friend and old acquaintance meets somewhere in the day (people.test.ts).
  */
-export const APART: readonly { a: string; b: string; why: string }[] = [{ a: "グレーテ", b: "アンナ", why: "妹は夜市、姉は昼の洗濯場。台所の置き手紙でやり取りする姉妹" }];
+export const APART: readonly { a: string; b: string; why: string }[] = [{ a: "グレーテ", b: "アンナ", why: "妹は夜市、姉は昼の洗濯場。台所の置き手紙でやり取りする姉妹" }]

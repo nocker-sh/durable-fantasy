@@ -1,36 +1,36 @@
-import "#/components/game/game.css";
-import { useEffect, useState } from "react";
-import { apply } from "#/world/core/apply.ts";
-import { addItem, emptyBag } from "#/world/core/bag.ts";
-import { emptyEquipment, newPlayer, type PlayerState } from "#/world/core/player.ts";
-import { lifeExpAt } from "#/world/core/life.ts";
-import { isShopId } from "#/world/core/shops.ts";
-import { derive } from "#/world/core/stats.ts";
-import { carried } from "#/world/core/apply.ts";
-import { Game, type GameState, type WindowId } from "#/world/game.ts";
-import { GameProvider } from "#/components/game/context.tsx";
-import { TooltipProvider } from "#/components/game/tooltip.tsx";
-import { Chat } from "#/components/hud/chat.tsx";
-import { DialogueBox } from "#/components/hud/dialogue.tsx";
-import { EquipmentWindow } from "#/components/hud/equipment-window.tsx";
-import { Hotbar } from "#/components/hud/hotbar.tsx";
-import { InventoryWindow } from "#/components/hud/inventory-window.tsx";
-import { ShopWindow } from "#/components/hud/shop-window.tsx";
-import { StatsWindow } from "#/components/hud/stats-window.tsx";
-import { StatusFrame } from "#/components/hud/status-frame.tsx";
-import { SystemModals } from "#/components/hud/system-menu.tsx";
-import { WorldmapWindow } from "#/components/hud/worldmap-window.tsx";
-import { Loading } from "#/components/hud/loading.tsx";
-import { Offline } from "#/components/hud/offline.tsx";
-import { Fallen } from "#/components/hud/fallen.tsx";
-import { useNoCanvasMenu } from "#/hooks/use-no-canvas-menu.ts";
+import "#/components/game/game.css"
+import { useEffect, useState } from "react"
+import { apply } from "#/world/core/apply.ts"
+import { addItem, emptyBag } from "#/world/core/bag.ts"
+import { emptyEquipment, newPlayer, type PlayerState } from "#/world/core/player.ts"
+import { lifeExpAt } from "#/world/core/life.ts"
+import { isShopId } from "#/world/core/shops.ts"
+import { derive } from "#/world/core/stats.ts"
+import { carried } from "#/world/core/apply.ts"
+import { Game, type GameState, type WindowId } from "#/world/game.ts"
+import { GameProvider } from "#/components/game/context.tsx"
+import { TooltipProvider } from "#/components/game/tooltip.tsx"
+import { Chat } from "#/components/hud/chat.tsx"
+import { DialogueBox } from "#/components/hud/dialogue.tsx"
+import { EquipmentWindow } from "#/components/hud/equipment-window.tsx"
+import { Hotbar } from "#/components/hud/hotbar.tsx"
+import { InventoryWindow } from "#/components/hud/inventory-window.tsx"
+import { ShopWindow } from "#/components/hud/shop-window.tsx"
+import { StatsWindow } from "#/components/hud/stats-window.tsx"
+import { StatusFrame } from "#/components/hud/status-frame.tsx"
+import { SystemModals } from "#/components/hud/system-menu.tsx"
+import { WorldmapWindow } from "#/components/hud/worldmap-window.tsx"
+import { Loading } from "#/components/hud/loading.tsx"
+import { Offline } from "#/components/hud/offline.tsx"
+import { Fallen } from "#/components/hud/fallen.tsx"
+import { useNoCanvasMenu } from "#/hooks/use-no-canvas-menu.ts"
 
-const WINDOWS = ["status", "hotbar", "chat", "inventory", "equipment", "stats", "worldmap", "shop", "dialogue", "system", "character", "loading", "fallen", "offline", "failed"] as const;
-type Shown = (typeof WINDOWS)[number];
+const WINDOWS = ["status", "hotbar", "chat", "inventory", "equipment", "stats", "worldmap", "shop", "dialogue", "system", "character", "loading", "fallen", "offline", "failed"] as const
+type Shown = (typeof WINDOWS)[number]
 
 /** A traveller a few days in: some gear on, a bag with a bit of everything. */
 function samplePlayer(): PlayerState {
-  let bag = emptyBag();
+  let bag = emptyBag()
   for (const [id, n] of [
     ["rye-bread", 5],
     ["red-potion", 8],
@@ -41,7 +41,7 @@ function samplePlayer(): PlayerState {
     ["small-crystal", 2],
     ["sealed-letter", 1],
   ] as const)
-    bag = addItem(bag, id, n) ?? bag;
+    bag = addItem(bag, id, n) ?? bag
   const p: PlayerState = {
     ...newPlayer(),
     gold: 1234,
@@ -52,8 +52,8 @@ function samplePlayer(): PlayerState {
     life: { ...newPlayer().life, woodcutting: lifeExpAt(4), carpentry: lifeExpAt(2), foraging: 300 },
     bag,
     equipment: { ...emptyEquipment(), weapon: "short-sword", body: "leather-armor", head: "cloth-hat", neck: "striped-muffler", feet: "leather-boots", accessory1: "fang-charm" },
-  };
-  return { ...p, hp: Math.floor(derive(p).maxHp * 0.7) };
+  }
+  return { ...p, hp: Math.floor(derive(p).maxHp * 0.7) }
 }
 
 /**
@@ -61,17 +61,17 @@ function samplePlayer(): PlayerState {
  * stands outside the dev frame (the game's own styles would leak into it); /dev/ui shows it in a box.
  * Nothing is connected; buttons that would talk to the server do nothing.
  */
-export const layout = false;
+export const layout = false
 
 export default function UiFrame() {
-  useNoCanvasMenu();
-  const q = typeof location === "undefined" ? new URLSearchParams() : new URLSearchParams(location.search);
-  const shown = (WINDOWS as readonly string[]).includes(q.get("window") ?? "") ? (q.get("window") as Shown) : "inventory";
-  const shopParam = q.get("shop") ?? "smithy";
+  useNoCanvasMenu()
+  const q = typeof location === "undefined" ? new URLSearchParams() : new URLSearchParams(location.search)
+  const shown = (WINDOWS as readonly string[]).includes(q.get("window") ?? "") ? (q.get("window") as Shown) : "inventory"
+  const shopParam = q.get("shop") ?? "smithy"
   const [game] = useState(() => {
-    const g = new Game();
-    const player = samplePlayer();
-    const windows: WindowId[] = (["inventory", "equipment", "stats", "worldmap", "chat"] as WindowId[]).filter((w) => w === shown || (shown === "shop" && w === "inventory"));
+    const g = new Game()
+    const player = samplePlayer()
+    const windows: WindowId[] = (["inventory", "equipment", "stats", "worldmap", "chat"] as WindowId[]).filter((w) => w === shown || (shown === "shop" && w === "inventory"))
     const patch: Partial<GameState> = {
       loading: shown === "loading" ? { map: "ファンティエット ― 広場", text: q.get("text") ?? "街を建てています…" } : null,
       failed: shown === "failed",
@@ -102,17 +102,17 @@ export default function UiFrame() {
               shownAt: 0,
             }
           : null,
-    };
-    g.state.set((s) => ({ ...s, ...patch }));
-    void apply;
-    return g;
-  });
-  const [mounted, setMounted] = useState(false);
+    }
+    g.state.set((s) => ({ ...s, ...patch }))
+    void apply
+    return g
+  })
+  const [mounted, setMounted] = useState(false)
   useEffect(() => {
-    setMounted(true);
-    document.body.dataset.ready = "1";
-  }, []);
-  if (!mounted) return null;
+    setMounted(true)
+    document.body.dataset.ready = "1"
+  }, [])
+  if (!mounted) return null
   return (
     <GameProvider game={game}>
       <TooltipProvider>
@@ -138,5 +138,5 @@ export default function UiFrame() {
         </div>
       </TooltipProvider>
     </GameProvider>
-  );
+  )
 }

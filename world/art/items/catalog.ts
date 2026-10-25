@@ -1,12 +1,12 @@
-import { hex, type PixBuf } from "../../scene/pix.ts";
-import { sprite } from "../pixel-art.ts";
-import { FLASK, BOWL, CUP } from "./vessels.ts";
-import { k, r, hexes, ramp3 } from "./palette.ts";
-import { LEAF, FLOWER, MUSHROOM, NUTS, POTATO, LOGS } from "./plants.ts";
-import { BLOB, FUR, FANG, FEATHER, SHELL, BONE, COG, SCRAP, THREAD, CRYSTAL, GLOW, crystalWhite } from "./materials.ts";
-import { LETTER, BELL } from "./quest.ts";
-import { STAFF, BOW, CAPE, NECKLACE, MUFFLER, SCARF, SICKLE, ROD } from "./equipment.ts";
-import { SKEWER, DRIEDFISH, PIE } from "./food.ts";
+import { hex, type PixBuf } from "../../scene/pix.ts"
+import { sprite } from "../pixel-art.ts"
+import { FLASK, BOWL, CUP } from "./vessels.ts"
+import { k, r, hexes, ramp3 } from "./palette.ts"
+import { LEAF, FLOWER, MUSHROOM, NUTS, POTATO, LOGS } from "./plants.ts"
+import { BLOB, FUR, FANG, FEATHER, SHELL, BONE, COG, SCRAP, THREAD, CRYSTAL, GLOW, crystalWhite } from "./materials.ts"
+import { LETTER, BELL } from "./quest.ts"
+import { STAFF, BOW, CAPE, NECKLACE, MUFFLER, SCARF, SICKLE, ROD } from "./equipment.ts"
+import { SKEWER, DRIEDFISH, PIE } from "./food.ts"
 
 export const ITEM_SPRITES: Record<string, PixBuf> = {
   potionR: sprite(FLASK, { k, c: r("wood", 3), g: hex("#cfe0e0"), ...hexes("#f2a08a", "#c8403a", "#7a1e1e") }),
@@ -66,4 +66,4 @@ export const ITEM_SPRITES: Record<string, PixBuf> = {
   potionG: sprite(FLASK, { k, c: r("wood", 3), g: hex("#cfe0e0"), ...hexes("#c8f0a8", "#6aa848", "#2e5a20") }),
   potionP: sprite(FLASK, { k, c: r("wood", 3), g: hex("#cfe0e0"), ...hexes("#e8c8f0", "#9a5ab8", "#4a2a5a") }),
   potionA: sprite(FLASK, { k, c: r("wood", 3), g: hex("#cfe0e0"), ...hexes("#ffe8a0", "#d8a030", "#7a5018") }),
-};
+}

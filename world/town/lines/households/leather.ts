@@ -1,4 +1,4 @@
-import type { Line } from "../line.ts";
+import type { Line } from "../line.ts"
 
 const lines = {
   ルドルフ: [
@@ -48,6 +48,6 @@ const lines = {
     { text: "革職人のルドルフだ。用があるなら言え。ないなら、革でも嗅いでいけ。", first: true },
     { text: "初めてか。革の匂いに慣れるまで、少し時間がかかるぞ。", first: true },
   ],
-} satisfies Record<string, readonly Line[]>;
+} satisfies Record<string, readonly Line[]>
 
-export { lines };
+export { lines }

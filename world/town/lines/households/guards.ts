@@ -1,4 +1,4 @@
-import type { Line } from "../line.ts";
+import type { Line } from "../line.ts"
 
 const lines = {
   ディーター: [
@@ -199,6 +199,6 @@ const lines = {
     { text: "はじめまして。衛兵のヴェロニカです。町で困ったら、わたしに。", first: true },
     { text: "規則を守る人より、隣の人を守る人の方が好きです。" },
   ],
-} satisfies Record<string, readonly Line[]>;
+} satisfies Record<string, readonly Line[]>
 
-export { lines };
+export { lines }

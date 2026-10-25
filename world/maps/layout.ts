@@ -2,67 +2,67 @@
 // field map. The scene paints and builds from it (scene/world.ts); the server and the tests read it
 // too, so nothing here draws.
 
-export type V2 = [number, number];
+export type V2 = [number, number]
 
-import { Polyline } from "../../lib/engine/polyline.ts";
-export const catmull = Polyline.catmull;
+import { Polyline } from "../../lib/engine/polyline.ts"
+export const catmull = Polyline.catmull
 
-export { smooth } from "../../lib/engine/math.ts";
+export { smooth } from "../../lib/engine/math.ts"
 
 // ------------------------------------------------------------------ layout
 // Each map describes its ground with a Layout (scene/world.ts swaps it in and recomputes the
 // fields). A feature a map does not have sits far outside it (OFF).
 
 export interface Road {
-  pts: V2[];
-  w: number;
-  kind: "cobble" | "dirt" | "pave";
+  pts: V2[]
+  w: number
+  kind: "cobble" | "dirt" | "pave"
 }
-export type Rect = { x0: number; z0: number; x1: number; z1: number };
+export type Rect = { x0: number; z0: number; x1: number; z1: number }
 
 export interface Layout {
   /** river centre line and half width; OFF_LINE for none */
-  river: V2[];
-  riverHW: number;
+  river: V2[]
+  riverHW: number
   /** z range where the river runs between stone embankments */
-  embanked: [number, number];
-  roads: Road[];
+  embanked: [number, number]
+  roads: Road[]
   /** round paved square and its radius; OFF_POINT for none */
-  plaza: V2;
-  plazaR: number;
-  terrace: Rect & { h: number };
-  stairs: Rect;
-  lavoir: Rect & { h: number };
-  lavStairs: Rect;
-  bridge: Rect;
-  fields: (Rect & { axis: "x" | "z" })[];
-  pigpen: Rect;
-  pasture: Rect;
-  graveyard: Rect;
-  gardens: Rect[];
-  dirtPatches: [number, number, number, number][];
+  plaza: V2
+  plazaR: number
+  terrace: Rect & { h: number }
+  stairs: Rect
+  lavoir: Rect & { h: number }
+  lavStairs: Rect
+  bridge: Rect
+  fields: (Rect & { axis: "x" | "z" })[]
+  pigpen: Rect
+  pasture: Rect
+  graveyard: Rect
+  gardens: Rect[]
+  dirtPatches: [number, number, number, number][]
   /** the flatter, built-up part: centre and radii (wilder, hillier ground outside) */
-  town: [number, number, number, number];
+  town: [number, number, number, number]
   /** seed for the rolling height noise */
-  seed: number;
+  seed: number
   /** how rolling the ground is inside and outside the town */
-  relief: [number, number];
+  relief: [number, number]
   /** a field's own landform, applied over the rolling ground: dunes, a sea cliff, a pass */
-  shape?: (x: number, z: number, h: number, roadD: number) => number;
+  shape?: (x: number, z: number, h: number, roadD: number) => number
   /** a field's ground: what grows or lies where no road or yard is (terrain.ts) */
-  biome?: "meadow" | "dune" | "coast" | "forest" | "pass";
+  biome?: "meadow" | "dune" | "coast" | "forest" | "pass"
   /** fog colour and range (in tiles beyond the player), for haze over dunes or mist in the forest */
-  fog?: { color: number; near: number; far: number };
+  fog?: { color: number; near: number; far: number }
   /** footpaths worn into the ground by people and animals: drawn only, they block and flatten nothing */
-  trails?: V2[][];
+  trails?: V2[][]
 }
 
-export const OFF: Rect & { h: number } = { x0: -99, z0: -99, x1: -98, z1: -98, h: 0 };
-export const OFF_POINT: V2 = [-99, -99];
+export const OFF: Rect & { h: number } = { x0: -99, z0: -99, x1: -98, z1: -98, h: 0 }
+export const OFF_POINT: V2 = [-99, -99]
 export const OFF_LINE: V2[] = [
   [-99, -99],
   [-98, -99],
-];
+]
 
 const rx30 = riverX0(
   30,
@@ -77,16 +77,16 @@ const rx30 = riverX0(
     [34, 41],
     [33.4, 51],
   ]),
-);
+)
 export function riverX0(z: number, river: V2[]): number {
   let best = 1e9,
-    bx = 0;
+    bx = 0
   for (const [x, zz] of river)
     if (Math.abs(zz - z) < best) {
-      best = Math.abs(zz - z);
-      bx = x;
+      best = Math.abs(zz - z)
+      bx = x
     }
-  return bx;
+  return bx
 }
 
 /** The village around the market square (the first map). */
@@ -247,4 +247,4 @@ export const VILLAGE: Layout = {
   town: [18, 26, 18, 17],
   seed: 7,
   relief: [0.7, 1.5],
-};
+}

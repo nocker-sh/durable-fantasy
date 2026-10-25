@@ -1,4 +1,4 @@
-import type { Line } from "../line.ts";
+import type { Line } from "../line.ts"
 
 const lines = {
   エルザ: [
@@ -200,6 +200,6 @@ const lines = {
     { text: "……レナ。", first: true },
     { text: "……だれ？お母さん、知らない人がいるの。", first: true },
   ],
-} satisfies Record<string, readonly Line[]>;
+} satisfies Record<string, readonly Line[]>
 
-export { lines };
+export { lines }

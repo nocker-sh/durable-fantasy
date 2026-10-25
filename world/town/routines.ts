@@ -3,25 +3,25 @@
 // sleep in the morning. A few keep day hours, and each has a reason in their trade. Everyone
 // mostly stands still at their spot; they change places only when the hour comes round.
 // Server and browser both read this, so everyone sees the same people in the same places.
-import { within } from "../core/clock.ts";
-import { INTERIORS, keeperPlace, seatsOf, type Cell } from "./interiors.ts";
+import { within } from "../core/clock.ts"
+import { INTERIORS, keeperPlace, seatsOf, type Cell } from "./interiors.ts"
 
 /** A spot: a named place on a map (scene `places`, exported to the map JSON), a tile position, or a cell. */
-export type Spot = { map: string; place: string } | { map: string; tile: readonly [number, number] } | { map: string; cell: Cell };
+export type Spot = { map: string; place: string } | { map: string; tile: readonly [number, number] } | { map: string; cell: Cell }
 /** Where someone is in a stretch of the day: at work, somewhere else, or at home out of sight. */
-export type Where = "work" | "home" | "tavern" | "inn" | Spot;
+export type Where = "work" | "home" | "tavern" | "inn" | Spot
 export interface Slot {
-  from: number;
-  where: Where;
-  doing: string;
+  from: number
+  where: Where
+  doing: string
 }
 
 const t = (s: string) => {
-  const [h, m] = s.split(":").map(Number);
-  return h * 60 + m;
-};
-const at = (from: string, where: Where, doing: string): Slot => ({ from: t(from), where, doing });
-const P = (map: string, place: string): Spot => ({ map, place });
+  const [h, m] = s.split(":").map(Number)
+  return h * 60 + m
+}
+const at = (from: string, where: Where, doing: string): Slot => ({ from: t(from), where, doing })
+const P = (map: string, place: string): Spot => ({ map, place })
 
 /** Each resident's day, slots in order round the clock (the last runs on into the first). */
 export const ROUTINES: Record<string, readonly Slot[]> = {
@@ -408,17 +408,17 @@ export const ROUTINES: Record<string, readonly Slot[]> = {
   ],
   エドガー: [at("02:00", "home", "眠る"), at("16:00", "work", "門の通りを眺める"), at("22:00", P("phanthiet-gate", "gateWell"), "井戸端で昔話"), at("23:00", "work", "門の通りを眺める")],
   マルグリット: [at("02:00", "home", "眠る"), at("17:00", "work", "戸口で編み物"), at("22:00", "inn", "宿でヘートヴィヒと編み物"), at("23:30", "work", "戸口で編み物")],
-};
+}
 
 /** The slot someone is in at `min`. */
 export function slotAt(name: string, min: number): Slot | null {
-  const day = [...(ROUTINES[name] ?? [])].sort((a, b) => a.from - b.from);
-  if (!day.length) return null;
+  const day = [...(ROUTINES[name] ?? [])].sort((a, b) => a.from - b.from)
+  if (!day.length) return null
   for (let i = 0; i < day.length; i++) {
-    const next = day[(i + 1) % day.length];
-    if (within(min, day[i].from, next.from)) return day[i];
+    const next = day[(i + 1) % day.length]
+    if (within(min, day[i].from, next.from)) return day[i]
   }
-  return day[0];
+  return day[0]
 }
 
 /** The people who drink at a place, in a fixed order, so each has their own seat. */
@@ -429,32 +429,32 @@ const PATRONS: Record<"tavern" | "inn", string[]> = {
   inn: Object.entries(ROUTINES)
     .filter(([, d]) => d.some((s) => s.where === "inn"))
     .map(([n]) => n),
-};
+}
 
 /**
  * Where someone stands at `min`: a spot, or null when they are at home out of sight. `work` is
  * their usual spot (residents.ts, with shopkeepers behind their counters).
  */
 export function spotAt(name: string, min: number, work: Spot): Spot | null {
-  const s = slotAt(name, min);
-  if (!s || s.where === "home") return null;
-  if (s.where === "work") return work;
+  const s = slotAt(name, min)
+  if (!s || s.where === "home") return null
+  if (s.where === "work") return work
   if (s.where === "tavern" || s.where === "inn") {
-    const it = INTERIORS.find((i) => i.house.id === s.where);
-    if (!it) return null;
-    const seats = seatsOf(it);
+    const it = INTERIORS.find((i) => i.house.id === s.where)
+    if (!it) return null
+    const seats = seatsOf(it)
     // the seats go round those who are there at this hour, in a fixed order
-    const here = PATRONS[s.where].filter((n) => slotAt(n, min)?.where === s.where);
-    const k = here.indexOf(name);
-    return seats.length && k >= 0 ? { map: it.id, cell: seats[k % seats.length] } : null;
+    const here = PATRONS[s.where].filter((n) => slotAt(n, min)?.where === s.where)
+    const k = here.indexOf(name)
+    return seats.length && k >= 0 ? { map: it.id, cell: seats[k % seats.length] } : null
   }
-  return s.where;
+  return s.where
 }
 
 /** A resident's work spot from their entry in residents.ts. */
 export function workSpot(r: { name: string; map?: string; at: string | readonly [number, number] }): Spot {
-  const keeper = keeperPlace(r.name);
-  if (keeper) return { map: keeper.map, cell: keeper.cell };
-  const map = r.map ?? "phanthiet";
-  return typeof r.at === "string" ? { map, place: r.at } : { map, tile: r.at };
+  const keeper = keeperPlace(r.name)
+  if (keeper) return { map: keeper.map, cell: keeper.cell }
+  const map = r.map ?? "phanthiet"
+  return typeof r.at === "string" ? { map, place: r.at } : { map, tile: r.at }
 }

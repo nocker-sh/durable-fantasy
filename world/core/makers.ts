@@ -1,28 +1,28 @@
 // Who makes what, and how their things turn out (game-system.md §4.2.1). A made thing carries its
 // maker's name ("イルムガルトの回復薬") and a quality; the maker's hand shows in how the qualities
 // fall, how it works, what it costs and what is said of it. Players' things use the plain recipe.
-import { ITEMS, QUALITY_EFFECT, QUALITY_PRICE, type ItemIcon, type ItemId, type Quality } from "./items.ts";
+import { ITEMS, QUALITY_EFFECT, QUALITY_PRICE, type ItemIcon, type ItemId, type Quality } from "./items.ts"
 
 export interface Trait {
   /** how likely each quality is, 並・良・上・極 (they need not add to 1) */
-  tiers: readonly [number, number, number, number];
+  tiers: readonly [number, number, number, number]
   /** works this much better or worse than the plain recipe */
-  effect?: number;
+  effect?: number
   /** leans: more SP and less HP, minutes of warmth on top, stamina on top */
-  sp?: number;
-  warm?: number;
-  stamina?: number;
+  sp?: number
+  warm?: number
+  stamina?: number
   /** price against the plain recipe */
-  price?: number;
+  price?: number
   /** what people say of it, after the item's own description */
-  note: string;
+  note: string
   /** the bottle or bowl it comes in */
-  icon?: ItemIcon;
+  icon?: ItemIcon
 }
 
-const steady = [0.05, 0.65, 0.28, 0.02] as const;
-const homely = [0.35, 0.4, 0.17, 0.08] as const;
-const plain = [0.2, 0.7, 0.1, 0] as const;
+const steady = [0.05, 0.65, 0.28, 0.02] as const
+const homely = [0.35, 0.4, 0.17, 0.08] as const
+const plain = [0.2, 0.7, 0.1, 0] as const
 
 export const MAKERS: Record<string, Partial<Record<ItemId, Trait>>> = {
   イルムガルト: {
@@ -69,45 +69,45 @@ export const MAKERS: Record<string, Partial<Record<ItemId, Trait>>> = {
   ヤコブ: { "smoked-fish": { tiers: plain, note: "浜の台で干した。潮の匂いがする。" } },
   グレーテ: { pickles: { tiers: plain, note: "姉妹で漬けた。酸っぱさは年々増している。" } },
   ブルーノ: { ration: { tiers: plain, note: "道具屋の奥で固く焼いた。味は二の次。" } },
-};
+}
 
 /** The maker whose thing it usually is, for made things that come with no name attached. */
 export function usualMaker(item: ItemId): string {
-  for (const [name, things] of Object.entries(MAKERS)) if (things[item]) return name;
-  return "町の人";
+  for (const [name, things] of Object.entries(MAKERS)) if (things[item]) return name
+  return "町の人"
 }
 
-export const traitOf = (item: ItemId, by: string | undefined): Trait | undefined => (by ? MAKERS[by]?.[item] : undefined);
+export const traitOf = (item: ItemId, by: string | undefined): Trait | undefined => (by ? MAKERS[by]?.[item] : undefined)
 
 /** "イルムガルトの回復薬", or the plain name for things nobody in particular made. */
 export function displayName(item: ItemId, by?: string): string {
-  return ITEMS[item].made && by ? `${by}の${ITEMS[item].name}` : ITEMS[item].name;
+  return ITEMS[item].made && by ? `${by}の${ITEMS[item].name}` : ITEMS[item].name
 }
 
 /** What one of these does, by its quality and maker. */
 export function effectOf(item: ItemId, q: Quality = 1, by?: string): { hp: number; sp: number; stamina: number; full: number; warm: number } {
-  const use = ITEMS[item].use ?? {};
-  const t = traitOf(item, by);
-  const k = (ITEMS[item].made ? QUALITY_EFFECT[q] : 1) * (t?.effect ?? 1);
+  const use = ITEMS[item].use ?? {}
+  const t = traitOf(item, by)
+  const k = (ITEMS[item].made ? QUALITY_EFFECT[q] : 1) * (t?.effect ?? 1)
   return {
     hp: Math.round((use.hp ?? 0) * k),
     sp: Math.round((use.sp ?? 0) * k + (t?.sp ?? 0)),
     stamina: Math.round((use.stamina ?? 0) * k + (t?.stamina ?? 0)),
     full: use.full ?? 0,
     warm: Math.round((use.warm ?? 0) * (ITEMS[item].made ? QUALITY_EFFECT[q] : 1) + (t?.warm ?? 0)),
-  };
+  }
 }
 
 /** What one costs in a shop, by its quality and maker. */
 export function priceOf(item: ItemId, q: Quality = 1, by?: string): number {
-  const base = ITEMS[item].price;
-  if (!ITEMS[item].made) return base;
-  return Math.max(1, Math.round(base * QUALITY_PRICE[q] * (traitOf(item, by)?.price ?? 1)));
+  const base = ITEMS[item].price
+  if (!ITEMS[item].made) return base
+  return Math.max(1, Math.round(base * QUALITY_PRICE[q] * (traitOf(item, by)?.price ?? 1)))
 }
 
 /** The qualities a maker's thing comes in at all. */
 export function qualitiesOf(item: ItemId, by?: string): Quality[] {
-  if (!ITEMS[item].made) return [1];
-  const t = traitOf(item, by);
-  return ([0, 1, 2, 3] as Quality[]).filter((q) => (t ? t.tiers[q] > 0 : q === 1));
+  if (!ITEMS[item].made) return [1]
+  const t = traitOf(item, by)
+  return ([0, 1, 2, 3] as Quality[]).filter((q) => (t ? t.tiers[q] > 0 : q === 1))
 }

@@ -1,4 +1,4 @@
-import type { Line } from "../line.ts";
+import type { Line } from "../line.ts"
 
 const lines = {
   ベアトリクス: [
@@ -99,6 +99,6 @@ const lines = {
     { text: "灯りが鎧に映って、きれいです。……磨いた甲斐がありました。", event: "灯りの祭り" },
     { text: "……いらっしゃいませ。防具なら、師匠に。あたしは見習いです。", first: true },
   ],
-} satisfies Record<string, readonly Line[]>;
+} satisfies Record<string, readonly Line[]>
 
-export { lines };
+export { lines }

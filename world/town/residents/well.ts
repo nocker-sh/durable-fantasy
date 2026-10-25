@@ -1,4 +1,4 @@
-import type { Resident } from "../resident.ts";
+import type { Resident } from "../resident.ts"
 
 const residents = {
   リーゼル: {
@@ -29,6 +29,6 @@ const residents = {
     item: "basket",
     look: { shoes: "leatherR", top: "cSky", apron: "cCream", frill: true, bow: "cRose", trim: "cBlue", sex: "f", skin: "skin2", hair: "hBrown", style: "pony", eye: "cGreen" },
   },
-} satisfies Record<string, Resident>;
+} satisfies Record<string, Resident>
 
-export { residents };
+export { residents }

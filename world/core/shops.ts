@@ -1,25 +1,25 @@
 // Shops in the town, the resident who keeps each one and what they sell (economy.md §4).
 // Every shop buys anything sellable at the base price; some pay more for certain kinds.
-import { sellPrice, ITEMS, type ItemId, type ItemKind } from "./items.ts";
+import { sellPrice, ITEMS, type ItemId, type ItemKind } from "./items.ts"
 
-export type ShopKind = "food" | "inn" | "weapon" | "armor" | "tools" | "medicine" | "crystal" | "tailor" | "buyer";
+export type ShopKind = "food" | "inn" | "weapon" | "armor" | "tools" | "medicine" | "crystal" | "tailor" | "buyer"
 
 export interface ShopDefinition {
-  name: string;
-  kind: ShopKind;
+  name: string
+  kind: ShopKind
   /** the map the shop stands on (world/maps) */
-  map: string;
+  map: string
   /** Resident names that open this shop when spoken to. */
-  keepers: readonly string[];
+  keepers: readonly string[]
   /** Line said when the shop window opens. */
-  greeting: string;
-  stock: readonly ItemId[];
+  greeting: string
+  stock: readonly ItemId[]
   /** whose made things these are (game-system.md §4.2.1); the usual maker when not named */
-  makers?: Partial<Record<ItemId, string>>;
+  makers?: Partial<Record<ItemId, string>>
   /** pays this many times the base price for these kinds */
-  rates?: Partial<Record<ItemKind, number>>;
+  rates?: Partial<Record<ItemKind, number>>
   /** a street seller's pitch: open only while the seller stands there (town/routines.ts) */
-  at?: { map: string; place: string };
+  at?: { map: string; place: string }
 }
 
 export const SHOP_KIND_NAME: Record<ShopKind, string> = {
@@ -32,7 +32,7 @@ export const SHOP_KIND_NAME: Record<ShopKind, string> = {
   crystal: "結晶",
   tailor: "仕立て",
   buyer: "買取",
-};
+}
 
 export const SHOPS = {
   // ---------------------------------------------------------------- the market square (town)
@@ -260,23 +260,23 @@ export const SHOPS = {
     greeting: "割りたての薪と、窯から出したばかりの炭だ。",
     stock: ["firewood", "charcoal", "log"],
   },
-} satisfies Record<string, ShopDefinition>;
+} satisfies Record<string, ShopDefinition>
 
-export type ShopId = keyof typeof SHOPS;
+export type ShopId = keyof typeof SHOPS
 
 export function isShopId(value: string): value is ShopId {
-  return Object.hasOwn(SHOPS, value);
+  return Object.hasOwn(SHOPS, value)
 }
 
 /** The shop someone keeps; `open` picks among several (a street seller with two pitches). */
 export function shopOfKeeper(name: string, open?: (shop: ShopId) => boolean): ShopId | null {
-  if (open) for (const id of Object.keys(SHOPS) as ShopId[]) if ((SHOPS[id].keepers as readonly string[]).includes(name) && open(id)) return id;
-  for (const id of Object.keys(SHOPS) as ShopId[]) if ((SHOPS[id].keepers as readonly string[]).includes(name)) return id;
-  return null;
+  if (open) for (const id of Object.keys(SHOPS) as ShopId[]) if ((SHOPS[id].keepers as readonly string[]).includes(name) && open(id)) return id
+  for (const id of Object.keys(SHOPS) as ShopId[]) if ((SHOPS[id].keepers as readonly string[]).includes(name)) return id
+  return null
 }
 
 /** What this shop pays for one of the item. */
 export function shopBuys(shop: ShopId, item: ItemId): number {
-  const rate = (SHOPS[shop] as ShopDefinition).rates?.[ITEMS[item].kind] ?? 1;
-  return Math.max(1, Math.floor(sellPrice(item) * rate));
+  const rate = (SHOPS[shop] as ShopDefinition).rates?.[ITEMS[item].kind] ?? 1
+  return Math.max(1, Math.floor(sellPrice(item) * rate))
 }

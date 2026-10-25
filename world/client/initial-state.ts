@@ -1,7 +1,7 @@
-import { jstMinutes } from "../core/clock.ts";
-import { MAPS } from "../maps/index.ts";
-import { Store } from "../../lib/engine/store.ts";
-import { DEFAULT_WINDOWS, type GameState } from "../state.ts";
+import { jstMinutes } from "../core/clock.ts"
+import { MAPS } from "../maps/index.ts"
+import { Store } from "../../lib/engine/store.ts"
+import { DEFAULT_WINDOWS, type GameState } from "../state.ts"
 
 export function createGameState() {
   return new Store<GameState>({
@@ -42,5 +42,5 @@ export function createGameState() {
     party: null,
     partyAsk: null,
     board: null,
-  });
+  })
 }

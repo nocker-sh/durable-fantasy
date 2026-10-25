@@ -1,17 +1,17 @@
-import { Button } from "#/components/ui/button.tsx";
-import { DevPage } from "#/dev/catalog.tsx";
-import { SHOPS } from "#/world/core/shops.ts";
+import { Button } from "#/components/ui/button.tsx"
+import { DevPage } from "#/dev/catalog.tsx"
+import { SHOPS } from "#/world/core/shops.ts"
 
-const WINDOWS = ["status", "hotbar", "chat", "inventory", "equipment", "stats", "worldmap", "shop", "dialogue", "system", "character", "loading", "fallen", "offline", "failed"] as const;
+const WINDOWS = ["status", "hotbar", "chat", "inventory", "equipment", "stats", "worldmap", "shop", "dialogue", "system", "character", "loading", "fallen", "offline", "failed"] as const
 
 /** The game's windows one at a time, with a fixed state: /dev/ui?window=shop&shop=smithy. */
 export default function UiPage() {
   return (
     <DevPage>
       {() => {
-        const q = new URLSearchParams(location.search);
-        const shown = (WINDOWS as readonly string[]).includes(q.get("window") ?? "") ? q.get("window")! : "inventory";
-        const shop = q.get("shop") ?? "smithy";
+        const q = new URLSearchParams(location.search)
+        const shown = (WINDOWS as readonly string[]).includes(q.get("window") ?? "") ? q.get("window")! : "inventory"
+        const shop = q.get("shop") ?? "smithy"
         return (
           <>
             <div className="flex flex-wrap gap-2">
@@ -32,8 +32,8 @@ export default function UiPage() {
             )}
             <iframe title={shown} src={`/dev/ui/frame?window=${shown}&shop=${shop}`} className="h-[760px] w-full rounded-lg border" />
           </>
-        );
+        )
       }}
     </DevPage>
-  );
+  )
 }

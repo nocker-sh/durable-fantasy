@@ -1,54 +1,54 @@
-export type HouseKind = "home" | "shop" | "public" | "workshop" | "farm" | "vacant";
+export type HouseKind = "home" | "shop" | "public" | "workshop" | "farm" | "vacant"
 
 export interface Room {
-  name: string;
-  floor: number;
+  name: string
+  floor: number
   /** beds in the room */
-  beds?: number;
+  beds?: number
 }
 
 export interface Plan {
-  rooms: readonly Room[];
+  rooms: readonly Room[]
   /** every lived-in building has one, so its chimney smokes */
-  hearth: boolean;
+  hearth: boolean
   /** a kitchen (or a cooking corner at the hearth) */
-  kitchen: boolean;
+  kitchen: boolean
   /** what the trade needs on the ground floor or in the yard */
-  workshop?: string;
-  furniture: readonly string[];
+  workshop?: string
+  furniture: readonly string[]
 }
 
 export interface HouseDef {
-  id: string;
-  map: string;
-  kind: HouseKind;
-  name: string;
+  id: string
+  map: string
+  kind: HouseKind
+  name: string
   /** the household living here, if any */
-  household?: string;
+  household?: string
   /** the shop on the ground floor (world/core/shops.ts) */
-  shop?: string;
+  shop?: string
   // the outside, as house() in scene/build.ts draws it
-  x0: number;
-  z0: number;
-  x1: number;
-  z1: number;
-  axis: "x" | "z";
-  roof: "roof" | "roof2" | "slate" | "thatch";
-  door: { side: "n" | "s" | "e" | "w"; u: number };
-  seed: number;
-  timber?: boolean;
-  sign?: string;
-  ramp?: string;
-  opening?: "n" | "s" | "e" | "w";
-  plan: Plan;
+  x0: number
+  z0: number
+  x1: number
+  z1: number
+  axis: "x" | "z"
+  roof: "roof" | "roof2" | "slate" | "thatch"
+  door: { side: "n" | "s" | "e" | "w"; u: number }
+  seed: number
+  timber?: boolean
+  sign?: string
+  ramp?: string
+  opening?: "n" | "s" | "e" | "w"
+  plan: Plan
 }
 
 export interface Household {
-  id: string;
-  name: string;
+  id: string
+  name: string
   /** resident names (world/scene/residents.ts) */
-  members: readonly string[];
-  living: "慎ましい" | "ふつう" | "ゆとりがある";
+  members: readonly string[]
+  living: "慎ましい" | "ふつう" | "ゆとりがある"
   /** how they earn their keep and where food and fuel come from */
-  trade: string;
+  trade: string
 }

@@ -1,4 +1,4 @@
-import type { Line } from "../line.ts";
+import type { Line } from "../line.ts"
 
 const lines = {
   ファルク: [
@@ -143,6 +143,6 @@ const lines = {
     { text: "町じゅう灯りだらけだ……！森から見るのと全然違う。", event: "灯りの祭り" },
     { text: "あ、町の人？おれ、ロルフ。森に住んでるんだ。", first: true },
   ],
-} satisfies Record<string, readonly Line[]>;
+} satisfies Record<string, readonly Line[]>
 
-export { lines };
+export { lines }

@@ -1,5 +1,5 @@
 // Choices for the studio UI, with Japanese labels.
-import type { Item, Look } from "#/world/scene/figure.ts";
+import type { Item, Look } from "#/world/scene/figure.ts"
 
 export const ITEMS: [Item, string][] = [
   [null, "なし"],
@@ -19,28 +19,28 @@ export const ITEMS: [Item, string][] = [
   ["basket", "かご"],
   ["sack", "袋"],
   ["cloth", "布"],
-];
+]
 export const SEX: [Look["sex"], string][] = [
   ["m", "男"],
   ["f", "女"],
-];
+]
 export const AGE: [NonNullable<Look["age"]>, string][] = [
   ["adult", "大人"],
   ["child", "子ども"],
   ["old", "年配"],
-];
+]
 export const SKIN: [Look["skin"], string][] = [
   ["skin1", "明るい"],
   ["skin2", "中間"],
   ["skin3", "濃い"],
-];
+]
 export const HAIR: [string, string][] = [
   ["hBrown", "茶"],
   ["hBlack", "黒"],
   ["hBlond", "金"],
   ["hRed", "赤"],
   ["hGray", "白髪"],
-];
+]
 export const STYLES: [Look["style"], string][] = [
   ["short", "ショート"],
   ["bob", "ボブ"],
@@ -50,7 +50,7 @@ export const STYLES: [Look["style"], string][] = [
   ["pony", "ポニー"],
   ["curly", "くせ毛"],
   ["bald", "なし"],
-];
+]
 export const CLOTH: [string, string][] = [
   ["cRose", "ばら"],
   ["cSky", "空色"],
@@ -67,7 +67,7 @@ export const CLOTH: [string, string][] = [
   ["cBrown", "茶"],
   ["cLinen", "生成り"],
   ["cGray", "灰"],
-];
+]
 export const HATS: [NonNullable<Look["hat"]> | null, string][] = [
   [null, "なし"],
   ["cap", "布帽子"],
@@ -78,16 +78,16 @@ export const HATS: [NonNullable<Look["hat"]> | null, string][] = [
   ["beret", "ベレー"],
   ["helm", "兜"],
   ["greathelm", "グレートヘルム"],
-];
+]
 
 /** Neck wraps (everyone wears one; there is no "none"). */
 export const NECKS: [NonNullable<Look["neck"]>, string][] = [
   ["muffler", "マフラー"],
   ["stole", "ストール"],
   ["scarf", "スカーフ"],
-];
+]
 
-export const DEFAULT_LOOK: Look = { sex: "m", age: "adult", skin: "skin1", hair: "hBrown", style: "short", top: "cSky", bottom: "cHoney", eye: "cBrown", neck: "muffler", neckRamp: "cRed" };
+export const DEFAULT_LOOK: Look = { sex: "m", age: "adult", skin: "skin1", hair: "hBrown", style: "short", top: "cSky", bottom: "cHoney", eye: "cBrown", neck: "muffler", neckRamp: "cRed" }
 
 /** Equipment sets: a look and the item it holds. */
 export const PRESETS: [string, Look, Item][] = [
@@ -199,4 +199,4 @@ export const PRESETS: [string, Look, Item][] = [
     },
     "halberd",
   ],
-];
+]

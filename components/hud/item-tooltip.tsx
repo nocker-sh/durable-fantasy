@@ -1,17 +1,17 @@
 // What an item is (ui.md §6.5), shown on hover wherever an item appears.
-import type { ReactElement, ReactNode } from "react";
-import { usePlayerIfAny } from "#/components/game/context.tsx";
-import { artsOf, skillOf } from "#/world/core/skills.ts";
-import { standing } from "#/world/core/stats.ts";
-import { GATHER_SKILL_NAME, ITEMS, KIND_NAME, QUALITIES, QUALITY_PRICE, RARITY_NAME, sellPrice, sellable, type ItemId, type Quality } from "#/world/core/items.ts";
-import { displayName, effectOf, traitOf } from "#/world/core/makers.ts";
-import { STAT_NAME, type Stat } from "#/world/core/growth.ts";
-import type { Skill } from "#/world/core/items.ts";
-import { Gold } from "#/components/game/gold.tsx";
-import { RARITY } from "#/components/game/slot.tsx";
-import { Tooltip, TooltipContent, TooltipTrigger } from "#/components/game/tooltip.tsx";
+import type { ReactElement, ReactNode } from "react"
+import { usePlayerIfAny } from "#/components/game/context.tsx"
+import { artsOf, skillOf } from "#/world/core/skills.ts"
+import { standing } from "#/world/core/stats.ts"
+import { GATHER_SKILL_NAME, ITEMS, KIND_NAME, QUALITIES, QUALITY_PRICE, RARITY_NAME, sellPrice, sellable, type ItemId, type Quality } from "#/world/core/items.ts"
+import { displayName, effectOf, traitOf } from "#/world/core/makers.ts"
+import { STAT_NAME, type Stat } from "#/world/core/growth.ts"
+import type { Skill } from "#/world/core/items.ts"
+import { Gold } from "#/components/game/gold.tsx"
+import { RARITY } from "#/components/game/slot.tsx"
+import { Tooltip, TooltipContent, TooltipTrigger } from "#/components/game/tooltip.tsx"
 
-const PART = { head: "頭", neck: "首巻き", body: "体", weapon: "武器", shield: "盾", feet: "足", accessory: "装飾品" } as const;
+const PART = { head: "頭", neck: "首巻き", body: "体", weapon: "武器", shield: "盾", feet: "足", accessory: "装飾品" } as const
 
 export function ItemTooltip({
   item,
@@ -21,21 +21,21 @@ export function ItemTooltip({
   side = "top",
   open,
 }: {
-  item: ItemId | null | undefined;
-  /** a made thing's quality and maker */ mark?: { q?: Quality; by?: string } | null;
-  children: ReactElement;
-  hint?: ReactNode;
-  side?: "top" | "right" | "left" | "bottom";
-  /** hold it open (dev previews) */ open?: boolean;
+  item: ItemId | null | undefined
+  /** a made thing's quality and maker */ mark?: { q?: Quality; by?: string } | null
+  children: ReactElement
+  hint?: ReactNode
+  side?: "top" | "right" | "left" | "bottom"
+  /** hold it open (dev previews) */ open?: boolean
 }) {
-  const me = usePlayerIfAny();
-  if (!item) return children;
-  const d = ITEMS[item];
-  const e = d.equip;
+  const me = usePlayerIfAny()
+  if (!item) return children
+  const d = ITEMS[item]
+  const e = d.equip
   const q = mark?.q ?? 1,
-    by = mark?.by;
-  const fx = d.use ? effectOf(item, q, by) : null;
-  const note = traitOf(item, by)?.note;
+    by = mark?.by
+  const fx = d.use ? effectOf(item, q, by) : null
+  const note = traitOf(item, by)?.note
   return (
     <Tooltip open={open}>
       <TooltipTrigger render={children} />
@@ -157,5 +157,5 @@ export function ItemTooltip({
         {hint && <p className="mt-1.5 text-[11px] text-text-faint">{hint}</p>}
       </TooltipContent>
     </Tooltip>
-  );
+  )
 }

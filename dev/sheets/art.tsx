@@ -1,13 +1,13 @@
-import { ITEMS, ITEM_IDS } from "#/world/core/items.ts";
-import { uiIconUrl } from "#/world/art/icons.ts";
-import { SPRITES, type SpriteName } from "#/world/art/pixel-art.ts";
-import { RAMPS } from "#/world/scene/pix.ts";
-import { MOTIONS } from "#/dev/studio/motions.ts";
-import { ANIMS } from "#/world/scene/figure.ts";
-import { AGE as OPT_AGE, CLOTH, HAIR, HATS, ITEMS as HAND_ITEMS, NECKS, PRESETS, SEX, SKIN, STYLES } from "#/dev/studio/options.ts";
-import { LOOKS as TRAVELLER_LOOKS } from "#/world/town/travellers.ts";
-import { leafTex, rockTex, roofTex, stoneTex, thatchTex, woodTex } from "#/world/scene/textures.ts";
-import { sheet } from "./schema.ts";
+import { ITEMS, ITEM_IDS } from "#/world/core/items.ts"
+import { uiIconUrl } from "#/world/art/icons.ts"
+import { SPRITES, type SpriteName } from "#/world/art/pixel-art.ts"
+import { RAMPS } from "#/world/scene/pix.ts"
+import { MOTIONS } from "#/dev/studio/motions.ts"
+import { ANIMS } from "#/world/scene/figure.ts"
+import { AGE as OPT_AGE, CLOTH, HAIR, HATS, ITEMS as HAND_ITEMS, NECKS, PRESETS, SEX, SKIN, STYLES } from "#/dev/studio/options.ts"
+import { LOOKS as TRAVELLER_LOOKS } from "#/world/town/travellers.ts"
+import { leafTex, rockTex, roofTex, stoneTex, thatchTex, woodTex } from "#/world/scene/textures.ts"
+import { sheet } from "./schema.ts"
 
 const uiIcons = sheet<SpriteName>({
   id: "icons",
@@ -19,15 +19,15 @@ const uiIcons = sheet<SpriteName>({
   icon: (n) => <img src={uiIconUrl(n, 16)} alt="" style={{ imageRendering: "pixelated" }} />,
   cols: [{ label: "使うアイテム", get: (n) => ITEM_IDS.filter((i) => ITEMS[i].icon === n).length || "", w: "w-24" }],
   refs: (n) => ITEM_IDS.filter((i) => ITEMS[i].icon === n).map((i) => ({ sheet: "items", id: i, as: "アイコン" })),
-});
+})
 
 /** A texture drawn into an image, pixel for pixel. */
 function texUrl(b: { w: number; h: number; data: Uint8ClampedArray }): string {
-  const c = document.createElement("canvas");
-  c.width = b.w;
-  c.height = b.h;
-  c.getContext("2d")!.putImageData(new ImageData(new Uint8ClampedArray(b.data), b.w, b.h), 0, 0);
-  return c.toDataURL();
+  const c = document.createElement("canvas")
+  c.width = b.w
+  c.height = b.h
+  c.getContext("2d")!.putImageData(new ImageData(new Uint8ClampedArray(b.data), b.w, b.h), 0, 0)
+  return c.toDataURL()
 }
 
 const TEXTURES: Record<string, { name: string; make: () => { w: number; h: number; data: Uint8ClampedArray } }> = {
@@ -39,11 +39,11 @@ const TEXTURES: Record<string, { name: string; make: () => { w: number; h: numbe
   thatch: { name: "藁屋根", make: () => thatchTex() },
   leaf: { name: "葉", make: () => leafTex() },
   leaf2: { name: "葉（濃い）", make: () => leafTex("leaf2") },
-};
+}
 
-const texCache = new Map<string, string>();
+const texCache = new Map<string, string>()
 
-const texOf = (id: string) => texCache.get(id) ?? (texCache.set(id, texUrl(TEXTURES[id].make())), texCache.get(id)!);
+const texOf = (id: string) => texCache.get(id) ?? (texCache.set(id, texUrl(TEXTURES[id].make())), texCache.get(id)!)
 
 const textures = sheet<string>({
   id: "textures",
@@ -57,14 +57,14 @@ const textures = sheet<string>({
     {
       label: "大きさ",
       get: (id) => {
-        const t = TEXTURES[id].make();
-        return `${t.w}×${t.h}`;
+        const t = TEXTURES[id].make()
+        return `${t.w}×${t.h}`
       },
       w: "w-20",
     },
   ],
   more: (id) => [{ title: "原寸の4倍", head: [], rows: [[<img key="t" src={texOf(id)} alt="" className="w-full max-w-lg" style={{ imageRendering: "pixelated" }} />]] }],
-});
+})
 
 const ramps = sheet<string>({
   id: "ramps",
@@ -85,7 +85,7 @@ const ramps = sheet<string>({
       ),
     },
   ],
-});
+})
 
 const motions = sheet<(typeof MOTIONS)[number]>({
   id: "motions",
@@ -98,7 +98,7 @@ const motions = sheet<(typeof MOTIONS)[number]>({
     { label: "持ち物", get: (m) => m.item ?? "" },
     { label: "小道具", get: (m) => m.prop ?? "" },
   ],
-});
+})
 
 const anims = sheet<string>({
   id: "anims",
@@ -109,9 +109,9 @@ const anims = sheet<string>({
   kind: (a) => ANIMS[a as keyof typeof ANIMS].clip,
   cols: [{ label: "コマ", get: (a) => ANIMS[a as keyof typeof ANIMS].n, w: "w-12" }],
   refs: (a) => MOTIONS.filter((m) => m.clip === ANIMS[a as keyof typeof ANIMS].clip).map((m) => ({ sheet: "motions", id: m.clip, as: "元の動き" })),
-});
+})
 
-type PartRow = { group: string; value: string; label: string };
+type PartRow = { group: string; value: string; label: string }
 
 const PART_GROUPS: [string, readonly (readonly [unknown, string])[]][] = [
   ["性別", SEX],
@@ -123,7 +123,7 @@ const PART_GROUPS: [string, readonly (readonly [unknown, string])[]][] = [
   ["帽子", HATS],
   ["首巻き", NECKS],
   ["持ち物", HAND_ITEMS],
-];
+]
 
 const parts = sheet<PartRow>({
   id: "parts",
@@ -133,9 +133,9 @@ const parts = sheet<PartRow>({
   name: (r) => r.label,
   kind: (r) => r.group,
   cols: [{ label: "値", get: (r) => r.value }],
-});
+})
 
-type PresetRow = { label: string; from: string };
+type PresetRow = { label: string; from: string }
 
 const presets = sheet<PresetRow>({
   id: "presets",
@@ -145,6 +145,6 @@ const presets = sheet<PresetRow>({
   name: (r) => r.label,
   kind: (r) => r.from,
   cols: [],
-});
+})
 
-export { uiIcons, texUrl, textures, ramps, motions, anims, parts, presets };
+export { uiIcons, texUrl, textures, ramps, motions, anims, parts, presets }

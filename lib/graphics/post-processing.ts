@@ -1,16 +1,16 @@
-import * as THREE from "three";
+import * as THREE from "three"
 export interface DioramaSettings {
-  enabled: boolean;
-  start: number;
-  falloff: number;
-  strength: number;
-  saturation: number;
-  contrast: number;
+  enabled: boolean
+  start: number
+  falloff: number
+  strength: number
+  saturation: number
+  contrast: number
 }
 function createState() {
-  const rtOpts = { type: THREE.HalfFloatType, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: true };
-  const rtScene = new THREE.WebGLRenderTarget(1, 1, rtOpts);
-  const rtBlur = new THREE.WebGLRenderTarget(1, 1, { ...rtOpts, depthBuffer: false });
+  const rtOpts = { type: THREE.HalfFloatType, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: true }
+  const rtScene = new THREE.WebGLRenderTarget(1, 1, rtOpts)
+  const rtBlur = new THREE.WebGLRenderTarget(1, 1, { ...rtOpts, depthBuffer: false })
   const blur = new THREE.ShaderMaterial({
     depthTest: false,
     depthWrite: false,
@@ -45,51 +45,51 @@ function createState() {
         gl_FragColor = c;
         #include <colorspace_fragment>
       }`,
-  });
-  const postScene = new THREE.Scene();
-  postScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), blur));
-  const postCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-  return { rtScene, rtBlur, blur, postScene, postCam };
+  })
+  const postScene = new THREE.Scene()
+  postScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), blur))
+  const postCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)
+  return { rtScene, rtBlur, blur, postScene, postCam }
 }
 export class DioramaPostProcessing {
-  private readonly state = createState();
+  private readonly state = createState()
   constructor(private readonly renderer: THREE.WebGLRenderer) {}
   render(scene: THREE.Scene, cam: THREE.Camera, diorama: DioramaSettings, renderScale: number) {
-    const { rtScene, rtBlur, blur, postScene, postCam } = this.state;
-    const renderer = this.renderer;
+    const { rtScene, rtBlur, blur, postScene, postCam } = this.state
+    const renderer = this.renderer
     if (!diorama.enabled) {
-      renderer.setRenderTarget(null);
-      renderer.render(scene, cam);
-      return;
+      renderer.setRenderTarget(null)
+      renderer.render(scene, cam)
+      return
     }
-    renderer.setRenderTarget(rtScene);
-    renderer.render(scene, cam);
-    const u = blur.uniforms;
-    u.texel.value.set(1 / rtScene.width, 1 / rtScene.height);
-    u.start.value = diorama.start;
-    u.falloff.value = diorama.falloff;
-    u.radius.value = diorama.strength / renderScale;
-    u.saturation.value = diorama.saturation;
-    u.contrast.value = diorama.contrast;
-    u.src.value = rtScene.texture;
-    u.dir.value.set(1, 0);
-    u.grade.value = 0;
-    renderer.setRenderTarget(rtBlur);
-    renderer.render(postScene, postCam);
-    u.src.value = rtBlur.texture;
-    u.dir.value.set(0, 1);
-    u.grade.value = 1;
-    renderer.setRenderTarget(null);
-    renderer.render(postScene, postCam);
+    renderer.setRenderTarget(rtScene)
+    renderer.render(scene, cam)
+    const u = blur.uniforms
+    u.texel.value.set(1 / rtScene.width, 1 / rtScene.height)
+    u.start.value = diorama.start
+    u.falloff.value = diorama.falloff
+    u.radius.value = diorama.strength / renderScale
+    u.saturation.value = diorama.saturation
+    u.contrast.value = diorama.contrast
+    u.src.value = rtScene.texture
+    u.dir.value.set(1, 0)
+    u.grade.value = 0
+    renderer.setRenderTarget(rtBlur)
+    renderer.render(postScene, postCam)
+    u.src.value = rtBlur.texture
+    u.dir.value.set(0, 1)
+    u.grade.value = 1
+    renderer.setRenderTarget(null)
+    renderer.render(postScene, postCam)
   }
   resize(width: number, height: number) {
-    this.state.rtScene.setSize(width, height);
-    this.state.rtBlur.setSize(width, height);
+    this.state.rtScene.setSize(width, height)
+    this.state.rtBlur.setSize(width, height)
   }
   dispose() {
-    this.state.rtScene.dispose();
-    this.state.rtBlur.dispose();
-    this.state.blur.dispose();
-    for (const mesh of this.state.postScene.children) (mesh as THREE.Mesh).geometry.dispose();
+    this.state.rtScene.dispose()
+    this.state.rtBlur.dispose()
+    this.state.blur.dispose()
+    for (const mesh of this.state.postScene.children) (mesh as THREE.Mesh).geometry.dispose()
   }
 }

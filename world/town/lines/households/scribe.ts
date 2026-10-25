@@ -1,4 +1,4 @@
-import type { Line } from "../line.ts";
+import type { Line } from "../line.ts"
 
 const lines = {
   エーリヒ: [
@@ -149,6 +149,6 @@ const lines = {
     { text: "灯りで字を書いたらきれいだろうなあ。消えちゃうけど。", event: "灯りの祭り" },
     { text: "はじめまして。わたし、ハンナ。お父さんは代書屋さんなの。", first: true },
   ],
-} satisfies Record<string, readonly Line[]>;
+} satisfies Record<string, readonly Line[]>
 
-export { lines };
+export { lines }

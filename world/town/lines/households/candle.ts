@@ -1,4 +1,4 @@
-import type { Line } from "../line.ts";
+import type { Line } from "../line.ts"
 
 const lines = {
   アガーテ: [
@@ -146,6 +146,6 @@ const lines = {
     { text: "どの灯りが母ちゃんので、どれがおれの芯か、全部分かるぜ。", event: "灯りの祭り" },
     { text: "なんだよ、見ない顔だな。おれ、フェリックス。ろうそく屋の息子。", first: true },
   ],
-} satisfies Record<string, readonly Line[]>;
+} satisfies Record<string, readonly Line[]>
 
-export { lines };
+export { lines }

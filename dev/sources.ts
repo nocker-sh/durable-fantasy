@@ -34,7 +34,7 @@ export const SOURCES: Record<string, readonly string[]> = {
   messages: ["REASON_TEXT"],
   screens: [],
   flavor: ["FLAVOR"],
-};
+}
 
 /** Exported constants that are not tables of things in the game. */
 export const NOT_TABLES: readonly string[] = [
@@ -85,4 +85,4 @@ export const NOT_TABLES: readonly string[] = [
   "LAYOUTS",
   "OPEN_SIDES",
   "GROUND_PX",
-];
+]

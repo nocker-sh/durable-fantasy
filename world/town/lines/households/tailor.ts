@@ -1,4 +1,4 @@
-import type { Line } from "../line.ts";
+import type { Line } from "../line.ts"
 
 const lines = {
   マグダレーナ: [
@@ -99,6 +99,6 @@ const lines = {
     { text: "ボタンの箱、ひっくり返しちゃった。……拾うの、手伝ってくれる？" },
     { text: "仕立て直した服って、二回生まれた服なの。あたし、そういうのが好き。" },
   ],
-} satisfies Record<string, readonly Line[]>;
+} satisfies Record<string, readonly Line[]>
 
-export { lines };
+export { lines }

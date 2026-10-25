@@ -1,4 +1,4 @@
-import { sheet } from "./schema.ts";
+import { sheet } from "./schema.ts"
 
 const SCREENS: { id: string; name: string; kind: string }[] = [
   { id: "loading", name: "読み込み", kind: "画面の間" },
@@ -16,7 +16,7 @@ const SCREENS: { id: string; name: string; kind: string }[] = [
   { id: "dialogue", name: "会話", kind: "ウィンドウ" },
   { id: "system", name: "メニュー", kind: "モーダル" },
   { id: "character", name: "キャラクター", kind: "モーダル" },
-];
+]
 
 const screens = sheet<(typeof SCREENS)[number]>({
   id: "screens",
@@ -29,6 +29,6 @@ const screens = sheet<(typeof SCREENS)[number]>({
   more: (x) => [
     { title: "見た目", head: [], wide: true, rows: [[<iframe key="f" title={x.name} src={`/dev/ui/frame?window=${x.id}`} className="aspect-video max-h-[70svh] w-full rounded-lg border" />]] },
   ],
-});
+})
 
-export { screens };
+export { screens }

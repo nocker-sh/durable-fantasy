@@ -3,32 +3,32 @@
 // than one trade: an axe takes the smith's iron and the woodworker's plank. Using a station costs a
 // small fee (money leaves the economy), a go costs stamina, and the quality of what comes out
 // follows your proficiency and what you put in. Pure: the server rolls the dice.
-import { QUALITY_EFFECT, type CraftSkill, type ItemId, type Quality } from "./items.ts";
-import { lifeLift } from "./life.ts";
+import { QUALITY_EFFECT, type CraftSkill, type ItemId, type Quality } from "./items.ts"
+import { lifeLift } from "./life.ts"
 
-export type StationKind = "hearth" | "workbench" | "loom" | "forge";
+export type StationKind = "hearth" | "workbench" | "loom" | "forge"
 
 export interface Station {
-  id: string;
-  kind: StationKind;
-  name: string;
-  map: string;
-  cell: readonly [number, number];
+  id: string
+  kind: StationKind
+  name: string
+  map: string
+  cell: readonly [number, number]
   /** what a go costs, paid to the town's 寄り合い */
-  fee: number;
+  fee: number
 }
 
 export interface Recipe {
-  id: string;
-  skill: CraftSkill;
-  station: StationKind;
-  inputs: readonly { item: ItemId; count: number }[];
-  output: { item: ItemId; count: number };
+  id: string
+  skill: CraftSkill
+  station: StationKind
+  inputs: readonly { item: ItemId; count: number }[]
+  output: { item: ItemId; count: number }
   /** the skill's level needed to try it (a milestone: 0, 2, 4, 8) */
-  min: number;
+  min: number
 }
 
-export type StationRule = Omit<Station, "map" | "cell">;
+export type StationRule = Omit<Station, "map" | "cell">
 
 /** The stations and what a go at each costs. Where each stands is the town's (town/stations.ts). */
 export const STATION_RULES: readonly StationRule[] = [
@@ -36,8 +36,8 @@ export const STATION_RULES: readonly StationRule[] = [
   { id: "workshop-bench", kind: "workbench", name: "共同の作業台", fee: 2 },
   { id: "workshop-loom", kind: "loom", name: "共同の機織り機と糸車", fee: 2 },
   { id: "craft-forge", kind: "forge", name: "共同の炉", fee: 4 },
-];
-export const stationOf = (id: string) => STATION_RULES.find((x) => x.id === id);
+]
+export const stationOf = (id: string) => STATION_RULES.find((x) => x.id === id)
 
 const r = (id: string, skill: CraftSkill, station: StationKind, inputs: [ItemId, number][], output: [ItemId, number], min = 0): Recipe => ({
   id,
@@ -46,7 +46,7 @@ const r = (id: string, skill: CraftSkill, station: StationKind, inputs: [ItemId,
   inputs: inputs.map(([item, count]) => ({ item, count })),
   output: { item: output[0], count: output[1] },
   min,
-});
+})
 
 export const RECIPES: readonly Recipe[] = [
   // cooking at the hearth: firewood for the fire, what grows and swims for the pot
@@ -465,28 +465,28 @@ export const RECIPES: readonly Recipe[] = [
     ["woven-muffler", 1],
     64,
   ),
-];
+]
 
-export const recipeOf = (id: string) => RECIPES.find((x) => x.id === id);
+export const recipeOf = (id: string) => RECIPES.find((x) => x.id === id)
 
 /** A hand new to a recipe spoils some of what it tries (the materials are lost): three in ten at its level, one fewer a level. */
-export const failChance = (level: number, min: number) => Math.max(0, 0.3 - (level - min) * 0.1);
-export const STAMINA_PER_CRAFT = 1;
+export const failChance = (level: number, min: number) => Math.max(0, 0.3 - (level - min) * 0.1)
+export const STAMINA_PER_CRAFT = 1
 
 /**
  * The quality of what comes out: the roll against chances that rise with the skill's level and
  * with the quality of what went in (an average of the made inputs, 1 when none were made).
  */
 export function craftedQuality(level: number, inputQuality: number, roll: number): Quality {
-  const lift = lifeLift(level) + (inputQuality - 1) * 0.15;
-  const pTop = Math.max(0, lift - 0.55) * 0.5; // 極
-  const pHigh = Math.min(0.5, Math.max(0, lift * 0.45)); // 上
-  const pLow = Math.max(0.05, 0.45 - lift * 0.6); // 並
-  if (roll < pTop) return 3;
-  if (roll < pTop + pHigh) return 2;
-  if (roll > 1 - pLow) return 0;
-  return 1;
+  const lift = lifeLift(level) + (inputQuality - 1) * 0.15
+  const pTop = Math.max(0, lift - 0.55) * 0.5 // 極
+  const pHigh = Math.min(0.5, Math.max(0, lift * 0.45)) // 上
+  const pLow = Math.max(0.05, 0.45 - lift * 0.6) // 並
+  if (roll < pTop) return 3
+  if (roll < pTop + pHigh) return 2
+  if (roll > 1 - pLow) return 0
+  return 1
 }
 
 /** How much a made input counts towards quality. */
-export const qualityWeight = (q: Quality | undefined) => (q === undefined ? 1 : QUALITY_EFFECT[q] >= 1.2 ? (q === 3 ? 3 : 2) : q === 0 ? 0 : 1);
+export const qualityWeight = (q: Quality | undefined) => (q === undefined ? 1 : QUALITY_EFFECT[q] >= 1.2 ? (q === 3 ? 3 : 2) : q === 0 ? 0 : 1)

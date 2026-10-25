@@ -1,68 +1,68 @@
-import { describe, expect, it } from "vitest";
-import { apply } from "./apply.ts";
-import { BAG_SIZE, addItem, countItem, emptyBag } from "./bag.ts";
-import { ITEMS, sellPrice } from "./items.ts";
-import { SHOPS, shopOfKeeper } from "./shops.ts";
-import { bagWith, player } from "../test/helpers.ts";
+import { describe, expect, it } from "vitest"
+import { apply } from "./apply.ts"
+import { BAG_SIZE, addItem, countItem, emptyBag } from "./bag.ts"
+import { ITEMS, sellPrice } from "./items.ts"
+import { SHOPS, shopOfKeeper } from "./shops.ts"
+import { bagWith, player } from "../test/helpers.ts"
 
 describe("shop", () => {
   it("maps every merchant to a shop", () => {
-    expect(shopOfKeeper("オットー")).toBe("fruit");
-    expect(shopOfKeeper("グレーテ")).toBe("vegetables");
-    expect(shopOfKeeper("ヤコブ")).toBe("fish");
-    expect(shopOfKeeper("マルタ")).toBe("bakery");
-    expect(shopOfKeeper("ハンス")).toBe("bakery");
-    expect(shopOfKeeper("ギュンター")).toBe("smithy");
-    expect(shopOfKeeper("ゲルダ")).toBe("inn");
-    expect(shopOfKeeper("イルムガルト")).toBe("apothecary");
-    expect(shopOfKeeper("ペーター")).toBeNull();
-  });
+    expect(shopOfKeeper("オットー")).toBe("fruit")
+    expect(shopOfKeeper("グレーテ")).toBe("vegetables")
+    expect(shopOfKeeper("ヤコブ")).toBe("fish")
+    expect(shopOfKeeper("マルタ")).toBe("bakery")
+    expect(shopOfKeeper("ハンス")).toBe("bakery")
+    expect(shopOfKeeper("ギュンター")).toBe("smithy")
+    expect(shopOfKeeper("ゲルダ")).toBe("inn")
+    expect(shopOfKeeper("イルムガルト")).toBe("apothecary")
+    expect(shopOfKeeper("ペーター")).toBeNull()
+  })
 
   it("buying takes gold and puts the goods in the bag", () => {
-    const result = apply(player({ gold: 50 }), { type: "buy", shop: "fruit", item: "apple", count: 4 });
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.state.gold).toBe(50 - ITEMS.apple.price * 4);
-    expect(countItem(result.state.bag, "apple")).toBe(4);
-    expect(result.events).toEqual([{ type: "bought", item: "apple", count: 4, cost: 12 }]);
-  });
+    const result = apply(player({ gold: 50 }), { type: "buy", shop: "fruit", item: "apple", count: 4 })
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.state.gold).toBe(50 - ITEMS.apple.price * 4)
+    expect(countItem(result.state.bag, "apple")).toBe(4)
+    expect(result.events).toEqual([{ type: "bought", item: "apple", count: 4, cost: 12 }])
+  })
 
   it("refuses goods the shop does not stock", () => {
-    expect(apply(player(), { type: "buy", shop: "fruit", item: "mace", count: 1 })).toEqual({ ok: false, reason: "NOT_SOLD_HERE" });
-  });
+    expect(apply(player(), { type: "buy", shop: "fruit", item: "mace", count: 1 })).toEqual({ ok: false, reason: "NOT_SOLD_HERE" })
+  })
 
   it("refuses when gold is short, without changing anything", () => {
-    const before = player({ gold: 100 });
-    expect(apply(before, { type: "buy", shop: "smithy", item: "mace", count: 1 })).toEqual({ ok: false, reason: "NO_GOLD" });
-    expect(before.gold).toBe(100);
-  });
+    const before = player({ gold: 100 })
+    expect(apply(before, { type: "buy", shop: "smithy", item: "mace", count: 1 })).toEqual({ ok: false, reason: "NO_GOLD" })
+    expect(before.gold).toBe(100)
+  })
 
   it("refuses when the bag is full", () => {
-    const full = player({ gold: 10_000, bag: addItem(emptyBag(), "dagger", BAG_SIZE)! });
-    expect(apply(full, { type: "buy", shop: "fruit", item: "apple", count: 1 })).toEqual({ ok: false, reason: "BAG_FULL" });
-  });
+    const full = player({ gold: 10_000, bag: addItem(emptyBag(), "dagger", BAG_SIZE)! })
+    expect(apply(full, { type: "buy", shop: "fruit", item: "apple", count: 1 })).toEqual({ ok: false, reason: "BAG_FULL" })
+  })
 
   it("refuses what would be too heavy to carry", () => {
     // 2000 + STR 1 × 30 = 2030; 21 spears weigh 2100
-    const loaded = player({ gold: 100_000, bag: bagWith(["spear", 20]) });
-    expect(apply(loaded, { type: "buy", shop: "smithy", item: "spear", count: 1 })).toEqual({ ok: false, reason: "TOO_HEAVY" });
-  });
+    const loaded = player({ gold: 100_000, bag: bagWith(["spear", 20]) })
+    expect(apply(loaded, { type: "buy", shop: "smithy", item: "spear", count: 1 })).toEqual({ ok: false, reason: "TOO_HEAVY" })
+  })
 
   it("selling pays half the price", () => {
-    const start = player({ gold: 0, bag: bagWith(["short-sword", 1]) });
-    const result = apply(start, { type: "sell", shop: "smithy", slot: 0, count: 1 });
-    expect(result.ok && result.state.gold).toBe(sellPrice("short-sword"));
-    expect(result.ok && result.state.bag[0]).toBeNull();
-  });
+    const start = player({ gold: 0, bag: bagWith(["short-sword", 1]) })
+    const result = apply(start, { type: "sell", shop: "smithy", slot: 0, count: 1 })
+    expect(result.ok && result.state.gold).toBe(sellPrice("short-sword"))
+    expect(result.ok && result.state.bag[0]).toBeNull()
+  })
 
   it("the buyer pays more for monster materials", () => {
-    const start = player({ gold: 0, bag: bagWith(["soft-fur", 10]) });
-    const there = apply(start, { type: "sell", shop: "buyer", slot: 0, count: 10 });
-    const here = apply(start, { type: "sell", shop: "fruit", slot: 0, count: 10 });
-    expect(there.ok && here.ok && there.state.gold > here.state.gold).toBe(true);
-  });
+    const start = player({ gold: 0, bag: bagWith(["soft-fur", 10]) })
+    const there = apply(start, { type: "sell", shop: "buyer", slot: 0, count: 10 })
+    const here = apply(start, { type: "sell", shop: "fruit", slot: 0, count: 10 })
+    expect(there.ok && here.ok && there.state.gold > here.state.gold).toBe(true)
+  })
 
   it("every stocked item has a price", () => {
-    for (const shop of Object.values(SHOPS)) for (const id of shop.stock) expect(ITEMS[id].price).toBeGreaterThan(0);
-  });
-});
+    for (const shop of Object.values(SHOPS)) for (const id of shop.stock) expect(ITEMS[id].price).toBeGreaterThan(0)
+  })
+})

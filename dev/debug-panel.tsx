@@ -1,27 +1,27 @@
 // Dev only (ui.md §8): time of day, the edge blur, position, FPS, sprites, connection and a
 // reset for the player's data. F1 or ` opens it. Built from the dev shadcn kit, not the game UI.
-import { useEffect, useState } from "react";
-import { Button } from "#/components/ui/button.tsx";
-import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card.tsx";
-import { Label } from "#/components/ui/label.tsx";
-import { Slider } from "#/components/ui/slider.tsx";
-import { Switch } from "#/components/ui/switch.tsx";
-import { useGame, useGameState } from "#/components/game/context.tsx";
-import { TIMES_OF_DAY, diorama } from "#/world/scene/index.ts";
+import { useEffect, useState } from "react"
+import { Button } from "#/components/ui/button.tsx"
+import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card.tsx"
+import { Label } from "#/components/ui/label.tsx"
+import { Slider } from "#/components/ui/slider.tsx"
+import { Switch } from "#/components/ui/switch.tsx"
+import { useGame, useGameState } from "#/components/game/context.tsx"
+import { TIMES_OF_DAY, diorama } from "#/world/scene/index.ts"
 
 export default function DebugPanel() {
-  const game = useGame();
-  const open = useGameState((s) => s.debug);
-  const [info, setInfo] = useState(() => game.debugInfo());
-  const [, redraw] = useState(0);
+  const game = useGame()
+  const open = useGameState((s) => s.debug)
+  const [info, setInfo] = useState(() => game.debugInfo())
+  const [, redraw] = useState(0)
 
   useEffect(() => {
-    if (!open) return;
-    const timer = setInterval(() => setInfo(game.debugInfo()), 500);
-    return () => clearInterval(timer);
-  }, [game, open]);
+    if (!open) return
+    const timer = setInterval(() => setInfo(game.debugInfo()), 500)
+    return () => clearInterval(timer)
+  }, [game, open])
 
-  if (!open) return null;
+  if (!open) return null
   const tune = (key: "start" | "falloff" | "strength" | "saturation" | "contrast", min: number, max: number, step: number) => (
     <div className="grid gap-1.5">
       <Label>
@@ -33,12 +33,12 @@ export default function DebugPanel() {
         step={step}
         value={[diorama[key]]}
         onValueChange={(v) => {
-          diorama[key] = Array.isArray(v) ? v[0] : v;
-          redraw((n) => n + 1);
+          diorama[key] = Array.isArray(v) ? v[0] : v
+          redraw((n) => n + 1)
         }}
       />
     </div>
-  );
+  )
 
   return (
     <div className="dev-debug fixed top-3 left-1/2 z-[100] w-80 -translate-x-1/2">
@@ -76,8 +76,8 @@ export default function DebugPanel() {
             <Switch
               checked={diorama.enabled}
               onCheckedChange={(on) => {
-                diorama.enabled = on;
-                redraw((n) => n + 1);
+                diorama.enabled = on
+                redraw((n) => n + 1)
               }}
             />
             <Label>縁のぼかし</Label>
@@ -91,8 +91,8 @@ export default function DebugPanel() {
             variant="destructive"
             size="sm"
             onClick={async () => {
-              await fetch("/api/player/reset", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: info.playerId }) });
-              game.rejoin();
+              await fetch("/api/player/reset", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: info.playerId }) })
+              game.rejoin()
             }}
           >
             プレイヤーデータを初期化
@@ -100,5 +100,5 @@ export default function DebugPanel() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

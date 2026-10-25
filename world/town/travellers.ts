@@ -1,6 +1,6 @@
 // Names and looks for players arriving in town. A new player gets a random name and look, and
 // can change both in the character window.
-import type { Look } from "../scene/figure.ts";
+import type { Look } from "../scene/figure.ts"
 
 const FIRST = [
   "リーンハルト",
@@ -19,18 +19,18 @@ const FIRST = [
   "テレーゼ",
   "ジークフリート",
   "アグネス",
-];
-const EPITHET = ["旅の", "北から来た", "風来の", "巡礼の", "放浪の", "歌う", "流れの", "峠越えの"];
+]
+const EPITHET = ["旅の", "北から来た", "風来の", "巡礼の", "放浪の", "歌う", "流れの", "峠越えの"]
 
 export function randomName(random = Math.random): string {
-  const pick = <T>(list: readonly T[]) => list[Math.floor(random() * list.length)];
-  const name = `${pick(EPITHET)}${pick(FIRST)}`;
-  return name.length <= 16 ? name : pick(FIRST);
+  const pick = <T>(list: readonly T[]) => list[Math.floor(random() * list.length)]
+  const name = `${pick(EPITHET)}${pick(FIRST)}`
+  return name.length <= 16 ? name : pick(FIRST)
 }
 
 export interface LookPreset {
-  label: string;
-  look: Look;
+  label: string
+  look: Look
 }
 
 export const LOOKS: readonly LookPreset[] = [
@@ -191,4 +191,4 @@ export const LOOKS: readonly LookPreset[] = [
       eye: "cBrown",
     },
   },
-];
+]

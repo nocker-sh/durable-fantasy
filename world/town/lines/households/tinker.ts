@@ -1,4 +1,4 @@
-import type { Line } from "../line.ts";
+import type { Line } from "../line.ts"
 
 const lines = {
   クルト: [
@@ -190,6 +190,6 @@ const lines = {
     { text: "ヨハンったら、わたしのぶんのパンまで食べようとするの。" },
     { text: "歌はね、覚えてる人がいれば、なくならないのよ。" },
   ],
-} satisfies Record<string, readonly Line[]>;
+} satisfies Record<string, readonly Line[]>
 
-export { lines };
+export { lines }
