@@ -1,0 +1,202 @@
+// Choices for the studio UI, with Japanese labels.
+import type { Item, Look } from "#/world/scene/figure.ts";
+
+export const ITEMS: [Item, string][] = [
+  [null, "なし"],
+  ["sword", "剣"],
+  ["hammer", "金槌"],
+  ["axe", "斧"],
+  ["hoe", "鍬"],
+  ["broom", "ほうき"],
+  ["peel", "パンへら"],
+  ["staff", "杖"],
+  ["spear", "槍"],
+  ["greatsword", "大剣"],
+  ["mace", "メイス"],
+  ["battleaxe", "戦斧"],
+  ["halberd", "ハルバード"],
+  ["bucket", "桶"],
+  ["basket", "かご"],
+  ["sack", "袋"],
+  ["cloth", "布"],
+];
+export const SEX: [Look["sex"], string][] = [
+  ["m", "男"],
+  ["f", "女"],
+];
+export const AGE: [NonNullable<Look["age"]>, string][] = [
+  ["adult", "大人"],
+  ["child", "子ども"],
+  ["old", "年配"],
+];
+export const SKIN: [Look["skin"], string][] = [
+  ["skin1", "明るい"],
+  ["skin2", "中間"],
+  ["skin3", "濃い"],
+];
+export const HAIR: [string, string][] = [
+  ["hBrown", "茶"],
+  ["hBlack", "黒"],
+  ["hBlond", "金"],
+  ["hRed", "赤"],
+  ["hGray", "白髪"],
+];
+export const STYLES: [Look["style"], string][] = [
+  ["short", "ショート"],
+  ["bob", "ボブ"],
+  ["long", "ロング"],
+  ["braid", "おさげ"],
+  ["bun", "おだんご"],
+  ["pony", "ポニー"],
+  ["curly", "くせ毛"],
+  ["bald", "なし"],
+];
+export const CLOTH: [string, string][] = [
+  ["cRose", "ばら"],
+  ["cSky", "空色"],
+  ["cCream", "クリーム"],
+  ["cMint", "ミント"],
+  ["cWine", "ワイン"],
+  ["cHoney", "はちみつ"],
+  ["cLilac", "ライラック"],
+  ["cRed", "赤"],
+  ["cBlue", "青"],
+  ["cMustard", "黄土"],
+  ["cGreen", "緑"],
+  ["cPlum", "紫"],
+  ["cBrown", "茶"],
+  ["cLinen", "生成り"],
+  ["cGray", "灰"],
+];
+export const HATS: [NonNullable<Look["hat"]> | null, string][] = [
+  [null, "なし"],
+  ["cap", "布帽子"],
+  ["hood", "フード"],
+  ["straw", "麦わら"],
+  ["kerchief", "スカーフ"],
+  ["coif", "コイフ"],
+  ["beret", "ベレー"],
+  ["helm", "兜"],
+  ["greathelm", "グレートヘルム"],
+];
+
+/** Neck wraps (everyone wears one; there is no "none"). */
+export const NECKS: [NonNullable<Look["neck"]>, string][] = [
+  ["muffler", "マフラー"],
+  ["stole", "ストール"],
+  ["scarf", "スカーフ"],
+];
+
+export const DEFAULT_LOOK: Look = { sex: "m", age: "adult", skin: "skin1", hair: "hBrown", style: "short", top: "cSky", bottom: "cHoney", eye: "cBrown", neck: "muffler", neckRamp: "cRed" };
+
+/** Equipment sets: a look and the item it holds. */
+export const PRESETS: [string, Look, Item][] = [
+  ["町の人", DEFAULT_LOOK, null],
+  [
+    "騎士",
+    {
+      sex: "m",
+      skin: "skin1",
+      style: "short",
+      hair: "hBlond",
+      top: "cCream",
+      bottom: "cGray",
+      jacket: "cBlue",
+      armor: "iron",
+      gloves: "iron",
+      shoes: "iron",
+      hat: "helm",
+      hatRamp: "iron",
+      plume: "cRed",
+      shield: "kite",
+      shieldRamp: "cBlue",
+      crest: "gold",
+      trim: "gold",
+      cape: "cBlue",
+      neck: "scarf",
+      neckRamp: "cRed",
+    },
+    "sword",
+  ],
+  [
+    "重騎士",
+    {
+      sex: "m",
+      skin: "skin2",
+      style: "short",
+      hair: "hBlack",
+      top: "cCream",
+      bottom: "cGray",
+      jacket: "cWine",
+      armor: "iron",
+      gloves: "iron",
+      shoes: "iron",
+      hat: "greathelm",
+      hatRamp: "iron",
+      plume: "cCream",
+      trim: "gold",
+      neck: "muffler",
+      neckRamp: "cWine",
+    },
+    "greatsword",
+  ],
+  [
+    "戦士",
+    {
+      sex: "m",
+      skin: "skin2",
+      hair: "hRed",
+      style: "curly",
+      top: "cWine",
+      bottom: "cBrown",
+      armor: "leather",
+      gloves: "leather",
+      shoes: "leatherD",
+      shield: "round",
+      neck: "muffler",
+      neckRamp: "cBrown",
+      neckStripe: "cCream",
+    },
+    "battleaxe",
+  ],
+  [
+    "女戦士",
+    {
+      sex: "f",
+      skin: "skin1",
+      hair: "hBrown",
+      style: "pony",
+      top: "cSky",
+      skirt: "short",
+      armor: "iron",
+      gloves: "leather",
+      shoes: "leatherK",
+      shield: "buckler",
+      trim: "cBlue",
+      neck: "stole",
+      neckRamp: "cBlue",
+    },
+    "mace",
+  ],
+  [
+    "衛兵",
+    {
+      sex: "m",
+      skin: "skin3",
+      hair: "hBrown",
+      style: "short",
+      top: "cRed",
+      bottom: "cGray",
+      jacket: "cRed",
+      armor: "gold",
+      gloves: "leather",
+      shoes: "leatherK",
+      hat: "helm",
+      hatRamp: "iron",
+      trim: "gold",
+      neck: "scarf",
+      neckRamp: "cMustard",
+    },
+    "halberd",
+  ],
+];

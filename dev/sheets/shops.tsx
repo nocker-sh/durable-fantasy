@@ -1,0 +1,77 @@
+import { Pixel } from "./shared.tsx";
+import { ITEMS, KIND_NAME, QUALITIES, type ItemId } from "#/world/core/items.ts";
+import { MAKERS } from "#/world/core/makers.ts";
+import { BATCHES } from "#/world/core/market.ts";
+import { SHOPS, SHOP_KIND_NAME, type ShopDefinition, type ShopId } from "#/world/core/shops.ts";
+import { formatTime } from "#/world/core/clock.ts";
+import { iconUrl } from "#/world/art/icons.ts";
+import { sheet } from "./schema.ts";
+import { mapName, ref } from "./shared.tsx";
+
+const shops = sheet({
+  id: "shops",
+  label: "店",
+  rows: () => Object.keys(SHOPS) as ShopId[],
+  key: (id) => id,
+  name: (id) => SHOPS[id].name,
+  kind: (id) => SHOP_KIND_NAME[SHOPS[id].kind],
+  cols: [
+    { label: "マップ", get: (id) => mapName(SHOPS[id].map) },
+    { label: "店主", get: (id) => SHOPS[id].keepers.join("、") },
+    { label: "品数", get: (id) => SHOPS[id].stock.length, w: "w-12" },
+    { label: "屋台", get: (id) => ((SHOPS[id] as ShopDefinition).at ? "○" : ""), w: "w-12" },
+  ],
+  refs: (id) => {
+    const s = SHOPS[id] as ShopDefinition;
+    return [...ref("maps", s.map, "場所"), ...s.keepers.flatMap((k) => ref("npcs", k, "店主")), ...s.stock.map((i) => ({ sheet: "items", id: i, as: "売り物" }))];
+  },
+  more: (id) => {
+    const s = SHOPS[id] as ShopDefinition;
+    return [{ title: "買取倍率", head: ["種類", "倍"], rows: Object.entries(s.rates ?? {}).map(([k, r]) => [KIND_NAME[k as keyof typeof KIND_NAME], r]) }];
+  },
+});
+
+type MakerRow = { maker: string; item: ItemId };
+
+const makers = sheet<MakerRow>({
+  id: "makers",
+  label: "作り手",
+  rows: () => Object.entries(MAKERS).flatMap(([maker, list]) => Object.keys(list).map((item) => ({ maker, item: item as ItemId }))),
+  key: (r) => `${r.maker}:${r.item}`,
+  name: (r) => `${r.maker}の${ITEMS[r.item].name}`,
+  kind: () => "作り手",
+  icon: (r) => <Pixel src={iconUrl(r.item, r.maker)} />,
+  cols: [
+    { label: "効き", get: (r) => `×${MAKERS[r.maker][r.item]!.effect ?? 1}`, w: "w-14" },
+    { label: "値段", get: (r) => `×${MAKERS[r.maker][r.item]!.price ?? 1}`, w: "w-14" },
+    { label: "品質の出方", get: (r) => MAKERS[r.maker][r.item]!.tiers.map((t, q) => `${QUALITIES[q]}${Math.round(t * 100)}`).join(" "), w: "w-40" },
+    { label: "評判", get: (r) => MAKERS[r.maker][r.item]!.note },
+  ],
+  refs: (r) => [...ref("npcs", r.maker, "作り手"), { sheet: "items", id: r.item, as: "品" }],
+});
+
+type BatchRow = { shop: string; item: ItemId };
+
+const batches = sheet<BatchRow>({
+  id: "batches",
+  label: "焼き上がり",
+  rows: () => Object.entries(BATCHES).flatMap(([shop, list]) => Object.keys(list).map((item) => ({ shop, item: item as ItemId }))),
+  key: (r) => `${r.shop}:${r.item}`,
+  name: (r) => ITEMS[r.item].name,
+  kind: (r) => (SHOPS[r.shop as ShopId] as ShopDefinition | undefined)?.name ?? r.shop,
+  icon: (r) => <Pixel src={iconUrl(r.item)} />,
+  cols: [
+    { label: "時刻", get: (r) => BATCHES[r.shop][r.item]!.at.map(formatTime).join(" "), w: "w-36" },
+    { label: "数", get: (r) => BATCHES[r.shop][r.item]!.count, w: "w-10" },
+    {
+      label: "住民が買う",
+      get: (r) => {
+        const e = BATCHES[r.shop][r.item]!.eaten;
+        return e ? `${e.after}分後に${e.count}` : "";
+      },
+    },
+  ],
+  refs: (r) => [...ref("shops", r.shop in SHOPS ? r.shop : null, "店"), { sheet: "items", id: r.item, as: "品" }],
+});
+
+export { shops, makers, batches };
