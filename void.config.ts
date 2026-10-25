@@ -10,4 +10,7 @@ export default defineConfig({
   worker: {
     compatibility_date: "2026-02-24",
   },
+  cloudflare: {
+    routes: [{ pattern: "durable-fantasy.nocker.sh", custom_domain: true }],
+  },
 })
