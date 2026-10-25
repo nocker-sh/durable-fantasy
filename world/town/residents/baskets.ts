@@ -1,0 +1,66 @@
+import type { Resident } from "../resident.ts";
+
+const residents = {
+  エマ: {
+    map: "phanthiet-craft",
+    name: "エマ",
+    job: "籠編み",
+    at: [35.8, 24.4],
+    item: "basket",
+    look: { skirt: "long", footwear: "clogs", top: "cGreen", apron: "cLinen", frill: false, bow: "cHoney", sex: "f", skin: "skin1", hair: "hBlond", style: "bun", eye: "cBlue" },
+  },
+  ニクラス: {
+    map: "phanthiet-craft",
+    name: "ニクラス",
+    job: "木工所の小僧",
+    at: [12, 22.3],
+    item: "sack",
+    look: {
+      legs: "breeches",
+      footwear: "shoes",
+      hose: "cCream",
+      shoes: "leatherD",
+      top: "cGreen",
+      bottom: "cBrown",
+      vest: "wool",
+      collar: null,
+      sex: "m",
+      skin: "skin1",
+      hair: "hBlond",
+      style: "short",
+      eye: "cBlue",
+    },
+  },
+  フリーダ: {
+    map: "phanthiet-craft",
+    name: "フリーダ",
+    job: "子ども",
+    at: [36.8, 25.4],
+    item: null,
+    look: {
+      skirt: "short",
+      footwear: "clogs",
+      hose: "cHoney",
+      top: "cGreen",
+      frill: true,
+      bow: "cHoney",
+      trim: "cGreen",
+      sex: "f",
+      age: "child",
+      skin: "skin1",
+      hair: "hBlond",
+      style: "pony",
+      eye: "cBlue",
+    },
+  },
+  ローゼマリー: {
+    map: "phanthiet-craft",
+    name: "ローゼマリー",
+    job: "籠編み",
+    at: [35.8, 26.6],
+    item: null,
+    look: { skirt: "long", footwear: "shoes", shoes: "leatherD", top: "cBrown", apron: "cLinen", cape: "cGray", sex: "f", age: "old", skin: "skin1", hair: "hGray", style: "bun", eye: "cBlue" },
+  },
+} satisfies Record<string, Resident>;
+
+export { residents };
