@@ -65,10 +65,26 @@ export function updateMonsters(list: MonsterView[], root: THREE.Group, now: numb
         b.scale.setScalar(0.45 * (1 - k * 0.5))
       })
       if (now >= m.burst.until) {
-        m.burst.bits.forEach((b) => root.remove(b))
-        m.burst = null
+        clearBurst(m)
       }
     }
+  }
+}
+
+/** Burst meshes own their geometry and materials, but borrow the shared slime texture. */
+function clearBurst(m: MonsterView) {
+  const effect = m.burst
+  m.burst = null
+  if (!effect) return
+  for (const bit of effect.bits) {
+    bit.removeFromParent()
+    bit.traverse((object) => {
+      const mesh = object as THREE.Mesh
+      if (!mesh.isMesh) return
+      mesh.geometry.dispose()
+      const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+      for (const material of materials) material.dispose()
+    })
   }
 }
 
@@ -76,6 +92,7 @@ export function updateMonsters(list: MonsterView[], root: THREE.Group, now: numb
 export function burst(m: MonsterView, root: THREE.Group, now: number) {
   const kind = MONSTER_KINDS[m.spawn.kind]
   if (kind.look !== "slime") return
+  clearBurst(m)
   const bits = [0, 1, 2, 3].map(() => {
     const b = slimeBody(kind.color ?? 0x8ac06a)
     root.add(b)
