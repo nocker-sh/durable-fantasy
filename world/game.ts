@@ -317,6 +317,7 @@ export class Game {
 
   moveSlot = this.playerActions.moveSlot.bind(this.playerActions)
 
+  forgetLife = this.playerActions.forgetLife.bind(this.playerActions)
   raise = this.playerActions.raise.bind(this.playerActions)
 
   bindHotbar = this.playerActions.bindHotbar.bind(this.playerActions)

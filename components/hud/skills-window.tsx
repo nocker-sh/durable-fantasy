@@ -1,8 +1,9 @@
+import { useState } from "react"
 // Skills (game-system.md §9, ui.md §3.10): the life skills' levels and their next milestones, what
 // anyone can do (sit, first aid), and the arts of the weapon in hand. Drag an icon to the shortcut bar.
 import { STAT_NAME, type Stat } from "#/world/core/growth.ts"
 import { GATHER_SKILL_NAME, ITEMS, type Skill } from "#/world/core/items.ts"
-import { LIFE_CAP, LIFE_MILESTONE_TEXT, LIFE_SKILLS, LIFE_TOTAL_CAP, lifeExpAt, lifeLevel, lifeTotal, nextMilestone } from "#/world/core/life.ts"
+import { LIFE_CAP, LIFE_MILESTONE_TEXT, LIFE_SKILLS, LIFE_TOTAL_CAP, forgottenLifeExp, lifeExpAt, lifeLevel, lifeTotal, nextMilestone } from "#/world/core/life.ts"
 import type { PlayerState } from "#/world/core/player.ts"
 import { SKILLS, SKILL_IDS, artBlocked, artsOf, isArt, skillOf, type SkillId } from "#/world/core/skills.ts"
 import { standing } from "#/world/core/stats.ts"
@@ -19,6 +20,9 @@ const needName = (k: string) => (k in STAT_NAME ? STAT_NAME[k as Stat] : GATHER_
 
 export function SkillsWindow() {
   const win = useWindow("skills")
+  const game = useGame()
+  const busy = useGameState((s) => s.busy)
+  const [forget, setForget] = useState<{ skill: Skill; exp: number } | null>(null)
   const player = useGameState((s) => s.player)
   if (!win.open || !player) return null
   const total = lifeTotal(player.life)
@@ -58,6 +62,33 @@ export function SkillsWindow() {
                       aria-label={`${GATHER_SKILL_NAME[s]}の経験`}
                     />
                   </div>
+                  {exp > 0 && (
+                    <Button size="sm" variant="ghost" className="self-end" disabled={busy} onClick={() => setForget({ skill: s, exp })}>
+                      忘れる
+                    </Button>
+                  )}
+                  {forget?.skill === s && (
+                    <div className="mt-1 flex flex-col gap-1 border-t border-white/10 pt-2 font-body text-xs" role="group" aria-label={`${GATHER_SKILL_NAME[s]}を忘れる確認`}>
+                      <p>
+                        {GATHER_SKILL_NAME[s]}を Lv {lifeLevel(forget.exp)} → {lifeLevel(forgottenLifeExp(forget.exp))} に下げ、経験 {forget.exp - forgottenLifeExp(forget.exp)}{" "}
+                        を失う。元には戻せないが、作業で育て直せる。
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          disabled={busy}
+                          onClick={async () => {
+                            if (await game.forgetLife(forget.skill, forget.exp)) setForget(null)
+                          }}
+                        >
+                          経験を失って忘れる
+                        </Button>
+                        <Button size="sm" disabled={busy} onClick={() => setForget(null)}>
+                          やめる
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                   {next && (
                     <p className="font-body text-[11px] text-text-dim">
                       Lv {next}: {LIFE_MILESTONE_TEXT[s][next]}
@@ -67,7 +98,9 @@ export function SkillsWindow() {
               )
             })}
           </ul>
-          <p className="mt-1 font-body text-[11px] text-text-faint">道具があれば誰でもできる。採るほど、作るほど上がる。合計が {LIFE_TOTAL_CAP} に届くと、どれも上がらなくなる。</p>
+          <p className="mt-1 font-body text-[11px] text-text-faint">
+            道具があれば誰でもできる。採るほど、作るほど上がる。合計が {LIFE_TOTAL_CAP} に届くと、どれも上がらなくなる。専門を変えたいときは、経験を忘れて合計に空きを作れる。
+          </p>
         </section>
         <section>
           <h3 className="mb-1 font-head text-xs text-brass-hi">動作</h3>

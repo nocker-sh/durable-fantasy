@@ -5,6 +5,7 @@ import { STATS, type Stat } from "./growth.ts"
 import { SLOTS, type CraftSkill, type GatherSkill, type ItemId, type Quality, type Slot } from "./items.ts"
 import { HOTBAR_SIZE, LOOK_COUNT, NECK_KINDS, NECK_RAMPS, hotbarEntry, itemId, nameSchema } from "./player.ts"
 import { isShopId, type ShopId } from "./shops.ts"
+import { LIFE_SKILLS } from "./life.ts"
 import { SKILL_IDS, type SkillId } from "./skills.ts"
 import type { Thread } from "./threads.ts"
 
@@ -35,6 +36,7 @@ export const commandSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("equip"), slot: slotIndex, to: equipSlot.optional() }),
   z.object({ type: z.literal("unequip"), slot: equipSlot }),
   z.object({ type: z.literal("raise"), stat: z.enum(STATS) }),
+  z.object({ type: z.literal("forget-life"), skill: z.enum(LIFE_SKILLS), exp: z.number().int().nonnegative() }),
   /** skills (core/skills.ts): first aid or a prayer on yourself, sit down to rest, get up */
   z.object({ type: z.literal("cast"), skill: z.enum(SKILL_IDS) }),
   z.object({ type: z.literal("sit") }),
@@ -125,6 +127,9 @@ export type Reason =
   | "TWO_HANDED"
   | "NOTHING_EQUIPPED"
   | "NOT_OWNED"
+  | "LIFE_CHANGED"
+  | "LIFE_EQUIPPED"
+  | "NO_LIFE_EXP"
   | "NO_POINTS"
   | "STAT_MAX"
   | "TOO_FAR"
@@ -213,6 +218,9 @@ export const REASON_TEXT: Record<Reason, string> = {
   NO_POINTS: "能力ポイントが足りない。",
   STAT_MAX: "これ以上は上げられない。",
   TOO_FAR: "遠すぎる。もっと近づいて。",
+  LIFE_CHANGED: "生活スキルの経験が変わった。もう一度確認してほしい。",
+  LIFE_EQUIPPED: "このスキルが必要な装備を先に外してほしい。",
+  NO_LIFE_EXP: "まだ忘れる経験がない。",
   OFFLINE: "接続が切れている。",
   TOO_FULL: "もうお腹いっぱいだ。",
   NOTHING_TO_GAIN: "いまは食べても飲んでも変わらない。",

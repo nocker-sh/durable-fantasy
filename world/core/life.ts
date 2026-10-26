@@ -94,3 +94,6 @@ export const LIFE_MILESTONE_TEXT: Readonly<Record<Skill, Partial<Record<number, 
   tailoring: { 2: "毛織りのマフラー", 4: "縞のマフラー", 8: "毛織りの外套" },
   smithing: { 2: "鎌・木こりの斧", 4: "ダガー", 8: "鉄の剣" },
 }
+
+/** Forget the current level and its partial progress; level zero loses only its progress. */
+export const forgottenLifeExp = (exp: number) => lifeExpAt(Math.max(0, lifeLevel(exp) - 1))

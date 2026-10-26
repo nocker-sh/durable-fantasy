@@ -2,7 +2,7 @@ import type { GameSession } from "./session.ts"
 import { artBlocked, skillOf, skillOfKey, type SkillId } from "../core/skills.ts"
 import { stationAt } from "../town/stations.ts"
 import { nodeOf } from "../core/gather.ts"
-import { sellable, type Quality } from "../core/items.ts"
+import { sellable, type Quality, type Skill } from "../core/items.ts"
 import { REASON_TEXT } from "../core/commands.ts"
 import type { Stat } from "../core/growth.ts"
 import { ITEMS, type ItemId, type Slot } from "../core/items.ts"
@@ -128,6 +128,10 @@ export class PlayerActions {
 
   moveSlot(from: number, to: number) {
     if (from !== to) void this.target.run({ type: "move", from, to })
+  }
+
+  forgetLife(skill: Skill, exp: number) {
+    return this.target.run({ type: "forget-life", skill, exp })
   }
 
   raise(stat: Stat) {

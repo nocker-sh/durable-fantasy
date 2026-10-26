@@ -4,7 +4,7 @@
 import { addItem, firstOf, moveSlot, putStack, removeItem, takeFromSlot, type Bag, type Stack } from "./bag.ts"
 import { STORAGE_KEEPER, STORE_FEE } from "./storage.ts"
 import { artBlocked, firstAid, isArt, skillOf } from "./skills.ts"
-import { GATHER_EXP, craftExp, gainLife, lifeLevel } from "./life.ts"
+import { GATHER_EXP, craftExp, gainLife, lifeLevel, forgottenLifeExp } from "./life.ts"
 import { keep } from "./threads.ts"
 import { MAX_ORDERS, commissionOf, commissionQuality } from "./commissions.ts"
 import type { Command, GameEvent, Reason, ServerCommand } from "./commands.ts"
@@ -445,6 +445,14 @@ export function apply(before: PlayerState, command: Command | ServerCommand, ctx
       const bag = putStack(state.bag, { item, count: 1, ...state.worn[command.slot] })
       if (!bag) return reject("BAG_FULL")
       return settle({ ...state, bag, equipment: { ...state.equipment, [command.slot]: null }, worn: without(state.worn, command.slot) }, { type: "unequipped", item, slot: command.slot })
+    }
+    case "forget-life": {
+      const exp = state.life[command.skill]
+      if (exp !== command.exp) return reject("LIFE_CHANGED")
+      if (exp <= 0) return reject("NO_LIFE_EXP")
+      const next = { ...state, life: { ...state.life, [command.skill]: forgottenLifeExp(exp) } }
+      if (Object.values(state.equipment).some((id) => id && unmet(ITEMS[id].equip?.needs, next).length)) return reject("LIFE_EQUIPPED")
+      return settle(next)
     }
     case "raise": {
       const value = state.stats[command.stat]
