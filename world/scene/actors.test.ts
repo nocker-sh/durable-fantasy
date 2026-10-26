@@ -46,6 +46,45 @@ describe("figure resource lifetime", () => {
     release.mockRestore()
   })
 
+  it("bounds retained strips and ignores evicted frame completions", () => {
+    const draw = canvasDocument()
+    const figure = new Figure(look)
+    const release = vi.spyOn(THREE.Texture.prototype, "dispose")
+    figure.prefetch("idle", null)
+    const stale = vi.mocked(spriteFrame).mock.calls[0][6]!
+    figure.prefetch("walk", null)
+    figure.prefetch("carry", null)
+    expect(release).toHaveBeenCalledTimes(8)
+    stale({} as ImageBitmap)
+    expect(draw).not.toHaveBeenCalled()
+    // Evicted directions can be requested again, rather than remaining permanently pending.
+    figure.prefetch("idle", null)
+    expect(spriteFrame).toHaveBeenCalledTimes(32)
+    figure.dispose()
+    expect(release).toHaveBeenCalledTimes(32)
+    release.mockRestore()
+  })
+
+  it("keeps the displayed texture alive while evicting and ignores stale baked strips", () => {
+    const draw = canvasDocument()
+    const figure = new Figure(look, { item: null, url: (anim, v) => `${anim}-${v}.png` })
+    figure.prefetch("idle", null)
+    vi.mocked(bakedStrip).mock.calls[0][2]!({} as ImageBitmap)
+    const stale = vi.mocked(bakedStrip).mock.calls[1][2]!
+    figure.refresh()
+    const displayed = figure.sprite.material.map!
+    const release = vi.spyOn(displayed, "dispose")
+    figure.prefetch("walk", null)
+    figure.prefetch("carry", null)
+    stale({} as ImageBitmap)
+    expect(draw).toHaveBeenCalledTimes(1)
+    expect(release).not.toHaveBeenCalled()
+    expect(figure.sprite.material.map).toBe(displayed)
+    figure.dispose()
+    expect(release).toHaveBeenCalledTimes(1)
+    release.mockRestore()
+  })
+
   it("requests a baked strip once while pending and falls back after failure", () => {
     canvasDocument()
     const figure = new Figure(look, { item: null, url: (_anim, v) => `test-${v}.png` })

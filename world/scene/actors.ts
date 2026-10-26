@@ -26,11 +26,15 @@ interface Strip {
   ready: Uint8Array
   requested: Uint8Array
   count: number
+  disposed?: boolean
   baked?: "loading" | "failed"
 }
 
 /** Strips baked ahead of time for a figure whose look never changes: anim and view → file URL. */
 export type BakedStrips = { item: Item; url: (anim: Anim, view: number) => string | null }
+
+// Keep two complete sets of eight directions per figure; older poses can be loaded again.
+const MAX_STRIPS = 16
 
 const shadowGeo = new THREE.CircleGeometry(0.26, 12)
 // upright card with the feet anchor at the origin; standing vertical (not camera-facing)
@@ -133,13 +137,17 @@ export class Figure {
     this.disposed = true
     this.root.removeFromParent()
     for (const strip of this.strips.values()) {
-      strip.tex.dispose()
-      strip.canvas.width = strip.canvas.height = 0
+      this.releaseStrip(strip)
     }
     this.strips.clear()
     this.sprite.material.dispose()
     this.ghost?.material.dispose()
     this.rim?.material.dispose()
+  }
+  private releaseStrip(strip: Strip) {
+    strip.disposed = true
+    strip.tex.dispose()
+    strip.canvas.width = strip.canvas.height = 0
   }
   hold(it: Item) {
     this.item = it
@@ -151,7 +159,17 @@ export class Figure {
   private strip(anim: Anim, item: Item, v: number): Strip {
     const key = anim + "|" + item + "|" + v
     let s = this.strips.get(key)
-    if (!s) {
+    if (s) {
+      this.strips.delete(key)
+      this.strips.set(key, s)
+    } else {
+      // Never release a texture still referenced by the visible figure or its overlays.
+      for (const [oldKey, old] of this.strips) {
+        if (this.strips.size < MAX_STRIPS) break
+        if (old.tex === this.sprite.material.map || old.tex === this.ghost?.material.map || old.tex === this.rim?.material.map) continue
+        this.strips.delete(oldKey)
+        this.releaseStrip(old)
+      }
       const count = FRAMES[anim]
       const canvas = document.createElement("canvas")
       canvas.width = count * FW
@@ -176,7 +194,7 @@ export class Figure {
     const url = s.baked !== "failed" && this.baked?.item === item ? this.baked.url(anim, v) : null
     if (url) {
       const loaded = (strip: ImageBitmap | null) => {
-        if (this.disposed) return
+        if (this.disposed || s.disposed) return
         if (!strip) {
           s.baked = "failed"
           return
@@ -193,7 +211,7 @@ export class Figure {
     }
     s.requested[f] = 1
     const done = (frame: ImageBitmap) => {
-      if (this.disposed || s.ready[f]) return
+      if (this.disposed || s.disposed || s.ready[f]) return
       s.ctx.clearRect(f * FW, 0, FW, FH)
       s.ctx.drawImage(frame, f * FW, 0)
       s.ready[f] = 1
