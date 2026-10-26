@@ -117,3 +117,52 @@ it("does not retain a failed entry promise", async () => {
   WorkerStub.all[1].finish()
   await expect(retry).resolves.toBeDefined()
 })
+
+it("returns painted ground before persistence completes and shares it during the write", async () => {
+  const writes: { oncomplete?: () => void; onabort?: () => void }[] = []
+  const store = {
+    get: () => {
+      const request = { result: undefined, onsuccess: () => {} }
+      queueMicrotask(() => request.onsuccess())
+      return request
+    },
+    getAllKeys: () => {
+      const request = { result: [], onsuccess: () => {} }
+      queueMicrotask(() => request.onsuccess())
+      return request
+    },
+    put: vi.fn(),
+  }
+  vi.stubGlobal("indexedDB", {
+    open: () => {
+      const request = {
+        result: {
+          transaction: (_: string, mode?: string) => {
+            const tx = { objectStore: () => store, oncomplete: undefined as (() => void) | undefined, onabort: undefined as (() => void) | undefined }
+            if (mode === "readwrite") writes.push(tx)
+            return tx
+          },
+        },
+        onsuccess: () => {},
+      }
+      queueMicrotask(() => request.onsuccess())
+      return request
+    },
+  })
+  const { groundOf } = await import("./ground")
+  const first = groundOf("a")
+  await vi.waitFor(() => expect(WorkerStub.all).toHaveLength(1))
+  WorkerStub.all[0].finish()
+  const pixels = await first
+  expect(writes).toHaveLength(1)
+  expect(store.put).toHaveBeenCalledOnce()
+  // Another map evicts the in-memory entry while the first map is still saving.
+  const other = groundOf("b")
+  expect(await groundOf("a")).toBe(pixels)
+  await vi.waitFor(() => expect(WorkerStub.all).toHaveLength(2))
+  expect(WorkerStub.all.filter((worker) => worker.job?.map === "a")).toHaveLength(1)
+  WorkerStub.all[1].finish()
+  await other
+  writes[0].oncomplete?.()
+  writes[1].onabort?.()
+})

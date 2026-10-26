@@ -45,6 +45,7 @@ function obtain(map: string, foreground: boolean): Promise<PixBuf> {
     existing.foreground ||= foreground
     return existing.promise
   }
+  let saving: Promise<void> = Promise.resolve()
   const job: GroundJobState = {
     foreground,
     promise: Promise.resolve()
@@ -52,11 +53,14 @@ function obtain(map: string, foreground: boolean): Promise<PixBuf> {
         const cached = await load(map).catch(() => null)
         if (cached) return cached
         const buf = await paint(map, () => job.foreground)
-        await keep(map, buf).catch(() => {})
+        saving = keep(map, buf).catch(() => {})
         return buf
       })
       .finally(() => {
-        if (active.get(map) === job) active.delete(map)
+        // Display ready pixels immediately, but share them until persistence finishes.
+        void saving.then(() => {
+          if (active.get(map) === job) active.delete(map)
+        })
       }),
   }
   active.set(map, job)
