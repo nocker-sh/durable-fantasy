@@ -3,7 +3,7 @@ import { GB, mat } from "../gfx"
 import { PixBuf, pick } from "../pix"
 import { groundH, blockCircle } from "../world"
 import { M } from "./materials.ts"
-import { updaters } from "./registry.ts"
+import { animateObject } from "./registry.ts"
 
 export function windmill(root: THREE.Group, x: number, z: number) {
   const y0 = groundH(x, z)
@@ -30,7 +30,7 @@ export function windmill(root: THREE.Group, x: number, z: number) {
     hub.add(arm)
   }
   root.add(hub)
-  updaters.push((_t, dt) => {
+  animateObject(hub, (_t, dt) => {
     hub.rotation.z -= dt * 0.5
   })
   blockCircle(x, z, 1.5)

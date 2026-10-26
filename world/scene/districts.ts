@@ -27,6 +27,7 @@ import {
   M,
   buildHouses,
   updaters,
+  movingObjects,
   type V2,
 } from "./build"
 import { groundH, isFree, N, roadD, riverD, blockRect, currentLayout } from "./world"
@@ -123,6 +124,7 @@ function stallDressing(g: THREE.Object3D, steam: boolean) {
   const puffs = [0, 1, 2].map((k) => {
     const p = new THREE.Sprite(new THREE.SpriteMaterial({ color: 0xe8e4e0, transparent: true, opacity: 0.35, depthWrite: false }))
     g.add(p)
+    movingObjects.add(p)
     return { p, k }
   })
   updaters.push((t) =>

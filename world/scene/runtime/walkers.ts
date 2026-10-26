@@ -1,7 +1,7 @@
 import type * as THREE from "three"
 import { walkH } from "../world"
 import { ANIM_DUR, type Anim, type Look } from "../figure"
-import { type Actor, Figure, allFigures } from "../actors"
+import { type Actor, Figure } from "../actors"
 import { wearable } from "../../town/residents.ts"
 import type { Avatar, Cell } from "./types.ts"
 import type { Walker } from "./walker.ts"
@@ -24,9 +24,7 @@ export function createWalkers(scene: THREE.Scene, onPickPlayer: (id: string) => 
     return fig
   }
   function dropFigure(fig: Figure) {
-    scene.remove(fig.root)
-    const i = allFigures.indexOf(fig)
-    if (i >= 0) allFigures.splice(i, 1)
+    fig.dispose()
   }
   const lookId = (l: Look) => JSON.stringify(l)
   const looks = new WeakMap<Walker, string>()

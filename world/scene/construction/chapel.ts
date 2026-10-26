@@ -5,7 +5,7 @@ import { ashlarTex } from "../textures"
 import { groundH, blockRect, blockCircle, currentLayout } from "../world"
 import { M } from "./materials.ts"
 import { glowify } from "./houses.ts"
-import { occluder, updaters, places } from "./registry.ts"
+import { occluder, animateObject, places } from "./registry.ts"
 import { fence } from "./fences.ts"
 
 // ---------------------------------------------------------------- chapel
@@ -92,7 +92,7 @@ export function chapel(root: THREE.Group) {
   const bell = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.38, 0.6, 10), new THREE.MeshLambertMaterial({ color: 0x9a7a3a }))
   bell.position.set(mx, yb + th - 0.9, mz)
   root.add(bell)
-  updaters.push((t) => {
+  animateObject(bell, (t) => {
     bell.rotation.x = Math.sin(t * 0.7) * Math.max(0, Math.sin(t * 0.05)) * 0.35
   })
   blockRect(x0 - 0.5, z0 - 0.5, x1 + 0.2, z1 + 0.4)

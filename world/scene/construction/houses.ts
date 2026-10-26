@@ -5,7 +5,7 @@ import { roofTex, thatchTex, wallTex, gableTex, signTex } from "../textures"
 import { HOUSES, enterable, floorsOf, type HouseDef } from "../../town/houses.ts"
 import { houseStyle, type HouseStyle } from "../../town/style.ts"
 import { groundH, blockRect, roadD, isFree } from "../world"
-import { houseGlows, glowMats, type V2, chimneys, occluder, places, updaters } from "./registry.ts"
+import { houseGlows, glowMats, type V2, chimneys, occluder, places, animateObject } from "./registry.ts"
 import { M } from "./materials.ts"
 import { woodpile, barrel } from "./furniture.ts"
 
@@ -408,7 +408,7 @@ function hangSign(root: THREE.Group, o: HouseOpts, door: V2, y0: number) {
   p.rotation.y = Math.atan2(nx, nz) + Math.PI / 2
   p.castShadow = true
   root.add(p)
-  updaters.push((t) => {
+  animateObject(p, (t) => {
     p.rotation.z = Math.sin(t * 1.3 + wx) * 0.06
   })
 }

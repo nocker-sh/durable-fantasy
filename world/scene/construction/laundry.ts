@@ -3,7 +3,7 @@ import { GB, toTex } from "../gfx"
 import { laundry, GPPU } from "../goods"
 import { groundH, blockCircle } from "../world"
 import { M } from "./materials.ts"
-import { updaters } from "./registry.ts"
+import { animateObject } from "./registry.ts"
 
 export function laundryLine(root: THREE.Group, ax: number, az: number, bx: number, bz: number, seed: number) {
   const gb = new GB()
@@ -36,7 +36,7 @@ export function laundryLine(root: THREE.Group, ax: number, az: number, bx: numbe
     m.castShadow = true
     root.add(m)
     const ph = k * 1.7
-    updaters.push((tt) => {
+    animateObject(m, (tt) => {
       m.rotation.x = Math.sin(tt * 1.6 + ph) * 0.18 + 0.12
     })
     t += b.w / GPPU + 0.12

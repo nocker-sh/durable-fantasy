@@ -1,4 +1,5 @@
 import * as THREE from "three"
+import { BillboardBatch } from "../../../lib/graphics/billboards.ts"
 import { N } from "../world"
 import { litSprites, toTex } from "../gfx"
 import { glowMats, fireLights, chimneys, houseGlows, lamps } from "../build"
@@ -33,22 +34,31 @@ function createEnvironment(scene: THREE.Scene) {
     return d < 5.5 ? (d < 3 && x < 6 && y < 6 ? [214, 206, 200] : [168, 162, 166]) : null
   })
   const puffTex = toTex(puffBuf, false)
-  const puffs: { s: THREE.Sprite; age: number; life: number; o: THREE.Vector3; vx: number }[] = []
+  const smoke = new BillboardBatch(puffTex, chimneys.length * 7)
+  if (smoke.count) scene.add(smoke.mesh)
+  const puffs: { age: number; life: number; o: THREE.Vector3; vx: number }[] = []
   chimneys.forEach((c, i) => {
     for (let k = 0; k < 7; k++) {
-      const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: puffTex, transparent: true, depthWrite: false }))
-      scene.add(s)
-      puffs.push({ s, age: (k / 7) * 4.5 + i, life: 4.5, o: c, vx: 0.15 + (i % 3) * 0.05 })
+      puffs.push({ age: (k / 7) * 4.5 + i, life: 4.5, o: c, vx: 0.15 + (i % 3) * 0.05 })
     }
   })
 
-  return { hemi, sun, puffs }
+  return {
+    hemi,
+    sun,
+    puffs,
+    smoke,
+    dispose: () => {
+      if (!smoke.count) smoke.dispose()
+      puffTex.dispose()
+    },
+  }
 }
 
 type SceneEnvironment = ReturnType<typeof createEnvironment>
 
 function createLighting(scene: THREE.Scene, world: SceneDefinition, wm: THREE.ShaderMaterial, applySchedule: (min: number) => void, environment: SceneEnvironment) {
-  const { hemi, sun, puffs } = environment
+  const { hemi, sun, puffs, smoke } = environment
   const TOD = [
     { sun: 0xfff2d8, si: 2.6, hemi: 0xfff6e8, hg: 0x585068, hi: 1.5, sky: 0x9ec4d8, tint: 0xffffff, glow: 0, night: 0, az: 0.9, el: 1.0 },
     { sun: 0xffb070, si: 2.2, hemi: 0xffd0a8, hg: 0x4a3a58, hi: 1.1, sky: 0xe8a878, tint: 0xf0c8a0, glow: 0.7, night: 0.35, az: 2.2, el: 0.42 },
@@ -129,14 +139,11 @@ function createLighting(scene: THREE.Scene, world: SceneDefinition, wm: THREE.Sh
       l.light.intensity = on ? 1.9 * flick : 0
       l.glow.emissiveIntensity = on ? 1.6 : 0
     })
-    puffs.forEach((p) => {
+    puffs.forEach((p, index) => {
       p.age += dt
       if (p.age > p.life) p.age -= p.life
       const k = p.age / p.life
-      p.s.position.set(p.o.x + k * k * 1.6 * p.vx * 6 + Math.sin(p.age * 2 + p.o.x) * 0.08, p.o.y + k * 2.6, p.o.z - k * k * 0.6)
-      const s = 0.18 + k * 0.5
-      p.s.scale.set(s, s, 1)
-      p.s.material.opacity = (1 - k) * 0.5 * Math.min(1, k * 8)
+      smoke.set(index, p.o.x + k * k * 1.6 * p.vx * 6 + Math.sin(p.age * 2 + p.o.x) * 0.08, p.o.y + k * 2.6, p.o.z - k * k * 0.6, 0.18 + k * 0.5, (1 - k) * 0.5 * Math.min(1, k * 8))
     })
     wm.uniforms.t.value = t
   }

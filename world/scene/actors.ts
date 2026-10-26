@@ -17,7 +17,6 @@ export type { Look, Item, Anim }
  */
 export const view = { yaw: 0, tint: new THREE.Color(1, 1, 1), cam: new THREE.Vector3(), frustum: new THREE.Frustum() }
 const tmpV = new THREE.Vector3()
-export const allFigures: Figure[] = []
 
 /** One anim/item/view as a strip of frames that fills in as they arrive. */
 interface Strip {
@@ -25,6 +24,7 @@ interface Strip {
   ctx: CanvasRenderingContext2D
   tex: THREE.Texture
   ready: Uint8Array
+  requested: Uint8Array
   count: number
   baked?: "loading" | "failed"
 }
@@ -50,6 +50,7 @@ export class Figure {
   anim: Anim = "idle"
   t = 0
   height: number
+  private disposed = false
   private strips = new Map<string, Strip>()
   private id: string
   /** a silhouette drawn through walls, while something we cannot see into stands in front */
@@ -126,7 +127,19 @@ export class Figure {
     this.root.add(this.sprite, sh)
     this.height = (look.age === "child" ? 1.25 : 1.65) * FIG
     this.id = lookKey(look, null)
-    allFigures.push(this)
+  }
+  dispose() {
+    if (this.disposed) return
+    this.disposed = true
+    this.root.removeFromParent()
+    for (const strip of this.strips.values()) {
+      strip.tex.dispose()
+      strip.canvas.width = strip.canvas.height = 0
+    }
+    this.strips.clear()
+    this.sprite.material.dispose()
+    this.ghost?.material.dispose()
+    this.rim?.material.dispose()
   }
   hold(it: Item) {
     this.item = it
@@ -149,19 +162,21 @@ export class Figure {
       tex.generateMipmaps = false
       tex.colorSpace = THREE.SRGBColorSpace
       tex.repeat.set(1 / count, 1)
-      s = { canvas, ctx: canvas.getContext("2d")!, tex, ready: new Uint8Array(count), count }
+      s = { canvas, ctx: canvas.getContext("2d")!, tex, ready: new Uint8Array(count), requested: new Uint8Array(count), count }
       this.strips.set(key, s)
     }
     return s
   }
   /** Request one frame; it is drawn into its strip when it arrives. */
   private want(anim: Anim, item: Item, v: number, f: number, urgency: number) {
+    if (this.disposed) return
     const s = this.strip(anim, item, v)
-    if (s.ready[f]) return
+    if (s.ready[f] || s.requested[f] || s.baked === "loading") return
     // a baked strip brings every frame at once
     const url = s.baked !== "failed" && this.baked?.item === item ? this.baked.url(anim, v) : null
     if (url) {
       const loaded = (strip: ImageBitmap | null) => {
+        if (this.disposed) return
         if (!strip) {
           s.baked = "failed"
           return
@@ -176,8 +191,9 @@ export class Figure {
       else s.baked = "loading"
       if (s.baked !== "failed") return
     }
+    s.requested[f] = 1
     const done = (frame: ImageBitmap) => {
-      if (s.ready[f]) return
+      if (this.disposed || s.ready[f]) return
       s.ctx.clearRect(f * FW, 0, FW, FH)
       s.ctx.drawImage(frame, f * FW, 0)
       s.ready[f] = 1
@@ -195,6 +211,7 @@ export class Figure {
   }
   /** Pick the frame for the current camera angle; while it is still rendering show the closest one there is. */
   refresh() {
+    if (this.disposed) return
     let rel = view.yaw - this.heading
     rel = ((rel % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2)
     const v = Math.round(rel / (Math.PI / 4)) % 8
@@ -333,7 +350,7 @@ export class Actor {
       if (!this.path.length) this.anim = "idle"
     } else if (this.routine.length) this.runRoutine(dt)
     this.fig.pose(this.anim, this.animT)
-    this.place()
+    if (this.fig.root.visible) this.place()
     this.nextSay -= dt
     if (this.nextSay < 0) {
       const pool = this.sayLines.length ? this.sayLines : this.lines

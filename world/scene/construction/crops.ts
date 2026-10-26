@@ -4,7 +4,7 @@ import { heap, basket } from "../goods"
 import { groundH } from "../world"
 import type { Goods } from "./stalls.ts"
 import { addSprite } from "./sprites.ts"
-import { updaters } from "./registry.ts"
+import { animateObject } from "./registry.ts"
 
 export function crops(root: THREE.Group, f: { x0: number; z0: number; x1: number; z1: number; axis: "x" | "z" }, kind: Goods, seed: number) {
   const r = new Rng(seed)
@@ -48,7 +48,7 @@ function wheatField(root: THREE.Group, f: { x0: number; z0: number; x1: number; 
     for (let x = f.x0 + 0.5; x < f.x1 - 0.4; x += 0.9) {
       const s = addSprite(root, b, x + (r.next() - 0.5) * 0.3, groundH(x, z) - 0.05, z, 64)
       const ph = x * 0.7 + z * 0.3
-      updaters.push((t) => {
+      animateObject(s, (t) => {
         s.material.rotation = Math.sin(t * 1.2 + ph) * 0.04
       })
     }

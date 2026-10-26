@@ -11,7 +11,7 @@ import { REACH } from "../../core/gather.ts"
 import { burst, makeMonsters, standBy, updateMonsters } from "../monsters"
 import { MELEE_REACH, MONSTER_KINDS } from "../../core/monsters.ts"
 import { groundOf } from "../ground"
-import { updaters, occluders, resetRegistries, houseGlows, lamps, stalls, type V2 } from "../build"
+import { updaters, occluders, resetRegistries, houseGlows, lamps, stalls, movingObjects, type V2 } from "../build"
 import { daylight } from "../../core/clock.ts"
 import type { Anim } from "../figure"
 import { outlineShape } from "../outline"
@@ -60,11 +60,12 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
   const { groundCanvas, wm, terrain } = await createTerrain(scene, world, ground, progress, tick)
   const town = new THREE.Group()
   world.build(town)
+  lap("scene: town built")
   // still things that share a material become one draw each; a house, a stall or a swaying crown
   // keeps its own transform so it can still fade, hide or move as one
   if (!world.indoor) {
     const anchors = [...occluders.map((o) => o.obj), ...Object.values(stalls).flatMap((s) => [s.wares, s.cover, s.group ?? s.wares])]
-    const merged = mergeStatic(town, { anchors, step: (t) => updaters.forEach((u) => u(t, 1 / 60)) })
+    const merged = mergeStatic(town, { anchors, moving: movingObjects })
     lap(`scene: merged ${merged.before} meshes into ${merged.after}`)
   }
   scene.add(town)
@@ -376,6 +377,9 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
   /** Let go of the window listeners and the GPU resources when the map is left. */
   function dispose() {
     pointer.dispose()
+    clearRemotes()
+    me.fig.dispose()
+    for (const person of people) person.fig.dispose()
     scene.traverse((o) => {
       const m = o as THREE.Mesh
       m.geometry?.dispose()
@@ -385,6 +389,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
         mm.dispose()
       }
     })
+    environment.dispose()
     post.dispose()
     renderer.dispose()
     renderer.forceContextLoss()
@@ -413,13 +418,19 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
     return out.z < 1 && Math.abs(out.x) < 1.1 && Math.abs(out.y) < 1.1
   }
   const place = (el: HTMLElement, vis: boolean, p: THREE.Vector3, dy = 0) => {
-    el.style.display = vis ? "" : "none"
+    const display = vis ? "" : "none"
+    if (el.style.display !== display) el.style.display = display
     if (vis) el.style.transform = `translate(${Math.round(((p.x + 1) / 2) * camera.width)}px, ${Math.round(((1 - p.y) / 2) * camera.height) - dy}px) translate(-50%, -100%)`
   }
 
   const clock = new THREE.Clock()
   const v = new THREE.Vector3()
   const camRight = new THREE.Vector3()
+  const projection = new THREE.Matrix4()
+  const followPosition = new THREE.Vector3()
+  const head = new THREE.Vector3()
+  const occlusionRay = new THREE.Ray()
+  const hitPoint = new THREE.Vector3()
   let lastReport = 0
   let frames = 0,
     fpsAt = performance.now(),
@@ -432,11 +443,11 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
   function frame() {
     if (!runtime.running) return
     const at = performance.now()
-    if (at - frameAt < FRAME_MS - 2) {
+    if (at - frameAt < FRAME_MS) {
       requestAnimationFrame(frame)
       return
     }
-    frameAt = at
+    frameAt = at - ((at - frameAt) % FRAME_MS)
     if (shadowDirty || at - shadowAt > SHADOW_MS) {
       renderer.shadowMap.needsUpdate = true
       shadowDirty = false
@@ -469,7 +480,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
     tickSprites()
     view.yaw = movement.yaw
     view.cam.copy(cam.position)
-    view.frustum.setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse))
+    view.frustum.setFromProjectionMatrix(projection.multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse))
     // residents stand and look around; they speak only through the conversation window
     people.forEach((p) => p.update(dt, t, () => {}))
     cam.getWorldDirection(v)
@@ -482,7 +493,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
     // a still middle: the view holds while the player moves about the middle of the screen
     // (DEAD of its width and height), follows by as much as they step beyond it, and comes back to
     // centre them after a turn of the view
-    camera.update(new THREE.Vector3(me.pos[0], walkH(me.pos[0], me.pos[1]) + 0.6, me.pos[1]), movement.yawTarget, movement.yaw !== movement.yawTarget, dt)
+    camera.update(followPosition.set(me.pos[0], walkH(me.pos[0], me.pos[1]) + 0.6, me.pos[1]), movement.yawTarget, movement.yaw !== movement.yawTarget, dt)
     movement.yaw = movement.yawTarget
 
     if (world.indoor) updateCutaways(cam.position)
@@ -493,13 +504,12 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
       scene.fog.far = camera.distance + fogDef.far
     }
     // fade houses and trees standing between the camera and the player
-    const head = new THREE.Vector3(me.pos[0], walkH(me.pos[0], me.pos[1]) + 0.9, me.pos[1])
-    const r2 = new THREE.Ray(cam.position.clone(), head.clone().sub(cam.position).normalize())
+    head.set(me.pos[0], walkH(me.pos[0], me.pos[1]) + 0.9, me.pos[1])
+    occlusionRay.set(cam.position, hitPoint.copy(head).sub(cam.position).normalize())
     const maxD = cam.position.distanceTo(head)
-    const hitP = new THREE.Vector3()
     let hidden = false
     occluders.forEach((o) => {
-      const hit = r2.intersectBox(o.box, hitP) && hitP.distanceTo(cam.position) < maxD - 0.3
+      const hit = occlusionRay.intersectBox(o.box, hitPoint) && hitPoint.distanceTo(cam.position) < maxD - 0.3
       if (o.opaque) {
         hidden ||= !!hit
         return
@@ -524,6 +534,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
     for (const w of remotes.values()) w.fig.outline(w === pointer.hoveredWalker)
     for (const m of monsters) outlineShape(m.body, m.spawn.id === pointer.hoveredMonster)
     for (const c of critters) c.outline(c === pointer.hoveredCritter)
+    environment.smoke.prepare(cam)
     render()
 
     // names over heads: players always, residents when near or under the pointer

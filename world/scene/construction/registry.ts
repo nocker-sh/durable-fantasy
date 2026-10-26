@@ -19,6 +19,13 @@ export const stalls: Record<string, { wares: THREE.Object3D; cover: THREE.Object
 
 export const updaters: ((t: number, dt: number) => void)[] = []
 
+/** Objects animated after construction; static batching must keep their local transforms. */
+export const movingObjects = new Set<THREE.Object3D>()
+export function animateObject(object: THREE.Object3D, update: (t: number, dt: number) => void) {
+  movingObjects.add(object)
+  updaters.push(update)
+}
+
 export const chimneys: THREE.Vector3[] = []
 
 export const places: Record<string, V2> = {}
@@ -30,6 +37,7 @@ export function resetRegistries() {
   glowMats.length = 0
   fireLights.length = 0
   updaters.length = 0
+  movingObjects.clear()
   chimneys.length = 0
   occluders.length = 0
   houseGlows.length = 0

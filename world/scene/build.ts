@@ -1,5 +1,5 @@
 // Public entry points; implementation lives in focused modules.
-export { type V2, glowMats, fireLights, houseGlows, lamps, stalls, updaters, chimneys, places, occluders, resetRegistries, occluder } from "./construction/registry.ts"
+export { type V2, glowMats, fireLights, houseGlows, lamps, stalls, updaters, movingObjects, animateObject, chimneys, places, occluders, resetRegistries, occluder } from "./construction/registry.ts"
 export { addSprite, flatDecal } from "./construction/sprites.ts"
 export { type HouseOpts, oriels, buildHouses, leanTos, house } from "./construction/houses.ts"
 export { chapel } from "./construction/chapel.ts"

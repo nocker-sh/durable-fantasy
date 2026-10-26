@@ -3,7 +3,7 @@ import { GB, toTex } from "../gfx"
 import { PixBuf, RAMPS, hash2, bayer } from "../pix"
 import { groundH, blockRect, blockCircle } from "../world"
 import { M } from "./materials.ts"
-import { updaters } from "./registry.ts"
+import { animateObject } from "./registry.ts"
 
 /**
  * A barrel, never quite like the one beside it (from where it stands): taller or squatter, staves
@@ -165,7 +165,7 @@ export function well(root: THREE.Group, x: number, z: number) {
   const hb = b.build()
   hb.position.set(x, y0 + 0.95 - 0.24, z)
   root.add(hb)
-  updaters.push((t) => {
+  animateObject(hb, (t) => {
     hb.rotation.y = Math.sin(t * 0.8) * 0.3
   })
 }

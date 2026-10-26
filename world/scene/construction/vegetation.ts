@@ -3,7 +3,7 @@ import { GB } from "../gfx"
 import { PixBuf, Rng, RAMPS } from "../pix"
 import { groundH, blockCircle } from "../world"
 import { M } from "./materials.ts"
-import { occluder, updaters } from "./registry.ts"
+import { occluder, animateObject } from "./registry.ts"
 import { addSprite } from "./sprites.ts"
 
 export function tree(root: THREE.Group, x: number, z: number, scale = 1, kind: "leaf" | "leaf2" | "autumn" = "leaf", seed = 0) {
@@ -30,7 +30,7 @@ export function tree(root: THREE.Group, x: number, z: number, scale = 1, kind: "
   crown.updateMatrixWorld(true)
   occluder(crown, 0)
   const ph = r.next() * 6
-  updaters.push((t) => {
+  animateObject(crown, (t) => {
     crown.rotation.z = Math.sin(t * 0.9 + ph) * 0.012
     crown.rotation.x = Math.sin(t * 0.7 + ph) * 0.01
   })
