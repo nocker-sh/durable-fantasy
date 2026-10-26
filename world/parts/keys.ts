@@ -17,7 +17,7 @@ const MOVE_KEYS: Record<string, [number, number]> = {
 
 /** What the keys can do to the game. */
 export interface KeyTarget {
-  readonly state: { get(): GameState }
+  readonly state: { get(): GameState; subscribe(listener: () => void): () => void }
   toggleDebug(): void
   setTyping(typing: boolean): void
   openModal(modal: ModalId | null): void
@@ -44,6 +44,10 @@ export interface KeyTarget {
   hold(dir: [number, number] | null): void
 }
 
+function movementBlocked(s: GameState) {
+  return !!(s.typing || s.modal || s.loading || s.dialogue || s.shop || s.trade || s.craft || s.commission || s.storage || s.board)
+}
+
 export class Keys {
   /** the movement keys held down */
   private held = new Set<string>()
@@ -61,11 +65,15 @@ export class Keys {
     const focus = (event: FocusEvent) => {
       if ((event.target as HTMLElement | null)?.closest?.("input, textarea, select, [contenteditable]")) this.release()
     }
+    const unsubscribe = this.game.state.subscribe(() => {
+      if (this.held.size && movementBlocked(this.game.state.get())) this.release()
+    })
     window.addEventListener("keydown", down)
     window.addEventListener("keyup", up)
     window.addEventListener("blur", blur)
     window.addEventListener("focusin", focus)
     this.stop = () => {
+      unsubscribe()
       window.removeEventListener("keydown", down)
       window.removeEventListener("keyup", up)
       window.removeEventListener("blur", blur)
@@ -159,7 +167,7 @@ export class Keys {
     // WASD and the arrows walk, a cell at a time, while held; not while talking or trading
     if (event.code in MOVE_KEYS && !event.shiftKey && !event.altKey) {
       event.preventDefault()
-      if (s.dialogue || s.shop || s.trade || s.craft || s.commission || s.storage || s.board) return
+      if (movementBlocked(s)) return
       if (event.repeat && !this.held.has(event.code)) return
       this.held.add(event.code)
       this.steer()

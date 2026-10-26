@@ -73,3 +73,49 @@ it.each(["focusin", "blur", "unlisten"])("releases held movement on %s without s
   expect(game.hold).toHaveBeenLastCalledWith(null)
   expect(game.stopWalking).toHaveBeenCalledOnce()
 })
+
+it.each([{ modal: "system" as const }, { typing: true }, { storage: true }, { commission: "smith" }, { loading: { map: "town", text: "loading" } }])(
+  "releases movement immediately when blocking state opens: %j",
+  (patch) => {
+    const { key, game } = fixture()
+    const initial = game.state.get()
+    key("KeyW")
+    key("KeyD")
+    // Opening with a mouse or server event need not produce another keyboard event.
+    game.state.set({ ...initial, ...patch })
+    expect(game.hold).toHaveBeenLastCalledWith(null)
+    expect(game.stopWalking).toHaveBeenCalledOnce()
+    game.state.set(initial)
+    key("KeyW", "keydown", true)
+    key("KeyD", "keyup")
+    expect(game.hold).toHaveBeenLastCalledWith(null)
+    key("KeyW", "keyup")
+    key("KeyW")
+    expect(game.hold).toHaveBeenLastCalledWith([0, 1])
+  },
+)
+
+it("keeps click walking and nonblocking windows independent of held-key cleanup", () => {
+  const { key, game } = fixture()
+  game.state.set({ ...game.state.get(), storage: true })
+  expect(game.stopWalking).not.toHaveBeenCalled()
+  game.state.set({ ...game.state.get(), storage: false })
+  key("KeyW")
+  game.state.set({ ...game.state.get(), windows: ["inventory"] })
+  expect(game.hold).toHaveBeenLastCalledWith([0, 1])
+  expect(game.stopWalking).not.toHaveBeenCalled()
+})
+
+it("removes the state listener when unlistened and registers once on relisten", () => {
+  const { keys, key, game } = fixture()
+  const subscribe = vi.spyOn(game.state, "subscribe")
+  const unsubscribe = vi.fn()
+  subscribe.mockReturnValue(unsubscribe)
+  keys.listen()
+  keys.listen()
+  expect(unsubscribe).toHaveBeenCalledOnce()
+  key("KeyW")
+  keys.unlisten()
+  expect(unsubscribe).toHaveBeenCalledTimes(2)
+  expect(game.stopWalking).toHaveBeenCalledOnce()
+})
