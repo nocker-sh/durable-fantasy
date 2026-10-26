@@ -156,3 +156,15 @@ describe("street sellers", () => {
       }
   })
 })
+
+it("laundry workers dry indoors before their next job without closing the evening stall", () => {
+  for (const name of ["アンナ", "クララ", "エルザ"]) {
+    const resident = RESIDENTS.find((r) => r.name === name)!
+    const drying = ROUTINES[name].find((slot) => slot.doing.includes("室内の縄に干す"))!
+    expect(drying, name).toBeDefined()
+    expect(drying.where, name).toBe("home")
+    expect(spotAt(name, drying.from, workSpot(resident)), name).toBeNull()
+    expect(slotAt(name, drying.from - 1)?.doing, name).toContain("洗う")
+  }
+  expect(shopOpen("fried-dough", 16 * 60 + 30)).toBe(true)
+})
