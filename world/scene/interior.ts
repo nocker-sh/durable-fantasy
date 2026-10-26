@@ -1,6 +1,7 @@
 // The inside of a building you can enter: one room on its own map (world/town/interiors.ts).
 // The room, its walls and furniture are drawn from the same Interior the server walks on, and the
 // walk grid is copied from interiorRows at the end, so both sides agree cell for cell.
+import { indoorLaundry } from "./construction/indoor-laundry"
 import * as THREE from "three"
 import { GB, colorMat } from "./gfx"
 import { barrel, bench, crate, fireLights, glowMats, M, sack, table, addSprite, type V2 } from "./build"
@@ -471,6 +472,12 @@ export function buildInterior(it: Interior) {
         trace(root, props, f, y0, seed + k * 11, (x, z) => (onWall ? y0 + 1.3 : heightAt(x, z)))
       })
     root.add(props.build())
+    if (it.drying) {
+      const line = indoorLaundry(it.drying.z1 - it.drying.z0, seed)
+      line.rotation.y = Math.PI / 2
+      line.position.set(it.drying.x, y0 + 1.9, (it.drying.z0 + it.drying.z1) / 2)
+      root.add(line)
+    }
     // what hangs from the beams
     const hang = HANGING[shop ?? ""] ?? []
     hang.forEach((k, i) => {

@@ -63,6 +63,8 @@ export interface Interior {
   arrive: Cell
   /** where the shopkeeper stands, behind the counter */
   keeper: Cell
+  /** Clothes dried along an entrance-room wall, above the walking floor. */
+  drying?: { x: number; z0: number; z1: number }
   furniture: readonly Furniture[]
 }
 
@@ -119,7 +121,10 @@ export function interiorPlan(h: HouseDef, floor = 0): Interior {
   // the keeper stands behind the counter (between it and the back partition), else at the back of the room
   const counter = furniture.find((f) => f.kind === "counter")
   const keeper = counter ? cellOf(counter.x, counter.z - counter.d / 2 - 0.35) : cellOf(CENTRE + 0.25, z0 + 1.0)
-  return { house: h, floor, id: interiorId(h), x0, z0, x1, z1, door, arrive: [door[0], door[1] - 2], keeper, furniture }
+  const entrance = plan.rooms.find((room) => room.floor === floor && room.name === "土間")
+  const drying =
+    floor === 0 && ["fisher", "greengrocer", "fruit"].includes(h.household ?? "") && entrance ? { x: x0 + 0.12, z0: z0 + entrance.z0 * K + 0.2, z1: z0 + entrance.z1 * K - 0.2 } : undefined
+  return { drying, house: h, floor, id: interiorId(h), x0, z0, x1, z1, door, arrive: [door[0], door[1] - 2], keeper, furniture }
 }
 
 export const INTERIORS: readonly Interior[] = HOUSES.filter(enterable).map((house) => interiorPlan(house))
