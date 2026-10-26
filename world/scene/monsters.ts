@@ -21,7 +21,7 @@ export function makeMonsters(root: THREE.Group, map: string): MonsterView[] {
   return SPAWNS.filter((s) => s.map === map).map((spawn) => {
     const kind = MONSTER_KINDS[spawn.kind]
     const body = kind.look === "slime" ? slimeBody(kind.color ?? 0x8ac06a) : hareBody()
-    if (spawn.kind === "blue-slime") body.scale.setScalar(1.2)
+    body.scale.setScalar(kind.size ?? 1)
     body.userData.monster = spawn.id
     root.add(body)
     const label = document.createElement("div")
@@ -46,7 +46,7 @@ export function updateMonsters(list: MonsterView[], root: THREE.Group, now: numb
       const squash = at.moving ? 1 - Math.sin(now / 110) * 0.07 : 1 + Math.sin(beat) * 0.035
       m.body.position.set(at.x, walkH(at.x, at.z) + 0.06 + hop, at.z)
       if (MONSTER_KINDS[m.spawn.kind].look === "slime") {
-        const sz = m.spawn.kind === "blue-slime" ? 1.2 : 1
+        const sz = MONSTER_KINDS[m.spawn.kind].size ?? 1
         m.body.scale.set(sz / Math.sqrt(squash), sz * squash, sz / Math.sqrt(squash))
       }
       if (at.moving) {

@@ -23,6 +23,34 @@ describe("the creatures outside town", () => {
     }
   })
 
+  it("places forest creatures in clear territories and keeps their movement off blocked cells", () => {
+    expect(new Set(SPAWNS.map((s) => s.id)).size).toBe(SPAWNS.length)
+    const forest = SPAWNS.filter((s) => s.map === "forest-edge" || s.map === "deep-forest")
+    expect(new Set(forest.map((s) => s.map)).size).toBe(2)
+    for (const spawn of forest) {
+      const free = (x: number, z: number) => walkable(MAPS[spawn.map], [Math.floor(x * 2), Math.floor(z * 2)])
+      for (let z = spawn.area[1]; z <= spawn.area[3]; z += 0.5) for (let x = spawn.area[0]; x <= spawn.area[2]; x += 0.5) expect(free(x, z), spawn.id).toBe(true)
+      for (let time = 0; time < 86_400_000; time += 7311) {
+        const at = monsterAt(spawn, time, free)
+        expect(free(at.x, at.z), spawn.id).toBe(true)
+      }
+    }
+  })
+
+  it("lets forest creatures share the existing claim, recovery and reward rules", () => {
+    const spawn = SPAWNS.find((s) => s.kind === "moss-slime")!
+    const kind = MONSTER_KINDS[spawn.kind]
+    const struck = hit(emptyWild(), spawn.id, 1, 0, "hunter")
+    expect(hit(struck.state, spawn.id, kind.hp, 1, "other").refused).toBe(true)
+    const beaten = hit(struck.state, spawn.id, kind.hp, 2, "hunter")
+    expect(beaten.beaten).toBe(true)
+    expect(hpOf(beaten.state, spawn.id, 3)).toBe(0)
+    expect(hpOf(beaten.state, spawn.id, 2 + kind.respawn * 1000)).toBe(kind.hp)
+    const reward = apply(player({ level: 16 }), { type: "loot", monster: spawn.id, exp: kind.exp, items: dropsOf(kind, [0, 0, 0]) })
+    expect(reward.ok && reward.state.exp).toBe(kind.exp)
+    expect(dropsOf(kind, [0, 0, 0])).toEqual(["jelly", "blue-jelly", "herb"])
+  })
+
   it("take blows until beaten, then are off for a while and come back whole", () => {
     let s = emptyWild()
     const max = MONSTER_KINDS.slime.hp
@@ -59,7 +87,7 @@ describe("the creatures outside town", () => {
     expect(r.ok && r.state.bag.some((s) => s?.item === "jelly")).toBe(true)
   })
 
-  it("live only where world.md puts them: the meadow beyond the gate, not in town", () => {
+  it("live only where world.md puts them: the fields and forests beyond the gate, not in town", () => {
     for (const s of SPAWNS) expect(MAPS[s.map].kind, s.id).toBe("field")
   })
 

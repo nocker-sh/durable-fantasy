@@ -21,6 +21,7 @@ export interface MonsterKind {
   /** how it looks (scene) */
   look: "slime" | "hare"
   color?: number
+  size?: number
 }
 
 export const MONSTER_KINDS: Record<string, MonsterKind> = {
@@ -51,9 +52,28 @@ export const MONSTER_KINDS: Record<string, MonsterKind> = {
     respawn: 120,
     look: "slime",
     color: 0x6a9ac8,
+    size: 1.2,
     drops: [
       { item: "blue-jelly", chance: 0.6 },
       { item: "jelly", chance: 0.4 },
+    ],
+  },
+  "moss-slime": {
+    name: "苔スライム",
+    hp: 260,
+    def: 8,
+    flee: 24,
+    atk: 22,
+    hit: 38,
+    exp: 140,
+    respawn: 150,
+    look: "slime",
+    color: 0x637e3e,
+    size: 1.35,
+    drops: [
+      { item: "jelly", chance: 0.9 },
+      { item: "blue-jelly", chance: 0.45 },
+      { item: "herb", chance: 0.3 },
     ],
   },
   hare: { name: "野うさぎ", hp: 22, def: 0, flee: 25, atk: 0, hit: 0, exp: 7, respawn: 150, look: "hare", drops: [{ item: "soft-fur", chance: 0.55 }] },
@@ -73,6 +93,11 @@ export const SPAWNS: readonly Spawn[] = [
   ...many("south-meadow", "slime", 4, [8, 28, 20, 40], 6),
   ...many("south-meadow", "blue-slime", 2, [36, 34, 44, 42]),
   ...many("south-meadow", "hare", 4, [30, 6, 44, 20]),
+  ...many("forest-edge", "blue-slime", 3, [36, 30, 39, 33]),
+  ...many("forest-edge", "hare", 2, [9, 15, 12, 18]),
+  ...many("deep-forest", "moss-slime", 2, [15, 12, 18, 15]),
+  ...many("deep-forest", "moss-slime", 2, [30, 36, 33, 39], 2),
+  ...many("deep-forest", "blue-slime", 2, [6, 27, 9, 30]),
 ]
 
 export const spawnOf = (id: string) => SPAWNS.find((s) => s.id === id)
