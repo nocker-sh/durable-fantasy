@@ -2,7 +2,7 @@ import { afterEach, expect, it, vi } from "vitest"
 import * as THREE from "three"
 import { burst, updateMonsters, type MonsterView } from "./monsters"
 import { slimeBody } from "./fields"
-import { SPAWNS } from "../core/monsters"
+import { SPAWNS, MonsterMotion } from "../core/monsters"
 
 vi.mock("./world", async (original) => ({ ...(await original<typeof import("./world")>()), isFree: () => true, walkH: () => 0 }))
 afterEach(() => vi.restoreAllMocks())
@@ -11,7 +11,7 @@ function fixture() {
   const root = new THREE.Group()
   const body = slimeBody(0x8ac06a)
   root.add(body)
-  const monster: MonsterView = { spawn: SPAWNS[0], body, pos: [30, 30], hp: 0, back: 99999, burst: null, label: {} as HTMLDivElement }
+  const monster: MonsterView = { spawn: SPAWNS[0], motion: new MonsterMotion(SPAWNS[0], () => true), body, pos: [30, 30], hp: 0, back: 99999, burst: null, label: {} as HTMLDivElement }
   const texture = (body.children[0] as THREE.Mesh<THREE.BufferGeometry, THREE.MeshLambertMaterial>).material.map!
   return { root, monster, texture }
 }

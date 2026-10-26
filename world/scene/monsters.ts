@@ -2,12 +2,13 @@
 // rest to rest; what the server says of their hurts shows as a little bar, blows as numbers that
 // float up, and a beaten slime bursts into little ones that scatter.
 import type * as THREE from "three"
-import { MONSTER_KINDS, SPAWNS, monsterAt, type Spawn } from "../core/monsters.ts"
+import { MONSTER_KINDS, SPAWNS, MonsterMotion, type Spawn } from "../core/monsters.ts"
 import { hareBody, slimeBody } from "./fields"
 import { isFree, walkH, type V2 } from "./world"
 
 export interface MonsterView {
   spawn: Spawn
+  motion: MonsterMotion
   body: THREE.Group
   pos: V2
   hp: number
@@ -27,7 +28,7 @@ export function makeMonsters(root: THREE.Group, map: string): MonsterView[] {
     const label = document.createElement("div")
     label.className = "gx-nameplate gx-nameplate--npc"
     label.innerHTML = `<span>${kind.name}</span><span class="gx-hp"><span></span></span>`
-    return { spawn, body, pos: [0, 0] as V2, hp: kind.hp, back: 0, burst: null, label }
+    return { spawn, motion: new MonsterMotion(spawn, isFree), body, pos: [0, 0] as V2, hp: kind.hp, back: 0, burst: null, label }
   })
 }
 
@@ -36,7 +37,7 @@ export function makeMonsters(root: THREE.Group, map: string): MonsterView[] {
 export function updateMonsters(list: MonsterView[], root: THREE.Group, now: number, yaw = 0) {
   for (const m of list) {
     const away = m.back > now || m.hp === 0
-    const at = monsterAt(m.spawn, now, (x, z) => isFree(x, z))
+    const at = m.motion.at(now)
     m.pos = [at.x, at.z]
     m.body.visible = !away
     if (!away) {
@@ -50,7 +51,7 @@ export function updateMonsters(list: MonsterView[], root: THREE.Group, now: numb
         m.body.scale.set(sz / Math.sqrt(squash), sz * squash, sz / Math.sqrt(squash))
       }
       if (at.moving) {
-        const ahead = monsterAt(m.spawn, now + 200)
+        const ahead = m.motion.at(now + 200)
         m.body.rotation.y = Math.atan2(ahead.x - at.x, ahead.z - at.z)
       } else {
         const d = Math.atan2(Math.sin(yaw - m.body.rotation.y), Math.cos(yaw - m.body.rotation.y))

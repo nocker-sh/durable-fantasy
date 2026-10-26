@@ -161,9 +161,43 @@ export function monsterAt(s: Spawn, t: number, free: (x: number, z: number) => b
     into = tt - seg * PERIOD
   const a = restAt(s, seg - 1, free),
     b = restAt(s, seg, free)
+  return between(a, b, into)
+}
+
+function between(a: [number, number], b: [number, number], into: number) {
   // a short shuffle takes two seconds; settling somewhere new, as long as its unhurried pace needs
   const k = Math.min(1, into / Math.max(MOVE, Math.hypot(b[0] - a[0], b[1] - a[1]) * 900))
   return { x: a[0] + (b[0] - a[0]) * k, z: a[1] + (b[1] - a[1]) * k, moving: k < 1 }
+}
+
+/** A scene's view of the same motion, retaining only current and adjacent resting points.
+ * The walkability function must remain stable for this instance's lifetime.
+ */
+export class MonsterMotion {
+  private readonly points = new Map<number, [number, number]>()
+  private readonly phase: number
+
+  constructor(
+    private readonly spawn: Spawn,
+    private readonly free: (x: number, z: number) => boolean,
+  ) {
+    this.phase = hash(spawn.id, 99) * PERIOD
+  }
+
+  private rest(segment: number): [number, number] {
+    const hit = this.points.get(segment)
+    if (hit) return hit
+    const point = restAt(this.spawn, segment, this.free)
+    this.points.set(segment, point)
+    if (this.points.size > 3) this.points.delete(this.points.keys().next().value!)
+    return point
+  }
+
+  at(time: number) {
+    const t = time + this.phase
+    const segment = Math.floor(t / PERIOD)
+    return between(this.rest(segment - 1), this.rest(segment), t - segment * PERIOD)
+  }
 }
 
 /** What a beaten one leaves: each drop rolled on its own (rolls from the server). */
