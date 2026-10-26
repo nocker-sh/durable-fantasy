@@ -3,7 +3,7 @@
 // sleep in the morning. A few keep day hours, and each has a reason in their trade. Everyone
 // mostly stands still at their spot; they change places only when the hour comes round.
 // Server and browser both read this, so everyone sees the same people in the same places.
-import { within } from "../core/clock.ts"
+import { CyclicSchedule } from "../../lib/engine/cyclic-schedule"
 import { INTERIORS, keeperPlace, seatsOf, type Cell } from "./interiors.ts"
 
 /** A spot: a named place on a map (scene `places`, exported to the map JSON), a tile position, or a cell. */
@@ -411,15 +411,11 @@ export const ROUTINES: Record<string, readonly Slot[]> = {
   マルグリット: [at("02:00", "home", "眠る"), at("17:00", "work", "戸口で編み物"), at("22:00", "inn", "宿でヘートヴィヒと編み物"), at("23:30", "work", "戸口で編み物")],
 }
 
-/** The slot someone is in at `min`. */
+const schedules = new Map(Object.entries(ROUTINES).map(([name, slots]) => [name, new CyclicSchedule(slots)]))
+
+/** The slot someone is in at `min`; definitions are sorted once when loaded. */
 export function slotAt(name: string, min: number): Slot | null {
-  const day = [...(ROUTINES[name] ?? [])].sort((a, b) => a.from - b.from)
-  if (!day.length) return null
-  for (let i = 0; i < day.length; i++) {
-    const next = day[(i + 1) % day.length]
-    if (within(min, day[i].from, next.from)) return day[i]
-  }
-  return day[0]
+  return schedules.get(name)?.at(min) ?? null
 }
 
 /** The people who drink at a place, in a fixed order, so each has their own seat. */

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { daylight } from "../core/clock.ts"
+import { daylight, within } from "../core/clock.ts"
 import { SHOPS } from "../core/shops.ts"
 import { MAPS, cellOfSpot, npcCell, npcsAt, shopOpen } from "../maps/index.ts"
 import { RESIDENTS } from "./residents.ts"
@@ -167,4 +167,16 @@ it("laundry workers dry indoors before their next job without closing the evenin
     expect(slotAt(name, drying.from - 1)?.doing, name).toContain("洗う")
   }
   expect(shopOpen("fried-dough", 16 * 60 + 30)).toBe(true)
+})
+
+it("keeps every resident's schedule identical at all minutes and slot boundaries", () => {
+  for (const [name, slots] of Object.entries(ROUTINES)) {
+    const sorted = [...slots].sort((a, b) => a.from - b.from)
+    const times = [...Array.from({ length: 1440 }, (_, minute) => minute), ...slots.flatMap((slot) => [slot.from - 0.01, slot.from + 0.01])]
+    for (const minute of times) {
+      const expected = sorted.find((slot, i) => within(minute, slot.from, sorted[(i + 1) % sorted.length].from)) ?? sorted[0] ?? null
+      expect(slotAt(name, minute)).toBe(expected)
+    }
+  }
+  expect(slotAt("unknown", 0)).toBeNull()
 })
