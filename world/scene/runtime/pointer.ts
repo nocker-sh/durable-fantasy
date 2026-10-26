@@ -78,12 +78,30 @@ export function createPointer({ renderer, cam, terrain, town, people, ids, remot
     while (o && !critters.some((c) => c.obj === o)) o = o.parent
     return critters.find((c) => c.obj === o) ?? null
   }
-  let drag: { x: number; moved: boolean } | null = null
+  let drag: { id: number; x: number; moved: boolean } | null = null
   const onDown = (e: PointerEvent) => {
-    if (e.button === 0) drag = { x: e.clientX, moved: false }
+    if (e.button === 0 && !drag) drag = { id: e.pointerId, x: e.clientX, moved: false }
   }
   let pending: PointerEvent | null = null
+  const clearHover = () => {
+    pending = null
+    cursor.visible = false
+    hovered = null
+    hoveredWalker = null
+    hoveredMonster = null
+    hoveredCritter = null
+    renderer.domElement.style.cursor = "default"
+  }
+  const cancel = () => {
+    drag = null
+    clearHover()
+  }
+  const onCancel = (e: PointerEvent) => {
+    if (!drag || drag.id === e.pointerId) cancel()
+  }
   const onMove = (e: PointerEvent) => {
+    if (drag && drag.id !== e.pointerId) return
+    if (drag && e.pointerType === "mouse" && !(e.buttons & 1)) cancel()
     if (drag) {
       const dx = e.clientX - drag.x
       if (Math.abs(dx) > 6) drag.moved = true
@@ -95,11 +113,7 @@ export function createPointer({ renderer, cam, terrain, town, people, ids, remot
     }
     pending = null
     if (e.target !== renderer.domElement) {
-      cursor.visible = false
-      hovered = null
-      hoveredWalker = null
-      hoveredMonster = null
-      hoveredCritter = null
+      clearHover()
       return
     }
     pending = e
@@ -124,6 +138,7 @@ export function createPointer({ renderer, cam, terrain, town, people, ids, remot
     } else cursor.visible = false
   }
   const onUp = (e: PointerEvent) => {
+    if (drag && drag.id !== e.pointerId) return
     const d = drag
     drag = null
     if (!d || d.moved || e.target !== renderer.domElement) return
@@ -158,6 +173,8 @@ export function createPointer({ renderer, cam, terrain, town, people, ids, remot
   renderer.domElement.addEventListener("pointerdown", onDown)
   window.addEventListener("pointermove", onMove)
   window.addEventListener("pointerup", onUp)
+  window.addEventListener("pointercancel", onCancel)
+  window.addEventListener("blur", cancel)
   renderer.domElement.addEventListener("wheel", onWheel, { passive: false })
 
   return {
@@ -175,11 +192,13 @@ export function createPointer({ renderer, cam, terrain, town, people, ids, remot
       return hoveredCritter
     },
     dispose() {
-      pending = null
+      cancel()
       renderer.domElement.removeEventListener("pointerdown", onDown)
       renderer.domElement.removeEventListener("wheel", onWheel)
       window.removeEventListener("pointermove", onMove)
       window.removeEventListener("pointerup", onUp)
+      window.removeEventListener("pointercancel", onCancel)
+      window.removeEventListener("blur", cancel)
     },
   }
 }

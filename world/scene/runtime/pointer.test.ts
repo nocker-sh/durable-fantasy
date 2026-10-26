@@ -17,6 +17,7 @@ function fixture() {
   const approachSpot = vi.fn()
   const camera = new THREE.PerspectiveCamera()
   const ray = vi.spyOn(THREE.Raycaster.prototype, "setFromCamera")
+  const movement = { yawTarget: 0 }
   const pointer = createPointer({
     renderer: { domElement: canvas } as unknown as THREE.WebGLRenderer,
     cam: camera,
@@ -26,7 +27,7 @@ function fixture() {
     ids: [],
     remotes: new Map(),
     cursor: new THREE.LineSegments(),
-    movement: { yawTarget: 0 },
+    movement,
     spotHit,
     monsterHit: () => null,
     approach: vi.fn(),
@@ -36,12 +37,12 @@ function fixture() {
     zoom: vi.fn(),
     clearFight: vi.fn(),
   })
-  const send = (type: string, x: number, target: EventTarget = canvas) => {
+  const send = (type: string, x: number, target: EventTarget = canvas, pointerId = 1) => {
     const event = new Event(type)
-    Object.defineProperties(event, { target: { value: target }, clientX: { value: x }, clientY: { value: 50 }, button: { value: 0 } })
+    Object.defineProperties(event, { target: { value: target }, clientX: { value: x }, clientY: { value: 50 }, button: { value: 0 }, pointerId: { value: pointerId } })
     ;(type === "pointerdown" ? canvas : window).dispatchEvent(event)
   }
-  return { pointer, send, ray, spotHit, approachSpot, window }
+  return { pointer, send, ray, spotHit, approachSpot, window, movement, canvas }
 }
 
 it("coalesces hover events to the most recent position once per rendered frame", () => {
@@ -81,4 +82,35 @@ it("discards queued hover when the pointer enters UI or the scene is disposed", 
   send("pointermove", 40)
   pointer.update()
   expect(ray).not.toHaveBeenCalled()
+})
+
+it.each(["pointercancel", "blur"])("ends a drag on %s without turning or clicking after return", (type) => {
+  const { pointer, send, ray, spotHit, approachSpot, movement } = fixture()
+  spotHit.mockReturnValue("ore")
+  send("pointerdown", 10)
+  send("pointermove", 12)
+  send(type, 12)
+  pointer.update()
+  expect(ray).not.toHaveBeenCalled()
+  send("pointermove", 150)
+  send("pointerup", 150)
+  expect(movement.yawTarget).toBe(0)
+  expect(approachSpot).not.toHaveBeenCalled()
+  send("pointerdown", 50)
+  send("pointerup", 50)
+  expect(approachSpot).toHaveBeenCalledWith("ore")
+  pointer.dispose()
+})
+
+it("keeps a drag owned by its original pointer when a second touch moves or ends", () => {
+  const { pointer, send, movement, canvas } = fixture()
+  send("pointerdown", 10, canvas, 1)
+  send("pointerdown", 70, canvas, 2)
+  send("pointermove", 300, canvas, 2)
+  send("pointercancel", 300, canvas, 2)
+  send("pointerup", 300, canvas, 2)
+  expect(movement.yawTarget).toBe(0)
+  send("pointermove", 110, canvas, 1)
+  expect(Math.abs(movement.yawTarget)).toBe(Math.PI / 4)
+  pointer.dispose()
 })
