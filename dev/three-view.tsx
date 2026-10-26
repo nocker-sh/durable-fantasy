@@ -2,7 +2,7 @@
 // thumbnail at the scene's pixel size, and a turning preview, by day or by night, that fits its box.
 import { useEffect, useRef, useState } from "react"
 import * as THREE from "three"
-import { INDOOR } from "#/world/scene/interior.ts"
+import { INDOOR, updateCutaways } from "#/world/scene/interior.ts"
 import { setLayout } from "#/world/scene/world.ts"
 import { resetRegistries, updaters } from "#/world/scene/build.ts"
 import { critters } from "#/world/scene/actors.ts"
@@ -80,7 +80,7 @@ export function Thumb({ id, build, px = 40 }: { id: string; build: Build; px?: n
 }
 
 /** The thing turning slowly, filling the width of its box; `night` lights it as after dark. */
-export function Turntable({ build, night }: { build: Build; night: boolean }) {
+export function Turntable({ build, night, cutaway = false }: { build: Build; night: boolean; cutaway?: boolean }) {
   const host = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const el = host.current!
@@ -114,6 +114,7 @@ export function Turntable({ build, night }: { build: Build; night: boolean }) {
       updaters.forEach((u) => u(t / 1000, dt))
       critters.forEach((c) => c.update(dt, new THREE.Vector3(1, 0, 0)))
       place(cam, centre, reach, t / 4000)
+      if (cutaway) updateCutaways(cam.position)
       renderer.render(scene, cam)
       raf = requestAnimationFrame(tick)
     }
@@ -122,8 +123,9 @@ export function Turntable({ build, night }: { build: Build; night: boolean }) {
       cancelAnimationFrame(raf)
       ro.disconnect()
       renderer.dispose()
+      renderer.forceContextLoss()
       el.removeChild(canvas)
     }
-  }, [build, night])
+  }, [build, night, cutaway])
   return <div ref={host} className="aspect-video max-h-[50svh] w-full overflow-hidden rounded-lg border" />
 }

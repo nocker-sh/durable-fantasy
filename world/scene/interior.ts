@@ -371,7 +371,7 @@ export function buildInterior(it: Interior) {
     const doorX = (it.door[0] + 0.5) / 2
     cutaways.push(
       { obj: wall(root, it.x0 - WALL_T, it.z0 - WALL_T, it.x1 + WALL_T, it.z0, y0), at: [cx, it.z0], normal: [0, -1] },
-      { obj: wall(root, it.x0 - WALL_T, it.z1, it.x1 + WALL_T, it.z1 + WALL_T, y0, [[doorX - 0.55, doorX + 0.55]]), at: [cx, it.z1], normal: [0, 1] },
+      { obj: wall(root, it.x0 - WALL_T, it.z1, it.x1 + WALL_T, it.z1 + WALL_T, y0, it.floor === 0 ? [[doorX - 0.55, doorX + 0.55]] : []), at: [cx, it.z1], normal: [0, 1] },
       { obj: wall(root, it.x0 - WALL_T, it.z0, it.x0, it.z1, y0), at: [it.x0, cz], normal: [-1, 0] },
       { obj: wall(root, it.x1, it.z0, it.x1 + WALL_T, it.z1, y0), at: [it.x1, cz], normal: [1, 0] },
     )
@@ -385,9 +385,11 @@ export function buildInterior(it: Interior) {
     root.add(wb.build())
     glowMats.push(windowMat)
     // a door mat inside the door
-    const dm = new GB()
-    dm.box(M.sack, M.sack, doorX - 0.45, y0, it.z1 - 0.7, doorX + 0.45, y0 + 0.012, it.z1 - 0.15, 2)
-    root.add(dm.build())
+    if (it.floor === 0) {
+      const dm = new GB()
+      dm.box(M.sack, M.sack, doorX - 0.45, y0, it.z1 - 0.7, doorX + 0.45, y0 + 0.012, it.z1 - 0.15, 2)
+      root.add(dm.build())
+    }
 
     const props = new GB()
     let shelves = 0
@@ -407,6 +409,17 @@ export function buildInterior(it: Interior) {
         case "table":
           table(props, f.x, f.z, f.w, f.d)
           break
+        case "bed": {
+          const x0 = f.x - f.w / 2,
+            x1 = f.x + f.w / 2
+          const z0 = f.z - f.d / 2,
+            z1 = f.z + f.d / 2
+          props.box(M.woodDark, null, x0, y0 + 0.12, z0, x1, y0 + 0.3, z1, 2)
+          props.box(cloth[2], null, x0 + 0.04, y0 + 0.3, z0 + 0.04, x1 - 0.04, y0 + 0.4, z1 - 0.04, 2)
+          props.box(cloth[1], null, x0 + 0.04, y0 + 0.4, z0 + f.d * 0.3, x1 - 0.04, y0 + 0.43, z1 - 0.04, 2)
+          props.box(M.woodV, null, x0, y0, z0, x1, y0 + 0.65, z0 + 0.07, 2)
+          break
+        }
         case "bench":
           bench(props, f.x, f.z, f.w)
           break

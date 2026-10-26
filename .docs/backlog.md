@@ -8,7 +8,7 @@
 
 ### 1. 全建物の室内スクショ
 
-入れる建物の室内は `scripts/shoot-interiors.ts` で撮ってあり、~/Pictures/durable-fantasy-houses/ にある（[[town#屋内マップ]]）。残りは、入れない建物（民家と仕事場）の室内の分と、/dev の建物詳細に絵を出すこと。
+入れる建物の室内は `scripts/shoot-interiors.ts` で撮ってあり、~/Pictures/durable-fantasy-houses/ にある（[[town#屋内マップ]]）。/dev の建物詳細では、民家と仕事場を含む全建物の各階を昼夜の3D表示で確認できる。残りは、入れない建物（民家と仕事場）の室内スクショを保存すること。
 
 ### 2. カメラの回転方向
 

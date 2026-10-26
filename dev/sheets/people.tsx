@@ -4,7 +4,7 @@ import { RESIDENTS, RESIDENT_LOOKS } from "#/world/town/residents.ts"
 import { SIZES, TILE_M } from "#/world/town/fit.ts"
 import { HOUSEHOLDS, HOUSES, bedsOf, floorsOf, householdOf } from "#/world/town/houses.ts"
 import { INTERIORS } from "#/world/town/interiors.ts"
-import { buildInterior } from "#/world/scene/interior.ts"
+import { HouseInterior } from "../house-interior"
 import { ALL_LINES } from "#/world/town/lines/index.ts"
 import { PEOPLE, RELATIONS } from "#/world/town/people.ts"
 import { ROUTINES } from "#/world/town/routines.ts"
@@ -105,12 +105,8 @@ const houses = sheet({
     ...ref("maps", INTERIORS.find((i) => i.house.id === h.id)?.id, "中"),
     ...[...new Set(h.plan.furniture.map((f) => f.replace(/（.+）$/, "").replace(/×\d+$/, "")))].filter((f) => SIZES[f]).map((f) => ({ sheet: "objects", id: f, as: "家具" })),
   ],
-  // the room you walk into, as the game draws it
-  build: (h) => {
-    const it = INTERIORS.find((i) => i.house.id === h.id)
-    return it ? (root) => buildInterior(it)(root) : null
-  },
   more: (h) => [
+    { title: "室内", head: [], wide: true, rows: [[<HouseInterior key={h.id} house={h} />]] },
     { title: "部屋", head: ["部屋", "階", "寝台"], rows: h.plan.rooms.map((r) => [r.name, r.floor + 1, r.beds ?? 0]) },
     { title: "家具", head: ["家具"], rows: h.plan.furniture.map((f) => [f]) },
   ],

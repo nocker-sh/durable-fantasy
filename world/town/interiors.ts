@@ -17,6 +17,7 @@ export type FurnitureKind =
   | "shelf"
   | "table"
   | "bench"
+  | "bed"
   | "chair"
   | "barrel"
   | "crate"
@@ -47,6 +48,7 @@ export interface Furniture {
 }
 
 export interface Interior {
+  floor: number
   house: HouseDef
   /** the indoor map's id */
   id: string
@@ -80,6 +82,7 @@ export function kindOf(name: string): FurnitureKind | null {
   if (/^(食卓|大きな食卓|長卓|卓|地図の卓|書き物机|縫い物の台|祈祷台)$/.test(n)) return "table"
   if (/^長椅子$/.test(n)) return "bench"
   if (/椅子/.test(n)) return "chair"
+  if (n.includes("寝台")) return "bed"
   if (/^(樽|酒樽|仕込み樽|水甕|魚桶|洗濯桶|大鍋)$/.test(n)) return "barrel"
   if (/^(木箱|素材の箱|粉箱|野菜籠|果物籠|羊毛の袋|薪の山|木材|荷車|干し草|巣箱)$/.test(n)) return "crate"
   if (/^(炉|暖炉)$/.test(n)) return "hearth"
@@ -93,7 +96,8 @@ export function kindOf(name: string): FurnitureKind | null {
 
 const DIVIDER_KIND = { 壁: "partition", 腰壁: "lowwall", カーテン: "curtain", 棚: "shelf" } as const
 
-function build(h: HouseDef): Interior {
+/** Build one floor for inspection; only INTERIORS registers playable rooms. */
+export function interiorPlan(h: HouseDef, floor = 0): Interior {
   const plan = floorPlan(h.id)
   const K = ROOM_SCALE
   const w = plan.W * K,
@@ -105,20 +109,20 @@ function build(h: HouseDef): Interior {
   const at = (r: { x0: number; z0: number; x1: number; z1: number }) => ({ x: x0 + ((r.x0 + r.x1) / 2) * K, z: z0 + ((r.z0 + r.z1) / 2) * K, w: (r.x1 - r.x0) * K, d: (r.z1 - r.z0) * K })
   const furniture: Furniture[] = []
   for (const p of plan.pieces) {
-    if (p.floor !== 0) continue
+    if (p.floor !== floor) continue
     const kind = p.on ? "trace" : kindOf(p.name)
     if (!kind) continue
     furniture.push({ kind, ...at(p), solid: p.solid && kind !== "trace", name: p.name })
   }
-  for (const dv of plan.dividers) if (dv.floor === 0) furniture.push({ kind: DIVIDER_KIND[dv.kind], ...at(dv), solid: true, name: dv.kind })
+  for (const dv of plan.dividers) if (dv.floor === floor) furniture.push({ kind: DIVIDER_KIND[dv.kind], ...at(dv), solid: true, name: dv.kind })
   const door = cellOf(x0 + plan.door * K, z1 - 0.25)
   // the keeper stands behind the counter (between it and the back partition), else at the back of the room
   const counter = furniture.find((f) => f.kind === "counter")
   const keeper = counter ? cellOf(counter.x, counter.z - counter.d / 2 - 0.35) : cellOf(CENTRE + 0.25, z0 + 1.0)
-  return { house: h, id: interiorId(h), x0, z0, x1, z1, door, arrive: [door[0], door[1] - 2], keeper, furniture }
+  return { house: h, floor, id: interiorId(h), x0, z0, x1, z1, door, arrive: [door[0], door[1] - 2], keeper, furniture }
 }
 
-export const INTERIORS: readonly Interior[] = HOUSES.filter(enterable).map(build)
+export const INTERIORS: readonly Interior[] = HOUSES.filter(enterable).map((house) => interiorPlan(house))
 
 export const interiorOf = (id: string) => INTERIORS.find((i) => i.id === id)
 
