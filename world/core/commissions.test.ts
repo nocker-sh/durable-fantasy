@@ -10,6 +10,44 @@ const bag = (...items: [ItemId, number][]): Bag => items.reduce<Bag>((b, [id, n]
 const H = 3_600_000
 
 describe("commissions", () => {
+  it("buys hides, tans leather, then commissions armor without using loose fur", () => {
+    let state = player({ gold: 500 })
+    const buy = apply(state, { type: "buy", shop: "leather", item: "raw-hide", count: 4 })
+    expect(buy.ok).toBe(true)
+    if (!buy.ok) return
+    state = buy.state
+    for (let i = 0; i < 2; i++) {
+      const order = apply(state, { type: "order", commission: "rudolf-leather", roll: 0.5 }, { now: 0 })
+      expect(order.ok).toBe(true)
+      if (!order.ok) return
+      state = order.state
+    }
+    expect(countItem(state.bag, "raw-hide")).toBe(0)
+    expect(apply(state, { type: "collect", index: 0 }, { now: H })).toEqual({ ok: false, reason: "NOT_READY" })
+    for (let i = 0; i < 2; i++) {
+      const collect = apply(state, { type: "collect", index: 0 }, { now: 2 * H })
+      expect(collect.ok).toBe(true)
+      if (!collect.ok) return
+      state = collect.state
+    }
+    expect(countItem(state.bag, "tanned-leather")).toBe(4)
+    const armor = apply(state, { type: "order", commission: "rudolf-armor", roll: 0.5 }, { now: 2 * H })
+    expect(armor.ok).toBe(true)
+    if (!armor.ok) return
+    expect(countItem(armor.state.bag, "tanned-leather")).toBe(0)
+    const ready = apply(armor.state, { type: "collect", index: 0 }, { now: 5 * H })
+    expect(ready.ok && countItem(ready.state.bag, "leather-armor")).toBe(1)
+    expect(armor.state.gold).toBe(326)
+    expect(500 - armor.state.gold).toBeLessThan(ITEMS["leather-armor"].price)
+    expect(apply(player({ gold: 500, bag: bag(["soft-fur", 4]) }), { type: "order", commission: "rudolf-armor", roll: 0.5 })).toEqual({ ok: false, reason: "MISSING_INPUTS" })
+  })
+
+  it("still delivers armor ordered before the material change", () => {
+    const waiting = player({ orders: [{ commission: "rudolf-armor", readyAt: H, q: 1 }] })
+    const result = apply(waiting, { type: "collect", index: 0 }, { now: H })
+    expect(result.ok && countItem(result.state.bag, "leather-armor")).toBe(1)
+  })
+
   it("takes the iron and the fee now, and the sword is ready in two hours", () => {
     const p = player({ gold: 200, bag: bag(["iron-ingot", 3]) })
     const r = apply(p, { type: "order", commission: "gunter-sword", roll: 0.5 }, { now: 0 })

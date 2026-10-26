@@ -21,7 +21,7 @@ export const SOURCES: Record<string, readonly string[]> = {
   objects: ["PROPS", "SIZES", "THINGS", "THINGS_BY_HOUSEHOLD"],
   world: ["WORLD", "GRID_SIZE", "WORLD_NODES", "LOCKED_CITIES"],
   icons: ["SPRITES"],
-  "item-art": ["ITEM_SPRITES"],
+  "item-art": ["ITEM_SPRITES", "HIDE"],
   textures: [],
   ramps: ["RAMPS"],
   parts: ["SEX", "AGE", "SKIN", "HAIR", "STYLES", "CLOTH", "HATS", "NECKS", "NECK_KINDS", "NECK_RAMPS", "FRINGES"],

@@ -196,3 +196,23 @@ const GLOW = hexes("#e8ffff", "#8fd0e0", "#3a6a88")
 const crystalWhite = { k, w: hex("#ffffff"), ...hexes("#f4f8ff", "#c8d4f0", "#6a7aa8") }
 
 export { BLOB, CRYSTAL, FUR, FANG, FEATHER, SHELL, BONE, COG, SCRAP, THREAD, GLOW, crystalWhite }
+
+/** A flattened hide, distinct from loose fleece; the dark edge becomes the leather rim. */
+export const HIDE = [
+  "................",
+  ".....kkkkkk.....",
+  "..kkkhhhhmmkkk..",
+  ".khhhhhhhmmmmsk.",
+  "..khhhmmmmmskk..",
+  "...khhmmmmmsk...",
+  "...khhmmmmmsk...",
+  "..khhmmmmmmssk..",
+  "..khmmmmmmmssk..",
+  "..khmmmmmmsssk..",
+  "...kmmmmmmssk...",
+  "...kmmmmmmssk...",
+  "..kkmmmmmmsskk..",
+  ".kmmmkkkkkksssk.",
+  "..kkk......kkk..",
+  "................",
+]

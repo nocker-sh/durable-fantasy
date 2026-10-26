@@ -3,7 +3,7 @@ import { sprite } from "../pixel-art.ts"
 import { FLASK, BOWL, CUP } from "./vessels.ts"
 import { k, r, hexes, ramp3 } from "./palette.ts"
 import { LEAF, FLOWER, MUSHROOM, NUTS, POTATO, LOGS } from "./plants.ts"
-import { BLOB, FUR, FANG, FEATHER, SHELL, BONE, COG, SCRAP, THREAD, CRYSTAL, GLOW, crystalWhite } from "./materials.ts"
+import { BLOB, HIDE, FUR, FANG, FEATHER, SHELL, BONE, COG, SCRAP, THREAD, CRYSTAL, GLOW, crystalWhite } from "./materials.ts"
 import { LETTER, BELL } from "./quest.ts"
 import { STAFF, BOW, CAPE, NECKLACE, MUFFLER, SCARF, SICKLE, ROD } from "./equipment.ts"
 import { SKEWER, DRIEDFISH, PIE } from "./food.ts"
@@ -23,6 +23,8 @@ export const ITEM_SPRITES: Record<string, PixBuf> = {
   jellyR: sprite(BLOB, { k, w: hex("#ffffff"), ...hexes("#ffc8b0", "#e07050", "#8a3020") }),
   fur: sprite(FUR, { k, ...ramp3("cBrown") }),
   furW: sprite(FUR, { k, ...ramp3("wool") }),
+  hide: sprite(HIDE, { k, ...hexes("#c9a778", "#987448", "#61482d") }),
+  leather: sprite(HIDE, { k, ...hexes("#bd8050", "#89532e", "#51311e") }),
   fang: sprite(FANG, { k, ...hexes("#fffaf0", "#e0d8c0", "#8a8070") }),
   feather: sprite(FEATHER, { k, b: r("wood", 2), ...hexes("#f8f4e8", "#c8c0b0", "#706858") }),
   shell: sprite(SHELL, { k, ...ramp3("cMustard") }),

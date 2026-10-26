@@ -169,7 +169,7 @@ export const SHOPS = {
     map: "phanthiet-craft",
     keepers: ["ルドルフ"],
     greeting: "革は手間をかけた分だけ応えるぞ。",
-    stock: ["leather-armor", "leather-boots", "fang-charm"],
+    stock: ["raw-hide", "tanned-leather", "leather-armor", "leather-boots", "fang-charm"],
     rates: { material: 1.1 },
   },
   // ---------------------------------------------------------------- street sellers, at their hours (economy.md §4.6)

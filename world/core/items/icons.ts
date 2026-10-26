@@ -46,6 +46,8 @@ export const ITEM_ICONS = [
   "jellyR",
   "fur",
   "furW",
+  "hide",
+  "leather",
   "fang",
   "feather",
   "shell",

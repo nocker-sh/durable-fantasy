@@ -75,6 +75,9 @@ const DEFINITIONS = {
   charcoal: material("炭", 6, "charcoal", "樹海の入り口の窯で焼いた炭。鍛冶と料理の火に。", "common", 2),
   mushroom: material("森のきのこ", 5, "mushroom", "木陰に生える茶色いきのこ。スープの具になる。"),
 
+  "raw-hide": material("獣の皮", 18, "hide", "猟師ファルクが届けた獣の皮。革職人に頼めば、丈夫な革になる。", "common", 4),
+  "tanned-leather": material("なめし革", 32, "leather", "ルドルフがなめした革。革鎧や靴の材料になる。", "common", 3),
+
   // ---------------------------------------------------------------- monster materials (drops)
   jelly: material("ぷるぷるのゼリー", 3, "jelly", "スライムが残す粘液のかたまり。乾くと固くなり、糊に使える。"),
   "blue-jelly": material("青いゼリー", 9, "jellyB", "水辺のスライムが残す冷たいゼリー。薬の材料になる。", "fine"),
