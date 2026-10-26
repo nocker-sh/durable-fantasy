@@ -1,7 +1,7 @@
 import type * as THREE from "three"
 import { walkH } from "../world"
 import { ANIM_DUR, type Anim, type Look } from "../figure"
-import { type Actor, Figure } from "../actors"
+import { Figure } from "../actors"
 import { wearable } from "../../town/residents.ts"
 import type { Avatar, Cell } from "./types.ts"
 import type { Walker } from "./walker.ts"
@@ -48,7 +48,6 @@ export function createWalkers(scene: THREE.Scene, onPickPlayer: (id: string) => 
     },
     yaw: Math.PI / 4,
     yawTarget: Math.PI / 4,
-    talkTarget: null as Actor | null,
   }
   const remotes = new Map<string, Walker>()
 
