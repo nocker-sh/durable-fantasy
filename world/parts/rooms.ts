@@ -66,6 +66,11 @@ export class Rooms {
     this.standby = entry
   }
 
+  /** Cancel speculative work when leaving the game. */
+  close() {
+    this.cancelStandby()
+  }
+
   private cancelStandby() {
     if (!this.standby) return
     this.standby.cancelled = true

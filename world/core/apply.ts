@@ -469,7 +469,7 @@ export function apply(before: PlayerState, command: Command | ServerCommand, ctx
       return accept({ ...state, hotbar }, { type: "rearranged" })
     }
     case "profile":
-      return accept({ ...state, name: command.name, look: command.look, neck: command.neck, neckRamp: command.neckRamp }, { type: "renamed", name: command.name })
+      return accept({ ...state, profileComplete: true, name: command.name, look: command.look, neck: command.neck, neckRamp: command.neckRamp }, { type: "renamed", name: command.name })
   }
 }
 

@@ -25,6 +25,7 @@ export interface SavePoint {
 export interface PlayerState {
   readonly version: 3
   readonly name: string
+  readonly profileComplete: boolean
   /** index into the look presets */
   readonly look: number
   /** what they wrap round the neck, and its colour (everyone wears one) */
@@ -141,6 +142,7 @@ export function newPlayer(name = DEFAULT_NAME, look = 0): PlayerState {
   const base = {
     version: 3 as const,
     name,
+    profileComplete: false,
     look,
     neck: "muffler" as NeckKind,
     neckRamp: "cRed",
@@ -201,6 +203,19 @@ const hotbarSchema = z.array(hotbarEntry.nullable()).length(HOTBAR_SIZE)
 
 export const nameSchema = z.string().trim().min(1).max(NAME_MAX)
 
+/** New names are normalized; old saves retain their original spelling. */
+export const profileNameSchema = z
+  .string()
+  .max(128)
+  .transform((value) => value.normalize("NFC").trim())
+  .pipe(
+    z
+      .string()
+      .min(1)
+      .max(NAME_MAX)
+      .refine((value) => !/[\p{Cc}\p{Cf}\p{Cs}]/u.test(value), "名前に制御文字は使えません"),
+  )
+
 const quality = z.literal([0, 1, 2, 3] as const)
 const wornSchema = z.object({ q: quality.optional(), by: z.string().max(NAME_MAX).optional(), dur: count.optional() })
 const lifeSchema = z.object(Object.fromEntries(LIFE_SKILLS.map((s) => [s, count.default(0)])) as unknown as Record<(typeof LIFE_SKILLS)[number], z.ZodDefault<typeof count>>)
@@ -209,6 +224,7 @@ const equipmentSchema = z.object(Object.fromEntries(SLOTS.map((s) => [s, itemId.
 /** What the third shape and the second share. */
 const common = {
   name: nameSchema,
+  profileComplete: z.boolean().default(true),
   look: z
     .number()
     .int()
@@ -321,7 +337,7 @@ export function loadPlayer(saved: unknown): PlayerState {
     const fresh = newPlayer()
     const equipment = { ...emptyEquipment(), weapon: old.data.weapon }
     const maxHp = derive({ ...fresh, equipment }).maxHp
-    return { ...fresh, gold: old.data.gold, bag: old.data.bag, hotbar: old.data.hotbar, equipment, hp: Math.min(old.data.hp, maxHp) }
+    return { ...fresh, profileComplete: true, gold: old.data.gold, bag: old.data.bag, hotbar: old.data.hotbar, equipment, hp: Math.min(old.data.hp, maxHp) }
   }
   return newPlayer()
 }

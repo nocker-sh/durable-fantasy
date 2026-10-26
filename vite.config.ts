@@ -1,19 +1,19 @@
 import { fileURLToPath } from "node:url"
 import tailwindcss from "@tailwindcss/vite"
-import { defineConfig, type Plugin } from "vite"
+import { defineConfig, normalizePath, type Plugin } from "vite"
 import { voidPlugin } from "void"
 import { voidReact } from "@void/react/plugin"
 
 // /dev/[sheet] also matches source URLs such as /dev/db.tsx. Let Vite serve those
 // modules through its filesystem URL before Void's page routing handles the request.
 function devSourceModules(): Plugin {
-  const root = fileURLToPath(new URL(".", import.meta.url)).replace(/\/$/, "")
+  const root = normalizePath(fileURLToPath(new URL(".", import.meta.url))).replace(/\/$/, "")
   return {
     name: "dev-source-modules",
     apply: "serve",
     configureServer(server) {
       server.middlewares.use((request, _response, next) => {
-        if (request.url && /^\/dev\/.*\.(?:[cm]?[jt]sx?|css)(?:\?|$)/.test(request.url)) request.url = `/@fs${root}${request.url}`
+        if (request.url && /^\/dev\/.*\.(?:[cm]?[jt]sx?|css)(?:\?|$)/.test(request.url)) request.url = `/@fs/${root}${request.url}`
         next()
       })
     },

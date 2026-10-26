@@ -76,6 +76,9 @@ export interface GameState {
   loading: { map: string; text: string } | null
   /** the map could not be drawn (the scene failed to build) */
   failed: boolean
+  failureMessage?: string
+  departed?: boolean
+  connectionReplaced?: boolean
   map: { id: MapId; name: string; warps: readonly (readonly [number, number])[] }
   me: { x: number; z: number; walking: boolean; heading: number }
   online: "connecting" | "online" | "offline"

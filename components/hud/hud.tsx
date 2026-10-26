@@ -1,5 +1,6 @@
 // Everything drawn over the world (ui.md §2): always-on HUD, windows, modals and notices.
 import { TooltipProvider } from "#/components/game/tooltip.tsx"
+import { useGameState } from "#/components/game/context.tsx"
 import { Chat, SystemLog } from "./chat.tsx"
 import { DialogueBox } from "./dialogue.tsx"
 import { EquipmentWindow } from "./equipment-window.tsx"
@@ -26,6 +27,10 @@ import { SkillsWindow } from "./skills-window.tsx"
 import { FriendsWindow, ThreadAsk } from "./friends-window.tsx"
 
 export function Hud() {
+  const departed = useGameState((s) => s.departed)
+  const replaced = useGameState((s) => s.connectionReplaced)
+  if (departed) return <Loading />
+  if (replaced) return <Offline />
   return (
     <TooltipProvider>
       <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden">

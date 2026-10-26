@@ -21,6 +21,11 @@ export class ServerMessages {
     if (import.meta.env.DEV) this.target.session.net.bytes += JSON.stringify(message).length
     switch (message.type) {
       case "snapshot": {
+        scene?.freeze(false)
+        if (message.at) {
+          this.target.session.arriveAt = message.at
+          scene?.placePlayer(message.at)
+        }
         lap("room: welcomed")
         // arrived beside a way out (or at a door): its room is got ready straight away
         {
@@ -145,6 +150,11 @@ export class ServerMessages {
         return
       }
       case "refused": {
+        if (message.what === "move" && message.at) {
+          this.target.session.arriveAt = message.at
+          scene?.placePlayer(message.at)
+          return
+        }
         if (message.what === "join" && message.reason === "FULL" && this.target.session.fullTries++ < 3) {
           // that channel filled up as we came: ask again
           this.target.session.socket?.close()

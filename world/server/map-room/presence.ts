@@ -12,6 +12,9 @@ import { cellsReached, type Cell, type MapPlayer, type PartyView, type ServerMes
 export const TOWN = "phanthiet"
 
 export interface Presence {
+  joining?: boolean
+  closed?: boolean
+  ready?: boolean
   player: MapPlayer | null
   /** the player's id, for their Player Durable Object */
   owner: string | null

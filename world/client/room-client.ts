@@ -2,7 +2,7 @@ import type { GameSession } from "./session.ts"
 import type { ServerMessageContext } from "./server-context.ts"
 import type { VoidSocket } from "void/ws"
 import type { Transition } from "../core/apply.ts"
-import { REASON_TEXT, type Command } from "../core/commands.ts"
+import { commandSchema, REASON_TEXT, type Command } from "../core/commands.ts"
 import { MAPS, cellDistance, isMapId, type MapId } from "../maps/index.ts"
 import type { Cell } from "../protocol.ts"
 import { lap } from "../diagnostics.ts"
@@ -11,12 +11,18 @@ const COMMAND_TIMEOUT = 8000
 
 export class RoomClient {
   private seq = 0
+  private generation = 0
+
+  cancel() {
+    this.generation++
+  }
   constructor(
     private readonly target: Pick<ServerMessageContext, "update" | "getScene" | "onServer" | "preview" | "notify" | "setPlayer" | "report"> & {
-      readonly session: Pick<GameSession, "wantChannel" | "rooms" | "state" | "socket" | "arriveAt" | "others" | "playerId" | "waiting">
+      readonly session: Pick<GameSession, "wantChannel" | "rooms" | "state" | "socket" | "arriveAt" | "others" | "playerId" | "waiting" | "engaged">
     },
   ) {}
   async connect(id: MapId) {
+    const generation = ++this.generation
     const want = this.target.session.wantChannel
     this.target.session.wantChannel = null
     // a room got ready while walking up to the way in is taken as it is
@@ -25,7 +31,7 @@ export class RoomClient {
       const { channel, channels } = await ready.channel
       const socket = ready.socket
       if (!socket) return
-      if (this.target.session.state.get().map.id !== id) {
+      if (generation !== this.generation || this.target.session.state.get().map.id !== id) {
         socket.close()
         return
       }
@@ -41,7 +47,7 @@ export class RoomClient {
     }
     const { channel, channels } = await this.target.session.rooms.askChannel(id, want)
     lap("room: channel chosen")
-    if (this.target.session.state.get().map.id !== id) return // moved on meanwhile
+    if (generation !== this.generation || this.target.session.state.get().map.id !== id) return // moved on meanwhile
     this.target.update({ room: { world: this.target.session.rooms.world, channel, channels } })
     const socket = this.target.session.rooms.open(id, channel)
     this.target.session.socket = socket
@@ -65,13 +71,35 @@ export class RoomClient {
     socket.on("open", () => {
       if (this.target.session.socket !== socket) return
       lap("room: socket open")
-      this.target.update({ online: "online" })
+      this.target.update({ online: "online", connectionReplaced: false })
       this.join()
     })
-    socket.on("close", () => {
+    socket.on("close", (event) => {
       if (this.target.session.socket !== socket) return
-      this.target.update({ online: "offline" })
-      for (const resolve of this.target.session.waiting.values()) resolve({ ok: false, reason: "OFFLINE" })
+      if (event.code === 4001) {
+        socket.close()
+        this.target.update({ connectionReplaced: true })
+        this.target.notify("このキャラクターは別の画面で開かれました。", "bad")
+      }
+      this.target.update({
+        online: "offline",
+        trade: null,
+        tradeAsk: null,
+        partyAsk: null,
+        threadAsk: null,
+        playerMenu: null,
+        dialogue: null,
+        shop: null,
+        stock: null,
+        craft: null,
+        commission: null,
+        storage: false,
+        board: null,
+      })
+      this.target.session.engaged = null
+      this.target.getScene()?.stop()
+      this.target.getScene()?.freeze(true)
+      for (const finish of this.target.session.waiting.values()) finish({ ok: false, reason: "OFFLINE" })
       this.target.session.waiting.clear()
       this.target.session.others.clear()
       this.target.getScene()?.clearRemotes()
@@ -90,13 +118,19 @@ export class RoomClient {
   }
 
   async run(command: Command, send?: (seq: number) => void): Promise<boolean> {
+    if (this.target.session.state.get().busy) return false
+    if (!send) {
+      const parsed = commandSchema.safeParse(command)
+      if (!parsed.success) return false
+      command = parsed.data
+    }
     const local = send ? null : this.target.preview(command)
     if (local) {
       this.target.notify(REASON_TEXT[local], "bad")
       return false
     }
     const socket = this.target.session.socket
-    if (!socket || this.target.session.state.get().online !== "online") {
+    if (!socket || this.target.session.state.get().online !== "online" || !this.target.session.others.you) {
       this.target.notify(REASON_TEXT.OFFLINE, "bad")
       return false
     }

@@ -7,13 +7,37 @@ import { LOOKS } from "../town/travellers.ts"
 const STORAGE = "durable-fantasy"
 const HELD: Partial<Record<ItemId, Item>> = { dagger: "sword", "short-sword": "sword", "hand-axe": "axe", spear: "spear", mace: "mace" }
 
-export function loadPlayerId(): string {
+let openingSession: Promise<string> | null = null
+
+export function loadPlayerId(): Promise<string> {
+  return (openingSession ??= (navigator.locks ? navigator.locks.request(`${STORAGE}/session`, openSession) : openSession()).finally(() => {
+    openingSession = null
+  }))
+}
+
+async function openSession(): Promise<string> {
   const key = `${STORAGE}/player`
-  let id = localStorage.getItem(key)
-  if (!id || !/^[0-9a-f-]{36}$/.test(id)) {
-    id = crypto.randomUUID()
-    localStorage.setItem(key, id)
+  let legacyId = localStorage.getItem(key)
+  if (!legacyId || !/^[0-9a-f-]{36}$/.test(legacyId)) {
+    legacyId = crypto.randomUUID()
+    localStorage.setItem(key, legacyId)
   }
+  const proofKey = `${STORAGE}/session-proof`
+  let proof = localStorage.getItem(proofKey)
+  if (!proof || !/^[a-f0-9]{64}$/.test(proof)) {
+    proof = Array.from(crypto.getRandomValues(new Uint8Array(32)), (byte) => byte.toString(16).padStart(2, "0")).join("")
+    localStorage.setItem(proofKey, proof)
+  }
+  const response = await fetch("/api/session", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ legacyId, proof }),
+    signal: AbortSignal.timeout(10000),
+  })
+  if (!response.ok) throw new Error("Session could not be restored")
+  const { id } = (await response.json()) as { id: string }
+  localStorage.setItem(key, id)
+  localStorage.removeItem(proofKey)
   return id
 }
 

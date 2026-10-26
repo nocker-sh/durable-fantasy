@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync } from "node:fs"
-import { resolve, dirname } from "node:path"
+import { resolve, dirname, sep } from "node:path"
 import { expect, it } from "vitest"
 
 function sources(directory: string): string[] {
@@ -15,21 +15,21 @@ it("game engine dependencies stay inside the engine", () => {
     const source = readFileSync(file, "utf8")
     const imports = [...source.matchAll(/(?:from\s*|import\s*\()['"]([^'"]+)['"]/g)].map((match) => match[1])
     for (const dependency of imports) {
-      const allowed = dependency.startsWith("./") && resolve(dirname(file), dependency).startsWith(directory + "/")
+      const allowed = dependency.startsWith("./") && resolve(dirname(file), dependency).startsWith(directory + sep)
       expect(allowed, `${file} imports ${dependency}`).toBe(true)
     }
   }
 })
 
 it("world logic does not import UI or developer tools", () => {
-  const uiDirectories = ["components", "hooks", "dev", "pages"].map((directory) => resolve(directory) + "/")
+  const uiDirectories = ["components", "hooks", "dev", "pages"].map((directory) => resolve(directory) + sep)
   for (const file of sources("world")) {
     const source = readFileSync(file, "utf8")
     const imports = [...source.matchAll(/(?:from\s*|import\s*\()['"]([^'"]+)['"]/g)].map((match) => match[1])
     for (const dependency of imports) {
       const target = dependency.startsWith("#/") ? resolve(dependency.slice(2)) : resolve(file, "..", dependency)
       expect(dependency !== "react" && !dependency.startsWith("react/") && !dependency.startsWith("@void/react"), `${file} imports ${dependency}`).toBe(true)
-      if (["world/core", "world/town", "world/server"].some((directory) => file.startsWith(resolve(directory) + "/")))
+      if (["world/core", "world/town", "world/server"].some((directory) => file.startsWith(resolve(directory) + sep)))
         expect(dependency !== "three" && !dependency.startsWith("three/"), `${file} imports ${dependency}`).toBe(true)
       expect(
         uiDirectories.some((directory) => target.startsWith(directory)),
@@ -46,7 +46,7 @@ it("graphics dependencies stay inside graphics, engine, or Three.js", () => {
     const imports = [...source.matchAll(/(?:from\s*|import\s*\()['"]([^'"]+)['"]/g)].map((match) => match[1])
     for (const dependency of imports) {
       const target = resolve(dirname(file), dependency)
-      expect(dependency === "three" || (dependency.startsWith(".") && [directory, resolve("lib/engine")].some((base) => target.startsWith(base + "/"))), `${file} imports ${dependency}`).toBe(true)
+      expect(dependency === "three" || (dependency.startsWith(".") && [directory, resolve("lib/engine")].some((base) => target.startsWith(base + sep))), `${file} imports ${dependency}`).toBe(true)
     }
   }
 })
@@ -73,7 +73,7 @@ it("application modules have no circular runtime imports", () => {
         continue
       if (!specifier.startsWith(".") && !specifier.startsWith("#/")) continue
       const target = specifier.startsWith("#/") ? resolve(specifier.slice(2)) : resolve(dirname(file), specifier)
-      const resolved = [target, `${target}.ts`, `${target}.tsx`, `${target}/index.ts`, `${target}/index.tsx`].find((path) => known.has(path))
+      const resolved = [target, `${target}.ts`, `${target}.tsx`, resolve(target, "index.ts"), resolve(target, "index.tsx")].find((path) => known.has(path))
       if (resolved) dependencies.push(resolved)
     }
     graph.set(file, dependencies)
