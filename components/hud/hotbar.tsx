@@ -26,6 +26,8 @@ const SKILL_ICON: Record<SkillId, { ui: SpriteName } | { item: ItemId }> = {
   fell: { item: "log" },
   lunge: { item: "short-sword" },
   pierce: { item: "dagger" },
+  sweep: { item: "iron-halberd" },
+  crack: { item: "iron-warhammer" },
   ember: { item: "small-crystal" },
   kodama: { item: "oak-staff" },
 }

@@ -1,11 +1,32 @@
-import type { ItemId } from "../core/items.ts"
+import { ITEMS, isItemId, type ItemIcon, type ItemId } from "../core/items.ts"
 import { wornNeck, type PlayerState } from "../core/player.ts"
 import type { MapPlayer } from "../protocol.ts"
 import type { Item, Look } from "../scene/index.ts"
 import { LOOKS } from "../town/travellers.ts"
 
 const STORAGE = "durable-fantasy"
-const HELD: Partial<Record<ItemId, Item>> = { dagger: "sword", "short-sword": "sword", "hand-axe": "axe", spear: "spear", mace: "mace" }
+/** What a weapon looks like in the hand, by the shape its icon is drawn as. */
+const HELD_BY_ICON: Partial<Record<ItemIcon, Item>> = {
+  dagger: "sword",
+  knife: "sword",
+  machete: "sword",
+  sword: "sword",
+  longsword: "sword",
+  greatsword: "greatsword",
+  axe: "axe",
+  spear: "spear",
+  mace: "mace",
+  flail: "mace",
+  warhammer: "hammer",
+  halberd: "halberd",
+  staff: "staff",
+}
+const heldOf = (id: ItemId): Item => {
+  const d = ITEMS[id]
+  if (d.equip?.part !== "weapon") return null
+  if (d.icon === "axe" && d.equip.twoHanded) return "battleaxe"
+  return HELD_BY_ICON[d.icon] ?? null
+}
 
 let openingSession: Promise<string> | null = null
 
@@ -43,12 +64,12 @@ async function openSession(): Promise<string> {
 
 export function playerAvatar(player: PlayerState) {
   const weapon = player.equipment.weapon
-  return { name: player.name, look: { ...LOOKS[player.look].look, neckStripe: undefined, ...wornNeck(player) }, held: (weapon && HELD[weapon]) || null }
+  return { name: player.name, look: { ...LOOKS[player.look].look, neckStripe: undefined, ...wornNeck(player) }, held: (weapon && heldOf(weapon)) || null }
 }
 
 export function remoteAvatar(p: MapPlayer) {
   const look = LOOKS[p.look]?.look ?? LOOKS[0].look
-  return { name: p.name, look: { ...look, neck: p.neck as Look["neck"], neckRamp: p.neckRamp, neckStripe: p.neckStripe }, held: (p.weapon && HELD[p.weapon]) || null }
+  return { name: p.name, look: { ...look, neck: p.neck as Look["neck"], neckRamp: p.neckRamp, neckStripe: p.neckStripe }, held: (p.weapon && isItemId(p.weapon) && heldOf(p.weapon)) || null }
 }
 
 export { STORAGE }

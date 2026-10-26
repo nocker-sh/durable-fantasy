@@ -22,6 +22,13 @@ export const ITEM_ICONS = [
   "axe",
   "spear",
   "mace",
+  "knife",
+  "machete",
+  "longsword",
+  "greatsword",
+  "warhammer",
+  "flail",
+  "halberd",
   // hand drawn (pixel-art.ts, item-art.ts)
   "hat",
   "helm",

@@ -1,6 +1,7 @@
 // Shops in the town, the resident who keeps each one and what they sell (economy.md §4).
 // Every shop buys anything sellable at the base price; some pay more for certain kinds.
 import { sellPrice, ITEMS, type ItemId, type ItemKind } from "./items.ts"
+import { IRON_WEAPONS } from "./items/weapons.ts"
 
 export type ShopKind = "food" | "inn" | "weapon" | "armor" | "tools" | "medicine" | "crystal" | "tailor" | "buyer"
 
@@ -84,7 +85,7 @@ export const SHOPS = {
     map: "phanthiet",
     keepers: ["ギュンター"],
     greeting: "腕に合うのを選びな。",
-    stock: ["wood-axe", "sickle", "dagger", "short-sword", "iron-sword", "hand-axe", "battle-axe", "spear", "mace"],
+    stock: ["wood-axe", "sickle", "dagger", "short-sword", "iron-sword", "hand-axe", "battle-axe", "spear", "mace", ...IRON_WEAPONS],
   },
   inn: {
     name: "ゲルダの宿",

@@ -37,6 +37,8 @@ export interface ItemDefinition {
   stack: number
   weight: number
   icon: ItemIcon
+  /** the metal its blade or head is drawn in, when not plain iron (items/weapons.ts, art/icons.ts) */
+  metal?: "iron" | "steel" | "engine"
   /**
    * what using it does (consumables): restores HP, SP and stamina, fills you up by `full` (out of
    * 100) and keeps you warm for `warm` minutes (game-system.md §3.6)

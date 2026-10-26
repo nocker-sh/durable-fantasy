@@ -4,6 +4,7 @@
 import type { Stat } from "./growth.ts"
 import type { ItemId, Skill as LifeSkill } from "./items.ts"
 import { lifeLevel, type LifeExp } from "./life.ts"
+import { weaponsOf } from "./items/weapons.ts"
 
 interface Base {
   name: string
@@ -55,12 +56,42 @@ export const SKILLS = {
     name: "踏み込み斬り",
     sp: 4,
     cooldown: 6000,
-    weapons: ["short-sword", "iron-sword", "engine-steel-sword", "reforged-blade"],
+    weapons: ["short-sword", "iron-sword", "engine-steel-sword", "reforged-blade", ...weaponsOf("longsword", "machete")],
     needs: { str: 8 },
     power: 1.6,
     text: "一歩踏み込んで、体ごと斬りつける。",
   },
-  pierce: { kind: "strike", name: "急所突き", sp: 3, cooldown: 5000, weapons: ["dagger"], needs: { dex: 9 }, power: 1, sure: true, text: "動きの止まった一瞬に、急所を突く。必ず会心になる。" },
+  pierce: {
+    kind: "strike",
+    name: "急所突き",
+    sp: 3,
+    cooldown: 5000,
+    weapons: ["dagger", ...weaponsOf("dagger", "knife")],
+    needs: { dex: 9 },
+    power: 1,
+    sure: true,
+    text: "動きの止まった一瞬に、急所を突く。必ず会心になる。",
+  },
+  sweep: {
+    kind: "strike",
+    name: "薙ぎ払い",
+    sp: 6,
+    cooldown: 8000,
+    weapons: ["battle-axe", "spear", ...weaponsOf("greatsword", "halberd", "battle-axe", "spear")],
+    needs: { str: 12 },
+    power: 2,
+    text: "長い得物を腰から大きく回し、足もとを払う。",
+  },
+  crack: {
+    kind: "strike",
+    name: "殻割り",
+    sp: 5,
+    cooldown: 7000,
+    weapons: ["mace", ...weaponsOf("warhammer", "flail", "mace")],
+    needs: { str: 11 },
+    power: 1.9,
+    text: "硬い殻の継ぎ目めがけて、重い頭を真上から落とす。",
+  },
   ember: {
     kind: "spell",
     name: "結晶の灯",

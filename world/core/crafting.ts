@@ -5,6 +5,7 @@
 // follows your proficiency and what you put in. Pure: the server rolls the dice.
 import { QUALITY_EFFECT, type CraftSkill, type ItemId, type Quality } from "./items.ts"
 import { lifeLift } from "./life.ts"
+import { WEAPONS, forgeOf, type WeaponId } from "./items/weapons.ts"
 
 export type StationKind = "hearth" | "workbench" | "loom" | "forge"
 
@@ -465,6 +466,11 @@ export const RECIPES: readonly Recipe[] = [
     ["woven-muffler", 1],
     64,
   ),
+  // every weapon of every shape and metal, at the forge (items/weapons.ts)
+  ...(Object.keys(WEAPONS) as WeaponId[]).map((id) => {
+    const f = forgeOf(id)
+    return r(id, "smithing", "forge", f.inputs as [ItemId, number][], [id, 1], f.min)
+  }),
 ]
 
 export const recipeOf = (id: string) => RECIPES.find((x) => x.id === id)

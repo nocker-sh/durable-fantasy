@@ -2,7 +2,7 @@
 // that are not tables of things (names for codes, sizes, layouts). sources.test.ts fails when the
 // game exports a new table that is in neither list, so nothing in the game goes unshown.
 export const SOURCES: Record<string, readonly string[]> = {
-  items: ["ITEMS", "ITEM_IDS", "ITEM_ICONS"],
+  items: ["ITEMS", "ITEM_IDS", "ITEM_ICONS", "WEAPONS", "IRON_WEAPONS"],
   npcs: ["RESIDENTS", "RESIDENT_LOOKS", "PEOPLE", "ROUTINES"],
   households: ["HOUSEHOLDS"],
   houses: ["HOUSES", "INTERIORS", "INDOOR_WORLDS", "OUT_FRONT", "TRACES"],
@@ -18,7 +18,7 @@ export const SOURCES: Record<string, readonly string[]> = {
   nodes: ["NODES", "LATER_SPOTS"],
   skills: ["SKILLS", "SKILL_IDS"],
   life: ["LIFE_SKILLS", "LIFE_MILESTONE_TEXT", "MILESTONES"],
-  objects: ["PROPS", "SIZES", "THINGS", "THINGS_BY_HOUSEHOLD"],
+  objects: ["PROPS", "SIZES", "THINGS", "THINGS_BY_HOUSEHOLD", "FURNISHINGS"],
   world: ["WORLD", "GRID_SIZE", "WORLD_NODES", "LOCKED_CITIES"],
   icons: ["SPRITES"],
   "item-art": ["ITEM_SPRITES", "HIDE"],
@@ -46,6 +46,8 @@ export const NOT_TABLES: readonly string[] = [
   "RARITY_NAME",
   "SHOP_KIND_NAME",
   "SLOT_NAME",
+  "METAL_NAME",
+  "WOOD_NAME",
   "STAT_NAME",
   // fixed lists of codes and factors
   "GATHER_SKILLS",
@@ -55,6 +57,8 @@ export const NOT_TABLES: readonly string[] = [
   "QUALITY_EFFECT",
   "QUALITY_PRICE",
   "SLOTS",
+  "METALS",
+  "WOOD_IDS",
   "STATS",
   "FRIEND",
   "TIMES_OF_DAY",

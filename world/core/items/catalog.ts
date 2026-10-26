@@ -1,5 +1,6 @@
 import { food, dish, medicine, tool, material, gear } from "./factories.ts"
 import type { ItemDefinition } from "./types.ts"
+import { WEAPONS } from "./weapons.ts"
 
 const DEFINITIONS = {
   // ---------------------------------------------------------------- food (shops on the market)
@@ -140,6 +141,8 @@ const DEFINITIONS = {
   ),
   spear: gear("槍", 150, "spear", { part: "weapon", atk: 28, delay: 1900, twoHanded: true, needs: { str: 9, dex: 9 }, scale: { dex: "C", str: "D" } }, 100, "間合いの長いトネリコの槍。両手で持つ。"),
   mace: gear("メイス", 180, "mace", { part: "weapon", atk: 26, delay: 1800, needs: { str: 12 }, scale: { str: "C" } }, 90, "鉄の頭をもつ打撃武器。鎧の上からでも効く。", "fine"),
+  // every shape in iron, steel and the engines' steel (weapons.ts)
+  ...WEAPONS,
   "oak-staff": gear("樫の杖", 110, "staff", { part: "weapon", atk: 6, delay: 1700, needs: { mnd: 7 }, bonus: { maxSp: 15 } }, 50, "術と祈りを唱える者が持つ杖。先に小さな結晶がはまっている。"),
   "short-bow": gear("短弓", 140, "bow", { part: "weapon", atk: 18, delay: 1600, twoHanded: true, needs: { dex: 10 }, scale: { dex: "C" } }, 50, "狩人が使う小ぶりの弓。両手で引く。"),
 

@@ -7,7 +7,10 @@ import { GB, colorMat } from "./gfx"
 import { barrel, bench, crate, fireLights, glowMats, M, sack, table, addSprite, type V2 } from "./build"
 import { basket, hanging, heap, GPPU } from "./goods"
 import { blocked, groundH, WN } from "./world"
+import { hash2 } from "./pix"
 import { INTERIORS, interiorRows, type Furniture, type Interior } from "../town/interiors.ts"
+import { HOUSEHOLDS } from "../town/houses.ts"
+import { furnish, paintOf, topOf, wood, woodOf, type Spot, type WoodId } from "./construction/furnishings.ts"
 
 import { INDOOR } from "../maps/ground-layouts.ts"
 
@@ -143,18 +146,47 @@ function counter(root: THREE.Group, f: Furniture, y0: number, shop: string | und
   const { x, z, w, d } = f
   gb.box(M.woodV, M.woodDark, x - w / 2, y0, z - d / 2, x + w / 2, y0 + COUNTER_H - 0.06, z + d / 2, 2)
   gb.box(M.woodDark, M.wood, x - w / 2 - 0.05, y0 + COUNTER_H - 0.06, z - d / 2 - 0.05, x + w / 2 + 0.05, y0 + COUNTER_H, z + d / 2 + 0.05, 2)
+  root.add(gb.build())
+  counterGoods(root, f, y0, shop, seed)
+}
+
+/** What the shop sets out on its counter: bottles in a row, a basket of its goods. */
+function counterGoods(root: THREE.Group, f: Furniture, y0: number, shop: string | undefined, seed: number) {
+  const { x, z, w } = f
+  const top = y0 + (topOf(f.name ?? "") ?? COUNTER_H)
   if (shop === "apothecary" || shop === "crystal" || shop === "tavern" || shop === "inn") {
+    const gb = new GB()
     for (let k = 0; k < 4; k++) {
       const bx = x - w / 2 + 0.3 + k * 0.22
-      gb.cyl(bottle[(k + seed) % bottle.length], null, bx, z, y0 + COUNTER_H, y0 + COUNTER_H + 0.2, 0.05, 0.05, 6, 1)
+      gb.cyl(bottle[(k + seed) % bottle.length], null, bx, z, top, top + 0.2, 0.05, 0.05, 6, 1)
     }
+    root.add(gb.build())
   }
-  root.add(gb.build())
   const g = new THREE.Group()
   g.position.set(x + w / 2 - 0.4, 0, z + 0.1)
   root.add(g)
   const goods = SHELF_GOODS[shop ?? ""]
-  if (goods) addSprite(g, basket(goods[seed % goods.length], seed, 26, 22), 0, y0 + COUNTER_H, 0)
+  if (goods) addSprite(g, basket(goods[seed % goods.length], seed, 26, 22), 0, top, 0)
+}
+
+/** Which way a piece faces: away from the wall it stands nearest, out into the room. */
+function spotOf(it: Interior, f: Furniture, y0: number): Spot {
+  const gaps: [number, Spot["face"]][] = [
+    [f.z - f.d / 2 - it.z0, 0],
+    [f.x - f.w / 2 - it.x0, 1],
+    [it.x1 - (f.x + f.w / 2), 3],
+    [it.z1 - (f.z + f.d / 2), 2],
+  ]
+  const [gap, face] = gaps.reduce((a, b) => (b[0] < a[0] ? b : a))
+  return { x: f.x, z: f.z, w: f.w, d: f.d, y: y0, face: gap < 0.8 ? face : 0 }
+}
+
+/** The wood of the household's furniture; a painted chest, bench or cradle where the house paints them. */
+function woodFor(it: Interior): (name: string) => WoodId {
+  const living = it.house.household ? HOUSEHOLDS.find((h) => h.id === it.house.household)?.living : it.house.kind === "public" ? "ゆとりがある" : undefined
+  const base = woodOf(living, it.house.seed)
+  const paints = living !== "慎ましい" && hash2(it.house.seed, 5, 73) > 0.55
+  return (name) => (paints && /^(衣装箱|長椅子|揺りかご)$/.test(name) ? paintOf(it.house.seed) : base)
 }
 
 function workbench(root: THREE.Group, f: Furniture, y0: number) {
@@ -394,7 +426,14 @@ export function buildInterior(it: Interior) {
 
     const props = new GB()
     let shelves = 0
-    for (const f of it.furniture) {
+    const woodOfPiece = woodFor(it)
+    it.furniture.forEach((f, k) => {
+      // a piece drawn as itself (construction/furnishings.ts); the rest by its kind below
+      const own = f.kind !== "trace" && f.kind !== "partition" && f.kind !== "lowwall" && f.kind !== "curtain" && f.kind !== "stair" && f.name
+      if (own && furnish(props, f.name!, spotOf(it, f, y0), wood(woodOfPiece(f.name!)), seed + k * 13)) {
+        if (f.kind === "counter") counterGoods(root, f, y0, shop, seed)
+        return
+      }
       switch (f.kind) {
         case "counter":
           counter(root, f, y0, shop, seed)
@@ -458,12 +497,12 @@ export function buildInterior(it: Interior) {
           partition(root, f, y0)
           break
       }
-    }
+    })
     // the traces of the life lived here, where the plan lays them
     const tops = it.furniture.filter((f) => f.kind === "table" || f.kind === "workbench" || f.kind === "counter" || f.kind === "hearth")
     const heightAt = (x: number, z: number) => {
       const t = tops.find((f) => Math.abs(x - f.x) <= f.w / 2 + 0.05 && Math.abs(z - f.z) <= f.d / 2 + 0.05)
-      return y0 + (!t ? 0.02 : t.kind === "hearth" ? 1.06 : t.kind === "counter" ? COUNTER_H : t.kind === "workbench" ? 0.82 : 0.62)
+      return y0 + (!t ? 0.02 : t.kind === "hearth" ? 1.06 : (topOf(t.name ?? "") ?? (t.kind === "counter" ? COUNTER_H : t.kind === "workbench" ? 0.82 : 0.62)))
     }
     it.furniture
       .filter((f) => f.kind === "trace")
