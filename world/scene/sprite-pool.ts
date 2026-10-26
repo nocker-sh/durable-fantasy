@@ -2,6 +2,7 @@
 // earlier visit, keyed by look), baked strips for residents (see maps.ts), and last a pool of
 // workers (sprite.worker.ts). The main thread never renders: it asks, gets null until the frame
 // arrives, and shows a stand-in meanwhile. The most recently asked, most urgent request goes next.
+import { BitmapCache } from "../../lib/graphics/bitmap-cache.ts"
 import { ANIMS, type Anim, type Item, type Look } from "./figure"
 import type { FrameDone, FrameJob } from "./sprite.worker"
 import { lookKey } from "./sprite-key"
@@ -18,7 +19,8 @@ interface Pending {
   listeners: Listener[]
 }
 
-const ready = new Map<string, ImageBitmap>()
+// One budget for decoded frames and baked strips; canvases copy them synchronously.
+const decoded = new BitmapCache(64 * 1024 * 1024, 512)
 const pending = new Map<string, Pending>()
 const running = new Map<string, Pending>()
 const idle: Worker[] = []
@@ -44,10 +46,10 @@ function start() {
 }
 
 function finish(key: string, bitmap: ImageBitmap) {
-  ready.set(key, bitmap)
   const p = running.get(key)
   running.delete(key)
   p?.listeners.forEach((fn) => fn(bitmap))
+  decoded.set(`frame:${key}`, bitmap)
 }
 
 /** Hand the most urgent waiting frames to free workers, after checking IndexedDB for each. */
@@ -112,7 +114,7 @@ export function tickSprites() {
  */
 export function spriteFrame(look: Look, item: Item, anim: Anim, view: number, f: number, urgency = 0, onReady?: Listener, id = lookKey(look, item)): ImageBitmap | null {
   const key = `${id}|${anim}|${view}|${f}`
-  const done = ready.get(key)
+  const done = decoded.get(`frame:${key}`)
   if (done) return done
   start()
   const score = clock * 1000 + urgency
@@ -134,7 +136,7 @@ export function spriteFrame(look: Look, item: Item, anim: Anim, view: number, f:
 
 /** The frame if it has been drawn, without asking for it. */
 export function readyFrame(look: Look, item: Item, anim: Anim, view: number, f: number, id = lookKey(look, item)): ImageBitmap | null {
-  return ready.get(`${id}|${anim}|${view}|${f}`) ?? null
+  return decoded.get(`frame:${id}|${anim}|${view}|${f}`) ?? null
 }
 
 export const spritesPending = () => pending.size + running.size
@@ -146,7 +148,6 @@ interface StripLoad {
   score: number
   listeners: ((strip: ImageBitmap | null) => void)[]
 }
-const strips = new Map<string, ImageBitmap | null>()
 const stripQueue = new Map<string, StripLoad>()
 const stripsLoading = new Map<string, StripLoad>()
 let loading = 0
@@ -167,8 +168,8 @@ function pumpStrips() {
       .then((bitmap) => {
         loading--
         stripsLoading.delete(s.url)
-        strips.set(s.url, bitmap)
         s.listeners.forEach((fn) => fn(bitmap))
+        decoded.set(`strip:${s.url}`, bitmap)
         pumpStrips()
       })
   }
@@ -179,7 +180,8 @@ function pumpStrips() {
  * (it is queued), null if it could not be loaded.
  */
 export function bakedStrip(url: string, urgency: number, onReady: (strip: ImageBitmap | null) => void): ImageBitmap | null | undefined {
-  if (strips.has(url)) return strips.get(url)
+  const cached = decoded.get(`strip:${url}`)
+  if (cached !== undefined) return cached
   const inflight = stripsLoading.get(url)
   if (inflight) {
     if (!inflight.listeners.includes(onReady)) inflight.listeners.push(onReady)
