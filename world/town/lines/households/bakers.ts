@@ -2,6 +2,8 @@ import type { Line } from "../line.ts"
 
 const lines = {
   マルタ: [
+    { text: "ウルリケさんの卵を預かってきたの？　籠ごと渡してちょうだい。", errand: { id: "ulrike-eggs", state: "ready" } },
+    { text: "届けてくれた卵で、次のパイを仕込めるわ。ありがとうね。", errand: { id: "ulrike-eggs", state: "done" } },
     { text: "焼きたてが一番よ。冷めたらスープに浸してね。" },
     { text: "黒パンは夜中から窯を焚いて焼くの。" },
     { text: "白パンは朝いちばんに売り切れちゃうのよ。" },

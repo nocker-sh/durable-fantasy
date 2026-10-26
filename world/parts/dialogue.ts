@@ -2,7 +2,7 @@
 // them (shop, commission, storage, errands). Game (game.ts) opens and turns the pages.
 import { COMMISSIONS } from "../core/commissions.ts"
 import { phase } from "../core/clock.ts"
-import { dayOf, errandOf, errandToday, todays } from "../core/errands.ts"
+import { dayOf, errandProgress, errandOf, errandToday, todays } from "../core/errands.ts"
 import { ITEMS } from "../core/items.ts"
 import { shopOfKeeper } from "../core/shops.ts"
 import { STORAGE_KEEPER } from "../core/storage.ts"
@@ -51,7 +51,7 @@ export function choicesFor(state: GameState, name: string): DialogueChoice[] {
  * doing, who is nearby, what kind of day it is and whether we have spoken before (remembered
  * under `spokenKey`).
  */
-export function linesFor(state: GameState, name: string, spokenKey: string): string[] {
+export function linesFor(state: GameState, name: string, spokenKey: string, now = Date.now()): string[] {
   let spoken: string[] = []
   try {
     spoken = JSON.parse(localStorage.getItem(spokenKey) ?? "[]")
@@ -63,10 +63,11 @@ export function linesFor(state: GameState, name: string, spokenKey: string): str
     doing: slotAt(name, state.clock.min)?.doing ?? "",
     nearby: new Set(state.npcs.map((n) => n.name).filter((n) => n !== name)),
     friend: state.player?.friends[name] ?? 0,
-    event: eventOf(Date.now()),
+    event: eventOf(now),
+    errands: state.player ? errandProgress(state.player, name, now) : {},
     firstTime: !spoken.includes(name),
   }
   if (situation.firstTime) localStorage.setItem(spokenKey, JSON.stringify([...spoken, name]))
-  const pages = pick(ALL_LINES[name] ?? [], situation, 3, Math.floor(Date.now() / 60_000))
+  const pages = pick(ALL_LINES[name] ?? [], situation, 3, Math.floor(now / 60_000))
   return pages.length ? pages : ["……"]
 }

@@ -2,6 +2,7 @@
 // bring the cook some fish, carry the farmer's eggs to the bakery. Which resident asks what is decided
 // by the date, so everyone in town hears the same requests. Doing one pays a little, and the resident
 // warms to you: friendship (0–100) changes what they say and takes up to 10% off their prices.
+import { countItem, type Bag } from "./bag.ts"
 import type { ItemId } from "./items.ts"
 import { ITEMS } from "./items.ts"
 
@@ -153,4 +154,17 @@ export const todays = (taken: readonly Taken[], now: number) => taken.filter((t)
 /** A short line for the list: what to do, and for whom. */
 export function errandLabel(e: Errand): string {
   return e.kind === "bring" ? `${e.from}に${ITEMS[e.wants!.item].name}×${e.wants!.count}` : `${e.from}の${e.parcel}を${e.to}へ`
+}
+
+export type ErrandProgress = "taken" | "ready" | "done"
+
+/** Conversation context, restricted to today and the people involved; never completes an errand. */
+export function errandProgress(player: { errands: readonly Taken[]; bag: Bag }, name: string, now: number): Record<string, ErrandProgress> {
+  const progress: Record<string, ErrandProgress> = {}
+  for (const taken of todays(player.errands, now)) {
+    const errand = errandOf(taken.id)
+    if (!errand || (errand.from !== name && errand.to !== name)) continue
+    progress[taken.id] = taken.done ? "done" : (errand.kind === "deliver" ? errand.to === name : countItem(player.bag, errand.wants!.item) >= errand.wants!.count) ? "ready" : "taken"
+  }
+  return progress
 }

@@ -1,6 +1,7 @@
 // What residents say when spoken to. Each line may say when it fits: the part of
 // the day, what they are doing, who is standing nearby, how well they know you, what kind of day it
 // is. The most fitting lines are said first. Lines are written per resident, by the district they live in (square.ts, market.ts, craft.ts, gate.ts).
+import type { ErrandProgress } from "../../core/errands.ts"
 import type { Phase } from "../../core/clock.ts"
 import type { TownEvent } from "../events.ts"
 
@@ -18,6 +19,7 @@ export interface Line {
   event?: TownEvent
   /** only the first time you speak to them */
   first?: true
+  errand?: { id: string; state: ErrandProgress }
 }
 
 export interface Situation {
@@ -27,6 +29,7 @@ export interface Situation {
   friend: number
   event: TownEvent | null
   firstTime: boolean
+  errands?: Readonly<Record<string, ErrandProgress>>
 }
 
 /** Does the line fit, and how closely (more conditions met, more fitting); -1 if it does not. */
@@ -55,6 +58,10 @@ export function fit(line: Line, s: Situation): number {
   if (line.first) {
     if (!s.firstTime) return -1
     score += 4
+  }
+  if (line.errand) {
+    if (s.errands?.[line.errand.id] !== line.errand.state) return -1
+    score += 5
   }
   return score
 }

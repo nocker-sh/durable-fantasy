@@ -2,6 +2,11 @@ import type { Line } from "../line.ts"
 
 const lines = {
   ゲルダ: [
+    { text: "きのこは急がなくていいよ。似たものを間違えて採るんじゃないよ。", errand: { id: "gerda-mushrooms", state: "taken" } },
+    { text: "頼んだきのこが揃ったかい？　こっちの籠に渡しておくれ。", errand: { id: "gerda-mushrooms", state: "ready" } },
+    { text: "さっきのきのこで、鍋の仕込みができるよ。助かったねえ。", errand: { id: "gerda-mushrooms", state: "done" } },
+    { text: "アンナからのシーツかい？　受け取るから、こっちへおいで。", errand: { id: "anna-linen", state: "ready" } },
+    { text: "届けてもらったシーツは、次のお客さんの部屋に敷くよ。", errand: { id: "anna-linen", state: "done" } },
     { text: "いらっしゃい。泊まっていくかい？" },
     { text: "暖炉のある部屋が空いてるよ。" },
     { text: "温めた乳もあるよ。マティアスの羊のさ。眠れない夜にはいいもんだ。" },

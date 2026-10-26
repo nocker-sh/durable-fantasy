@@ -2,6 +2,9 @@ import type { Line } from "../line.ts"
 
 const lines = {
   イルムガルト: [
+    { text: "青い薬草はまだなのね。無理に奥まで行くんじゃないわよ。", errand: { id: "irmgard-herbs", state: "taken" } },
+    { text: "青い薬草、揃ったのね。渡す前に、根についた土を払ってちょうだい。", errand: { id: "irmgard-herbs", state: "ready" } },
+    { text: "さっきの青い薬草、今夜の薬に使わせてもらうわ。", errand: { id: "irmgard-herbs", state: "done" } },
     { text: "薬は多めに持っていきなさい。足りないより、余るほうがずっといいの。" },
     { text: "薬草の匂いがするでしょう。ここは薬屋よ。" },
     { text: "寒さで喉をやられないようにね。薬草茶を一杯、飲んでいきなさい。" },
