@@ -115,6 +115,7 @@ export function Turntable({ build, night, cutaway = false }: { build: Build; nig
     const ro = new ResizeObserver(fit)
     ro.observe(el)
     let raf = 0,
+      frames = 0,
       last = performance.now()
     const tick = (t: number) => {
       const dt = Math.min(0.05, (t - last) / 1000)
@@ -124,6 +125,7 @@ export function Turntable({ build, night, cutaway = false }: { build: Build; nig
       place(cam, centre, reach, t / 4000)
       if (cutaway) updateCutaways(cam.position)
       renderer.render(scene, cam)
+      if (++frames === 20) canvas.dataset.ready = "1"
       raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
