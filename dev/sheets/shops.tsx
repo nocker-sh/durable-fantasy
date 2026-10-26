@@ -1,3 +1,4 @@
+import { StreetSellers } from "./street-sellers"
 import { Pixel } from "./shared.tsx"
 import { ITEMS, KIND_NAME, QUALITIES, type ItemId } from "#/world/core/items.ts"
 import { MAKERS } from "#/world/core/makers.ts"
@@ -11,6 +12,7 @@ import { mapName, ref } from "./shared.tsx"
 const shops = sheet({
   id: "shops",
   label: "店",
+  top: () => <StreetSellers />,
   rows: () => Object.keys(SHOPS) as ShopId[],
   key: (id) => id,
   name: (id) => SHOPS[id].name,
