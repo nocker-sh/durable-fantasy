@@ -120,14 +120,27 @@ function computeFields() {
       F.h[k] = computeH(x, z, dr)
     }
 }
-computeFields()
+let fieldsReady = false
+
+/** Initialize only the selected layout, including callers using the default map directly. */
+export function ensureFields() {
+  if (fieldsReady) return
+  // Height shaping samples the road field while it is being computed.
+  fieldsReady = true
+  try {
+    computeFields()
+  } catch (error) {
+    fieldsReady = false
+    throw error
+  }
+}
 
 /** Make `l` the current map's ground: every painter and builder reads it from now on. */
 /** The layout in use, for painters that need its own hooks. */
 export const currentLayout = () => layout
 
 export function setLayout(l: Layout) {
-  if (l === layout) return
+  if (l === layout && fieldsReady) return
   layout = l
   const known = FIELD_CACHE.get(l)
   if (known) {
@@ -137,8 +150,10 @@ export function setLayout(l: Layout) {
     F.roadKind.set(known.roadKind)
     F.trail.set(known.trail ?? new Float32Array(F.trail.length).fill(1e9))
     PLAZA_H = known.plazaH
+    fieldsReady = true
   } else {
-    computeFields()
+    fieldsReady = false
+    ensureFields()
     FIELD_CACHE.set(l, fieldsNow())
   }
   blocked.fill(0)
@@ -157,6 +172,7 @@ export interface Fields {
 const FIELD_CACHE = new Map<Layout, Fields>()
 /** A copy of the fields of the plan in use. */
 export function fieldsNow(): Fields {
+  ensureFields()
   return { h: F.h.slice(), river: F.river.slice(), road: F.road.slice(), roadKind: F.roadKind.slice(), trail: F.trail.slice(), plazaH: PLAZA_H }
 }
 /** Fields worked out elsewhere (a worker, or kept from an earlier visit), for when the plan is next used. */
@@ -169,12 +185,25 @@ const heightField = new ScalarField(F.h, GN, FR)
 const riverField = new ScalarField(F.river, GN, FR)
 const roadField = new ScalarField(F.road, GN, FR)
 const trailField = new ScalarField(F.trail, GN, FR)
-export const groundH = (x: number, z: number) => heightField.sample(x, z)
-export const riverD = (x: number, z: number) => riverField.sample(x, z)
-export const roadD = (x: number, z: number) => roadField.sample(x, z)
+export const groundH = (x: number, z: number) => {
+  ensureFields()
+  return heightField.sample(x, z)
+}
+export const riverD = (x: number, z: number) => {
+  ensureFields()
+  return riverField.sample(x, z)
+}
+export const roadD = (x: number, z: number) => {
+  ensureFields()
+  return roadField.sample(x, z)
+}
 /** How far a footpath is (tiles); far away where there are none. */
-export const trailD = (x: number, z: number) => trailField.sample(x, z)
+export const trailD = (x: number, z: number) => {
+  ensureFields()
+  return trailField.sample(x, z)
+}
 export function roadKind(x: number, z: number): number {
+  ensureFields()
   const i = Math.round(Math.min(GN - 1, Math.max(0, x * FR))),
     j = Math.round(Math.min(GN - 1, Math.max(0, z * FR)))
   return F.roadKind[j * GN + i]

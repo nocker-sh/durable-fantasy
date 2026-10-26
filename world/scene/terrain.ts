@@ -1,5 +1,5 @@
 import { PixBuf, pick, hash2, vnoise, fbm, type RGB, hex, RAMPS, bayer } from "./pix"
-import { N, FR, F, GRID_N, groundH, riverD, roadD, roadKind, inRect, smooth, currentLayout as layout, trailD } from "./world"
+import { N, FR, F, GRID_N, ensureFields, groundH, riverD, roadD, roadKind, inRect, smooth, currentLayout as layout, trailD } from "./world"
 import { PPU } from "./textures"
 
 /**
@@ -419,6 +419,7 @@ const WATER_LINE = -0.95
 
 /** Heights for the terrain mesh, at 4 vertices per tile. */
 export function meshHeights(res: number): Float32Array {
+  ensureFields()
   const n = N * res + 1
   const out = new Float32Array(n * n)
   const step = FR / res
