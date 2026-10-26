@@ -12,13 +12,14 @@ import { remoteAvatar } from "./identity.ts"
 
 function fixture() {
   const session = new GameSession()
+  session.state.set({ ...session.state.get(), online: "online" })
   const send = vi.fn()
   session.socket = { send } as unknown as VoidSocket<"/map/:mapId">
   const freeze = vi.fn()
   const update = (patch: Partial<GameState> | ((state: GameState) => Partial<GameState>)) => session.state.set((state) => ({ ...state, ...(typeof patch === "function" ? patch(state) : patch) }))
   let client: RoomClient
   const callbacks: Parameters<typeof createSessionContext>[1] = {
-    getScene: () => ({ freeze }) as unknown as MapScene,
+    getScene: () => ({ freeze, clearRemotes: vi.fn() }) as unknown as MapScene,
     preview: vi.fn(() => null),
     onServer: vi.fn(),
     wayBeside: () => null,
@@ -78,6 +79,57 @@ describe("client controllers", () => {
     expect(session.waiting.size).toBe(0)
     expect(session.state.get().busy).toBe(false)
     expect(callbacks.notify).toHaveBeenCalled()
+  })
+
+  it("releases completed command timers and keeps busy until all replies arrive", async () => {
+    vi.useFakeTimers()
+    const { session, client } = fixture()
+    const first = client.run({ type: "use", slot: 0 })
+    const second = client.run({ type: "use", slot: 1 })
+    expect(vi.getTimerCount()).toBe(2)
+    session.waiting.get(1)!({ ok: true, state: player(), events: [] })
+    expect(await first).toBe(true)
+    expect(session.state.get().busy).toBe(true)
+    expect(vi.getTimerCount()).toBe(1)
+    session.waiting.get(2)!({ ok: true, state: player(), events: [] })
+    expect(await second).toBe(true)
+    expect(session.state.get().busy).toBe(false)
+    expect(vi.getTimerCount()).toBe(0)
+  })
+
+  it("fails pending commands immediately on disconnect and does not buffer new commands", async () => {
+    vi.useFakeTimers()
+    const { session, client, send } = fixture()
+    const listeners = new Map<string, () => void>()
+    session.socket = { send, on: (event: string, handler: () => void) => listeners.set(event, handler) } as unknown as VoidSocket<"/map/:mapId">
+    client.listen(session.socket)
+    const first = client.run({ type: "use", slot: 0 })
+    const second = client.run({ type: "use", slot: 1 })
+    listeners.get("close")!()
+    expect(await first).toBe(false)
+    expect(await second).toBe(false)
+    expect(session.waiting.size).toBe(0)
+    expect(session.state.get().busy).toBe(false)
+    expect(vi.getTimerCount()).toBe(0)
+    expect(await client.run({ type: "use", slot: 0 })).toBe(false)
+    expect(send).toHaveBeenCalledTimes(2)
+  })
+
+  it("cleans up when sending throws and ignores a reply from a room just left", async () => {
+    vi.useFakeTimers()
+    const { session, client, send, callbacks } = fixture()
+    send.mockImplementationOnce(() => {
+      throw new Error("closed")
+    })
+    expect(await client.run({ type: "use", slot: 0 })).toBe(false)
+    expect(session.waiting.size).toBe(0)
+    expect(vi.getTimerCount()).toBe(0)
+    expect(session.state.get().busy).toBe(false)
+    const result = client.run({ type: "use", slot: 0 })
+    session.waiting.get(2)!({ ok: true, state: player(), events: [] })
+    session.socket = null
+    expect(await result).toBe(false)
+    expect(callbacks.setPlayer).not.toHaveBeenCalled()
   })
 
   it("connects using a prefetch taken before its channel request finishes", async () => {

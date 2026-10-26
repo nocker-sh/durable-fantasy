@@ -71,6 +71,8 @@ export class RoomClient {
     socket.on("close", () => {
       if (this.target.session.socket !== socket) return
       this.target.update({ online: "offline" })
+      for (const resolve of this.target.session.waiting.values()) resolve({ ok: false, reason: "OFFLINE" })
+      this.target.session.waiting.clear()
       this.target.session.others.clear()
       this.target.getScene()?.clearRemotes()
     })
@@ -94,18 +96,30 @@ export class RoomClient {
       return false
     }
     const socket = this.target.session.socket
-    if (!socket) return false
+    if (!socket || this.target.session.state.get().online !== "online") {
+      this.target.notify(REASON_TEXT.OFFLINE, "bad")
+      return false
+    }
     const seq = ++this.seq
     this.target.update({ busy: true })
     const result = await new Promise<Transition>((resolve) => {
-      this.target.session.waiting.set(seq, resolve)
-      if (send) send(seq)
-      else socket.send({ type: "command", seq, command })
-      setTimeout(() => {
-        if (this.target.session.waiting.delete(seq)) resolve({ ok: false, reason: "OFFLINE" })
-      }, COMMAND_TIMEOUT)
+      const finish = (result: Transition) => {
+        if (!this.target.session.waiting.delete(seq)) return
+        clearTimeout(timer)
+        resolve(result)
+      }
+      const timer = setTimeout(() => finish({ ok: false, reason: "OFFLINE" }), COMMAND_TIMEOUT)
+      this.target.session.waiting.set(seq, finish)
+      try {
+        if (send) send(seq)
+        else socket.send({ type: "command", seq, command })
+      } catch {
+        finish({ ok: false, reason: "OFFLINE" })
+      }
     })
-    this.target.update({ busy: false })
+    this.target.update({ busy: this.target.session.waiting.size > 0 })
+    // A reply received just before leaving must not overwrite the new room's state.
+    if (this.target.session.socket !== socket) return false
     if (!result.ok) {
       this.target.notify(REASON_TEXT[result.reason], "bad")
       return false
