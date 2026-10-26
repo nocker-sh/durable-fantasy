@@ -267,7 +267,7 @@ const v1Schema = z.object({
 })
 
 /**
- * Move a second-shape save forward: the level kept (to 16), stats begun again with the points
+ * Move a second-shape save forward: the level kept (to the current cap), stats begun again with the points
  * that level brings, proficiency as life skill levels, the basic skill as sitting. What can no
  * longer be worn goes back to the bag if it fits.
  */

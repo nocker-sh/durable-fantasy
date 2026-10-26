@@ -12,19 +12,48 @@ describe("growth", () => {
     expect([1, 10, 50, 98].map(statCost)).toEqual([1, 1, 1, 1])
   })
 
-  it("a new character has every stat at 5 and ten points to give; the level stops at 16", () => {
+  it("a new character has every stat at 5 and ten points to give; the level stops at 32", () => {
     const p = newPlayer()
     expect(Object.values(p.stats)).toEqual([5, 5, 5, 5, 5, 5])
     expect(p.statPoints).toBe(10)
-    const top = gainExp({ level: 15, exp: 0, statPoints: 0 }, 10_000_000)
+    const top = gainExp({ level: MAX_LEVEL - 1, exp: 0, statPoints: 0 }, 10_000_000)
     expect(top).toMatchObject({ level: MAX_LEVEL, exp: 0, statPoints: 2 })
-    expect(MAX_LEVEL).toBe(16)
+    expect(MAX_LEVEL).toBe(32)
   })
 
   it("levels up as many times as the experience reaches and hands out points", () => {
     const need = expToNext(1) + expToNext(2)
     const p = gainExp({ level: 1, exp: 0, statPoints: 0 }, need + 5)
     expect(p).toEqual({ level: 3, exp: 5, statPoints: pointsForLevel(2) + pointsForLevel(3), gained: 2 })
+  })
+
+  it("continues from the former cap, restores HP and SP, and preserves the expanded save", () => {
+    const old = player({ level: 16, exp: 0, statPoints: 3, hp: 1, sp: 0 })
+    expect(loadPlayer(JSON.parse(JSON.stringify(old)))).toEqual(old)
+    const result = apply(old, { type: "loot", monster: "slime", exp: expToNext(16), items: [] })
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.state).toMatchObject({ level: 17, exp: 0, statPoints: 5 })
+    expect(result.state.hp).toBe(derive(result.state).maxHp)
+    expect(result.state.sp).toBe(derive(result.state).maxSp)
+    expect(loadPlayer(JSON.parse(JSON.stringify(result.state)))).toEqual(result.state)
+  })
+
+  it("awards each new level once and discards excess experience only at the new cap", () => {
+    const start = player({ level: 16, exp: 0, statPoints: 0 })
+    let need = 0
+    for (let level = 16; level < 32; level++) {
+      const next = expToNext(level)
+      expect(next).toBeGreaterThan(expToNext(level - 1))
+      need += next
+    }
+    const below = gainExp(start, need - 1)
+    expect(below).toMatchObject({ level: 31, statPoints: 30, gained: 15 })
+    const top = gainExp(start, need + 100)
+    expect(top).toEqual({ level: 32, exp: 0, statPoints: 32, gained: 16 })
+    expect(gainExp(top, 10000)).toEqual({ ...top, gained: 0 })
+    const saved = player({ level: top.level, exp: top.exp, statPoints: top.statPoints })
+    expect(loadPlayer(JSON.parse(JSON.stringify(saved)))).toEqual(saved)
   })
 
   it("raising a stat spends points and refuses without enough", () => {
@@ -169,7 +198,7 @@ describe("saves", () => {
     expect(loadPlayer({ gold: -1 })).toEqual(newPlayer())
   })
 
-  it("moves a save with a job forward: level to 16, stats begun again with the points, proficiency as levels", () => {
+  it("moves a save with a job forward: level retained within the cap, stats begun again with the points, proficiency as levels", () => {
     const { life: _life, worn: _worn, stats: _stats, ...now } = newPlayer()
     const v2 = {
       ...now,
@@ -188,7 +217,7 @@ describe("saves", () => {
       hotbar: ["skill:basic", "rye-bread", ...Array(8).fill(null)],
     }
     const p = loadPlayer(JSON.parse(JSON.stringify(v2)))
-    expect(p).toMatchObject({ version: 3, level: 16, exp: 0, statPoints: 10 + 15 * 2 })
+    expect(p).toMatchObject({ version: 3, level: 20, exp: 77, statPoints: 10 + 19 * 2 })
     expect(p.stats).toEqual(startingStats())
     expect(p.hotbar.slice(0, 2)).toEqual(["skill:sit", "rye-bread"])
     // the battle axe needs more strength than a fresh start: back in the bag

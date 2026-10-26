@@ -8,7 +8,7 @@ export type Stats = Readonly<Record<Stat, number>>
 export const STAT_NAME: Record<Stat, string> = { vit: "体力", mnd: "精神", str: "筋力", dex: "技量", int: "知力", fth: "信仰" }
 
 /** The character's level stops here for now (game-system.md §3.2). */
-export const MAX_LEVEL = 16
+export const MAX_LEVEL = 32
 export const MAX_STAT = 99
 /** every stat a new character starts with */
 export const START_STAT = 5
