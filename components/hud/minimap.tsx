@@ -1,7 +1,8 @@
 // The minimap window (ui.md §3.2, Tab): the map from above, north up. Only what is on a map: its
-// name, you (with your facing), other players, NPCs by kind and warps. Click to walk there; the
+// name, you (with your facing), other players, residents, shops and warps. Click to walk there; the
 // title bar switches between a small and a large map.
-import { useEffect, useRef, useState, type MouseEvent } from "react"
+import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react"
+import { shopMarkers } from "#/world/maps/shop-markers.ts"
 import { formatTime, phase } from "#/world/core/clock.ts"
 import { useGame, useGameState } from "#/components/game/context.tsx"
 import { TitleButton, Window } from "#/components/game/window.tsx"
@@ -20,17 +21,32 @@ export function Minimap() {
   const npcs = useGameState((s) => s.npcs)
   const map = useGameState((s) => s.map)
   const loading = useGameState((s) => s.loading)
+  const min = useGameState((s) => s.clock.min)
+  const shops = useMemo(() => shopMarkers(map.id, min), [map.id, min])
+  const background = useRef<HTMLCanvasElement | null>(null)
+
+  // Rescale the ground only when the map or its display size changes.
+  useEffect(() => {
+    background.current = null
+    const ground = game.groundImage()
+    if (!ground || loading) return
+    const image = document.createElement("canvas")
+    image.width = image.height = SIZE
+    const ctx = image.getContext("2d")!
+    ctx.imageSmoothingEnabled = false
+    ctx.drawImage(ground, 0, 0, SIZE, SIZE)
+    ctx.fillStyle = "rgba(18,20,34,0.28)"
+    ctx.fillRect(0, 0, SIZE, SIZE)
+    background.current = image
+  }, [game, map, loading, SIZE])
 
   useEffect(() => {
     const ctx = canvas.current?.getContext("2d")
-    const ground = game.groundImage()
+    const ground = background.current
     if (!ctx || !ground) return
     const scale = SIZE / game.mapSize
     ctx.imageSmoothingEnabled = false
     ctx.drawImage(ground, 0, 0, SIZE, SIZE)
-    // a light wash so the marks read over the ground
-    ctx.fillStyle = "rgba(18,20,34,0.28)"
-    ctx.fillRect(0, 0, SIZE, SIZE)
     const at = (x: number, z: number) => [Math.round(x * scale), Math.round(z * scale)] as const
     const square = (x: number, z: number, r: number, fill: string) => {
       const [px, pz] = at(x, z)
@@ -39,10 +55,7 @@ export function Minimap() {
       ctx.fillStyle = fill
       ctx.fillRect(px - r, pz - r, r * 2, r * 2)
     }
-    for (const n of npcs) {
-      if (n.role === "shop") square(n.x, n.z, 2, "#e0b84a")
-      else square(n.x, n.z, 1, "#e8dcc0")
-    }
+    for (const n of npcs) square(n.x, n.z, 1, "#e8dcc0")
     for (const [i, j] of map.warps) {
       const [px, pz] = at((i + 0.5) / 2, (j + 0.5) / 2)
       ctx.strokeStyle = "#b8d0ff"
@@ -108,8 +121,34 @@ export function Minimap() {
           style={{ width: SIZE, height: SIZE }}
           className="block cursor-pointer rounded-md shadow-[0_0_0_1px_rgb(255_255_255/0.08)] [image-rendering:pixelated]"
         />
+        {!loading &&
+          shops.map(({ cell, shops: sellers }) => {
+            const open = sellers.some((s) => s.open)
+            const label = sellers.map((s) => `${s.name}：${s.open ? "営業中" : "準備中"}`).join("\n")
+            const x = (cell[0] + 0.5) / 2,
+              z = (cell[1] + 0.5) / 2
+            return (
+              <button
+                key={cell.join(",")}
+                type="button"
+                title={label}
+                aria-label={label}
+                onClick={() => game.walkTo(x, z)}
+                className="absolute flex size-3.5 -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-sm focus-visible:outline-2 focus-visible:outline-white"
+                style={{ left: (x / game.mapSize) * SIZE, top: (z / game.mapSize) * SIZE }}
+              >
+                <span className="size-1.5 border border-amber-300 shadow-[0_0_0_1px_#0b0c15]" style={{ backgroundColor: open ? "#e0b84a" : "#202332" }} />
+              </button>
+            )
+          })}
         <span className="pointer-events-none absolute top-1 left-1/2 -translate-x-1/2 rounded bg-black/50 px-1 font-head text-[10px] leading-3.5 text-white">北</span>
       </div>
+      {shops.length > 0 && (
+        <div className="mt-1 flex gap-3 text-[10px] text-amber-200">
+          <span>■ 営業中</span>
+          <span>□ 準備中</span>
+        </div>
+      )}
       <Clock />
     </Window>
   )
