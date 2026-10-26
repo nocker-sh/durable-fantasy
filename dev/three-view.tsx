@@ -1,3 +1,4 @@
+import { SceneResources } from "#/lib/graphics/scene-resources.ts"
 // Things the scene builds (objects, creatures) drawn on their own for the dev pages: a small still
 // thumbnail at the scene's pixel size, and a turning preview, by day or by night, that fits its box.
 import { useEffect, useRef, useState } from "react"
@@ -53,7 +54,8 @@ const thumbs = new Map<string, string>()
 
 /** A still of the thing at `px` pixels square, drawn once and kept. */
 export function thumbUrl(key: string, build: Build, px = 40): string {
-  const known = thumbs.get(key)
+  const cacheKey = `${px}:${key}`
+  const known = thumbs.get(cacheKey)
   if (known) return known
   shared ??= new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: true, alpha: true })
   shared.setPixelRatio(1)
@@ -61,15 +63,21 @@ export function thumbUrl(key: string, build: Build, px = 40): string {
   shared.shadowMap.enabled = true
   shared.outputColorSpace = THREE.SRGBColorSpace
   const { scene, centre, reach } = stage(build, false)
-  scene.background = null
-  scene.children.filter((c) => c instanceof THREE.Mesh).forEach((c) => scene.remove(c))
-  const cam = new THREE.PerspectiveCamera(24, 1, 0.05, 200)
-  place(cam, centre, reach, 0.6)
-  updaters.forEach((u) => u(0, 0))
-  shared.render(scene, cam)
-  const url = shared.domElement.toDataURL()
-  thumbs.set(key, url)
-  return url
+  const resources = new SceneResources(scene)
+  try {
+    scene.background = null
+    scene.children.filter((c) => c instanceof THREE.Mesh).forEach((c) => scene.remove(c))
+    const cam = new THREE.PerspectiveCamera(24, 1, 0.05, 200)
+    place(cam, centre, reach, 0.6)
+    updaters.forEach((u) => u(0, 0))
+    shared.render(scene, cam)
+    const url = shared.domElement.toDataURL()
+    thumbs.set(cacheKey, url)
+    return url
+  } finally {
+    resources.dispose()
+    shared.renderLists.dispose()
+  }
 }
 
 /** A thumbnail drawn in the browser after the page has mounted. */
@@ -122,6 +130,7 @@ export function Turntable({ build, night, cutaway = false }: { build: Build; nig
     return () => {
       cancelAnimationFrame(raf)
       ro.disconnect()
+      new SceneResources(scene).dispose()
       renderer.dispose()
       renderer.forceContextLoss()
       el.removeChild(canvas)
