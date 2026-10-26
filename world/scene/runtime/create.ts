@@ -1,3 +1,4 @@
+import { WarpMarkers } from "./warps"
 import { FrameLimiter } from "../../../lib/engine/frame-limiter"
 import { walkDirection } from "../turn"
 import { createGatheringSpots } from "./gathering.ts"
@@ -78,20 +79,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
   const walkers = createWalkers(scene, (id) => runtime.events?.pickPlayer?.(id))
   const { me, movement, remotes, setAvatar, addRemote, updateRemote, removeRemote, clearRemotes, moveRemote, stepWalker, placeWalker, plate } = walkers
   // warps: a soft ring of light on the ground
-  const warpMarks: THREE.Mesh[] = []
-  const warpMat = new THREE.MeshBasicMaterial({ color: 0xbfd8ff, transparent: true, opacity: 0.55, depthWrite: false, side: THREE.DoubleSide })
-  function setWarps(cells: readonly (readonly [number, number])[]) {
-    for (const m of warpMarks) scene.remove(m)
-    warpMarks.length = 0
-    for (const c of cells) {
-      const p = center([c[0], c[1]])
-      const m = new THREE.Mesh(new THREE.RingGeometry(0.42, 0.62, 24), warpMat)
-      m.rotation.x = -Math.PI / 2
-      m.position.set(p[0], walkH(p[0], p[1]) + 0.05, p[1])
-      scene.add(m)
-      warpMarks.push(m)
-    }
-  }
+  const warps = new WarpMarkers(scene)
 
   // destination marker and a cursor on the cell under the pointer
   const marker = new THREE.Mesh(new THREE.RingGeometry(0.16, 0.24, 16), new THREE.MeshBasicMaterial({ color: 0xffe080, transparent: true, opacity: 0.85, depthTest: false }))
@@ -373,6 +361,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
   /** Let go of the window listeners and the GPU resources when the map is left. */
   function dispose() {
     pointer.dispose()
+    warps.dispose()
     clearRemotes()
     me.fig.dispose()
     for (const person of people) person.fig.dispose()
@@ -467,8 +456,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
       placeWalker(w)
     }
     marker.scale.setScalar(1 + Math.sin(t * 6) * 0.1)
-    warpMat.opacity = 0.4 + Math.sin(t * 2) * 0.15
-    for (const m of warpMarks) m.rotation.z = t * 0.3
+    warps.update(t)
 
     tickSprites()
     view.yaw = movement.yaw
@@ -639,7 +627,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
     setAvatar,
     bubble,
     freeze,
-    setWarps,
+    setWarps: (cells: readonly (readonly [number, number])[]) => warps.set(cells),
     addRemote,
     updateRemote,
     removeRemote,
