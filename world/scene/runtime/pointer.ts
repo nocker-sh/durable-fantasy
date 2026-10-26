@@ -82,6 +82,7 @@ export function createPointer({ renderer, cam, terrain, town, people, ids, remot
   const onDown = (e: PointerEvent) => {
     if (e.button === 0) drag = { x: e.clientX, moved: false }
   }
+  let pending: PointerEvent | null = null
   const onMove = (e: PointerEvent) => {
     if (drag) {
       const dx = e.clientX - drag.x
@@ -92,6 +93,7 @@ export function createPointer({ renderer, cam, terrain, town, people, ids, remot
         drag.x = e.clientX
       }
     }
+    pending = null
     if (e.target !== renderer.domElement) {
       cursor.visible = false
       hovered = null
@@ -100,6 +102,13 @@ export function createPointer({ renderer, cam, terrain, town, people, ids, remot
       hoveredCritter = null
       return
     }
+    pending = e
+  }
+  // Input can arrive faster than rendering; only raycast the latest hover position.
+  const update = () => {
+    const e = pending
+    pending = null
+    if (!e) return
     setNdc(e)
     hovered = residentHit()
     hoveredWalker = hovered ? null : walkerHit()
@@ -152,6 +161,7 @@ export function createPointer({ renderer, cam, terrain, town, people, ids, remot
   renderer.domElement.addEventListener("wheel", onWheel, { passive: false })
 
   return {
+    update,
     get hovered() {
       return hovered
     },
@@ -165,6 +175,7 @@ export function createPointer({ renderer, cam, terrain, town, people, ids, remot
       return hoveredCritter
     },
     dispose() {
+      pending = null
       renderer.domElement.removeEventListener("pointerdown", onDown)
       renderer.domElement.removeEventListener("wheel", onWheel)
       window.removeEventListener("pointermove", onMove)

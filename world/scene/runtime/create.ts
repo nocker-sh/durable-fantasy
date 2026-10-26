@@ -520,6 +520,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
       })
       o.obj.visible = o.fade > 0.03
     })
+    pointer.update()
     me.fig.xray(hidden)
     // the player is always outlined (seen through roofs too); anyone else while the pointer is on them
     me.fig.outline(true, hidden)
