@@ -116,10 +116,17 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
   }
   // ---------------------------------------------------------------- movement
   let frozen = false
+  let spotTarget: string | null = null
+  let fightTarget: string | null = null
+  function clearTargets() {
+    movement.talkTarget = null
+    spotTarget = null
+    fightTarget = null
+  }
   function freeze(on: boolean) {
     frozen = on
     if (on) {
-      movement.talkTarget = null
+      clearTargets()
       if (me.path.length > 1) {
         me.path = [me.path[0]]
         runtime.events?.walk([cellOf(me.path[0])])
@@ -127,9 +134,9 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
       marker.visible = false
     }
   }
-  function walkTo(t: V2, keepTalk = false) {
+  function walkTo(t: V2, keepAction = false) {
     if (frozen) return false
-    if (!keepTalk) movement.talkTarget = null
+    if (!keepAction) clearTargets()
     const from = me.path.length ? me.path[0] : me.pos
     const p = findPath(from, t, true)
     if (!p) return false
@@ -143,6 +150,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
   function placePlayer(at: Cell) {
     const p = center(at)
     if (!isFree(p[0], p[1])) return
+    clearTargets()
     me.pos = p
     me.path = []
     camFocus.set(p[0], walkH(p[0], p[1]) + 0.6, p[1])
@@ -169,14 +177,12 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
     for (const [a, b] of tries) {
       const next = center([ci + a, cj + b])
       if (!isFree(next[0], next[1])) continue
-      movement.talkTarget = null
       walkTo(next)
       return
     }
   }
   function stop() {
-    movement.talkTarget = null
-    fightTarget = null
+    clearTargets()
     if (me.path.length > 1) {
       me.path = [me.path[0]]
       runtime.events?.walk([cellOf(me.path[0])])
@@ -185,12 +191,11 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
   }
   // ---------------------------------------------------------------- gathering spots (core/gather.ts)
   const { spots, setNodes, spotHit } = createGatheringSpots(town, map)
-  let spotTarget: string | null = null
   /** Walk up to a gathering spot, then have a go at it. */
   function approachSpot(id: string) {
     const s = spots.get(id)
     if (!s || frozen) return
-    movement.talkTarget = null
+    clearTargets()
     const within = (p: V2) => Math.hypot(p[0] - s.at[0], p[1] - s.at[1]) <= (REACH - 0.6) / 2
     const arrive = (x: string) => (x.startsWith("station:") ? runtime.events?.stationAt(x.slice(8)) : runtime.events?.gatherAt(x))
     if (within(me.pos)) {
@@ -221,7 +226,6 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
 
   // ---------------------------------------------------------------- creatures (core/monsters.ts)
   const monsters = makeMonsters(town, map)
-  let fightTarget: string | null = null
   let attackDelay = 1500,
     lastSwing = 0,
     lastRepath = 0
@@ -236,8 +240,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
   }
   function fight(id: string) {
     if (!frozen) {
-      movement.talkTarget = null
-      spotTarget = null
+      clearTargets()
       fightTarget = id
       lastRepath = 0
     }
@@ -303,6 +306,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
     if (frozen) return
     const a = personOf(id)
     if (!a) return
+    clearTargets()
     movement.talkTarget = a
     // stand on a free cell next to the resident, on the side facing the player
     const dx = me.pos[0] - a.pos[0],
@@ -538,7 +542,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
         if (wall - lastRepath > 600) {
           lastRepath = wall
           const p = standBy(target, me.pos, MELEE_REACH)
-          if (p) walkTo(p)
+          if (p) walkTo(p, true)
         }
       } else {
         if (me.path.length > 1) {
