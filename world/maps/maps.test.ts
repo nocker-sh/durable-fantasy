@@ -36,27 +36,40 @@ describe("every map can be walked through", () => {
     })
   }
 
-  it("for now the town, the meadow and the forest can be walked into, and nothing else", () => {
-    const reach = (open: boolean) => {
-      const seen = new Set<string>(["phanthiet"])
-      const queue = ["phanthiet"]
+  it("connects the town to all built outdoor routes while unbuilt cities stay closed", () => {
+    const reach = (start: string) => {
+      const seen = new Set<string>([start])
+      const queue = [start]
       while (queue.length)
         for (const w of MAPS[queue.shift()!].warps)
-          if (!seen.has(w.to.map) && (!open || isOpen(w.to.map))) {
+          if (!seen.has(w.to.map) && isOpen(w.to.map)) {
             seen.add(w.to.map)
             queue.push(w.to.map)
           }
       return seen
     }
-    const open = reach(true)
-    expect([...open].filter((id) => MAPS[id].kind === "field").sort()).toEqual(["deep-forest", "forest-edge", "south-meadow"])
+    const open = reach("phanthiet")
+    expect([...open].filter((id) => MAPS[id].kind === "field").sort()).toEqual([
+      "deep-forest",
+      "forest-edge",
+      "hue-gate",
+      "mountain-pass",
+      "net-sheds",
+      "quynhon-gate",
+      "red-dunes",
+      "sea-cliff",
+      "south-meadow",
+    ])
     // the forest is reached from the meadow, not round by the sea
     expect(MAPS["south-meadow"].warps.some((w) => w.to.map === "forest-edge")).toBe(true)
     // every town map and building is open
     for (const id of Object.keys(MAPS)) if (MAPS[id].kind !== "field") expect(open.has(id), id).toBe(true)
-    // the closed roads still lead on to the gates of Quy Nhon and Hue, for when they open
-    for (const id of ["quynhon-gate", "mountain-pass", "hue-gate"]) expect(reach(false).has(id), id).toBe(true)
-    for (const id of ["red-dunes", "sea-cliff", "net-sheds", "quynhon-gate", "mountain-pass", "hue-gate"]) expect(isOpen(id), id).toBe(false)
+    for (const id of ["red-dunes", "sea-cliff", "net-sheds", "quynhon-gate", "mountain-pass", "hue-gate"]) {
+      expect(isOpen(id), id).toBe(true)
+      expect(open.has(id), `town to ${id}`).toBe(true)
+      expect(reach(id).has("phanthiet"), `${id} back to town`).toBe(true)
+    }
+    for (const id of ["quynhon", "hue", "unknown-map", "constructor", "toString", "__proto__"]) expect(isOpen(id), id).toBe(false)
   })
 
   it("the maps lie on the world grid: every outdoor map has a square, all of one size", () => {

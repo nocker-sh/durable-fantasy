@@ -222,13 +222,10 @@ function crossings(def: MapDefinition, all: Record<string, MapDefinition>): Warp
   return out
 }
 
-/**
- * The fields that can be walked into for now: the meadow and the forest round the town
- * (game-system.md §1). The rest are made but closed; their roads are refused (ROAD_CLOSED).
- */
-export const OPEN_FIELDS: readonly string[] = ["south-meadow", "forest-edge", "deep-forest"]
-/** Can this map be gone into? The town and its buildings always; a field only if it is open. */
-export const isOpen = (id: string) => MAPS[id]?.kind !== "field" || OPEN_FIELDS.includes(id)
+/** Playable outdoor maps (game-system.md §1); new maps stay closed until checked. */
+export const OPEN_FIELDS: readonly string[] = ["south-meadow", "forest-edge", "deep-forest", "red-dunes", "sea-cliff", "net-sheds", "quynhon-gate", "mountain-pass", "hue-gate"]
+/** Only defined maps may be entered; unbuilt cities remain unavailable. */
+export const isOpen = (id: string) => Object.hasOwn(MAPS, id) && (MAPS[id].kind !== "field" || OPEN_FIELDS.includes(id))
 
 /** The city a map belongs to, as shown before the district: "ファンティエット ― 広場". */
 const CITY_NAME: Record<string, string> = { phanthiet: "ファンティエット" }

@@ -124,7 +124,7 @@ async function warp(roomCtx: Ctx, message: Message<"warp">) {
     await ctx.connection.send({ type: "refused", what: "warp" })
     return
   }
-  // for now only the meadow and the forest are open beyond the town (game-system.md §1)
+  // Only checked, playable destinations may be entered (game-system.md §1).
   if (!isOpen(warp.to.map)) {
     await ctx.connection.send({ type: "refused", what: "warp", reason: "ROAD_CLOSED" })
     return
