@@ -195,7 +195,8 @@ export function paintRows(buf: PixBuf, y0: number, y1: number) {
     const z = (sy + 0.5) / PPU
     for (let sx = 0; sx < S; sx++) {
       const x = (sx + 0.5) / PPU
-      buf.set(sx, sy - y0, ashen(groundColor(x, z, sx, sy), x, z, sx, sy))
+      // Opaque ash hides the ground pixel completely; avoid painting what it covers.
+      buf.set(sx, sy - y0, ashAt(x, z, sx, sy) ?? groundColor(x, z, sx, sy))
     }
   }
 }
@@ -207,9 +208,10 @@ const ASH_LIGHT: RGB = hex("#a8a49c"),
  * wind leaves it, and swept up into a grey bank along each side of a road — the road itself is
  * kept clear, with footprints in what is left on it.
  */
-function ashen(c: RGB, x: number, z: number, sx: number, sy: number): RGB {
+function ashAt(x: number, z: number, sx: number, sy: number): RGB | null {
   const d = roadD(x, z)
-  const drift = fbm(x, z, 0.35, 77)
+  // The swept road has its own distribution, independent of the wind drifts.
+  const drift = d < -0.05 ? 0 : fbm(x, z, 0.35, 77)
   // swept to the road's edges, a hand's width either side
   const bank = d > -0.05 && d < 0.35 ? 1 - Math.abs(d - 0.15) / 0.2 : 0
   let k = 0.06 + Math.max(0, drift - 0.55) * 0.8 + Math.max(0, bank) * 0.5
@@ -217,7 +219,7 @@ function ashen(c: RGB, x: number, z: number, sx: number, sy: number): RGB {
   // pixel by pixel, so the film is grains, not a wash
   const grain = hash2(sx, sy, 93)
   if (grain > 1 - k) return grain > 1 - k * 0.4 ? ASH_LIGHT : ASH_DARK
-  return c
+  return null
 }
 
 function groundColor(x: number, z: number, sx: number, sy: number): RGB {
