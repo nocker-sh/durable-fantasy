@@ -78,6 +78,12 @@ export function ItemTooltip({
               <dd className="text-right text-[#f0b060]">{fx.warm}分</dd>
             </>
           ) : null}
+          {fx?.focus ? (
+            <>
+              <dt className="text-text-dim">集中（SP自然回復 +1）</dt>
+              <dd className="text-right text-good">{fx.focus}分</dd>
+            </>
+          ) : null}
           {fx?.full ? (
             <>
               <dt className="text-text-dim">満腹</dt>

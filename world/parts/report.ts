@@ -122,7 +122,7 @@ export function tell(event: GameEvent, me: string | undefined): Told {
       return out
     case "used":
       notify(
-        `${name(event.item, event.by)}を${ITEMS[event.item].use?.full ? "食べた" : "使った"}。${[event.hp ? `HP +${event.hp}` : "", event.sp ? `SP +${event.sp}` : "", event.stamina ? `スタミナ +${event.stamina}` : "", event.warm ? `体が温まった（${event.warm}分）` : ""].filter(Boolean).join(" ")}`,
+        `${name(event.item, event.by)}を${ITEMS[event.item].use?.full ? "食べた" : "使った"}。${[event.hp ? `HP +${event.hp}` : "", event.sp ? `SP +${event.sp}` : "", event.stamina ? `スタミナ +${event.stamina}` : "", event.warm ? `体が温まった（${event.warm}分）` : "", event.focus ? `集中（${event.focus}分）` : ""].filter(Boolean).join(" ")}`,
         "good",
       )
       return out

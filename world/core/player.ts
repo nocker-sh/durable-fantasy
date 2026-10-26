@@ -52,6 +52,9 @@ export interface PlayerState {
   readonly fullAt: number
   /** warm until this time (ms) */
   readonly warmUntil: number
+  /** Food focus: extra SP recovery between these server timestamps. */
+  readonly focusAt: number
+  readonly focusUntil: number
   /** experience in each life skill; the levels follow from it (core/life.ts, game-system.md §9.1) */
   readonly life: LifeExp
   /** work left with resident craftsmen (economy.md §3) */
@@ -108,19 +111,22 @@ export interface Rest {
 }
 
 /** Bring HP and SP up to date: what has come back since they were last counted. Fallen, nothing does. */
-export function settle<P extends Pick<PlayerState, "hp" | "hpAt" | "sp" | "spAt" | "sitting">>(p: P, r: Rest, now: number): P {
+export function settle<P extends Pick<PlayerState, "hp" | "hpAt" | "sp" | "spAt" | "sitting"> & Partial<Pick<PlayerState, "focusAt" | "focusUntil">>>(p: P, r: Rest, now: number): P {
   if (p.hp <= 0) return p
   const k = p.sitting ? 2 : 1
-  const one = (v: number, at: number, max: number, per: number): [number, number] => {
+  const one = (v: number, at: number, max: number, per: number, focus = false): [number, number] => {
     // not counted yet (a new traveller, an older save): it starts coming back from now
     if (!at || v >= max) return [Math.min(v, max), now]
     const n = Math.floor(Math.max(0, now - at) / REGEN_MS)
     if (!n) return [v, at]
-    const next = Math.min(max, v + n * per * k)
+    const first = Math.max(1, Math.floor(((p.focusAt ?? 0) - at) / REGEN_MS) + 1)
+    const last = Math.min(n, Math.ceil(((p.focusUntil ?? 0) - at) / REGEN_MS) - 1)
+    const extra = focus ? Math.max(0, last - first + 1) : 0
+    const next = Math.min(max, v + n * per * k + extra)
     return [next, next >= max ? now : at + n * REGEN_MS]
   }
   const [hp, hpAt] = one(p.hp, p.hpAt, r.maxHp, r.regenHp)
-  const [sp, spAt] = one(p.sp, p.spAt, r.maxSp, r.regenSp)
+  const [sp, spAt] = one(p.sp, p.spAt, r.maxSp, r.regenSp, true)
   if (hp === p.hp && hpAt === p.hpAt && sp === p.sp && spAt === p.spAt) return p
   return { ...p, hp, hpAt, sp, spAt }
 }
@@ -163,6 +169,8 @@ export function newPlayer(name = DEFAULT_NAME, look = 0): PlayerState {
     full: 0,
     fullAt: 0,
     warmUntil: 0,
+    focusAt: 0,
+    focusUntil: 0,
     life: emptyLife(),
     orders: [],
     friends: {},
@@ -221,6 +229,8 @@ const common = {
   full: count.max(100).default(0),
   fullAt: count.default(0),
   warmUntil: count.default(0),
+  focusAt: count.default(0),
+  focusUntil: count.default(0),
   orders: z.array(z.object({ commission: z.string().max(40), readyAt: count, q: quality })).default([]),
   friends: z.record(z.string().max(20), count.max(100)).default({}),
   errands: z.array(z.object({ id: z.string().max(40), day: z.string().max(10), done: z.boolean() })).default([]),

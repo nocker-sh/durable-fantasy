@@ -162,7 +162,7 @@ export type Reason =
 export type GameEvent =
   | { type: "bought"; item: ItemId; count: number; cost: number; by?: string }
   | { type: "sold"; item: ItemId; count: number; gain: number }
-  | { type: "used"; item: ItemId; hp: number; sp: number; stamina: number; warm: number; by?: string }
+  | { type: "used"; item: ItemId; hp: number; sp: number; stamina: number; warm: number; focus?: number; by?: string }
   | { type: "tired"; stamina: number }
   | { type: "gathered"; item: ItemId; count: number; skill: GatherSkill; level: number; up: boolean; broke: ItemId | null }
   | { type: "ordered"; commission: string; readyAt: number }

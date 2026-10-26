@@ -489,16 +489,18 @@ function use(state: PlayerState, slot: Stack, bag: Bag | null, now: number): Tra
   const wantsHp = e.hp > 0 && state.hp < d.maxHp,
     wantsSp = e.sp > 0 && state.sp < d.maxSp
   const wantsStamina = e.stamina > 0 && state.stamina < MAX_STAMINA
-  const food = e.full > 0 || e.warm > 0
-  if (!wantsHp && !wantsSp && !wantsStamina && !(food && e.warm > 0)) return reject(food ? "NOTHING_TO_GAIN" : e.sp && !e.hp ? "SP_FULL" : "HP_FULL")
+  const food = e.full > 0 || e.warm > 0 || e.focus > 0
+  if (!wantsHp && !wantsSp && !wantsStamina && !(food && (e.warm > 0 || e.focus > 0))) return reject(food ? "NOTHING_TO_GAIN" : e.sp && !e.hp ? "SP_FULL" : "HP_FULL")
   if (!bag) return reject("NOT_OWNED")
   const hp = Math.min(d.maxHp, state.hp + e.hp)
   const sp = Math.min(d.maxSp, state.sp + e.sp)
   const stamina = Math.min(MAX_STAMINA, state.stamina + e.stamina)
   const warmUntil = e.warm > 0 ? Math.max(state.warmUntil, now + e.warm * 60_000) : state.warmUntil
+  const focusUntil = e.focus > 0 ? Math.max(state.focusUntil, now + e.focus * 60_000) : state.focusUntil
+  const focusAt = e.focus > 0 && state.focusUntil <= now ? now : state.focusAt
   return accept(
-    { ...state, hp, sp, stamina, full: e.full > 0 ? full + e.full : state.full, fullAt: e.full > 0 ? now : state.fullAt, warmUntil, bag },
-    { type: "used", item, hp: hp - state.hp, sp: sp - state.sp, stamina: stamina - state.stamina, warm: e.warm, ...(slot.by ? { by: slot.by } : {}) },
+    { ...state, hp, sp, stamina, focusAt, focusUntil, full: e.full > 0 ? full + e.full : state.full, fullAt: e.full > 0 ? now : state.fullAt, warmUntil, bag },
+    { type: "used", item, hp: hp - state.hp, sp: sp - state.sp, stamina: stamina - state.stamina, warm: e.warm, ...(e.focus > 0 ? { focus: e.focus } : {}), ...(slot.by ? { by: slot.by } : {}) },
   )
 }
 

@@ -14,7 +14,7 @@ export function StatusFrame() {
     <div className="pointer-events-auto absolute top-4 left-4 flex w-[268px] flex-col gap-1.5">
       <HpSp player={player} rest={derived} />
       <Meter tone="stamina" value={player.stamina} max={MAX_STAMINA} aria-label="スタミナ" className="h-[4px]" />
-      <Body full={player.full} fullAt={player.fullAt} warmUntil={player.warmUntil} />
+      <Body full={player.full} fullAt={player.fullAt} warmUntil={player.warmUntil} focusUntil={player.focusUntil} />
     </div>
   )
 }
@@ -36,16 +36,18 @@ function HpSp({ player, rest }: { player: PlayerState; rest: Rest }) {
 }
 
 /** How full you are and how long you will stay warm (game-system.md §3.6), ticking by the minute. */
-function Body({ full, fullAt, warmUntil }: { full: number; fullAt: number; warmUntil: number }) {
+function Body({ full, fullAt, warmUntil, focusUntil }: { full: number; fullAt: number; warmUntil: number; focusUntil: number }) {
   const [now, setNow] = useState(() => Date.now())
   useEffect(() => {
+    setNow(Date.now())
     const t = window.setInterval(() => setNow(Date.now()), 20_000)
     return () => window.clearInterval(t)
-  }, [])
+  }, [fullAt, warmUntil, focusUntil])
   const f = fullNow({ full, fullAt }, now)
+  const focus = Math.max(0, Math.ceil((focusUntil - now) / 60_000))
   const warm = Math.max(0, Math.ceil((warmUntil - now) / 60_000))
   return (
-    <div className="mt-0.5 flex items-center gap-3 font-head text-[11px] leading-none text-text-dim ui-text-shadow">
+    <div className="mt-0.5 flex flex-wrap items-center gap-3 font-head text-[11px] leading-none text-text-dim ui-text-shadow">
       <span className="flex items-center gap-1" title="満腹（食べ過ぎると食べられない）">
         <img src={uiIconUrl("full", 14)} alt="" className="size-[14px]" />
         {f >= 80 ? "満腹" : f >= 40 ? "腹八分" : f > 0 ? "小腹" : "空腹"}
@@ -54,6 +56,11 @@ function Body({ full, fullAt, warmUntil }: { full: number; fullAt: number; warmU
         <img src={uiIconUrl("warm", 14)} alt="" className={warm ? "size-[14px]" : "size-[14px] grayscale"} />
         {warm ? `温まっている ${warm}分` : "冷えている"}
       </span>
+      {focus > 0 && (
+        <span className="text-good" title="集中（SPの自然回復量 +1）">
+          集中 {focus}分
+        </span>
+      )}
     </div>
   )
 }
