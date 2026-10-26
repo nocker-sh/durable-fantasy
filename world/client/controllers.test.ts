@@ -80,6 +80,29 @@ describe("client controllers", () => {
     expect(callbacks.notify).toHaveBeenCalled()
   })
 
+  it("connects using a prefetch taken before its channel request finishes", async () => {
+    const { session, client, send, callbacks } = fixture()
+    let choose!: (value: { channel: number; channels: Record<number, number> }) => void
+    vi.spyOn(session.rooms, "askChannel").mockReturnValue(
+      new Promise((resolve) => {
+        choose = resolve
+      }),
+    )
+    const listeners = new Map<string, () => void>()
+    const socket = { send, on: (event: string, handler: () => void) => listeners.set(event, handler), close: vi.fn() }
+    vi.spyOn(session.rooms, "open").mockReturnValue(socket as unknown as VoidSocket<"/map/:mapId">)
+    session.arriveAt = [1, 2]
+    session.rooms.standBy("phanthiet")
+    const connecting = client.connect("phanthiet")
+    choose({ channel: 2, channels: { 2: 1 } })
+    await connecting
+    expect(session.socket).toBe(socket)
+    listeners.get("open")!()
+    expect(session.state.get().online).toBe("online")
+    expect(send).toHaveBeenCalledWith(expect.objectContaining({ type: "join", at: [1, 2] }))
+    expect(callbacks.onServer).not.toHaveBeenCalled()
+  })
+
   it("opens storage from a conversation and updates the scene and server together", () => {
     const { session, context, callbacks, send, freeze } = fixture()
     callbacks.update({ dialogue: { resident: 0, name: STORAGE_KEEPER, job: "倉庫", pages: ["どうぞ"], page: 0, shownAt: 0, choices: [{ label: "預ける", action: "storage" }] } })

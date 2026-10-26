@@ -23,14 +23,16 @@ export class RoomClient {
     const ready = this.target.session.rooms.take(id, want)
     if (ready) {
       const { channel, channels } = await ready.channel
+      const socket = ready.socket
+      if (!socket) return
       if (this.target.session.state.get().map.id !== id) {
-        ready.socket.close()
+        socket.close()
         return
       }
       lap(ready.open ? "room: was ready" : "room: was being got ready")
       this.target.update({ room: { world: this.target.session.rooms.world, channel, channels } })
-      this.target.session.socket = ready.socket
-      this.listen(ready.socket)
+      this.target.session.socket = socket
+      this.listen(socket)
       if (ready.open) {
         this.target.update({ online: "online" })
         this.join()

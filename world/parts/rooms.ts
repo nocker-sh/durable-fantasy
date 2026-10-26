@@ -13,7 +13,7 @@ export interface Channel {
 export interface Standby {
   map: MapId
   channel: Promise<Channel>
-  socket: RoomSocket
+  socket: RoomSocket | null
   open: boolean
   at: number
 }
@@ -21,7 +21,7 @@ export interface Standby {
 export class Rooms {
   /** the parallel town we are in */
   world = 1
-  private standby: Standby | null = null
+  private standby: (Standby & { cancelled: boolean }) | null = null
 
   /** Which channel of a map to go into (the directory chooses; channel 1 if it cannot be reached). */
   async askChannel(id: MapId, want: number | null = null): Promise<Channel> {
@@ -47,23 +47,36 @@ export class Rooms {
   /** Get the room of `map` ready: ask its channel and open its socket (nothing is said to it until we arrive). */
   standBy(map: MapId) {
     if (this.standby?.map === map) return
-    this.standby?.socket?.close()
-    const channel = this.askChannel(map)
-    const entry: Standby = { map, channel, socket: null as unknown as RoomSocket, open: false, at: performance.now() }
-    this.standby = entry
-    void channel.then(({ channel: c }) => {
-      if (this.standby !== entry) return
-      entry.socket = this.open(map, c)
-      entry.socket.on("open", () => {
+    this.cancelStandby()
+    // Resolving channel also guarantees socket creation, including when take() transfers ownership
+    // before the channel request completes.
+    const channel = this.askChannel(map).then((chosen) => {
+      if (entry.cancelled) return chosen
+      const socket = this.open(map, chosen.channel)
+      entry.socket = socket
+      socket.on("open", () => {
         entry.open = true
       })
+      socket.on("close", () => {
+        entry.open = false
+      })
+      return chosen
     })
+    const entry = { map, channel, socket: null as RoomSocket | null, open: false, at: performance.now(), cancelled: false }
+    this.standby = entry
+  }
+
+  private cancelStandby() {
+    if (!this.standby) return
+    this.standby.cancelled = true
+    this.standby.socket?.close()
+    this.standby = null
   }
 
   /** The room got ready for `map`, taken as it is; any other one is closed. A channel asked for skips it. */
   take(map: MapId, want: number | null): Standby | null {
     const ready = !want && this.standby?.map === map ? this.standby : null
-    if (!ready) this.standby?.socket?.close()
+    if (!ready) this.cancelStandby()
     this.standby = null
     return ready
   }
