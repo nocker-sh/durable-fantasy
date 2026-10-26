@@ -13,7 +13,6 @@ import { stall, type Goods } from "./stalls.ts"
 import { lantern, oven, forge, anvil, trough } from "./workshops.ts"
 import { addSprite, flatDecal } from "./sprites.ts"
 import { M } from "./materials.ts"
-import { laundryLine } from "./laundry.ts"
 import { crops, wheatField } from "./crops.ts"
 import { haystack, cart } from "./cart.ts"
 import { windmill } from "./windmill.ts"
@@ -108,11 +107,6 @@ export function buildTown(root: THREE.Group) {
   root.add(wc.build())
   for (let i = 0; i < 4; i++) flatDecal(root, clutter("chips", 10 + i), 3.6 + (i % 2) * 0.6, 23.5 + (i >> 1) * 0.6, 40, i)
 
-  // drying yard & laundry lines
-  laundryLine(root, 26.3, 34.4, 28.6, 34.6, 1)
-  laundryLine(root, 26.3, 36.2, 28.6, 36.6, 3)
-  laundryLine(root, 9.1, 19.4, 11.6, 19.6, 6)
-  laundryLine(root, 6.8, 31.0, 6.9, 33.3, 9)
   places.hang = [27.4, 35.4]
 
   // inn: tables and barrels

@@ -23,7 +23,6 @@ import {
   well,
   woodpile,
   haystack,
-  laundryLine,
   M,
   buildHouses,
   updaters,
@@ -138,15 +137,11 @@ function stallDressing(g: THREE.Object3D, steam: boolean) {
 }
 
 /**
- * The alley behind the shopping street's north row. The tavern hangs out its tablecloths and the
- * tailor her dyed cloth across it; empty bottles wait behind the tavern for the brewery, herbs grow
+ * The alley behind the shopping street's north row. Empty bottles wait behind the tavern
+ * for the brewery, herbs grow
  * in pots behind the apothecary, a rain barrel stands under each eave.
  */
 function backAlley(root: THREE.Group) {
-  laundryLine(root, 5.2, 17.0, 5.6, 14.6, 81) // the tavern's tablecloths
-  laundryLine(root, 7.6, 17.0, 7.9, 14.7, 82)
-  laundryLine(root, 29.6, 17.0, 29.4, 14.6, 83) // the tailor's dyed cloth
-  laundryLine(root, 31.8, 17.0, 32.2, 14.6, 84)
   const gb = new GB()
   // behind the tavern: crates of empty bottles going back to the brewery, a spare barrel
   crate(gb, 4.4, 15.0, 0.5)
@@ -184,7 +179,6 @@ export function buildCraft(root: THREE.Group) {
   table(gb, 27.2, 26.6, 1.2, 0.6)
   sack(gb, 28.4, 27.6)
   root.add(gb.build())
-  laundryLine(root, 24.6, 28.4, 28.8, 28.6, 8)
   cart(root, 22.4, 26.4, 0.6, "barrels")
   haystack(root, 36.4, 31.6, 0.8)
   for (const x of [4, 12, 22, 30, 38]) lantern(root, x, 21.8)

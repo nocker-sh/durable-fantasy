@@ -1,11 +1,11 @@
-// What stands round each house: firewood against a wall, a bucket by the door, washing on a line,
+// What stands round each house: firewood against a wall, a bucket by the door,
 // the tools of the household's trade (town.md「軒先と路地」). It is all worked out from
 // the household table (world/town/houses.ts), never placed by hand, so a fisher's house has nets
 // and a weaver's a spare cart wheel, a well-off house flower pots and a modest one a small woodpile.
 // Nothing goes in front of a door or on the way to it.
 import * as THREE from "three"
 import { GB, colorMat, mat } from "./gfx"
-import { M, barrel, bucket, crate, sack, woodpile, laundryLine, addSprite, places, type V2 } from "./build"
+import { M, barrel, bucket, crate, sack, woodpile, addSprite, places, type V2 } from "./build"
 import { basket, hanging, GPPU } from "./goods"
 import { Rng } from "./pix"
 import { leafTex } from "./textures"
@@ -203,8 +203,6 @@ export function rentSign(root: THREE.Group, x: number, z: number) {
 }
 
 // ---------------------------------------------------------------- per house
-/** Households that do washing, for themselves or as work: a line out back. */
-const WASHING = new Set(["fisher", "greengrocer", "fruit", "well", "farm", "carter", "elder", "bakers", "inn"])
 
 function dress(root: THREE.Group, gb: GB, h: HouseDef) {
   const r = new Rng(h.seed * 31 + 7)
@@ -258,16 +256,6 @@ function dress(root: THREE.Group, gb: GB, h: HouseDef) {
         pz = door[1] + oz
       if (isFree(px, pz) && clear(h, [px, pz], 0.1)) flowerPot(gb, root, px, pz, h.seed + k)
     }
-  }
-  // washing on a line out back
-  if (WASHING.has(hh.id)) {
-    const back = sides[2]
-    const [ox, oz] = OUT[back]
-    const ax = back === "n" || back === "s" ? h.x0 + 0.3 : back === "e" ? h.x1 + 0.9 : h.x0 - 0.9
-    const az = back === "n" ? h.z0 - 0.9 : back === "s" ? h.z1 + 0.9 : h.z0 + 0.3
-    const bxx = back === "n" || back === "s" ? Math.min(h.x1 - 0.3, ax + 2.6) : ax
-    const bzz = back === "e" || back === "w" ? Math.min(h.z1 - 0.3, az + 2.6) : az
-    if (isFree(ax, az) && isFree(bxx, bzz) && isFree((ax + bxx) / 2 + ox * 0.3, (az + bzz) / 2 + oz * 0.3)) laundryLine(root, ax, az, bxx, bzz, h.seed)
   }
   // the trade
   const t = hh.id

@@ -2,7 +2,7 @@
 // server to check paths and distances without building the 3D scene. Both come from the scene
 // the browser builds, so run this after changing the terrain, buildings or residents, with the
 // dev server running:
-//   npx tsx scripts/export-map.ts [dev server URL] [map …]
+//   bun scripts/export-map.ts [dev server URL] [map …]
 import { writeFileSync } from "node:fs"
 import { join } from "node:path"
 import { chromium } from "playwright-core"
@@ -55,7 +55,7 @@ for (const map of only.length
         .replace(/0/g, "."),
     )
   const out = { size: data.size, rows, places: data.places }
-  writeFileSync(join(import.meta.dirname, "..", "src", "game", "maps", `${map}.json`), JSON.stringify(out, null, 1) + "\n")
+  writeFileSync(join(import.meta.dirname, "..", "world", "maps", `${map}.json`), JSON.stringify(out, null, 1) + "\n")
   console.log(`${map}: grid ${data.size}×${data.size}, ${Object.keys(data.places).length} places`)
 }
 await browser.close()
