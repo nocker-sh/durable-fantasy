@@ -3,7 +3,7 @@
 // in bands by a few workers at once (ground.worker.ts).
 import { PixBuf } from "./pix"
 import { GROUND_PX, paintRows } from "./terrain"
-import { hasFields, primeFields, setLayout, type Fields } from "./world"
+import { hasFields, primeFields, setLayout, currentLayout, type Fields } from "./world"
 import { layoutOf } from "../maps/layouts.ts"
 import type { GroundDone, GroundJob } from "./ground.worker"
 import terrainSrc from "./terrain.ts?raw"
@@ -32,40 +32,68 @@ function hash(s: string): string {
   return (h >>> 0).toString(36)
 }
 
-/** The ground of a map; asking twice gives the same picture. Only the map being entered is held in memory. */
+interface GroundJobState {
+  foreground: boolean
+  promise: Promise<PixBuf>
+}
+const active = new Map<string, GroundJobState>()
+
+/** Share loading and painting, including a prefetch promoted to the current map. */
+function obtain(map: string, foreground: boolean): Promise<PixBuf> {
+  const existing = active.get(map)
+  if (existing) {
+    existing.foreground ||= foreground
+    return existing.promise
+  }
+  const job: GroundJobState = {
+    foreground,
+    promise: Promise.resolve()
+      .then(async () => {
+        const cached = await load(map).catch(() => null)
+        if (cached) return cached
+        const buf = await paint(map, () => job.foreground)
+        await keep(map, buf).catch(() => {})
+        return buf
+      })
+      .finally(() => {
+        if (active.get(map) === job) active.delete(map)
+      }),
+  }
+  active.set(map, job)
+  return job.promise
+}
+
+/** The ground of a map; only the map being entered is retained after loading. */
 export function groundOf(map: string): Promise<PixBuf> {
   let p = memory.get(map)
   if (!p) {
     memory.clear()
-    p = load(map).then(
-      (kept) =>
-        kept ??
-        paint(map).then((buf) => {
-          void keep(map, buf)
-          return buf
-        }),
-    )
+    p = obtain(map, true)
     memory.set(map, p)
+    void p.catch(() => {
+      if (memory.get(map) === p) memory.delete(map)
+    })
   }
   return p
 }
 
 const kept = new Set<string>()
 let queue: Promise<void> = Promise.resolve()
-/** Paint a map's ground ahead of time and keep it in IndexedDB (the maps one step away), one map at a time. */
+/** Prefetch one map at a time. Entering a queued map starts it immediately. */
 export function prefetchGround(map: string) {
   if (kept.has(map) || memory.has(map)) return
   kept.add(map)
   queue = queue
     .then(async () => {
-      if (memory.has(map) || (await has(map))) return
-      await keep(map, await paint(map, false))
+      if (!memory.has(map) && !(await has(map))) await obtain(map, false)
     })
-    .catch(() => {})
+    .catch(() => {
+      kept.delete(map)
+    })
 }
 
-/** `here`: this is the map being entered, so a band whose worker fails may be painted on the main thread (whose layout is this map's). */
-function paint(map: string, here = true): Promise<PixBuf> {
+/** Only the current map may fall back to main-thread painting if a worker fails. */
+function paint(map: string, foreground: () => boolean): Promise<PixBuf> {
   const n = Math.max(1, Math.min(6, (navigator.hardwareConcurrency || 4) - 1))
   const buf = new PixBuf(GROUND_PX, GROUND_PX)
   const band = Math.ceil(GROUND_PX / n)
@@ -79,7 +107,7 @@ function paint(map: string, here = true): Promise<PixBuf> {
             buf.data.set(event.data.data, event.data.y0 * GROUND_PX * 4)
             if (event.data.fields) {
               primeFields(layoutOf(map), event.data.fields)
-              void keepFields(map, event.data.fields)
+              void keepFields(map, event.data.fields).catch(() => {})
             }
             w.terminate()
             resolve()
@@ -89,10 +117,11 @@ function paint(map: string, here = true): Promise<PixBuf> {
           w.onerror = (e) => {
             e.preventDefault()
             w.terminate()
-            if (!here) {
+            if (!foreground()) {
               reject(e)
               return
             }
+            const previous = currentLayout()
             try {
               setLayout(layoutOf(map))
               const part = new PixBuf(GROUND_PX, job.y1 - job.y0)
@@ -101,6 +130,8 @@ function paint(map: string, here = true): Promise<PixBuf> {
               resolve()
             } catch (error) {
               reject(error)
+            } finally {
+              setLayout(previous)
             }
           }
           w.postMessage(job)
@@ -112,17 +143,24 @@ function paint(map: string, here = true): Promise<PixBuf> {
 // ---------------------------------------------------------------- IndexedDB
 const DB = "df-ground",
   STORE = "ground"
+let database: Promise<IDBDatabase | null> | null = null
 function db(): Promise<IDBDatabase | null> {
-  return new Promise((resolve) => {
+  return (database ??= new Promise((resolve) => {
     try {
       const req = indexedDB.open(DB, 1)
       req.onupgradeneeded = () => req.result.createObjectStore(STORE)
-      req.onsuccess = () => resolve(req.result)
+      req.onsuccess = () => {
+        req.result.onversionchange = () => {
+          req.result.close()
+          database = null
+        }
+        resolve(req.result)
+      }
       req.onerror = () => resolve(null)
     } catch {
       resolve(null)
     }
-  })
+  }))
 }
 async function load(map: string): Promise<PixBuf | null> {
   const d = await db()
@@ -156,6 +194,7 @@ async function keepFields(map: string, f: Fields) {
   d?.transaction(STORE, "readwrite").objectStore(STORE).put(f, `${map}:${VERSION}:fields`)
 }
 
+/** Check saved prefetches without decoding their full-size pixel buffers. */
 async function has(map: string): Promise<boolean> {
   const d = await db()
   if (!d) return false
@@ -169,6 +208,10 @@ async function keep(map: string, buf: PixBuf) {
   const d = await db()
   if (!d) return
   const tx = d.transaction(STORE, "readwrite")
+  const done = new Promise<void>((resolve) => {
+    tx.oncomplete = () => resolve()
+    tx.onerror = tx.onabort = () => resolve()
+  })
   const store = tx.objectStore(STORE)
   // only this version is kept: older pictures of every map go
   const all = store.getAllKeys()
@@ -176,4 +219,5 @@ async function keep(map: string, buf: PixBuf) {
     for (const k of all.result) if (!String(k).includes(`:${VERSION}`)) store.delete(k)
     store.put(buf.data, `${map}:${VERSION}`)
   }
+  await done
 }
