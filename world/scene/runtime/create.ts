@@ -1,3 +1,4 @@
+import { FrameLimiter } from "../../../lib/engine/frame-limiter"
 import { walkDirection } from "../turn"
 import { createGatheringSpots } from "./gathering.ts"
 import { createPointer } from "./pointer.ts"
@@ -430,19 +431,16 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
   let frames = 0,
     fpsAt = performance.now(),
     fpsNow = 0
-  // pixel art needs no more than 30 frames a second, and a weak machine gets room to breathe
-  const FRAME_MS = 1000 / 30
+  // Cap high-refresh displays while allowing smooth movement at 60 frames a second.
+  const framesDue = new FrameLimiter(60)
   const SHADOW_MS = 250
-  let frameAt = 0,
-    shadowAt = 0
-  function frame() {
+  let shadowAt = 0
+  function frame(at: number) {
     if (!runtime.running) return
-    const at = performance.now()
-    if (at - frameAt < FRAME_MS) {
+    if (!framesDue.ready(at)) {
       requestAnimationFrame(frame)
       return
     }
-    frameAt = at - ((at - frameAt) % FRAME_MS)
     if (shadowDirty || at - shadowAt > SHADOW_MS) {
       renderer.shadowMap.needsUpdate = true
       shadowDirty = false
@@ -536,7 +534,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
     for (const w of [me, ...remotes.values()]) place(w.label, toScreen(w.pos, w.fig.height, v), v, 2)
     // creatures: where the clock puts them; the one we fight, followed and struck when in reach
     const wall = Date.now()
-    updateMonsters(monsters, town, wall, movement.yaw)
+    updateMonsters(monsters, town, wall, movement.yaw, dt)
     for (const m of monsters) {
       const kind = MONSTER_KINDS[m.spawn.kind]
       const show = m.body.visible && (m.spawn.id === fightTarget || m.hp < kind.hp || Math.hypot(m.pos[0] - me.pos[0], m.pos[1] - me.pos[1]) < 4)

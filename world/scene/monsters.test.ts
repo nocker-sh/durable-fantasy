@@ -52,3 +52,16 @@ it("cleans up an interrupted burst and does not retain resources over repeated f
   expect(material).toHaveBeenCalledTimes(404)
   expect(shared).not.toHaveBeenCalled()
 })
+
+it("turns at the same speed at 30 and 60 fps", () => {
+  const turn = (fps: number) => {
+    const { root, monster } = fixture()
+    monster.hp = 30
+    monster.back = 0
+    let now = 0
+    while (monster.motion.at(now).moving) now += 100
+    for (let frame = 0; frame < fps; frame++) updateMonsters([monster], root, now, 1, 1 / fps)
+    return monster.body.rotation.y
+  }
+  expect(turn(60)).toBeCloseTo(turn(30), 12)
+})

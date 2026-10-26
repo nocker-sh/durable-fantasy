@@ -34,7 +34,7 @@ export function makeMonsters(root: THREE.Group, map: string): MonsterView[] {
 
 /** Move each to where the clock puts it, hop it, hide it while it is off recovering. */
 /** `yaw`: where the camera looks from; a creature sitting still turns its face that way. */
-export function updateMonsters(list: MonsterView[], root: THREE.Group, now: number, yaw = 0) {
+export function updateMonsters(list: MonsterView[], root: THREE.Group, now: number, yaw = 0, dt = 1 / 30) {
   for (const m of list) {
     const away = m.back > now || m.hp === 0
     const at = m.motion.at(now)
@@ -55,7 +55,7 @@ export function updateMonsters(list: MonsterView[], root: THREE.Group, now: numb
         m.body.rotation.y = Math.atan2(ahead.x - at.x, ahead.z - at.z)
       } else {
         const d = Math.atan2(Math.sin(yaw - m.body.rotation.y), Math.cos(yaw - m.body.rotation.y))
-        m.body.rotation.y += d * 0.08
+        m.body.rotation.y += d * (1 - 0.92 ** (dt * 30))
       }
     }
     if (m.burst) {
