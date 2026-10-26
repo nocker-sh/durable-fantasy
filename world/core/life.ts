@@ -23,8 +23,14 @@ export const craftExp = (min: number) => 10 + 4 * min
 /** Experience to go from a level to the next. */
 export const lifeToNext = (level: number) => Math.round(40 * (level + 1) ** 1.5)
 
+// Include the next threshold so even the final level can render its experience meter.
+const thresholds = [0]
+for (let level = 0; level <= LIFE_FINAL; level++) thresholds.push(thresholds[level] + lifeToNext(level))
+
 /** Experience it takes to stand at a level from nothing. */
 export function lifeExpAt(level: number): number {
+  const cached = thresholds[level]
+  if (cached !== undefined) return cached
   let total = 0
   for (let l = 0; l < level; l++) total += lifeToNext(l)
   return total
@@ -32,9 +38,15 @@ export function lifeExpAt(level: number): number {
 
 /** The level a total of experience makes. */
 export function lifeLevel(exp: number): number {
-  let level = 0
-  while (level < LIFE_FINAL && exp >= lifeExpAt(level + 1)) level++
-  return level
+  if (!(exp >= thresholds[1])) return 0
+  let low = 1
+  let high = LIFE_FINAL
+  while (low < high) {
+    const middle = Math.ceil((low + high) / 2)
+    if (exp >= thresholds[middle]) low = middle
+    else high = middle - 1
+  }
+  return low
 }
 
 export type LifeExp = Readonly<Record<Skill, number>>
