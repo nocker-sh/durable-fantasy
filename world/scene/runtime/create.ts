@@ -1,3 +1,4 @@
+import { walkDirection } from "../turn"
 import { createGatheringSpots } from "./gathering.ts"
 import { createPointer } from "./pointer.ts"
 import { PixelCamera } from "../../../lib/graphics/pixel-camera.ts"
@@ -165,13 +166,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
   /** One cell on along the held keys, turned by the camera: up on screen is away from the camera. */
   function stepHeld() {
     if (!held || frozen || me.path.length > 1) return
-    const s = Math.sin(movement.yaw),
-      c = Math.cos(movement.yaw)
-    const wx = c * held[0] - s * held[1],
-      wz = -s * held[0] - c * held[1]
-    const len = Math.hypot(wx, wz) || 1
-    const di = Math.abs(wx / len) > 0.38 ? Math.sign(wx) : 0,
-      dj = Math.abs(wz / len) > 0.38 ? Math.sign(wz) : 0
+    const [di, dj] = walkDirection(held, movement.yaw)
     const [ci, cj] = cellOf(me.path.length ? me.path[0] : me.pos)
     // straight on if it is free; on a slant blocked by a corner, slide along whichever side is open
     const tries: [number, number][] =

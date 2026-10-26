@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { STEP, dragTurn, keyTurn } from "./turn.ts"
+import { STEP, dragTurn, keyTurn, walkDirection } from "./turn.ts"
 
 /** Where a point east of the player shows on screen after a turn (the camera stands at yaw, looking at the player). */
 function screenX(yaw: number, point: [number, number]) {
@@ -26,4 +26,33 @@ describe("which way the view turns", () => {
     expect(screenX(yaw + dragTurn(120), ahead)).toBeGreaterThan(screenX(yaw, ahead))
     expect(screenX(yaw + keyTurn(1), ahead)).toBeGreaterThan(screenX(yaw, ahead))
   })
+})
+
+const screenDirections: [number, number][] = [
+  [0, 1],
+  [1, 1],
+  [1, 0],
+  [1, -1],
+  [0, -1],
+  [-1, -1],
+  [-1, 0],
+  [-1, 1],
+]
+const groundDirections: [number, number][] = [
+  [0, -1],
+  [1, -1],
+  [1, 0],
+  [1, 1],
+  [0, 1],
+  [-1, 1],
+  [-1, 0],
+  [-1, -1],
+]
+it.each(Array.from({ length: 8 }, (_, n) => n))("preserves all eight screen movement directions at camera step %i", (turn) => {
+  screenDirections.forEach((direction, index) => {
+    const expected = groundDirections[(index - turn + 8) % 8]
+    expect(walkDirection(direction, turn * STEP)).toEqual(expected)
+    expect(walkDirection(direction, (turn - 8) * STEP)).toEqual(expected)
+  })
+  expect(walkDirection([0, 0], turn * STEP)).toEqual([0, 0])
 })

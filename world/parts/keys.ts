@@ -52,27 +52,38 @@ export class Keys {
   constructor(private readonly game: KeyTarget) {}
 
   listen() {
+    this.unlisten()
     const down = (event: KeyboardEvent) => this.down(event)
     const up = (event: KeyboardEvent) => {
       if (this.held.delete(event.code)) this.steer()
     }
-    const blur = () => {
-      this.held.clear()
-      this.steer()
+    const blur = () => this.release()
+    const focus = (event: FocusEvent) => {
+      if ((event.target as HTMLElement | null)?.closest?.("input, textarea, select, [contenteditable]")) this.release()
     }
     window.addEventListener("keydown", down)
     window.addEventListener("keyup", up)
     window.addEventListener("blur", blur)
+    window.addEventListener("focusin", focus)
     this.stop = () => {
       window.removeEventListener("keydown", down)
       window.removeEventListener("keyup", up)
       window.removeEventListener("blur", blur)
+      window.removeEventListener("focusin", focus)
     }
   }
 
   unlisten() {
     this.stop?.()
     this.stop = null
+    this.release()
+  }
+
+  private release() {
+    if (!this.held.size) return
+    this.held.clear()
+    this.game.hold(null)
+    this.game.stopWalking()
   }
 
   private down(event: KeyboardEvent) {
@@ -84,7 +95,7 @@ export class Keys {
       return
     }
     const target = event.target as HTMLElement | null
-    const inField = !!target?.closest("input, textarea, select, [contenteditable='true']")
+    const inField = !!target?.closest("input, textarea, select, [contenteditable]")
     const s = g.state.get()
     if (event.key === "Escape") {
       event.preventDefault()
@@ -107,8 +118,12 @@ export class Keys {
       else g.openModal("system")
       return
     }
-    if (inField || s.modal || s.loading) return
+    if (inField || s.typing || s.modal || s.loading) {
+      this.release()
+      return
+    }
     if (event.key === "Enter") {
+      this.release()
       g.setTyping(true)
       event.preventDefault()
       return
@@ -145,6 +160,7 @@ export class Keys {
     if (event.code in MOVE_KEYS && !event.shiftKey && !event.altKey) {
       event.preventDefault()
       if (s.dialogue || s.shop || s.trade || s.craft || s.commission || s.storage || s.board) return
+      if (event.repeat && !this.held.has(event.code)) return
       this.held.add(event.code)
       this.steer()
       return
@@ -169,12 +185,9 @@ export class Keys {
 
   /** Tell the scene which way the held keys point. */
   private steer() {
-    let x = 0,
-      y = 0
-    for (const code of this.held) {
-      x += MOVE_KEYS[code][0]
-      y += MOVE_KEYS[code][1]
-    }
-    this.game.hold(x || y ? [Math.sign(x), Math.sign(y)] : null)
+    const down = (a: string, b: string) => Number(this.held.has(a) || this.held.has(b))
+    const x = down("KeyD", "ArrowRight") - down("KeyA", "ArrowLeft")
+    const y = down("KeyW", "ArrowUp") - down("KeyS", "ArrowDown")
+    this.game.hold(x || y ? [x, y] : null)
   }
 }
