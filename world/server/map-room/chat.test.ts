@@ -52,3 +52,23 @@ it("retains the two-line limit even when a recipient cannot receive", async () =
   await HANDLERS.say!(f.context, { type: "say", text: "こんばんは" })
   expect(f.nearby.send).toHaveBeenCalledTimes(3)
 })
+
+it("bounds stored attempts during a burst without changing acceptance or cooldown extension", async () => {
+  vi.useFakeTimers()
+  vi.spyOn(console, "warn").mockImplementation(() => {})
+  const f = fixture()
+  f.failed.send.mockResolvedValue()
+  // Reference the original rolling-window rule, including rejected attempts.
+  let history: number[] = []
+  let delivered = 0
+  const times = [...Array.from({ length: 2000 }, (_, i) => 1000 + Math.floor(i / 10)), 1500, 2199, 2200, 2500, 3199, 3200, 4200, 4200, 4200]
+  for (const now of times) {
+    vi.setSystemTime(now)
+    history = [...history.filter((at) => now - at < 1000), now]
+    if (history.length <= 2) delivered++
+    await HANDLERS.say!(f.context, { type: "say", text: "こんにちは" })
+    expect(f.nearby.send).toHaveBeenCalledTimes(delivered)
+    expect(f.self.state.said.length).toBeLessThanOrEqual(2)
+  }
+  expect(delivered).toBeGreaterThan(2)
+})

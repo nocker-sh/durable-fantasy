@@ -10,9 +10,11 @@ async function say(roomCtx: Ctx, message: Message<"say">) {
   if (!me.player) return
   // at most two lines a second
   const now = Date.now()
-  const said = [...me.said.filter((t) => now - t < 1000), now]
-  save({ said })
-  if (said.length > 2) return
+  // Two recent attempts already fill the window; older ones cannot change the decision.
+  // Keep rejected attempts too, so continuous sending still extends the wait.
+  const recent = me.said.slice(-2).filter((t) => now - t < 1000)
+  save({ said: [...recent, now].slice(-2) })
+  if (recent.length >= 2) return
   const shout = !!message.shout
   const from = reachable(me)[0]
   for (const other of ctx.room.getConnections()) {
