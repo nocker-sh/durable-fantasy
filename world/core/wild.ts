@@ -33,11 +33,11 @@ export function hpOf(s: WildState, id: string, now: number): number {
  * A blow from `player` (damage 0 for a miss): what it has left, and whether that beat it (it goes off
  * and is back after its respawn time). A creature already fighting someone else is not theirs to strike.
  */
-export function hit(s: WildState, id: string, damage: number, now: number, player: string): { state: WildState; hp: number; beaten: boolean; refused: boolean } {
+export function hit(s: WildState, id: string, damage: number, now: number, player: string): { state: WildState; hp: number; beaten: boolean; refused: boolean; reason?: "TAKEN" | "TARGET_GONE" } {
   const spawn = spawnOf(id)
-  if (!spawn || !about(s, id, now)) return { state: s, hp: 0, beaten: false, refused: false }
+  if (!spawn || !about(s, id, now)) return { state: s, hp: 0, beaten: false, refused: true, reason: "TARGET_GONE" }
   const other = fighting(s, id, now)
-  if (other && other !== player) return { state: s, hp: hpOf(s, id, now), beaten: false, refused: true }
+  if (other && other !== player) return { state: s, hp: hpOf(s, id, now), beaten: false, refused: true, reason: "TAKEN" }
   const hp = Math.max(0, hpOf(s, id, now) - damage)
   const by = { ...s.by }
   if (hp > 0) return { state: { ...s, hp: { ...s.hp, [id]: hp }, by: { ...by, [id]: { player, at: now } } }, hp, beaten: false, refused: false }

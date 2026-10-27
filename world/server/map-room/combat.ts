@@ -51,7 +51,7 @@ async function attack(roomCtx: Ctx, message: Message<"attack">) {
   // the creature is whoever struck it first's to finish (core/wild.ts); a miss still starts the fight
   const r = await Wild.get(ctx.params.mapId).strike(spawn.id, blow.kind === "miss" ? 0 : blow.damage, me.owner)
   if (r.refused) {
-    await ctx.connection.send({ type: "refused", what: "attack", reason: "TAKEN" })
+    await ctx.connection.send({ type: "refused", what: "attack", reason: r.reason ?? "TAKEN" })
     return
   }
   await ctx.room.broadcast({ type: "struck", by: me.player.id, monster: spawn.id, swing: blow, hp: r.hp, back: r.back })

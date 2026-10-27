@@ -13,11 +13,11 @@ export const Wild = defineDurableState({
       return Object.fromEntries(SPAWNS.filter((s) => s.map === map).map((s) => [s.id, { hp: hpOf(context.state.wild, s.id, now), back: context.state.wild.back[s.id] ?? 0 }]))
     },
     /** A blow from a player (0 for a miss); refused while it is someone else's fight. */
-    strike(context, id: string, damage: number, player: string): { hp: number; beaten: boolean; back: number; refused: boolean } {
+    strike(context, id: string, damage: number, player: string) {
       const now = Date.now()
       const r = hit({ ...emptyWild(), ...context.state.wild }, id, damage, now, player)
       context.state.wild = r.state
-      return { hp: r.hp, beaten: r.beaten, back: r.state.back[id] ?? 0, refused: r.refused }
+      return { hp: r.hp, beaten: r.beaten, back: r.state.back[id] ?? 0, refused: r.refused, reason: r.reason }
     },
   },
 })

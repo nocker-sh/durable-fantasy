@@ -153,6 +153,7 @@ export type Reason =
   | "FALLEN"
   | "NOT_FALLEN"
   | "TAKEN"
+  | "TARGET_GONE"
   | "STORAGE_FULL"
   | "NOT_STORABLE"
   | "NOT_TRADABLE"
@@ -241,6 +242,7 @@ export const REASON_TEXT: Record<Reason, string> = {
   FALLEN: "倒れていて動けない。",
   NOT_FALLEN: "倒れてはいない。",
   TAKEN: "ほかの人が戦っている。",
+  TARGET_GONE: "相手はもういない。",
   STORAGE_FULL: "倉庫に空きがない。",
   NOT_STORABLE: "それは預けられない。",
   NOT_TRADABLE: "それは渡せない。",
