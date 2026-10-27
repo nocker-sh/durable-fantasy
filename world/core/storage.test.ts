@@ -1,3 +1,4 @@
+import { loadPlayer } from "./player.ts"
 import { describe, expect, it } from "vitest"
 import { apply } from "./apply.ts"
 import { addItem, countItem, emptyBag } from "./bag.ts"
@@ -41,4 +42,17 @@ describe("the town warehouse", () => {
     expect(storageOpen(20 * 60)).toBe(true)
     expect(storageOpen(10 * 60)).toBe(false)
   })
+})
+
+it("keeps an old unmarked stole unchanged through storage and save reload", () => {
+  const original = { item: "fur-stole", count: 1 } as const
+  const start = player({ gold: 20, bag: [original, ...emptyBag(23)] })
+  const stored = apply(start, { type: "store", slot: 0, count: 1 }, { now: 1 })
+  if (!stored.ok) throw Error(stored.reason)
+  expect(stored.state.storage[0]).toEqual(original)
+  const saved = loadPlayer(JSON.parse(JSON.stringify(stored.state)))
+  const taken = apply(saved, { type: "retrieve", index: 0, count: 1 }, { now: 2 })
+  if (!taken.ok) throw Error(taken.reason)
+  expect(taken.state.bag[0]).toEqual(original)
+  expect(taken.state.storage[0]).toBeNull()
 })

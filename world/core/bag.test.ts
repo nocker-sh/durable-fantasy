@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { BAG_SIZE, addItem, countItem, emptyBag, moveSlot, removeItem, roomFor, type Bag } from "./bag.ts"
+import { BAG_SIZE, addItem, countItem, emptyBag, moveSlot, putStack, removeItem, roomFor, type Bag } from "./bag.ts"
 
 describe("bag", () => {
   it("tops up existing stacks before using empty slots", () => {
@@ -38,4 +38,23 @@ describe("bag", () => {
     expect(moveSlot(bag, 2, 0)![0]?.item).toBe("pear")
     expect(moveSlot(bag, 5, 0)).toBeNull()
   })
+})
+
+it("moves unmarked goods without inventing a maker or merging into marked goods", () => {
+  const bag: Bag = [{ item: "potion", count: 98 }, { item: "potion", count: 90, q: 1, by: "イルムガルト" }, null]
+  const before = structuredClone(bag)
+  const moved = putStack(bag, { item: "potion", count: 3 })
+  expect(moved).toEqual([{ item: "potion", count: 99 }, bag[1], { item: "potion", count: 2 }])
+  expect(bag).toEqual(before)
+  expect(putStack(bag.slice(0, 2), { item: "potion", count: 3 })).toBeNull()
+  expect(bag).toEqual(before)
+})
+
+it("generates new tools with full durability but preserves transferred wear", () => {
+  const fresh = addItem(emptyBag(), "wood-axe", 2)!
+  expect(fresh[0]!.dur).toBeGreaterThan(3)
+  expect(fresh[1]).toEqual(fresh[0])
+  const worn = { ...fresh[0]!, dur: 3 }
+  expect(putStack(emptyBag(), worn)![0]).toEqual(worn)
+  expect(putStack(emptyBag(), { item: "wood-axe", count: 1 })![0]).toEqual({ item: "wood-axe", count: 1 })
 })

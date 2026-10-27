@@ -73,27 +73,7 @@ export function roomFor(bag: Bag, item: ItemId, mark?: Partial<Mark>): number {
 
 /** Add items, topping up stacks of the same kind first, then filling empty slots in order. */
 export function addItem(bag: Bag, item: ItemId, count: number, mark?: Partial<Mark>): Bag | null {
-  if (!Number.isInteger(count) || count <= 0) return null
-  if (roomFor(bag, item, mark) < count) return null
-  const m = markFor(item, mark)
-  const kind = withMark(item, 0, m)
-  const stack = ITEMS[item].stack
-  const next = [...bag]
-  let left = count
-  for (let i = 0; i < next.length && left > 0; i++) {
-    const slot = next[i]
-    if (!slot || !sameKind(slot, kind) || slot.count >= stack) continue
-    const put = Math.min(left, stack - slot.count)
-    next[i] = withMark(item, slot.count + put, m)
-    left -= put
-  }
-  for (let i = 0; i < next.length && left > 0; i++) {
-    if (next[i]) continue
-    const put = Math.min(left, stack)
-    next[i] = withMark(item, put, m)
-    left -= put
-  }
-  return next
+  return putStack(bag, withMark(item, count, markFor(item, mark)))
 }
 
 /** Remove items (of any quality and maker unless given), taking from the last stacks first. */
@@ -123,12 +103,24 @@ export function takeFromSlot(bag: Bag, index: number, count: number): Bag | null
 
 /** Put a stack into a bag as it is (a worn tool keeps its wear); null when there is no room. */
 export function putStack(bag: Bag, s: Stack): Bag | null {
-  if (s.dur === undefined) return addItem(bag, s.item, s.count, s.q !== undefined ? { q: s.q, by: s.by } : undefined)
-  const i = bag.findIndex((x) => !x)
-  if (i < 0) return null
+  if (!Number.isInteger(s.count) || s.count <= 0) return null
+  const limit = ITEMS[s.item].stack
   const next = [...bag]
-  next[i] = { ...s }
-  return next
+  let left = s.count
+  for (let i = 0; i < next.length && left > 0; i++) {
+    const slot = next[i]
+    if (!slot || !sameKind(slot, s) || slot.dur !== s.dur || slot.count >= limit) continue
+    const put = Math.min(left, limit - slot.count)
+    next[i] = { ...slot, count: slot.count + put }
+    left -= put
+  }
+  for (let i = 0; i < next.length && left > 0; i++) {
+    if (next[i]) continue
+    const put = Math.min(left, limit)
+    next[i] = { ...s, count: put }
+    left -= put
+  }
+  return left === 0 ? next : null
 }
 
 /** The first stack of the item, for using it from the hotbar. */
