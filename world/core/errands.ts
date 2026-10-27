@@ -55,6 +55,14 @@ export const ERRANDS: readonly Errand[] = [
     "鉄くずを三つ持ってきてくれ。砂丘の砂スライムが取り込んでるやつでもいい。溶かして鍬を直す。",
     "錆びてても中は使える。カールの鍬を直してやれるぜ。",
   ),
+  bring(
+    "beatrix-ingots",
+    "ベアトリクス",
+    "iron-ingot",
+    2,
+    "兜の縁を直す鉄が足りないんだ。延べ棒を二本、持ってきてくれるかい。薄くなったままじゃ危ないからね。",
+    "これなら丈夫に直せるよ。助かった。防具は命を預かるものだからね。",
+  ),
   bring("gottfried-logs", "ゴットフリート", "log", 3, "板にする原木が足りん。三本、森で伐ってきてくれ。", "まっすぐな木だ。いい板になる。"),
   bring("rudolf-fur", "ルドルフ", "soft-fur", 3, "やわらかい冬毛を三つ、持ってこい。野うさぎのでいい。靴の内張りにするんだぞ。", "毛並みがいい。ありがたい。"),
   bring("benedikt-herbs", "ベネディクト", "herb", 4, "寝込んでいる人に薬湯を出したいのです。薬草を四束、分けていただけませんか。", "女神さまの代わりに、お礼を言わせてください。"),
@@ -123,15 +131,38 @@ function hash(a: string): number {
 /** A little over half of those with something to ask ask it on a given day. */
 const ASKS = 0.6
 
-/** Today's errand from a resident, if they have one. */
-export function errandToday(from: string, day: string): Errand | undefined {
-  const theirs = ERRANDS.filter((e) => e.from === from)
-  if (!theirs.length || hash(`${day}:${from}`) >= ASKS) return undefined
-  return theirs[Math.floor(hash(`${from}:${day}`) * theirs.length)]
+/** Bound the town's daily requests as more residents gain errands. */
+export const DAILY_ERRAND_LIMIT = 18
+const byResident = new Map<string, Errand[]>()
+for (const errand of ERRANDS) {
+  const list = byResident.get(errand.from) ?? []
+  list.push(errand)
+  byResident.set(errand.from, list)
+}
+let cachedDay: string | undefined
+let daily = new Map<string, Errand>()
+
+function requestsOn(day: string): ReadonlyMap<string, Errand> {
+  if (cachedDay === day) return daily
+  const candidates = [...byResident].map(([from, errands]) => ({ from, errands, rank: hash(`${day}:${from}`) }))
+  const selected = candidates
+    .filter((candidate) => candidate.rank < ASKS)
+    .sort((a, b) => a.rank - b.rank)
+    .slice(0, DAILY_ERRAND_LIMIT)
+  daily = new Map(selected.map(({ from, errands }) => [from, errands[Math.floor(hash(`${from}:${day}`) * errands.length)]]))
+  cachedDay = day
+  return daily
 }
 
-/** Every errand asked on a day. */
-export const errandsOn = (day: string) => [...new Set(ERRANDS.map((e) => e.from))].map((f) => errandToday(f, day)).filter((e): e is Errand => !!e)
+/** Today's errand from a resident, if they have one. */
+export const errandToday = (from: string, day: string): Errand | undefined => requestsOn(day).get(from)
+
+/** Every errand asked on a day, in resident definition order. */
+export const errandsOn = (day: string) =>
+  [...byResident.keys()].flatMap((from) => {
+    const errand = errandToday(from, day)
+    return errand ? [errand] : []
+  })
 
 /** An errand a player has taken: for today only. */
 export interface Taken {

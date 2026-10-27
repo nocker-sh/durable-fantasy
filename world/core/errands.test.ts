@@ -1,3 +1,4 @@
+import { loadPlayer } from "./player.ts"
 import { describe, expect, it } from "vitest"
 import { apply } from "./apply.ts"
 import { countItem } from "./bag.ts"
@@ -176,4 +177,28 @@ describe("errands", () => {
     const food = apply(player({ bag: bagWith(["herb", 1]) }), { type: "sell", shop: "general", slot: 0, count: 1 }, { now: DAY0 })
     expect(food.ok && food.state.friends).toEqual({})
   })
+})
+
+it("delivers player-smelted iron to the armorer once and preserves the completed request", () => {
+  const id = "beatrix-ingots"
+  const now = dayOfErrand(id)
+  const request = ERRANDS.find((e) => e.id === id)!
+  let state = player({ name: "エルナ", gold: 100, bag: bagWith(["rusty-scrap", 4], ["charcoal", 2]) })
+  const accepted = apply(state, { type: "errand-take", errand: id, from: request.from }, { now })
+  if (!accepted.ok) throw Error(accepted.reason)
+  state = accepted.state
+  for (let i = 0; i < 2; i++) {
+    const made = apply(state, { type: "craft", recipe: "iron-ingot", station: "craft-forge", roll: 0.5 }, { now })
+    if (!made.ok) throw Error(made.reason)
+    state = made.state
+  }
+  expect(countItem(state.bag, "iron-ingot")).toBe(2)
+  const before = state
+  const handed = apply(state, { type: "errand-hand", errand: id, to: request.from }, { now })
+  if (!handed.ok) throw Error(handed.reason)
+  expect(countItem(handed.state.bag, "iron-ingot")).toBe(0)
+  expect(handed.state.gold).toBe(before.gold + request.gold)
+  expect(handed.state.friends[request.from]).toBe(FRIEND.bring)
+  const saved = loadPlayer(JSON.parse(JSON.stringify(handed.state)))
+  expect(apply(saved, { type: "errand-hand", errand: id, to: request.from }, { now })).toEqual({ ok: false, reason: "NO_ERRAND" })
 })
