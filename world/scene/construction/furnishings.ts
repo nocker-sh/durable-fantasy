@@ -113,28 +113,37 @@ export interface Spot {
 export class Kit {
   readonly W: number
   readonly D: number
+  /**
+   * `scale` draws a small thing larger than life, to sit right in a room drawn half again as large
+   * (W and D stay the footprint's own).
+   */
   constructor(
     readonly gb: GB,
     readonly s: Spot,
+    readonly scale = 1,
   ) {
     const side = s.face === 1 || s.face === 3
-    this.W = side ? s.d : s.w
-    this.D = side ? s.w : s.d
+    this.W = (side ? s.d : s.w) / scale
+    this.D = (side ? s.w : s.d) / scale
   }
   /** a point of the frame, in the world */
   at(u: number, v: number): [number, number] {
     const { x, z, face } = this.s
+    u *= this.scale
+    v *= this.scale
     return face === 0 ? [x + u, z + v] : face === 2 ? [x - u, z - v] : face === 1 ? [x + v, z - u] : [x - v, z + u]
   }
   box(side: THREE.Material, top: THREE.Material | null, u0: number, y0: number, v0: number, u1: number, y1: number, v1: number, r = 1) {
     const [ax, az] = this.at(u0, v0),
       [bx, bz] = this.at(u1, v1)
-    const y = this.s.y
-    this.gb.box(side, top, Math.min(ax, bx), y + Math.min(y0, y1), Math.min(az, bz), Math.max(ax, bx), y + Math.max(y0, y1), Math.max(az, bz), r)
+    const y = this.s.y,
+      k = this.scale
+    this.gb.box(side, top, Math.min(ax, bx), y + Math.min(y0, y1) * k, Math.min(az, bz), Math.max(ax, bx), y + Math.max(y0, y1) * k, Math.max(az, bz), r)
   }
   cyl(side: THREE.Material, top: THREE.Material | null, u: number, v: number, y0: number, y1: number, r0: number, r1 = r0, seg = 8) {
     const [x, z] = this.at(u, v)
-    this.gb.cyl(side, top, x, z, this.s.y + y0, this.s.y + y1, r0, r1, seg, 1)
+    const k = this.scale
+    this.gb.cyl(side, top, x, z, this.s.y + y0 * k, this.s.y + y1 * k, r0 * k, r1 * k, seg, 1)
   }
   /** four square legs, `inset` in from the corners */
   legs(m: THREE.Material, h: number, t = 0.05, inset = 0.04, W = this.W, D = this.D, v = 0) {
@@ -880,6 +889,288 @@ function shrink(k: Kit, W: number, v: number): { x: number; z: number; w: number
   return { x, z, w: side ? 0.4 : W, d: side ? W : 0.4 }
 }
 
+// ---------------------------------------------------------------- what the shops and rooms came to need
+
+function stool(k: Kit, wd: Wood) {
+  // three splayed legs and a round seat
+  const rr = Math.min(k.W, k.D) / 2 - 0.02
+  for (let t = 0; t < 3; t++) {
+    const a = (t / 3) * Math.PI * 2 + 0.3
+    k.box(wd.dark, null, Math.cos(a) * rr * 0.7 - 0.025, 0, Math.sin(a) * rr * 0.7 - 0.025, Math.cos(a) * rr * 0.7 + 0.025, 0.44, Math.sin(a) * rr * 0.7 + 0.025)
+  }
+  k.cyl(wd.body, wd.top, 0, 0, 0.44, 0.48, rr, rr, 9)
+}
+
+function washstand(k: Kit, wd: Wood, seed: number) {
+  // a stand with a basin let into its top, a jug in it, a towel on the rail and a cake of soap
+  const { W, D } = k
+  k.legs(wd.dark, 0.8, 0.045, 0.03)
+  k.slab(wd.body, 0.2, 0.03, W - 0.08, D - 0.08)
+  k.slab(wd.top, 0.8, 0.04)
+  k.cyl(glaze[(seed + 2) % glaze.length], M.water, 0, 0.02, 0.8, 0.9, 0.12, 0.18, 10)
+  k.cyl(glaze[(seed + 2) % glaze.length], null, 0.05, 0.02, 0.9, 1.06, 0.06, 0.04, 7)
+  k.box(wd.dark, null, -W / 2 - 0.04, 0.6, -0.02, -W / 2, 0.64, D / 2 - 0.05)
+  k.box(linen, null, -W / 2 - 0.05, 0.38, 0.02, -W / 2 - 0.035, 0.64, D / 2 - 0.1)
+  k.box(wax, null, W / 2 - 0.12, 0.84, -D / 2 + 0.06, W / 2 - 0.05, 0.87, -D / 2 + 0.12)
+  k.box(wd.top, wd.top, -W / 2, 0.84, -D / 2, W / 2, 1.0, -D / 2 + 0.03) // the splash board
+}
+
+function drawers(k: Kit, wd: Wood, seed: number, rows = 4) {
+  const { W, D } = k
+  const h = rows * 0.22 + 0.1
+  k.box(wd.body, null, -W / 2, 0.06, -D / 2, W / 2, h, D / 2)
+  k.box(wd.dark, null, -W / 2 + 0.03, 0, -D / 2 + 0.03, W / 2 - 0.03, 0.06, D / 2 - 0.03)
+  k.box(wd.top, wd.top, -W / 2 - 0.02, h, -D / 2 - 0.02, W / 2 + 0.02, h + 0.04, D / 2 + 0.02)
+  for (let i = 0; i < rows; i++) {
+    const y = 0.1 + i * 0.22
+    for (const half of W > 0.9 && i === rows - 1 ? [-1, 1] : [0]) {
+      const u0 = half === 0 ? -W / 2 + 0.04 : half < 0 ? -W / 2 + 0.04 : 0.01,
+        u1 = half === 0 ? W / 2 - 0.04 : half < 0 ? -0.01 : W / 2 - 0.04
+      k.box(wd.trim ?? wd.dark, null, u0, y, D / 2, u1, y + 0.19, D / 2 + 0.015)
+      k.box(brass, null, (u0 + u1) / 2 - 0.03, y + 0.08, D / 2 + 0.015, (u0 + u1) / 2 + 0.03, y + 0.11, D / 2 + 0.03)
+    }
+  }
+  // what is set out on top: a candle, a little box, a folded cloth
+  candleOn(k, -W / 2 + 0.15, 0, h + 0.04)
+  k.box(wd.dark, brass, 0.0, h + 0.04, -0.08, 0.16, h + 0.12, 0.06)
+  if (r(seed, 4) > 0.4) k.box(cloth[Math.floor(r(seed, 5) * cloth.length)], null, W / 2 - 0.3, h + 0.04, -0.1, W / 2 - 0.08, h + 0.07, 0.12)
+}
+
+function candleOn(k: Kit, u: number, v: number, y: number) {
+  k.cyl(brass, null, u, v, y, y + 0.02, 0.045, 0.045, 6)
+  k.cyl(wax, null, u, v, y + 0.02, y + 0.17, 0.015, 0.015, 5)
+  k.box(colorMat(0xffc860), null, u - 0.007, y + 0.17, v - 0.007, u + 0.007, y + 0.2, v + 0.007)
+}
+
+function coatStand(k: Kit, wd: Wood, seed: number) {
+  k.box(wd.dark, null, -0.18, 0, -0.03, 0.18, 0.05, 0.03)
+  k.box(wd.dark, null, -0.03, 0, -0.18, 0.03, 0.05, 0.18)
+  k.box(wd.body, null, -0.03, 0.05, -0.03, 0.03, 1.7, 0.03)
+  for (let t = 0; t < 4; t++) {
+    const a = (t / 4) * Math.PI * 2
+    k.box(wd.dark, null, Math.cos(a) * 0.12 - 0.015, 1.55, Math.sin(a) * 0.12 - 0.015, Math.cos(a) * 0.12 + 0.015, 1.6, Math.sin(a) * 0.12 + 0.015)
+  }
+  // a coat, a hat, a scarf left on it
+  const c = cloth[Math.floor(r(seed, 1) * cloth.length)]
+  k.box(c, null, 0.03, 0.75, -0.12, 0.13, 1.55, 0.12)
+  k.cyl(cloth[Math.floor(r(seed, 2) * cloth.length)], null, -0.1, 0, 1.6, 1.68, 0.1, 0.08, 7)
+  if (r(seed, 3) > 0.4) k.box(cloth[0], null, -0.09, 1.0, -0.03, -0.05, 1.55, 0.03)
+}
+
+function birdcage(k: Kit, wd: Wood, seed: number) {
+  // a finch in a cage on a stand by the window
+  k.cyl(wd.dark, null, 0, 0, 0, 0.04, 0.16, 0.16, 8)
+  k.box(wd.dark, null, -0.025, 0.04, -0.025, 0.025, 1.0, 0.025)
+  k.cyl(brass, null, 0, 0, 1.0, 1.02, 0.17, 0.17, 10)
+  for (let t = 0; t < 12; t++) {
+    const a = (t / 12) * Math.PI * 2
+    k.box(brass, null, Math.cos(a) * 0.16 - 0.006, 1.02, Math.sin(a) * 0.16 - 0.006, Math.cos(a) * 0.16 + 0.006, 1.35, Math.sin(a) * 0.16 + 0.006)
+  }
+  k.cyl(brass, null, 0, 0, 1.35, 1.45, 0.17, 0.03, 10)
+  k.box(wd.top, null, -0.12, 1.12, -0.01, 0.12, 1.13, 0.01)
+  k.box(r(seed, 1) > 0.5 ? colorMat(0xd8b040) : colorMat(0x8a6a4a), null, -0.03, 1.13, -0.025, 0.04, 1.2, 0.025)
+}
+
+function brazier(k: Kit) {
+  // an iron pan of embers on three legs, for warming hands in a room without a fire
+  for (let t = 0; t < 3; t++) {
+    const a = (t / 3) * Math.PI * 2
+    k.box(M.iron, null, Math.cos(a) * 0.2 - 0.02, 0, Math.sin(a) * 0.2 - 0.02, Math.cos(a) * 0.2 + 0.02, 0.4, Math.sin(a) * 0.2 + 0.02)
+  }
+  k.cyl(M.iron, null, 0, 0, 0.35, 0.5, 0.18, 0.26, 10)
+  k.cyl(colorMat(0xff8a3a), colorMat(0xff8a3a), 0, 0, 0.44, 0.47, 0.22, 0.22, 10)
+  for (let t = 0; t < 4; t++) k.box(M.dark, null, -0.12 + t * 0.07, 0.47, -0.05, -0.08 + t * 0.07, 0.5, 0.05)
+}
+
+function shavingHorse(k: Kit, wd: Wood) {
+  // the bench a bow maker sits astride, a stave clamped under its head, a drawknife on it
+  const { W } = k
+  k.box(wd.body, wd.top, -W / 2, 0.45, -0.12, W / 2, 0.52, 0.12)
+  for (const [u, v] of [
+    [-W / 2 + 0.1, -0.12],
+    [-W / 2 + 0.1, 0.12],
+    [W / 2 - 0.1, 0],
+  ])
+    k.box(wd.dark, null, u - 0.03, 0, v - 0.03, u + 0.03, 0.45, v + 0.03)
+  k.box(wd.top, null, 0.05, 0.52, -0.1, W / 2 - 0.1, 0.6, 0.1) // the ramp
+  k.box(wd.dark, null, 0.1, 0.6, -0.04, 0.16, 0.95, 0.04) // the head
+  k.box(M.woodV, null, -0.1, 0.6, -0.03, W / 2, 0.64, 0.03) // the stave
+  k.box(M.iron, null, -0.2, 0.52, 0.06, 0.1, 0.54, 0.1)
+}
+
+function breadRack(k: Kit, wd: Wood, seed: number) {
+  // two tiers of long baskets, loaves in them
+  const { W, D } = k
+  k.legs(wd.dark, 0.85, 0.04, 0.02)
+  for (const y of [0.3, 0.75]) {
+    k.box(willow, null, -W / 2 + 0.04, y, -D / 2 + 0.04, W / 2 - 0.04, y + 0.1, D / 2 - 0.04)
+    for (let t = 0; t < Math.floor(W / 0.16); t++) k.cyl(colorMat(t % 3 ? 0x7a5236 : 0xc89a5a), null, -W / 2 + 0.12 + t * 0.16, (r(seed, t) - 0.5) * 0.1, y + 0.08, y + 0.16, 0.07, 0.05, 6)
+  }
+}
+
+function tiltedShelf(k: Kit, wd: Wood, seed: number, what: "bottles" | "thread" | "leather" | "plates") {
+  const { W, D } = k
+  if (what === "plates") {
+    // a dresser: cupboard doors below, plates stood along the rails above
+    k.box(wd.body, wd.top, -W / 2, 0, -D / 2, W / 2, 0.85, D / 2)
+    for (const s of [-1, 1]) {
+      k.box(wd.trim ?? wd.dark, null, s * W / 4 - W / 4 + 0.04, 0.08, D / 2, s * W / 4 + W / 4 - 0.04, 0.78, D / 2 + 0.015)
+      k.box(brass, null, s * 0.04 - 0.015, 0.45, D / 2 + 0.015, s * 0.04 + 0.015, 0.5, D / 2 + 0.03)
+    }
+    const top = k.D * 0.5
+    for (const su of [-1, 1]) k.box(wd.dark, wd.top, su * W / 2 - (su > 0 ? 0.05 : 0), 0.85, -D / 2, su * W / 2 + (su < 0 ? 0.05 : 0), 1.85, -D / 2 + top)
+    k.box(wd.body, null, -W / 2, 0.85, -D / 2, W / 2, 1.85, -D / 2 + 0.03)
+    k.box(wd.top, wd.top, -W / 2 - 0.03, 1.85, -D / 2, W / 2 + 0.03, 1.9, -D / 2 + top + 0.02)
+    for (const y of [1.2, 1.55]) {
+      k.box(wd.top, wd.top, -W / 2, y, -D / 2, W / 2, y + 0.03, -D / 2 + top)
+      let u = -W / 2 + 0.08
+      for (let t = 0; u < W / 2 - 0.12; t++) {
+        const g = glaze[(t + Math.floor(r(seed, t) * 4)) % glaze.length]
+        k.box(g, g, u, y + 0.03, -D / 2 + 0.06, u + 0.025, y + 0.3, -D / 2 + 0.09)
+        u += 0.12
+      }
+    }
+    for (let t = 0; t < 4; t++) k.cyl(t % 2 ? clay : glaze[t % glaze.length], null, -W / 2 + 0.15 + t * ((W - 0.3) / 3), -D / 2 + 0.12, 0.88, 1.0 + r(seed, t + 7) * 0.1, 0.05, 0.07, 7)
+    return
+  }
+  const boards = [0.04, 0.5, 0.95, 1.4]
+  frame(k, wd, 1.8, boards)
+  boards.forEach((b, i) =>
+    row(k, b, -W / 2 + 0.08, W / 2 - 0.1, (u, j) => {
+      if (what === "bottles") {
+        const g = [glass, glaze[0], colorMat(0x3a5a3a), colorMat(0x6a2a2a)][Math.floor(r(seed + i, j) * 4)]
+        k.cyl(g, null, u + 0.04, 0, b + 0.035, b + 0.25, 0.04, 0.04, 6)
+        k.cyl(g, null, u + 0.04, 0, b + 0.25, b + 0.33, 0.015, 0.015, 5)
+        return 0.1
+      }
+      if (what === "thread") {
+        const c = cloth[Math.floor(r(seed + i, j) * cloth.length)]
+        k.cyl(c, c, u + 0.05, 0, b + 0.035, b + 0.14, 0.045, 0.045, 6)
+        return 0.11
+      }
+      // rolled hides, their ends showing
+      k.cyl(colorMat([0x8a6a4a, 0x6a4632, 0x4a3226][j % 3]), null, u + 0.09, 0, b + 0.035, b + 0.2, 0.08, 0.08, 7)
+      return 0.2
+    }),
+  )
+}
+
+/** What a shop keeps on its open shelves (interior.ts picks it by the shop). */
+export type Stock = "bread" | "jars" | "sundries" | "bottles" | "stores"
+
+const crust = [colorMat(0xb87a3a), colorMat(0x9a5e2a), colorMat(0xd0a060)]
+
+/**
+ * A long open shelf in bays, stocked the way a shop's shelf is in the afternoon: the boards near
+ * the hand full, the top one half sold, a gap here and there where something went this morning.
+ */
+export function stockShelf(gb: GB, spot: Spot, wd: Wood, seed: number, stock: Stock) {
+  const k = new Kit(gb, spot)
+  const { W, D } = k
+  const h = 1.75
+  const boards = [0.04, 0.5, 0.95, 1.4]
+  const bays = Math.max(1, Math.round(W / 1.2))
+  const bw = W / bays
+  for (let i = 0; i <= bays; i++) {
+    const u = -W / 2 + i * bw
+    k.box(wd.dark, wd.top, Math.max(-W / 2, u - 0.035), 0, -D / 2, Math.min(W / 2, u + 0.035), h, D / 2)
+  }
+  k.box(wd.body, null, -W / 2, 0, -D / 2, W / 2, h, -D / 2 + 0.03)
+  for (const b of boards) k.box(wd.top, wd.top, -W / 2, b, -D / 2, W / 2, b + 0.035, D / 2)
+  k.box(wd.dark, wd.top, -W / 2 - 0.03, h, -D / 2, W / 2 + 0.03, h + 0.05, D / 2 + 0.02)
+  const v = Math.min(0.06, D / 2 - 0.12)
+  boards.forEach((b, row) => {
+    const y = b + 0.035
+    for (let i = 0; i < bays; i++) {
+      const full = r(seed + row * 31, i)
+      if (full < (row === 3 ? 0.4 : 0.12)) continue
+      const u0 = -W / 2 + i * bw + 0.08,
+        u1 = u0 + (bw - 0.16) * (full < 0.5 ? 0.55 : 1)
+      const kind = stock === "sundries" ? (["jars", "stores", "rope", "candles"] as const)[Math.floor(r(seed + row, i + 40) * 4)] : stock
+      row_(k, y, u0, u1, v, kind, seed + row * 7 + i)
+    }
+  })
+}
+
+function row_(k: Kit, y: number, u0: number, u1: number, v: number, kind: Stock | "rope" | "candles", seed: number) {
+  row(k, y, u0, u1, (u, j) => {
+    const n = r(seed, j)
+    if (kind === "bread") {
+      if (n < 0.5) {
+        const c = crust[j % 3]
+        k.cyl(c, c, u + 0.09, v, y, y + 0.09, 0.09, 0.07, 8)
+        return 0.2
+      }
+      k.box(crust[(j + 1) % 3], crust[2], u, y, v - 0.07, u + 0.26, y + 0.1, v + 0.07)
+      return 0.3
+    }
+    if (kind === "jars") {
+      const g = n < 0.4 ? clay : glaze[j % glaze.length]
+      const rr = 0.05 + n * 0.04
+      k.cyl(g, g, u + rr, v, y, y + 0.14 + n * 0.12, rr, rr * 0.75, 7)
+      return rr * 2 + 0.04
+    }
+    if (kind === "bottles") {
+      const g = [glass, glaze[0], colorMat(0x3a5a3a), colorMat(0x6a2a2a)][Math.floor(n * 4)]
+      k.cyl(g, null, u + 0.04, v, y, y + 0.22, 0.04, 0.04, 6)
+      k.cyl(g, null, u + 0.04, v, y + 0.22, y + 0.3, 0.015, 0.015, 5)
+      return 0.1
+    }
+    if (kind === "rope") {
+      k.cyl(M.rope, M.rope, u + 0.12, v, y, y + 0.08, 0.12, 0.12, 8)
+      return 0.28
+    }
+    if (kind === "candles") {
+      for (let t = 0; t < 5; t++) k.box(colorMat(0xe8dcb8), null, u + t * 0.035, y, v - 0.04, u + t * 0.035 + 0.025, y + 0.2, v - 0.015)
+      return 0.24
+    }
+    // stores: a small crate or a tied sack
+    if (n < 0.5) {
+      k.box(M.sack, M.sack, u, y, v - 0.1, u + 0.22, y + 0.2, v + 0.1)
+      return 0.27
+    }
+    k.box(M.woodV, M.wood, u, y, v - 0.11, u + 0.26, y + 0.2, v + 0.11)
+    return 0.31
+  })
+}
+
+// ---------------------------------------------------------------- the fire
+
+/**
+ * The hearth every home is built round: a stone stove with the fire's mouth at the front, a hood
+ * and chimney up into the ceiling, a pot on its hook, the kettle, a shelf of things kept dry above
+ * it and the day's firewood stacked beside. A fireplace is the same set into the wall.
+ */
+function hearth(k: Kit, wd: Wood, seed: number, set = false) {
+  const { W, D } = k
+  const fw = set ? W : W * 0.78
+  const u0 = set ? 0 : -W / 2 + fw / 2
+  k.box(M.stoneDark, M.stone, u0 - fw / 2, 0, -D / 2, u0 + fw / 2, 0.75, D / 2, 2)
+  k.box(M.stone, M.stone, u0 - fw / 2 - 0.04, 0.75, -D / 2, u0 + fw / 2 + 0.04, 0.85, D / 2 + 0.06, 2) // the ledge
+  // the hood narrowing up to the chimney
+  k.box(M.plaster, null, u0 - fw / 2 + 0.05, 1.35, -D / 2, u0 + fw / 2 - 0.05, 1.7, D / 2 - 0.05)
+  k.box(M.plaster, null, u0 - fw * 0.28, 1.7, -D / 2, u0 + fw * 0.28, 2.5, D / 2 - 0.25)
+  k.box(M.woodDark, null, u0 - fw / 2, 1.3, D / 2 - 0.1, u0 + fw / 2, 1.38, D / 2 - 0.02) // the mantel beam
+  // the fire's mouth, the embers and a log in it
+  k.box(M.dark, null, u0 - fw * 0.3, 0.08, D / 2, u0 + fw * 0.3, 0.6, D / 2 + 0.01)
+  k.box(colorMat(0xff8a3a), null, u0 - fw * 0.22, 0.08, D / 2 + 0.01, u0 + fw * 0.22, 0.2, D / 2 + 0.02)
+  k.box(M.woodDark, null, u0 - fw * 0.2, 0.18, D / 2 + 0.005, u0 + fw * 0.15, 0.25, D / 2 + 0.025)
+  // on the ledge: the kettle, a pot, a jar of salt
+  k.cyl(M.iron, M.dark, u0 - fw * 0.25, D / 2 - 0.2, 0.85, 1.0, 0.1, 0.08, 8)
+  k.box(M.iron, null, u0 - fw * 0.25 + 0.08, 0.93, D / 2 - 0.21, u0 - fw * 0.25 + 0.2, 0.95, D / 2 - 0.19)
+  k.cyl(M.iron, M.dark, u0 + fw * 0.15, D / 2 - 0.25, 0.85, 1.05, 0.15, 0.16, 9)
+  k.cyl(clay, null, u0 + fw * 0.38, D / 2 - 0.15, 0.85, 0.98, 0.05, 0.04, 6)
+  // what is kept on the mantel to stay dry
+  k.cyl(brass, null, u0 - fw * 0.35, D / 2 - 0.06, 1.38, 1.4, 0.04, 0.04, 6)
+  k.cyl(wax, null, u0 - fw * 0.35, D / 2 - 0.06, 1.4, 1.55, 0.015, 0.015, 5)
+  for (let t = 0; t < 3; t++) k.cyl(t % 2 ? clay : glaze[(seed + t) % glaze.length], null, u0 - fw * 0.1 + t * 0.14, D / 2 - 0.06, 1.38, 1.48 + r(seed, t) * 0.06, 0.04, 0.035, 6)
+  if (!set) {
+    // the day's firewood, stacked beside it
+    const lu = W / 2 - (W - fw) / 2
+    for (let l = 0; l < 4; l++) for (let t = 0; t < 3; t++) k.box(M.woodV, M.woodDark, lu - 0.1 + t * 0.07 - 0.035, l * 0.07, -D / 2 + 0.1, lu - 0.1 + t * 0.07 + 0.035, l * 0.07 + 0.065, D / 2 - 0.1)
+  }
+}
+
 // ---------------------------------------------------------------- what each piece is drawn as
 
 const B = (f: Builder) => f
@@ -958,6 +1249,24 @@ export const FURNISHINGS: Record<string, Builder> = {
   巣箱: B((k) => beehive(k)),
   干し草: B((k) => hay(k)),
   荷車: handcart,
+  腰掛け: stool,
+  洗面台: washstand,
+  箪笥: B((k, w, s) => drawers(k, w, s)),
+  長持: B((k, w, s) => wardrobeChest(k, w, s)),
+  帽子掛け: coatStand,
+  鳥かご: birdcage,
+  火鉢: B((k) => brazier(k)),
+  削り馬: shavingHorse,
+  パン籠: breadRack,
+  薪入れ: B((k, _w, s) => bundles(k, s, "logs")),
+  薬草の籠: B((k, _w, s) => basketOf(k, s, "veg")),
+  焼き入れの桶: B((k, w, s) => tub(k, w, s, "fish")),
+  食器棚: B((k, w, s) => tiltedShelf(k, w, s, "plates")),
+  酒の棚: B((k, w, s) => tiltedShelf(k, w, s, "bottles")),
+  糸の棚: B((k, w, s) => tiltedShelf(k, w, s, "thread")),
+  革の棚: B((k, w, s) => tiltedShelf(k, w, s, "leather")),
+  炉: B((k, w, s) => hearth(k, w, s)),
+  暖炉: B((k, w, s) => hearth(k, w, s, true)),
 }
 
 /** How high the top of a piece is, for setting things down on it (the traces of life, interior.ts). */

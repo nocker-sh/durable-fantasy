@@ -18,7 +18,7 @@ export const SOURCES: Record<string, readonly string[]> = {
   nodes: ["NODES", "LATER_SPOTS"],
   skills: ["SKILLS", "SKILL_IDS"],
   life: ["LIFE_SKILLS", "LIFE_MILESTONE_TEXT", "MILESTONES"],
-  objects: ["PROPS", "SIZES", "THINGS", "THINGS_BY_HOUSEHOLD", "FURNISHINGS"],
+  objects: ["PROPS", "SIZES", "THINGS", "THINGS_BY_HOUSEHOLD", "FURNISHINGS", "ON_WALLS"],
   world: ["WORLD", "GRID_SIZE", "WORLD_NODES", "LOCKED_CITIES"],
   icons: ["SPRITES"],
   "item-art": ["ITEM_SPRITES", "HIDE"],

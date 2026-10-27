@@ -19,7 +19,7 @@ const houses: readonly HouseDef[] = [
     seed: 71,
     sign: "shield",
     ramp: "plaster",
-    plan: home([room("店先", 0), room("仕上げ場", 0), bed("寝室", 1, 1), bed("見習いの部屋", 1, 1)], ["鎧掛け", "盾の壁掛け", "作業台", "寝台×2", "椅子×2"], "仕上げ台"),
+    plan: home([room("店先", 0), room("仕上げ場", 0), bed("寝室", 1, 1), bed("見習いの部屋", 1, 1)], ["鎧掛け", "盾の壁掛け", "作業台", "焼き入れの桶", "腰掛け", "寝台×2", "椅子×2"], "仕上げ台"),
   },
   {
     id: "woodworker",
@@ -38,7 +38,7 @@ const houses: readonly HouseDef[] = [
     seed: 72,
     timber: true,
     sign: "bow",
-    plan: home([room("工房", 0), bed("屋根裏の寝間", 1, 2)], ["木工台", "鉋と鋸", "弓の並んだ棚", "木材", "寝台×2", "椅子×2"], "木工台"),
+    plan: home([room("工房", 0), bed("屋根裏の寝間", 1, 2)], ["木工台", "鉋と鋸", "弓の並んだ棚", "木材", "削り馬", "腰掛け", "寝台×2", "椅子×2"], "木工台"),
   },
   {
     id: "leather",
@@ -56,7 +56,7 @@ const houses: readonly HouseDef[] = [
     door: { side: "s", u: 2.0 },
     seed: 73,
     sign: "hide",
-    plan: home([room("店先", 0), room("なめし場", 0), bed("寝室", 1, 1)], ["吊るした革", "なめし桶", "作業台", "寝台", "椅子×1"], "なめし場"),
+    plan: home([room("店先", 0), room("なめし場", 0), bed("寝室", 1, 1)], ["吊るした革", "なめし桶", "作業台", "革の棚", "腰掛け", "寝台", "椅子×1"], "なめし場"),
   },
   {
     id: "h-c1",
@@ -92,7 +92,7 @@ const houses: readonly HouseDef[] = [
       hearth: true,
       kitchen: true,
       workshop: "かまど・作業台（木工と調合）・機織り機と糸車（使用料は寄り合いへ）",
-      furniture: ["木工台", "機織り機", "糸車", "調合台"],
+      furniture: ["木工台", "機織り機", "糸車", "調合台", "長椅子", "道具棚"],
     },
   },
   {

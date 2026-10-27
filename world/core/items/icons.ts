@@ -29,6 +29,10 @@ export const ITEM_ICONS = [
   "warhammer",
   "flail",
   "halberd",
+  "estoc",
+  "falchion",
+  "bill",
+  "pick",
   // hand drawn (pixel-art.ts, item-art.ts)
   "hat",
   "helm",
