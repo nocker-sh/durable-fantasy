@@ -327,19 +327,22 @@ export function npcCell(map: MapDefinition, name: string, min = jstMinutes(Date.
   return spot && spot.map === map.id ? cellOfSpot(spot) : null
 }
 
+/** Whether this particular keeper is present for this shop, including separate street pitches. */
+export function keeperPresent(shop: keyof typeof SHOPS, name: string, min: number): boolean {
+  if (!(SHOPS[shop].keepers as readonly string[]).includes(name)) return false
+  const work = WORK.get(name)
+  if (!work) return false
+  const pitch = (SHOPS[shop] as { at?: { map: string; place: string } }).at
+  if (pitch) {
+    const spot = spotAt(name, min, work)
+    return !!spot && "place" in spot && spot.map === pitch.map && spot.place === pitch.place
+  }
+  return npcCell(MAPS[work.map], name, min) !== null
+}
+
 /** Is the shop minded at `min`: is one of its keepers at their spot? */
 export function shopOpen(shop: keyof typeof SHOPS, min: number): boolean {
-  const pitch = (SHOPS[shop] as { at?: { map: string; place: string } }).at
-  return SHOPS[shop].keepers.some((k) => {
-    const w = WORK.get(k)
-    if (!w) return false
-    // a street seller is open only while standing at the pitch
-    if (pitch) {
-      const s = spotAt(k, min, w)
-      return !!s && "place" in s && s.map === pitch.map && s.place === pitch.place
-    }
-    return npcCell(MAPS[w.map], k, min) !== null
-  })
+  return SHOPS[shop].keepers.some((name) => keeperPresent(shop, name, min))
 }
 
 /** Minutes until the shop's last keeper goes home, looking up to two hours ahead; null if not that soon. */

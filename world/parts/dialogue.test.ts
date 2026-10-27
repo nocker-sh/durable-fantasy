@@ -70,3 +70,10 @@ it("offers the chapel commission while the monk is at his counter", () => {
   expect(choicesFor(at(18 * 60), "ベネディクト")).toContainEqual({ label: "仕事を頼む", action: "commission" })
   expect(choicesFor(at(8 * 60), "ベネディクト").some((choice) => choice.action === "commission")).toBe(false)
 })
+
+it("offers shopping only with the on-duty keeper of a shared shop", () => {
+  const base = createGameState().get()
+  const state = { ...base, player: player(), clock: { ...base.clock, min: 18 * 60 } }
+  expect(choicesFor(state, "ハンス")).toContainEqual({ label: "買い物をする", action: "shop" })
+  expect(choicesFor(state, "マルタ").some((choice) => choice.action === "shop")).toBe(false)
+})

@@ -232,6 +232,18 @@ describe("client controllers", () => {
     expect(callbacks.toggleWindow).toHaveBeenCalledWith("inventory")
   })
 
+  it.each(["shop", "commission"] as const)("does not open a stale %s choice after the keeper goes off duty", (action) => {
+    const { session, context, callbacks, send } = fixture()
+    const dialogue = { resident: 0, name: "ベネディクト", job: "修道士", pages: ["どうぞ"], page: 0, shownAt: -100000, choices: [{ label: "頼む", action }] }
+    callbacks.update({ clock: { ...session.state.get().clock, min: 8 * 60 }, dialogue })
+    new DialogueActions(context).choose(0)
+    expect(session.state.get().shop).toBeNull()
+    expect(session.state.get().commission).toBeNull()
+    expect(session.state.get().dialogue).toEqual(dialogue)
+    expect(send).not.toHaveBeenCalled()
+    expect(callbacks.toggleWindow).not.toHaveBeenCalled()
+  })
+
   it("sends trade requests through the current socket", () => {
     const { context, send } = fixture()
     new SocialActions(context).askTrade("other-player")

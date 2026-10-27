@@ -6,9 +6,9 @@ import { BATCHES, type Batch } from "../core/market.ts"
 import { within } from "../core/clock.ts"
 import { ITEMS, type ItemId } from "../core/items.ts"
 import { SHOPS, shopOfKeeper, type ShopId } from "../core/shops.ts"
-import { shopOpen } from "../maps/index.ts"
+import { keeperPresent } from "../maps/index.ts"
 import { RESIDENTS } from "../town/residents.ts"
-import { choicesFor, linesFor } from "../parts/dialogue.ts"
+import { choicesFor, keepingShop, linesFor } from "../parts/dialogue.ts"
 import { fullyShown } from "../state.ts"
 import type { GameContext } from "./context.ts"
 
@@ -86,14 +86,16 @@ export class DialogueActions {
       return
     }
     if (choice.action === "commission") {
+      if (!keepingShop(dialogue.name, this.target.session.state.get().clock.min)) return
       this.target.update({ dialogue: null, commission: dialogue.name })
       this.syncEngaged()
       return
     }
     if (choice.action === "shop") {
       // a seller with two pitches opens the one they are standing at now
-      const shop = shopOfKeeper(dialogue.name, (s) => shopOpen(s, this.target.session.state.get().clock.min))
-      if (!shop) return
+      const min = this.target.session.state.get().clock.min
+      const shop = shopOfKeeper(dialogue.name, (id) => keeperPresent(id, dialogue.name, min))
+      if (!shop || !keeperPresent(shop, dialogue.name, min)) return
       this.target.addChat({ channel: "npc", name: dialogue.name, text: SHOPS[shop].greeting })
       this.shopKeeper = dialogue.name
       this.target.update({ dialogue: null, shop, stock: null })

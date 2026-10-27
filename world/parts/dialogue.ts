@@ -6,7 +6,7 @@ import { dayOf, errandProgress, errandOf, errandToday, todays } from "../core/er
 import { ITEMS } from "../core/items.ts"
 import { shopOfKeeper } from "../core/shops.ts"
 import { STORAGE_KEEPER } from "../core/storage.ts"
-import { shopOpen } from "../maps/index.ts"
+import { keeperPresent } from "../maps/index.ts"
 import { eventOf } from "../town/events.ts"
 import { pick, type Situation } from "../town/lines/line.ts"
 import { ALL_LINES } from "../town/lines/index.ts"
@@ -16,8 +16,8 @@ import type { DialogueChoice, GameState } from "../state.ts"
 
 /** Is the resident minding their shop now (a seller off duty just talks). */
 export function keepingShop(name: string, min: number): boolean {
-  const shop = shopOfKeeper(name, (id) => shopOpen(id, min))
-  return shop !== null && shopOpen(shop, min)
+  const shop = shopOfKeeper(name, (id) => keeperPresent(id, name, min))
+  return shop !== null && keeperPresent(shop, name, min)
 }
 
 /** What a resident and we have to do with errands now: hear today's, or hand one over to them. */
