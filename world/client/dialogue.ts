@@ -1,3 +1,4 @@
+import { parseChatInput } from "./chat-input.ts"
 import type { GameSession } from "./session.ts"
 import { STORAGE } from "./identity.ts"
 import { STORAGE_KEEPER } from "../core/storage.ts"
@@ -16,15 +17,13 @@ export class DialogueActions {
   constructor(private readonly target: Pick<GameContext, "addChat" | "getScene" | "update" | "run" | "toggleWindow"> & { readonly session: Pick<GameSession, "state" | "socket" | "engaged"> }) {}
   private shopKeeper: string | null = null
   say(text: string) {
-    let said = text.trim().slice(0, 140)
-    if (!said) return
-    if (said.startsWith("/w ")) {
-      this.target.addChat({ channel: "system", text: "ささやきはまだ使えない。" })
+    const input = parseChatInput(text)
+    if (!input) return
+    if (input.kind === "unavailable") {
+      this.target.addChat({ channel: "system", text: input.text })
       return
     }
-    const shout = said.startsWith("/s ")
-    if (shout) said = said.slice(3).trim()
-    if (!said) return
+    const { text: said, shout } = input
     this.target.getScene()?.bubble("me", said)
     this.target.addChat({ channel: "player", name: this.target.session.state.get().player?.name, text: said, self: true, shout })
     this.target.session.socket?.send({ type: "say", text: said, shout })

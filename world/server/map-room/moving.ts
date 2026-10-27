@@ -1,4 +1,4 @@
-// The map room's handlers for joining, walking, talking, looking about, warping, coming to and engaging a resident.
+// The map room's handlers for joining, walking, looking about, warping, coming to and engaging a resident.
 import { mayVisit } from "../../core/threads.ts"
 import { Player } from "../../../durable-objects/player.ts"
 import { SHOPS, isShopId } from "../../core/shops.ts"
@@ -8,8 +8,8 @@ import { Wild } from "../../../durable-objects/wild.ts"
 import { SPAWNS } from "../../core/monsters.ts"
 import { Nature } from "../../../durable-objects/nature.ts"
 import { Directory } from "../../../durable-objects/directory.ts"
-import { MAPS, TALK_CELLS, cellDistance, isOpen, minutesToClose, npcCell, walkable } from "../../maps/index.ts"
-import { HEARING_CELLS, validPath, cellsReached, type Cell, type MapPlayer } from "../../protocol.ts"
+import { MAPS, TALK_CELLS, isOpen, minutesToClose, npcCell, walkable } from "../../maps/index.ts"
+import { validPath, cellsReached, type Cell, type MapPlayer } from "../../protocol.ts"
 import type { Ctx, Handlers, Message } from "./context.ts"
 import { TOWN, timeFor, presence, mapPlayer, reachable, near, atWarp } from "./presence.ts"
 
@@ -95,24 +95,6 @@ async function move(roomCtx: Ctx, message: Message<"move">) {
   return
 }
 
-async function say(roomCtx: Ctx, message: Message<"say">) {
-  const { ctx, me, save } = roomCtx
-  if (!me.player) return
-  // at most two lines a second
-  const now = Date.now()
-  const said = [...me.said.filter((t) => now - t < 1000), now]
-  save({ said })
-  if (said.length > 2) return
-  const shout = !!message.shout
-  const from = reachable(me)[0]
-  for (const other of ctx.room.getConnections()) {
-    const them = presence(other)
-    if (other.id === ctx.connection.id || !them.player) continue
-    if (shout || reachable(them).some((c) => cellDistance(c, from) <= HEARING_CELLS)) await other.send({ type: "said", id: me.player.id, text: message.text, shout })
-  }
-  return
-}
-
 async function engage(roomCtx: Ctx, message: Message<"engage">) {
   const { ctx, map, me, save } = roomCtx
   if (!me.player) return
@@ -180,7 +162,6 @@ async function warp(roomCtx: Ctx, message: Message<"warp">) {
 export const HANDLERS: Handlers = {
   join: join,
   move: move,
-  say: say,
   engage: engage,
   revive: revive,
   look: look,
