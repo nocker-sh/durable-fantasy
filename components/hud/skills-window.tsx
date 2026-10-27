@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useDeadlineClock } from "#/hooks/use-deadline-clock.ts"
 import { REASON_TEXT } from "#/world/core/commands.ts"
 // Skills (game-system.md §9, ui.md §3.10): the life skills' levels and their next milestones, what
 // anyone can do (sit, first aid), and the arts of the weapon in hand. Drag an icon to the shortcut bar.
@@ -25,6 +26,8 @@ export function SkillsWindow() {
   const busy = useGameState((s) => s.busy)
   const [forget, setForget] = useState<{ skill: Skill; exp: number } | null>(null)
   const player = useGameState((s) => s.player)
+  const until = win.open && player ? Math.max(0, ...Object.values(player.ready)) : 0
+  const now = useDeadlineClock(until)
   if (!win.open || !player) return null
   const total = lifeTotal(player.life)
   const held = artsOf(player.equipment.weapon)
@@ -107,7 +110,7 @@ export function SkillsWindow() {
           <h3 className="mb-1 font-head text-xs text-brass-hi">動作</h3>
           <ul className="flex flex-col gap-1">
             {(["sit", "first-aid"] as const).map((id) => (
-              <SkillRow key={id} id={id} player={player} />
+              <SkillRow key={id} id={id} player={player} now={now} />
             ))}
           </ul>
         </section>
@@ -117,7 +120,7 @@ export function SkillsWindow() {
           {held.length ? (
             <ul className="flex flex-col gap-1">
               {held.map((id) => (
-                <SkillRow key={id} id={id} player={player} />
+                <SkillRow key={id} id={id} player={player} now={now} />
               ))}
             </ul>
           ) : (
@@ -127,7 +130,7 @@ export function SkillsWindow() {
             <summary className="cursor-pointer font-head text-[11px] text-text-dim">ほかの武器の技</summary>
             <ul className="mt-1 flex flex-col gap-1">
               {others.map((id) => (
-                <SkillRow key={id} id={id} player={player} />
+                <SkillRow key={id} id={id} player={player} now={now} />
               ))}
             </ul>
           </details>
@@ -137,11 +140,12 @@ export function SkillsWindow() {
   )
 }
 
-function SkillRow({ id, player }: { id: SkillId; player: PlayerState }) {
+function SkillRow({ id, player, now }: { id: SkillId; player: PlayerState; now: number }) {
   const game = useGame()
   const busy = useGameState((s) => s.busy)
   const sk = skillOf(id)
   const blocked = artBlocked(id, player)
+  const seconds = Math.max(0, Math.ceil(((player.ready[id] ?? 0) - now) / 1000))
   const icon = skillIconUrl(id)
   return (
     <li className="ui-well flex flex-col gap-1 p-2">
@@ -158,8 +162,8 @@ function SkillRow({ id, player }: { id: SkillId; player: PlayerState }) {
               {player.sitting ? "立つ" : "座る"}
             </Button>
           ) : (
-            <Button size="sm" variant="primary" disabled={busy || !!blocked} onClick={() => game.useSkill(id)}>
-              使う
+            <Button size="sm" variant="primary" disabled={busy || !!blocked || seconds > 0} onClick={() => game.useSkill(id)}>
+              {seconds > 0 ? `あと${seconds}秒` : "使う"}
             </Button>
           )}
         </span>
