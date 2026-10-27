@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { BAG_SIZE, countItem } from "./bag.ts"
+import { BAG_SIZE, countItem, emptyBag } from "./bag.ts"
 import { prepareTrade, finishTrade, type TradeProposal, type TradeRecord } from "./trade-transaction.ts"
 import { bagWith, player } from "../test/helpers.ts"
 
@@ -103,4 +103,22 @@ it("committing preserves recovery and other unrelated player fields", () => {
   const result = finishTrade(recovered, record, proposal.id, 1, "committed")
   expect(result.ok && result.player.hp).toBe(recovered.hp)
   expect(result.ok && result.player.name).toBe("エルナ")
+})
+
+it("keeps unmarked and crafted goods distinct across a saved trade and repeated commit", () => {
+  const goods = [
+    { item: "fur-stole", count: 1 },
+    { item: "potion", count: 2 },
+  ] as const
+  const existing = { item: "potion", count: 4, q: 1, by: "イルムガルト" } as const
+  const recipient = player({ bag: [existing, ...emptyBag(23)] })
+  const request: TradeProposal = { id: "unmarked-goods", revision: 1, offer: { lots: [], gold: 0 }, outgoing: [], incoming: goods, gold: 0 }
+  const reserved = prepared(recipient, request)
+  const restored = JSON.parse(JSON.stringify(reserved)) as TradeRecord
+  const committed = finishTrade(recipient, restored, request.id, 1, "committed")
+  if (!committed.ok) throw Error(committed.reason)
+  expect(committed.player.bag.slice(0, 3)).toEqual([existing, ...goods])
+  expect(recipient.bag[1]).toBeNull()
+  const retry = finishTrade(committed.player, committed.record, request.id, 1, "committed")
+  expect(retry).toEqual(committed)
 })

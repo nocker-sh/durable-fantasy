@@ -2,6 +2,8 @@
 // and a refused command never changes anything. The server runs this to decide; the client runs
 // it only to grey out what would be refused.
 import { addItem, firstOf, moveSlot, putStack, removeItem, takeFromSlot, type Bag, type Stack } from "./bag.ts"
+import { carried } from "./inventory-weight.ts"
+import { tradeOut, tradeIn } from "./trade-command.ts"
 import { STORAGE_KEEPER, STORE_FEE } from "./storage.ts"
 import { cast, payArt } from "./skill-command.ts"
 import { forgottenLifeExp } from "./life.ts"
@@ -24,13 +26,7 @@ import type { PlayerState } from "./player.ts"
 import { SHOPS, shopBuys } from "./shops.ts"
 import { derive, unmet } from "./stats.ts"
 
-/** Everything carried: the bag and what is worn. */
-export function carried(state: Pick<PlayerState, "bag" | "equipment">): number {
-  let total = 0
-  for (const s of state.bag) if (s) total += ITEMS[s.item].weight * s.count
-  for (const id of Object.values(state.equipment)) if (id) total += ITEMS[id].weight
-  return total
-}
+export { carried } from "./inventory-weight.ts"
 
 /**
  * What the server knows when it runs a command: the time (for fullness and warmth), for a
@@ -230,34 +226,10 @@ export function apply(before: PlayerState, command: Command | ServerCommand, ctx
       if (!bag) return reject("BAG_FULL")
       return accept({ ...state, bag, storage }, { type: "retrieved", item: lot.item, count: command.count, ...(lot.by ? { by: lot.by } : {}) })
     }
-    case "trade-out": {
-      const { lots, gold } = command.offer
-      if (!Number.isInteger(gold) || gold < 0 || gold > state.gold) return reject("NO_GOLD")
-      if (new Set(lots.map((l) => l.slot)).size !== lots.length) return reject("NOT_ENOUGH")
-      let bag: Bag = state.bag
-      const stacks: Stack[] = []
-      for (const { slot, count } of lots) {
-        const s = state.bag[slot]
-        if (!s) return reject("EMPTY_SLOT")
-        if (ITEMS[s.item].kind === "key") return reject("NOT_TRADABLE")
-        const next = takeFromSlot(bag, slot, count)
-        if (!next) return reject("NOT_ENOUGH")
-        bag = next
-        stacks.push({ ...s, count })
-      }
-      return accept({ ...state, bag, gold: state.gold - gold }, { type: "traded-out", stacks, gold })
-    }
-    case "trade-in": {
-      let bag: Bag = state.bag
-      for (const s of command.stacks) {
-        const next = putStack(bag, s)
-        if (!next) return reject("BAG_FULL")
-        bag = next
-      }
-      const weight = carried({ bag, equipment: state.equipment })
-      if (command.stacks.length && weight > derive(state).maxWeight) return reject("TOO_HEAVY")
-      return accept({ ...state, bag, gold: state.gold + command.gold }, { type: "traded-in", stacks: [...command.stacks], gold: command.gold })
-    }
+    case "trade-out":
+      return tradeOut(state, command)
+    case "trade-in":
+      return tradeIn(state, command)
     case "cast":
       return cast(state, command.skill, now)
     case "art":
