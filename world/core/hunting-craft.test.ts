@@ -1,6 +1,8 @@
 import { expect, it } from "vitest"
 import { apply } from "./apply"
 import { dropsOf, MONSTER_KINDS, SPAWNS } from "./monsters"
+import { derive } from "./stats"
+import { countItem } from "./bag"
 import { lifeExpAt } from "./life"
 import { bagWith, player } from "../test/helpers"
 
@@ -23,4 +25,24 @@ it("turns loot from a spawned forest animal into a wearable charm", () => {
   const worn = apply(crafted.state, { type: "equip", slot })
   if (!worn.ok) throw Error(worn.reason)
   expect(worn.state.equipment.accessory1).toBe("fang-charm")
+})
+
+it("uses meadow hare fur to tailor early body armour before the wool cape", () => {
+  const spawn = SPAWNS.find((s) => s.map === "south-meadow" && s.kind === "hare")!
+  const kind = MONSTER_KINDS[spawn.kind]
+  const base = player({ name: "エルナ", gold: 100, bag: bagWith(["yarn", 4]), life: { ...player().life, tailoring: lifeExpAt(4) } })
+  const loot = apply(base, { type: "loot", monster: spawn.id, exp: kind.exp, items: dropsOf(kind, [0]) })
+  if (!loot.ok) throw Error(loot.reason)
+  const command = { type: "craft" as const, recipe: "traveller-coat", station: "workshop-loom", roll: 0.5 }
+  expect(apply({ ...loot.state, life: { ...base.life, tailoring: lifeExpAt(3) } }, command)).toEqual({ ok: false, reason: "NOT_SKILLED" })
+  const crafted = apply(loot.state, command)
+  if (!crafted.ok) throw Error(crafted.reason)
+  expect(countItem(crafted.state.bag, "yarn")).toBe(0)
+  expect(countItem(crafted.state.bag, "soft-fur")).toBe(0)
+  const slot = crafted.state.bag.findIndex((s) => s?.item === "traveller-coat")
+  expect(crafted.state.bag[slot]).toEqual({ item: "traveller-coat", count: 1, q: 1, by: "エルナ" })
+  const worn = apply(crafted.state, { type: "equip", slot })
+  if (!worn.ok) throw Error(worn.reason)
+  expect(worn.state.equipment.body).toBe("traveller-coat")
+  expect(derive(worn.state).def).toBe(derive({ ...worn.state, equipment: { ...worn.state.equipment, body: null } }).def + 3)
 })

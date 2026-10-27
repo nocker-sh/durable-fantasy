@@ -69,6 +69,7 @@ export const MAKERS: Record<string, Partial<Record<ItemId, Trait>>> = {
     "wooden-shield": { tiers: ordinary, note: "ゴットフリートが板を合わせた盾。金具は鍛冶場から。" },
   },
   マグダレーナ: {
+    "traveller-coat": { tiers: ordinary, note: "マグダレーナが毛糸を織り、冬毛を当てて仕立てた旅の上着。" },
     "fur-stole": { tiers: ordinary, note: "マグダレーナが冬毛を寄せ、毛糸で肩掛けに仕立てた。" },
     "cloth-hat": { tiers: ordinary, note: "マグダレーナが織った布を縫い合わせた帽子。縁を折り返して丈夫にした。" },
     "wool-muffler": { tiers: ordinary, note: "マティアスの羊の毛を、マグダレーナが紡いで織った。" },

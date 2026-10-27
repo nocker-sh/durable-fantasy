@@ -156,7 +156,7 @@ const DEFINITIONS = {
   // ---------------------------------------------------------------- armour
   "cloth-hat": craftedGear("布の帽子", 30, "hat", { part: "head", def: 1 }, 10, "冷たい風と小雨を防ぐ。"),
   "iron-helm": craftedGear("鉄兜", 140, "helm", { part: "head", def: 4, needs: { str: 7 } }, 60, "鍛冶場で叩き出した鉄の兜。", "fine"),
-  "traveller-coat": gear("旅人の服", 80, "tunic", { part: "body", def: 3 }, 30, "厚手の毛織りの上着。"),
+  "traveller-coat": craftedGear("旅人の服", 80, "tunic", { part: "body", def: 3 }, 30, "厚手の毛織りに冬毛を当てた上着。"),
   "leather-armor": craftedGear("革の鎧", 220, "tunic", { part: "body", def: 6 }, 80, "なめした革を重ねた鎧。動きやすい。", "fine"),
   "chain-mail": craftedGear("鎖帷子", 480, "armor", { part: "body", def: 10, needs: { str: 10, vit: 8 } }, 160, "細い鉄の輪を編んだ鎧。重いが頼もしい。", "fine"),
   "wool-cape": craftedGear("毛織りの外套", 160, "cape", { part: "body", def: 4, bonus: { maxHp: 20 } }, 30, "白い毛を織った外套。夜の野営でも体が冷えない。", "fine"),

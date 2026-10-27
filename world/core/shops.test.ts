@@ -85,3 +85,11 @@ it.each([
   expect(result.state.gold).toBe(500 - price)
   expect(result.state.bag).toContainEqual({ item, count: 1, q: 1, by: "ギュンター" })
 })
+
+it.each(["tailor", "general", "old-clothes"] as const)("keeps the traveller coat at its existing price in %s", (shop) => {
+  const before = player({ gold: 100 })
+  const result = apply(before, { type: "buy", shop, item: "traveller-coat", count: 1 })
+  if (!result.ok) throw Error(result.reason)
+  expect(result.state.gold).toBe(20)
+  expect(result.state.bag).toContainEqual({ item: "traveller-coat", count: 1, q: 1, by: "マグダレーナ" })
+})
