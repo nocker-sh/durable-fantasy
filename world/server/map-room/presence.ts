@@ -29,6 +29,8 @@ export interface Presence {
   held?: number | null
   /** when they last struck a blow (ms) */
   struck?: number
+  /** Last authoritative creature refresh sent on this connection. */
+  wildCheckedAt?: number
   /** fallen (0 HP): they cannot move until they come to in town */
   down?: boolean
   /** a face-to-face trade (core/trade.ts): asked of someone, or open with them */

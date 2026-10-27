@@ -45,7 +45,7 @@ try {
   const target = await page.evaluate(async () => {
     const { SPAWNS, monsterAt } = await import("/world/core/monsters.ts")
     const cell = game.scene.playerCell()
-    const candidates = SPAWNS.filter((s) => s.map === game.state.get().map.id && s.kind === "slime" && (game.session.wild[s.id]?.back ?? 0) <= Date.now())
+    const candidates = SPAWNS.filter((s) => s.map === game.state.get().map.id && s.kind === "slime" && game.session.wild[s.id]?.hp > 0 && game.session.wild[s.id].back <= Date.now())
     const distance = (s) => {
       const at = monsterAt(s, Date.now())
       return Math.hypot(at.x - (cell[0] + 0.5) / 2, at.z - (cell[1] + 0.5) / 2)
@@ -60,6 +60,19 @@ try {
   const result = await page.evaluate(() => ({ exp: game.state.get().player.exp, hp: game.state.get().player.hp, level: game.state.get().player.level, bag: game.state.get().player.bag }))
   if (result.hp <= 0) throw Error("Starting character fell before earning experience")
   if (result.exp <= before.exp) throw Error("No experience awarded")
+  // Stay in the same room: only an authoritative refresh can restore the defeated target.
+  await page.waitForFunction((id) => game.session.wild[id]?.hp > 0 && game.session.wild[id].back <= Date.now(), target, { timeout: 120000 })
+  await page.evaluate((id) => game.scene.fight(id), target)
+  await page.waitForFunction(
+    (before) => {
+      const p = game.state.get().player
+      return p.level > before.level || p.exp > before.exp || p.hp <= 0
+    },
+    result,
+    { timeout: 120000 },
+  )
+  if (await page.evaluate(() => game.state.get().player.hp <= 0)) throw Error("Starting character fell after the creature recovered")
+  console.log("defeated the recovered creature without rejoining")
   await mkdir("public/tmp", { recursive: true })
   await page.screenshot({ path: "public/tmp/first-combat.png" })
   // Eat the starting bread through its real shortcut, then rest through the keyboard.
@@ -97,10 +110,23 @@ try {
   await page.reload()
   await waitReady(page)
   const restored = await page.evaluate(() => ({ exp: game.state.get().player.exp, level: game.state.get().player.level, bag: game.state.get().player.bag }))
-  if (restored.exp !== result.exp || restored.level !== result.level || JSON.stringify(restored.bag) !== JSON.stringify(afterRest.bag)) throw Error("Combat rewards did not persist")
+  if (restored.exp !== afterRest.exp || restored.level !== afterRest.level || JSON.stringify(restored.bag) !== JSON.stringify(afterRest.bag)) throw Error("Combat rewards did not persist")
   if (errors.length) throw Error(errors.join("\n"))
   await writeFile("public/tmp/first-combat.json", JSON.stringify({ cpuSlowdown, route, target, before, result, beforeMeal, afterMeal, afterRest, restored }, null, 2))
-  console.log(JSON.stringify({ cpuSlowdown, route, target, weapon: before.weapon, exp: result.exp, hp: result.hp, afterMeal: afterMeal.hp, afterRest: afterRest.hp, persisted: true }))
+  console.log(
+    JSON.stringify({
+      cpuSlowdown,
+      route,
+      target,
+      weapon: before.weapon,
+      exp: restored.exp,
+      hp: result.hp,
+      recoveredTargetDefeated: true,
+      afterMeal: afterMeal.hp,
+      afterRest: afterRest.hp,
+      persisted: true,
+    }),
+  )
 } catch (error) {
   await mkdir("public/tmp", { recursive: true })
   await page?.screenshot({ path: "public/tmp/first-combat-failure.png" })

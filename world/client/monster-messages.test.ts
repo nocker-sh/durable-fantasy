@@ -9,7 +9,8 @@ it.each([false, true])("retains monster updates and clears only the defeated tar
     fighting: { monster: "first", at: 1000 } as { monster: string; at: number } | null,
   }
   const struck = vi.fn()
-  const messages = new ServerMessages({ session, getScene: () => (visible ? { struck } : null) } as unknown as Context)
+  const setWild = vi.fn()
+  const messages = new ServerMessages({ session, getScene: () => (visible ? { struck, setWild } : null) } as unknown as Context)
   const hit = (monster: string, hp: number, back: number) => messages.handle({ type: "struck", by: "player", monster, hp, back, swing: { kind: "hit", damage: 10 } })
   hit("first", 10, 0)
   expect(session.wild.first).toEqual({ hp: 10, back: 0 })
@@ -20,6 +21,11 @@ it.each([false, true])("retains monster updates and clears only the defeated tar
   hit("first", 0, 6000)
   expect(session.wild.first).toEqual({ hp: 0, back: 6000 })
   expect(session.fighting).toBeNull()
+  const recovered = { first: { hp: 20, back: 6000 }, second: { hp: 15, back: 5000 } }
+  messages.handle({ type: "wild", monsters: recovered })
+  expect(session.wild).toEqual(recovered)
+  expect(setWild).toHaveBeenCalledTimes(visible ? 1 : 0)
+  if (visible) expect(setWild).toHaveBeenCalledWith(recovered)
   // A later hit after respawning replaces the old respawn deadline.
   hit("first", 10, 0)
   expect(session.wild.first).toEqual({ hp: 10, back: 0 })
