@@ -227,6 +227,17 @@ export const RECIPES: readonly Recipe[] = [
     ["wool-cape", 1],
     8,
   ),
+  r(
+    "fang-charm",
+    "tailoring",
+    "loom",
+    [
+      ["sharp-fang", 3],
+      ["yarn", 1],
+    ],
+    ["fang-charm", 1],
+    4,
+  ),
   // the forge: scrap to iron, iron and wood to tools
   r(
     "iron-ingot",
@@ -281,6 +292,40 @@ export const RECIPES: readonly Recipe[] = [
       ["soft-fur", 1],
     ],
     ["iron-sword", 1],
+    8,
+  ),
+  r(
+    "hand-axe",
+    "smithing",
+    "forge",
+    [
+      ["iron-ingot", 2],
+      ["plank", 1],
+    ],
+    ["hand-axe", 1],
+    4,
+  ),
+  r(
+    "spear",
+    "smithing",
+    "forge",
+    [
+      ["iron-ingot", 3],
+      ["plank", 2],
+      ["yarn", 1],
+    ],
+    ["spear", 1],
+    8,
+  ),
+  r(
+    "mace",
+    "smithing",
+    "forge",
+    [
+      ["iron-ingot", 4],
+      ["plank", 1],
+    ],
+    ["mace", 1],
     8,
   ),
   // past level 8 (economy.md §2.1): not to be made in v0.1, where life skills stop at 8

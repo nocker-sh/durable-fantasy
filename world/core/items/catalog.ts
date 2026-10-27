@@ -128,7 +128,7 @@ const DEFINITIONS = {
     "よく鍛えた鉄の剣。重心がまっすぐで振りやすい。",
     "fine",
   ),
-  "hand-axe": gear("手斧", 90, "axe", { part: "weapon", atk: 20, delay: 1700, needs: { str: 9 }, scale: { str: "C" } }, 70, "薪割りにも戦いにも使える。"),
+  "hand-axe": { ...gear("手斧", 90, "axe", { part: "weapon", atk: 20, delay: 1700, needs: { str: 9 }, scale: { str: "C" } }, 70, "薪割りにも戦いにも使える。"), made: true },
   "battle-axe": gear(
     "戦斧",
     380,
@@ -138,8 +138,11 @@ const DEFINITIONS = {
     "両手で振るう大きな斧。木こりのヨーゼフも一目置く。",
     "fine",
   ),
-  spear: gear("槍", 150, "spear", { part: "weapon", atk: 28, delay: 1900, twoHanded: true, needs: { str: 9, dex: 9 }, scale: { dex: "C", str: "D" } }, 100, "間合いの長いトネリコの槍。両手で持つ。"),
-  mace: gear("メイス", 180, "mace", { part: "weapon", atk: 26, delay: 1800, needs: { str: 12 }, scale: { str: "C" } }, 90, "鉄の頭をもつ打撃武器。鎧の上からでも効く。", "fine"),
+  spear: {
+    ...gear("槍", 150, "spear", { part: "weapon", atk: 28, delay: 1900, twoHanded: true, needs: { str: 9, dex: 9 }, scale: { dex: "C", str: "D" } }, 100, "間合いの長いトネリコの槍。両手で持つ。"),
+    made: true,
+  },
+  mace: { ...gear("メイス", 180, "mace", { part: "weapon", atk: 26, delay: 1800, needs: { str: 12 }, scale: { str: "C" } }, 90, "鉄の頭をもつ打撃武器。鎧の上からでも効く。", "fine"), made: true },
   "oak-staff": gear("樫の杖", 110, "staff", { part: "weapon", atk: 6, delay: 1700, needs: { mnd: 7 }, bonus: { maxSp: 15 } }, 50, "術と祈りを唱える者が持つ杖。先に小さな結晶がはまっている。"),
   "short-bow": gear("短弓", 140, "bow", { part: "weapon", atk: 18, delay: 1600, twoHanded: true, needs: { dex: 10 }, scale: { dex: "C" } }, 50, "狩人が使う小ぶりの弓。両手で引く。"),
 
@@ -169,7 +172,7 @@ const DEFINITIONS = {
 
   // ---------------------------------------------------------------- accessories
   charm: gear("お守り", 120, "charm", { part: "accessory", def: 1 }, 5, "町の礼拝堂で祈りを込めた木のお守り。", "rare"),
-  "fang-charm": gear("牙のお守り", 90, "charm", { part: "accessory", bonus: { str: 2 } }, 3, "鋭い牙を紐で結んだお守り。腕に力がこもる気がする。", "fine"),
+  "fang-charm": { ...gear("牙のお守り", 90, "charm", { part: "accessory", bonus: { str: 2 } }, 3, "鋭い牙を紐で結んだお守り。腕に力がこもる気がする。", "fine"), made: true },
   "silver-ring": gear("銀の指輪", 260, "ring", { part: "accessory", bonus: { dex: 2 } }, 1, "荷運びのルカスが港町から運んできた銀の指輪。", "fine"),
   "prayer-necklace": gear("祈りの首飾り", 300, "necklace", { part: "accessory", bonus: { fth: 2, maxSp: 20 } }, 2, "修道士の祈りの言葉が刻まれた首飾り。", "rare"),
 
