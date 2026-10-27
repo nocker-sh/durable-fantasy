@@ -27,6 +27,8 @@ const plain = [0.2, 0.7, 0.1, 0] as const
 
 export const MAKERS: Record<string, Partial<Record<ItemId, Trait>>> = {
   イルムガルト: {
+    "blue-potion": { tiers: ordinary, note: "イルムガルトが青い葉を煮詰め、ゼリーでまとめた水薬。" },
+    "orange-potion": { tiers: ordinary, note: "イルムガルトが蜜を合わせ、苦みを和らげた水薬。" },
     potion: { tiers: steady, effect: 1.05, price: 1.1, note: "薬師イルムガルトの手。苦いが、すぐ効く。出来はいつも揃っている。", icon: "potionR" },
     "herb-tea": { tiers: steady, sp: 4, note: "喉が弱い人にと、イルムガルトが勧める。", icon: "cupTea" },
   },

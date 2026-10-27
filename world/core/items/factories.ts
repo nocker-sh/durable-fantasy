@@ -41,6 +41,8 @@ const medicine = (name: string, price: number, use: { hp?: number; sp?: number }
   use,
 })
 
+const brewedMedicine = (...args: Parameters<typeof medicine>): ItemDefinition => ({ ...medicine(...args), made: true })
+
 const tool = (name: string, price: number, icon: ItemIcon, skill: GatherSkill, power: number, durability: number, description: string, weight: number, equip?: Equipment): ItemDefinition => ({
   name,
   kind: "tool",
@@ -81,4 +83,4 @@ const gear = (name: string, price: number, icon: ItemIcon, equip: Equipment, wei
 /** Equipment that can be produced keeps the maker and quality just like tools. */
 const craftedGear = (...args: Parameters<typeof gear>): ItemDefinition => ({ ...gear(...args), made: true })
 
-export { food, dish, medicine, tool, material, gear, craftedGear }
+export { food, dish, medicine, brewedMedicine, tool, material, gear, craftedGear }

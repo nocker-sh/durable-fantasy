@@ -1,4 +1,4 @@
-import { food, dish, medicine, tool, material, gear, craftedGear } from "./factories.ts"
+import { food, dish, medicine, brewedMedicine, tool, material, gear, craftedGear } from "./factories.ts"
 import type { ItemDefinition } from "./types.ts"
 
 const DEFINITIONS = {
@@ -45,11 +45,11 @@ const DEFINITIONS = {
   // ---------------------------------------------------------------- medicine
   herb: medicine("薬草", 6, { hp: 15 }, "herb", "草原に生える苦い葉。噛むと傷の痛みがひく。", "common", 1),
   "blue-herb": medicine("青い薬草", 25, { sp: 12 }, "herbB", "日陰や湿った草地にまれに混じる青い葉。頭がすっと冴える。", "fine", 1),
-  potion: { ...medicine("回復薬", 40, { hp: 60 }, "potionR", "薬草を煮詰めた回復薬。作り手で効き目も味も違う。"), made: true },
+  potion: brewedMedicine("回復薬", 40, { hp: 60 }, "potionR", "薬草を煮詰めた回復薬。作り手で効き目も味も違う。"),
   "red-potion": medicine("赤い水薬", 30, { hp: 45 }, "potionR", "薬草を煮詰めた水薬。旅人の必需品。"),
-  "orange-potion": medicine("橙の水薬", 75, { hp: 100 }, "potionO", "蜜を加えてよく効くようにした水薬。", "fine"),
+  "orange-potion": brewedMedicine("橙の水薬", 75, { hp: 100 }, "potionO", "蜜を加えてよく効くようにした水薬。", "fine"),
   "white-potion": medicine("白い水薬", 180, { hp: 220 }, "potionW", "修道士に伝わる処方。滅多に出回らない。", "rare"),
-  "blue-potion": medicine("青い水薬", 90, { sp: 40 }, "potionB", "青い薬草から作る水薬。結晶を扱う者が好む。", "fine"),
+  "blue-potion": brewedMedicine("青い水薬", 90, { sp: 40 }, "potionB", "青い薬草から作る水薬。結晶を扱う者が好む。", "fine"),
 
   // ---------------------------------------------------------------- gathering tools (economy.md §1)
   // with the practice of a woodcutter (and the arm for it), the axe is a weapon too (game-system.md §9.3)
