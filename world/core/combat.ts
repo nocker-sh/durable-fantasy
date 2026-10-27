@@ -1,5 +1,8 @@
 // Auto-attack resolution (game-system.md §8). The server rolls on its own clock; randomness is
 // passed in so tests can pin it.
+import type { Stats } from "./growth.ts"
+import type { OffensiveEffect } from "./skills.ts"
+
 export type Random = () => number
 
 export interface Fighter {
@@ -39,18 +42,12 @@ export function deathPenalty(level: number, needed: number): number {
  * critical); a spell's attack comes from a stat instead of the weapon, never misses and meets
  * half the armour.
  */
-export function artSwing(
-  art: { power?: number; sure?: boolean; magic?: { base: number; per: number; stat: string } },
-  stats: Readonly<Record<string, number>>,
-  attacker: Fighter,
-  target: Fighter,
-  random: Random,
-): Swing {
-  if (art.magic) {
-    const atk = art.magic.base + art.magic.per * (stats[art.magic.stat] ?? 0)
+export function artSwing(art: OffensiveEffect, stats: Stats, attacker: Fighter, target: Fighter, random: Random): Swing {
+  if (art.kind === "spell") {
+    const atk = art.magic.base + art.magic.per * stats[art.magic.stat]
     const raw = atk * (0.9 + random() * 0.2) - target.def / 2
     return { kind: "hit", damage: Math.max(1, Math.round(raw)) }
   }
-  const strong = { ...attacker, atk: attacker.atk * (art.power ?? 1) }
+  const strong = { ...attacker, atk: attacker.atk * art.power }
   return swing(art.sure ? { ...strong, crit: 100 } : strong, target, random)
 }

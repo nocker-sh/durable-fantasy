@@ -26,7 +26,8 @@ interface EquippedArt extends Base {
 }
 
 type StatEffect = { base: number; per: number; stat: Stat }
-export type Art = EquippedArt & ({ kind: "strike"; power: number; sure?: boolean } | { kind: "spell"; magic: StatEffect } | { kind: "prayer"; heal: StatEffect })
+export type OffensiveEffect = { kind: "strike"; power: number; sure?: boolean } | { kind: "spell"; magic: StatEffect }
+export type Art = EquippedArt & (OffensiveEffect | { kind: "prayer"; heal: StatEffect })
 
 export type SkillDef = Action | Art
 
