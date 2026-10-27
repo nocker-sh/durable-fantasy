@@ -62,6 +62,14 @@ describe("shop", () => {
     expect(there.ok && here.ok && there.state.gold > here.state.gold).toBe(true)
   })
 
+  it("keeps the shop stole at its ordinary price with its maker", () => {
+    const before = player({ gold: 1000 })
+    const result = apply(before, { type: "buy", shop: "tailor", item: "fur-stole", count: 1 })
+    if (!result.ok) throw Error(result.reason)
+    expect(result.state.gold).toBe(before.gold - ITEMS["fur-stole"].price)
+    expect(result.state.bag).toContainEqual({ item: "fur-stole", count: 1, q: 1, by: "マグダレーナ" })
+  })
+
   it("every stocked item has a price", () => {
     for (const shop of Object.values(SHOPS)) for (const id of shop.stock) expect(ITEMS[id].price).toBeGreaterThan(0)
   })

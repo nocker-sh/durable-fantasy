@@ -167,7 +167,15 @@ const DEFINITIONS = {
     "青と生成りの縞。迷っても見つけてもらえるように、目立つ色で編む。",
     "fine",
   ),
-  "fur-stole": gear("冬毛のストール", 180, "stole", { part: "neck", def: 1, look: { neck: "stole", neckRamp: "cBrown" } }, 6, "やわらかい冬毛を寄せて肩掛けにした。夜の冷えにも負けない。", "fine"),
+  "fur-stole": craftedGear(
+    "冬毛のストール",
+    180,
+    "stole",
+    { part: "neck", def: 1, look: { neck: "stole", neckRamp: "cBrown" } },
+    6,
+    "やわらかい冬毛を寄せて肩掛けにした。夜の冷えにも負けない。",
+    "fine",
+  ),
   "embroidered-scarf": gear("刺繍入りのスカーフ", 140, "scarf", { part: "neck", look: { neck: "scarf", neckRamp: "cPlum", neckStripe: "cHoney" } }, 2, "金糸で家紋を刺繍した細身のスカーフ。", "fine"),
 
   // ---------------------------------------------------------------- accessories

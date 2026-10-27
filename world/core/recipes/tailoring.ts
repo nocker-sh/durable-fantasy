@@ -7,6 +7,17 @@ export const TAILORING_RECIPES: readonly Recipe[] = [
   r("wool-muffler", "tailoring", "loom", [["yarn", 3]], ["wool-muffler", 1], 2),
   r("striped-muffler", "tailoring", "loom", [["yarn", 4]], ["striped-muffler", 1], 4),
   r(
+    "fur-stole",
+    "tailoring",
+    "loom",
+    [
+      ["soft-fur", 3],
+      ["yarn", 2],
+    ],
+    ["fur-stole", 1],
+    4,
+  ),
+  r(
     "wool-cape",
     "tailoring",
     "loom",
