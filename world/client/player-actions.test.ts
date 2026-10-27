@@ -32,3 +32,35 @@ it("does not send a repeated art during its cooldown and accepts it at the deadl
   actions.useSkill("pierce")
   expect(send).toHaveBeenCalledExactlyOnceWith({ type: "attack", monster: "test-monster", art: "pierce" })
 })
+
+it.each([true, false])("returns the authoritative gathering outcome %s after the reply", async (accepted) => {
+  const session = new GameSession()
+  const send = vi.fn()
+  session.socket = { send } as unknown as VoidSocket<"/map/:mapId">
+  let reply!: (ok: boolean) => void
+  const run = vi.fn((_command, dispatch) => {
+    dispatch(7)
+    return new Promise<boolean>((resolve) => {
+      reply = resolve
+    })
+  })
+  const actions = new PlayerActions({ session, run, notify: vi.fn(), lookAtShop: vi.fn(), getScene: () => null, update: vi.fn() })
+  const done = vi.fn()
+  const pending = actions.gather("south-meadow-herbs-1").then(done)
+  await Promise.resolve()
+  expect(done).not.toHaveBeenCalled()
+  expect(send).toHaveBeenCalledExactlyOnceWith({ type: "gather", seq: 7, node: "south-meadow-herbs-1" })
+  reply(accepted)
+  await pending
+  expect(done).toHaveBeenCalledExactlyOnceWith(accepted)
+})
+
+it.each(["busy", "engaged", "unknown"])("reports a skipped gathering request when %s without sending it", async (reason) => {
+  const session = new GameSession()
+  if (reason === "busy") session.state.set((s) => ({ ...s, busy: true }))
+  if (reason === "engaged") session.engaged = "resident"
+  const run = vi.fn()
+  const actions = new PlayerActions({ session, run, notify: vi.fn(), lookAtShop: vi.fn(), getScene: () => null, update: vi.fn() })
+  expect(await actions.gather(reason === "unknown" ? "missing-node" : "south-meadow-herbs-1")).toBe(false)
+  expect(run).not.toHaveBeenCalled()
+})

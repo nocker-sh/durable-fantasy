@@ -23,12 +23,12 @@ export class PlayerActions {
     void this.target.run({ type: "buy", shop, item, count, ...(q !== undefined ? { q } : {}), ...(price !== undefined ? { price } : {}) }).then(() => this.target.lookAtShop())
   }
 
-  gather(node: string) {
-    if (this.target.session.state.get().busy || this.target.session.engaged) return
+  async gather(node: string): Promise<boolean> {
+    if (this.target.session.state.get().busy || this.target.session.engaged) return false
     const spot = nodeOf(node)
-    if (!spot) return
+    if (!spot) return false
     this.target.getScene()?.playAction(spot.kind === "tree" ? "chop" : spot.kind === "fish" ? "draw" : "scrub", spot.cell)
-    void this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "gather", seq, node }))
+    return this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "gather", seq, node }))
   }
 
   craft(recipe: string) {

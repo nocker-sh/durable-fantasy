@@ -54,7 +54,16 @@ try {
     null,
     { timeout: 120000 },
   )
-  await page.evaluate(() => game.gather("south-meadow-herbs-1"))
+  const gathered = await page.evaluate(() => game.gather("south-meadow-herbs-1"))
+  if (!gathered) {
+    const state = await page.evaluate(() => ({
+      busy: game.state.get().busy,
+      engaged: game.session.engaged !== null,
+      online: game.state.get().online,
+      notices: game.state.get().notices.map((n) => n.text),
+    }))
+    throw Error(`Gathering was not accepted: ${JSON.stringify(state)}`)
+  }
   await page.waitForFunction((before) => game.state.get().player.life.foraging > before, before, { timeout: 15000 })
   const result = await page.evaluate(() => ({
     map: game.state.get().map.id,
