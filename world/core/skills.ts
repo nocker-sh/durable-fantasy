@@ -55,6 +55,16 @@ export const SKILLS = {
     power: 1.6,
     text: "一歩踏み込んで、体ごと斬りつける。",
   },
+  hew: {
+    kind: "strike",
+    name: "大振り",
+    sp: 7,
+    cooldown: 10_000,
+    weapons: ["iron-sword", "engine-steel-sword", "reforged-blade"],
+    needs: { str: 14 },
+    power: 2.3,
+    text: "剣を大きく構え、一体へ体重を乗せて斬り込む。踏み込み斬りより消耗が大きい。",
+  },
   pierce: { kind: "strike", name: "急所突き", sp: 3, cooldown: 5000, weapons: ["dagger"], needs: { dex: 9 }, power: 1, sure: true, text: "動きの止まった一瞬に、急所を突く。必ず会心になる。" },
   cleave: {
     kind: "strike",

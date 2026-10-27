@@ -10,6 +10,7 @@ const SKILL_ICON: Record<SkillId, { ui: SpriteName } | { item: ItemId }> = {
   chop: { item: "wood-axe" },
   fell: { item: "log" },
   lunge: { item: "short-sword" },
+  hew: { item: "iron-sword" },
   pierce: { item: "dagger" },
   cleave: { item: "hand-axe" },
   thrust: { item: "spear" },
