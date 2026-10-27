@@ -9,9 +9,9 @@ it("persists member boundaries and chat cursors across real Void state reloads",
     blockConcurrencyWhile: <T>(fn: () => Promise<T>) => fn(),
     storage: {
       get: async (key: string) => structuredClone(saved.get(key)),
-      put: async (key: string, value: unknown) => {
+      put: vi.fn(async (key: string, value: unknown) => {
         saved.set(key, structuredClone(value))
-      },
+      }),
     },
   }
   const restart = () => new Party.class(context as unknown as DurableObjectState, {})
@@ -22,7 +22,10 @@ it("persists member boundaries and chat cursors across real Void state reloads",
   expect((await restart().view()).members.map((member) => member.owner)).toEqual(["a", "b"])
   expect(await restart().chat("b", 0)).toEqual({ seq: 0, lines: [] })
   expect(await restart().say("a", "仲間だけ")).toBeNull()
-  const first = await restart().chat("b", 0)
+  const writes = context.storage.put.mock.calls.length
+  const { party, chat: first } = await restart().poll("b", { ...member("b"), hp: 7 }, 0)
+  expect(party.members.find((member) => member.owner === "b")?.hp).toBe(7)
+  expect(context.storage.put).toHaveBeenCalledTimes(writes + 1)
   expect(first?.lines.map((line) => line.text)).toEqual(["仲間だけ"])
   expect(await restart().chat("outsider", 0)).toBeNull()
   await restart().join(member("c"))

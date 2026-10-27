@@ -31,9 +31,10 @@ export const Party = defineDurableState({
       context.state.chat = leavePartyChat(context.state.chat ?? emptyPartyChat(), context.state.party)
       return context.state.party
     },
-    report(context, owner: string, s: Omit<Member, "owner">): PartyState {
-      context.state.party = report(context.state.party, owner, s)
-      return context.state.party
+    /** One consistent view of the roster and visible chat, saved in one operation. */
+    poll(context, owner: string, status: Omit<Member, "owner">, after: number) {
+      context.state.party = report(context.state.party, owner, status)
+      return { party: context.state.party, chat: readPartyChat(context.state.chat ?? emptyPartyChat(), context.state.party, owner, after, Date.now()) }
     },
     setMode(context, owner: string, mode: ShareMode): PartyState {
       if (context.state.party.leader === owner) context.state.party = { ...context.state.party, mode }

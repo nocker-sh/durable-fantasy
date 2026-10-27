@@ -1,5 +1,5 @@
 // The map room's handlers for parties (core/party.ts).
-import { deliverPartyChat } from "./party-chat.ts"
+import { sendPartyChat } from "./party-chat.ts"
 import { Party } from "../../../durable-objects/party.ts"
 import { PARTY_MAX } from "../../core/party.ts"
 import { Player } from "../../../durable-objects/player.ts"
@@ -89,7 +89,11 @@ async function partyLook(roomCtx: Ctx, message: Message<"party-look">) {
   }
   // report how we are, and see how the others are
   const d = await Player.get(me.owner).read()
-  const p = await Party.get(me.party).report(me.owner, { name: me.player.name, level: d.level, hp: d.hp, maxHp: derive(d).maxHp, map: map.name, at: Date.now() })
+  const { party: p, chat } = await Party.get(me.party).poll(
+    me.owner,
+    { name: me.player.name, level: d.level, hp: d.hp, maxHp: derive(d).maxHp, map: map.name, at: Date.now() },
+    message.chat?.party === me.party ? message.chat.seq : 0,
+  )
   if (!p.members.some((m) => m.owner === me.owner)) {
     // the party broke up while we were away
     save({ party: null })
@@ -98,7 +102,7 @@ async function partyLook(roomCtx: Ctx, message: Message<"party-look">) {
     return
   }
   await ctx.connection.send({ type: "party", view: partyView(p, me.owner) })
-  if (d.party === me.party) await deliverPartyChat(roomCtx, message.chat)
+  if (d.party === me.party) await sendPartyChat(roomCtx, chat)
   return
 }
 

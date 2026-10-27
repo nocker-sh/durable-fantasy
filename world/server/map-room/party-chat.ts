@@ -1,5 +1,6 @@
 import { Party } from "../../../durable-objects/party.ts"
 import { Player } from "../../../durable-objects/player.ts"
+import type { readPartyChat } from "../../core/party-chat.ts"
 import type { Ctx, Handlers } from "./context.ts"
 import { presence } from "./presence.ts"
 import { notifyClient } from "./notifications.ts"
@@ -7,7 +8,11 @@ import { notifyClient } from "./notifications.ts"
 export async function deliverPartyChat({ ctx, me }: Ctx, cursor?: { party: string; seq: number }) {
   if (!me.owner || !me.party) return
   const batch = await Party.get(me.party).chat(me.owner, cursor?.party === me.party ? cursor.seq : 0)
-  if (!batch || presence(ctx.connection).closed) return
+  await sendPartyChat({ ctx, me }, batch)
+}
+
+export async function sendPartyChat({ ctx, me }: Pick<Ctx, "ctx" | "me">, batch: ReturnType<typeof readPartyChat>) {
+  if (!batch || !me.party || presence(ctx.connection).closed) return
   await notifyClient(
     ctx.connection.send({
       type: "party-chat",
