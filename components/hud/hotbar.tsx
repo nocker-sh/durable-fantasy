@@ -3,9 +3,8 @@
 // from the skills window; right-click a shortcut to clear it.
 import { useState, type DragEvent, type MouseEvent } from "react"
 import { countItem } from "#/world/core/bag.ts"
-import type { ItemId } from "#/world/core/items.ts"
 import { REASON_TEXT } from "#/world/core/commands.ts"
-import { SKILLS, artBlocked, skillKey, skillOfKey, type SkillId } from "#/world/core/skills.ts"
+import { SKILLS, artBlocked, skillKey, skillOfKey } from "#/world/core/skills.ts"
 import type { WindowId } from "#/world/game.ts"
 import { useGame, useGameState } from "#/components/game/context.tsx"
 import { type LucideIcon, Map, Settings, ShoppingBag, SquareStar, Shirt, Users } from "lucide-react"
@@ -14,25 +13,10 @@ import { Kbd } from "#/components/game/kbd.tsx"
 import { Slot } from "#/components/game/slot.tsx"
 import { Tooltip, TooltipContent, TooltipTrigger } from "#/components/game/tooltip.tsx"
 import { ItemTooltip } from "./item-tooltip.tsx"
-import { iconUrl, uiIconUrl } from "#/world/art/icons.ts"
-import type { SpriteName } from "#/world/art/pixel-art.ts"
+import type { ItemId } from "#/world/core/items.ts"
 import { carriesItem, readDrag } from "./drag.ts"
 
-/** How a skill looks on the bar: a picture of its own, or the thing it is done with. */
-const SKILL_ICON: Record<SkillId, { ui: SpriteName } | { item: ItemId }> = {
-  sit: { ui: "full" },
-  "first-aid": { item: "herb" },
-  chop: { item: "wood-axe" },
-  fell: { item: "log" },
-  lunge: { item: "short-sword" },
-  pierce: { item: "dagger" },
-  ember: { item: "small-crystal" },
-  kodama: { item: "oak-staff" },
-}
-export const skillIconUrl = (id: SkillId) => {
-  const i = SKILL_ICON[id]
-  return "ui" in i ? uiIconUrl(i.ui, 32) : iconUrl(i.item)
-}
+import { skillIconUrl } from "./skill-icon.ts"
 
 const KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
 

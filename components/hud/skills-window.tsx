@@ -13,7 +13,7 @@ import { Meter } from "#/components/game/meter.tsx"
 import { Window } from "#/components/game/window.tsx"
 import { useWindow } from "./use-window.ts"
 import { startDrag } from "./drag.ts"
-import { skillIconUrl } from "./hotbar.tsx"
+import { skillIconUrl } from "./skill-icon.ts"
 
 const KIND = { action: "動作", strike: "戦技", spell: "術", prayer: "祈り" } as const
 const needName = (k: string) => (k in STAT_NAME ? STAT_NAME[k as Stat] : GATHER_SKILL_NAME[k as Skill])
