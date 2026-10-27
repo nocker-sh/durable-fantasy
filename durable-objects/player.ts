@@ -39,13 +39,13 @@ export const Player = defineDurableState({
     },
     walk(context, connection: string, route: Cell[], since = Date.now()): boolean {
       const location = context.state.location
-      if (!location || location.connection !== connection) return false
+      if (!location || location.connection !== connection || context.state.player.hp <= 0) return false
       context.state.location = { ...location, route, since }
       return true
     },
     travel(context, connection: string, map: string, at: Cell): boolean {
       const location = context.state.location
-      if (!location || location.connection !== connection) return false
+      if (!location || location.connection !== connection || context.state.player.hp <= 0) return false
       context.state.location = { ...location, map, route: [at], since: Date.now(), connection: null }
       return true
     },
@@ -98,8 +98,15 @@ export const Player = defineDurableState({
     /** Run a command; the room passes the price the shop asks today, the time is the server's. */
     run(context, command: Command | ServerCommand, ctx: Omit<Context, "now"> = {}): Transition {
       if (context.state.trade?.status === "prepared") return { ok: false, reason: "NOT_READY" }
-      const result = apply(loadPlayer(context.state.player), command, { ...ctx, now: Date.now() })
-      if (result.ok) context.state.player = result.state
+      const now = Date.now()
+      const result = apply(loadPlayer(context.state.player), command, { ...ctx, now })
+      if (result.ok) {
+        context.state.player = result.state
+        const location = context.state.location
+        if (result.state.hp <= 0 && location) {
+          context.state.location = { ...location, route: [locationAt(location, now)], since: now }
+        }
+      }
       return result
     },
     /** Dev only: put things in the bag (checks and the debug panel). */
