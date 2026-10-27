@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useDeadlineClock } from "#/hooks/use-deadline-clock.ts"
+import { apply } from "#/world/core/apply.ts"
 import { REASON_TEXT } from "#/world/core/commands.ts"
 // Skills (game-system.md §9, ui.md §3.10): the life skills' levels and their next milestones, what
 // anyone can do (sit, first aid), and the arts of the weapon in hand. Drag an icon to the shortcut bar.
@@ -7,7 +8,7 @@ import { STAT_NAME, type Stat } from "#/world/core/growth.ts"
 import { GATHER_SKILL_NAME, ITEMS, type Skill } from "#/world/core/items.ts"
 import { LIFE_CAP, LIFE_MILESTONE_TEXT, LIFE_SKILLS, LIFE_TOTAL_CAP, forgottenLifeExp, lifeExpAt, lifeLevel, lifeTotal, nextMilestone } from "#/world/core/life.ts"
 import type { PlayerState } from "#/world/core/player.ts"
-import { SKILLS, SKILL_IDS, artBlocked, artsOf, isArt, skillOf, type SkillId } from "#/world/core/skills.ts"
+import { SKILLS, SKILL_IDS, artsOf, isArt, skillOf, type SkillId } from "#/world/core/skills.ts"
 import { standing } from "#/world/core/stats.ts"
 import { useGame, useGameState } from "#/components/game/context.tsx"
 import { Button } from "#/components/game/button.tsx"
@@ -26,8 +27,8 @@ export function SkillsWindow() {
   const busy = useGameState((s) => s.busy)
   const [forget, setForget] = useState<{ skill: Skill; exp: number } | null>(null)
   const player = useGameState((s) => s.player)
-  const until = win.open && player ? Math.max(0, ...Object.values(player.ready)) : 0
-  const now = useDeadlineClock(until)
+  // Recovery can make a skill usable even when there is no cooldown pending.
+  const now = useDeadlineClock(win.open ? Infinity : 0)
   if (!win.open || !player) return null
   const total = lifeTotal(player.life)
   const held = artsOf(player.equipment.weapon)
@@ -144,7 +145,10 @@ function SkillRow({ id, player, now }: { id: SkillId; player: PlayerState; now: 
   const game = useGame()
   const busy = useGameState((s) => s.busy)
   const sk = skillOf(id)
-  const blocked = artBlocked(id, player)
+  const preview = apply(player, id === "sit" ? { type: player.sitting ? "stand" : "sit" } : sk.kind === "strike" || sk.kind === "spell" ? { type: "art", skill: id } : { type: "cast", skill: id }, {
+    now,
+  })
+  const blocked = preview.ok ? null : preview.reason
   const seconds = Math.max(0, Math.ceil(((player.ready[id] ?? 0) - now) / 1000))
   const icon = skillIconUrl(id)
   return (
@@ -158,7 +162,7 @@ function SkillRow({ id, player, now }: { id: SkillId; player: PlayerState; now: 
         </span>
         <span className="ml-auto">
           {id === "sit" ? (
-            <Button size="sm" variant="primary" disabled={busy} onClick={() => game.toggleSit()}>
+            <Button size="sm" variant="primary" disabled={busy || !!blocked} onClick={() => game.toggleSit()}>
               {player.sitting ? "立つ" : "座る"}
             </Button>
           ) : (
