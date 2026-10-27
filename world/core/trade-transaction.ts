@@ -27,14 +27,14 @@ export interface TradeRecord {
 type Failure = { ok: false; reason: Reason }
 type Prepared = { ok: true; record: TradeRecord }
 
-const sameStacks = (a: readonly Stack[], b: readonly Stack[]) =>
+export const sameStacks = (a: readonly Stack[], b: readonly Stack[]) =>
   a.length === b.length &&
   a.every((s, i) => {
     const t = b[i]
     return s.item === t.item && s.count === t.count && s.q === t.q && s.by === t.by && s.dur === t.dur
   })
 
-function sameProposal(a: TradeProposal, b: TradeProposal): boolean {
+export function sameProposal(a: TradeProposal, b: TradeProposal): boolean {
   return (
     a.id === b.id &&
     a.revision === b.revision &&

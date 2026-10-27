@@ -1,4 +1,4 @@
-import { expect, it, vi } from "vitest"
+import { afterEach, expect, it, vi } from "vitest"
 import { Player } from "../../durable-objects/player.ts"
 import { bagWith, player } from "../test/helpers.ts"
 import type { TradeProposal } from "../core/trade-transaction.ts"
@@ -15,14 +15,14 @@ const proposal: TradeProposal = {
   gold: 3,
 }
 const initialPlayer = () => player({ gold: 100, bag: bagWith(["herb", 3]) })
-function fixture() {
+function fixture(initial = initialPlayer()) {
   const saved = new Map<string, unknown>([
     [
       "__void_durable_state",
       {
         __voidDurableState: true,
         version: 0,
-        value: { player: initialPlayer(), credential: "test-credential", location: null },
+        value: { player: initial, credential: "test-credential", location: null },
       },
     ],
   ])
@@ -31,6 +31,7 @@ function fixture() {
     id: { toString: () => "test-player" },
     blockConcurrencyWhile: <T>(fn: () => Promise<T>) => fn(),
     storage: {
+      setAlarm: vi.fn(async (_at: number) => {}),
       get: async (key: string) => structuredClone(saved.get(key)),
       put: async (key: string, value: unknown) => {
         if (fail) {
@@ -41,10 +42,11 @@ function fixture() {
       },
     },
   }
-  const restart = () => new Player.class(objectState as unknown as DurableObjectState, {}) as unknown as ReturnType<typeof Player.get>
+  const restart = () => new Player.class(objectState as unknown as DurableObjectState, {})
   return {
     restart,
     saved,
+    alarms: objectState.storage.setAlarm,
     failNextSave: () => {
       fail = true
     },
@@ -57,7 +59,7 @@ it("migrates old player data without losing identity or inventory", async () => 
   expect(await p.tradeStatus()).toBeNull()
   expect(await p.authenticate("test-credential")).toBe(true)
   expect((await p.read()).bag).toEqual(initialPlayer().bag)
-  expect(f.saved.get("__void_durable_state")).toMatchObject({ version: 1, value: { trade: null } })
+  expect(f.saved.get("__void_durable_state")).toMatchObject({ version: 2, value: { trade: null, tradeJob: null } })
 })
 
 it("persists a reservation across restart and blocks commands and debug inventory mutations", async () => {
@@ -130,4 +132,134 @@ it("serializes a prepare and a concurrent inventory command", async () => {
   expect(prepared.ok).toBe(true)
   expect(spent).toEqual({ ok: false, reason: "NOT_READY" })
   expect((await p.read()).bag).toEqual(initialPlayer().bag)
+})
+
+afterEach(() => vi.restoreAllMocks())
+const remoteProposal: TradeProposal = {
+  ...proposal,
+  offer: { lots: [{ slot: 0, count: 1 }], gold: 3 },
+  outgoing: proposal.incoming,
+  incoming: proposal.outgoing,
+  gold: 10,
+}
+function pair() {
+  const local = fixture()
+  const remote = fixture(player({ gold: 50, bag: bagWith(["jelly", 2]) }))
+  let peer = remote.restart()
+  vi.spyOn(Player, "get").mockImplementation(() => peer as unknown as ReturnType<typeof Player.get>)
+  return {
+    local,
+    remote,
+    peer,
+    restartPeer: () => {
+      peer = remote.restart()
+      return peer
+    },
+  }
+}
+
+it("persists the decision before delivering it and recovers via the real alarm hook", async () => {
+  const f = pair()
+  let owner = f.local.restart()
+  expect((await owner.beginTrade("peer", proposal, remoteProposal)).ok).toBe(true)
+  expect(f.local.alarms).toHaveBeenCalled()
+  owner = f.local.restart()
+  await owner.alarm()
+  expect((await owner.tradeJob())?.decision).toBe("committed")
+  expect((await f.peer.tradeStatus())?.status).toBe("prepared")
+  expect((await owner.read()).gold).toBe(100)
+  expect((await f.peer.read()).gold).toBe(50)
+  owner = f.local.restart()
+  await owner.alarm()
+  expect((await owner.tradeJob())?.finished).toBe(true)
+  expect((await owner.read()).gold).toBe(93)
+  expect((await f.peer.read()).gold).toBe(57)
+  await owner.alarm()
+  expect((await f.peer.read()).gold).toBe(57)
+})
+
+it("recovers a lost peer prepare response without cancelling reserved goods", async () => {
+  const f = pair()
+  const owner = f.local.restart()
+  await owner.beginTrade("peer", proposal, remoteProposal)
+  const prepare = f.peer.prepareTrade.bind(f.peer)
+  vi.spyOn(f.peer, "prepareTrade").mockImplementationOnce(async (request) => {
+    await prepare(request)
+    throw new Error("Reply lost")
+  })
+  await expect(owner.advanceTrade()).rejects.toThrow("Reply lost")
+  expect((await owner.tradeJob())?.decision).toBeNull()
+  expect((await f.peer.tradeStatus())?.status).toBe("prepared")
+  f.restartPeer()
+  const resumed = f.local.restart()
+  await resumed.advanceTrade()
+  await resumed.advanceTrade()
+  expect((await resumed.read()).gold).toBe(93)
+})
+
+it("recovers when the local commit save fails after the peer already committed", async () => {
+  const f = pair()
+  const owner = f.local.restart()
+  await owner.beginTrade("peer", proposal, remoteProposal)
+  await owner.advanceTrade()
+  f.local.failNextSave()
+  await expect(owner.advanceTrade()).rejects.toThrow("Storage unavailable")
+  expect((await f.peer.read()).gold).toBe(57)
+  expect((await owner.read()).gold).toBe(100)
+  expect((await owner.tradeJob())?.finished).toBe(false)
+  const resumed = f.local.restart()
+  await resumed.advanceTrade()
+  expect((await resumed.read()).gold).toBe(93)
+  expect((await f.peer.read()).gold).toBe(57)
+})
+
+it("aborts after an explicit peer refusal and unlocks the local inventory", async () => {
+  const f = pair()
+  const owner = f.local.restart()
+  await f.peer.run({ type: "trade-out", offer: { lots: [{ slot: 0, count: 2 }], gold: 0 } })
+  await owner.beginTrade("peer", proposal, remoteProposal)
+  await owner.advanceTrade()
+  expect((await owner.tradeJob())?.decision).toBe("aborted")
+  await owner.advanceTrade()
+  expect((await owner.read()).gold).toBe(100)
+  expect((await owner.tradeStatus())?.status).toBe("aborted")
+  expect((await owner.run({ type: "trade-out", offer: { lots: [], gold: 1 } })).ok).toBe(true)
+})
+
+it("rejects mismatched reciprocal goods and does not reserve anything", async () => {
+  const f = pair()
+  const owner = f.local.restart()
+  expect(await owner.beginTrade("peer", proposal, { ...remoteProposal, gold: 100 })).toEqual({ ok: false, reason: "NOT_READY" })
+  expect(await owner.tradeStatus()).toBeNull()
+  expect(await owner.tradeJob()).toBeNull()
+})
+
+it("replays preparation after the coordinator decision save fails", async () => {
+  const f = pair()
+  const owner = f.local.restart()
+  await owner.beginTrade("peer", proposal, remoteProposal)
+  f.local.failNextSave()
+  await expect(owner.advanceTrade()).rejects.toThrow("Storage unavailable")
+  expect((await owner.tradeJob())?.decision).toBeNull()
+  expect((await f.peer.tradeStatus())?.status).toBe("prepared")
+  const resumed = f.local.restart()
+  await resumed.advanceTrade()
+  await resumed.advanceTrade()
+  expect((await resumed.read()).gold).toBe(93)
+  expect((await f.peer.read()).gold).toBe(57)
+})
+
+it("finishes a lost commit reply even after the peer has completed a later exchange", async () => {
+  const f = pair()
+  const owner = f.local.restart()
+  await owner.beginTrade("peer", proposal, remoteProposal)
+  await owner.advanceTrade()
+  f.local.failNextSave()
+  await expect(owner.advanceTrade()).rejects.toThrow("Storage unavailable")
+  const later = { ...remoteProposal, id: "later-exchange", revision: 2, offer: { lots: [], gold: 0 }, outgoing: [], incoming: [], gold: 0 }
+  expect((await f.peer.prepareTrade(later)).ok).toBe(true)
+  await f.peer.finishTrade(later.id, 2, "committed")
+  await f.local.restart().advanceTrade()
+  expect((await f.local.restart().read()).gold).toBe(93)
+  expect((await f.peer.read()).gold).toBe(57)
 })

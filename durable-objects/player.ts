@@ -9,12 +9,22 @@ import { loadPlayer, newPlayer, settle, type PlayerState } from "#/world/core/pl
 import { derive } from "#/world/core/stats.ts"
 import { addItem } from "#/world/core/bag.ts"
 import { prepareTrade, finishTrade, type TradeProposal, type TradeRecord } from "../world/core/trade-transaction.ts"
+import { beginTrade, advanceTrade, type TradeJob, type TradeParticipant, type TradePeer } from "../world/server/trade-coordinator.ts"
 import type { ItemId } from "#/world/core/items.ts"
 
 export const Player = defineDurableState({
-  initialState: { player: newPlayer() as PlayerState, credential: null as string | null, location: null as PlayerLocation | null, trade: null as TradeRecord | null },
-  version: 1,
-  migrations: [{ version: 1, migrate: (old) => ({ ...(old as { player: PlayerState; credential: string | null; location: PlayerLocation | null }), trade: null }) }],
+  initialState: {
+    player: newPlayer() as PlayerState,
+    credential: null as string | null,
+    location: null as PlayerLocation | null,
+    trade: null as TradeRecord | null,
+    tradeJob: null as TradeJob | null,
+  },
+  version: 2,
+  migrations: [
+    { version: 1, migrate: (old) => ({ ...(old as { player: PlayerState; credential: string | null; location: PlayerLocation | null }), trade: null, tradeJob: null }) },
+    { version: 2, migrate: (old) => ({ ...(old as TradeParticipant & { credential: string | null; location: PlayerLocation | null }), tradeJob: null }) },
+  ],
   methods: {
     arrive(context, world: number, map: string, connection: string) {
       const now = Date.now()
@@ -57,6 +67,18 @@ export const Player = defineDurableState({
       context.state.player = settle(p, derive(p), Date.now())
       return context.state.player
     },
+    async beginTrade(context, peer: string, local: TradeProposal, remote: TradeProposal): Promise<ReturnType<typeof beginTrade>> {
+      const result = beginTrade(context.state, peer, local, remote, Date.now())
+      if (result.ok && !result.job.finished) await context.setAlarm(Date.now() + 100)
+      return result
+    },
+    tradeJob(context): TradeJob | null {
+      return context.state.tradeJob
+    },
+    async advanceTrade(context): Promise<TradeJob | null> {
+      await advancePlayerTrade(context, (id) => Player.get(id))
+      return context.state.tradeJob
+    },
     tradeStatus(context): TradeRecord | null {
       return context.state.trade
     },
@@ -96,6 +118,17 @@ export const Player = defineDurableState({
       return context.state.player
     },
   },
+  async alarm(context) {
+    await advancePlayerTrade(context, (id) => Player.get(id))
+  },
 })
+
+async function advancePlayerTrade(context: { state: TradeParticipant; setAlarm(at: number): Promise<void> }, peer: (id: string) => TradePeer): Promise<void> {
+  const job = context.state.tradeJob
+  if (!job || job.finished) return
+  // Schedule recovery before crossing the RPC boundary. A failed state save leaves this retry armed.
+  await context.setAlarm(Date.now() + 5000)
+  await advanceTrade(context.state, peer(job.peer))
+}
 
 export default Player

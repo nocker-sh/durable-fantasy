@@ -54,6 +54,8 @@ export interface TradeSide {
   locked: boolean
   /** pressed "exchange" */
   done: boolean
+  /** Both confirmed; a durable settlement is being started or delivered. */
+  settling?: boolean
 }
 
 /** The time of day for this player: Japan's, or in dev the time their clock is held at. */

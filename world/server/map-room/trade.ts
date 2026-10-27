@@ -1,5 +1,5 @@
 // The map room's handlers for face-to-face trades between players (core/trade.ts).
-import { TRADE_CELLS, TRADE_LOTS, checkTrade, emptyOffer, takenOf } from "../../core/trade.ts"
+import { TRADE_CELLS, TRADE_LOTS, checkTrade, emptyOffer } from "../../core/trade.ts"
 import type { Stack } from "../../core/bag.ts"
 import { Player } from "../../../durable-objects/player.ts"
 import { ITEMS } from "../../core/items.ts"
@@ -55,7 +55,7 @@ async function tradeAnswer(roomCtx: Ctx, message: Message<"trade-answer">) {
 async function tradeOffer(roomCtx: Ctx, message: Message<"trade-offer">) {
   const { ctx, me, save } = roomCtx
   const them = me.trade?.open ? ctx.room.getConnection(me.trade.with) : undefined
-  if (!me.owner || !me.trade || !them || me.trade.locked) return
+  if (!me.owner || !me.trade || !them || me.trade.locked || me.trade.settling) return
   const data = await Player.get(me.owner).read()
   const lots = message.lots.slice(0, TRADE_LOTS)
   const shown: Stack[] = []
@@ -77,7 +77,7 @@ async function tradeLockOrTradeGo(roomCtx: Ctx, message: Message<"trade-lock" | 
   const { ctx, me, save } = roomCtx
   const them = me.trade?.open ? ctx.room.getConnection(me.trade.with) : undefined
   const other = them && presence(them)
-  if (!me.owner || !me.trade || !them || !other?.trade || !other.owner) return
+  if (!me.owner || !me.trade || !them || !other?.trade || !other.owner || me.owner === other.owner || other.trade.with !== ctx.connection.id || me.trade.settling || other.trade.settling) return
   if (message.type === "trade-lock") save({ trade: { ...me.trade, locked: true } })
   else if (me.trade.locked && other.trade.locked) save({ trade: { ...me.trade, done: true } })
   const mine = presence(ctx.connection).trade!
@@ -85,41 +85,52 @@ async function tradeLockOrTradeGo(roomCtx: Ctx, message: Message<"trade-lock" | 
     await showTrade(ctx.connection, them)
     return
   }
-  // both pressed exchange: check both can give and take, then take each side's goods and hand them over
+  // Reserve the handshake before awaiting RPCs, so repeated confirmations cannot start two jobs.
+  save({ trade: { ...mine, settling: true } })
+  setTrade(them, { ...other.trade, settling: true })
   const pa = Player.get(me.owner),
     pb = Player.get(other.owner)
-  const [a, b] = await Promise.all([pa.read(), pb.read()])
-  const why = checkTrade(a, mine.offer, b, other.trade.offer, Date.now())
   const finish = async (reason: string | null) => {
     save({ trade: undefined })
-    setTrade(them, undefined)
-    await ctx.connection.send({ type: "trade-closed", reason: reason ?? "DONE" })
-    await them.send({ type: "trade-closed", reason: reason ?? "DONE" })
+    if (presence(them).trade?.with === ctx.connection.id) setTrade(them, undefined)
+    await Promise.allSettled([ctx.connection.send({ type: "trade-closed", reason: reason ?? "DONE" }), them.send({ type: "trade-closed", reason: reason ?? "DONE" })])
   }
-  if (why) return finish(why)
-  const outA = await pa.run({ type: "trade-out", offer: mine.offer })
-  if (!outA.ok) return finish(outA.reason)
-  const outB = await pb.run({ type: "trade-out", offer: other.trade.offer })
-  if (!outB.ok) {
-    await pa.run({ type: "trade-in", stacks: takenOf(outA.events), gold: mine.offer.gold })
-    return finish(outB.reason)
+  let mayBePending = false
+  try {
+    const [a, b, recordA, recordB] = await Promise.all([pa.read(), pb.read(), pa.tradeStatus(), pb.tradeStatus()])
+    if (recordA?.status === "prepared" || recordB?.status === "prepared") return finish("NOT_READY")
+    const why = checkTrade(a, mine.offer, b, other.trade.offer, Date.now())
+    if (why) return finish(why)
+    const id = crypto.randomUUID()
+    const local = { id, revision: (recordA?.proposal.revision ?? 0) + 1, offer: mine.offer, outgoing: mine.shown, incoming: other.trade.shown, gold: other.trade.offer.gold }
+    const remote = { id, revision: (recordB?.proposal.revision ?? 0) + 1, offer: other.trade.offer, outgoing: other.trade.shown, incoming: mine.shown, gold: mine.offer.gold }
+    mayBePending = true
+    // All coordinator-to-peer calls follow the same owner ordering, preventing RPC wait cycles.
+    const first = me.owner < other.owner
+    const coordinator = first ? pa : pb
+    const started = await coordinator.beginTrade(first ? other.owner : me.owner, first ? local : remote, first ? remote : local)
+    if (!started.ok) return finish(started.reason)
+    // Each call is a separate durable save boundary. Alarms continue these steps if a reply is lost.
+    await coordinator.advanceTrade()
+    const job = await coordinator.advanceTrade()
+    if (!job?.finished) return finish("PENDING")
+    if (job.reason) return finish(job.reason)
+    const [stateA, stateB] = await Promise.all([pa.read(), pb.read()])
+    await Promise.allSettled([
+      ctx.connection.send({ type: "result", seq: -1, result: { ok: true, state: stateA, events: [] } }),
+      them.send({ type: "result", seq: -1, result: { ok: true, state: stateB, events: [] } }),
+    ])
+    return finish(null)
+  } catch {
+    // The reply may be lost after saving. Never compensate by inventing a reverse transfer:
+    // the saved job and participant reservations decide what the recovery alarm must do.
+    return finish(mayBePending ? "PENDING" : "NOT_READY")
   }
-  const inB = await pb.run({ type: "trade-in", stacks: takenOf(outA.events), gold: mine.offer.gold })
-  const inA = inB.ok ? await pa.run({ type: "trade-in", stacks: takenOf(outB.events), gold: other.trade.offer.gold }) : inB
-  if (!inB.ok || !inA.ok) {
-    // checked above, so this should not happen: give each side back what was theirs
-    if (inB.ok) await pb.run({ type: "trade-out", offer: { lots: [], gold: mine.offer.gold } })
-    await pa.run({ type: "trade-in", stacks: takenOf(outA.events), gold: mine.offer.gold })
-    await pb.run({ type: "trade-in", stacks: takenOf(outB.events), gold: other.trade.offer.gold })
-    return finish(inB.ok ? (inA as { reason: string }).reason : inB.reason)
-  }
-  await ctx.connection.send({ type: "result", seq: -1, result: inA })
-  await them.send({ type: "result", seq: -1, result: inB })
-  return finish(null)
 }
 
 async function tradeCancel(roomCtx: Ctx, _message: Message<"trade-cancel">) {
   const { ctx, me, save } = roomCtx
+  if (me.trade?.settling) return
   const them = me.trade ? ctx.room.getConnection(me.trade.with) : undefined
   save({ trade: undefined })
   if (them && presence(them).trade?.with === ctx.connection.id) {

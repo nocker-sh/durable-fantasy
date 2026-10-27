@@ -157,6 +157,7 @@ export function partyClosedText(reason: string): string {
 export function tradeClosedText(reason: string): string {
   const text: Record<string, string> = {
     DONE: "取引が成立した。",
+    PENDING: "取引結果を確認できなかった。少し待ってから町に入り直し、持ち物を確認してね。",
     DECLINED: "取引を断られた。",
     CANCELLED: "取引をやめた。",
     LEFT: "相手がいなくなった。",
