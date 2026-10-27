@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { apply } from "./apply.ts"
+import { apply, makerAt } from "./apply.ts"
 import { addItem, countItem, emptyBag, moveSlot } from "./bag.ts"
 import { displayName, effectOf, priceOf, qualitiesOf, MAKERS } from "./makers.ts"
 import { ITEMS, type ItemId } from "./items.ts"
@@ -55,8 +55,26 @@ describe("quality and makers", () => {
     for (const [shopId, shop] of Object.entries(SHOPS))
       for (const id of shop.stock) {
         if (!ITEMS[id].made) continue
-        const by = (shop as { makers?: Record<string, string> }).makers?.[id]
-        if (by) expect(MAKERS[by]?.[id], `${shopId}: ${by} makes ${id}`).toBeDefined()
+        const by = makerAt(shopId as keyof typeof SHOPS, id)
+        expect(MAKERS[by]?.[id], `${shopId}: ${by} makes ${id}`).toBeDefined()
       }
   })
+})
+
+it.each([
+  ["smithy", "iron-sword", "ギュンター"],
+  ["tailor", "wool-muffler", "マグダレーナ"],
+  ["woodworker", "short-bow", "ゴットフリート"],
+  ["armorer", "wooden-shield", "ゴットフリート"],
+  ["leather", "fang-charm", "ルドルフ"],
+] as const)("keeps the maker when equipment from %s is bought and worn", (shop, item, by) => {
+  const bought = apply(player({ gold: 1000, stats: { ...player().stats, str: 20, dex: 20 } }), { type: "buy", shop, item, count: 1 })
+  if (!bought.ok) throw Error(bought.reason)
+  expect(bought.state.gold).toBe(1000 - ITEMS[item].price)
+  expect(qualitiesOf(item, by)).toEqual([1])
+  const slot = bought.state.bag.findIndex((s) => s?.item === item)
+  expect(bought.state.bag[slot]).toMatchObject({ by, q: 1 })
+  const equipped = apply(bought.state, { type: "equip", slot })
+  if (!equipped.ok) throw Error(equipped.reason)
+  expect(Object.values(equipped.state.worn)).toContainEqual({ by, q: 1 })
 })

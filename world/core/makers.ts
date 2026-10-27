@@ -20,6 +20,7 @@ export interface Trait {
   icon?: ItemIcon
 }
 
+const ordinary = [0, 1, 0, 0] as const
 const steady = [0.05, 0.65, 0.28, 0.02] as const
 const homely = [0.35, 0.4, 0.17, 0.08] as const
 const plain = [0.2, 0.7, 0.1, 0] as const
@@ -47,10 +48,28 @@ export const MAKERS: Record<string, Partial<Record<ItemId, Trait>>> = {
     "honey-cake": { tiers: steady, note: "ウルリケの巣箱の蜜を使う。" },
   },
   ギュンター: {
+    dagger: { tiers: ordinary, note: "ギュンターが鍛えた短い刃。手入れしやすい形にしてある。" },
+    "iron-sword": { tiers: ordinary, note: "ギュンターの炉で鍛え、重心を確かめた剣。" },
+    "hand-axe": { tiers: ordinary, note: "ギュンターが木の柄に刃を据えた。薪仕事にも使う。" },
+    spear: { tiers: ordinary, note: "ゴットフリートの木の柄に、ギュンターが穂先を付けた。" },
+    mace: { tiers: ordinary, note: "ギュンターが鉄の頭を打ち、柄に留めた。" },
     "wood-axe": { tiers: [0.05, 0.6, 0.3, 0.05], note: "鍛冶屋は町でうちだけだ、と打った本人が言う。" },
     sickle: { tiers: [0.1, 0.7, 0.2, 0], note: "見習いのペーターが研いだ物も混じっている。" },
   },
-  ゴットフリート: { "fishing-rod": { tiers: [0, 0.5, 0.4, 0.1], note: "寒い冬に切った竹のように締まった木で削った。" } },
+  ゴットフリート: {
+    "fishing-rod": { tiers: [0, 0.5, 0.4, 0.1], note: "寒い冬に切った竹のように締まった木で削った。" },
+    "wooden-stick": { tiers: ordinary, note: "ゴットフリートが枝を選び、握るところを削った。" },
+    "short-bow": { tiers: ordinary, note: "ゴットフリートが木のしなりを確かめて削った弓。" },
+    "wooden-shield": { tiers: ordinary, note: "ゴットフリートが板を合わせた盾。金具は鍛冶場から。" },
+  },
+  マグダレーナ: {
+    "wool-muffler": { tiers: ordinary, note: "マティアスの羊の毛を、マグダレーナが紡いで織った。" },
+    "striped-muffler": { tiers: ordinary, note: "マグダレーナが色糸を替えながら織った首巻き。" },
+    "wool-cape": { tiers: ordinary, note: "マグダレーナが裾まで目を揃えて織った外套。" },
+  },
+  ルドルフ: {
+    "fang-charm": { tiers: ordinary, note: "森で集めた牙をルドルフが磨き、毛糸で結んだ。" },
+  },
   マティアス: {
     cheese: { tiers: plain, note: "羊飼いが小屋で寝かせたチーズ。" },
     "hot-milk": { tiers: plain, note: "朝に搾った羊の乳を温めた。" },
