@@ -3,6 +3,7 @@
 // each player's data through their Player Durable Object. Who is where lives on the connections,
 // so the room keeps nothing once the last player leaves.
 import { defineRoom } from "void/ws"
+import { KeyedQueue } from "#/lib/engine/keyed-queue.ts"
 import { Player } from "../../durable-objects/player.ts"
 import { Directory } from "../../durable-objects/directory.ts"
 import { parseRoom } from "#/world/channels.ts"
@@ -12,6 +13,8 @@ import { HANDLERS } from "#/world/server/map-room/index.ts"
 import type { Ctx } from "#/world/server/map-room/context.ts"
 import { type Presence, presence, setTrade } from "#/world/server/map-room/presence.ts"
 import { authenticatedPlayer, sameOrigin } from "#/world/server/session.ts"
+
+const messages = new KeyedQueue()
 
 export default defineRoom({
   name: "map-room",
@@ -29,24 +32,30 @@ export default defineRoom({
     ctx.connection.setState({ player: null, owner, route: [], since: 0, said: [], engaged: null } satisfies Presence)
   },
   async onMessage(ctx, message) {
-    const key = parseRoom(ctx.params.mapId)!
-    const map: MapDefinition = MAPS[key.map]
-    const me = presence(ctx.connection)
-    if (message.type !== "join" && me.player && me.owner && !(await Player.get(me.owner).ownsConnection(ctx.connection.id))) {
-      ctx.connection.close(4001, "Character opened elsewhere")
-      return
-    }
-    // Creation is saved before this connection can participate in the world.
-    if (me.ready === false && message.type !== "join" && !(message.type === "command" && message.command.type === "profile")) return
-    const save = (patch: Partial<Presence>) => ctx.connection.setState({ ...presence(ctx.connection), ...patch } satisfies Presence)
-    /** Someone sitting gets up before they walk off or strike. */
-    const standUp = async () => {
-      if (!me.sitting || !me.owner) return
-      save({ sitting: false })
-      await ctx.connection.send({ type: "result", seq: -1, result: await Player.get(me.owner).run({ type: "stand" }) })
-    }
-    const handle = HANDLERS[message.type] as ((c: Ctx, m: typeof message) => Promise<void>) | undefined
-    await handle?.({ ctx, key, map, me, save, standUp }, message)
+    const receivedAt = Date.now()
+    return messages.run(`${ctx.id}:${ctx.connection.id}`, async () => {
+      const key = parseRoom(ctx.params.mapId)!
+      const map: MapDefinition = MAPS[key.map]
+      let me = presence(ctx.connection)
+      if (me.closed) return
+      if (message.type !== "join" && me.player && me.owner && !(await Player.get(me.owner).ownsConnection(ctx.connection.id))) {
+        ctx.connection.close(4001, "Character opened elsewhere")
+        return
+      }
+      me = presence(ctx.connection)
+      if (me.closed) return
+      // Creation is saved before this connection can participate in the world.
+      if (me.ready === false && message.type !== "join" && !(message.type === "command" && message.command.type === "profile")) return
+      const save = (patch: Partial<Presence>) => ctx.connection.setState({ ...presence(ctx.connection), ...patch } satisfies Presence)
+      /** Someone sitting gets up before they walk off or strike. */
+      const standUp = async () => {
+        if (!me.sitting || !me.owner) return
+        save({ sitting: false })
+        await ctx.connection.send({ type: "result", seq: -1, result: await Player.get(me.owner).run({ type: "stand" }) })
+      }
+      const handle = HANDLERS[message.type] as ((c: Ctx, m: typeof message) => Promise<void>) | undefined
+      await handle?.({ ctx, key, map, me, save, standUp, receivedAt }, message)
+    })
   },
   async onClose(ctx) {
     const me = presence(ctx.connection)

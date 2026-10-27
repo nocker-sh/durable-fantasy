@@ -37,10 +37,10 @@ export const Player = defineDurableState({
     ownsConnection(context, connection: string): boolean {
       return context.state.location?.connection === connection
     },
-    walk(context, connection: string, route: Cell[]): boolean {
+    walk(context, connection: string, route: Cell[], since = Date.now()): boolean {
       const location = context.state.location
       if (!location || location.connection !== connection) return false
-      context.state.location = { ...location, route, since: Date.now() }
+      context.state.location = { ...location, route, since }
       return true
     },
     travel(context, connection: string, map: string, at: Cell): boolean {

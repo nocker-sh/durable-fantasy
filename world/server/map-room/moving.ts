@@ -9,7 +9,7 @@ import { SPAWNS } from "../../core/monsters.ts"
 import { Nature } from "../../../durable-objects/nature.ts"
 import { Directory } from "../../../durable-objects/directory.ts"
 import { MAPS, TALK_CELLS, cellDistance, isOpen, minutesToClose, npcCell, walkable } from "../../maps/index.ts"
-import { HEARING_CELLS, validPath, type Cell, type MapPlayer } from "../../protocol.ts"
+import { HEARING_CELLS, validPath, cellsReached, type Cell, type MapPlayer } from "../../protocol.ts"
 import type { Ctx, Handlers, Message } from "./context.ts"
 import { TOWN, timeFor, presence, mapPlayer, reachable, near, atWarp } from "./presence.ts"
 
@@ -76,7 +76,9 @@ async function join(roomCtx: Ctx, message: Message<"join">) {
 async function move(roomCtx: Ctx, message: Message<"move">) {
   const { ctx, map, me, save, standUp } = roomCtx
   if (!me.player) return
-  if (me.engaged || me.down || me.trade?.open || !validPath(reachable(me), message.path, (c) => walkable(map, c))) {
+  const since = roomCtx.receivedAt ?? Date.now()
+  const reached = cellsReached(me.route, Math.max(0, since - me.since) / 1000)
+  if (me.engaged || me.down || me.trade?.open || !validPath(reached, message.path, (c) => walkable(map, c))) {
     const at = reachable(me)[0]
     if (me.owner && (await Player.get(me.owner).walk(ctx.connection.id, [at]))) {
       save({ player: { ...me.player, at }, route: [at], since: Date.now() })
@@ -86,9 +88,9 @@ async function move(roomCtx: Ctx, message: Message<"move">) {
     return
   }
   await standUp()
-  if (!me.owner || !(await Player.get(me.owner).walk(ctx.connection.id, message.path))) return
+  if (!me.owner || !(await Player.get(me.owner).walk(ctx.connection.id, message.path, since))) return
   const at = message.path[message.path.length - 1]
-  save({ player: { ...me.player, at }, route: message.path, since: Date.now() })
+  save({ player: { ...me.player, at }, route: message.path, since })
   await ctx.room.broadcast({ type: "moved", id: me.player.id, path: message.path }, [ctx.connection.id])
   return
 }

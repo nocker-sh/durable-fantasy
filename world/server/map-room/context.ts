@@ -10,6 +10,8 @@ export interface Ctx {
   ctx: RoomContext<ServerMessage>
   key: RoomKey
   map: MapDefinition
+  /** Server receipt time, before queued work and persistence waits. */
+  receivedAt?: number
   me: Presence
   save(patch: Partial<Presence>): void
   /** someone sitting gets up before they walk off or strike */
