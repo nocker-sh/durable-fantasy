@@ -3,8 +3,8 @@
 // it only to grey out what would be refused.
 import { addItem, firstOf, moveSlot, putStack, removeItem, takeFromSlot, type Bag, type Stack } from "./bag.ts"
 import { STORAGE_KEEPER, STORE_FEE } from "./storage.ts"
-import { artBlocked, firstAid, isArt, skillOf } from "./skills.ts"
-import { lifeLevel, forgottenLifeExp } from "./life.ts"
+import { cast, payArt } from "./skill-command.ts"
+import { forgottenLifeExp } from "./life.ts"
 import { keep } from "./threads.ts"
 import { MAX_ORDERS, commissionOf, commissionQuality } from "./commissions.ts"
 import type { Command, ServerCommand } from "./commands.ts"
@@ -283,40 +283,10 @@ export function apply(before: PlayerState, command: Command | ServerCommand, ctx
       if (command.stacks.length && weight > derive(state).maxWeight) return reject("TOO_HEAVY")
       return accept({ ...state, bag, gold: state.gold + command.gold }, { type: "traded-in", stacks: [...command.stacks], gold: command.gold })
     }
-    case "cast": {
-      // something done to yourself: first aid (anyone with a herb) or a prayer of the staff in hand
-      const sk = skillOf(command.skill)
-      if (command.skill !== "first-aid" && sk.kind !== "prayer") return reject("NOT_USABLE")
-      const blocked = artBlocked(command.skill, state)
-      if (blocked) return reject(blocked)
-      if ((state.ready[command.skill] ?? 0) > now) return reject("COOLDOWN")
-      if (state.sp < sk.sp) return reject("SP_SHORT")
-      const d = derive(state)
-      if (state.hp >= d.maxHp) return reject("HP_FULL")
-      let bag = state.bag
-      let gain: number
-      if (command.skill === "first-aid") {
-        const next = removeItem(bag, "herb", 1)
-        if (!next) return reject("NO_HERB")
-        bag = next
-        gain = firstAid(lifeLevel(state.life.alchemy), d.stats.vit)
-      } else {
-        const heal = (sk as { heal: { base: number; per: number; stat: keyof PlayerState["stats"] } }).heal
-        gain = Math.floor(heal.base + heal.per * d.stats[heal.stat])
-      }
-      const hp = Math.min(d.maxHp, state.hp + gain)
-      return accept({ ...state, bag, hp, sp: state.sp - sk.sp, ready: { ...state.ready, [command.skill]: now + sk.cooldown } }, { type: "cast", skill: command.skill, hp: hp - state.hp })
-    }
-    case "art": {
-      // a blow with the weapon in hand: the room has checked the reach and rolls the blow once this is paid for
-      const sk = skillOf(command.skill)
-      if (!isArt(sk) || sk.kind === "prayer") return reject("NOT_USABLE")
-      const blocked = artBlocked(command.skill, state)
-      if (blocked) return reject(blocked)
-      if ((state.ready[command.skill] ?? 0) > now) return reject("COOLDOWN")
-      if (state.sp < sk.sp) return reject("SP_SHORT")
-      return accept({ ...state, sp: state.sp - sk.sp, sitting: false, ready: { ...state.ready, [command.skill]: now + sk.cooldown } }, { type: "art", skill: command.skill })
-    }
+    case "cast":
+      return cast(state, command.skill, now)
+    case "art":
+      return payArt(state, command.skill, now)
     case "sit":
       return accept({ ...state, sitting: true }, { type: "sat" })
     case "stand":

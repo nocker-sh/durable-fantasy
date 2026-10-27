@@ -19,20 +19,14 @@ export interface Action extends Base {
   kind: "action"
 }
 
-/** Comes with a weapon: a blow at what you are fighting, or (a prayer) something done to yourself. */
-export interface Art extends Base {
-  kind: "strike" | "spell" | "prayer"
+/** Weapon requirements are shared; each art kind carries only its own effect. */
+interface EquippedArt extends Base {
   weapons: readonly ItemId[]
   needs: Partial<Record<Stat | LifeSkill, number>>
-  /** a strike: times the usual blow */
-  power?: number
-  /** a strike: always a critical */
-  sure?: boolean
-  /** a spell's attack: base, and per point of this stat; it never misses and armour counts half */
-  magic?: { base: number; per: number; stat: Stat }
-  /** a prayer's HP back: base, and per point of this stat */
-  heal?: { base: number; per: number; stat: Stat }
 }
+
+type StatEffect = { base: number; per: number; stat: Stat }
+export type Art = EquippedArt & ({ kind: "strike"; power: number; sure?: boolean } | { kind: "spell"; magic: StatEffect } | { kind: "prayer"; heal: StatEffect })
 
 export type SkillDef = Action | Art
 

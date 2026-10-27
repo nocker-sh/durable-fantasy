@@ -4,7 +4,7 @@ import { STAT_NAME } from "#/world/core/growth.ts"
 import { GATHER_SKILL_NAME, GATHER_SKILLS } from "#/world/core/items.ts"
 import { LIFE_MILESTONE_TEXT, LIFE_SKILLS, MILESTONES } from "#/world/core/life.ts"
 import { MONSTER_KINDS, SPAWNS } from "#/world/core/monsters.ts"
-import { SKILLS, type Art } from "#/world/core/skills.ts"
+import { SKILLS, skillOf } from "#/world/core/skills.ts"
 import { hareBody, slimeBody } from "#/world/scene/fields.ts"
 import type { Build } from "../three-view.tsx"
 import { sheet } from "./schema.ts"
@@ -67,14 +67,17 @@ const skills = sheet({
     {
       label: "効き",
       get: (id) => {
-        const s: Partial<Omit<Art, "kind">> = SKILLS[id]
-        return s.power
-          ? `×${s.power}${s.sure ? " 必ず会心" : ""}`
-          : s.magic
-            ? `${s.magic.base}+${STAT_NAME[s.magic.stat]}×${s.magic.per}`
-            : s.heal
-              ? `回復 ${s.heal.base}+${STAT_NAME[s.heal.stat]}×${s.heal.per}`
-              : ""
+        const s = skillOf(id)
+        switch (s.kind) {
+          case "strike":
+            return `×${s.power}${s.sure ? " 必ず会心" : ""}`
+          case "spell":
+            return `${s.magic.base}+${STAT_NAME[s.magic.stat]}×${s.magic.per}`
+          case "prayer":
+            return `回復 ${s.heal.base}+${STAT_NAME[s.heal.stat]}×${s.heal.per}`
+          case "action":
+            return ""
+        }
       },
     },
   ],
