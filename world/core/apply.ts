@@ -6,7 +6,7 @@ import { STORAGE_KEEPER, STORE_FEE } from "./storage.ts"
 import { cast, payArt } from "./skill-command.ts"
 import { forgottenLifeExp } from "./life.ts"
 import { keep } from "./threads.ts"
-import { MAX_ORDERS, commissionOf, commissionQuality } from "./commissions.ts"
+import { order, collect } from "./commission-command.ts"
 import type { Command, ServerCommand } from "./commands.ts"
 import { effectOf, priceOf, qualitiesOf, usualMaker } from "./makers.ts"
 import { gather } from "./gather-command.ts"
@@ -112,35 +112,10 @@ export function apply(before: PlayerState, command: Command | ServerCommand, ctx
       return gather(state, command, now)
     case "craft":
       return craft(state, command)
-    case "order": {
-      const job = commissionOf(command.commission)
-      if (!job) return reject("NOT_SOLD_HERE")
-      if (state.orders.length >= MAX_ORDERS) return reject("TOO_MANY_ORDERS")
-      const fee = friendPrice(job.fee, state.friends[job.craftsman] ?? 0)
-      if (state.gold < fee) return reject("NO_GOLD")
-      let bag: Bag = state.bag
-      for (const { item, count } of job.inputs) {
-        const next = removeItem(bag, item, count)
-        if (!next) return reject("MISSING_INPUTS")
-        bag = next
-      }
-      const readyAt = now + job.minutes * 60_000
-      const q = ITEMS[job.output.item].made ? commissionQuality(job.craftsman, job.output.item, command.roll) : 1
-      return accept({ ...state, bag, gold: state.gold - fee, orders: [...state.orders, { commission: job.id, readyAt, q }] }, { type: "ordered", commission: job.id, readyAt })
-    }
-    case "collect": {
-      const order = state.orders[command.index]
-      const job = order && commissionOf(order.commission)
-      if (!order || !job) return reject("NOT_READY")
-      if (order.readyAt > now) return reject("NOT_READY")
-      const made = ITEMS[job.output.item].made
-      const bag = addItem(state.bag, job.output.item, job.output.count, made ? { q: order.q, by: job.craftsman } : undefined)
-      if (!bag) return reject("BAG_FULL")
-      return accept(
-        { ...state, bag, orders: state.orders.filter((_, i) => i !== command.index), friends: befriend(state.friends, job.craftsman, FRIEND.commission) },
-        { type: "collected", item: job.output.item, count: job.output.count, q: made ? order.q : null, by: job.craftsman },
-      )
-    }
+    case "order":
+      return order(state, command, now)
+    case "collect":
+      return collect(state, command, now)
     case "errand-take": {
       const e = errandOf(command.errand)
       const list = todays(state.errands, now)

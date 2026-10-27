@@ -125,6 +125,30 @@ describe("commissions", () => {
     expect(apply(player({ gold: 0, bag: bag(["rusty-scrap", 4], ["charcoal", 2]) }), { type: "order", commission: "gunter-ingot", roll: 0.5 })).toEqual({ ok: false, reason: "NO_GOLD" })
   })
 
+  it("retains a finished order when the bag is full, then collects it exactly once", () => {
+    const waiting = player({
+      bag: emptyBag().map(() => ({ item: "wooden-stick", count: 1 })),
+      orders: [{ commission: "rudolf-boots", readyAt: H, q: 2 }],
+    })
+    const before = structuredClone(waiting)
+    expect(apply(waiting, { type: "collect", index: 0 }, { now: H })).toEqual({ ok: false, reason: "BAG_FULL" })
+    expect(waiting).toEqual(before)
+    const cleared = { ...waiting, bag: waiting.bag.map((item, index) => (index === 0 ? null : item)) }
+    const collected = apply(cleared, { type: "collect", index: 0 }, { now: H })
+    if (!collected.ok) throw Error(collected.reason)
+    expect(collected.state.orders).toEqual([])
+    expect(countItem(collected.state.bag, "leather-boots")).toBe(1)
+    expect(collected.state.friends["ルドルフ"]).toBeGreaterThan(waiting.friends["ルドルフ"] ?? 0)
+    expect(apply(collected.state, { type: "collect", index: 0 }, { now: H })).toEqual({ ok: false, reason: "NOT_READY" })
+  })
+
+  it("does not spend the first material or fee when a later ingredient is missing", () => {
+    const state = player({ gold: 100, bag: bag(["iron-ingot", 1]) })
+    const before = structuredClone(state)
+    expect(apply(state, { type: "order", commission: "gunter-axe", roll: 0.5 }, { now: 0 })).toEqual({ ok: false, reason: "MISSING_INPUTS" })
+    expect(state).toEqual(before)
+  })
+
   it("every commission is taken by a real craftsman, and costs less than buying it outright", () => {
     for (const job of COMMISSIONS) {
       expect(
