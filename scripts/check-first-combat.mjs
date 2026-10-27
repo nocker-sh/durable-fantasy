@@ -4,10 +4,38 @@ import { mkdir, writeFile } from "node:fs/promises"
 import { createCharacter, waitReady, walkToMap } from "./lib/game-browser.mjs"
 const browser = await chromium.launch({ channel: "chrome", args: ["--disable-http2"] })
 let page
+const commands = []
+const errors = []
+const started = Date.now()
 try {
   page = await browser.newPage({ ignoreHTTPSErrors: true, viewport: { width: 1280, height: 800 } })
-  const errors = []
   page.on("pageerror", (error) => errors.push(error.message))
+  // Keep only command metadata: socket URLs and full player snapshots contain private data.
+  page.on("websocket", (socket) => {
+    for (const event of ["framesent", "framereceived"]) {
+      socket.on(event, ({ payload }) => {
+        let message
+        try {
+          message = JSON.parse(String(payload))
+        } catch {
+          return
+        }
+        if (!["command", "result", "move", "attack", "refused"].includes(message?.type)) return
+        commands.push({
+          ms: Date.now() - started,
+          event,
+          type: message.type,
+          seq: message.seq,
+          command: message.command?.type,
+          ok: message.result?.ok,
+          reason: message.result?.reason ?? message.reason,
+          what: message.what,
+          monster: message.monster,
+          pathLength: message.path?.length,
+        })
+      })
+    }
+  })
   await createCharacter(page)
   const route = await walkToMap(page, "south-meadow")
   const before = await page.evaluate(() => ({ exp: game.state.get().player.exp, weapon: game.state.get().player.equipment.weapon }))
@@ -74,6 +102,7 @@ try {
 } catch (error) {
   await mkdir("public/tmp", { recursive: true })
   await page?.screenshot({ path: "public/tmp/first-combat-failure.png" })
+  console.error({ commands, errors })
   console.error(
     await page?.evaluate(() =>
       window.game
@@ -82,6 +111,9 @@ try {
             cell: game.scene?.playerCell(),
             online: game.state.get().online,
             hp: game.state.get().player?.hp,
+            profileComplete: game.state.get().player?.profileComplete,
+            busy: game.state.get().busy,
+            joined: !!game.session.others.you,
             exp: game.state.get().player?.exp,
             notices: game.state.get().notices,
             wild: game.session.wild,
