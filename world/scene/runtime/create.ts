@@ -1,3 +1,4 @@
+import { OcclusionQuery } from "../../../lib/graphics/occlusion-query.ts"
 import { ScreenLabels } from "../../../lib/graphics/screen-labels"
 import { PendingAction } from "./action-target"
 import { WarpMarkers } from "./warps"
@@ -419,8 +420,10 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
   const projection = new THREE.Matrix4()
   const followPosition = new THREE.Vector3()
   const head = new THREE.Vector3()
-  const occlusionRay = new THREE.Ray()
-  const hitPoint = new THREE.Vector3()
+  const occlusion = new OcclusionQuery(
+    occluders.map((o) => o.box),
+    0.3,
+  )
   let lastReport = 0
   let frames = 0,
     fpsAt = performance.now(),
@@ -492,11 +495,10 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
     }
     // fade houses and trees standing between the camera and the player
     head.set(me.pos[0], walkH(me.pos[0], me.pos[1]) + 0.9, me.pos[1])
-    occlusionRay.set(cam.position, hitPoint.copy(head).sub(cam.position).normalize())
-    const maxD = cam.position.distanceTo(head)
+    const occluded = occlusion.update(cam.position, head)
     let hidden = false
-    occluders.forEach((o) => {
-      const hit = occlusionRay.intersectBox(o.box, hitPoint) && hitPoint.distanceTo(cam.position) < maxD - 0.3
+    occluders.forEach((o, i) => {
+      const hit = occluded[i]
       if (o.opaque) {
         hidden ||= !!hit
         return
