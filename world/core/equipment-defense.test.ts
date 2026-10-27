@@ -15,7 +15,7 @@ it.each([
 
 it("preserves unmarked and non-crafted armor defense", () => {
   expect(equipmentDefense("leather-armor")).toBe(6)
-  expect(equipmentDefense("iron-helm", 3)).toBe(4)
+  expect(equipmentDefense("traveller-coat", 3)).toBe(3)
   const p = player()
   const armor = { ...p, equipment: { ...p.equipment, body: "leather-armor" as const } }
   expect(derive(armor).def - derive(p).def).toBe(6)
@@ -24,6 +24,8 @@ it("preserves unmarked and non-crafted armor defense", () => {
 it.each([
   ["leather", "leather-armor", "ルドルフ"],
   ["armorer", "chain-mail", "ベアトリクス"],
+  ["armorer", "iron-helm", "ベアトリクス"],
+  ["tailor", "cloth-hat", "マグダレーナ"],
 ] as const)("keeps the regular shop price and records the maker: %s", (shop, item, maker) => {
   const result = apply(player({ gold: 1000 }), { type: "buy", shop, item, count: 1 })
   if (!result.ok) throw Error(result.reason)

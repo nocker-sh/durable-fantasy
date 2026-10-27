@@ -147,8 +147,8 @@ const DEFINITIONS = {
   "short-bow": craftedGear("短弓", 140, "bow", { part: "weapon", atk: 18, delay: 1600, twoHanded: true, needs: { dex: 10 }, scale: { dex: "C" } }, 50, "狩人が使う小ぶりの弓。両手で引く。"),
 
   // ---------------------------------------------------------------- armour
-  "cloth-hat": gear("布の帽子", 30, "hat", { part: "head", def: 1 }, 10, "冷たい風と小雨を防ぐ。"),
-  "iron-helm": gear("鉄兜", 140, "helm", { part: "head", def: 4, needs: { str: 7 } }, 60, "鍛冶場で叩き出した鉄の兜。", "fine"),
+  "cloth-hat": craftedGear("布の帽子", 30, "hat", { part: "head", def: 1 }, 10, "冷たい風と小雨を防ぐ。"),
+  "iron-helm": craftedGear("鉄兜", 140, "helm", { part: "head", def: 4, needs: { str: 7 } }, 60, "鍛冶場で叩き出した鉄の兜。", "fine"),
   "traveller-coat": gear("旅人の服", 80, "tunic", { part: "body", def: 3 }, 30, "厚手の毛織りの上着。"),
   "leather-armor": craftedGear("革の鎧", 220, "tunic", { part: "body", def: 6 }, 80, "なめした革を重ねた鎧。動きやすい。", "fine"),
   "chain-mail": craftedGear("鎖帷子", 480, "armor", { part: "body", def: 10, needs: { str: 10, vit: 8 } }, 160, "細い鉄の輪を編んだ鎧。重いが頼もしい。", "fine"),
