@@ -16,6 +16,7 @@ import { ItemTooltip } from "./item-tooltip.tsx"
 import type { ItemId } from "#/world/core/items.ts"
 import { carriesItem, readDrag } from "./drag.ts"
 
+import { useDeadlineClock } from "#/hooks/use-deadline-clock.ts"
 import { skillIconUrl } from "./skill-icon.ts"
 
 const KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
@@ -43,6 +44,12 @@ export function Hotbar() {
     if (drag) game.bindHotbar(index, "skill" in drag ? skillKey(drag.skill) : drag.item)
   }
 
+  const until =
+    player?.hotbar.reduce((latest, entry) => {
+      const id = entry && skillOfKey(entry)
+      return id ? Math.max(latest, player.ready[id] ?? 0) : latest
+    }, 0) ?? 0
+  const now = useDeadlineClock(until)
   const need = player ? expToNext(player.level) : 0
   return (
     <>
@@ -66,14 +73,28 @@ export function Hotbar() {
             },
           }
           if (skill) {
-            // a skill: dim while the weapon in hand or what has been raised does not allow it
+            // Keep the shortcut removable while waiting; the controller also guards keyboard use.
             const blocked = player ? artBlocked(skill, player) : null
+            const seconds = Math.max(0, Math.ceil(((player?.ready[skill] ?? 0) - now) / 1000))
             return (
               <Tooltip key={key}>
-                <TooltipTrigger render={<Slot round icon={skillIconUrl(skill)} dim={!!blocked} keyHint={key} aria-label={`ショートカット ${key}: ${SKILLS[skill].name}`} {...drop_} />} />
+                <TooltipTrigger
+                  render={
+                    <Slot
+                      round
+                      icon={skillIconUrl(skill)}
+                      dim={!!blocked || seconds > 0}
+                      keyHint={key}
+                      aria-label={`ショートカット ${key}: ${SKILLS[skill].name}${seconds ? `（あと${seconds}秒）` : ""}`}
+                      {...drop_}
+                    >
+                      {seconds > 0 && <span className="pointer-events-none absolute bottom-1 font-tiny text-xs text-white ui-text-shadow">{seconds}</span>}
+                    </Slot>
+                  }
+                />
                 <TooltipContent className="font-head text-xs">
                   {SKILLS[skill].name}
-                  {blocked ? `（${REASON_TEXT[blocked]}）` : ""} ・ 右クリックで外す
+                  {blocked ? `（${REASON_TEXT[blocked]}）` : seconds ? `（あと${seconds}秒）` : ""} ・ SP {SKILLS[skill].sp} ・ 右クリックで外す
                 </TooltipContent>
               </Tooltip>
             )

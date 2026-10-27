@@ -95,6 +95,7 @@ export class PlayerActions {
     const p = this.target.session.state.get().player
     const blocked = p && artBlocked(skill, p)
     if (blocked) return this.target.notify(REASON_TEXT[blocked], "bad")
+    if ((p?.ready[skill] ?? 0) > Date.now()) return this.target.notify(REASON_TEXT.COOLDOWN, "bad")
     if (!this.target.session.fighting || performance.now() - this.target.session.fighting.at > 4000) return this.target.notify("戦っている相手がいない。生き物をクリックしてから使おう。", "bad")
     this.target.session.socket?.send({ type: "attack", monster: this.target.session.fighting.monster, art: skill })
   }
