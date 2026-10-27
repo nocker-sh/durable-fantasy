@@ -48,3 +48,27 @@ it("loads existing unmarked equipment without resetting the character", () => {
   expect(loaded.name).toBe("エルナ")
   expect(loaded.bag[0]).toEqual({ item: "dagger", count: 1 })
 })
+
+it.each([false, true])("switches from a worn axe and shield atomically when extra bag space is %s", (hasSpace) => {
+  const base = player()
+  const before = player({
+    stats: { ...base.stats, str: 30, dex: 30 },
+    life: { ...base.life, woodcutting: lifeExpAt(4) },
+    bag: emptyBag().map((_, index) => (index === 0 ? { item: "spear", count: 1, q: 2, by: "エルナ" } : hasSpace && index === 23 ? null : { item: "dagger", count: 1 })),
+    equipment: { ...base.equipment, weapon: "wood-axe", shield: "wooden-shield" },
+    worn: { weapon: { q: 2, by: "ギュンター", dur: 7 }, shield: { q: 1, by: "ゴットフリート" } },
+  })
+  const snapshot = structuredClone(before)
+  const result = apply(before, { type: "equip", slot: 0 })
+  expect(before).toEqual(snapshot)
+  if (!hasSpace) {
+    expect(result).toEqual({ ok: false, reason: "BAG_FULL" })
+    return
+  }
+  if (!result.ok) throw Error(result.reason)
+  expect(result.state.equipment).toMatchObject({ weapon: "spear", shield: null })
+  expect(result.state.worn.weapon).toEqual({ q: 2, by: "エルナ" })
+  expect(result.state.worn.shield).toBeUndefined()
+  expect(result.state.bag).toContainEqual({ item: "wood-axe", count: 1, q: 2, by: "ギュンター", dur: 7 })
+  expect(result.state.bag).toContainEqual({ item: "wooden-shield", count: 1, q: 1, by: "ゴットフリート" })
+})
