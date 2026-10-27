@@ -11,7 +11,7 @@ import { riverX0, smooth, VILLAGE, type Layout } from "../maps/layout.ts"
 export { catmull, smooth, OFF, OFF_LINE, OFF_POINT, VILLAGE, type Layout, type Road, type V2 } from "../maps/layout.ts"
 
 import { Polyline } from "../../lib/engine/polyline.ts"
-const segDist = Polyline.distance
+type RoadPath = { path: Polyline; width: number; kind: number }
 
 import { lerp } from "../../lib/engine/math.ts"
 
@@ -41,7 +41,7 @@ function baseH(x: number, z: number): number {
 
 let PLAZA_H = baseH(layout.plaza[0], layout.plaza[1])
 
-function computeH(x: number, z: number, dr: number): number {
+function computeH(x: number, z: number, dr: number, roads: readonly RoadPath[]): number {
   let h = baseH(x, z)
   // plaza flattened
   const dp = Math.hypot(x - layout.plaza[0], z - layout.plaza[1])
@@ -75,26 +75,33 @@ function computeH(x: number, z: number, dr: number): number {
   }
   if (layout.shape) {
     // roads stay walkable: the landform eases off near them
-    const rd = Math.max(0, segRoad(x, z))
+    const rd = Math.max(0, segRoad(x, z, roads))
     h = lerp(h, layout.shape(x, z, h, roadD(x, z)), smooth(0.4, 2.2, rd))
   }
   return h
 }
 
-function segRoad(x: number, z: number): number {
+function segRoad(x: number, z: number, roads: readonly RoadPath[]): number {
   let best = 1e9
-  for (const r of layout.roads) best = Math.min(best, segDist(x, z, r.pts) - r.w)
+  for (const road of roads) best = Math.min(best, road.path.distance(x, z) - road.width)
   return best
 }
 
 function computeFields() {
+  const river = new Polyline(layout.river)
+  const trails = (layout.trails ?? []).map((points) => new Polyline(points))
+  const roadPaths: RoadPath[] = layout.roads.map((road) => ({
+    path: new Polyline(road.pts),
+    width: road.w,
+    kind: road.kind === "cobble" ? 1 : road.kind === "dirt" ? 2 : 3,
+  }))
   PLAZA_H = baseH(layout.plaza[0], layout.plaza[1])
   for (let j = 0; j < GN; j++)
     for (let i = 0; i < GN; i++) {
       const x = i / FR,
         z = j / FR,
         k = j * GN + i
-      const dr = segDist(x, z, layout.river)
+      const dr = river.distance(x, z)
       F.river[k] = dr
       let best = 1e9,
         kind = 0
@@ -105,19 +112,19 @@ function computeFields() {
         wz = (vnoise(x, z, 0.14, sd + 402) - 0.5) * 0.9
       const swell = 1 + (fbm(x, z, 0.2, sd + 403) - 0.5) * 0.5
       const ragged = (vnoise(x, z, 1.7, sd + 404) - 0.5) * 0.16
-      layout.roads.forEach((r) => {
-        const d = segDist(x + wx, z + wz, r.pts) - r.w * swell + ragged
+      for (const road of roadPaths) {
+        const d = road.path.distance(x + wx, z + wz) - road.width * swell + ragged
         if (d < best) {
           best = d
-          kind = r.kind === "cobble" ? 1 : r.kind === "dirt" ? 2 : 3
+          kind = road.kind
         }
-      })
+      }
       F.road[k] = best
       let tr = 1e9
-      for (const t of layout.trails ?? []) tr = Math.min(tr, segDist(x, z, t))
+      for (const trail of trails) tr = Math.min(tr, trail.distance(x, z))
       F.trail[k] = tr
       F.roadKind[k] = kind
-      F.h[k] = computeH(x, z, dr)
+      F.h[k] = computeH(x, z, dr, roadPaths)
     }
 }
 let fieldsReady = false
