@@ -4,7 +4,7 @@ import { countItem } from "./bag.ts"
 import { startingStats } from "./growth.ts"
 import { lifeExpAt } from "./life.ts"
 import { emptyEquipment } from "./player.ts"
-import { SKILLS, artBlocked, artsOf, firstAid } from "./skills.ts"
+import { SKILLS, SKILL_IDS, artBlocked, artsOf, firstAid, isArt, skillOf } from "./skills.ts"
 import { bagWith, player } from "../test/helpers.ts"
 import { commandSchema } from "./commands.ts"
 
@@ -68,4 +68,24 @@ describe("arts come with the weapon in hand", () => {
     expect(commandSchema.safeParse({ type: "hotbar", index: 3, item: "skill:basic" }).success).toBe(false)
     expect(commandSchema.safeParse({ type: "learn", skill: "sit" }).success).toBe(false)
   })
+})
+
+it("indexes every weapon art in definition order and shares immutable lists", () => {
+  const weapons = new Set(
+    SKILL_IDS.flatMap((id) => {
+      const skill = skillOf(id)
+      return isArt(skill) ? [...skill.weapons] : []
+    }),
+  )
+  for (const weapon of weapons) {
+    const expected = SKILL_IDS.filter((id) => {
+      const skill = skillOf(id)
+      return isArt(skill) && skill.weapons.includes(weapon)
+    })
+    expect(artsOf(weapon)).toEqual(expected)
+    expect(artsOf(weapon)).toBe(artsOf(weapon))
+    expect(Object.isFrozen(artsOf(weapon))).toBe(true)
+  }
+  expect(artsOf(null)).toEqual([])
+  expect(artsOf("herb")).toBe(artsOf(null))
 })

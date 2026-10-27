@@ -181,12 +181,17 @@ export function artBlocked(id: SkillId, p: { equipment: { weapon: ItemId | null 
   return null
 }
 
-/** The arts that come with a weapon. */
-export const artsOf = (weapon: ItemId | null) =>
-  SKILL_IDS.filter((id) => {
-    const s = skillOf(id)
-    return isArt(s) && !!weapon && s.weapons.includes(weapon)
-  })
+const weaponArts = new Map<ItemId, readonly SkillId[]>()
+const noArts: readonly SkillId[] = Object.freeze([])
+for (const id of SKILL_IDS) {
+  const skill = skillOf(id)
+  if (!isArt(skill)) continue
+  for (const weapon of skill.weapons) weaponArts.set(weapon, [...(weaponArts.get(weapon) ?? noArts), id])
+}
+for (const arts of weaponArts.values()) Object.freeze(arts)
+
+/** Stable, immutable lists in definition order, shared by skill windows and item descriptions. */
+export const artsOf = (weapon: ItemId | null): readonly SkillId[] => (weapon ? (weaponArts.get(weapon) ?? noArts) : noArts)
 
 /** A skill on the shortcut bar is written "skill:<id>"; anything else there is an item. */
 export type SkillKey = `skill:${SkillId}`
