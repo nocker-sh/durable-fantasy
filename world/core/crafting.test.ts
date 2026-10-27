@@ -24,6 +24,22 @@ describe("making things", () => {
     expect(r.state.life.cooking).toBe(craftExp(0))
   })
 
+  it("splits a log into fuel and uses that fuel to cook tea", () => {
+    const start = player({ gold: 100, bag: bag(["log", 1], ["herb", 2]) })
+    const split = apply(start, { type: "craft", recipe: "firewood", station: "workshop-bench", roll: 0.5 })
+    if (!split.ok) throw Error(split.reason)
+    expect(countItem(split.state.bag, "log")).toBe(0)
+    expect(countItem(split.state.bag, "firewood")).toBe(2)
+    expect(split.state.life.carpentry).toBe(craftExp(0))
+    const tea = apply(split.state, { type: "craft", recipe: "herb-tea", station: "workshop-hearth", roll: 0.5 })
+    if (!tea.ok) throw Error(tea.reason)
+    expect(countItem(tea.state.bag, "firewood")).toBe(1)
+    expect(countItem(tea.state.bag, "herb")).toBe(0)
+    expect(countItem(tea.state.bag, "herb-tea")).toBe(2)
+    expect(tea.state.life.cooking).toBe(craftExp(0))
+    expect(tea.state.gold).toBeLessThan(split.state.gold)
+  })
+
   it("an axe needs the smith's iron and the woodworker's plank, and the forge", () => {
     const p = player({ gold: 100, life: at("smithing", 2), bag: bag(["iron-ingot", 1], ["plank", 1]) })
     expect(apply(p, { type: "craft", recipe: "wood-axe", station: "workshop-bench", roll: 0.5 })).toEqual({ ok: false, reason: "WRONG_STATION" })
