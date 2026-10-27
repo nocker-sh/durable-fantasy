@@ -1,6 +1,6 @@
 import { afterEach, expect, it, vi } from "vitest"
 import * as THREE from "three"
-import { burst, updateMonsters, type MonsterView } from "./monsters"
+import { burst, updateMonsterHealth, updateMonsters, type MonsterView } from "./monsters"
 import * as terrain from "./world"
 import { slimeBody } from "./fields"
 import { SPAWNS, MONSTER_KINDS, MonsterMotion } from "../core/monsters"
@@ -12,7 +12,17 @@ function fixture() {
   const root = new THREE.Group()
   const body = slimeBody(0x8ac06a)
   root.add(body)
-  const monster: MonsterView = { spawn: SPAWNS[0], motion: new MonsterMotion(SPAWNS[0], () => true), body, pos: [30, 30], hp: 0, back: 99999, burst: null, label: {} as HTMLDivElement }
+  const monster: MonsterView = {
+    spawn: SPAWNS[0],
+    motion: new MonsterMotion(SPAWNS[0], () => true),
+    body,
+    pos: [30, 30],
+    hp: 0,
+    back: 99999,
+    burst: null,
+    label: {} as HTMLDivElement,
+    hpBar: { style: {} } as HTMLElement,
+  }
   const texture = (body.children[0] as THREE.Mesh<THREE.BufferGeometry, THREE.MeshLambertMaterial>).material.map!
   return { root, monster, texture }
 }
@@ -106,4 +116,30 @@ it("shares one ground sample among burst pieces and resamples after hidden movem
   updateMonsters([monster], root, 1400)
   expect(height).toHaveBeenCalledTimes(2)
   expect(monster.body.position.y).toBeCloseTo(3.06)
+})
+
+it("writes a monster HP bar only when its displayed percentage changes", () => {
+  const { monster } = fixture()
+  const widths: string[] = []
+  monster.hpBar = {
+    style: {
+      set width(value: string) {
+        widths.push(value)
+      },
+    },
+  } as HTMLElement
+  const max = MONSTER_KINDS[monster.spawn.kind].hp
+  monster.hp = max
+  for (let frame = 0; frame < 60; frame++) updateMonsterHealth(monster)
+  expect(widths).toEqual(["100%"])
+  monster.hp = max / 2
+  updateMonsterHealth(monster)
+  monster.hp = max * 0.501
+  updateMonsterHealth(monster)
+  expect(widths).toEqual(["100%", "50%"])
+  monster.hp = 0
+  updateMonsterHealth(monster)
+  monster.hp = max
+  updateMonsterHealth(monster)
+  expect(widths).toEqual(["100%", "50%", "0%", "100%"])
 })

@@ -18,6 +18,8 @@ export interface MonsterView {
   /** the burst of little slimes, while it plays */
   burst: { bits: THREE.Group[]; until: number } | null
   label: HTMLDivElement
+  hpBar: HTMLElement
+  hpWidth?: number
 }
 
 export function makeMonsters(root: THREE.Group, map: string): MonsterView[] {
@@ -30,8 +32,16 @@ export function makeMonsters(root: THREE.Group, map: string): MonsterView[] {
     const label = document.createElement("div")
     label.className = "gx-nameplate gx-nameplate--npc"
     label.innerHTML = `<span>${kind.name}</span><span class="gx-hp"><span></span></span>`
-    return { spawn, motion: new MonsterMotion(spawn, isFree), body, pos: [0, 0] as V2, hp: kind.hp, back: 0, burst: null, label }
+    return { spawn, motion: new MonsterMotion(spawn, isFree), body, pos: [0, 0] as V2, hp: kind.hp, back: 0, burst: null, label, hpBar: label.querySelector<HTMLElement>(".gx-hp > span")! }
   })
+}
+
+/** The rendered percentage changes on damage and recovery, not on every animation frame. */
+export function updateMonsterHealth(m: MonsterView) {
+  const width = Math.round((m.hp / MONSTER_KINDS[m.spawn.kind].hp) * 100)
+  if (m.hpWidth === width) return
+  m.hpBar.style.width = `${width}%`
+  m.hpWidth = width
 }
 
 /** Move each to where the clock puts it, hop it, hide it while it is off recovering. */

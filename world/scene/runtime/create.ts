@@ -12,7 +12,7 @@ import * as THREE from "three"
 import { initWalk, walkH, isFree, setLayout } from "../world"
 import { updateCutaways } from "../interior"
 import { REACH } from "../../core/gather.ts"
-import { burst, makeMonsters, standBy, updateMonsters } from "../monsters"
+import { burst, makeMonsters, standBy, updateMonsterHealth, updateMonsters } from "../monsters"
 import { MELEE_REACH, MONSTER_KINDS } from "../../core/monsters.ts"
 import { groundOf } from "../ground"
 import { updaters, occluders, resetRegistries, houseGlows, lamps, stalls, movingObjects, type V2 } from "../build"
@@ -529,7 +529,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
     for (const m of monsters) {
       const kind = MONSTER_KINDS[m.spawn.kind]
       const show = m.body.visible && (m.spawn.id === action.fighting || m.hp < kind.hp || Math.hypot(m.pos[0] - me.pos[0], m.pos[1] - me.pos[1]) < 4)
-      ;(m.label.querySelector(".gx-hp > span") as HTMLElement).style.width = `${Math.round((m.hp / kind.hp) * 100)}%`
+      updateMonsterHealth(m)
       place(m.label, show && toScreen(m.pos, 0.55, v), v, 2)
     }
     const target = action.fighting ? monsters.find((m) => m.spawn.id === action.fighting) : undefined
