@@ -37,6 +37,20 @@ describe("gathering", () => {
     expect(r.ok && r.state.bag.some((s) => s?.item === "wood-axe")).toBe(false)
   })
 
+  it.each([1, 2])("handles a full bag with %i uses left without partial consumption", (dur) => {
+    const p = player({ bag: withAxe(dur).map((slot) => slot ?? { item: "dagger", count: 1 }) })
+    const original = structuredClone(p)
+    const result = apply(p, { type: "gather", node: tree.id, roll: 0.5 })
+    expect(p).toEqual(original)
+    if (dur > 1) {
+      expect(result).toEqual({ ok: false, reason: "BAG_FULL" })
+      return
+    }
+    if (!result.ok) throw Error(result.reason)
+    expect(result.state.bag[0]).toEqual({ item: "log", count: 1 })
+    expect(result.events[0]).toMatchObject({ type: "gathered", broke: "wood-axe" })
+  })
+
   it("too tired to gather at all", () => {
     expect(apply(player({ stamina: 1 }), { type: "gather", node: herb.id, roll: 0.1 })).toEqual({ ok: false, reason: "EXHAUSTED" })
   })

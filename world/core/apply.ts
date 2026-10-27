@@ -4,12 +4,12 @@
 import { addItem, firstOf, moveSlot, putStack, removeItem, takeFromSlot, type Bag, type Stack } from "./bag.ts"
 import { STORAGE_KEEPER, STORE_FEE } from "./storage.ts"
 import { artBlocked, firstAid, isArt, skillOf } from "./skills.ts"
-import { GATHER_EXP, gainLife, lifeLevel, forgottenLifeExp } from "./life.ts"
+import { lifeLevel, forgottenLifeExp } from "./life.ts"
 import { keep } from "./threads.ts"
 import { MAX_ORDERS, commissionOf, commissionQuality } from "./commissions.ts"
 import type { Command, ServerCommand } from "./commands.ts"
 import { effectOf, priceOf, qualitiesOf, usualMaker } from "./makers.ts"
-import { GATHER_STAMINA, nodeOf, yieldOf } from "./gather.ts"
+import { gather } from "./gather-command.ts"
 import { equip, unequip, settleStats } from "./equipment-command.ts"
 import { craft } from "./craft-command.ts"
 import { accept, reject, type Transition } from "./transition.ts"
@@ -19,7 +19,7 @@ import { deathPenalty } from "./combat.ts"
 import { FRIEND, MAX_ERRANDS, befriend, dayOf, errandOf, errandToday, friendPrice, todays } from "./errands.ts"
 import { MAX_STAT, expToNext, gainExp, statCost } from "./growth.ts"
 import { FIGHT_STAMINA } from "./monsters.ts"
-import { ITEMS, QUALITY_EFFECT, QUALITY_PRICE, sellable, type ItemId, type Quality } from "./items.ts"
+import { ITEMS, QUALITY_PRICE, sellable, type ItemId, type Quality } from "./items.ts"
 import type { PlayerState } from "./player.ts"
 import { SHOPS, shopBuys } from "./shops.ts"
 import { derive, unmet } from "./stats.ts"
@@ -108,55 +108,8 @@ export function apply(before: PlayerState, command: Command | ServerCommand, ctx
       if (index < 0) return reject("NOT_OWNED")
       return use(state, state.bag[index]!, takeFromSlot(state.bag, index, 1), now)
     }
-    case "gather": {
-      const node = nodeOf(command.node)
-      if (!node) return reject("SPENT")
-      // the best tool of the skill that still has uses: in the bag, or held as a weapon (the woodcutter's axe)
-      const powerOf = (item: ItemId, q: Quality | undefined) => ITEMS[item].tool!.power * QUALITY_EFFECT[q ?? 1]
-      let toolAt = -1
-      state.bag.forEach((s, i) => {
-        const t = s && ITEMS[s.item].tool
-        if (t?.skill === node.skill && (s!.dur ?? 0) > 0 && (toolAt < 0 || powerOf(state.bag[toolAt]!.item, state.bag[toolAt]!.q) < powerOf(s!.item, s!.q))) toolAt = i
-      })
-      const held = state.equipment.weapon,
-        heldWorn = state.worn.weapon
-      const holding = !!held && ITEMS[held].tool?.skill === node.skill && (heldWorn?.dur ?? 0) > 0
-      const useHeld = holding && (toolAt < 0 || powerOf(held!, heldWorn?.q) >= powerOf(state.bag[toolAt]!.item, state.bag[toolAt]!.q))
-      if (node.needsTool && toolAt < 0 && !useHeld) return reject("NO_TOOL")
-      const cost = Math.ceil(GATHER_STAMINA * (warmNow(state, now) ? 1 : 1.5))
-      if (state.stamina < cost) return reject("EXHAUSTED")
-      const tool = useHeld ? { item: held!, ...heldWorn } : toolAt >= 0 ? state.bag[toolAt]! : null
-      const power = tool ? powerOf(tool.item, tool.q) : 1
-      const level = lifeLevel(state.life[node.skill])
-      const got = yieldOf(node, level, power, command.roll)
-      let bag: Bag = [...state.bag]
-      let equipment = state.equipment,
-        worn = state.worn
-      let broke: ItemId | null = null
-      if (tool) {
-        const dur = (tool.dur ?? 1) - 1
-        if (useHeld) {
-          if (dur <= 0) {
-            broke = tool.item
-            equipment = { ...equipment, weapon: null }
-            const { weapon: _, ...rest } = worn
-            worn = rest
-          } else worn = { ...worn, weapon: { ...heldWorn, dur } }
-        } else if (dur <= 0) {
-          broke = tool.item
-          ;(bag as (Stack | null)[])[toolAt] = null
-        } else (bag as (Stack | null)[])[toolAt] = { ...(tool as Stack), dur }
-      }
-      const made = ITEMS[got.item].made ? { q: 1 as Quality, by: state.name } : undefined
-      const added = addItem(bag, got.item, got.count, made)
-      if (!added) return reject("BAG_FULL")
-      bag = added
-      const grown = gainLife(state.life, node.skill, GATHER_EXP)
-      return accept(
-        { ...state, bag, equipment, worn, stamina: state.stamina - cost, life: grown.life },
-        { type: "gathered", item: got.item, count: got.count, skill: node.skill, level: grown.level, up: grown.up, broke },
-      )
-    }
+    case "gather":
+      return gather(state, command, now)
     case "craft":
       return craft(state, command)
     case "order": {
