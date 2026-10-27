@@ -59,6 +59,7 @@ export const MAKERS: Record<string, Partial<Record<ItemId, Trait>>> = {
     sickle: { tiers: [0.1, 0.7, 0.2, 0], note: "見習いのペーターが研いだ物も混じっている。" },
   },
   ゴットフリート: {
+    "oak-staff": { tiers: ordinary, note: "ゴットフリートが樫を削り、先に結晶をはめた杖。" },
     "fishing-rod": { tiers: [0, 0.5, 0.4, 0.1], note: "寒い冬に切った竹のように締まった木で削った。" },
     "wooden-stick": { tiers: ordinary, note: "ゴットフリートが枝を選び、握るところを削った。" },
     "short-bow": { tiers: ordinary, note: "ゴットフリートが木のしなりを確かめて削った弓。" },

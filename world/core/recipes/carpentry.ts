@@ -26,6 +26,18 @@ export const CARPENTRY_RECIPES: readonly Recipe[] = [
     ["wooden-shield", 1],
     4,
   ),
+  // A carved shaft with a crystal fitted at the tip, for both spells and prayers.
+  r(
+    "oak-staff",
+    "carpentry",
+    "workbench",
+    [
+      ["plank", 2],
+      ["small-crystal", 1],
+    ],
+    ["oak-staff", 1],
+    4,
+  ),
   r(
     "short-bow",
     "carpentry",
