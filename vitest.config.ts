@@ -5,5 +5,7 @@ export default defineConfig({
   test: {
     include: ["world/**/*.test.ts", "lib/**/*.test.ts", "components/**/*.test.ts", "dev/**/*.test.ts"],
     environment: "node",
+    // Transform Void so participant tests can replace only the Workers host base class.
+    server: { deps: { inline: ["void"] } },
   },
 })
