@@ -1,4 +1,5 @@
 // The map room's handlers for parties (core/party.ts).
+import { deliverPartyChat } from "./party-chat.ts"
 import { Party } from "../../../durable-objects/party.ts"
 import { PARTY_MAX } from "../../core/party.ts"
 import { Player } from "../../../durable-objects/player.ts"
@@ -79,7 +80,7 @@ async function partyMode(roomCtx: Ctx, message: Message<"party-mode">) {
   return
 }
 
-async function partyLook(roomCtx: Ctx, _message: Message<"party-look">) {
+async function partyLook(roomCtx: Ctx, message: Message<"party-look">) {
   const { ctx, map, me, save } = roomCtx
   if (!me.owner || !me.player) return
   if (!me.party) {
@@ -97,6 +98,7 @@ async function partyLook(roomCtx: Ctx, _message: Message<"party-look">) {
     return
   }
   await ctx.connection.send({ type: "party", view: partyView(p, me.owner) })
+  if (d.party === me.party) await deliverPartyChat(roomCtx, message.chat)
   return
 }
 

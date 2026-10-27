@@ -8,6 +8,7 @@ import { HANDLERS as combat } from "./combat.ts"
 import { HANDLERS as trade } from "./trade.ts"
 import { HANDLERS as threads } from "./threads.ts"
 import { HANDLERS as party } from "./party.ts"
+import { HANDLERS as partyChat } from "./party-chat.ts"
 import { HANDLERS as wild } from "./wild.ts"
 
-export const HANDLERS: Handlers = { ...moving, ...chat, ...work, ...exchange, ...combat, ...trade, ...threads, ...party, ...wild }
+export const HANDLERS: Handlers = { ...moving, ...chat, ...work, ...exchange, ...combat, ...trade, ...threads, ...party, ...wild, ...partyChat }

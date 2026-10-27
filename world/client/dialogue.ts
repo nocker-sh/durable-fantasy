@@ -14,13 +14,19 @@ import { fullyShown } from "../state.ts"
 import type { GameContext } from "./context.ts"
 
 export class DialogueActions {
-  constructor(private readonly target: Pick<GameContext, "addChat" | "getScene" | "update" | "run" | "toggleWindow"> & { readonly session: Pick<GameSession, "state" | "socket" | "engaged"> }) {}
+  constructor(
+    private readonly target: Pick<GameContext, "addChat" | "getScene" | "update" | "run" | "toggleWindow"> & { readonly session: Pick<GameSession, "state" | "socket" | "engaged" | "partyChat"> },
+  ) {}
   private shopKeeper: string | null = null
   say(text: string) {
     const input = parseChatInput(text)
     if (!input) return
     if (input.kind === "unavailable") {
       this.target.addChat({ channel: "system", text: input.text })
+      return
+    }
+    if (input.kind === "party") {
+      this.target.session.socket?.send({ type: "party-say", text: input.text, chat: this.target.session.partyChat })
       return
     }
     const { text: said, shout } = input

@@ -90,6 +90,7 @@ export function Chat() {
         {lines.map((line) => (
           <p key={line.id} className="break-all">
             <span className={NAME_COLOR(line)}>{line.name}</span>
+            {line.channel === "party" && <span className="text-text-dim">（パーティ）</span>}
             {line.shout && <span className="text-text-dim">（叫ぶ）</span>}
             <span className="text-text-dim">：</span>
             <span className={line.channel === "npc" ? "text-npc" : "text-white"}>{line.text}</span>
@@ -98,7 +99,7 @@ export function Chat() {
       </div>
       <form onSubmit={send} className="px-2.5 pt-1 pb-2.5">
         {typing ? (
-          <Input ref={input} value={text} maxLength={140} placeholder="メッセージを入力…（/s で叫ぶ）" onChange={(e) => setText(e.target.value)} onBlur={() => !text && game.setTyping(false)} />
+          <Input ref={input} value={text} maxLength={140} placeholder="メッセージを入力…（/p 仲間・/s 叫ぶ）" onChange={(e) => setText(e.target.value)} onBlur={() => !text && game.setTyping(false)} />
         ) : (
           <button
             type="button"

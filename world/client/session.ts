@@ -12,6 +12,7 @@ export class GameSession {
   readonly state = createGameState()
   socket: VoidSocket<"/map/:mapId"> | null = null
   playerId = ""
+  partyChat = { party: "", seq: 0 }
   readonly others = new Others()
   waiting = new Map<number, (result: Transition) => void>()
   arriveAt: Cell | null = null

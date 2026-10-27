@@ -123,7 +123,7 @@ export class Game {
     // how the party is doing: our own room reports us, and tells us of the others
     const partyTick = window.setInterval(() => {
       if (this.session.others.you) this.session.socket?.send({ type: "heartbeat" })
-      if (this.state.get().player?.party) this.session.socket?.send({ type: "party-look" })
+      if (this.state.get().player?.party) this.session.socket?.send({ type: "party-look", chat: this.session.partyChat })
     }, 5_000)
     const tick = window.setInterval(() => {
       this.lookAtShop() // the shelves change as others buy and batches come out

@@ -82,6 +82,8 @@ const mapPlayer = z.object({
   at: cellSchema,
 })
 
+const partyChatCursor = z.object({ party: z.string().max(64), seq: z.number().int().nonnegative() })
+
 export const clientMessage = z.discriminatedUnion("type", [
   z.object({ type: z.literal("heartbeat") }),
   /** Enter as the authenticated owner. `at` is a client prediction; the server chooses the position. */
@@ -154,7 +156,8 @@ export const clientMessage = z.discriminatedUnion("type", [
   z.object({ type: z.literal("party-answer"), from: z.string().max(64), yes: z.boolean() }),
   z.object({ type: z.literal("party-leave") }),
   z.object({ type: z.literal("party-mode"), mode: z.enum(["own", "even"]) }),
-  z.object({ type: z.literal("party-look") }),
+  z.object({ type: z.literal("party-look"), chat: partyChatCursor.optional() }),
+  z.object({ type: z.literal("party-say"), text: z.string().trim().min(1).max(140), chat: partyChatCursor.optional() }),
   /** Fallen, come to in town (game-system.md §8). */
   z.object({ type: z.literal("revive") }),
   /** Ask what a shop has now (the shelves are shared: market Durable Object). */
@@ -195,6 +198,13 @@ export const serverMessage = z.discriminatedUnion("type", [
   z.object({ type: z.literal("party-invited"), from: z.string(), name: z.string() }),
   /** Our party as it is now (null: in none). */
   z.object({ type: z.literal("party"), view: z.custom<PartyView | null>(() => true) }),
+  /** Recent speech visible to this party member, with a cursor for polling. */
+  z.object({
+    type: z.literal("party-chat"),
+    party: z.string(),
+    seq: z.number().int().nonnegative(),
+    lines: z.array(z.object({ seq: z.number().int().positive(), name: z.string(), text: z.string(), self: z.boolean() })),
+  }),
   /** An invitation fell through: DECLINED, BUSY, NOT_LEADER, FULL. */
   z.object({ type: z.literal("party-closed"), reason: z.string() }),
   /** Someone asks to trade with us. */

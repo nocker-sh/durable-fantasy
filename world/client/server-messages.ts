@@ -14,7 +14,10 @@ export class ServerMessages {
       ServerMessageContext,
       "getScene" | "wayBeside" | "standBy" | "avatarOf" | "setPlayer" | "maybeReady" | "addChat" | "report" | "update" | "notify" | "toggleWindow" | "enterMap" | "connect" | "visitTown"
     > & {
-      readonly session: Pick<GameSession, "net" | "arriveAt" | "others" | "socket" | "waiting" | "wild" | "fighting" | "state" | "engaged" | "fullTries" | "warping" | "warpAgainAt" | "refusedWarp">
+      readonly session: Pick<
+        GameSession,
+        "partyChat" | "net" | "arriveAt" | "others" | "socket" | "waiting" | "wild" | "fighting" | "state" | "engaged" | "fullTries" | "warping" | "warpAgainAt" | "refusedWarp"
+      >
     },
   ) {}
   handle(message: ServerMessage) {
@@ -38,7 +41,7 @@ export class ServerMessages {
         scene?.clearRemotes()
         for (const p of message.players) scene?.addRemote(p.id, this.target.avatarOf(p), p.at)
         this.target.setPlayer(message.me)
-        if (message.me.party) this.target.session.socket?.send({ type: "party-look" })
+        if (message.me.party) this.target.session.socket?.send({ type: "party-look", chat: this.target.session.partyChat })
         this.target.maybeReady()
         return
       }
@@ -94,6 +97,16 @@ export class ServerMessages {
       case "thread-closed":
         this.target.notify(threadClosedText(message.reason), "bad")
         return
+      case "party-chat": {
+        const session = this.target.session
+        if (session.state.get().player?.party !== message.party) return
+        const after = session.partyChat.party === message.party ? session.partyChat.seq : 0
+        for (const line of message.lines) {
+          if (line.seq > after) this.target.addChat({ channel: "party", name: line.name, text: line.text, self: line.self })
+        }
+        session.partyChat = { party: message.party, seq: Math.max(after, message.seq) }
+        return
+      }
       case "party-invited":
         this.target.update({ partyAsk: { from: message.from, name: message.name } })
         return
@@ -170,6 +183,10 @@ export class ServerMessages {
           // no thread leads here: our muffler takes us home
           this.target.notify("この町へつながる糸を持っていない。", "bad")
           this.target.visitTown(this.target.session.state.get().homeTown)
+          return
+        }
+        if (message.what === "party-chat") {
+          this.target.addChat({ channel: "system", text: message.reason === "RATE_LIMIT" ? "少し間をあけて話そう。" : "パーティに入ってから話そう。" })
           return
         }
         if (message.what === "art") {
