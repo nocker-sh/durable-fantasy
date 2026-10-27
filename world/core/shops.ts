@@ -127,7 +127,7 @@ export const SHOPS = {
     map: "phanthiet-market",
     keepers: ["マグダレーナ", "ロッテ"],
     greeting: "寒さに負けない服を仕立てていますよ。",
-    stock: ["wool-muffler", "striped-muffler", "embroidered-scarf", "fur-stole", "traveller-coat", "wool-cape", "cloth-hat", "silver-ring"],
+    stock: ["white-fleece", "wool-muffler", "striped-muffler", "embroidered-scarf", "fur-stole", "traveller-coat", "wool-cape", "cloth-hat", "silver-ring"],
   },
   crystal: {
     name: "コンスタンティンの結晶屋",
