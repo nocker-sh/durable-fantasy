@@ -153,7 +153,7 @@ const DEFINITIONS = {
   "leather-armor": craftedGear("革の鎧", 220, "tunic", { part: "body", def: 6 }, 80, "なめした革を重ねた鎧。動きやすい。", "fine"),
   "chain-mail": craftedGear("鎖帷子", 480, "armor", { part: "body", def: 10, needs: { str: 10, vit: 8 } }, 160, "細い鉄の輪を編んだ鎧。重いが頼もしい。", "fine"),
   "wool-cape": craftedGear("毛織りの外套", 160, "cape", { part: "body", def: 4, bonus: { maxHp: 20 } }, 30, "白い毛を織った外套。夜の野営でも体が冷えない。", "fine"),
-  "leather-boots": gear("革の靴", 50, "boots", { part: "feet", def: 1 }, 20, "長い道のりでも足が痛まない。"),
+  "leather-boots": craftedGear("革の靴", 50, "boots", { part: "feet", def: 1 }, 20, "長い道のりでも足が痛まない。"),
   "wooden-shield": craftedGear("木の盾", 60, "shield", { part: "shield", def: 3 }, 50, "樫の板に鉄の縁を打った丸盾。"),
 
   // ---------------------------------------------------------------- neck wraps (for looks; the tailor sells them)

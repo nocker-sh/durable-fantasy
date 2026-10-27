@@ -22,6 +22,7 @@ it("preserves unmarked and non-crafted armor defense", () => {
 })
 
 it.each([
+  ["leather", "leather-boots", "ルドルフ"],
   ["leather", "leather-armor", "ルドルフ"],
   ["armorer", "chain-mail", "ベアトリクス"],
   ["armorer", "iron-helm", "ベアトリクス"],

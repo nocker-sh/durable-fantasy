@@ -76,6 +76,7 @@ export const MAKERS: Record<string, Partial<Record<ItemId, Trait>>> = {
     "chain-mail": { tiers: steady, note: "ベアトリクスが鉄の輪を一つずつ留め、継ぎ目を確かめた鎖帷子。" },
   },
   ルドルフ: {
+    "leather-boots": { tiers: steady, note: "ルドルフがなめし革を裁ち、底を重ねて縫った靴。" },
     "leather-armor": { tiers: steady, note: "ルドルフがなめした革を重ね、丈夫な糸で縫った鎧。" },
     "fang-charm": { tiers: ordinary, note: "森で集めた牙をルドルフが磨き、毛糸で結んだ。" },
   },

@@ -85,6 +85,7 @@ export const COMMISSIONS: readonly Commission[] = [
     60,
   ),
   c("rudolf-leather", "ルドルフ", ["tanned-leather", 2], [["raw-hide", 2]], 16, 120),
+  c("rudolf-boots", "ルドルフ", ["leather-boots", 1], [["tanned-leather", 1]], 12, 60),
   c("rudolf-armor", "ルドルフ", ["leather-armor", 1], [["tanned-leather", 4]], 70, 180),
   c("beatrix-mail", "ベアトリクス", ["chain-mail", 1], [["iron-ingot", 4]], 150, 180),
 ]

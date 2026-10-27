@@ -92,6 +92,28 @@ describe("commissions", () => {
     expect(removed.state.bag).toContainEqual({ item: job.output.item, count: 1, q: 2, by: job.craftsman })
   })
 
+  it("turns bought leather into boots and preserves their maker and quality when worn", () => {
+    const bought = apply(player({ gold: 100 }), { type: "buy", shop: "leather", item: "tanned-leather", count: 1 })
+    if (!bought.ok) throw Error(bought.reason)
+    const ordered = apply(bought.state, { type: "order", commission: "rudolf-boots", roll: 0.8 }, { now: 0 })
+    if (!ordered.ok) throw Error(ordered.reason)
+    expect(countItem(ordered.state.bag, "tanned-leather")).toBe(0)
+    expect(ordered.state.gold).toBe(100 - ITEMS["tanned-leather"].price - 12)
+    expect(apply(ordered.state, { type: "collect", index: 0 }, { now: H - 1 })).toEqual({ ok: false, reason: "NOT_READY" })
+    const collected = apply(loadPlayer(JSON.parse(JSON.stringify(ordered.state))), { type: "collect", index: 0 }, { now: H })
+    if (!collected.ok) throw Error(collected.reason)
+    const slot = collected.state.bag.findIndex((entry) => entry?.item === "leather-boots")
+    const equipped = apply(collected.state, { type: "equip", slot })
+    if (!equipped.ok) throw Error(equipped.reason)
+    const saved = loadPlayer(JSON.parse(JSON.stringify(equipped.state)))
+    expect(saved.equipment.feet).toBe("leather-boots")
+    expect(saved.worn.feet).toEqual({ q: 2, by: "ルドルフ" })
+    expect(derive(saved).def - derive(collected.state).def).toBe(1)
+    const removed = apply(saved, { type: "unequip", slot: "feet" })
+    if (!removed.ok) throw Error(removed.reason)
+    expect(removed.state.bag).toContainEqual({ item: "leather-boots", count: 1, q: 2, by: "ルドルフ" })
+  })
+
   it("three at a time, and not without the materials or the money", () => {
     let p = player({ gold: 1000, bag: bag(["rusty-scrap", 20], ["charcoal", 10]) })
     for (let k = 0; k < MAX_ORDERS; k++) {
