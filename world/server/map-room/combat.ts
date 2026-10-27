@@ -60,12 +60,18 @@ async function attack(roomCtx: Ctx, message: Message<"attack">) {
     )
     // in a party sharing evenly, those of it on this map share the experience (core/party.ts)
     let exp = kind.exp
-    const party = me.party ? await Party.get(me.party).view() : null
-    if (party?.mode === "even") {
+    const party = me.party && data.party === me.party ? await Party.get(me.party).view() : null
+    if (party?.mode === "even" && party.members.some((member) => member.owner === me.owner)) {
       const near: { owner: string; level: number; conn: WebSocketConnection<ServerMessage> }[] = []
+      const members = new Set(party.members.map((member) => member.owner))
+      const seen = new Set([me.owner])
       for (const c of ctx.room.getConnections()) {
         const p = presence(c)
-        if (p.party === me.party && p.owner && p.owner !== me.owner && !p.down) near.push({ owner: p.owner, level: (await Player.get(p.owner).read()).level, conn: c })
+        if (!p.owner || p.closed || p.down || p.party !== me.party || !members.has(p.owner) || seen.has(p.owner)) continue
+        seen.add(p.owner)
+        // Presence may still show the old HP or party after a fall or departure.
+        const member = await Player.get(p.owner).read()
+        if (member.hp > 0 && member.party === me.party) near.push({ owner: p.owner, level: member.level, conn: c })
       }
       const shares = shareOut(kind.exp, "even", { owner: me.owner, level: data.level }, near)
       exp = shares.find((x) => x.owner === me.owner)!.exp
