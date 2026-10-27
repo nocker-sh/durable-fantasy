@@ -47,6 +47,12 @@ export function equipmentDefense(item: ItemId, quality: Quality = 1): number {
   return Math.round((definition.equip?.def ?? 0) * (definition.made ? QUALITY_EFFECT[quality] : 1))
 }
 
+/** Quality changes the crafted weapon itself; stat scaling remains a separate contribution. */
+export function equipmentAttack(item: ItemId, quality: Quality = 1): number {
+  const definition = ITEMS[item]
+  return Math.round((definition.equip?.atk ?? 0) * (definition.made ? QUALITY_EFFECT[quality] : 1))
+}
+
 export function derive(b: Build): Derived {
   let armorDef = 0
   const plus: Record<string, number> = {}
@@ -63,7 +69,7 @@ export function derive(b: Build): Derived {
     stats,
     maxHp: 20 + b.level * 3 + vit * 5 + (plus.maxHp ?? 0),
     maxSp: 5 + b.level + mnd * 3 + (plus.maxSp ?? 0),
-    atk: 1 + (weapon?.atk ?? 0) + scaling(weapon, stats),
+    atk: 1 + (b.equipment.weapon ? equipmentAttack(b.equipment.weapon, b.worn?.weapon?.q) : 0) + scaling(weapon, stats),
     def: Math.floor(vit / 4) + armorDef,
     hit: b.level + dex,
     flee: b.level + Math.floor(dex / 2),

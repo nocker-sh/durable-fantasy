@@ -7,7 +7,7 @@ import { Slot } from "#/components/game/slot.tsx"
 import { Window } from "#/components/game/window.tsx"
 import { uiIconUrl } from "#/world/art/icons.ts"
 import type { SpriteName } from "#/world/art/pixel-art.ts"
-import { equipmentDefense } from "#/world/core/stats.ts"
+import { equipmentAttack, equipmentDefense } from "#/world/core/stats.ts"
 import { displayName } from "#/world/core/makers.ts"
 import { ItemTooltip } from "./item-tooltip.tsx"
 import { carriesItem, readDrag, startDrag } from "./drag.ts"
@@ -26,7 +26,7 @@ export function EquipmentWindow() {
   const derived = useGameState((s) => s.derived)
   const portrait = useGameState((s) => s.portrait)
   if (!win.open || !player || !derived) return null
-  const gearAtk = Object.values(player.equipment).reduce((n, id) => n + (id ? (ITEMS[id].equip?.atk ?? 0) : 0), 0)
+  const gearAtk = player.equipment.weapon ? equipmentAttack(player.equipment.weapon, player.worn.weapon?.q) : 0
   const gearDef = SLOTS.reduce((n, slot) => {
     const item = player.equipment[slot]
     return n + (item ? equipmentDefense(item, player.worn[slot]?.q) : 0)
