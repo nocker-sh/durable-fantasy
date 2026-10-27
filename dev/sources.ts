@@ -10,7 +10,7 @@ export const SOURCES: Record<string, readonly string[]> = {
   shops: ["SHOPS"],
   batches: ["BATCHES"],
   makers: ["MAKERS"],
-  recipes: ["RECIPES"],
+  recipes: ["RECIPES", "COOKING_RECIPES", "ALCHEMY_RECIPES", "CARPENTRY_RECIPES", "TAILORING_RECIPES", "SMITHING_RECIPES", "MILESTONES_RECIPES"],
   stations: ["STATIONS", "STATION_RULES", "EXCHANGE_BOARD"],
   commissions: ["COMMISSIONS"],
   errands: ["ERRANDS"],
