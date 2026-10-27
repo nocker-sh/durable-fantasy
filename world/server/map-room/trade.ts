@@ -28,9 +28,20 @@ async function tradeAnswer(roomCtx: Ctx, message: Message<"trade-answer">) {
   const them = ctx.room.getConnection(message.from)
   const other = them && presence(them)
   if (!me.player || !them || other?.trade?.with !== ctx.connection.id || other.trade.open) return
-  if (!message.yes || me.trade?.open || me.down) {
+  // An invitation does not reserve either player: they may move or become busy before answering.
+  const target = reachable(other).at(-1)
+  const reason = !message.yes
+    ? "DECLINED"
+    : !me.owner || !other.owner || other.closed || me.closed || me.trade?.open || me.down || other.down || me.engaged || other.engaged
+      ? "BUSY"
+      : !target || !near(me, target, TRADE_CELLS)
+        ? "TOO_FAR"
+        : null
+  if (reason) {
     setTrade(them, undefined)
-    await them.send({ type: "trade-closed", reason: "DECLINED" })
+    await them.send({ type: "trade-closed", reason })
+    // Do not close an unrelated trade the recipient has since opened.
+    if (message.yes && !me.trade?.open) await ctx.connection.send({ type: "trade-closed", reason })
     return
   }
   const side = (w: string): TradeSide => ({ with: w, open: true, offer: emptyOffer(), shown: [], locked: false, done: false })
