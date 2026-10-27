@@ -46,12 +46,24 @@ export function StatsWindow() {
           <ul className="flex flex-col gap-1">
             {STATS.map((stat) => {
               const value = player.stats[stat]
+              const bonus = d.stats[stat] - value
               const cost = statCost(value)
               const can = value < MAX_STAT && player.statPoints >= cost
               return (
                 <li key={stat} className="flex h-6 items-center gap-1.5 font-head text-[13px]">
-                  <span className="w-12 text-text-dim">{STAT_NAME[stat]}</span>
-                  <span className="w-6 text-right tabular-nums">{value}</span>
+                  <span className="w-10 text-text-dim">{STAT_NAME[stat]}</span>
+                  <span className="flex-1 text-right whitespace-nowrap tabular-nums">
+                    <span className="sr-only">{`${STAT_NAME[stat]} ${value}${bonus ? `、装備補正 ${bonus > 0 ? "+" : ""}${bonus}、合計 ${d.stats[stat]}` : ""}`}</span>
+                    <span aria-hidden="true">
+                      {value}
+                      {bonus !== 0 && (
+                        <span className="ml-1 text-brass-hi">
+                          {bonus > 0 ? "+" : ""}
+                          {bonus}
+                        </span>
+                      )}
+                    </span>
+                  </span>
                   <Button size="icon-sm" disabled={!can || busy} aria-label={`${STAT_NAME[stat]}を上げる`} onClick={() => game.raise(stat)} className="ml-auto">
                     +
                   </Button>
@@ -73,6 +85,7 @@ export function StatsWindow() {
           ))}
         </dl>
       </div>
+      <p className="mt-2 font-body text-[11px] leading-relaxed text-text-dim">能力値の横の加減算は装備の補正。装備・技の条件は補正前の能力値で判定します。</p>
     </Window>
   )
 }
