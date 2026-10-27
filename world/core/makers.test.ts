@@ -62,6 +62,7 @@ describe("quality and makers", () => {
 })
 
 it.each([
+  ["crystal", "prayer-necklace", "ベネディクト"],
   ["smithy", "iron-sword", "ギュンター"],
   ["tailor", "wool-muffler", "マグダレーナ"],
   ["woodworker", "short-bow", "ゴットフリート"],

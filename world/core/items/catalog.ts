@@ -189,7 +189,7 @@ const DEFINITIONS = {
   charm: craftedGear("お守り", 120, "charm", { part: "accessory", def: 1 }, 5, "町の礼拝堂で祈りを込めた木のお守り。", "rare"),
   "fang-charm": { ...gear("牙のお守り", 90, "charm", { part: "accessory", bonus: { str: 2 } }, 3, "鋭い牙を紐で結んだお守り。腕に力がこもる気がする。", "fine"), made: true },
   "silver-ring": gear("銀の指輪", 260, "ring", { part: "accessory", bonus: { dex: 2 } }, 1, "荷運びのルカスが港町から運んできた銀の指輪。", "fine"),
-  "prayer-necklace": gear("祈りの首飾り", 300, "necklace", { part: "accessory", bonus: { fth: 2, maxSp: 20 } }, 2, "修道士の祈りの言葉が刻まれた首飾り。", "rare"),
+  "prayer-necklace": craftedGear("祈りの首飾り", 300, "necklace", { part: "accessory", bonus: { fth: 2, maxSp: 20 } }, 2, "木に祈りの言葉を刻み、結晶をはめて毛糸を通した首飾り。", "rare"),
 
   // ---------------------------------------------------------------- what only the practised bring (economy.md §2.1)
   // Not to be had in v0.1: life skills stop at 8. Defined so the trades past it have a shape.

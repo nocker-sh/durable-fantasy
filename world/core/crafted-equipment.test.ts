@@ -41,7 +41,7 @@ it.each(equipmentRecipes.filter((recipe) => recipe.min <= LIFE_CAP))("preserves 
   expect(sold.state.gold - removed.state.gold).toBe(Math.max(1, Math.floor(sellPrice(original.item) * QUALITY_PRICE[original.q!])))
 })
 
-it.each(["traveller-coat", "short-sword", "battle-axe", "dagger", "leather-armor", "chain-mail", "cloth-hat", "iron-helm", "leather-boots", "charm", "fur-stole"] as const)(
+it.each(["prayer-necklace", "traveller-coat", "short-sword", "battle-axe", "dagger", "leather-armor", "chain-mail", "cloth-hat", "iron-helm", "leather-boots", "charm", "fur-stole"] as const)(
   "loads existing unmarked %s without resetting the character",
   (item) => {
     const p = player({ name: "エルナ", gold: 1234, bag: emptyBag().map((_, index) => (index === 0 ? { item, count: 1 } : null)) })

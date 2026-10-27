@@ -50,4 +50,16 @@ export const CARPENTRY_RECIPES: readonly Recipe[] = [
     ["short-bow", 1],
     8,
   ),
+  r(
+    "prayer-necklace",
+    "carpentry",
+    "workbench",
+    [
+      ["plank", 2],
+      ["small-crystal", 2],
+      ["yarn", 1],
+    ],
+    ["prayer-necklace", 1],
+    8,
+  ),
 ]
