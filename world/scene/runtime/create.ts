@@ -536,7 +536,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
       const kind = MONSTER_KINDS[m.spawn.kind]
       const show = m.body.visible && (m.spawn.id === action.fighting || m.hp < kind.hp || Math.hypot(m.pos[0] - me.pos[0], m.pos[1] - me.pos[1]) < 4)
       updateMonsterHealth(m)
-      place(m.label, show && toScreen(m.pos, 0.55, v), v, 2)
+      place(m.label, show && toScreen(m.pos, 0.55, v, m.groundHeight), v, 2)
     }
     const target = action.fighting ? monsters.find((m) => m.spawn.id === action.fighting) : undefined
     if (target && !target.body.visible) action.endFight()
@@ -569,7 +569,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
     }
     people.forEach((a, i) => {
       const near = Math.hypot(a.pos[0] - me.pos[0], a.pos[1] - me.pos[1]) < NAME_RANGE || a === pointer.hovered
-      place(residentLabels[i], a.fig.root.visible && near && toScreen(a.pos, a.fig.height, v), v, 2)
+      place(residentLabels[i], a.fig.root.visible && near && toScreen(a.pos, a.fig.height, v, a.fig.root.position.y), v, 2)
     })
     const now = performance.now()
     // bubbles sit above the name

@@ -1,4 +1,5 @@
 import * as THREE from "three"
+import { PositionSample } from "#/lib/engine/position-sample.ts"
 import { walkH, isFree } from "./world"
 import { findPath } from "./path"
 import { places, type V2, pigMesh, sheepMesh, addSprite } from "./build"
@@ -295,6 +296,7 @@ export class Figure {
 export type Step = { go: string | V2; run?: boolean } | { do: Anim; t: number; face?: string | V2; item?: Item; say?: string[] } | { wander: [number, number, number, number]; n: number; anim?: Anim }
 
 export class Actor {
+  private readonly ground = new PositionSample(walkH)
   pos: V2
   path: V2[] = []
   heading = 0
@@ -333,7 +335,7 @@ export class Actor {
     this.place()
   }
   place() {
-    this.fig.root.position.set(this.pos[0], walkH(this.pos[0], this.pos[1]), this.pos[1])
+    this.fig.root.position.set(this.pos[0], this.ground.at(this.pos[0], this.pos[1]), this.pos[1])
     this.fig.face(this.heading)
     this.fig.refresh()
   }

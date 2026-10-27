@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
 import * as THREE from "three"
-import { Figure, view } from "./actors"
+import { Actor, Figure, view } from "./actors"
+import * as terrain from "./world"
 import { bakedStrip, spriteFrame } from "./sprite-pool"
 
 vi.mock("./sprite-pool", () => ({
@@ -12,6 +13,7 @@ vi.mock("./sprite-pool", () => ({
 const look = { top: "cCream", bottom: "cGray", sex: "m", skin: "skin1", hair: "hBrown", style: "curly", eye: "cBlue" } as const
 
 afterEach(() => {
+  vi.restoreAllMocks()
   vi.unstubAllGlobals()
   vi.clearAllMocks()
 })
@@ -21,6 +23,28 @@ function canvasDocument() {
   vi.stubGlobal("document", { createElement: () => ({ width: 0, height: 0, getContext: () => ({ clearRect: vi.fn(), drawImage }) }) })
   return drawImage
 }
+
+it("reuses resident ground height while stationary and resamples after movement or relocation", () => {
+  canvasDocument()
+  const height = vi.spyOn(terrain, "walkH").mockImplementation((x, z) => x / 10 + z / 20)
+  const actor = new Actor("エルナ", "", look, [20, 30], [], [], new THREE.Scene())
+  for (let i = 0; i < 120; i++) actor.update(1 / 60, i / 60, () => {})
+  expect(height).toHaveBeenCalledTimes(1)
+  expect(actor.fig.root.position.y).toBe(3.5)
+  expect(actor.animT).toBeGreaterThan(0)
+  actor.path = [[21, 30]]
+  actor.update(1 / 60, 2, () => {})
+  expect(height).toHaveBeenCalledTimes(2)
+  expect(actor.fig.root.position.y).toBeCloseTo(actor.pos[0] / 10 + actor.pos[1] / 20)
+  actor.path = []
+  actor.pos = [10, 10]
+  actor.place()
+  expect(height).toHaveBeenCalledTimes(3)
+  expect(actor.fig.root.position.y).toBe(1.5)
+  actor.place()
+  expect(height).toHaveBeenCalledTimes(3)
+  actor.fig.dispose()
+})
 
 describe("figure resource lifetime", () => {
   it("requests each pending frame once and ignores completion after disposal", () => {
