@@ -17,6 +17,7 @@ const SKILL_ICON: Record<SkillId, { ui: SpriteName } | { item: ItemId }> = {
   crush: { item: "mace" },
   aim: { item: "short-bow" },
   mend: { item: "oak-staff" },
+  solace: { item: "amber-staff" },
   flare: { item: "small-crystal" },
   ember: { item: "small-crystal" },
   kodama: { item: "oak-staff" },

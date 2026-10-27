@@ -117,6 +117,16 @@ export const SKILLS = {
     heal: { base: 6, per: 1.2, stat: "fth" },
     text: "結晶を握り、短い祈りを唱えて自分の傷を癒やす。生活スキルの習熟は要らない。",
   },
+  solace: {
+    kind: "prayer",
+    name: "深い癒やしの祈り",
+    sp: 12,
+    cooldown: 16_000,
+    weapons: ["amber-staff", "world-branch-staff"],
+    needs: { fth: 16 },
+    heal: { base: 14, per: 2.4, stat: "fth" },
+    text: "杖の結晶に長い祈りを唱え、自分の深い傷を癒やす。傷癒やしの祈りより消耗が大きく、次に唱えるまで間を置く。",
+  },
   flare: {
     kind: "spell",
     name: "結晶の閃光",
