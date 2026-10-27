@@ -32,28 +32,22 @@ async function attack(roomCtx: Ctx, message: Message<"attack">) {
   const at = monsterAt(spawn, now, (x, z) => walkable(map, [Math.floor(x * 2), Math.floor(z * 2)]))
   const here = reachable(me)
   if (!here.some((c) => Math.hypot((c[0] + 0.5) / 2 - at.x, (c[1] + 0.5) / 2 - at.z) <= MELEE_REACH + 0.8)) return
-  if (art) {
-    // the art is paid for (SP, the wait, the weapon and the needs) before the blow is rolled
-    const paid = await Player.get(me.owner).run({ type: "art", skill: message.art! })
-    await ctx.connection.send({ type: "result", seq: -1, result: paid })
-    if (!paid.ok) {
-      await ctx.connection.send({ type: "refused", what: "art", reason: paid.reason })
-      return
-    }
-    data = paid.state
-  }
-  save({ struck: now })
-  await standUp()
   const kind = MONSTER_KINDS[spawn.kind]
   const them = { atk: 0, def: kind.def, hit: 0, flee: kind.flee, crit: 0 }
   const mine = { atk: d.atk, def: d.def, hit: d.hit, flee: d.flee, crit: d.crit }
   const blow = art && isArt(art) ? artSwing(art, d.stats, mine, them, Math.random) : swing(mine, them, Math.random)
   // the creature is whoever struck it first's to finish (core/wild.ts); a miss still starts the fight
-  const r = await Wild.get(ctx.params.mapId).strike(spawn.id, blow.kind === "miss" ? 0 : blow.damage, me.owner)
+  const r = await Wild.get(ctx.params.mapId).strike(spawn.id, blow.kind === "miss" ? 0 : blow.damage, me.owner, message.art)
+  if (r.payment) {
+    await ctx.connection.send({ type: "result", seq: -1, result: r.payment })
+    if (r.payment.ok) data = r.payment.state
+  }
   if (r.refused) {
-    await ctx.connection.send({ type: "refused", what: "attack", reason: r.reason ?? "TAKEN" })
+    await ctx.connection.send({ type: "refused", what: r.payment && !r.payment.ok ? "art" : "attack", reason: r.reason ?? "TAKEN" })
     return
   }
+  save({ struck: now })
+  await standUp()
   await ctx.room.broadcast({ type: "struck", by: me.player.id, monster: spawn.id, swing: blow, hp: r.hp, back: r.back })
   if (r.beaten) {
     const items = dropsOf(
