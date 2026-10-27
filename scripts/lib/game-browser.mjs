@@ -4,6 +4,7 @@ export const waitReady = (page) => page.waitForFunction(() => window.game?.scene
 export async function createCharacter(page) {
   await page.goto(process.env.BASE ?? "https://durable-fantasy.localhost")
   await page.getByRole("dialog", { name: "キャラクターを作る" }).waitFor({ timeout: 180000 })
+  await waitReady(page)
   await page.getByRole("textbox", { name: "名前", exact: true }).fill("エルナ")
   await page.getByRole("button", { name: "この姿で始める" }).click()
   await page.getByRole("button", { name: "町を歩く", exact: true }).click()

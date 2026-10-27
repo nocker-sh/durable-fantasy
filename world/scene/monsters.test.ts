@@ -143,3 +143,24 @@ it("writes a monster HP bar only when its displayed percentage changes", () => {
   updateMonsterHealth(monster)
   expect(widths).toEqual(["100%", "50%", "0%", "100%"])
 })
+
+it("skips invisible recovery frames and resumes at the current clock position", () => {
+  const { root, monster } = fixture()
+  const motion = vi.spyOn(monster.motion, "at")
+  const height = vi.spyOn(terrain, "walkH")
+  for (let frame = 0; frame < 600; frame++) updateMonsters([monster], root, frame * 16)
+  expect(monster.body.visible).toBe(false)
+  expect(motion).not.toHaveBeenCalled()
+  expect(height).not.toHaveBeenCalled()
+  // Passing the recovery time alone cannot override the authoritative zero HP.
+  updateMonsters([monster], root, 100000)
+  expect(motion).not.toHaveBeenCalled()
+  monster.hp = MONSTER_KINDS[monster.spawn.kind].hp
+  const now = 100001
+  const expected = new MonsterMotion(monster.spawn, () => true).at(now)
+  updateMonsters([monster], root, now)
+  expect(monster.body.visible).toBe(true)
+  expect(monster.pos).toEqual([expected.x, expected.z])
+  expect(motion).toHaveBeenCalledWith(now)
+  expect(height).toHaveBeenCalledTimes(1)
+})

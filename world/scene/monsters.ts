@@ -49,12 +49,14 @@ export function updateMonsterHealth(m: MonsterView) {
 export function updateMonsters(list: MonsterView[], root: THREE.Group, now: number, yaw = 0, dt = 1 / 30) {
   for (const m of list) {
     const away = m.back > now || m.hp === 0
+    m.body.visible = !away
+    // Motion is clock-based: hidden creatures can catch up directly when they return.
+    if (away && !m.burst) continue
     const at = m.motion.at(now)
     if (m.pos[0] !== at.x || m.pos[1] !== at.z) m.groundHeight = undefined
     m.pos[0] = at.x
     m.pos[1] = at.z
     if ((!away || m.burst) && m.groundHeight === undefined) m.groundHeight = walkH(at.x, at.z)
-    m.body.visible = !away
     if (!away) {
       // shuffling: small hops; sitting: a slow quiver, each to its own beat
       const beat = now / 700 + m.body.id
