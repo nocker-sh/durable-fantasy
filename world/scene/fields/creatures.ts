@@ -1,3 +1,4 @@
+import { mergeStatic } from "../../../lib/graphics/batch"
 import { outlineShape } from "../outline"
 import * as THREE from "three"
 import { colorMat, toTex } from "../gfx"
@@ -83,8 +84,9 @@ export function hareBody(color = 0x8a7058): THREE.Group {
     body.add(ear)
   }
   // eyes only, one on each side of the head
+  const eyes = new THREE.MeshBasicMaterial({ color: 0x1a1420 })
   for (const sx of [-1, 1]) {
-    const e = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.025, 0.025), new THREE.MeshBasicMaterial({ color: 0x1a1420 }))
+    const e = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.025, 0.025), eyes)
     e.position.set(sx * 0.056, 0.19, 0.17)
     body.add(e)
   }
@@ -92,6 +94,10 @@ export function hareBody(color = 0x8a7058): THREE.Group {
   tail.position.set(0, 0.12, -0.14)
   b.castShadow = true
   body.add(b, h, tail)
+  // Every part moves with the body; keep the original shadow flags while joining like materials.
+  const parts = [...body.children] as THREE.Mesh[]
+  mergeStatic(body, { anchors: [], moving: [] })
+  for (const part of parts) if (!part.parent) part.geometry.dispose()
   return body
 }
 
