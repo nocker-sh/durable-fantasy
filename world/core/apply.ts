@@ -1,10 +1,11 @@
 // Run one command against a player's data. Pure: the same input always gives the same result,
 // and a refused command never changes anything. The server runs this to decide; the client runs
 // it only to grey out what would be refused.
-import { addItem, firstOf, moveSlot, putStack, removeItem, takeFromSlot, type Bag, type Stack } from "./bag.ts"
+import { addItem, firstOf, moveSlot, removeItem, takeFromSlot, type Bag, type Stack } from "./bag.ts"
 import { carried } from "./inventory-weight.ts"
 import { tradeOut, tradeIn } from "./trade-command.ts"
-import { STORAGE_KEEPER, STORE_FEE } from "./storage.ts"
+import { store, retrieve } from "./storage-command.ts"
+import { dealtWith } from "./commerce-friendship.ts"
 import { cast, payArt } from "./skill-command.ts"
 import { forgottenLifeExp } from "./life.ts"
 import { keep } from "./threads.ts"
@@ -44,19 +45,6 @@ export const makerAt = (shop: keyof typeof SHOPS, item: ItemId) => (SHOPS[shop] 
 
 /** How well the shop's people know the player: the friendliest of its keepers. */
 export const shopFriend = (state: Pick<PlayerState, "friends">, shop: keyof typeof SHOPS) => Math.max(0, ...SHOPS[shop].keepers.map((k) => state.friends[k] ?? 0))
-
-/** Doing business with someone: a little more friendship, once a day each (the day is kept in boughtOn). */
-function dealtWith(state: PlayerState, names: readonly string[], now: number) {
-  const today = dayOf(now)
-  let friends = state.friends,
-    boughtOn = state.boughtOn
-  for (const k of names)
-    if (boughtOn[k] !== today) {
-      friends = befriend(friends, k, FRIEND.bought)
-      boughtOn = { ...boughtOn, [k]: today }
-    }
-  return { friends, boughtOn }
-}
 
 export function apply(before: PlayerState, command: Command | ServerCommand, ctx: Context = {}): Transition {
   const now = ctx.now ?? 0
@@ -200,32 +188,10 @@ export function apply(before: PlayerState, command: Command | ServerCommand, ctx
       const hp = Math.max(1, Math.floor(derive(state).maxHp / 2))
       return accept({ ...state, hp, hpAt: now, sitting: false, exp: state.exp - lost }, { type: "revived", hp, lost })
     }
-    case "store": {
-      const slot = state.bag[command.slot]
-      if (!slot) return reject("EMPTY_SLOT")
-      if (ITEMS[slot.item].kind === "key") return reject("NOT_STORABLE")
-      if (state.gold < STORE_FEE) return reject("NO_GOLD")
-      const bag = takeFromSlot(state.bag, command.slot, command.count)
-      if (!bag) return reject("NOT_ENOUGH")
-      const storage = putStack(state.storage, { ...slot, count: command.count })
-      if (!storage) return reject("STORAGE_FULL")
-      // Hilde gets to know whose shelf it is, once a day
-      const { friends, boughtOn } = dealtWith(state, [STORAGE_KEEPER], now)
-      return accept(
-        { ...state, bag, storage, gold: state.gold - STORE_FEE, friends, boughtOn },
-        { type: "stored", item: slot.item, count: command.count, fee: STORE_FEE, ...(slot.by ? { by: slot.by } : {}) },
-      )
-    }
-    case "retrieve": {
-      const lot = state.storage[command.index]
-      if (!lot) return reject("EMPTY_SLOT")
-      const storage = takeFromSlot(state.storage, command.index, command.count)
-      if (!storage) return reject("NOT_ENOUGH")
-      if (carried(state) + ITEMS[lot.item].weight * command.count > derive(state).maxWeight) return reject("TOO_HEAVY")
-      const bag = putStack(state.bag, { ...lot, count: command.count })
-      if (!bag) return reject("BAG_FULL")
-      return accept({ ...state, bag, storage }, { type: "retrieved", item: lot.item, count: command.count, ...(lot.by ? { by: lot.by } : {}) })
-    }
+    case "store":
+      return store(state, command, now)
+    case "retrieve":
+      return retrieve(state, command)
     case "trade-out":
       return tradeOut(state, command)
     case "trade-in":

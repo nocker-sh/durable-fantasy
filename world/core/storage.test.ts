@@ -2,8 +2,9 @@ import { emptyEquipment, loadPlayer } from "./player.ts"
 import { describe, expect, it } from "vitest"
 import { apply } from "./apply.ts"
 import { addItem, countItem, emptyBag } from "./bag.ts"
-import { STORAGE_SIZE, STORE_FEE } from "./storage.ts"
+import { STORAGE_KEEPER, STORAGE_SIZE, STORE_FEE } from "./storage.ts"
 import { ITEMS } from "./items.ts"
+import { FRIEND } from "./errands.ts"
 import { derive } from "./stats.ts"
 import { storageOpen } from "../town/warehouse.ts"
 import { bagWith, player } from "../test/helpers.ts"
@@ -79,4 +80,28 @@ it("allows only the part of a stored lot that fits the carrying weight", () => {
   if (!result.ok) throw Error(result.reason)
   expect(countItem(result.state.bag, "log")).toBe(capacity)
   expect(result.state.storage[0]?.count).toBe(9)
+})
+
+it("charges every deposit but rewards friendship only once per day, never for a rejected deposit or withdrawal", () => {
+  const now = Date.UTC(2026, 0, 1, 12)
+  let state = player({ gold: 100, bag: bagWith(["herb", 4]) })
+  for (const [time, friendship] of [
+    [now, FRIEND.bought],
+    [now + 1, FRIEND.bought],
+    [now + 86_400_000, FRIEND.bought * 2],
+  ]) {
+    const result = apply(state, { type: "store", slot: 0, count: 1 }, { now: time })
+    if (!result.ok) throw Error(result.reason)
+    expect(result.state.gold).toBe(state.gold - STORE_FEE)
+    expect(result.state.friends[STORAGE_KEEPER]).toBe(friendship)
+    state = loadPlayer(JSON.parse(JSON.stringify(result.state)))
+  }
+  const before = structuredClone(state)
+  expect(apply(state, { type: "store", slot: 0, count: 2 }, { now: now + 2 * 86_400_000 })).toEqual({ ok: false, reason: "NOT_ENOUGH" })
+  expect(state).toEqual(before)
+  const withdrawn = apply(state, { type: "retrieve", index: 0, count: 3 }, { now: now + 2 * 86_400_000 })
+  if (!withdrawn.ok) throw Error(withdrawn.reason)
+  expect(withdrawn.state.gold).toBe(state.gold)
+  expect(withdrawn.state.friends).toEqual(state.friends)
+  expect(withdrawn.state.boughtOn).toEqual(state.boughtOn)
 })
