@@ -114,6 +114,23 @@ describe("commissions", () => {
     expect(removed.state.bag).toContainEqual({ item: "leather-boots", count: 1, q: 2, by: "ルドルフ" })
   })
 
+  it("commissions the chapel charm and preserves its maker in an accessory slot", () => {
+    const ordered = apply(player({ gold: 100, bag: bag(["plank", 1], ["yarn", 1]) }), { type: "order", commission: "benedict-charm", roll: 0.5 }, { now: 0 })
+    if (!ordered.ok) throw Error(ordered.reason)
+    expect(ordered.state.gold).toBe(60)
+    expect(countItem(ordered.state.bag, "plank")).toBe(0)
+    expect(countItem(ordered.state.bag, "yarn")).toBe(0)
+    const collected = apply(loadPlayer(JSON.parse(JSON.stringify(ordered.state))), { type: "collect", index: 0 }, { now: H })
+    if (!collected.ok) throw Error(collected.reason)
+    const slot = collected.state.bag.findIndex((entry) => entry?.item === "charm")
+    const equipped = apply(collected.state, { type: "equip", slot })
+    if (!equipped.ok) throw Error(equipped.reason)
+    const saved = loadPlayer(JSON.parse(JSON.stringify(equipped.state)))
+    expect(saved.equipment.accessory1).toBe("charm")
+    expect(saved.worn.accessory1).toEqual({ q: 1, by: "ベネディクト" })
+    expect(derive(saved).def - derive(collected.state).def).toBe(1)
+  })
+
   it("three at a time, and not without the materials or the money", () => {
     let p = player({ gold: 1000, bag: bag(["rusty-scrap", 20], ["charcoal", 10]) })
     for (let k = 0; k < MAX_ORDERS; k++) {

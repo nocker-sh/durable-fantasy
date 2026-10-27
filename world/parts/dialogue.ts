@@ -15,7 +15,10 @@ import { storageOpen } from "../town/warehouse.ts"
 import type { DialogueChoice, GameState } from "../state.ts"
 
 /** Is the resident minding their shop now (a seller off duty just talks). */
-export const keepingShop = (name: string, min: number) => !!shopOfKeeper(name, (s) => shopOpen(s, min))
+export function keepingShop(name: string, min: number): boolean {
+  const shop = shopOfKeeper(name, (id) => shopOpen(id, min))
+  return shop !== null && shopOpen(shop, min)
+}
 
 /** What a resident and we have to do with errands now: hear today's, or hand one over to them. */
 export function errandChoices(state: GameState, name: string, now = Date.now()): DialogueChoice[] {

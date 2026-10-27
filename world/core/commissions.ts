@@ -25,6 +25,17 @@ const c = (id: string, craftsman: string, output: [ItemId, number], inputs: [Ite
 })
 
 export const COMMISSIONS: readonly Commission[] = [
+  c(
+    "benedict-charm",
+    "ベネディクト",
+    ["charm", 1],
+    [
+      ["plank", 1],
+      ["yarn", 1],
+    ],
+    40,
+    60,
+  ),
   c("gunter-sword", "ギュンター", ["iron-sword", 1], [["iron-ingot", 3]], 120, 120),
   c(
     "gunter-axe",

@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from "vitest"
-import { linesFor } from "./dialogue"
+import { choicesFor, linesFor } from "./dialogue"
 import { createGameState } from "../client/initial-state"
 import { player, bagWith } from "../test/helpers"
 import { dayOf, errandProgress } from "../core/errands"
@@ -62,4 +62,11 @@ it.each(["taken", "ready", "done"] as const)("the smith responds to scrap progre
     if (line.errand!.state === progress) expect(selected).toContain(line.text)
     else expect(selected).not.toContain(line.text)
   }
+})
+
+it("offers the chapel commission while the monk is at his counter", () => {
+  const base = createGameState().get()
+  const at = (min: number) => ({ ...base, player: player(), clock: { ...base.clock, min } })
+  expect(choicesFor(at(18 * 60), "ベネディクト")).toContainEqual({ label: "仕事を頼む", action: "commission" })
+  expect(choicesFor(at(8 * 60), "ベネディクト").some((choice) => choice.action === "commission")).toBe(false)
 })

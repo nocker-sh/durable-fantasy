@@ -40,6 +40,7 @@ export const MAKERS: Record<string, Partial<Record<ItemId, Trait>>> = {
     "cabbage-soup": { tiers: homely, note: "おかわりは、と聞かれる。" },
   },
   ベネディクト: {
+    charm: { tiers: ordinary, note: "ベネディクトが木を削り、毛糸を通して祈りを込めたお守り。" },
     potion: { tiers: [0.1, 0.5, 0.3, 0.1], effect: 0.9, sp: 10, price: 1.25, note: "修道士が祈りの言葉と一緒に煎じた。HP より SP に効く。量は少ない。", icon: "potionP" },
     porridge: { tiers: [0.6, 0.4, 0, 0], price: 1, note: "寄り合いの寄進で炊いている。一椀二枚、足りなければあとでいい。" },
   },
