@@ -2,6 +2,9 @@ import type { Line } from "../line.ts"
 
 const lines = {
   ギュンター: [
+    { text: "鉄くずは三つだ。砂丘へ行くなら、武器と食い物を忘れるなよ。", errand: { id: "gunter-scrap", state: "taken" } },
+    { text: "鉄くずが揃ったな。砂を落としてから炉に入れるぜ。渡してくれるか。", errand: { id: "gunter-scrap", state: "ready" } },
+    { text: "あんたの鉄で鍬が直せる。カールも畑仕事に戻れるぜ。", errand: { id: "gunter-scrap", state: "done" } },
     { text: "鍛冶屋は町でうちだけだ。鍋の穴から剣まで、全部ここに来る。" },
     { text: "鉄は熱いうちに打て。人の話もそうだぜ。" },
     { text: "炭はヨーゼフのだ。あいつの炭は火の持ちが違う。" },

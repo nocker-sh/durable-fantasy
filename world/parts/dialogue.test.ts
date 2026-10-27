@@ -50,3 +50,16 @@ it("references existing errands involving the speaker", () => {
       expect([errand!.from, errand!.to]).toContain(name)
     }
 })
+
+it.each(["taken", "ready", "done"] as const)("the smith responds to scrap progress: %s", (progress) => {
+  vi.stubGlobal("localStorage", { getItem: () => '["ギュンター"]', setItem: vi.fn() })
+  const state = {
+    ...createGameState().get(),
+    player: player({ errands: [taken("gunter-scrap", progress === "done")], bag: bagWith(["rusty-scrap", progress === "ready" ? 3 : 1]) }),
+  }
+  const selected = linesFor(state, "ギュンター", "spoken", now)
+  for (const line of ALL_LINES["ギュンター"].filter((line) => line.errand?.id === "gunter-scrap")) {
+    if (line.errand!.state === progress) expect(selected).toContain(line.text)
+    else expect(selected).not.toContain(line.text)
+  }
+})

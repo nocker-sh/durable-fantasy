@@ -95,6 +95,25 @@ describe("errands", () => {
     expect(apply(done.state, { type: "errand-hand", errand: "irmgard-herbs", to: "イルムガルト" }, { now })).toEqual({ ok: false, reason: "NO_ERRAND" })
   })
 
+  it("turns recovered scrap into smith work, pays once, and keeps surplus material", () => {
+    const id = "gunter-scrap"
+    const now = dayOfErrand(id)
+    const p = player({ bag: bagWith(["rusty-scrap", 2]) })
+    const taken = apply(p, { type: "errand-take", errand: id, from: "ギュンター" }, { now })
+    expect(taken.ok).toBe(true)
+    if (!taken.ok) return
+    const hand = { type: "errand-hand", errand: id, to: "ギュンター" } as const
+    expect(apply(taken.state, hand, { now })).toEqual({ ok: false, reason: "NOT_ENOUGH" })
+    const done = apply({ ...taken.state, bag: bagWith(["rusty-scrap", 4]) }, hand, { now })
+    expect(done.ok).toBe(true)
+    if (!done.ok) return
+    expect(countItem(done.state.bag, "rusty-scrap")).toBe(1)
+    expect(done.state.gold).toBe(p.gold + ERRANDS.find((e) => e.id === id)!.gold)
+    expect(done.state.friends["ギュンター"]).toBe(FRIEND.bring)
+    expect(done.state.errands.find((e) => e.id === id)?.done).toBe(true)
+    expect(apply(done.state, hand, { now })).toEqual({ ok: false, reason: "NO_ERRAND" })
+  })
+
   it("bring without enough of the thing is refused and nothing changes", () => {
     const now = dayOfErrand("irmgard-herbs")
     const t = apply(player({ bag: bagWith(["blue-herb", 1]) }), { type: "errand-take", errand: "irmgard-herbs", from: "イルムガルト" }, { now })
