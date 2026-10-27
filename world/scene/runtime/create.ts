@@ -1,3 +1,4 @@
+import { ScreenLabels } from "../../../lib/graphics/screen-labels"
 import { PendingAction } from "./action-target"
 import { WarpMarkers } from "./warps"
 import { FrameLimiter } from "../../../lib/engine/frame-limiter"
@@ -405,11 +406,12 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
     out.set(pos[0], walkH(pos[0], pos[1]) + h, pos[1]).project(cam)
     return out.z < 1 && Math.abs(out.x) < 1.1 && Math.abs(out.y) < 1.1
   }
+  const labels = new ScreenLabels()
   const place = (el: HTMLElement, vis: boolean, p: THREE.Vector3, dy = 0) => {
-    const display = vis ? "" : "none"
-    if (el.style.display !== display) el.style.display = display
-    if (vis) el.style.transform = `translate(${Math.round(((p.x + 1) / 2) * camera.width)}px, ${Math.round(((1 - p.y) / 2) * camera.height) - dy}px) translate(-50%, -100%)`
+    if (!vis) labels.place(el, false)
+    else labels.place(el, true, Math.round(((p.x + 1) / 2) * camera.width), Math.round(((1 - p.y) / 2) * camera.height) - dy)
   }
+  let hoveredLabel: HTMLElement | null = null
 
   const clock = new THREE.Clock()
   const v = new THREE.Vector3()
@@ -557,9 +559,14 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
         }
       }
     }
+    const nextHoveredLabel = pointer.hovered ? (residentLabels[people.indexOf(pointer.hovered)] ?? null) : null
+    if (nextHoveredLabel !== hoveredLabel) {
+      hoveredLabel?.classList.remove("gx-nameplate--hover")
+      nextHoveredLabel?.classList.add("gx-nameplate--hover")
+      hoveredLabel = nextHoveredLabel
+    }
     people.forEach((a, i) => {
       const near = Math.hypot(a.pos[0] - me.pos[0], a.pos[1] - me.pos[1]) < NAME_RANGE || a === pointer.hovered
-      residentLabels[i].classList.toggle("gx-nameplate--hover", a === pointer.hovered)
       place(residentLabels[i], a.fig.root.visible && near && toScreen(a.pos, a.fig.height, v), v, 2)
     })
     const now = performance.now()
