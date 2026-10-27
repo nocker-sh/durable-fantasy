@@ -121,8 +121,13 @@ function BuyRow({ offer }: { offer: Offer }) {
         <Slot icon={game.iconUrl(item, by)} rarity={d.rarity} dim={affordable === 0} aria-label={displayName(item, by)} />
       </ItemTooltip>
       <div className="min-w-0 flex-1">
-        <div className="truncate font-body text-[13px]">{displayName(item, by)}</div>
-        <div className="flex items-center gap-1.5">
+        <div className="break-words font-body text-[13px] leading-snug">{d.name}</div>
+        {by && (
+          <div className="truncate font-head text-[11px] text-text-dim" title={by}>
+            作り手：{by}
+          </div>
+        )}
+        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
           {d.made && <span className="bg-sunk px-1 font-head text-[11px] leading-4 text-brass-hi shadow-[inset_0_0_0_1px_var(--color-brass-lo)]">{QUALITIES[offer.q]}</span>}
           <Gold amount={pay * n} className={affordable < n ? "text-xs text-bad" : "text-xs text-text-dim"} />
           {price < list && <span className="font-head text-[11px] text-good">値引き</span>}
