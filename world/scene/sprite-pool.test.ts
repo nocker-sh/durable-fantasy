@@ -88,3 +88,46 @@ it.each(["blocked", "throws"])("keeps worker capacity available when cache acces
   expect(jobs).toHaveLength(2)
   await vi.advanceTimersByTimeAsync(5000)
 })
+
+it("releases a failed frame's worker, processes other frames and retries only after a delay", async () => {
+  vi.useFakeTimers()
+  const jobs: { key: string }[] = []
+  const workers: { onmessage?: (event: { data: unknown }) => void }[] = []
+  class WorkerStub {
+    onmessage?: (event: { data: unknown }) => void
+    constructor() {
+      workers.push(this)
+    }
+    postMessage(job: { key: string }) {
+      jobs.push(job)
+    }
+  }
+  vi.stubGlobal("Worker", WorkerStub)
+  vi.stubGlobal("navigator", { hardwareConcurrency: 2 })
+  vi.stubGlobal("indexedDB", undefined)
+  const { spriteFrame, spritesPending } = await import("./sprite-pool.ts")
+  const delivered = vi.fn()
+  const request = (f: number) => spriteFrame({} as Look, null, "idle", 0, f, 0, delivered, "test")
+  request(0)
+  request(1)
+  await vi.advanceTimersByTimeAsync(0)
+  expect(jobs).toHaveLength(1)
+  workers[0].onmessage?.({ data: { key: jobs[0].key, failed: true } })
+  await vi.advanceTimersByTimeAsync(0)
+  expect(jobs).toHaveLength(2)
+  const bitmap = { width: 1, height: 1, close: vi.fn() }
+  workers[0].onmessage?.({ data: { key: jobs[1].key, bitmap, png: null } })
+  expect(delivered).toHaveBeenCalledExactlyOnceWith(bitmap)
+  expect(spritesPending()).toBe(0)
+  request(0)
+  await vi.advanceTimersByTimeAsync(4999)
+  request(0)
+  expect(spritesPending()).toBe(0)
+  await vi.advanceTimersByTimeAsync(1)
+  request(0)
+  await vi.advanceTimersByTimeAsync(0)
+  expect(jobs).toHaveLength(3)
+  workers[0].onmessage?.({ data: { key: jobs[2].key, bitmap, png: null } })
+  expect(delivered).toHaveBeenCalledTimes(2)
+  expect(spritesPending()).toBe(0)
+})

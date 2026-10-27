@@ -5,7 +5,7 @@
 import { OptionalCacheAccess } from "../../lib/engine/optional-cache-access.ts"
 import { BitmapCache } from "../../lib/graphics/bitmap-cache.ts"
 import { ANIMS, type Anim, type Item, type Look } from "./figure"
-import type { FrameDone, FrameJob } from "./sprite.worker"
+import type { FrameResult, FrameJob } from "./sprite.worker"
 import { lookKey } from "./sprite-key"
 
 export { lookKey }
@@ -27,6 +27,9 @@ const decoded = new BitmapCache(64 * 1024 * 1024, 512)
 const pending = new Map<string, Pending>()
 const running = new Map<string, Pending>()
 const idle: Worker[] = []
+const failedUntil = new Map<string, number>()
+const FRAME_RETRY_MS = 5000
+const FAILED_FRAMES = 512
 let workers: Worker[] | null = null
 /** grows every animation frame, so fresh requests outrank stale ones */
 let clock = 0
@@ -36,10 +39,18 @@ function start() {
   const n = Math.max(1, Math.min(4, (navigator.hardwareConcurrency || 4) - 1))
   workers = Array.from({ length: n }, () => {
     const w = new Worker(new URL("./sprite.worker.ts", import.meta.url), { type: "module" })
-    w.onmessage = (event: MessageEvent<FrameDone>) => {
-      const { key, bitmap, png } = event.data
-      finish(key, bitmap)
-      void cacheWrites.run(() => store(key, png), undefined)
+    w.onmessage = (event: MessageEvent<FrameResult>) => {
+      const result = event.data
+      if ("failed" in result) {
+        running.delete(result.key)
+        failedUntil.delete(result.key)
+        failedUntil.set(result.key, performance.now() + FRAME_RETRY_MS)
+        if (failedUntil.size > FAILED_FRAMES) failedUntil.delete(failedUntil.keys().next().value!)
+      } else {
+        const { key, bitmap, png } = result
+        finish(key, bitmap)
+        if (png) void cacheWrites.run(() => store(key, png), undefined)
+      }
       idle.push(w)
       pump()
     }
@@ -125,6 +136,11 @@ export function spriteFrame(look: Look, item: Item, anim: Anim, view: number, f:
   const key = `${id}|${anim}|${view}|${f}`
   const done = decoded.get(`frame:${key}`)
   if (done) return done
+  const retryAt = failedUntil.get(key)
+  if (retryAt !== undefined) {
+    if (performance.now() < retryAt) return null
+    failedUntil.delete(key)
+  }
   start()
   const score = clock * 1000 + urgency
   const run = running.get(key)

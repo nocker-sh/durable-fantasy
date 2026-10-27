@@ -15,22 +15,34 @@ export interface FrameJob {
 export interface FrameDone {
   key: string
   bitmap: ImageBitmap
-  png: Blob
+  png: Blob | null
 }
+
+export interface FrameFailed {
+  key: string
+  failed: true
+}
+export type FrameResult = FrameDone | FrameFailed
 
 const canvas = new OffscreenCanvas(FW, FH)
 const ctx = canvas.getContext("2d")!
 
 self.onmessage = async (event: MessageEvent<FrameJob>) => {
   const job = event.data
-  // clips registered on the main thread (studio motions) are not in this copy of ANIMS yet
-  ANIMS[job.anim as Anim] ??= job.spec
-  const buf = new PixBuf(FW, FH)
-  renderFrame(job.look, job.anim as Anim, job.f, job.view, job.item, buf, 0, 0)
-  ctx.clearRect(0, 0, FW, FH)
-  ctx.putImageData(new ImageData(buf.data, FW, FH), 0, 0)
-  const png = await canvas.convertToBlob({ type: "image/png" })
-  const bitmap = canvas.transferToImageBitmap()
-  const done: FrameDone = { key: job.key, bitmap, png }
-  ;(self as unknown as Worker).postMessage(done, [bitmap])
+  try {
+    // Clips registered by the studio are not in this worker's animation table yet.
+    ANIMS[job.anim as Anim] ??= job.spec
+    const buf = new PixBuf(FW, FH)
+    renderFrame(job.look, job.anim as Anim, job.f, job.view, job.item, buf, 0, 0)
+    ctx.clearRect(0, 0, FW, FH)
+    ctx.putImageData(new ImageData(buf.data, FW, FH), 0, 0)
+    // Persistence is optional: an encoding failure must not discard a rendered frame.
+    const png = await canvas.convertToBlob({ type: "image/png" }).catch(() => null)
+    const bitmap = canvas.transferToImageBitmap()
+    const done: FrameDone = { key: job.key, bitmap, png }
+    ;(self as unknown as Worker).postMessage(done, [bitmap])
+  } catch {
+    const failed: FrameFailed = { key: job.key, failed: true }
+    ;(self as unknown as Worker).postMessage(failed)
+  }
 }
