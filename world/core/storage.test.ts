@@ -1,8 +1,10 @@
-import { loadPlayer } from "./player.ts"
+import { emptyEquipment, loadPlayer } from "./player.ts"
 import { describe, expect, it } from "vitest"
 import { apply } from "./apply.ts"
 import { addItem, countItem, emptyBag } from "./bag.ts"
 import { STORAGE_SIZE, STORE_FEE } from "./storage.ts"
+import { ITEMS } from "./items.ts"
+import { derive } from "./stats.ts"
 import { storageOpen } from "../town/warehouse.ts"
 import { bagWith, player } from "../test/helpers.ts"
 
@@ -55,4 +57,26 @@ it("keeps an old unmarked stole unchanged through storage and save reload", () =
   if (!taken.ok) throw Error(taken.reason)
   expect(taken.state.bag[0]).toEqual(original)
   expect(taken.state.storage[0]).toBeNull()
+})
+
+it("allows a partial withdrawal when the whole lot exceeds bag capacity", () => {
+  const p = player({ equipment: emptyEquipment(), bag: Array.from({ length: 24 }, (_, i) => ({ item: "herb", count: i === 0 ? 98 : 99 })), storage: bagWith(["herb", 7]) })
+  const start = { ...p, stats: { ...p.stats, str: 100 } }
+  expect(apply(start, { type: "retrieve", index: 0, count: 7 }, { now: 1 })).toEqual({ ok: false, reason: "BAG_FULL" })
+  const result = apply(start, { type: "retrieve", index: 0, count: 1 }, { now: 1 })
+  if (!result.ok) throw Error(result.reason)
+  expect(result.state.bag[0]?.count).toBe(99)
+  expect(result.state.storage[0]?.count).toBe(6)
+  expect(p.storage[0]?.count).toBe(7)
+})
+
+it("allows only the part of a stored lot that fits the carrying weight", () => {
+  const p = player({ equipment: emptyEquipment(), storage: bagWith(["log", 10]) })
+  const capacity = Math.floor(derive(p).maxWeight / ITEMS.log.weight)
+  const start = { ...p, bag: bagWith(["log", capacity - 1]) }
+  expect(apply(start, { type: "retrieve", index: 0, count: 2 }, { now: 1 })).toEqual({ ok: false, reason: "TOO_HEAVY" })
+  const result = apply(start, { type: "retrieve", index: 0, count: 1 }, { now: 1 })
+  if (!result.ok) throw Error(result.reason)
+  expect(countItem(result.state.bag, "log")).toBe(capacity)
+  expect(result.state.storage[0]?.count).toBe(9)
 })
