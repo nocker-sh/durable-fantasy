@@ -4,13 +4,15 @@
 import { addItem, firstOf, moveSlot, putStack, removeItem, takeFromSlot, type Bag, type Stack } from "./bag.ts"
 import { STORAGE_KEEPER, STORE_FEE } from "./storage.ts"
 import { artBlocked, firstAid, isArt, skillOf } from "./skills.ts"
-import { GATHER_EXP, craftExp, gainLife, lifeLevel, forgottenLifeExp } from "./life.ts"
+import { GATHER_EXP, gainLife, lifeLevel, forgottenLifeExp } from "./life.ts"
 import { keep } from "./threads.ts"
 import { MAX_ORDERS, commissionOf, commissionQuality } from "./commissions.ts"
-import type { Command, GameEvent, Reason, ServerCommand } from "./commands.ts"
+import type { Command, GameEvent, ServerCommand } from "./commands.ts"
 import { effectOf, priceOf, qualitiesOf, usualMaker } from "./makers.ts"
 import { GATHER_STAMINA, nodeOf, yieldOf } from "./gather.ts"
-import { STAMINA_PER_CRAFT, craftedQuality, failChance, qualityWeight, recipeOf, stationOf } from "./crafting.ts"
+import { craft } from "./craft-command.ts"
+import { accept, reject, type Transition } from "./transition.ts"
+export type { Transition } from "./transition.ts"
 import { MAX_STAMINA, fullNow, settle as settleHp, warmNow } from "./player.ts"
 import { deathPenalty } from "./combat.ts"
 import { FRIEND, MAX_ERRANDS, befriend, dayOf, errandOf, errandToday, friendPrice, todays } from "./errands.ts"
@@ -20,11 +22,6 @@ import { ITEMS, QUALITY_EFFECT, QUALITY_PRICE, sellable, slotsFor, type ItemId, 
 import type { PlayerState, Worn } from "./player.ts"
 import { SHOPS, shopBuys } from "./shops.ts"
 import { derive, unmet } from "./stats.ts"
-
-export type Transition = { readonly ok: true; readonly state: PlayerState; readonly events: readonly GameEvent[] } | { readonly ok: false; readonly reason: Reason }
-
-const accept = (state: PlayerState, ...events: GameEvent[]): Transition => ({ ok: true, state, events })
-const reject = (reason: Reason): Transition => ({ ok: false, reason })
 
 /** Everything carried: the bag and what is worn. */
 export function carried(state: Pick<PlayerState, "bag" | "equipment">): number {
@@ -159,51 +156,8 @@ export function apply(before: PlayerState, command: Command | ServerCommand, ctx
         { type: "gathered", item: got.item, count: got.count, skill: node.skill, level: grown.level, up: grown.up, broke },
       )
     }
-    case "craft": {
-      const recipe = recipeOf(command.recipe),
-        station = stationOf(command.station)
-      if (!recipe || !station || recipe.station !== station.kind) return reject("WRONG_STATION")
-      const skill = lifeLevel(state.life[recipe.skill])
-      if (skill < recipe.min) return reject("NOT_SKILLED")
-      if (state.gold < station.fee) return reject("NO_GOLD")
-      const cost = STAMINA_PER_CRAFT
-      if (state.stamina < cost) return reject("EXHAUSTED")
-      // take the inputs, the lowest qualities first (keep the good ones for later)
-      let bag: Bag = state.bag
-      let weight = 0,
-        made = 0
-      for (const { item, count } of recipe.inputs) {
-        for (let left = count; left > 0; left--) {
-          let at = -1
-          bag.forEach((s, i) => {
-            if (s?.item === item && (at < 0 || (s.q ?? 1) < (bag[at]!.q ?? 1))) at = i
-          })
-          if (at < 0) return reject("MISSING_INPUTS")
-          if (ITEMS[item].made) {
-            weight += qualityWeight(bag[at]!.q)
-            made++
-          }
-          bag = takeFromSlot(bag, at, 1)!
-        }
-      }
-      // a hand new to the recipe spoils it now and then: the materials and fee are gone, but half the experience comes
-      if ((command.roll * 15485863) % 1 < failChance(skill, recipe.min)) {
-        const grown = gainLife(state.life, recipe.skill, Math.floor(craftExp(recipe.min) / 2))
-        return accept(
-          { ...state, bag, gold: state.gold - station.fee, stamina: state.stamina - cost, life: grown.life },
-          { type: "spoiled", recipe: recipe.id, skill: recipe.skill, level: grown.level, up: grown.up, fee: station.fee },
-        )
-      }
-      const out = recipe.output
-      const q = ITEMS[out.item].made ? craftedQuality(skill, made ? weight / made : 1, command.roll) : null
-      const added = addItem(bag, out.item, out.count, q !== null ? { q, by: state.name } : undefined)
-      if (!added) return reject("BAG_FULL")
-      const grown = gainLife(state.life, recipe.skill, craftExp(recipe.min))
-      return accept(
-        { ...state, bag: added, gold: state.gold - station.fee, stamina: state.stamina - cost, life: grown.life },
-        { type: "crafted", item: out.item, count: out.count, q, skill: recipe.skill, level: grown.level, up: grown.up, fee: station.fee },
-      )
-    }
+    case "craft":
+      return craft(state, command)
     case "order": {
       const job = commissionOf(command.commission)
       if (!job) return reject("NOT_SOLD_HERE")
