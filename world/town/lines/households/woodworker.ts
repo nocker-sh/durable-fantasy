@@ -2,6 +2,9 @@ import type { Line } from "../line.ts"
 
 const lines = {
   ゴットフリート: [
+    { text: "頼んだ原木は三本だ。斧が傷んでいたら、無理に振るうな。", errand: { id: "gottfried-logs", state: "taken" } },
+    { text: "原木が揃ったな。こちらへ渡してくれ。木目を見て、板を取る。", errand: { id: "gottfried-logs", state: "ready" } },
+    { text: "持ってきてくれた原木は、板に挽く分へ回す。端も柄に使える。", errand: { id: "gottfried-logs", state: "done" } },
     { text: "トネリコは粘る。樫は折れない。木にも性格がある。" },
     { text: "いい木で作ったものしか置いてない。" },
     { text: "削った木の匂いは毎日違う。今日のは甘い。" },

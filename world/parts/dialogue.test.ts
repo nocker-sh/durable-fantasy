@@ -77,3 +77,21 @@ it("offers shopping only with the on-duty keeper of a shared shop", () => {
   expect(choicesFor(state, "ハンス")).toContainEqual({ label: "買い物をする", action: "shop" })
   expect(choicesFor(state, "マルタ").some((choice) => choice.action === "shop")).toBe(false)
 })
+
+it.each(["beatrix-ingots", "gottfried-logs", "rudolf-fur"])("keeps the craftsperson's dialogue in step with %s", (id) => {
+  const errand = errandOf(id)!
+  vi.stubGlobal("localStorage", { getItem: () => JSON.stringify([errand.from]), setItem: vi.fn() })
+  const state = { ...createGameState().get(), player: player() }
+  const lines = ALL_LINES[errand.from].filter((line) => line.errand?.id === id)
+  expect(lines).toHaveLength(3)
+  for (const progress of ["taken", "ready", "done"] as const) {
+    state.player = player({ errands: [taken(id, progress === "done")], bag: progress === "ready" ? bagWith([errand.wants!.item, errand.wants!.count]) : player().bag })
+    const pages = linesFor(state, errand.from, "spoken", now)
+    for (const line of lines) {
+      if (line.errand!.state === progress) expect(pages).toContain(line.text)
+      else expect(pages).not.toContain(line.text)
+    }
+  }
+  const tomorrow = linesFor(state, errand.from, "spoken", now + 86400000)
+  for (const line of lines) expect(tomorrow).not.toContain(line.text)
+})

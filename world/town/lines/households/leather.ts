@@ -2,6 +2,9 @@ import type { Line } from "../line.ts"
 
 const lines = {
   ルドルフ: [
+    { text: "冬毛は三つだぞ。革とは別だ。靴の中で足に当たるところに使うんだ。", errand: { id: "rudolf-fur", state: "taken" } },
+    { text: "冬毛が揃ったか。寄せる前に草を払うから、こっちへ渡してくれ。", errand: { id: "rudolf-fur", state: "ready" } },
+    { text: "あの冬毛があれば、靴の内張りを厚くできる。足先の冷えが違うんだぞ。", errand: { id: "rudolf-fur", state: "done" } },
     { text: "革はな、手間をかけた分だけ応えてくれるぞ。" },
     { text: "やわらかい皮は靴に、硬いのは鎧にするんだぞ。" },
     { text: "冬毛は靴の内張りだ。鎧にする革とは別物だぞ。" },

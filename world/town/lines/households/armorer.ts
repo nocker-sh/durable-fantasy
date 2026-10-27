@@ -2,6 +2,9 @@ import type { Line } from "../line.ts"
 
 const lines = {
   ベアトリクス: [
+    { text: "延べ棒は二本だよ。共同の炉で鉄くずを溶かせるから、炭も忘れずにね。", errand: { id: "beatrix-ingots", state: "taken" } },
+    { text: "延べ棒が揃ったね。こっちへ渡しておくれ。兜の縁に合わせて打つよ。", errand: { id: "beatrix-ingots", state: "ready" } },
+    { text: "あんたの鉄で、兜の縁を打ち直せるよ。薄いところを残さず仕上げるさ。", errand: { id: "beatrix-ingots", state: "done" } },
     { text: "鎖帷子は重いけど、命には代えられないからね。" },
     { text: "鉄兜はあたしが叩き出したんだよ。へこんだら持っておいで。" },
     { text: "木の盾の鉄の縁、あれはあたしが打ってるんだよ。" },
