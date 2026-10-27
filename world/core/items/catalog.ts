@@ -1,4 +1,4 @@
-import { food, dish, medicine, tool, material, gear } from "./factories.ts"
+import { food, dish, medicine, tool, material, gear, craftedGear } from "./factories.ts"
 import type { ItemDefinition } from "./types.ts"
 
 const DEFINITIONS = {
@@ -116,10 +116,10 @@ const DEFINITIONS = {
   },
 
   // ---------------------------------------------------------------- weapons
-  "wooden-stick": gear("木の棒", 8, "staff", { part: "weapon", atk: 4, delay: 1700, scale: { str: "E" } }, 20, "手頃な長さの枝。ないよりはまし。"),
-  dagger: gear("ダガー", 40, "dagger", { part: "weapon", atk: 9, delay: 1200, needs: { dex: 7 }, scale: { dex: "C", str: "E" } }, 40, "刃渡りの短い小刀。軽くて扱いやすい。"),
+  "wooden-stick": craftedGear("木の棒", 8, "staff", { part: "weapon", atk: 4, delay: 1700, scale: { str: "E" } }, 20, "手頃な長さの枝。ないよりはまし。"),
+  dagger: craftedGear("ダガー", 40, "dagger", { part: "weapon", atk: 9, delay: 1200, needs: { dex: 7 }, scale: { dex: "C", str: "E" } }, 40, "刃渡りの短い小刀。軽くて扱いやすい。"),
   "short-sword": gear("ショートソード", 120, "sword", { part: "weapon", atk: 22, delay: 1500, needs: { str: 8, dex: 7 }, scale: { str: "D", dex: "D" } }, 60, "ギュンターが打った片手剣。"),
-  "iron-sword": gear(
+  "iron-sword": craftedGear(
     "鉄の剣",
     320,
     "sword",
@@ -144,7 +144,7 @@ const DEFINITIONS = {
   },
   mace: { ...gear("メイス", 180, "mace", { part: "weapon", atk: 26, delay: 1800, needs: { str: 12 }, scale: { str: "C" } }, 90, "鉄の頭をもつ打撃武器。鎧の上からでも効く。", "fine"), made: true },
   "oak-staff": gear("樫の杖", 110, "staff", { part: "weapon", atk: 6, delay: 1700, needs: { mnd: 7 }, bonus: { maxSp: 15 } }, 50, "術と祈りを唱える者が持つ杖。先に小さな結晶がはまっている。"),
-  "short-bow": gear("短弓", 140, "bow", { part: "weapon", atk: 18, delay: 1600, twoHanded: true, needs: { dex: 10 }, scale: { dex: "C" } }, 50, "狩人が使う小ぶりの弓。両手で引く。"),
+  "short-bow": craftedGear("短弓", 140, "bow", { part: "weapon", atk: 18, delay: 1600, twoHanded: true, needs: { dex: 10 }, scale: { dex: "C" } }, 50, "狩人が使う小ぶりの弓。両手で引く。"),
 
   // ---------------------------------------------------------------- armour
   "cloth-hat": gear("布の帽子", 30, "hat", { part: "head", def: 1 }, 10, "冷たい風と小雨を防ぐ。"),
@@ -152,13 +152,13 @@ const DEFINITIONS = {
   "traveller-coat": gear("旅人の服", 80, "tunic", { part: "body", def: 3 }, 30, "厚手の毛織りの上着。"),
   "leather-armor": gear("革の鎧", 220, "tunic", { part: "body", def: 6 }, 80, "なめした革を重ねた鎧。動きやすい。", "fine"),
   "chain-mail": gear("鎖帷子", 480, "armor", { part: "body", def: 10, needs: { str: 10, vit: 8 } }, 160, "細い鉄の輪を編んだ鎧。重いが頼もしい。", "fine"),
-  "wool-cape": gear("毛織りの外套", 160, "cape", { part: "body", def: 4, bonus: { maxHp: 20 } }, 30, "白い毛を織った外套。夜の野営でも体が冷えない。", "fine"),
+  "wool-cape": craftedGear("毛織りの外套", 160, "cape", { part: "body", def: 4, bonus: { maxHp: 20 } }, 30, "白い毛を織った外套。夜の野営でも体が冷えない。", "fine"),
   "leather-boots": gear("革の靴", 50, "boots", { part: "feet", def: 1 }, 20, "長い道のりでも足が痛まない。"),
-  "wooden-shield": gear("木の盾", 60, "shield", { part: "shield", def: 3 }, 50, "樫の板に鉄の縁を打った丸盾。"),
+  "wooden-shield": craftedGear("木の盾", 60, "shield", { part: "shield", def: 3 }, 50, "樫の板に鉄の縁を打った丸盾。"),
 
   // ---------------------------------------------------------------- neck wraps (for looks; the tailor sells them)
-  "wool-muffler": gear("毛織りのマフラー", 60, "muffler", { part: "neck", look: { neck: "muffler", neckRamp: "cRed" } }, 3, "厚手に織った赤いマフラー。町の人の半分はこれを巻いている。"),
-  "striped-muffler": gear(
+  "wool-muffler": craftedGear("毛織りのマフラー", 60, "muffler", { part: "neck", look: { neck: "muffler", neckRamp: "cRed" } }, 3, "厚手に織った赤いマフラー。町の人の半分はこれを巻いている。"),
+  "striped-muffler": craftedGear(
     "縞のマフラー",
     90,
     "mufflerS",
@@ -221,7 +221,7 @@ const DEFINITIONS = {
     milestone: 64,
   },
   "black-oak-bow": {
-    ...gear(
+    ...craftedGear(
       "黒樫の長弓",
       1100,
       "bow",
@@ -233,7 +233,7 @@ const DEFINITIONS = {
     milestone: 16,
   },
   "amber-staff": {
-    ...gear(
+    ...craftedGear(
       "琥珀塗りの杖",
       2400,
       "staff",
@@ -245,7 +245,7 @@ const DEFINITIONS = {
     milestone: 32,
   },
   "world-branch-staff": {
-    ...gear(
+    ...craftedGear(
       "世界樹の枝の杖",
       8000,
       "staff",
@@ -268,7 +268,7 @@ const DEFINITIONS = {
     milestone: 16,
   },
   "engine-steel-sword": {
-    ...gear(
+    ...craftedGear(
       "機関鋼の剣",
       3000,
       "sword",
@@ -280,7 +280,7 @@ const DEFINITIONS = {
     milestone: 32,
   },
   "reforged-blade": {
-    ...gear(
+    ...craftedGear(
       "打ち直した古剣",
       9000,
       "sword",
@@ -292,11 +292,11 @@ const DEFINITIONS = {
     milestone: 64,
   },
   "lined-coat": {
-    ...gear("冬毛の裏地の外套", 1000, "cape", { part: "body", def: 8, bonus: { maxHp: 40 } }, 35, "やわらかい冬毛を裏一面に縫い込んだ外套。夜明け前の霜の中でも震えない。", "rare"),
+    ...craftedGear("冬毛の裏地の外套", 1000, "cape", { part: "body", def: 8, bonus: { maxHp: 40 } }, 35, "やわらかい冬毛を裏一面に縫い込んだ外套。夜明け前の霜の中でも震えない。", "rare"),
     milestone: 16,
   },
   "frost-shawl": {
-    ...gear(
+    ...craftedGear(
       "霜の花染めの肩掛け",
       2200,
       "stole",
@@ -308,7 +308,7 @@ const DEFINITIONS = {
     milestone: 32,
   },
   "woven-muffler": {
-    ...gear(
+    ...craftedGear(
       "重ね織りのマフラー",
       7000,
       "muffler",

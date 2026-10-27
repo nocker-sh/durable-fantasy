@@ -78,4 +78,7 @@ const gear = (name: string, price: number, icon: ItemIcon, equip: Equipment, wei
   equip,
 })
 
-export { food, dish, medicine, tool, material, gear }
+/** Equipment that can be produced keeps the maker and quality just like tools. */
+const craftedGear = (...args: Parameters<typeof gear>): ItemDefinition => ({ ...gear(...args), made: true })
+
+export { food, dish, medicine, tool, material, gear, craftedGear }
