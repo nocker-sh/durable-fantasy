@@ -2,6 +2,7 @@
 // earlier visit, keyed by look), baked strips for residents (see maps.ts), and last a pool of
 // workers (sprite.worker.ts). The main thread never renders: it asks, gets null until the frame
 // arrives, and shows a stand-in meanwhile. The most recently asked, most urgent request goes next.
+import { OptionalCacheAccess } from "../../lib/engine/optional-cache-access.ts"
 import { BitmapCache } from "../../lib/graphics/bitmap-cache.ts"
 import { ANIMS, type Anim, type Item, type Look } from "./figure"
 import type { FrameDone, FrameJob } from "./sprite.worker"
@@ -11,6 +12,8 @@ export { lookKey }
 
 /** Bump when the renderer's output changes, so frames kept in IndexedDB are drawn again. */
 const RENDER_VERSION = 2
+const cacheReads = new OptionalCacheAccess(5000)
+const cacheWrites = new OptionalCacheAccess(5000)
 
 type Listener = (frame: ImageBitmap) => void
 interface Pending {
@@ -36,7 +39,7 @@ function start() {
     w.onmessage = (event: MessageEvent<FrameDone>) => {
       const { key, bitmap, png } = event.data
       finish(key, bitmap)
-      void store(key, png)
+      void cacheWrites.run(() => store(key, png), undefined)
       idle.push(w)
       pump()
     }
@@ -61,13 +64,19 @@ function pump() {
     pending.delete(p.job.key)
     running.set(p.job.key, p)
     const worker = idle.pop()!
-    void load(p.job.key).then((bitmap) => {
-      if (bitmap) {
-        idle.push(worker)
-        finish(p.job.key, bitmap)
-        pump()
-      } else worker.postMessage(p.job)
-    })
+    void cacheReads
+      .run(
+        () => load(p.job.key),
+        null,
+        (bitmap) => bitmap?.close(),
+      )
+      .then((bitmap) => {
+        if (bitmap) {
+          idle.push(worker)
+          finish(p.job.key, bitmap)
+          pump()
+        } else worker.postMessage(p.job)
+      })
   }
 }
 

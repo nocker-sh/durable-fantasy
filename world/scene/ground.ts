@@ -1,6 +1,7 @@
 // A map's ground picture, cheapest first: memory, IndexedDB (kept from an earlier visit, keyed by
 // the map and the painting code itself, so a change to the code paints it afresh), and last painted
 // in bands by a few workers at once (ground.worker.ts).
+import { OptionalCacheAccess } from "../../lib/engine/optional-cache-access.ts"
 import { PixBuf } from "./pix"
 import { GROUND_PX, paintRows } from "./terrain"
 import { hasFields, primeFields, setLayout, currentLayout, type Fields } from "./world"
@@ -22,6 +23,8 @@ const engineSources = import.meta.glob<string>(["../../lib/engine/{math,noise,ra
 /** what the picture is painted from: if any of it changes, the kept pictures are not used */
 const VERSION = hash(terrainSrc + worldSrc + pixSrc + texturesSrc + layoutsSrc + layoutSrc + Object.values(engineSources).join(""))
 const memory = new Map<string, Promise<PixBuf>>()
+const cacheReads = new OptionalCacheAccess(5000)
+const cacheWrites = new OptionalCacheAccess(5000)
 
 function hash(s: string): string {
   let h = 2166136261
@@ -50,10 +53,10 @@ function obtain(map: string, foreground: boolean): Promise<PixBuf> {
     foreground,
     promise: Promise.resolve()
       .then(async () => {
-        const cached = await load(map).catch(() => null)
+        const cached = await cacheReads.run(() => load(map), null)
         if (cached) return cached
         const buf = await paint(map, () => job.foreground)
-        saving = keep(map, buf).catch(() => {})
+        saving = cacheWrites.run(() => keep(map, buf), undefined)
         return buf
       })
       .finally(() => {
@@ -89,7 +92,7 @@ export function prefetchGround(map: string) {
   kept.add(map)
   queue = queue
     .then(async () => {
-      if (!memory.has(map) && !(await has(map))) await obtain(map, false)
+      if (!memory.has(map) && !(await cacheReads.run(() => has(map), false))) await obtain(map, false)
     })
     .catch(() => {
       kept.delete(map)
@@ -111,7 +114,7 @@ function paint(map: string, foreground: () => boolean): Promise<PixBuf> {
             buf.data.set(event.data.data, event.data.y0 * GROUND_PX * 4)
             if (event.data.fields) {
               primeFields(layoutOf(map), event.data.fields)
-              void keepFields(map, event.data.fields).catch(() => {})
+              void cacheWrites.run(() => keepFields(map, event.data.fields!), undefined)
             }
             w.terminate()
             resolve()

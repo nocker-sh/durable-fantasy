@@ -41,6 +41,7 @@ beforeEach(() => {
   vi.stubGlobal("indexedDB", undefined)
 })
 afterEach(() => {
+  vi.useRealTimers()
   vi.unstubAllGlobals()
   vi.clearAllMocks()
   vi.resetModules()
@@ -165,4 +166,26 @@ it("returns painted ground before persistence completes and shares it during the
   await other
   writes[0].oncomplete?.()
   writes[1].onabort?.()
+})
+
+it("paints the current ground when opening the optional cache never finishes", async () => {
+  vi.useFakeTimers()
+  const open = vi.fn(() => ({}))
+  vi.stubGlobal("indexedDB", { open })
+  const { groundOf } = await import("./ground")
+  const result = groundOf("a")
+  await vi.advanceTimersByTimeAsync(4999)
+  expect(WorkerStub.all).toHaveLength(0)
+  await vi.advanceTimersByTimeAsync(1)
+  expect(WorkerStub.all).toHaveLength(1)
+  WorkerStub.all[0].finish()
+  expect((await result).data[0]).toBe(7)
+  const next = groundOf("b")
+  await vi.advanceTimersByTimeAsync(0)
+  expect(WorkerStub.all).toHaveLength(2)
+  WorkerStub.all[1].finish()
+  await next
+  // Writes have a separate deadline and cannot delay displaying either map.
+  await vi.advanceTimersByTimeAsync(5000)
+  expect(open).toHaveBeenCalledOnce()
 })
