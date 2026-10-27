@@ -3,6 +3,7 @@ import type { GameSession } from "./session.ts"
 import { skillOf, skillOfKey, type SkillId } from "../core/skills.ts"
 import { stationAt } from "../town/stations.ts"
 import { nodeOf } from "../core/gather.ts"
+import { gatheringTool } from "../core/gathering-tool.ts"
 import { sellable, type Quality, type Skill } from "../core/items.ts"
 import { REASON_TEXT } from "../core/commands.ts"
 import type { Stat } from "../core/growth.ts"
@@ -28,6 +29,13 @@ export class PlayerActions {
     if (this.target.session.state.get().busy || this.target.session.engaged) return false
     const spot = nodeOf(node)
     if (!spot) return false
+    const player = this.target.session.state.get().player
+    if (player && spot.needsTool && !gatheringTool(player, spot.skill)) {
+      const tool = { woodcutting: "斧", fishing: "釣り竿", foraging: "鎌" }[spot.skill]
+      const prepare = spot.skill === "woodcutting" ? "持ち物に入れるか、装備して" : "持ち物に入れて"
+      this.target.notify(`${tool}が必要。耐久の残った道具を${prepare}から採集しよう。`, "bad")
+      return false
+    }
     this.target.getScene()?.playAction(spot.kind === "tree" ? "chop" : spot.kind === "fish" ? "draw" : "scrub", spot.cell)
     return this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "gather", seq, node }))
   }

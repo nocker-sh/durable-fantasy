@@ -3,6 +3,7 @@ import { PlayerActions } from "./player-actions"
 import { GameSession } from "./session"
 import { emptyEquipment } from "../core/player"
 import { player } from "../test/helpers"
+import { NODES } from "../core/gather"
 import { REASON_TEXT } from "../core/commands"
 import type { VoidSocket } from "void/ws"
 
@@ -91,4 +92,31 @@ it("rejects an art with insufficient SP locally and sends it after regeneration 
   actions.useSkill("pierce")
   expect(send).toHaveBeenCalledExactlyOnceWith({ type: "attack", monster: "test-monster", art: "pierce" })
   expect(session.state.get().player).toEqual(before)
+})
+
+it.each([
+  ["tree", "斧"],
+  ["fish", "釣り竿"],
+] as const)("explains the missing tool for %s before animation or sending", async (kind, name) => {
+  const session = new GameSession()
+  session.state.set((s) => ({ ...s, player: player() }))
+  const run = vi.fn()
+  const notify = vi.fn()
+  const getScene = vi.fn(() => null)
+  const actions = new PlayerActions({ session, run, notify, getScene, lookAtShop: vi.fn(), update: vi.fn() })
+  expect(await actions.gather(NODES.find((node) => node.kind === kind)!.id)).toBe(false)
+  expect(run).not.toHaveBeenCalled()
+  expect(getScene).not.toHaveBeenCalled()
+  expect(notify).toHaveBeenCalledWith(expect.stringContaining(`${name}が必要`), "bad")
+})
+
+it("accepts an equipped usable axe without requiring another in the bag", async () => {
+  const session = new GameSession()
+  session.state.set((s) => ({ ...s, player: player({ equipment: { ...emptyEquipment(), weapon: "wood-axe" }, worn: { weapon: { q: 1, dur: 1 } } }) }))
+  const run = vi.fn(async () => true)
+  const notify = vi.fn()
+  const actions = new PlayerActions({ session, run, notify, getScene: () => null, lookAtShop: vi.fn(), update: vi.fn() })
+  expect(await actions.gather(NODES.find((node) => node.kind === "tree")!.id)).toBe(true)
+  expect(run).toHaveBeenCalledTimes(1)
+  expect(notify).not.toHaveBeenCalled()
 })
