@@ -403,8 +403,8 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
     walkers.layer = el
     for (const node of [me.label, ...residentLabels, ...monsters.map((m) => m.label), ...[...remotes.values()].map((w) => w.label), ...[...speech.values()].map((b) => b.el)]) el.appendChild(node)
   }
-  const toScreen = (pos: V2, h: number, out: THREE.Vector3) => {
-    out.set(pos[0], walkH(pos[0], pos[1]) + h, pos[1]).project(cam)
+  const toScreen = (pos: V2, h: number, out: THREE.Vector3, ground = walkH(pos[0], pos[1])) => {
+    out.set(pos[0], ground + h, pos[1]).project(cam)
     return out.z < 1 && Math.abs(out.x) < 1.1 && Math.abs(out.y) < 1.1
   }
   const labels = new ScreenLabels()
@@ -483,7 +483,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
     // a still middle: the view holds while the player moves about the middle of the screen
     // (DEAD of its width and height), follows by as much as they step beyond it, and comes back to
     // centre them after a turn of the view
-    camera.update(followPosition.set(me.pos[0], walkH(me.pos[0], me.pos[1]) + 0.6, me.pos[1]), movement.yawTarget, movement.yaw !== movement.yawTarget, dt)
+    camera.update(followPosition.set(me.pos[0], me.fig.root.position.y + 0.6, me.pos[1]), movement.yawTarget, movement.yaw !== movement.yawTarget, dt)
     movement.yaw = movement.yawTarget
 
     if (world.indoor) updateCutaways(cam.position)
@@ -494,7 +494,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
       scene.fog.far = camera.distance + fogDef.far
     }
     // fade houses and trees standing between the camera and the player
-    head.set(me.pos[0], walkH(me.pos[0], me.pos[1]) + 0.9, me.pos[1])
+    head.set(me.pos[0], me.fig.root.position.y + 0.9, me.pos[1])
     const occluded = occlusion.update(cam.position, head)
     let hidden = false
     occluders.forEach((o, i) => {
@@ -528,7 +528,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
     render()
 
     // names over heads: players always, residents when near or under the pointer
-    for (const w of [me, ...remotes.values()]) place(w.label, toScreen(w.pos, w.fig.height, v), v, 2)
+    for (const w of [me, ...remotes.values()]) place(w.label, toScreen(w.pos, w.fig.height, v, w.fig.root.position.y), v, 2)
     // creatures: where the clock puts them; the one we fight, followed and struck when in reach
     const wall = Date.now()
     updateMonsters(monsters, town, wall, movement.yaw, dt)
@@ -579,7 +579,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
         speech.delete(w)
         continue
       }
-      place(b.el, toScreen(w.pos, w.fig.height, v), v, 20)
+      place(b.el, toScreen(w.pos, w.fig.height, v, w.fig.root.position.y), v, 20)
     }
     ashfall?.update(dt, t, camFocus, 1 - daylight(lighting.minutes))
     frames++

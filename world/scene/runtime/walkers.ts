@@ -1,4 +1,5 @@
 import type * as THREE from "three"
+import { PositionSample } from "../../../lib/engine/position-sample.ts"
 import { PathFollower } from "../../../lib/engine/path-follower"
 import { walkH } from "../world"
 import { ANIM_DUR, type Anim, type Look } from "../figure"
@@ -141,8 +142,14 @@ export function createWalkers(scene: THREE.Scene, onPickPlayer: (id: string) => 
     w.fig.pose("walk", w.t)
     return true
   }
+  const ground = new WeakMap<Walker, PositionSample>()
   function placeWalker(w: Walker) {
-    w.fig.root.position.set(w.pos[0], walkH(w.pos[0], w.pos[1]), w.pos[1])
+    let height = ground.get(w)
+    if (!height) {
+      height = new PositionSample(walkH)
+      ground.set(w, height)
+    }
+    w.fig.root.position.set(w.pos[0], height.at(w.pos[0], w.pos[1]), w.pos[1])
     w.fig.face(w.head)
     w.fig.refresh()
   }
