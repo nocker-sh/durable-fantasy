@@ -11,6 +11,8 @@ export interface MonsterView {
   motion: MonsterMotion
   body: THREE.Group
   pos: V2
+  /** Cached terrain height at pos; invalidated when the creature moves. */
+  groundHeight?: number
   hp: number
   back: number
   /** the burst of little slimes, while it plays */
@@ -38,14 +40,17 @@ export function updateMonsters(list: MonsterView[], root: THREE.Group, now: numb
   for (const m of list) {
     const away = m.back > now || m.hp === 0
     const at = m.motion.at(now)
-    m.pos = [at.x, at.z]
+    if (m.pos[0] !== at.x || m.pos[1] !== at.z) m.groundHeight = undefined
+    m.pos[0] = at.x
+    m.pos[1] = at.z
+    if ((!away || m.burst) && m.groundHeight === undefined) m.groundHeight = walkH(at.x, at.z)
     m.body.visible = !away
     if (!away) {
       // shuffling: small hops; sitting: a slow quiver, each to its own beat
       const beat = now / 700 + m.body.id
       const hop = at.moving ? Math.abs(Math.sin(now / 220)) * 0.09 : 0
       const squash = at.moving ? 1 - Math.sin(now / 110) * 0.07 : 1 + Math.sin(beat) * 0.035
-      m.body.position.set(at.x, walkH(at.x, at.z) + 0.06 + hop, at.z)
+      m.body.position.set(at.x, m.groundHeight! + 0.06 + hop, at.z)
       if (MONSTER_KINDS[m.spawn.kind].look === "slime") {
         const sz = MONSTER_KINDS[m.spawn.kind].size ?? 1
         m.body.scale.set(sz / Math.sqrt(squash), sz * squash, sz / Math.sqrt(squash))
@@ -62,7 +67,7 @@ export function updateMonsters(list: MonsterView[], root: THREE.Group, now: numb
       const k = 1 - (m.burst.until - now) / 1200
       m.burst.bits.forEach((b, i) => {
         const a = (i / m.burst!.bits.length) * Math.PI * 2
-        b.position.set(m.pos[0] + Math.cos(a) * k * 1.6, walkH(m.pos[0], m.pos[1]) + 0.05 + Math.sin(k * Math.PI) * 0.4, m.pos[1] + Math.sin(a) * k * 1.6)
+        b.position.set(m.pos[0] + Math.cos(a) * k * 1.6, m.groundHeight! + 0.05 + Math.sin(k * Math.PI) * 0.4, m.pos[1] + Math.sin(a) * k * 1.6)
         b.scale.setScalar(0.45 * (1 - k * 0.5))
       })
       if (now >= m.burst.until) {
