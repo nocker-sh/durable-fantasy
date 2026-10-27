@@ -1,7 +1,7 @@
 // Fight with the actual starting equipment and persist the server-awarded experience.
 import { chromium } from "playwright-core"
 import { mkdir, writeFile } from "node:fs/promises"
-import { createCharacter, waitReady, walkToMap } from "./lib/game-browser.mjs"
+import { configureCpu, createCharacter, waitReady, walkToMap } from "./lib/game-browser.mjs"
 const browser = await chromium.launch({ channel: "chrome", args: ["--disable-http2"] })
 let page
 const commands = []
@@ -9,6 +9,8 @@ const errors = []
 const started = Date.now()
 try {
   page = await browser.newPage({ ignoreHTTPSErrors: true, viewport: { width: 1280, height: 800 } })
+  const cpuSlowdown = await configureCpu(page)
+  console.log(`CPU slowdown: ${cpuSlowdown}`)
   page.on("pageerror", (error) => errors.push(error.message))
   // Keep only command metadata: socket URLs and full player snapshots contain private data.
   page.on("websocket", (socket) => {
@@ -97,8 +99,8 @@ try {
   const restored = await page.evaluate(() => ({ exp: game.state.get().player.exp, level: game.state.get().player.level, bag: game.state.get().player.bag }))
   if (restored.exp !== result.exp || restored.level !== result.level || JSON.stringify(restored.bag) !== JSON.stringify(afterRest.bag)) throw Error("Combat rewards did not persist")
   if (errors.length) throw Error(errors.join("\n"))
-  await writeFile("public/tmp/first-combat.json", JSON.stringify({ route, target, before, result, beforeMeal, afterMeal, afterRest, restored }, null, 2))
-  console.log(JSON.stringify({ route, target, weapon: before.weapon, exp: result.exp, hp: result.hp, afterMeal: afterMeal.hp, afterRest: afterRest.hp, persisted: true }))
+  await writeFile("public/tmp/first-combat.json", JSON.stringify({ cpuSlowdown, route, target, before, result, beforeMeal, afterMeal, afterRest, restored }, null, 2))
+  console.log(JSON.stringify({ cpuSlowdown, route, target, weapon: before.weapon, exp: result.exp, hp: result.hp, afterMeal: afterMeal.hp, afterRest: afterRest.hp, persisted: true }))
 } catch (error) {
   await mkdir("public/tmp", { recursive: true })
   await page?.screenshot({ path: "public/tmp/first-combat-failure.png" })

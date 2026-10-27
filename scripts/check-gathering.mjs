@@ -1,11 +1,13 @@
 // Fresh character walks through real exits and gathers with server distance checks.
-import { createCharacter, waitReady, walkToMap } from "./lib/game-browser.mjs"
+import { configureCpu, createCharacter, waitReady, walkToMap } from "./lib/game-browser.mjs"
 import { chromium } from "playwright-core"
 import { mkdir, writeFile } from "node:fs/promises"
 const browser = await chromium.launch({ channel: "chrome", args: ["--disable-http2"] })
 let page
 try {
   page = await browser.newPage({ ignoreHTTPSErrors: true, viewport: { width: 1280, height: 800 } })
+  const cpuSlowdown = await configureCpu(page)
+  console.log(`CPU slowdown: ${cpuSlowdown}`)
   const errors = []
   page.on("pageerror", (error) => errors.push(error.message))
   await createCharacter(page)
@@ -56,8 +58,8 @@ try {
   if (errors.length) throw Error(errors.join("\n"))
   await mkdir("public/tmp", { recursive: true })
   await page.screenshot({ path: "public/tmp/gathering.png" })
-  await writeFile("public/tmp/gathering.json", JSON.stringify({ route, result, restored }, null, 2))
-  console.log(JSON.stringify({ route, result, restored }))
+  await writeFile("public/tmp/gathering.json", JSON.stringify({ cpuSlowdown, route, result, restored }, null, 2))
+  console.log(JSON.stringify({ cpuSlowdown, route, result, restored }))
 } catch (error) {
   await mkdir("public/tmp", { recursive: true })
   await page?.screenshot({ path: "public/tmp/gathering-failure.png" })
