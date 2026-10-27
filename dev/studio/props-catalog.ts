@@ -28,7 +28,7 @@ import {
   stumps,
   tufts,
 } from "#/world/scene/fields.ts"
-import { critters } from "#/world/scene/actors.ts"
+import { critters } from "#/world/scene/animals.ts"
 import { THINGS } from "#/world/scene/things.ts"
 
 export interface Prop {

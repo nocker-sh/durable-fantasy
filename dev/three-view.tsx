@@ -6,7 +6,7 @@ import * as THREE from "three"
 import { INDOOR, updateCutaways } from "#/world/scene/interior.ts"
 import { setLayout } from "#/world/scene/world.ts"
 import { resetRegistries, updaters } from "#/world/scene/build.ts"
-import { critters } from "#/world/scene/actors.ts"
+import { critters } from "#/world/scene/animals.ts"
 
 /** Builds the thing at (x, z) into the group. */
 export type Build = (root: THREE.Group, x: number, z: number) => void

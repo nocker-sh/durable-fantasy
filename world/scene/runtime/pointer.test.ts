@@ -3,7 +3,7 @@ import * as THREE from "three"
 import { createPointer } from "./pointer"
 
 vi.mock("../world", async (original) => ({ ...(await original<typeof import("../world")>()), walkH: () => 0, isFree: () => true }))
-vi.mock("../actors", () => ({ critters: [] }))
+vi.mock("../animals", () => ({ critters: [] }))
 afterEach(() => {
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
