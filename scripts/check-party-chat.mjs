@@ -4,12 +4,32 @@ import { mkdir } from "node:fs/promises"
 import { createCharacter, waitReady, walkToMap } from "./lib/game-browser.mjs"
 const browser = await chromium.launch({ channel: "chrome", args: ["--disable-http2"] })
 const errors = []
+const failedScripts = []
+const withDeadline = async (promise) => {
+  let timer
+  try {
+    return await Promise.race([
+      promise,
+      new Promise((resolve) => {
+        timer = setTimeout(() => resolve({ diagnosticsTimedOut: true }), 5000)
+      }),
+    ])
+  } finally {
+    clearTimeout(timer)
+  }
+}
+const pages = []
 try {
-  const pages = []
   for (const name of ["エルナ", "フリッツ", "オットー"]) {
     const context = await browser.newContext({ ignoreHTTPSErrors: true, viewport: { width: 1280, height: 800 } })
     const page = await context.newPage()
     page.on("pageerror", (error) => errors.push(error.message))
+    page.on("response", (response) => {
+      if (response.request().resourceType() === "script" && response.status() >= 400) failedScripts.push({ name, path: new URL(response.url()).pathname, status: response.status() })
+    })
+    page.on("requestfailed", (request) => {
+      if (request.resourceType() === "script") failedScripts.push({ name, path: new URL(request.url()).pathname, failed: true })
+    })
     await createCharacter(page, name)
     pages.push(page)
   }
@@ -67,6 +87,29 @@ try {
   await absent(host, "脱退後の話")
   if (errors.length) throw Error(errors.join("\n"))
   console.log("join privacy, reload, deduplication and leaving passed")
+} catch (error) {
+  console.error("party chat check failed", error.message)
+  console.error({
+    failedScripts,
+    errors,
+    states: await Promise.all(
+      pages.map((page) =>
+        withDeadline(
+          page
+            .evaluate(() => ({
+              map: window.game?.state.get().map.id,
+              online: window.game?.state.get().online,
+              loading: window.game?.state.get().loading,
+              failed: window.game?.state.get().failed,
+              failureMessage: window.game?.state.get().failureMessage,
+              sceneReady: window.game?.scene?.ready,
+            }))
+            .catch(() => null),
+        ),
+      ),
+    ),
+  })
+  throw error
 } finally {
   await browser.close()
 }
