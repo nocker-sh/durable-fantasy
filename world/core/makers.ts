@@ -51,6 +51,7 @@ export const MAKERS: Record<string, Partial<Record<ItemId, Trait>>> = {
     "honey-cake": { tiers: steady, note: "ウルリケの巣箱の蜜を使う。" },
   },
   ギュンター: {
+    "short-sword": { tiers: ordinary, note: "ギュンターが刃を鍛え、木の柄に革を巻いた片手剣。" },
     dagger: { tiers: ordinary, note: "ギュンターが鍛えた短い刃。手入れしやすい形にしてある。" },
     "iron-sword": { tiers: ordinary, note: "ギュンターの炉で鍛え、重心を確かめた剣。" },
     "hand-axe": { tiers: ordinary, note: "ギュンターが木の柄に刃を据えた。薪仕事にも使う。" },

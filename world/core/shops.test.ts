@@ -74,3 +74,11 @@ describe("shop", () => {
     for (const shop of Object.values(SHOPS)) for (const id of shop.stock) expect(ITEMS[id].price).toBeGreaterThan(0)
   })
 })
+
+it("keeps the smith's short sword at its existing price with ordinary maker quality", () => {
+  const before = player({ gold: 200 })
+  const result = apply(before, { type: "buy", shop: "smithy", item: "short-sword", count: 1 })
+  if (!result.ok) throw Error(result.reason)
+  expect(result.state.gold).toBe(80)
+  expect(result.state.bag).toContainEqual({ item: "short-sword", count: 1, q: 1, by: "ギュンター" })
+})

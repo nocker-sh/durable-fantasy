@@ -118,7 +118,14 @@ const DEFINITIONS = {
   // ---------------------------------------------------------------- weapons
   "wooden-stick": craftedGear("木の棒", 8, "staff", { part: "weapon", atk: 4, delay: 1700, scale: { str: "E" } }, 20, "手頃な長さの枝。ないよりはまし。"),
   dagger: craftedGear("ダガー", 40, "dagger", { part: "weapon", atk: 9, delay: 1200, needs: { dex: 7 }, scale: { dex: "C", str: "E" } }, 40, "刃渡りの短い小刀。軽くて扱いやすい。"),
-  "short-sword": gear("ショートソード", 120, "sword", { part: "weapon", atk: 22, delay: 1500, needs: { str: 8, dex: 7 }, scale: { str: "D", dex: "D" } }, 60, "ギュンターが打った片手剣。"),
+  "short-sword": craftedGear(
+    "ショートソード",
+    120,
+    "sword",
+    { part: "weapon", atk: 22, delay: 1500, needs: { str: 8, dex: 7 }, scale: { str: "D", dex: "D" } },
+    60,
+    "短い刃に革巻きの柄を付けた片手剣。",
+  ),
   "iron-sword": craftedGear(
     "鉄の剣",
     320,

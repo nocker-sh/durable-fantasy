@@ -57,6 +57,18 @@ export const SMITHING_RECIPES: readonly Recipe[] = [
     4,
   ),
   r(
+    "short-sword",
+    "smithing",
+    "forge",
+    [
+      ["iron-ingot", 2],
+      ["plank", 1],
+      ["tanned-leather", 1],
+    ],
+    ["short-sword", 1],
+    4,
+  ),
+  r(
     "iron-sword",
     "smithing",
     "forge",

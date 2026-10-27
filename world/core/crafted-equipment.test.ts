@@ -41,13 +41,16 @@ it.each(equipmentRecipes.filter((recipe) => recipe.min <= LIFE_CAP))("preserves 
   expect(sold.state.gold - removed.state.gold).toBe(Math.max(1, Math.floor(sellPrice(original.item) * QUALITY_PRICE[original.q!])))
 })
 
-it.each(["dagger", "leather-armor", "chain-mail", "cloth-hat", "iron-helm", "leather-boots", "charm", "fur-stole"] as const)("loads existing unmarked %s without resetting the character", (item) => {
-  const p = player({ name: "エルナ", gold: 1234, bag: emptyBag().map((_, index) => (index === 0 ? { item, count: 1 } : null)) })
-  const loaded = loadPlayer(JSON.parse(JSON.stringify(p)))
-  expect(loaded.gold).toBe(1234)
-  expect(loaded.name).toBe("エルナ")
-  expect(loaded.bag[0]).toEqual({ item, count: 1 })
-})
+it.each(["short-sword", "dagger", "leather-armor", "chain-mail", "cloth-hat", "iron-helm", "leather-boots", "charm", "fur-stole"] as const)(
+  "loads existing unmarked %s without resetting the character",
+  (item) => {
+    const p = player({ name: "エルナ", gold: 1234, bag: emptyBag().map((_, index) => (index === 0 ? { item, count: 1 } : null)) })
+    const loaded = loadPlayer(JSON.parse(JSON.stringify(p)))
+    expect(loaded.gold).toBe(1234)
+    expect(loaded.name).toBe("エルナ")
+    expect(loaded.bag[0]).toEqual({ item, count: 1 })
+  },
+)
 
 it.each([false, true])("switches from a worn axe and shield atomically when extra bag space is %s", (hasSpace) => {
   const base = player()
