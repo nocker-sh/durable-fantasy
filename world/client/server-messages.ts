@@ -13,7 +13,9 @@ export class ServerMessages {
     private readonly target: Pick<
       ServerMessageContext,
       "getScene" | "wayBeside" | "standBy" | "avatarOf" | "setPlayer" | "maybeReady" | "addChat" | "report" | "update" | "notify" | "toggleWindow" | "enterMap" | "connect" | "visitTown"
-    > & { readonly session: Pick<GameSession, "net" | "arriveAt" | "others" | "socket" | "waiting" | "wild" | "state" | "engaged" | "fullTries" | "warping" | "warpAgainAt" | "refusedWarp"> },
+    > & {
+      readonly session: Pick<GameSession, "net" | "arriveAt" | "others" | "socket" | "waiting" | "wild" | "fighting" | "state" | "engaged" | "fullTries" | "warping" | "warpAgainAt" | "refusedWarp">
+    },
   ) {}
   handle(message: ServerMessage) {
     const scene = this.target.getScene()
@@ -128,6 +130,8 @@ export class ServerMessages {
         return
       }
       case "struck": {
+        this.target.session.wild = { ...this.target.session.wild, [message.monster]: { hp: message.hp, back: message.back } }
+        if (message.hp === 0 && this.target.session.fighting?.monster === message.monster) this.target.session.fighting = null
         scene?.struck(message.monster, message.swing.kind, message.swing.kind === "miss" ? 0 : message.swing.damage, message.hp, message.back)
         return
       }
