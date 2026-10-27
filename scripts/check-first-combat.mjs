@@ -15,7 +15,7 @@ try {
   const target = await page.evaluate(async () => {
     const { SPAWNS, monsterAt } = await import("/world/core/monsters.ts")
     const cell = game.scene.playerCell()
-    const candidates = SPAWNS.filter((s) => s.map === game.state.get().map.id && s.kind === "slime")
+    const candidates = SPAWNS.filter((s) => s.map === game.state.get().map.id && s.kind === "slime" && (game.session.wild[s.id]?.back ?? 0) <= Date.now())
     const distance = (s) => {
       const at = monsterAt(s, Date.now())
       return Math.hypot(at.x - (cell[0] + 0.5) / 2, at.z - (cell[1] + 0.5) / 2)
@@ -25,6 +25,7 @@ try {
     game.scene.fight(candidates[0].id)
     return candidates[0].id
   })
+  console.log("fighting", target)
   await page.waitForFunction((exp) => game.state.get().player.exp > exp || game.state.get().player.hp <= 0, before.exp, { timeout: 120000 })
   const result = await page.evaluate(() => ({ exp: game.state.get().player.exp, hp: game.state.get().player.hp, level: game.state.get().player.level, bag: game.state.get().player.bag }))
   if (result.hp <= 0) throw Error("Starting character fell before earning experience")
@@ -83,6 +84,7 @@ try {
             hp: game.state.get().player?.hp,
             exp: game.state.get().player?.exp,
             notices: game.state.get().notices,
+            wild: game.session.wild,
           }
         : { game: false },
     ),
