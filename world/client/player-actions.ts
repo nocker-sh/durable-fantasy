@@ -1,5 +1,6 @@
+import { apply } from "../core/apply.ts"
 import type { GameSession } from "./session.ts"
-import { artBlocked, skillOf, skillOfKey, type SkillId } from "../core/skills.ts"
+import { skillOf, skillOfKey, type SkillId } from "../core/skills.ts"
 import { stationAt } from "../town/stations.ts"
 import { nodeOf } from "../core/gather.ts"
 import { sellable, type Quality, type Skill } from "../core/items.ts"
@@ -93,9 +94,10 @@ export class PlayerActions {
     if (s.kind === "action" || s.kind === "prayer") return void this.target.run({ type: "cast", skill })
     // an art's blow goes at what we are fighting: struck within the last few seconds
     const p = this.target.session.state.get().player
-    const blocked = p && artBlocked(skill, p)
-    if (blocked) return this.target.notify(REASON_TEXT[blocked], "bad")
-    if ((p?.ready[skill] ?? 0) > Date.now()) return this.target.notify(REASON_TEXT.COOLDOWN, "bad")
+    if (!p) return
+    // Preview the same recovery and cost rules; only the server commits the result.
+    const preview = apply(p, { type: "art", skill }, { now: Date.now() })
+    if (!preview.ok) return this.target.notify(REASON_TEXT[preview.reason], "bad")
     if (!this.target.session.fighting || performance.now() - this.target.session.fighting.at > 4000) return this.target.notify("戦っている相手がいない。生き物をクリックしてから使おう。", "bad")
     this.target.session.socket?.send({ type: "attack", monster: this.target.session.fighting.monster, art: skill })
   }
