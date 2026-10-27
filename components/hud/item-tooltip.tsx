@@ -2,7 +2,7 @@
 import type { ReactElement, ReactNode } from "react"
 import { usePlayerIfAny } from "#/components/game/context.tsx"
 import { artsOf, skillOf } from "#/world/core/skills.ts"
-import { standing } from "#/world/core/stats.ts"
+import { equipmentDefense, standing } from "#/world/core/stats.ts"
 import { GATHER_SKILL_NAME, ITEMS, KIND_NAME, QUALITIES, QUALITY_PRICE, RARITY_NAME, sellPrice, sellable, type ItemId, type Quality } from "#/world/core/items.ts"
 import { displayName, effectOf, traitOf } from "#/world/core/makers.ts"
 import { STAT_NAME, type Stat } from "#/world/core/growth.ts"
@@ -99,7 +99,7 @@ export function ItemTooltip({
           {e?.def ? (
             <>
               <dt className="text-text-dim">防御</dt>
-              <dd className="text-right">+{e.def}</dd>
+              <dd className="text-right">+{equipmentDefense(item, q)}</dd>
             </>
           ) : null}
           {Object.entries(e?.bonus ?? {}).map(([key, n]) => (

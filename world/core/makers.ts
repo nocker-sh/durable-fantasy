@@ -70,7 +70,11 @@ export const MAKERS: Record<string, Partial<Record<ItemId, Trait>>> = {
     "striped-muffler": { tiers: ordinary, note: "マグダレーナが色糸を替えながら織った首巻き。" },
     "wool-cape": { tiers: ordinary, note: "マグダレーナが裾まで目を揃えて織った外套。" },
   },
+  ベアトリクス: {
+    "chain-mail": { tiers: steady, note: "ベアトリクスが鉄の輪を一つずつ留め、継ぎ目を確かめた鎖帷子。" },
+  },
   ルドルフ: {
+    "leather-armor": { tiers: steady, note: "ルドルフがなめした革を重ね、丈夫な糸で縫った鎧。" },
     "fang-charm": { tiers: ordinary, note: "森で集めた牙をルドルフが磨き、毛糸で結んだ。" },
   },
   マティアス: {

@@ -4,6 +4,8 @@ import { addItem, countItem, emptyBag, type Bag } from "./bag.ts"
 import { COMMISSIONS, MAX_ORDERS } from "./commissions.ts"
 import { ITEMS, type ItemId } from "./items.ts"
 import { RESIDENTS } from "../town/residents.ts"
+import { derive } from "./stats.ts"
+import { loadPlayer } from "./player.ts"
 import { player } from "../test/helpers.ts"
 
 const bag = (...items: [ItemId, number][]): Bag => items.reduce<Bag>((b, [id, n]) => addItem(b, id, n)!, emptyBag())
@@ -66,6 +68,28 @@ describe("commissions", () => {
     const r = apply(p, { type: "order", commission: "irmgard-potions", roll: 0.5 }, { now: 0 })
     const got = r.ok ? apply(r.state, { type: "collect", index: 0 }, { now: H }) : r
     expect(got.ok && got.state.bag.find((s) => s?.item === "potion")).toMatchObject({ by: "イルムガルト", count: 5 })
+  })
+
+  it.each(["rudolf-armor", "beatrix-mail"])("retains commissioned armor quality through saving, equipment and removal: %s", (id) => {
+    const job = COMMISSIONS.find((job) => job.id === id)!
+    const base = player()
+    const p = player({ gold: 1000, stats: { ...base.stats, str: 12, vit: 12 }, bag: bag(...job.inputs.map((input) => [input.item, input.count] as [ItemId, number])) })
+    const ordered = apply(p, { type: "order", commission: id, roll: 0.8 }, { now: 0 })
+    if (!ordered.ok) throw Error(ordered.reason)
+    expect(ordered.state.orders[0].q).toBe(2)
+    const collected = apply(loadPlayer(JSON.parse(JSON.stringify(ordered.state))), { type: "collect", index: 0 }, { now: job.minutes * 60_000 })
+    if (!collected.ok) throw Error(collected.reason)
+    const slot = collected.state.bag.findIndex((s) => s?.item === job.output.item)
+    expect(collected.state.bag[slot]).toMatchObject({ item: job.output.item, q: 2, by: job.craftsman })
+    const equipped = apply(collected.state, { type: "equip", slot })
+    if (!equipped.ok) throw Error(equipped.reason)
+    const saved = loadPlayer(JSON.parse(JSON.stringify(equipped.state)))
+    expect(saved.worn.body).toEqual({ q: 2, by: job.craftsman })
+    const ordinary = { ...saved, worn: { ...saved.worn, body: { q: 1 as const, by: job.craftsman } } }
+    expect(derive(saved).def).toBeGreaterThan(derive(ordinary).def)
+    const removed = apply(saved, { type: "unequip", slot: "body" })
+    if (!removed.ok) throw Error(removed.reason)
+    expect(removed.state.bag).toContainEqual({ item: job.output.item, count: 1, q: 2, by: job.craftsman })
   })
 
   it("three at a time, and not without the materials or the money", () => {

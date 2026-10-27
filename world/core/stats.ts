@@ -1,5 +1,5 @@
 // Values that follow from stats, level and equipment (game-system.md §3.4, §4.4).
-import { GRADES, ITEMS, type Equipment, type ItemId, type Skill, type Slot } from "./items.ts"
+import { GRADES, ITEMS, QUALITY_EFFECT, SLOTS, type Quality, type Equipment, type ItemId, type Skill, type Slot } from "./items.ts"
 import { START_STAT, type Stat, type Stats } from "./growth.ts"
 import { lifeLevel, type LifeExp } from "./life.ts"
 
@@ -25,6 +25,7 @@ export interface Build {
   readonly level: number
   readonly stats: Stats
   readonly equipment: Readonly<Record<Slot, ItemId | null>>
+  readonly worn?: Readonly<Partial<Record<Slot, { q?: Quality }>>>
 }
 
 /** Bare hands: a blow now and then. */
@@ -38,12 +39,19 @@ export function scaling(e: Equipment | undefined, stats: Stats): number {
   return plus
 }
 
+/** Unmarked and ordinary equipment retain their base defense. */
+export function equipmentDefense(item: ItemId, quality: Quality = 1): number {
+  const definition = ITEMS[item]
+  return Math.round((definition.equip?.def ?? 0) * (definition.made ? QUALITY_EFFECT[quality] : 1))
+}
+
 export function derive(b: Build): Derived {
   let armorDef = 0
   const plus: Record<string, number> = {}
-  for (const id of Object.values(b.equipment)) {
+  for (const slot of SLOTS) {
+    const id = b.equipment[slot]
     const e = id ? ITEMS[id].equip : undefined
-    armorDef += e?.def ?? 0
+    armorDef += id ? equipmentDefense(id, b.worn?.[slot]?.q) : 0
     for (const [key, n] of Object.entries(e?.bonus ?? {})) plus[key] = (plus[key] ?? 0) + (n ?? 0)
   }
   const stats = Object.fromEntries(Object.entries(b.stats).map(([s, n]) => [s, n + (plus[s] ?? 0)])) as unknown as Stats
