@@ -1,1 +1,5 @@
 dev/
+
+# Keep generated game sprites; exclude browser checks and other temporary output.
+/tmp/*
+!/tmp/sprites/
