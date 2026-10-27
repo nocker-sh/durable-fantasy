@@ -40,6 +40,17 @@ export const TAILORING_RECIPES: readonly Recipe[] = [
     4,
   ),
   r(
+    "leather-armor",
+    "tailoring",
+    "loom",
+    [
+      ["tanned-leather", 5],
+      ["yarn", 2],
+    ],
+    ["leather-armor", 1],
+    8,
+  ),
+  r(
     "wool-cape",
     "tailoring",
     "loom",
