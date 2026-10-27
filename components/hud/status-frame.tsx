@@ -2,8 +2,9 @@
 import { useGameState } from "#/components/game/context.tsx"
 import { Meter } from "#/components/game/meter.tsx"
 import { uiIconUrl } from "#/world/art/icons.ts"
-import { REGEN_MS, MAX_STAMINA, fullNow, settle, type PlayerState, type Rest } from "#/world/core/player.ts"
+import { REGEN_MS, DIGEST_MS, MAX_STAMINA, fullNow, settle, type PlayerState, type Rest } from "#/world/core/player.ts"
 import { useEffect, useState } from "react"
+import { useDeadlineClock } from "#/hooks/use-deadline-clock.ts"
 
 export function StatusFrame() {
   const player = useGameState((s) => s.player)
@@ -22,11 +23,13 @@ export function StatusFrame() {
 /** HP and SP, coming back a little at a time while up and about (core/player.ts settle). */
 function HpSp({ player, rest }: { player: PlayerState; rest: Rest }) {
   const [now, setNow] = useState(() => Date.now())
+  const p = settle(player, rest, Math.max(now, Date.now()))
+  const recovering = p.hp > 0 && (p.hp < rest.maxHp || p.sp < rest.maxSp)
   useEffect(() => {
-    const t = window.setInterval(() => setNow(Date.now()), REGEN_MS / 4)
-    return () => window.clearInterval(t)
-  }, [])
-  const p = settle(player, rest, now)
+    if (!recovering) return
+    const timer = setTimeout(() => setNow(Date.now()), REGEN_MS / 4)
+    return () => clearTimeout(timer)
+  }, [recovering, now])
   return (
     <>
       <Meter tone="hp" value={p.hp} max={rest.maxHp} aria-label="HP" className="h-[6px]" />
@@ -37,12 +40,8 @@ function HpSp({ player, rest }: { player: PlayerState; rest: Rest }) {
 
 /** How full you are and how long you will stay warm (game-system.md §3.6), ticking by the minute. */
 function Body({ full, fullAt, warmUntil, focusUntil }: { full: number; fullAt: number; warmUntil: number; focusUntil: number }) {
-  const [now, setNow] = useState(() => Date.now())
-  useEffect(() => {
-    setNow(Date.now())
-    const t = window.setInterval(() => setNow(Date.now()), 20_000)
-    return () => window.clearInterval(t)
-  }, [fullAt, warmUntil, focusUntil])
+  const until = Math.max(full > 0 ? fullAt + full * DIGEST_MS : 0, warmUntil, focusUntil)
+  const now = useDeadlineClock(until, 20_000)
   const f = fullNow({ full, fullAt }, now)
   const focus = Math.max(0, Math.ceil((focusUntil - now) / 60_000))
   const warm = Math.max(0, Math.ceil((warmUntil - now) / 60_000))

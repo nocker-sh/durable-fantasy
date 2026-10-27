@@ -70,6 +70,8 @@ Durable Object の入口は `durable-objects/` にあり、どれも Void の規
 
 テストは実装と同じディレクトリに `*.test.ts` で置き、`vp run test` で動かす。規則のテストは `world/core/` の関数を直接呼ぶ。町の暮らしの整合（寝床の数、日課、通れる道、軒先の物の置き場など）もテストで確かめ、テストにできないものは [[consistency]] のチェックリストで確かめる。`lib/engine/` には、依存の向きと実行時の import に循環がないことを確かめるテストがある。型だけの依存は `import type`・`export type` で明示し、実行時の依存に含めない。
 
+HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは行動不能で停止する。満腹・温まり・集中の表示も、すべて尽きたらタイマーを止める。プレイヤーの状態が更新されたらその場で表示を計算し直し、回復や効果が生じたら再開する（`components/hud/status-frame.tsx`）。
+
 ## ブラウザの所有権と復帰
 
 `routes/api/session.ts` は `world/server/session.ts` を呼び、ブラウザの所有権を Cookie とプレイヤーの Durable Object で照合する。マップ接続は認証済みの所有者を接続状態へ置く。プロフィールの入力規則は `world/core/player.ts`、復帰位置の計算は `world/core/location.ts` にあり、描画や UI を参照しない。作成途中の入力は `world/client/profile-draft.ts` が扱う。プレイヤーの保存先でも HP がない間の歩行とマップ移動を拒否する。倒れたときは、その時刻までに歩いた位置へ経路を止め、HP と同じ状態保存で確定する。再接続後に残りの経路を歩き終えた扱いにせず、復活で HP が戻った後に町への移動を受け付ける。保存・移行の約束は [[game-system#13. 永続化]] を参照する。
