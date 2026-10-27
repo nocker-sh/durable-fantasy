@@ -55,6 +55,7 @@ export const MAKERS: Record<string, Partial<Record<ItemId, Trait>>> = {
     dagger: { tiers: ordinary, note: "ギュンターが鍛えた短い刃。手入れしやすい形にしてある。" },
     "iron-sword": { tiers: ordinary, note: "ギュンターの炉で鍛え、重心を確かめた剣。" },
     "hand-axe": { tiers: ordinary, note: "ギュンターが木の柄に刃を据えた。薪仕事にも使う。" },
+    "battle-axe": { tiers: ordinary, note: "ギュンターが大きな刃を鍛え、両手用の柄を革で巻いて握りを補強した。" },
     spear: { tiers: ordinary, note: "ゴットフリートの木の柄に、ギュンターが穂先を付けた。" },
     mace: { tiers: ordinary, note: "ギュンターが鉄の頭を打ち、柄に留めた。" },
     "wood-axe": { tiers: [0.05, 0.6, 0.3, 0.05], note: "鍛冶屋は町でうちだけだ、と打った本人が言う。" },

@@ -7,7 +7,7 @@ import { ITEMS, sellPrice } from "./items"
 import { artsOf } from "./skills"
 import { bagWith, player } from "../test/helpers"
 
-it.each(["fang-charm", "hand-axe", "spear", "mace", "short-sword"])("turns gathered materials into usable %s with maker and quality", (id) => {
+it.each(["fang-charm", "hand-axe", "battle-axe", "spear", "mace", "short-sword"])("turns gathered materials into usable %s with maker and quality", (id) => {
   const recipe = RECIPES.find((r) => r.id === id)!
   const station = id === "fang-charm" ? "workshop-loom" : "craft-forge"
   const p = player({

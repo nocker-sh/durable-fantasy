@@ -136,7 +136,7 @@ const DEFINITIONS = {
     "fine",
   ),
   "hand-axe": { ...gear("手斧", 90, "axe", { part: "weapon", atk: 20, delay: 1700, needs: { str: 9 }, scale: { str: "C" } }, 70, "薪割りにも戦いにも使える。"), made: true },
-  "battle-axe": gear(
+  "battle-axe": craftedGear(
     "戦斧",
     380,
     "axe",

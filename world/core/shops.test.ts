@@ -75,10 +75,13 @@ describe("shop", () => {
   })
 })
 
-it("keeps the smith's short sword at its existing price with ordinary maker quality", () => {
-  const before = player({ gold: 200 })
-  const result = apply(before, { type: "buy", shop: "smithy", item: "short-sword", count: 1 })
+it.each([
+  ["short-sword", 120],
+  ["battle-axe", 380],
+] as const)("keeps the smith's %s at its existing price with ordinary maker quality", (item, price) => {
+  const before = player({ gold: 500 })
+  const result = apply(before, { type: "buy", shop: "smithy", item, count: 1 })
   if (!result.ok) throw Error(result.reason)
-  expect(result.state.gold).toBe(80)
-  expect(result.state.bag).toContainEqual({ item: "short-sword", count: 1, q: 1, by: "ギュンター" })
+  expect(result.state.gold).toBe(500 - price)
+  expect(result.state.bag).toContainEqual({ item, count: 1, q: 1, by: "ギュンター" })
 })

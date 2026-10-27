@@ -92,6 +92,18 @@ export const SMITHING_RECIPES: readonly Recipe[] = [
     4,
   ),
   r(
+    "battle-axe",
+    "smithing",
+    "forge",
+    [
+      ["iron-ingot", 6],
+      ["plank", 2],
+      ["tanned-leather", 2],
+    ],
+    ["battle-axe", 1],
+    8,
+  ),
+  r(
     "spear",
     "smithing",
     "forge",
