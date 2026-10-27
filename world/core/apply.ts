@@ -6,18 +6,19 @@ import { carried } from "./inventory-weight.ts"
 import { tradeOut, tradeIn } from "./trade-command.ts"
 import { store, retrieve } from "./storage-command.ts"
 import { dealtWith } from "./commerce-friendship.ts"
+import { consume } from "./consume-command.ts"
 import { cast, payArt } from "./skill-command.ts"
 import { forgottenLifeExp } from "./life.ts"
 import { keep } from "./threads.ts"
 import { order, collect } from "./commission-command.ts"
 import type { Command, ServerCommand } from "./commands.ts"
-import { effectOf, priceOf, qualitiesOf, usualMaker } from "./makers.ts"
+import { priceOf, qualitiesOf, usualMaker } from "./makers.ts"
 import { gather } from "./gather-command.ts"
 import { equip, unequip, settleStats } from "./equipment-command.ts"
 import { craft } from "./craft-command.ts"
 import { accept, reject, type Transition } from "./transition.ts"
 export type { Transition } from "./transition.ts"
-import { MAX_STAMINA, fullNow, settle as settleHp, warmNow } from "./player.ts"
+import { settle as settleHp, warmNow } from "./player.ts"
 import { deathPenalty } from "./combat.ts"
 import { FRIEND, MAX_ERRANDS, befriend, dayOf, errandOf, errandToday, friendPrice, todays } from "./errands.ts"
 import { MAX_STAT, expToNext, gainExp, statCost } from "./growth.ts"
@@ -82,15 +83,12 @@ export function apply(before: PlayerState, command: Command | ServerCommand, ctx
       const known = SHOPS[command.shop].kind === "buyer" ? dealtWith(state, ctx.keepers ?? SHOPS[command.shop].keepers, now) : state
       return accept({ ...state, gold: state.gold + gain, bag, friends: known.friends, boughtOn: known.boughtOn }, { type: "sold", item: slot.item, count: command.count, gain })
     }
-    case "use": {
-      const slot = state.bag[command.slot]
-      if (!slot) return reject("EMPTY_SLOT")
-      return use(state, slot, takeFromSlot(state.bag, command.slot, 1), now)
-    }
+    case "use":
+      return consume(state, command.slot, now)
     case "use-item": {
       const index = firstOf(state.bag, command.item)
       if (index < 0) return reject("NOT_OWNED")
-      return use(state, state.bag[index]!, takeFromSlot(state.bag, index, 1), now)
+      return consume(state, index, now)
     }
     case "gather":
       return gather(state, command, now)
@@ -263,31 +261,4 @@ export function apply(before: PlayerState, command: Command | ServerCommand, ctx
 export function sellsFor(shop: keyof typeof SHOPS, slot: Stack): number {
   const base = shopBuys(shop, slot.item)
   return ITEMS[slot.item].made ? Math.max(1, Math.floor(base * QUALITY_PRICE[slot.q ?? 1])) : base
-}
-
-function use(state: PlayerState, slot: Stack, bag: Bag | null, now: number): Transition {
-  const item = slot.item
-  if (!ITEMS[item].use) return reject("NOT_USABLE")
-  const e = effectOf(item, slot.q ?? 1, slot.by)
-  const d = derive(state)
-  const full = fullNow(state, now)
-  if (e.full > 0 && full + e.full > 100) return reject("TOO_FULL")
-  const wantsHp = e.hp > 0 && state.hp < d.maxHp,
-    wantsSp = e.sp > 0 && state.sp < d.maxSp
-  const wantsStamina = e.stamina > 0 && state.stamina < MAX_STAMINA
-  const food = e.full > 0 || e.warm > 0 || e.focus > 0
-  const extendsWarmth = e.warm > 0 && now + e.warm * 60_000 > state.warmUntil
-  const extendsFocus = e.focus > 0 && now + e.focus * 60_000 > state.focusUntil
-  if (!wantsHp && !wantsSp && !wantsStamina && !extendsWarmth && !extendsFocus) return reject(food ? "NOTHING_TO_GAIN" : e.sp && !e.hp ? "SP_FULL" : "HP_FULL")
-  if (!bag) return reject("NOT_OWNED")
-  const hp = Math.min(d.maxHp, state.hp + e.hp)
-  const sp = Math.min(d.maxSp, state.sp + e.sp)
-  const stamina = Math.min(MAX_STAMINA, state.stamina + e.stamina)
-  const warmUntil = e.warm > 0 ? Math.max(state.warmUntil, now + e.warm * 60_000) : state.warmUntil
-  const focusUntil = e.focus > 0 ? Math.max(state.focusUntil, now + e.focus * 60_000) : state.focusUntil
-  const focusAt = e.focus > 0 && state.focusUntil <= now ? now : state.focusAt
-  return accept(
-    { ...state, hp, sp, stamina, focusAt, focusUntil, full: e.full > 0 ? full + e.full : state.full, fullAt: e.full > 0 ? now : state.fullAt, warmUntil, bag },
-    { type: "used", item, hp: hp - state.hp, sp: sp - state.sp, stamina: stamina - state.stamina, warm: e.warm, ...(e.focus > 0 ? { focus: e.focus } : {}), ...(slot.by ? { by: slot.by } : {}) },
-  )
 }
