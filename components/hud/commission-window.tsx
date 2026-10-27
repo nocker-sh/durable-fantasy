@@ -1,6 +1,6 @@
 // Work left with a resident craftsman (economy.md §3): what they will make, from what, for how much
 // and how long; and what you have left with them, with when it will be ready.
-import { useEffect, useState } from "react"
+import { useDeadlineClock } from "#/hooks/use-deadline-clock.ts"
 import { REASON_TEXT } from "#/world/core/commands.ts"
 import { countItem } from "#/world/core/bag.ts"
 import { formatTime, jstMinutes } from "#/world/core/clock.ts"
@@ -20,14 +20,11 @@ export function CommissionWindow() {
   const who = useGameState((s) => s.commission)
   const player = useGameState((s) => s.player)
   const busy = useGameState((s) => s.busy)
-  const [now, setNow] = useState(() => Date.now())
-  useEffect(() => {
-    const t = window.setInterval(() => setNow(Date.now()), 10_000)
-    return () => window.clearInterval(t)
-  }, [])
+  const mine = (player?.orders ?? []).map((o, index) => ({ o, index, job: commissionOf(o.commission)! })).filter((x) => x.job?.craftsman === who)
+  const until = mine.reduce((latest, { o }) => Math.max(latest, o.readyAt), 0)
+  const now = useDeadlineClock(until, 10_000)
   if (!who || !player) return null
   const jobs = COMMISSIONS.filter((c) => c.craftsman === who)
-  const mine = player.orders.map((o, index) => ({ o, index, job: commissionOf(o.commission)! })).filter((x) => x.job?.craftsman === who)
   return (
     <Window id="commission" title={`${who}に頼む`} z={30} onClose={() => game.closeCommission()} initial={() => ({ x: 364, y: 104 })} className="w-[380px]">
       {mine.length > 0 && (
