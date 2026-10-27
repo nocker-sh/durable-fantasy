@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { REASON_TEXT } from "#/world/core/commands.ts"
 // Skills (game-system.md §9, ui.md §3.10): the life skills' levels and their next milestones, what
 // anyone can do (sit, first aid), and the arts of the weapon in hand. Drag an icon to the shortcut bar.
 import { STAT_NAME, type Stat } from "#/world/core/growth.ts"
@@ -112,6 +113,7 @@ export function SkillsWindow() {
         </section>
         <section>
           <h3 className="mb-1 font-head text-xs text-brass-hi">戦技と魔法</h3>
+          <p className="mb-1 font-body text-[11px] text-text-dim">戦技・術は、生き物をクリックして戦い始めてから使う。アイコンをショートカットバーへドラッグしても使える。</p>
           {held.length ? (
             <ul className="flex flex-col gap-1">
               {held.map((id) => (
@@ -155,11 +157,11 @@ function SkillRow({ id, player }: { id: SkillId; player: PlayerState }) {
             <Button size="sm" variant="primary" disabled={busy} onClick={() => game.toggleSit()}>
               {player.sitting ? "立つ" : "座る"}
             </Button>
-          ) : sk.kind === "action" || sk.kind === "prayer" ? (
+          ) : (
             <Button size="sm" variant="primary" disabled={busy || !!blocked} onClick={() => game.useSkill(id)}>
               使う
             </Button>
-          ) : null}
+          )}
         </span>
       </div>
       {isArt(sk) && (
@@ -173,6 +175,7 @@ function SkillRow({ id, player }: { id: SkillId; player: PlayerState }) {
         </div>
       )}
       <p className="font-body text-[12px] text-text-dim">{SKILLS[id].text}</p>
+      {blocked && <p className="font-body text-[11px] text-bad">{REASON_TEXT[blocked]}</p>}
     </li>
   )
 }
