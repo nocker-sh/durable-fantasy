@@ -338,7 +338,9 @@ function use(state: PlayerState, slot: Stack, bag: Bag | null, now: number): Tra
     wantsSp = e.sp > 0 && state.sp < d.maxSp
   const wantsStamina = e.stamina > 0 && state.stamina < MAX_STAMINA
   const food = e.full > 0 || e.warm > 0 || e.focus > 0
-  if (!wantsHp && !wantsSp && !wantsStamina && !(food && (e.warm > 0 || e.focus > 0))) return reject(food ? "NOTHING_TO_GAIN" : e.sp && !e.hp ? "SP_FULL" : "HP_FULL")
+  const extendsWarmth = e.warm > 0 && now + e.warm * 60_000 > state.warmUntil
+  const extendsFocus = e.focus > 0 && now + e.focus * 60_000 > state.focusUntil
+  if (!wantsHp && !wantsSp && !wantsStamina && !extendsWarmth && !extendsFocus) return reject(food ? "NOTHING_TO_GAIN" : e.sp && !e.hp ? "SP_FULL" : "HP_FULL")
   if (!bag) return reject("NOT_OWNED")
   const hp = Math.min(d.maxHp, state.hp + e.hp)
   const sp = Math.min(d.maxSp, state.sp + e.sp)
