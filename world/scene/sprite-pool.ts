@@ -30,33 +30,67 @@ const idle: Worker[] = []
 const failedUntil = new Map<string, number>()
 const FRAME_RETRY_MS = 5000
 const FAILED_FRAMES = 512
-let workers: Worker[] | null = null
+const workers = new Set<Worker>()
+const assigned = new Map<Worker, Pending>()
+let started = false
 /** grows every animation frame, so fresh requests outrank stale ones */
 let clock = 0
 
 function start() {
-  if (workers) return
+  if (started) return
+  started = true
   const n = Math.max(1, Math.min(4, (navigator.hardwareConcurrency || 4) - 1))
-  workers = Array.from({ length: n }, () => {
-    const w = new Worker(new URL("./sprite.worker.ts", import.meta.url), { type: "module" })
-    w.onmessage = (event: MessageEvent<FrameResult>) => {
-      const result = event.data
-      if ("failed" in result) {
-        running.delete(result.key)
-        failedUntil.delete(result.key)
-        failedUntil.set(result.key, performance.now() + FRAME_RETRY_MS)
-        if (failedUntil.size > FAILED_FRAMES) failedUntil.delete(failedUntil.keys().next().value!)
-      } else {
-        const { key, bitmap, png } = result
-        finish(key, bitmap)
-        if (png) void cacheWrites.run(() => store(key, png), undefined)
-      }
-      idle.push(w)
-      pump()
+  for (let i = 0; i < n; i++) spawnWorker()
+}
+
+function failFrame(key: string) {
+  running.delete(key)
+  failedUntil.delete(key)
+  failedUntil.set(key, performance.now() + FRAME_RETRY_MS)
+  if (failedUntil.size > FAILED_FRAMES) failedUntil.delete(failedUntil.keys().next().value!)
+}
+
+/** Each lost slot schedules one replacement, even if several error events arrive. */
+function retireWorker(worker: Worker) {
+  if (!workers.delete(worker)) return
+  const index = idle.indexOf(worker)
+  if (index !== -1) idle.splice(index, 1)
+  const job = assigned.get(worker)
+  assigned.delete(worker)
+  if (job) failFrame(job.job.key)
+  worker.terminate()
+  setTimeout(spawnWorker, FRAME_RETRY_MS)
+}
+
+function spawnWorker() {
+  let worker: Worker
+  try {
+    worker = new Worker(new URL("./sprite.worker.ts", import.meta.url), { type: "module" })
+  } catch {
+    setTimeout(spawnWorker, FRAME_RETRY_MS)
+    return
+  }
+  workers.add(worker)
+  worker.onerror = () => retireWorker(worker)
+  worker.onmessageerror = () => retireWorker(worker)
+  worker.onmessage = (event: MessageEvent<FrameResult>) => {
+    const result = event.data
+    if (!workers.has(worker) || assigned.get(worker)?.job.key !== result.key) {
+      if (!("failed" in result)) result.bitmap.close()
+      return
     }
-    return w
-  })
-  idle.push(...workers)
+    assigned.delete(worker)
+    if ("failed" in result) failFrame(result.key)
+    else {
+      const { key, bitmap, png } = result
+      finish(key, bitmap)
+      if (png) void cacheWrites.run(() => store(key, png), undefined)
+    }
+    idle.push(worker)
+    pump()
+  }
+  idle.push(worker)
+  pump()
 }
 
 function finish(key: string, bitmap: ImageBitmap) {
@@ -75,6 +109,7 @@ function pump() {
     pending.delete(p.job.key)
     running.set(p.job.key, p)
     const worker = idle.pop()!
+    assigned.set(worker, p)
     void cacheReads
       .run(
         () => load(p.job.key),
@@ -82,11 +117,23 @@ function pump() {
         (bitmap) => bitmap?.close(),
       )
       .then((bitmap) => {
+        // The worker may have failed while its cache read was pending.
+        if (assigned.get(worker) !== p) {
+          bitmap?.close()
+          return
+        }
         if (bitmap) {
+          assigned.delete(worker)
           idle.push(worker)
           finish(p.job.key, bitmap)
           pump()
-        } else worker.postMessage(p.job)
+        } else {
+          try {
+            worker.postMessage(p.job)
+          } catch {
+            retireWorker(worker)
+          }
+        }
       })
   }
 }
