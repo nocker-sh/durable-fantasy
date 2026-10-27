@@ -6,6 +6,9 @@ import { ITEMS } from "../../core/items.ts"
 import type { Ctx, Handlers, Message } from "./context.ts"
 import { type TradeSide, presence, setTrade, showTrade, reachable, near } from "./presence.ts"
 
+/** A connection can start a later trade with the same partner while an earlier handler awaits RPC. */
+const sameTrade = (a: TradeSide | undefined, b: TradeSide | undefined) => !!a && !!b && a.session === b.session && a.with === b.with
+
 async function tradeAsk(roomCtx: Ctx, message: Message<"trade-ask">) {
   const { ctx, me, save } = roomCtx
   const them = ctx.room.getConnection(message.target)
@@ -95,10 +98,24 @@ async function tradeOffer(roomCtx: Ctx, message: Message<"trade-offer">) {
 }
 
 async function tradeLockOrTradeGo(roomCtx: Ctx, message: Message<"trade-lock" | "trade-go">) {
-  const { ctx, me, save } = roomCtx
+  const { ctx, save } = roomCtx
+  const me = presence(ctx.connection)
+  if (!sameTrade(me.trade, roomCtx.me.trade)) return
   const them = me.trade?.open ? ctx.room.getConnection(me.trade.with) : undefined
   const other = them && presence(them)
-  if (!me.owner || !me.trade || !them || !other?.trade || !other.owner || me.owner === other.owner || other.trade.with !== ctx.connection.id || me.trade.settling || other.trade.settling) return
+  if (
+    !me.owner ||
+    !me.trade ||
+    !them ||
+    !other?.trade ||
+    !other.owner ||
+    me.owner === other.owner ||
+    other.trade.with !== ctx.connection.id ||
+    other.trade.session !== me.trade.session ||
+    me.trade.settling ||
+    other.trade.settling
+  )
+    return
   if (message.type === "trade-lock") save({ trade: { ...me.trade, locked: true } })
   else if (me.trade.locked && other.trade.locked) save({ trade: { ...me.trade, done: true } })
   const mine = presence(ctx.connection).trade!
@@ -112,9 +129,16 @@ async function tradeLockOrTradeGo(roomCtx: Ctx, message: Message<"trade-lock" | 
   const pa = Player.get(me.owner),
     pb = Player.get(other.owner)
   const finish = async (reason: string | null) => {
-    save({ trade: undefined })
-    if (presence(them).trade?.with === ctx.connection.id) setTrade(them, undefined)
-    await Promise.allSettled([ctx.connection.send({ type: "trade-closed", reason: reason ?? "DONE" }), them.send({ type: "trade-closed", reason: reason ?? "DONE" })])
+    const notify: Promise<void>[] = []
+    if (sameTrade(presence(ctx.connection).trade, mine)) {
+      save({ trade: undefined })
+      notify.push(ctx.connection.send({ type: "trade-closed", reason: reason ?? "DONE" }))
+    }
+    if (sameTrade(presence(them).trade, other.trade)) {
+      setTrade(them, undefined)
+      notify.push(them.send({ type: "trade-closed", reason: reason ?? "DONE" }))
+    }
+    await Promise.allSettled(notify)
   }
   let mayBePending = false
   try {
@@ -150,11 +174,12 @@ async function tradeLockOrTradeGo(roomCtx: Ctx, message: Message<"trade-lock" | 
 }
 
 async function tradeCancel(roomCtx: Ctx, _message: Message<"trade-cancel">) {
-  const { ctx, me, save } = roomCtx
-  if (me.trade?.settling) return
+  const { ctx, save } = roomCtx
+  const me = presence(ctx.connection)
+  if (!sameTrade(me.trade, roomCtx.me.trade) || me.trade?.settling) return
   const them = me.trade ? ctx.room.getConnection(me.trade.with) : undefined
   save({ trade: undefined })
-  if (them && presence(them).trade?.with === ctx.connection.id) {
+  if (them && presence(them).trade?.with === ctx.connection.id && presence(them).trade?.session === me.trade?.session) {
     setTrade(them, undefined)
     await them.send({ type: "trade-closed", reason: "CANCELLED" })
   }

@@ -7,7 +7,7 @@ import { bagWith, player } from "../../test/helpers.ts"
 import { mapPlayer } from "./presence.ts"
 
 const read = vi.hoisted(() => vi.fn())
-vi.mock("../../../durable-objects/player.ts", () => ({ Player: { get: () => ({ read }) } }))
+vi.mock("../../../durable-objects/player.ts", () => ({ Player: { get: () => ({ read, tradeStatus: async () => null, beginTrade: async () => ({ ok: false, reason: "NOT_READY" }) }) } }))
 import { HANDLERS } from "./trade.ts"
 afterEach(() => read.mockReset())
 
@@ -26,15 +26,13 @@ function socket(id: string, withId: string) {
 function fixture() {
   const me = socket("me", "peer"),
     peer = socket("peer", "me")
-  const offer = (count = 1) =>
-    HANDLERS["trade-offer"]!(
-      {
-        ctx: { connection: me, room: { getConnection: () => peer } },
-        me: me.state,
-        save: (patch: Partial<Presence>) => me.setState({ ...me.state, ...patch }),
-      } as unknown as Ctx,
-      { type: "trade-offer", lots: [{ slot: 0, count }], gold: 0 },
-    )
+  const context = (snapshot = me.state) =>
+    ({
+      ctx: { connection: me, room: { getConnection: () => peer } },
+      me: snapshot,
+      save: (patch: Partial<Presence>) => me.setState({ ...me.state, ...patch }),
+    }) as unknown as Ctx
+  const offer = (count = 1) => HANDLERS["trade-offer"]!(context(), { type: "trade-offer", lots: [{ slot: 0, count }], gold: 0 })
   const pending = () => {
     let resolve!: (value: ReturnType<typeof player>) => void
     const promise = new Promise<ReturnType<typeof player>>((done) => {
@@ -43,7 +41,7 @@ function fixture() {
     read.mockReturnValueOnce(promise)
     return () => resolve(player({ bag: bagWith(["herb", 5]) }))
   }
-  return { me, peer, offer, pending }
+  return { me, peer, offer, pending, context }
 }
 
 it("publishes the inventory snapshot and resets both confirmations", async () => {
@@ -107,4 +105,64 @@ it("does not unsettle a different partner's trade", async () => {
   await work
   expect(f.peer.state.trade).toEqual(before)
   expect(f.me.send).not.toHaveBeenCalled()
+})
+
+it.each(["trade-lock", "trade-go", "trade-cancel"] as const)("ignores a delayed %s for a previous trade with the same partner", async (type) => {
+  const f = fixture()
+  const previous = structuredClone(f.me.state)
+  f.me.state.trade = { ...side("peer", "new"), locked: true }
+  f.peer.state.trade = { ...side("me", "new"), locked: true }
+  const before = structuredClone([f.me.state, f.peer.state])
+  if (type === "trade-cancel") await HANDLERS["trade-cancel"]!(f.context(previous), { type })
+  else if (type === "trade-go") await HANDLERS["trade-go"]!(f.context(previous), { type })
+  else await HANDLERS["trade-lock"]!(f.context(previous), { type })
+  expect([f.me.state, f.peer.state]).toEqual(before)
+  expect(f.me.send).not.toHaveBeenCalled()
+  expect(f.peer.send).not.toHaveBeenCalled()
+  expect(read).not.toHaveBeenCalled()
+})
+
+it("uses the current offer flags when a delayed exchange follows an offer change", async () => {
+  const f = fixture()
+  const previous = { ...f.me.state, trade: { ...f.me.state.trade!, locked: true } }
+  f.peer.state.trade!.locked = true
+  await HANDLERS["trade-go"]!(f.context(previous), { type: "trade-go" })
+  expect(f.me.state.trade?.done).toBe(false)
+  expect(read).not.toHaveBeenCalled()
+})
+
+it("does not cancel a settlement that started while ownership was being checked", async () => {
+  const f = fixture()
+  const previous = structuredClone(f.me.state)
+  f.me.state.trade!.settling = true
+  await HANDLERS["trade-cancel"]!(f.context(previous), { type: "trade-cancel" })
+  expect(f.me.state.trade?.settling).toBe(true)
+  expect(f.peer.state.trade).toBeDefined()
+  expect(f.me.send).not.toHaveBeenCalled()
+})
+
+it("still cancels both sides of the current trade", async () => {
+  const f = fixture()
+  await HANDLERS["trade-cancel"]!(f.context(), { type: "trade-cancel" })
+  expect(f.me.state.trade).toBeUndefined()
+  expect(f.peer.state.trade).toBeUndefined()
+  for (const connection of [f.me, f.peer]) expect(connection.send).toHaveBeenCalledWith({ type: "trade-closed", reason: "CANCELLED" })
+})
+
+it("does not close a newer trade when an earlier settlement finishes awaiting inventory", async () => {
+  const f = fixture()
+  f.me.state.trade!.locked = true
+  f.peer.state.trade = { ...f.peer.state.trade!, locked: true, done: true }
+  const first = f.pending(),
+    second = f.pending()
+  const work = HANDLERS["trade-go"]!(f.context(), { type: "trade-go" })
+  f.me.state.trade = side("peer", "new")
+  f.peer.state.trade = side("me", "new")
+  const before = structuredClone([f.me.state, f.peer.state])
+  first()
+  second()
+  await work
+  expect([f.me.state, f.peer.state]).toEqual(before)
+  expect(f.me.send).not.toHaveBeenCalled()
+  expect(f.peer.send).not.toHaveBeenCalled()
 })
