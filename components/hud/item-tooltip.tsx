@@ -1,6 +1,7 @@
 // What an item is (ui.md §6.5), shown on hover wherever an item appears.
 import type { ReactElement, ReactNode } from "react"
 import { usePlayerIfAny } from "#/components/game/context.tsx"
+import { fullDurability } from "#/world/core/bag.ts"
 import { artsOf, skillOf } from "#/world/core/skills.ts"
 import { equipmentDefense, standing } from "#/world/core/stats.ts"
 import { GATHER_SKILL_NAME, ITEMS, KIND_NAME, QUALITIES, QUALITY_PRICE, RARITY_NAME, sellPrice, sellable, type ItemId, type Quality } from "#/world/core/items.ts"
@@ -22,7 +23,7 @@ export function ItemTooltip({
   open,
 }: {
   item: ItemId | null | undefined
-  /** a made thing's quality and maker */ mark?: { q?: Quality; by?: string } | null
+  /** a made thing's quality and maker */ mark?: { q?: Quality; by?: string; dur?: number } | null
   children: ReactElement
   hint?: ReactNode
   side?: "top" | "right" | "left" | "bottom"
@@ -90,6 +91,12 @@ export function ItemTooltip({
               <dd className="text-right">+{fx.full}</dd>
             </>
           ) : null}
+          {d.tool && (
+            <>
+              <dt className="text-text-dim">{mark?.dur === undefined ? "耐久（新品）" : "残り耐久"}</dt>
+              <dd className="text-right">{mark?.dur === undefined ? fullDurability(item, q) : `${mark.dur} / ${fullDurability(item, q)}`}</dd>
+            </>
+          )}
           {e?.atk ? (
             <>
               <dt className="text-text-dim">攻撃力</dt>

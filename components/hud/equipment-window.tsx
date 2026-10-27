@@ -1,12 +1,14 @@
 // What is worn (ui.md §3.8): seven slots around the figure. Drag from the bag onto a slot to wear
 // it, double-click a slot (or drag it back to the bag) to take it off.
 import { useState, type DragEvent } from "react"
-import { ITEMS, SLOT_NAME, slotsFor, type Slot as SlotId } from "#/world/core/items.ts"
+import { ITEMS, SLOTS, SLOT_NAME, slotsFor, type Slot as SlotId } from "#/world/core/items.ts"
 import { useGame, useGameState } from "#/components/game/context.tsx"
 import { Slot } from "#/components/game/slot.tsx"
 import { Window } from "#/components/game/window.tsx"
 import { uiIconUrl } from "#/world/art/icons.ts"
 import type { SpriteName } from "#/world/art/pixel-art.ts"
+import { equipmentDefense } from "#/world/core/stats.ts"
+import { displayName } from "#/world/core/makers.ts"
 import { ItemTooltip } from "./item-tooltip.tsx"
 import { carriesItem, readDrag, startDrag } from "./drag.ts"
 import { useWindow } from "./use-window.ts"
@@ -25,7 +27,10 @@ export function EquipmentWindow() {
   const portrait = useGameState((s) => s.portrait)
   if (!win.open || !player || !derived) return null
   const gearAtk = Object.values(player.equipment).reduce((n, id) => n + (id ? (ITEMS[id].equip?.atk ?? 0) : 0), 0)
-  const gearDef = Object.values(player.equipment).reduce((n, id) => n + (id ? (ITEMS[id].equip?.def ?? 0) : 0), 0)
+  const gearDef = SLOTS.reduce((n, slot) => {
+    const item = player.equipment[slot]
+    return n + (item ? equipmentDefense(item, player.worn[slot]?.q) : 0)
+  }, 0)
   return (
     <Window
       id="equipment"
@@ -78,6 +83,7 @@ export function EquipmentWindow() {
 function Worn({ slot }: { slot: SlotId }) {
   const game = useGame()
   const item = useGameState((s) => s.player?.equipment[slot] ?? null)
+  const mark = useGameState((s) => s.player?.worn[slot])
   const [over, setOver] = useState(false)
   const drop = (event: DragEvent) => {
     event.preventDefault()
@@ -86,17 +92,17 @@ function Worn({ slot }: { slot: SlotId }) {
     if (drag && "slot" in drag && slotsFor(drag.item).includes(slot)) game.equip(drag.slot, slot)
   }
   return (
-    <ItemTooltip item={item} side="left" hint="ダブルクリックで外す">
+    <ItemTooltip item={item} mark={mark} side="left" hint="ダブルクリックで外す">
       <Slot
-        icon={item ? game.iconUrl(item) : null}
+        icon={item ? game.iconUrl(item, mark?.by) : null}
         rarity={item ? ITEMS[item].rarity : undefined}
         emptyIcon={uiIconUrl(EMPTY[slot], 32, true)}
         over={over}
         draggable={!!item}
-        aria-label={`${SLOT_NAME[slot]}: ${item ? ITEMS[item].name : "なし"}`}
+        aria-label={`${SLOT_NAME[slot]}: ${item ? displayName(item, mark?.by) : "なし"}`}
         title={item ? undefined : SLOT_NAME[slot]}
         onDoubleClick={() => item && game.unequip(slot)}
-        onDragStart={(e) => item && startDrag(e, { item, worn: slot }, game.iconUrl(item))}
+        onDragStart={(e) => item && startDrag(e, { item, worn: slot }, game.iconUrl(item, mark?.by))}
         onDragOver={(e) => {
           if (!carriesItem(e)) return
           e.preventDefault()
