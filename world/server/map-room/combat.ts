@@ -20,6 +20,10 @@ async function attack(roomCtx: Ctx, message: Message<"attack">) {
   if (!spawn || spawn.map !== key.map) return
   const now = Date.now()
   let data = await Player.get(me.owner).read()
+  if (data.hp <= 0) {
+    await ctx.connection.send({ type: "refused", what: "attack", reason: "FALLEN" })
+    return
+  }
   const d = derive(data)
   const art = message.art ? skillOf(message.art) : null
   if (art && (!isArt(art) || art.kind === "prayer")) return

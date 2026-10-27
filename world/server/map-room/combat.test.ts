@@ -48,3 +48,34 @@ it.each(["hunter", "other"])("does not broadcast a blow or retaliate when %s att
   expect(calls.run).not.toHaveBeenCalled()
   expect(beaten.state.back[spawn.id]).toBe(999 + MONSTER_KINDS[spawn.kind].respawn * 1000)
 })
+
+it.each([
+  ["normal", undefined],
+  ["lunge", "lunge"],
+] as const)("rejects %s attacks from persisted zero HP even before presence marks the player down", async (_label, art) => {
+  const spawn = SPAWNS.find((s) => s.kind === "slime")!
+  const at = monsterAt(spawn, Date.now(), () => true)
+  const cell: [number, number] = [Math.floor(at.x * 2), Math.floor(at.z * 2)]
+  const alive = player()
+  calls.read.mockResolvedValue({ ...alive, hp: 0 })
+  calls.strike.mockResolvedValue({ refused: true, reason: "TARGET_GONE" })
+  const send = vi.fn(async () => {})
+  const broadcast = vi.fn(async () => {})
+  const save = vi.fn()
+  const standUp = vi.fn(async () => {})
+  const context = {
+    ctx: { params: { mapId: "field" }, connection: { send }, room: { broadcast } },
+    key: { map: spawn.map },
+    map: {},
+    me: { owner: "hunter", player: mapPlayer("connection", alive, cell), route: [cell], since: Date.now(), down: false },
+    save,
+    standUp,
+  } as unknown as Ctx
+  await HANDLERS.attack!(context, { type: "attack", monster: spawn.id, ...(art ? { art } : {}) })
+  expect(calls.strike).not.toHaveBeenCalled()
+  expect(calls.run).not.toHaveBeenCalled()
+  expect(broadcast).not.toHaveBeenCalled()
+  expect(save).not.toHaveBeenCalled()
+  expect(standUp).not.toHaveBeenCalled()
+  expect(send).toHaveBeenCalledWith({ type: "refused", what: "attack", reason: "FALLEN" })
+})
