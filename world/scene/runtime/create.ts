@@ -634,6 +634,9 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
     },
     approach,
     stop,
+    stopFight(id: string) {
+      if (action.fighting === id) stop()
+    },
     placePlayer,
     faceResident,
     setLayer,

@@ -43,7 +43,7 @@ it.each(["hunter", "other"])("does not broadcast a blow or retaliate when %s att
   } as unknown as Ctx
   await HANDLERS.attack!(context, { type: "attack", monster: spawn.id })
   expect(calls.strike).toHaveBeenCalledOnce()
-  expect(send).toHaveBeenCalledWith({ type: "refused", what: "attack", reason: "TARGET_GONE" })
+  expect(send).toHaveBeenCalledWith({ type: "refused", what: "attack", monster: spawn.id, reason: "TARGET_GONE" })
   expect(broadcast).not.toHaveBeenCalled()
   expect(calls.run).not.toHaveBeenCalled()
   expect(beaten.state.back[spawn.id]).toBe(999 + MONSTER_KINDS[spawn.kind].respawn * 1000)
@@ -77,7 +77,7 @@ it.each([
   expect(broadcast).not.toHaveBeenCalled()
   expect(save).not.toHaveBeenCalled()
   expect(standUp).not.toHaveBeenCalled()
-  expect(send).toHaveBeenCalledWith({ type: "refused", what: "attack", reason: "FALLEN" })
+  expect(send).toHaveBeenCalledWith({ type: "refused", what: "attack", monster: spawn.id, reason: "FALLEN" })
 })
 
 it("persists retaliation even if the attack broadcast and result delivery fail", async () => {

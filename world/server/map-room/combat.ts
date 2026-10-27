@@ -19,7 +19,7 @@ async function attack(roomCtx: Ctx, message: Message<"attack">) {
   const now = Date.now()
   let data = await Player.get(me.owner).read()
   if (data.hp <= 0) {
-    await notifyClient(ctx.connection.send({ type: "refused", what: "attack", reason: "FALLEN" }))
+    await notifyClient(ctx.connection.send({ type: "refused", what: "attack", monster: spawn.id, reason: "FALLEN" }))
     return
   }
   const d = derive(data)
@@ -28,7 +28,7 @@ async function attack(roomCtx: Ctx, message: Message<"attack">) {
   // not faster than their attack delay allows (a little slack for the network); an art keeps its own wait
   if (!art && me.struck && now - me.struck < d.attackDelay * 0.85) return
   if (data.stamina < FIGHT_STAMINA) {
-    await notifyClient(ctx.connection.send({ type: "refused", what: "attack", reason: "EXHAUSTED" }))
+    await notifyClient(ctx.connection.send({ type: "refused", what: "attack", monster: spawn.id, reason: "EXHAUSTED" }))
     return
   }
   const at = monsterAt(spawn, now, (x, z) => walkable(map, [Math.floor(x * 2), Math.floor(z * 2)]))
@@ -45,7 +45,7 @@ async function attack(roomCtx: Ctx, message: Message<"attack">) {
     if (r.payment.ok) data = r.payment.state
   }
   if (r.refused) {
-    await notifyClient(ctx.connection.send({ type: "refused", what: r.payment && !r.payment.ok ? "art" : "attack", reason: r.reason ?? "TAKEN" }))
+    await notifyClient(ctx.connection.send({ type: "refused", what: r.payment && !r.payment.ok ? "art" : "attack", monster: spawn.id, reason: r.reason ?? "TAKEN" }))
     return
   }
   save({ struck: now })

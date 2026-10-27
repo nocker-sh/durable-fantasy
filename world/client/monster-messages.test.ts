@@ -2,6 +2,24 @@ import { expect, it, vi } from "vitest"
 import { ServerMessages } from "./server-messages.ts"
 
 type Context = ConstructorParameters<typeof ServerMessages>[0]
+it("limits a delayed attack refusal to its original creature", () => {
+  const session = {
+    net: { messages: 0, bytes: 0, since: 0 },
+    fighting: { monster: "next", at: 1000 } as { monster: string; at: number } | null,
+  }
+  const stopFight = vi.fn()
+  const stop = vi.fn()
+  const notify = vi.fn()
+  const messages = new ServerMessages({ session, notify, getScene: () => ({ stopFight, stop }) } as unknown as Context)
+  messages.handle({ type: "refused", what: "attack", monster: "previous", reason: "TARGET_GONE" })
+  expect(session.fighting?.monster).toBe("next")
+  expect(stopFight).toHaveBeenCalledExactlyOnceWith("previous")
+  expect(stop).not.toHaveBeenCalled()
+  messages.handle({ type: "refused", what: "attack", monster: "next", reason: "EXHAUSTED" })
+  expect(session.fighting).toBeNull()
+  expect(stopFight).toHaveBeenLastCalledWith("next")
+})
+
 it.each([false, true])("retains monster updates and clears only the defeated target, including without a scene: %s", (visible) => {
   const session = {
     net: { messages: 0, bytes: 0, since: 0 },

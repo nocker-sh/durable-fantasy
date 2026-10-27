@@ -177,7 +177,10 @@ export class ServerMessages {
           return
         }
         if (message.what === "attack") {
-          this.target.getScene()?.stop()
+          if (message.monster) {
+            scene?.stopFight(message.monster)
+            if (this.target.session.fighting?.monster === message.monster) this.target.session.fighting = null
+          }
           this.target.notify(REASON_TEXT[message.reason && message.reason in REASON_TEXT ? (message.reason as Reason) : "EXHAUSTED"], "bad")
           return
         }

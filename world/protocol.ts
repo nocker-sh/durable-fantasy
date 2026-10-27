@@ -222,7 +222,7 @@ export const serverMessage = z.discriminatedUnion("type", [
     /** what it pays now for what you carry */ buys: z.record(z.string(), z.number()).optional(),
   }),
   /** The server turned the last request down (a bad path, too far from a warp…). */
-  z.object({ type: z.literal("refused"), what: z.string(), reason: z.string().optional(), at: cellSchema.optional() }),
+  z.object({ type: z.literal("refused"), what: z.string(), reason: z.string().optional(), monster: z.string().optional(), at: cellSchema.optional() }),
 ])
 export type ServerMessage = z.infer<typeof serverMessage>
 

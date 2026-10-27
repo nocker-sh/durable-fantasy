@@ -92,6 +92,9 @@ export class MapScene {
   stop() {
     this.runtime?.stop()
   }
+  stopFight(id: string) {
+    this.runtime?.stopFight(id)
+  }
   /** The walk grid as built (1 = blocked), for scripts/export-map.ts. */
   walkGrid(): Uint8Array {
     return blocked.slice()
