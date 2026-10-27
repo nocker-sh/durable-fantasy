@@ -95,6 +95,17 @@ export const COMMISSIONS: readonly Commission[] = [
     40,
     60,
   ),
+  c(
+    "irmgard-blue-potions",
+    "イルムガルト",
+    ["blue-potion", 2],
+    [
+      ["blue-herb", 3],
+      ["blue-jelly", 1],
+    ],
+    30,
+    60,
+  ),
   c("rudolf-leather", "ルドルフ", ["tanned-leather", 2], [["raw-hide", 2]], 16, 120),
   c("rudolf-boots", "ルドルフ", ["leather-boots", 1], [["tanned-leather", 1]], 12, 60),
   c("rudolf-armor", "ルドルフ", ["leather-armor", 1], [["tanned-leather", 4]], 70, 180),

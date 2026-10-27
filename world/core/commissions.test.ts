@@ -177,3 +177,28 @@ describe("commissions", () => {
     }
   })
 })
+
+it("commissions SP medicine without alchemy, saves the waiting order, then consumes one bottle", () => {
+  const job = COMMISSIONS.find((job) => job.id === "irmgard-blue-potions")!
+  const start = player({ gold: 200, bag: bag(["blue-herb", 3], ["blue-jelly", 1]) })
+  const ordered = apply(start, { type: "order", commission: job.id, roll: 0.5 }, { now: 1 })
+  if (!ordered.ok) throw Error(ordered.reason)
+  expect(ordered.state.life.alchemy).toBe(0)
+  expect(ordered.state.gold).toBe(170)
+  expect(countItem(ordered.state.bag, "blue-herb")).toBe(0)
+  expect(countItem(ordered.state.bag, "blue-jelly")).toBe(0)
+  const saved = loadPlayer(JSON.parse(JSON.stringify(ordered.state)))
+  const ready = saved.orders[0].readyAt
+  expect(apply(saved, { type: "collect", index: 0 }, { now: ready - 1 })).toEqual({ ok: false, reason: "NOT_READY" })
+  const collected = apply(saved, { type: "collect", index: 0 }, { now: ready })
+  if (!collected.ok) throw Error(collected.reason)
+  const slot = collected.state.bag.findIndex((s) => s?.item === "blue-potion")
+  expect(collected.state.bag[slot]).toEqual({ item: "blue-potion", count: 2, q: 1, by: job.craftsman })
+  const used = apply({ ...collected.state, sp: 0, spAt: ready }, { type: "use", slot }, { now: ready })
+  if (!used.ok) throw Error(used.reason)
+  expect(used.state.sp).toBe(Math.min(40, derive(used.state).maxSp))
+  expect(countItem(used.state.bag, "blue-potion")).toBe(1)
+  expect(apply(used.state, { type: "collect", index: 0 }, { now: ready })).toEqual({ ok: false, reason: "NOT_READY" })
+  const cost = job.fee + job.inputs.reduce((sum, input) => sum + ITEMS[input.item].price * input.count, 0)
+  expect(cost).toBeLessThan(ITEMS["blue-potion"].price * job.output.count)
+})
