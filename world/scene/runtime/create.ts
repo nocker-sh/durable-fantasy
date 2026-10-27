@@ -441,7 +441,6 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
     const elapsed = clock.getDelta()
     const dt = Math.min(0.05, elapsed)
     const t = clock.elapsedTime
-    stepHeld()
     const wasWalking = me.path.length > 0
     stepWalker(me, dt, elapsed)
     if (wasWalking && !me.path.length) {
@@ -453,6 +452,8 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
         else runtime.events?.gatherAt(arrived.id)
       }
     }
+    // A path requested by held input starts now; it must not consume time from the previous frame.
+    stepHeld()
     placeWalker(me)
     for (const w of remotes.values()) {
       stepWalker(w, dt, elapsed)

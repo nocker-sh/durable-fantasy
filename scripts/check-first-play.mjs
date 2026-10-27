@@ -1,11 +1,23 @@
 // Fresh browser: creation draft, saved character, basic UI, chat, resume and exit.
 import { chromium } from "playwright-core"
 import { mkdir } from "node:fs/promises"
+let page
+const refusals = []
 const browser = await chromium.launch({ channel: "chrome", args: ["--disable-http2"] })
 try {
-  const page = await browser.newPage({ ignoreHTTPSErrors: true, viewport: { width: 1280, height: 800 } })
+  page = await browser.newPage({ ignoreHTTPSErrors: true, viewport: { width: 1280, height: 800 } })
   const errors = []
   page.on("pageerror", (e) => errors.push(e.message))
+  page.on("websocket", (socket) => {
+    socket.on("framereceived", ({ payload }) => {
+      try {
+        const message = JSON.parse(String(payload))
+        if (message.type === "refused") refusals.push({ what: message.what, reason: message.reason, at: message.at })
+      } catch {
+        // Non-JSON frames carry no game command diagnostics.
+      }
+    })
+  })
   await page.goto(process.env.BASE ?? "https://durable-fantasy.localhost")
   await page.getByRole("dialog", { name: "キャラクターを作る" }).waitFor({ timeout: 180000 })
   await page.waitForFunction(() => window.game?.state.get().loading === null, null, { timeout: 180000 })
@@ -59,6 +71,19 @@ try {
   await page.getByRole("button", { name: "町に戻る", exact: true }).waitFor()
   console.log("left successfully")
   if (errors.length) throw Error(errors.join("\n"))
+} catch (error) {
+  console.error("first-play failure", {
+    refusals,
+    state: await page
+      ?.evaluate(() => ({
+        player: window.game?.scene?.player(),
+        online: window.game?.state.get().online,
+        profileComplete: window.game?.state.get().player?.profileComplete,
+        dialogue: window.game?.state.get().dialogue?.name,
+      }))
+      .catch(() => null),
+  })
+  throw error
 } finally {
   await browser.close()
 }
