@@ -234,6 +234,7 @@ export class Figure {
     rel = ((rel % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2)
     const v = Math.round(rel / (Math.PI / 4)) % 8
     this.root.getWorldPosition(tmpV)
+    const { x, y, z } = tmpV
     const dist = tmpV.distanceTo(view.cam)
     tmpV.y += this.height * 0.5
     const seen = view.frustum.containsPoint(tmpV)
@@ -280,8 +281,7 @@ export class Figure {
     }
     m.color.copy(view.tint)
     // face the camera around y only; stretch so the foreshortened card shows the sprite at full height
-    this.root.getWorldPosition(tmpV)
-    tmpV.subVectors(view.cam, tmpV)
+    tmpV.set(view.cam.x - x, view.cam.y - y, view.cam.z - z)
     const hd = Math.hypot(tmpV.x, tmpV.z) || 1
     this.sprite.rotation.y = Math.atan2(tmpV.x, tmpV.z) - this.root.rotation.y
     this.sprite.scale.y = Math.min(2.5, Math.hypot(hd, tmpV.y) / hd)

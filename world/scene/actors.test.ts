@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
 import * as THREE from "three"
-import { Figure } from "./actors"
+import { Figure, view } from "./actors"
 import { bakedStrip, spriteFrame } from "./sprite-pool"
 
 vi.mock("./sprite-pool", () => ({
@@ -97,4 +97,41 @@ describe("figure resource lifetime", () => {
     expect(spriteFrame).toHaveBeenCalledTimes(1)
     figure.dispose()
   })
+})
+
+it("samples a nested figure's world position once per refresh while following parent movement", () => {
+  canvasDocument()
+  const figure = new Figure(look, { item: null, url: (_anim, v) => `pose-${v}.png` })
+  figure.prefetch("idle", null)
+  for (const call of vi.mocked(bakedStrip).mock.calls) call[2]!({} as ImageBitmap)
+  const parent = new THREE.Group()
+  parent.position.set(5, 2, -3)
+  parent.rotation.y = 0.4
+  parent.scale.setScalar(1.5)
+  parent.add(figure.root)
+  figure.root.position.set(2, 1, 4)
+  figure.root.rotation.y = 0.3
+  const camera = view.cam.clone()
+  view.cam.set(12, 10, 14)
+  const position = vi.spyOn(figure.root, "getWorldPosition")
+  try {
+    for (let frame = 0; frame < 3; frame++) {
+      parent.position.x += 1
+      parent.updateMatrixWorld(true)
+      const at = new THREE.Vector3().setFromMatrixPosition(figure.root.matrixWorld)
+      const delta = view.cam.clone().sub(at)
+      const horizontal = Math.hypot(delta.x, delta.z)
+      figure.refresh()
+      expect(position).toHaveBeenCalledTimes(frame + 1)
+      expect(figure.sprite.visible).toBe(true)
+      expect(figure.sprite.rotation.y).toBeCloseTo(Math.atan2(delta.x, delta.z) - figure.root.rotation.y)
+      expect(figure.sprite.scale.y).toBeCloseTo(Math.min(2.5, Math.hypot(horizontal, delta.y) / horizontal))
+      expect(figure.sprite.position.x).toBeCloseTo((delta.x / horizontal) * 0.12)
+      expect(figure.sprite.position.z).toBeCloseTo((delta.z / horizontal) * 0.12)
+    }
+  } finally {
+    view.cam.copy(camera)
+    position.mockRestore()
+    figure.dispose()
+  }
 })
