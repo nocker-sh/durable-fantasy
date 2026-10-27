@@ -1,4 +1,5 @@
 import type * as THREE from "three"
+import { PathFollower } from "../../../lib/engine/path-follower"
 import { walkH } from "../world"
 import { ANIM_DUR, type Anim, type Look } from "../figure"
 import { Figure } from "../actors"
@@ -117,7 +118,8 @@ export function createWalkers(scene: THREE.Scene, onPickPlayer: (id: string) => 
   /** what the player is doing with their hands for a moment (chopping, picking, fishing) */
   let action: { anim: Anim; until: number } | null = null
   /** Step along the path from cell centre to cell centre; returns true while walking. */
-  function stepWalker(w: Walker, dt: number) {
+  const follower = new PathFollower(STEP_SPEED)
+  function stepWalker(w: Walker, dt: number, elapsed = dt) {
     if (!w.path.length && w === me && action && performance.now() < action.until) {
       w.t += (dt * Math.PI * 2) / ANIM_DUR[action.anim]
       w.fig.pose(action.anim, w.t)
@@ -128,17 +130,9 @@ export function createWalkers(scene: THREE.Scene, onPickPlayer: (id: string) => 
       w.fig.pose("idle", w.t)
       return false
     }
-    const [tx, tz] = w.path[0]
-    const dx = tx - w.pos[0],
-      dz = tz - w.pos[1],
-      d = Math.hypot(dx, dz),
-      sp = STEP_SPEED * dt
-    if (d <= sp) {
-      w.pos = [tx, tz]
-      w.path.shift()
-    } else w.pos = [w.pos[0] + (dx / d) * sp, w.pos[1] + (dz / d) * sp]
-    if (d > 1e-4) {
-      let diff = Math.atan2(dx, dz) - w.head
+    const heading = follower.advance(w, elapsed)
+    if (heading !== null) {
+      let diff = heading - w.head
       while (diff > Math.PI) diff -= Math.PI * 2
       while (diff < -Math.PI) diff += Math.PI * 2
       w.head += diff * Math.min(1, dt * 14)

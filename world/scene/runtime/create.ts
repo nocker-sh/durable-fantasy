@@ -438,11 +438,12 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
       shadowDirty = false
       shadowAt = at
     }
-    const dt = Math.min(0.05, clock.getDelta())
+    const elapsed = clock.getDelta()
+    const dt = Math.min(0.05, elapsed)
     const t = clock.elapsedTime
     stepHeld()
     const wasWalking = me.path.length > 0
-    stepWalker(me, dt)
+    stepWalker(me, dt, elapsed)
     if (wasWalking && !me.path.length) {
       marker.visible = false
       const arrived = action.arrive()
@@ -454,7 +455,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
     }
     placeWalker(me)
     for (const w of remotes.values()) {
-      stepWalker(w, dt)
+      stepWalker(w, dt, elapsed)
       placeWalker(w)
     }
     marker.scale.setScalar(1 + Math.sin(t * 6) * 0.1)
