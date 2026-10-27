@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { apply } from "./apply.ts"
-import { CLAIM_MS, MONSTER_KINDS, SPAWNS, dropsOf, monsterAt } from "./monsters.ts"
+import { CLAIM_MS, MONSTER_KINDS, SPAWNS, dropsOf, monsterAt, spawnOf, spawnsOn } from "./monsters.ts"
 import { emptyWild, fighting, hit, hpOf } from "./wild.ts"
 import { MAPS, walkable } from "../maps/index.ts"
 import { player } from "../test/helpers.ts"
@@ -11,6 +11,18 @@ import { expToNext } from "./growth.ts"
 const slime = SPAWNS.find((s) => s.kind === "slime")!
 
 describe("the creatures outside town", () => {
+  it("preserves every map's population and definition order through indexed lookups", () => {
+    for (const map of Object.keys(MAPS)) {
+      const expected = SPAWNS.filter((spawn) => spawn.map === map)
+      expect(spawnsOn(map)).toEqual(expected)
+      expect(spawnsOn(map)).toBe(spawnsOn(map))
+      for (const spawn of expected) expect(spawnOf(spawn.id)).toBe(spawn)
+    }
+    expect(spawnsOn("unknown-map")).toEqual([])
+    expect(spawnOf("unknown-creature")).toBeUndefined()
+    expect(spawnOf("constructor")).toBeUndefined()
+  })
+
   it("wander within their area, on free ground, the same for everyone at the same moment", () => {
     const map = MAPS[slime.map]
     const free = (x: number, z: number) => walkable(map, [Math.floor(x * 2), Math.floor(z * 2)])

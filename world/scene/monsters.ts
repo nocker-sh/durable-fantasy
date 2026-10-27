@@ -2,7 +2,7 @@
 // rest to rest; what the server says of their hurts shows as a little bar, blows as numbers that
 // float up, and a beaten slime bursts into little ones that scatter.
 import type * as THREE from "three"
-import { MONSTER_KINDS, SPAWNS, MonsterMotion, type Spawn } from "../core/monsters.ts"
+import { MONSTER_KINDS, spawnsOn, MonsterMotion, type Spawn } from "../core/monsters.ts"
 import { hareBody, slimeBody } from "./fields"
 import { isFree, walkH, type V2 } from "./world"
 
@@ -23,7 +23,7 @@ export interface MonsterView {
 }
 
 export function makeMonsters(root: THREE.Group, map: string): MonsterView[] {
-  return SPAWNS.filter((s) => s.map === map).map((spawn) => {
+  return spawnsOn(map).map((spawn) => {
     const kind = MONSTER_KINDS[spawn.kind]
     const body = kind.look === "slime" ? slimeBody(kind.color ?? 0x8ac06a) : hareBody(kind.color)
     body.scale.setScalar(kind.size ?? 1)

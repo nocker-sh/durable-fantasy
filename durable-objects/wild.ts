@@ -2,7 +2,7 @@
 // two players striking the same slime take turns and it is beaten once.
 import { defineDurableState } from "void/durable"
 import { emptyWild, hit, hpOf, type WildState } from "#/world/core/wild.ts"
-import { SPAWNS } from "#/world/core/monsters.ts"
+import { spawnsOn } from "#/world/core/monsters.ts"
 import type { SkillId } from "#/world/core/skills.ts"
 import type { Transition } from "#/world/core/apply.ts"
 import { Player } from "./player.ts"
@@ -13,7 +13,7 @@ export const Wild = defineDurableState({
     /** Every creature on the map: what it has left (0: off recovering) and when it is back. */
     state(context, map: string): Record<string, { hp: number; back: number }> {
       const now = Date.now()
-      return Object.fromEntries(SPAWNS.filter((s) => s.map === map).map((s) => [s.id, { hp: hpOf(context.state.wild, s.id, now), back: context.state.wild.back[s.id] ?? 0 }]))
+      return Object.fromEntries(spawnsOn(map).map((s) => [s.id, { hp: hpOf(context.state.wild, s.id, now), back: context.state.wild.back[s.id] ?? 0 }]))
     },
     /** A blow from a player (0 for a miss); refused while it is someone else's fight. */
     async strike(context, id: string, damage: number, player: string, art?: SkillId) {

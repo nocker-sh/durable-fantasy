@@ -137,7 +137,18 @@ export const SPAWNS: readonly Spawn[] = [
   ...many("deep-forest", "blue-slime", 2, [6, 27, 9, 30]),
 ]
 
-export const spawnOf = (id: string) => SPAWNS.find((s) => s.id === id)
+const spawnsById = new Map(SPAWNS.map((spawn) => [spawn.id, spawn]))
+const spawnsByMap = new Map<string, Spawn[]>()
+const noSpawns: readonly Spawn[] = []
+for (const spawn of SPAWNS) {
+  const group = spawnsByMap.get(spawn.map)
+  if (group) group.push(spawn)
+  else spawnsByMap.set(spawn.map, [spawn])
+}
+
+export const spawnOf = (id: string) => spawnsById.get(id)
+/** Stable definition order; callers must not change the shared map population. */
+export const spawnsOn = (map: string): readonly Spawn[] => spawnsByMap.get(map) ?? noSpawns
 
 /** How far you strike from, in tiles. */
 export const MELEE_REACH = 1.6

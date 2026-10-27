@@ -5,7 +5,7 @@ import { SHOPS, isShopId } from "../../core/shops.ts"
 import { sellable } from "../../core/items.ts"
 import { Market } from "../../../durable-objects/market.ts"
 import { Wild } from "../../../durable-objects/wild.ts"
-import { SPAWNS } from "../../core/monsters.ts"
+import { spawnsOn } from "../../core/monsters.ts"
 import { Nature } from "../../../durable-objects/nature.ts"
 import { Directory } from "../../../durable-objects/directory.ts"
 import { MAPS, TALK_CELLS, isOpen, minutesToClose, npcCell, walkable } from "../../maps/index.ts"
@@ -58,7 +58,7 @@ async function join(roomCtx: Ctx, message: Message<"join">) {
       const them = otherPresence.ready === false ? null : otherPresence.player
       if (them && other.id !== ctx.connection.id) players.push(them)
     }
-    const wild = SPAWNS.some((s) => s.map === key.map)
+    const wild = spawnsOn(key.map).length > 0
     const rest = Promise.all([Nature.get(`town-${key.world}`).left(key.map), wild ? Wild.get(ctx.params.mapId).state(key.map) : null])
     await ctx.connection.send({ type: "snapshot", you: player.id, me: data, players, at })
     const [left, monsters] = await rest
