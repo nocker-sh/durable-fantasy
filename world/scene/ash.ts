@@ -2,6 +2,7 @@
 // player, and a dusting of it on everything that faces the sky — roofs, eaves, sills, the lids of
 // barrels, the rails of fences — thicker on flat tops, broken up so it never looks painted on.
 import * as THREE from "three"
+import { PhaseOscillator } from "../../lib/engine/phase-oscillator"
 
 const ASH = new THREE.Color(0x9c9890)
 
@@ -57,8 +58,12 @@ export function dustAll(root: THREE.Object3D, skip: (o: THREE.Object3D) => boole
 export class Ashfall {
   readonly points: THREE.Points
   private v: Float32Array
+  private readonly driftX: PhaseOscillator
+  private readonly driftZ: PhaseOscillator
   private readonly size = 22
   constructor(count = 1600) {
+    this.driftX = new PhaseOscillator(count, 1)
+    this.driftZ = new PhaseOscillator(count, 1.7)
     const pos = new Float32Array(count * 3)
     this.v = new Float32Array(count)
     for (let i = 0; i < count; i++) {
@@ -80,10 +85,12 @@ export class Ashfall {
     const pos = this.points.geometry.attributes.position as THREE.BufferAttribute
     const a = pos.array as Float32Array,
       h = this.size / 2
+    this.driftX.setTime(t * 0.4)
+    this.driftZ.setTime(t * 0.3)
     for (let i = 0; i < this.v.length; i++) {
       a[i * 3 + 1] -= this.v[i] * dt
-      a[i * 3] += Math.sin(t * 0.4 + i) * 0.08 * dt + 0.05 * dt
-      a[i * 3 + 2] += Math.cos(t * 0.3 + i * 1.7) * 0.06 * dt
+      a[i * 3] += this.driftX.sin(i) * 0.08 * dt + 0.05 * dt
+      a[i * 3 + 2] += this.driftZ.cos(i) * 0.06 * dt
       if (a[i * 3 + 1] < -1) {
         a[i * 3 + 1] = 8 + Math.random()
         a[i * 3] = (Math.random() - 0.5) * this.size
