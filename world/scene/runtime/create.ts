@@ -12,7 +12,7 @@ import * as THREE from "three"
 import { initWalk, walkH, isFree, setLayout } from "../world"
 import { updateCutaways } from "../interior"
 import { REACH } from "../../core/gather.ts"
-import { burst, makeMonsters, standBy, updateMonsterHealth, updateMonsters } from "../monsters"
+import { burst, makeMonsters, approachMonster, updateMonsterHealth, updateMonsters } from "../monsters"
 import { MELEE_REACH, MONSTER_KINDS } from "../../core/monsters.ts"
 import { groundOf } from "../ground"
 import { updaters, occluders, resetRegistries, houseGlows, lamps, stalls, movingObjects, type V2 } from "../build"
@@ -541,8 +541,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
       if (d > MELEE_REACH) {
         if (wall - lastRepath > 600) {
           lastRepath = wall
-          const p = standBy(target, me.pos, MELEE_REACH)
-          if (p) walkTo(p, true)
+          approachMonster(target, me.pos, MELEE_REACH, (point) => walkTo(point, true))
         }
       } else {
         if (me.path.length > 1) {

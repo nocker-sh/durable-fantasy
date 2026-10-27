@@ -119,13 +119,13 @@ export function burst(m: MonsterView, root: THREE.Group, now: number) {
   m.burst = { bits, until: now + 1200 }
 }
 
-/** A free spot within reach of the creature, on the side we come from. */
-export function standBy(m: MonsterView, from: V2, reach: number): V2 | null {
+/** Try reachable positions around the creature, preferring the side we come from. */
+export function approachMonster(m: MonsterView, from: V2, reach: number, tryWalk: (point: V2) => boolean): boolean {
   const ang = Math.atan2(from[1] - m.pos[1], from[0] - m.pos[0])
   for (let k = 0; k < 8; k++) {
     const a = ang + (k % 2 ? 1 : -1) * Math.ceil(k / 2) * (Math.PI / 4)
     const p: V2 = [m.pos[0] + Math.cos(a) * reach * 0.7, m.pos[1] + Math.sin(a) * reach * 0.7]
-    if (isFree(p[0], p[1])) return p
+    if (isFree(p[0], p[1]) && tryWalk(p)) return true
   }
-  return null
+  return false
 }

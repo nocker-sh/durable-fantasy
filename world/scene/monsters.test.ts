@@ -1,6 +1,6 @@
 import { afterEach, expect, it, vi } from "vitest"
 import * as THREE from "three"
-import { burst, updateMonsterHealth, updateMonsters, type MonsterView } from "./monsters"
+import { approachMonster, burst, updateMonsterHealth, updateMonsters, type MonsterView } from "./monsters"
 import * as terrain from "./world"
 import { slimeBody } from "./fields"
 import { SPAWNS, MONSTER_KINDS, MonsterMotion } from "../core/monsters"
@@ -163,4 +163,30 @@ it("skips invisible recovery frames and resumes at the current clock position", 
   expect(monster.pos).toEqual([expected.x, expected.z])
   expect(motion).toHaveBeenCalledWith(now)
   expect(height).toHaveBeenCalledTimes(1)
+})
+
+it("tries another attack position when the first free position has no route", () => {
+  const { monster } = fixture()
+  const walk = vi.fn().mockReturnValueOnce(false).mockReturnValueOnce(true)
+  expect(approachMonster(monster, [25, 30], 1.6, walk)).toBe(true)
+  expect(walk).toHaveBeenCalledTimes(2)
+  const [first, second] = walk.mock.calls.map(([point]) => point)
+  expect(second).not.toEqual(first)
+  for (const point of [first, second]) expect(Math.hypot(point[0] - 30, point[1] - 30)).toBeLessThan(1.6)
+})
+
+it("skips blocked positions without pathfinding and stops after the first accepted route", () => {
+  const { monster } = fixture()
+  const free = vi.spyOn(terrain, "isFree").mockReturnValueOnce(false).mockReturnValue(true)
+  const walk = vi.fn(() => true)
+  expect(approachMonster(monster, [25, 30], 1.6, walk)).toBe(true)
+  expect(free).toHaveBeenCalledTimes(2)
+  expect(walk).toHaveBeenCalledTimes(1)
+})
+
+it("finishes an unsuccessful search without accepting an unreachable position", () => {
+  const { monster } = fixture()
+  const walk = vi.fn(() => false)
+  expect(approachMonster(monster, [25, 30], 1.6, walk)).toBe(false)
+  expect(walk).toHaveBeenCalledTimes(8)
 })
