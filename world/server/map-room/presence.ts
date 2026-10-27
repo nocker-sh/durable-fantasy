@@ -43,6 +43,10 @@ export interface Presence {
 }
 
 export interface TradeSide {
+  /** Shared identity of this accepted invitation, distinct from a later trade with the same person. */
+  session?: string
+  /** Latest offer request; older inventory reads must not overwrite it. */
+  offerVersion?: number
   /** the other player's connection */
   with: string
   /** both have agreed to trade (until then it is only asked) */

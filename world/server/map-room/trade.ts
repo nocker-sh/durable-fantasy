@@ -44,7 +44,8 @@ async function tradeAnswer(roomCtx: Ctx, message: Message<"trade-answer">) {
     if (message.yes && !me.trade?.open) await ctx.connection.send({ type: "trade-closed", reason })
     return
   }
-  const side = (w: string): TradeSide => ({ with: w, open: true, offer: emptyOffer(), shown: [], locked: false, done: false })
+  const session = crypto.randomUUID()
+  const side = (w: string): TradeSide => ({ session, with: w, open: true, offer: emptyOffer(), shown: [], locked: false, done: false })
   // standing to trade: both stop where they are
   save({ trade: side(them.id), route: [reachable(me).at(-1)!], since: Date.now() })
   setTrade(them, side(ctx.connection.id), { route: [reachable(other).at(-1)!], since: Date.now() })
@@ -56,7 +57,28 @@ async function tradeOffer(roomCtx: Ctx, message: Message<"trade-offer">) {
   const { ctx, me, save } = roomCtx
   const them = me.trade?.open ? ctx.room.getConnection(me.trade.with) : undefined
   if (!me.owner || !me.trade || !them || me.trade.locked || me.trade.settling) return
+  const current = presence(ctx.connection).trade
+  if (!current?.open || current.session !== me.trade.session || current.with !== them.id || current.locked || current.settling) return
+  const version = (current.offerVersion ?? 0) + 1
+  save({ trade: { ...current, offerVersion: version } })
   const data = await Player.get(me.owner).read()
+  const mine = presence(ctx.connection)
+  const other = presence(them)
+  if (
+    mine.closed ||
+    other.closed ||
+    !mine.trade?.open ||
+    !other.trade?.open ||
+    mine.trade.session !== current.session ||
+    other.trade.session !== current.session ||
+    mine.trade.with !== them.id ||
+    other.trade.with !== ctx.connection.id ||
+    mine.trade.offerVersion !== version ||
+    mine.trade.locked ||
+    mine.trade.settling ||
+    other.trade.settling
+  )
+    return
   const lots = message.lots.slice(0, TRADE_LOTS)
   const shown: Stack[] = []
   for (const l of lots) {
@@ -66,9 +88,8 @@ async function tradeOffer(roomCtx: Ctx, message: Message<"trade-offer">) {
   }
   if (new Set(lots.map((l) => l.slot)).size !== lots.length || message.gold > data.gold) return
   // a changed offer unsettles both sides
-  save({ trade: { ...me.trade, offer: { lots, gold: message.gold }, shown, locked: false, done: false } })
-  const other = presence(them)
-  if (other.trade) setTrade(them, { ...other.trade, locked: false, done: false })
+  save({ trade: { ...mine.trade, offer: { lots, gold: message.gold }, shown, locked: false, done: false } })
+  setTrade(them, { ...other.trade, locked: false, done: false })
   await showTrade(ctx.connection, them)
   return
 }
