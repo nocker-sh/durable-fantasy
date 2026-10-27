@@ -4,6 +4,8 @@ import { START_STAT, type Stat, type Stats } from "./growth.ts"
 import { lifeLevel, type LifeExp } from "./life.ts"
 
 export interface Derived {
+  /** Equipment bonuses affect potency, but never equipment or art requirements. */
+  stats: Stats
   maxHp: number
   maxSp: number
   atk: number
@@ -58,6 +60,7 @@ export function derive(b: Build): Derived {
   const weapon = b.equipment.weapon ? ITEMS[b.equipment.weapon].equip : undefined
   const { vit, mnd, str, dex } = stats
   return {
+    stats,
     maxHp: 20 + b.level * 3 + vit * 5 + (plus.maxHp ?? 0),
     maxSp: 5 + b.level + mnd * 3 + (plus.maxSp ?? 0),
     atk: 1 + (weapon?.atk ?? 0) + scaling(weapon, stats),

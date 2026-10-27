@@ -47,7 +47,7 @@ async function attack(roomCtx: Ctx, message: Message<"attack">) {
   const kind = MONSTER_KINDS[spawn.kind]
   const them = { atk: 0, def: kind.def, hit: 0, flee: kind.flee, crit: 0 }
   const mine = { atk: d.atk, def: d.def, hit: d.hit, flee: d.flee, crit: d.crit }
-  const blow = art && isArt(art) ? artSwing(art, data.stats, mine, them, Math.random) : swing(mine, them, Math.random)
+  const blow = art && isArt(art) ? artSwing(art, d.stats, mine, them, Math.random) : swing(mine, them, Math.random)
   // the creature is whoever struck it first's to finish (core/wild.ts); a miss still starts the fight
   const r = await Wild.get(ctx.params.mapId).strike(spawn.id, blow.kind === "miss" ? 0 : blow.damage, me.owner)
   if (r.refused) {

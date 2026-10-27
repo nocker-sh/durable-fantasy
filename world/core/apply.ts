@@ -299,10 +299,10 @@ export function apply(before: PlayerState, command: Command | ServerCommand, ctx
         const next = removeItem(bag, "herb", 1)
         if (!next) return reject("NO_HERB")
         bag = next
-        gain = firstAid(lifeLevel(state.life.alchemy), state.stats.vit)
+        gain = firstAid(lifeLevel(state.life.alchemy), d.stats.vit)
       } else {
         const heal = (sk as { heal: { base: number; per: number; stat: keyof PlayerState["stats"] } }).heal
-        gain = Math.floor(heal.base + heal.per * state.stats[heal.stat])
+        gain = Math.floor(heal.base + heal.per * d.stats[heal.stat])
       }
       const hp = Math.min(d.maxHp, state.hp + gain)
       return accept({ ...state, bag, hp, sp: state.sp - sk.sp, ready: { ...state.ready, [command.skill]: now + sk.cooldown } }, { type: "cast", skill: command.skill, hp: hp - state.hp })
