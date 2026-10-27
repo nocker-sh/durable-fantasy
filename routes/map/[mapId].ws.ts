@@ -2,6 +2,7 @@
 // paths against the map's walk grid, checks distances for shops and warps, and runs commands on
 // each player's data through their Player Durable Object. Who is where lives on the connections,
 // so the room keeps nothing once the last player leaves.
+import { notifyClient } from "../../world/server/map-room/notifications.ts"
 import { defineRoom } from "void/ws"
 import { KeyedQueue } from "#/lib/engine/keyed-queue.ts"
 import { Player } from "../../durable-objects/player.ts"
@@ -51,7 +52,8 @@ export default defineRoom({
       const standUp = async () => {
         if (!me.sitting || !me.owner) return
         save({ sitting: false })
-        await ctx.connection.send({ type: "result", seq: -1, result: await Player.get(me.owner).run({ type: "stand" }) })
+        const result = await Player.get(me.owner).run({ type: "stand" })
+        await notifyClient(ctx.connection.send({ type: "result", seq: -1, result }))
       }
       const handle = HANDLERS[message.type] as ((c: Ctx, m: typeof message) => Promise<void>) | undefined
       await handle?.({ ctx, key, map, me, save, standUp, receivedAt }, message)

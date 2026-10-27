@@ -8,6 +8,7 @@ import type { PlayerState } from "../../core/player.ts"
 import type { ServerMessage } from "../../protocol.ts"
 import type { Ctx } from "./context.ts"
 import { presence } from "./presence.ts"
+import { notifyClient } from "./notifications.ts"
 
 export async function awardDefeat(roomCtx: Pick<Ctx, "ctx" | "me">, owner: string, data: Pick<PlayerState, "party" | "level">, monster: string, kind: MonsterKind): Promise<void> {
   const { ctx, me } = roomCtx
@@ -34,9 +35,12 @@ export async function awardDefeat(roomCtx: Pick<Ctx, "ctx" | "me">, owner: strin
     exp = shares.find((x) => x.owner === owner)!.exp
     for (const sh of shares) {
       const m = near.find((x) => x.owner === sh.owner)
-      if (m) await m.conn.send({ type: "result", seq: -1, result: await Player.get(m.owner).run({ type: "share", exp: sh.exp, monster }) })
+      if (m) {
+        const result = await Player.get(m.owner).run({ type: "share", exp: sh.exp, monster })
+        await notifyClient(m.conn.send({ type: "result", seq: -1, result }))
+      }
     }
   }
   const result = await Player.get(owner).run({ type: "loot", monster, exp, items })
-  await ctx.connection.send({ type: "result", seq: -1, result })
+  await notifyClient(ctx.connection.send({ type: "result", seq: -1, result }))
 }

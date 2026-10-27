@@ -9,6 +9,7 @@ import { walkable } from "../../maps/index.ts"
 import type { Ctx, Handlers, Message } from "./context.ts"
 import { reachable } from "./presence.ts"
 import { awardDefeat } from "./combat-rewards.ts"
+import { notifyClient } from "./notifications.ts"
 
 async function attack(roomCtx: Ctx, message: Message<"attack">) {
   const { ctx, key, map, me, save, standUp } = roomCtx
@@ -18,7 +19,7 @@ async function attack(roomCtx: Ctx, message: Message<"attack">) {
   const now = Date.now()
   let data = await Player.get(me.owner).read()
   if (data.hp <= 0) {
-    await ctx.connection.send({ type: "refused", what: "attack", reason: "FALLEN" })
+    await notifyClient(ctx.connection.send({ type: "refused", what: "attack", reason: "FALLEN" }))
     return
   }
   const d = derive(data)
@@ -27,7 +28,7 @@ async function attack(roomCtx: Ctx, message: Message<"attack">) {
   // not faster than their attack delay allows (a little slack for the network); an art keeps its own wait
   if (!art && me.struck && now - me.struck < d.attackDelay * 0.85) return
   if (data.stamina < FIGHT_STAMINA) {
-    await ctx.connection.send({ type: "refused", what: "attack", reason: "EXHAUSTED" })
+    await notifyClient(ctx.connection.send({ type: "refused", what: "attack", reason: "EXHAUSTED" }))
     return
   }
   const at = monsterAt(spawn, now, (x, z) => walkable(map, [Math.floor(x * 2), Math.floor(z * 2)]))
@@ -40,16 +41,16 @@ async function attack(roomCtx: Ctx, message: Message<"attack">) {
   // the creature is whoever struck it first's to finish (core/wild.ts); a miss still starts the fight
   const r = await Wild.get(ctx.params.mapId).strike(spawn.id, blow.kind === "miss" ? 0 : blow.damage, me.owner, message.art)
   if (r.payment) {
-    await ctx.connection.send({ type: "result", seq: -1, result: r.payment })
+    await notifyClient(ctx.connection.send({ type: "result", seq: -1, result: r.payment }))
     if (r.payment.ok) data = r.payment.state
   }
   if (r.refused) {
-    await ctx.connection.send({ type: "refused", what: r.payment && !r.payment.ok ? "art" : "attack", reason: r.reason ?? "TAKEN" })
+    await notifyClient(ctx.connection.send({ type: "refused", what: r.payment && !r.payment.ok ? "art" : "attack", reason: r.reason ?? "TAKEN" }))
     return
   }
   save({ struck: now })
   await standUp()
-  await ctx.room.broadcast({ type: "struck", by: me.player.id, monster: spawn.id, swing: blow, hp: r.hp, back: r.back })
+  await notifyClient(ctx.room.broadcast({ type: "struck", by: me.player.id, monster: spawn.id, swing: blow, hp: r.hp, back: r.back }))
   if (r.beaten) {
     await awardDefeat(roomCtx, me.owner, data, spawn.id, kind)
     return
@@ -60,11 +61,11 @@ async function attack(roomCtx: Ctx, message: Message<"attack">) {
     let down = false
     if (back.kind !== "miss") {
       const result = await Player.get(me.owner).run({ type: "hurt", amount: back.damage, by: kind.name })
-      await ctx.connection.send({ type: "result", seq: -1, result })
+      await notifyClient(ctx.connection.send({ type: "result", seq: -1, result }))
       down = result.ok && result.state.hp <= 0
       if (down) save({ down: true, route: [reachable(me).at(-1)!], since: Date.now() })
     }
-    await ctx.room.broadcast({ type: "hitback", monster: spawn.id, target: me.player.id, swing: back, down })
+    await notifyClient(ctx.room.broadcast({ type: "hitback", monster: spawn.id, target: me.player.id, swing: back, down }))
   }
   return
 }

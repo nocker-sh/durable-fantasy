@@ -79,3 +79,35 @@ it.each([
   expect(standUp).not.toHaveBeenCalled()
   expect(send).toHaveBeenCalledWith({ type: "refused", what: "attack", reason: "FALLEN" })
 })
+
+it("persists retaliation even if the attack broadcast and result delivery fail", async () => {
+  const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+  const random = vi.spyOn(Math, "random").mockReturnValue(0)
+  try {
+    const spawn = SPAWNS.find((s) => s.kind === "slime")!
+    const p = player()
+    calls.read.mockResolvedValue(p)
+    calls.strike.mockResolvedValue({ refused: false, beaten: false, hp: 1, back: 0 })
+    calls.run.mockResolvedValue({ ok: true, state: { ...p, hp: 5 }, events: [] })
+    const at = monsterAt(spawn, Date.now(), () => true)
+    const cell: [number, number] = [Math.floor(at.x * 2), Math.floor(at.z * 2)]
+    const context = {
+      ctx: {
+        params: { mapId: "field" },
+        connection: { send: vi.fn().mockRejectedValue(Error("Socket closed")) },
+        room: { broadcast: vi.fn().mockRejectedValue(Error("Socket closed")) },
+      },
+      key: { map: spawn.map },
+      map: {},
+      me: { owner: "hunter", player: mapPlayer("connection", p, cell), route: [cell], since: Date.now() },
+      save: vi.fn(),
+      standUp: vi.fn(async () => {}),
+    } as unknown as Ctx
+    await HANDLERS.attack!(context, { type: "attack", monster: spawn.id })
+    expect(calls.run).toHaveBeenCalledExactlyOnceWith({ type: "hurt", amount: expect.any(Number), by: MONSTER_KINDS[spawn.kind].name })
+    expect(warn).toHaveBeenCalledTimes(3)
+  } finally {
+    warn.mockRestore()
+    random.mockRestore()
+  }
+})
