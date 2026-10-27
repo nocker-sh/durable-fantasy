@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 import { apply } from "./apply.ts"
 import { addItem, countItem, emptyBag, type Bag } from "./bag.ts"
-import { RECIPES, craftedQuality } from "./crafting.ts"
+import { RECIPES, craftedQuality, recipeOf } from "./crafting.ts"
 import { STATIONS } from "../town/stations.ts"
 import { ITEMS, type ItemId } from "./items.ts"
 import { MAPS, walkable } from "../maps/index.ts"
@@ -49,7 +49,10 @@ describe("making things", () => {
   })
 
   it("every recipe's things exist, nothing makes itself from itself, and every station stands somewhere you can be", () => {
+    expect(new Set(RECIPES.map((recipe) => recipe.id)).size).toBe(RECIPES.length)
+    expect(recipeOf("missing-recipe")).toBeUndefined()
     for (const rec of RECIPES) {
+      expect(recipeOf(rec.id)).toBe(rec)
       expect(ITEMS[rec.output.item], rec.id).toBeDefined()
       for (const i of rec.inputs) {
         expect(ITEMS[i.item], `${rec.id}: ${i.item}`).toBeDefined()
