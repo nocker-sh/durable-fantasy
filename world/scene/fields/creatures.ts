@@ -69,9 +69,9 @@ export function slimeBody(color: number): THREE.Group {
 }
 
 /** A hare's body: blocky, long-eared. */
-export function hareBody(): THREE.Group {
+export function hareBody(color = 0x8a7058): THREE.Group {
   const body = new THREE.Group()
-  const fur = colorMat(0x8a7058),
+  const fur = colorMat(color),
     pale = colorMat(0xd8ccb8)
   const b = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.14, 0.26), fur)
   b.position.y = 0.09

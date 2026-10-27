@@ -76,6 +76,23 @@ export const MONSTER_KINDS: Record<string, MonsterKind> = {
       { item: "herb", chance: 0.3 },
     ],
   },
+  "ash-hare": {
+    name: "灰うさぎ",
+    hp: 72,
+    def: 3,
+    flee: 18,
+    atk: 10,
+    hit: 16,
+    exp: 28,
+    respawn: 150,
+    look: "hare",
+    color: 0x85858b,
+    size: 1.25,
+    drops: [
+      { item: "sharp-fang", chance: 0.65 },
+      { item: "soft-fur", chance: 0.35 },
+    ],
+  },
   hare: { name: "野うさぎ", hp: 22, def: 0, flee: 25, atk: 0, hit: 0, exp: 7, respawn: 150, look: "hare", drops: [{ item: "soft-fur", chance: 0.55 }] },
 }
 
@@ -95,6 +112,7 @@ export const SPAWNS: readonly Spawn[] = [
   ...many("south-meadow", "hare", 4, [30, 6, 44, 20]),
   ...many("forest-edge", "blue-slime", 3, [36, 30, 39, 33]),
   ...many("forest-edge", "hare", 2, [9, 15, 12, 18]),
+  ...many("forest-edge", "ash-hare", 2, [9, 15, 12, 18]),
   ...many("deep-forest", "moss-slime", 2, [15, 12, 18, 15]),
   ...many("deep-forest", "moss-slime", 2, [30, 36, 33, 39], 2),
   ...many("deep-forest", "blue-slime", 2, [6, 27, 9, 30]),

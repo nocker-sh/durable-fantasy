@@ -85,7 +85,7 @@ const DEFINITIONS = {
   "ember-jelly": material("熾火のゼリー", 45, "jellyR", "ほんのり温かいゼリー。冬の懐炉に重宝される。", "rare"),
   "soft-fur": material("やわらかい冬毛", 8, "fur", "野うさぎが逃げるときに残していく冬毛のかたまり。仕立て屋が喜んで買う。"),
   "white-fleece": material("白い毛", 14, "furW", "ふわふわの白い毛。紡げば上等な糸になる。", "fine"),
-  "sharp-fang": material("鋭い牙", 12, "fang", "小さいが、よく研がれた牙。お守りに加工される。"),
+  "sharp-fang": material("鋭い牙", 12, "fang", "森の灰うさぎが残した硬い歯。根や樹皮をかじって鋭くなり、お守りに加工される。"),
   feather: material("羽根", 5, "feather", "大きな鳥の羽根。矢羽根や帽子の飾りに使う。"),
   "hard-shell": material("硬い甲殻", 16, "shell", "虫の魔物の甲殻。軽くて丈夫。"),
   "old-bone": material("古い骨", 6, "bone", "何の骨かはわからない。崩れた砦のあたりでよく見つかる。"),

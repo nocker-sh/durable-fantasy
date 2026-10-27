@@ -21,7 +21,7 @@ export interface MonsterView {
 export function makeMonsters(root: THREE.Group, map: string): MonsterView[] {
   return SPAWNS.filter((s) => s.map === map).map((spawn) => {
     const kind = MONSTER_KINDS[spawn.kind]
-    const body = kind.look === "slime" ? slimeBody(kind.color ?? 0x8ac06a) : hareBody()
+    const body = kind.look === "slime" ? slimeBody(kind.color ?? 0x8ac06a) : hareBody(kind.color)
     body.scale.setScalar(kind.size ?? 1)
     body.userData.monster = spawn.id
     root.add(body)
