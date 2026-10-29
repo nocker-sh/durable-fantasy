@@ -12,7 +12,8 @@ import { clothStripeTex, leafTex } from "./textures"
 import { blockCircle, blockRect, currentLayout, groundH, isFree, roadD } from "./world"
 import { THINGS, thingsFor } from "./things"
 import { HOUSEHOLDS, HOUSES, type HouseDef } from "../town/houses.ts"
-import { SHOPS, SHOP_KIND_NAME, type ShopKind } from "../core/shops.ts"
+import { SHOPS, type ShopKind } from "../core/shops.ts"
+import { KIND_SIGN, SHOP_SIGN, WORDS, letter, signLines } from "./lettering.ts"
 import { ROUTINES } from "../town/routines.ts"
 import { RESIDENTS } from "../town/residents.ts"
 
@@ -186,10 +187,7 @@ export function rentSign(root: THREE.Group, x: number, z: number) {
   g.fillStyle = "#c8b090"
   g.fillRect(0, 0, 64, 32)
   g.fillStyle = "#2a1e1a"
-  g.font = 'bold 18px "DotGothic16", sans-serif'
-  g.textAlign = "center"
-  g.textBaseline = "middle"
-  g.fillText("貸家", 32, 17)
+  letter(g, signLines(WORDS.toLet), 32, 17, 58, 14)
   const tex = new THREE.CanvasTexture(c)
   tex.magFilter = THREE.NearestFilter
   tex.colorSpace = THREE.SRGBColorSpace
@@ -538,7 +536,7 @@ function dress(root: THREE.Group, gb: GB, h: HouseDef) {
   void r
 }
 
-/** Boards by shop doors: 営業中 while someone minds the counter, 準備中 otherwise (index.ts turns them); wares set out by the door go with 営業中. */
+/** Boards by shop doors: open while someone minds the counter, shut otherwise (index.ts turns them); wares set out by the door go with the open board. */
 export const shopBoards: { shop: string; open: THREE.Object3D; shut: THREE.Object3D; wares?: THREE.Object3D }[] = []
 
 function boardTex(text: string, ink: string, ground: string) {
@@ -551,17 +549,14 @@ function boardTex(text: string, ink: string, ground: string) {
   g.fillStyle = ground
   g.fillRect(3, 3, 90, 38)
   g.fillStyle = ink
-  g.font = 'bold 26px "DotGothic16", sans-serif'
-  g.textAlign = "center"
-  g.textBaseline = "middle"
-  g.fillText(text, 48, 23)
+  letter(g, [text], 48, 23, 84, 22)
   const t = new THREE.CanvasTexture(c)
   t.magFilter = THREE.NearestFilter
   t.colorSpace = THREE.SRGBColorSpace
   return t
 }
-const OPEN_MAT = () => new THREE.MeshLambertMaterial({ map: boardTex("営業中", "#1e1410", "#d8c088"), side: THREE.DoubleSide })
-const SHUT_MAT = () => new THREE.MeshLambertMaterial({ map: boardTex("準備中", "#d8d0c0", "#3a3034"), side: THREE.DoubleSide })
+const OPEN_MAT = () => new THREE.MeshLambertMaterial({ map: boardTex(WORDS.open, "#1e1410", "#d8c088"), side: THREE.DoubleSide })
+const SHUT_MAT = () => new THREE.MeshLambertMaterial({ map: boardTex(WORDS.shut, "#d8d0c0", "#3a3034"), side: THREE.DoubleSide })
 
 /** A little board hung by the door of a shop. */
 function shopBoard(root: THREE.Group, h: HouseDef) {
@@ -589,9 +584,8 @@ function shopBoard(root: THREE.Group, h: HouseDef) {
 
 // ---------------------------------------------------------------- shop fronts
 
-/** What the hanging sign over a shop's door says: the trade, short. */
-const SIGN_WORD: Partial<Record<string, string>> = { tavern: "酒場", inn: "宿", smithy: "鍛冶", woodworker: "木工", leather: "革", bakery: "パン" }
-const signWord = (shop: string, kind: ShopKind) => SIGN_WORD[shop] ?? SHOP_KIND_NAME[kind].split("・")[0]
+/** What the hanging sign over a shop's door says: the trade, short (lettering.ts). */
+const signWord = (shop: string, kind: ShopKind) => SHOP_SIGN[shop] ?? KIND_SIGN[kind]
 /** The awning's stripes, by trade. */
 const AWNING: Record<ShopKind, [string, string]> = {
   food: ["cMustard", "cLinen"],
@@ -617,10 +611,7 @@ function signTex(word: string) {
   g.fillStyle = "#a88a60"
   g.fillRect(3, 3, 58, 34)
   g.fillStyle = "#2a1c14"
-  g.font = `bold ${word.length > 2 ? 15 : 20}px "DotGothic16", sans-serif`
-  g.textAlign = "center"
-  g.textBaseline = "middle"
-  g.fillText(word, 32, 21)
+  letter(g, signLines(word), 32, 21, 54, 14)
   const t = new THREE.CanvasTexture(c)
   t.magFilter = THREE.NearestFilter
   t.colorSpace = THREE.SRGBColorSpace

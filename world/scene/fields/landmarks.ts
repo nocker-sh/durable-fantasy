@@ -6,9 +6,10 @@ import { leafTex } from "../textures"
 import { N, blockCircle, blockRect, groundH } from "../world"
 import { rust, rustDark, rocks, rockGeo } from "./vegetation.ts"
 import { type Spot, instanced } from "./instancing.ts"
+import { BOARDS, letter } from "../lettering.ts"
 
 // ---------------------------------------------------------------- landmarks
-export function signboard(root: THREE.Group, x: number, z: number, lines: string[], rot = 0) {
+export function signboard(root: THREE.Group, x: number, z: number, lines: readonly string[], rot = 0) {
   const c = document.createElement("canvas")
   c.width = 256
   c.height = 128
@@ -18,12 +19,7 @@ export function signboard(root: THREE.Group, x: number, z: number, lines: string
   g.fillStyle = "#8a6a48"
   for (let y = 0; y < 128; y += 32) g.fillRect(0, y, 256, 3)
   g.fillStyle = "#1e1410"
-  g.font = 'bold 34px "DotGothic16", sans-serif'
-  g.textAlign = "center"
-  g.textBaseline = "middle"
-  const size = Math.min(34, Math.floor(236 / Math.max(...lines.map((l) => l.length))))
-  g.font = `bold ${size}px "DotGothic16", sans-serif`
-  lines.forEach((l, i) => g.fillText(l, 128, 64 + (i - (lines.length - 1) / 2) * (size + 8)))
+  letter(g, lines, 128, 64, 236, 30)
   const tex = new THREE.CanvasTexture(c)
   tex.magFilter = THREE.NearestFilter
   tex.colorSpace = THREE.SRGBColorSpace
@@ -69,7 +65,7 @@ export function cityWall(root: THREE.Group, z: number, gx: number, chimneysBehin
   gb.box(M.wood, M.wood, gx - 1.6, y + 0.7, z + 1.38, gx + 1.6, y + 0.86, z + 1.54, 2)
   blockRect(gx - 1.7, z + 1.2, gx + 1.7, z + 1.7)
   root.add(gb.build())
-  signboard(root, gx + 2.4, z + 2.2, ["この先は工事中", "まだ入れない"], -0.2)
+  signboard(root, gx + 2.4, z + 2.2, BOARDS.unbuilt, -0.2)
   if (chimneysBehind)
     for (const [cx, cz] of [
       [14, z - 4],

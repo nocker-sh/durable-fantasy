@@ -34,10 +34,13 @@ export const SOURCES: Record<string, readonly string[]> = {
   messages: ["REASON_TEXT"],
   screens: [],
   flavor: ["FLAVOR"],
+  lettering: ["WORDS", "SHOP_SIGN", "KIND_SIGN", "BOARDS"],
 }
 
 /** Exported constants that are not tables of things in the game. */
 export const NOT_TABLES: readonly string[] = [
+  // The letters the world may be written in, a pattern.
+  "LETTERS",
   // Server command dispatch, not a world data table.
   "HANDLERS",
   // names for codes, shown inside the sheets

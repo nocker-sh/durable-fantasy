@@ -9,12 +9,13 @@ import { signboard, cairn, rustedMachine, brokenTower, netShed, boat, dryingRack
 import { broadleaves, rocks, pines, tufts, logs, stumps, mushrooms, shrubs, branches, deadTrees, trunkGeo } from "./vegetation.ts"
 import { scatter, edgeward, offRoad } from "./scatter.ts"
 import { type Spot, instanced } from "./instancing.ts"
+import { BOARDS } from "../lettering.ts"
 
 // ---------------------------------------------------------------- builders
 function meadow(root: THREE.Group) {
   orchard(root, 6, 8, 4, 3)
   vineyard(root, 6, 16, 3, 7)
-  signboard(root, 26.2, 6.4, ["オットーの果樹園"], 0.2)
+  signboard(root, 26.2, 6.4, BOARDS.orchard, 0.2)
   // a lone old tree on the hill, the meadow's landmark
   broadleaves(root, [{ x: 34, z: 13, s: 1.6, r: 0.4 }], M.leaf)
   rocks(root, [
@@ -125,7 +126,7 @@ function sheds(root: THREE.Group) {
   crate(g, 30.6, 33.8, 0.45)
   sack(g, 31, 32.4)
   root.add(g.build())
-  signboard(root, 22.2, 31.2, ["ヤコブの網小屋"], 0.1)
+  signboard(root, 22.2, 31.2, BOARDS.netShed, 0.1)
   rocks(
     root,
     scatter(2041, 26, 0.3, 1.0, (x, z) => offRoad(1.2)(x, z)),
@@ -158,7 +159,7 @@ function forestEdge(root: THREE.Group) {
     root,
     scatter(2051, 16, 0.8, 1.2, (x, z) => Math.hypot(x - 16, z - 26) < 7 && offRoad(1.2)(x, z)),
   )
-  signboard(root, 21.6, 24.2, ["ヨーゼフの炭焼き場"], 0.3)
+  signboard(root, 21.6, 24.2, BOARDS.kilns, 0.3)
   pines(
     root,
     scatter(2052, 260, 0.9, 1.4, (x, z) => Math.hypot(x - 16, z - 26) > 7.5 && offRoad(1.8)(x, z)),
@@ -231,7 +232,7 @@ function deepForest(root: THREE.Group) {
 
 function quynhonGate(root: THREE.Group) {
   cityWall(root, 10.5, 24, false)
-  signboard(root, 19.4, 33.6, ["南 峠道", "西 樹海", "北 クイニョン"], 0.4)
+  signboard(root, 19.4, 33.6, BOARDS.crossroads, 0.4)
   pines(
     root,
     scatter(2071, 34, 0.8, 1.2, (x, z) => z > 16 && x < 34 && offRoad(2)(x, z)),

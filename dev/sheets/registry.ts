@@ -7,7 +7,7 @@ import { recipes, stations, commissions, errands, nodes } from "./crafting.tsx"
 import { monsters, skills, life } from "./combat.tsx"
 import { objects } from "./objects.tsx"
 import { uiIcons, textures, ramps, parts, presets, motions, anims } from "./art.tsx"
-import { lines, events, messages, flavor } from "./dialogue.tsx"
+import { lines, events, messages, flavor, lettering } from "./dialogue.tsx"
 import { screens } from "./screens.tsx"
 
 export const SHEETS: Sheet[] = [
@@ -43,6 +43,7 @@ export const SHEETS: Sheet[] = [
   messages,
   screens,
   flavor,
+  lettering,
 ]
 
 export const sheetOf = (id: string) => SHEETS.find((s) => s.id === id)
