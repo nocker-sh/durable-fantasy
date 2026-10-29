@@ -13,15 +13,17 @@ import pixSrc from "./pix.ts?raw"
 import texturesSrc from "./textures.ts?raw"
 import layoutsSrc from "../maps/ground-layouts.ts?raw"
 import layoutSrc from "../maps/layout.ts?raw"
+import layoutOfSrc from "../maps/layouts.ts?raw"
 // The painter also depends on these reusable calculations; include their source in the cache key.
-const engineSources = import.meta.glob<string>(["../../lib/engine/{math,noise,random,polyline,scalar-field}.ts", "../../lib/graphics/pixel-buffer.ts", "./textures/*.ts"], {
+// (the town's houses too: the ways worn to their doors are painted)
+const engineSources = import.meta.glob<string>(["../../lib/engine/{math,noise,random,polyline,scalar-field}.ts", "../../lib/graphics/pixel-buffer.ts", "./textures/*.ts", "../town/houses/*.ts"], {
   query: "?raw",
   import: "default",
   eager: true,
 })
 
 /** what the picture is painted from: if any of it changes, the kept pictures are not used */
-const VERSION = hash(terrainSrc + worldSrc + pixSrc + texturesSrc + layoutsSrc + layoutSrc + Object.values(engineSources).join(""))
+const VERSION = hash(terrainSrc + worldSrc + pixSrc + texturesSrc + layoutsSrc + layoutSrc + layoutOfSrc + Object.values(engineSources).join(""))
 const memory = new Map<string, Promise<PixBuf>>()
 const cacheReads = new OptionalCacheAccess(5000)
 const cacheWrites = new OptionalCacheAccess(5000)

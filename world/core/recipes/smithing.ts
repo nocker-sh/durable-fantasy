@@ -1,4 +1,5 @@
 import { recipe as r, type Recipe } from "./definition.ts"
+import { FORGED_WEAPON_RECIPES } from "./forged-weapons"
 
 export const SMITHING_RECIPES: readonly Recipe[] = [
   // the forge: scrap to iron, iron and wood to tools
@@ -126,4 +127,5 @@ export const SMITHING_RECIPES: readonly Recipe[] = [
     ["mace", 1],
     8,
   ),
+  ...FORGED_WEAPON_RECIPES,
 ]

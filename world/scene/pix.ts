@@ -29,9 +29,21 @@ const RAMPS_HEX: Record<string, string[]> = {
   thatch: ["#3a3034", "#5e4a3c", "#8a6c46", "#ae8e52", "#cdb064", "#e2cc82"],
   water: ["#1e2840", "#283a5a", "#334f72", "#45698a", "#6a8ea2", "#a6c2c2"],
   wood: ["#2e2430", "#47343a", "#644a44", "#82644e", "#a0805c"],
+  // furniture woods and the paints a chest or cupboard is decorated with (scene/construction/furnishings.ts)
+  pine: ["#4a3a30", "#76603e", "#a08650", "#c2a866", "#dcc488"],
+  oak: ["#2a1c1e", "#4a2e28", "#6e4430", "#8e5e3a", "#ac7a4a"],
+  birch: ["#5a5050", "#857a6e", "#ab9e86", "#c9bc9c", "#e0d4b4"],
+  walnut: ["#1e1618", "#2e2020", "#45302a", "#5c4232", "#74563e"],
+  blackOak: ["#16141a", "#221e24", "#332c30", "#463c3c", "#5a4e48"],
+  paintBlue: ["#1c2234", "#2a3650", "#3c5070", "#567092", "#7a92ac"],
+  paintRed: ["#2c1418", "#4c2024", "#6e302e", "#904438", "#ac5e48"],
+  paintGreen: ["#182420", "#24382e", "#34503e", "#4a6a4e", "#668664"],
   glass: ["#1c2236", "#2a3550", "#3e5068", "#6a7e8c"],
   gold: ["#5a4030", "#9a7440", "#c8a050", "#ead27a"],
   iron: ["#1e1e2a", "#33343f", "#4c4e5a", "#6c707a", "#9aa0a4"],
+  // the better metals a weapon is forged in (core/items/weapons.ts)
+  steel: ["#1c2230", "#2e3a4e", "#4a5c72", "#7890a6", "#c4d2dc"],
+  engine: ["#1a161e", "#2e2630", "#4a3c40", "#7a6458", "#c8a874"],
   fire: ["#5a2030", "#a8402c", "#e07a2c", "#f6b84a", "#fff0a0"],
   // people
   skin1: ["#6a4448", "#9a6658", "#c48e74", "#e0b896", "#f2d4b4"],

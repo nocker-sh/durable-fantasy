@@ -9,15 +9,17 @@ import { SPRITES, silhouette, type SpriteName } from "./pixel-art.ts"
 import { ITEM_SPRITES } from "./item-art.ts"
 
 const SIZE = 24
-const cache = new Map<ItemIcon, string>()
+const cache = new Map<string, string>()
 
 /** An item's icon; a maker may bottle or serve it their own way (core/makers.ts). */
 export function iconUrl(id: ItemId, by?: string): string {
   const icon = traitOf(id, by)?.icon ?? ITEMS[id].icon
-  let url = cache.get(icon)
+  const metal = ITEMS[id].metal ?? "iron"
+  const key = `${icon}|${metal}`
+  let url = cache.get(key)
   if (!url) {
-    url = toUrl(enlarge(crop(draw(icon), 1), 32))
-    cache.set(icon, url)
+    url = toUrl(enlarge(crop(draw(icon, RAMPS[metal]), 1), 32))
+    cache.set(key, url)
   }
   return url
 }
@@ -84,18 +86,33 @@ function crop(b: PixBuf, margin: number): PixBuf {
   return out
 }
 
-function draw(icon: ItemIcon): PixBuf {
+function draw(icon: ItemIcon, metal: RGB[]): PixBuf {
   switch (icon) {
     case "dagger":
-      return blade(9, 2, RAMPS.leather)
+      return blade(9, 2, RAMPS.leather, metal)
+    case "knife":
+      return blade(7, 1, RAMPS.leatherD, metal, 2)
     case "sword":
-      return blade(14, 3, RAMPS.leatherR)
+      return blade(14, 3, RAMPS.leatherR, metal)
+    case "longsword":
+      return blade(16, 3, RAMPS.leatherK, metal, 1, 5)
+    case "greatsword":
+      return blade(18, 4, RAMPS.leatherR, metal, 2, 6)
+    case "estoc":
+      return blade(17, 2, RAMPS.leatherK, metal, 1, 4)
+    case "falchion":
+      return blade(11, 2, RAMPS.leatherD, metal, 2)
+    case "machete":
+      return machete(metal)
     case "spear":
-      return polearm("spear")
     case "axe":
-      return polearm("axe")
     case "mace":
-      return polearm("mace")
+    case "warhammer":
+    case "flail":
+    case "halberd":
+    case "bill":
+    case "pick":
+      return polearm(icon, metal)
     default:
       if (icon in ITEM_SPRITES) return ITEM_SPRITES[icon]
       if (icon in SPRITES) return SPRITES[icon as SpriteName]
@@ -103,34 +120,56 @@ function draw(icon: ItemIcon): PixBuf {
   }
 }
 
-/** A diagonal blade from the lower left to the upper right with a crossguard and grip. */
-function blade(length: number, guard: number, grip: RGB[]): PixBuf {
-  const b = new PixBuf(SIZE, SIZE)
-  const iron = RAMPS.iron,
-    gold = RAMPS.gold
-  const x0 = 6,
-    y0 = 17
+/** A diagonal blade from the lower left to the upper right with a crossguard and grip; `width` 2 is a broad blade. */
+function blade(length: number, guard: number, grip: RGB[], iron = RAMPS.iron, width = 1, gripLen = 3): PixBuf {
+  const b = new PixBuf(SIZE + 8, SIZE + 8)
+  const gold = RAMPS.gold
+  const x0 = 4 + gripLen * 0.5,
+    y0 = b.h - 6 - gripLen * 0.5
+  const ox = Math.round(x0),
+    oy = Math.round(y0)
   for (let k = 0; k < length; k++) {
-    const x = x0 + 2 + k,
-      y = y0 - 2 - k
+    const x = ox + 2 + k,
+      y = oy - 2 - k
     b.set(x, y, iron[4])
     b.set(x + 1, y, iron[3])
     b.set(x, y + 1, iron[2])
+    if (width > 1 && k < length - 2) {
+      b.set(x + 1, y + 1, iron[3])
+      b.set(x + 2, y + 1, iron[1])
+    }
   }
-  b.set(x0 + 2 + length, y0 - 2 - length, iron[4])
-  for (let k = -guard; k <= guard; k++) b.set(x0 + 1 + k, y0 - 1 + k, k === 0 ? gold[3] : gold[2])
-  for (let k = 0; k < 3; k++) b.set(x0 - k, y0 + k, grip[2 + (k & 1)])
-  b.set(x0 - 3, y0 + 3, gold[3])
+  b.set(ox + 2 + length, oy - 2 - length, iron[4])
+  for (let k = -guard; k <= guard; k++) b.set(ox + 1 + k, oy - 1 + k, k === 0 ? gold[3] : gold[2])
+  for (let k = 0; k < gripLen; k++) b.set(ox - k, oy + k, grip[2 + (k & 1)])
+  b.set(ox - gripLen, oy + gripLen, gold[3])
   b.outline(OUTLINE)
   return b
 }
 
-/** A long wooden haft with a head: spear point, axe blade or mace. */
-function polearm(kind: "spear" | "axe" | "mace"): PixBuf {
+/** A broad single-edged blade, its back straight and its edge swelling to a squared tip. */
+function machete(iron: RGB[]): PixBuf {
   const b = new PixBuf(SIZE, SIZE)
-  const wood = RAMPS.wood,
-    iron = RAMPS.iron
-  const reach = kind === "spear" ? 17 : 13
+  const wood = RAMPS.wood
+  for (let k = 0; k < 4; k++) b.set(4 + k, 19 - k, wood[2 + (k & 1)])
+  for (let k = 0; k < 11; k++) {
+    const x = 8 + k,
+      y = 15 - k
+    const w = 1 + Math.min(2, Math.floor(k / 3))
+    for (let t = 0; t <= w; t++) {
+      b.set(x + t, y + t, t === w ? iron[4] : t === 0 ? iron[2] : iron[3])
+      b.set(x + t + 1, y + t, t === w ? iron[4] : iron[3])
+    }
+  }
+  b.outline(OUTLINE)
+  return b
+}
+
+/** A long wooden haft with a head: spear point, axe blade, mace, hammer, flail or halberd. */
+function polearm(kind: "spear" | "axe" | "mace" | "warhammer" | "flail" | "halberd" | "bill" | "pick", iron: RGB[]): PixBuf {
+  const b = new PixBuf(SIZE, SIZE)
+  const wood = RAMPS.wood
+  const reach = kind === "spear" || kind === "halberd" ? 17 : kind === "bill" ? 15 : kind === "flail" ? 11 : 13
   for (let k = 0; k < reach; k++) {
     const x = 3 + k,
       y = 20 - k
@@ -139,15 +178,61 @@ function polearm(kind: "spear" | "axe" | "mace"): PixBuf {
   }
   const hx = 3 + reach,
     hy = 20 - reach
-  if (kind === "spear") {
+  if (kind === "spear" || kind === "halberd") {
     for (let k = 0; k < 4; k++) {
       b.set(hx + k, hy - k, iron[4])
       b.set(hx + k + 1, hy - k, iron[3])
     }
     b.set(hx - 1, hy + 1, iron[2])
     b.set(hx + 1, hy + 1, iron[2])
+    if (kind === "halberd") {
+      // an axe blade below the point on one side, a hook on the other
+      for (let y = 0; y <= 4; y++) for (let x = 0; x <= 3 - Math.abs(y - 2) / 2; x++) b.set(hx - 4 - x + y, hy + 2 + y + x, x > 2 - Math.abs(y - 2) / 2 ? iron[4] : iron[2 + ((x + y) & 1)])
+      b.set(hx + 1, hy + 3, iron[3])
+      b.set(hx + 2, hy + 3, iron[2])
+    }
   } else if (kind === "axe") {
     for (let y = -4; y <= 3; y++) for (let x = 0; x <= 4 - Math.abs(y) / 2; x++) b.set(hx + x - 3, hy + y - 1 - x, x > 3 - Math.abs(y) / 2 ? iron[4] : iron[2 + ((x + y) & 1)])
+  } else if (kind === "bill") {
+    // a hedging bill on a pole: a blade curving forward to a hook, a short spike on top
+    for (let k = 0; k < 6; k++) {
+      b.set(hx + k, hy - k, iron[k === 5 ? 4 : 3])
+      b.set(hx + k + 1, hy - k + 1, iron[2])
+      b.set(hx + k + 1, hy - k, iron[4])
+    }
+    for (let k = 1; k < 5; k++) b.set(hx + k + 2, hy - k + 2, iron[2]) // the belly of the blade
+    b.set(hx + 7, hy - 4, iron[3])
+    b.set(hx + 8, hy - 4, iron[3])
+    b.set(hx + 8, hy - 3, iron[4]) // the hook turning back
+    b.set(hx + 7, hy - 2, iron[3])
+    b.set(hx + 5, hy - 6, iron[4])
+    b.set(hx + 5, hy - 7, iron[3])
+  } else if (kind === "pick") {
+    // a beak across the haft, long and pointed one way, a short hammer face the other
+    for (let t = -2; t <= 5; t++) {
+      b.set(hx + t, hy + t, iron[t > 3 ? 4 : 3])
+      if (t < 4) b.set(hx + t + 1, hy + t, iron[2])
+    }
+    b.set(hx - 3, hy - 3, iron[3])
+    b.set(hx - 2, hy - 3, iron[4])
+  } else if (kind === "warhammer") {
+    // a square head across the haft, a short spike behind
+    for (let t = -3; t <= 3; t++)
+      for (let w = -1; w <= 1; w++) {
+        const x = hx + t + w,
+          y = hy + t - w
+        b.set(x, y, iron[w === -1 ? 4 : w === 0 ? 3 : 2])
+      }
+    b.set(hx - 4, hy - 4, iron[3])
+  } else if (kind === "flail") {
+    // a short chain, then a striking bar swinging free
+    b.set(hx + 1, hy - 1, iron[3])
+    b.set(hx + 2, hy - 1, iron[2])
+    b.set(hx + 3, hy - 2, iron[3])
+    for (let k = 0; k < 6; k++) {
+      b.set(hx + 4 + k, hy - 2 + Math.floor(k / 2), iron[4])
+      b.set(hx + 4 + k, hy - 1 + Math.floor(k / 2), iron[2])
+    }
   } else {
     for (let y = -3; y <= 3; y++) for (let x = -3; x <= 3; x++) if (x * x + y * y <= 10) b.set(hx + x, hy + y, iron[Math.max(0, Math.min(4, 3 - Math.round((x + y) / 2)))])
     for (const [x, y] of [

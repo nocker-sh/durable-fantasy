@@ -18,7 +18,7 @@ const houses: readonly HouseDef[] = [
     door: { side: "s", u: 2.2 },
     seed: 31,
     sign: "mug",
-    plan: home([room("酒場", 0), room("台所", 0), bed("フランツの部屋", 1, 1), room("酒蔵", 1), bed("奉公人の部屋", 1, 2)], ["カウンター", "卓×4", "樽", "暖炉", "寝台×3", "椅子×12"]),
+    plan: home([room("酒場", 0), room("台所", 0), bed("フランツの部屋", 1, 1), room("酒蔵", 1), bed("奉公人の部屋", 1, 2)], ["カウンター", "卓×4", "樽", "暖炉", "酒の棚", "薪入れ", "帽子掛け", "寝台×3", "椅子×12"]),
   },
   {
     id: "apothecary",
@@ -36,7 +36,7 @@ const houses: readonly HouseDef[] = [
     door: { side: "s", u: 1.8 },
     seed: 32,
     sign: "potion",
-    plan: home([room("店先", 0), room("調合部屋", 0), bed("寝室", 1, 1), bed("エーファの寝間", 1, 1), room("乾燥部屋", 1)], ["薬棚", "調合台", "乳鉢", "吊るした薬草", "寝台×2", "椅子×2"], "調合台"),
+    plan: home([room("店先", 0), room("調合部屋", 0), bed("寝室", 1, 1), bed("エーファの寝間", 1, 1), room("乾燥部屋", 1)], ["薬棚", "調合台", "乳鉢", "吊るした薬草", "腰掛け", "洗面台", "薬草の籠", "寝台×2", "椅子×2"], "調合台"),
   },
   {
     id: "general",
@@ -54,7 +54,7 @@ const houses: readonly HouseDef[] = [
     door: { side: "s", u: 1.8 },
     seed: 33,
     sign: "bag",
-    plan: home([room("店先", 0), room("奥の物置", 0), bed("ブルーノの部屋", 1, 1)], ["商品棚", "カウンター", "縄の束", "卓", "寝台", "椅子×1"]),
+    plan: home([room("店先", 0), room("奥の物置", 0), bed("ブルーノの部屋", 1, 1)], ["商品棚", "カウンター", "縄の束", "卓", "樽", "腰掛け", "寝台", "椅子×1"]),
   },
   {
     id: "tailor",
@@ -74,7 +74,7 @@ const houses: readonly HouseDef[] = [
     sign: "needle",
     plan: home(
       [room("店先", 0), room("仕事場", 0), bed("寝室", 1, 1), bed("ロッテの部屋", 1, 1), room("布の倉", 1)],
-      ["吊るした服", "姿見", "縫い物の台", "機織り機", "糸車", "寝台×2", "椅子×2"],
+      ["吊るした服", "姿見", "縫い物の台", "機織り機", "糸車", "糸の棚", "帽子掛け", "寝台×2", "椅子×2"],
       "機織り機と糸車",
     ),
   },
@@ -95,7 +95,7 @@ const houses: readonly HouseDef[] = [
     seed: 35,
     sign: "crystal",
     ramp: "plaster",
-    plan: home([room("店先", 0), room("金庫室", 0), bed("寝室", 1, 1)], ["鍵付きの陳列棚", "天秤", "金庫", "食卓", "寝台", "椅子×1"]),
+    plan: home([room("店先", 0), room("金庫室", 0), bed("寝室", 1, 1)], ["鍵付きの陳列棚", "天秤", "金庫", "食卓", "腰掛け", "鳥かご", "寝台", "椅子×1"]),
   },
   {
     id: "h-m1",
@@ -130,7 +130,7 @@ const houses: readonly HouseDef[] = [
     door: { side: "n", u: 2.2 },
     seed: 37,
     sign: "scale",
-    plan: home([room("買取場", 0), room("素材の倉", 0), bed("屋根裏の寝間", 1, 2)], ["大きな天秤", "素材の箱", "帳場", "食卓", "寝台×2", "椅子×2"]),
+    plan: home([room("買取場", 0), room("素材の倉", 0), bed("屋根裏の寝間", 1, 2)], ["大きな天秤", "素材の箱", "帳場", "食卓", "木箱×2", "樽", "寝台×2", "椅子×2"]),
   },
   {
     id: "h-m2",
@@ -198,7 +198,7 @@ const houses: readonly HouseDef[] = [
     roof: "slate",
     door: { side: "n", u: 2.0 },
     seed: 41,
-    plan: { rooms: [room("集会室", 0), room("記録室", 1)], hearth: true, kitchen: false, furniture: ["長卓", "椅子", "取引の掲示板", "書類棚"] },
+    plan: { rooms: [room("集会室", 0), room("記録室", 1)], hearth: true, kitchen: false, furniture: ["長卓", "長椅子", "火鉢", "帽子掛け", "椅子", "取引の掲示板", "書類棚"] },
   },
 ]
 

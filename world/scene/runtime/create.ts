@@ -3,9 +3,10 @@ import { ScreenLabels } from "../../../lib/graphics/screen-labels"
 import { PendingAction } from "./action-target"
 import { WarpMarkers } from "./warps"
 import { FrameLimiter } from "../../../lib/engine/frame-limiter"
-import { walkDirection } from "../turn"
+import { keyTurn, walkDirection } from "../turn"
 import { createGatheringSpots } from "./gathering.ts"
 import { createPointer } from "./pointer.ts"
+import { createPreviewControls } from "./preview.ts"
 import { PixelCamera } from "../../../lib/graphics/pixel-camera.ts"
 import { createWalkers } from "./walkers.ts"
 import { DioramaPostProcessing } from "../../../lib/graphics/post-processing.ts"
@@ -36,7 +37,19 @@ import type { Cell, SceneEvents } from "./types.ts"
 import type { Walker } from "./walker.ts"
 import { center, CELL, cellOf, NAME_RANGE } from "./grid.ts"
 
-async function createSceneRuntime(map: string, progress: (t: string) => void) {
+/** How a scene is shown: in the game, or (preview) as the /dev map view, with no player and a free camera. */
+export interface SceneOptions {
+  preview?: boolean
+  /** preview: where to look first, in world units (the map's middle if left out) */
+  at?: V2
+  /** preview: the zoom step to start at (0 is furthest out) */
+  zoom?: number
+  /** preview: the view turned by this many 45° steps from the game's own */
+  turn?: number
+}
+
+async function createSceneRuntime(map: string, progress: (t: string) => void, options: SceneOptions = {}) {
+  const preview = !!options.preview
   const world = MAP_SCENES[map] ?? MAP_SCENES.phanthiet
   progress("地面を描いています…")
   // the ground and the plan's fields come from workers or from an earlier visit; only then is the plan used
@@ -96,15 +109,28 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
   marker.renderOrder = cursor.renderOrder = 999
   scene.add(marker, cursor)
 
-  const camera = new PixelCamera(new THREE.Vector3(me.pos[0], walkH(me.pos[0], me.pos[1]), me.pos[1]), FIG_PPU, (width, height, scale) => {
-    const renderWidth = Math.ceil(width / scale),
-      renderHeight = Math.ceil(height / scale)
-    renderer.setPixelRatio(1)
-    renderer.setSize(renderWidth, renderHeight, false)
-    post.resize(renderWidth, renderHeight)
-    renderer.domElement.style.width = width + "px"
-    renderer.domElement.style.height = height + "px"
-  })
+  // the view looks at the player; the preview looks wherever it is sent, and can pull further back
+  if (preview) {
+    me.fig.root.visible = false
+    movement.yaw = movement.yawTarget = movement.yaw + keyTurn(options.turn ?? 0)
+  }
+  const lookAt = options.at ?? world.middle ?? world.centre
+  const start = preview ? new THREE.Vector3(lookAt[0], walkH(lookAt[0], lookAt[1]), lookAt[1]) : new THREE.Vector3(me.pos[0], walkH(me.pos[0], me.pos[1]), me.pos[1])
+  const camera = new PixelCamera(
+    start,
+    FIG_PPU,
+    (width, height, scale) => {
+      const renderWidth = Math.ceil(width / scale),
+        renderHeight = Math.ceil(height / scale)
+      renderer.setPixelRatio(1)
+      renderer.setSize(renderWidth, renderHeight, false)
+      post.resize(renderWidth, renderHeight)
+      renderer.domElement.style.width = width + "px"
+      renderer.domElement.style.height = height + "px"
+    },
+    preview ? [0.5, 1, 2] : undefined,
+    preview ? (options.zoom ?? 1) : 0,
+  )
   const cam = camera.camera,
     camFocus = camera.focus
   const resize = camera.resize,
@@ -343,30 +369,34 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
     me.head = Math.atan2(a.pos[0] - me.pos[0], a.pos[1] - me.pos[1])
   }
 
-  const pointer = createPointer({
-    renderer,
-    cam,
-    terrain,
-    town,
-    people,
-    ids,
-    remotes,
-    cursor,
-    movement,
-    spotHit,
-    monsterHit,
-    approach,
-    approachSpot,
-    fight,
-    walkTo,
-    zoom,
-    clearFight: () => {
-      action.endFight()
-    },
-  })
+  const previewControls = preview ? createPreviewControls({ renderer, movement, pan: (dx, dy, yaw) => camera.pan(dx, dy, yaw), zoom }) : null
+  const pointer = preview
+    ? { update() {}, dispose() {}, hovered: null, hoveredWalker: null, hoveredMonster: null, hoveredCritter: null }
+    : createPointer({
+        renderer,
+        cam,
+        terrain,
+        town,
+        people,
+        ids,
+        remotes,
+        cursor,
+        movement,
+        spotHit,
+        monsterHit,
+        approach,
+        approachSpot,
+        fight,
+        walkTo,
+        zoom,
+        clearFight: () => {
+          action.endFight()
+        },
+      })
   /** Let go of the window listeners and the GPU resources when the map is left. */
   function dispose() {
     pointer.dispose()
+    previewControls?.dispose()
     warps.dispose()
     clearRemotes()
     me.fig.dispose()
@@ -447,6 +477,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
     const elapsed = clock.getDelta()
     const dt = Math.min(0.05, elapsed)
     const t = clock.elapsedTime
+    if (!preview) stepHeld()
     const wasWalking = me.path.length > 0
     stepWalker(me, dt, elapsed)
     if (wasWalking && !me.path.length) {
@@ -484,8 +515,15 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
     // a still middle: the view holds while the player moves about the middle of the screen
     // (DEAD of its width and height), follows by as much as they step beyond it, and comes back to
     // centre them after a turn of the view
-    camera.update(followPosition.set(me.pos[0], me.fig.root.position.y + 0.6, me.pos[1]), movement.yawTarget, movement.yaw !== movement.yawTarget, dt)
-    movement.yaw = movement.yawTarget
+    if (previewControls) {
+      movement.yaw = movement.yawTarget
+      previewControls.update(dt, camera.height)
+      camFocus.y = walkH(camFocus.x, camFocus.z) + 0.6
+      camera.look(camFocus, movement.yaw)
+    } else {
+      camera.update(followPosition.set(me.pos[0], me.fig.root.position.y + 0.6, me.pos[1]), movement.yawTarget, movement.yaw !== movement.yawTarget, dt)
+      movement.yaw = movement.yawTarget
+    }
 
     if (world.indoor) updateCutaways(cam.position)
     // a field's fog is measured from the player, not the camera, so it thickens beyond them, never on them
@@ -498,7 +536,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
     head.set(me.pos[0], me.fig.root.position.y + 0.9, me.pos[1])
     const occluded = occlusion.update(cam.position, head)
     let hidden = false
-    occluders.forEach((o, i) => {
+    if (!preview) occluders.forEach((o, i) => {
       const hit = occluded[i]
       if (o.opaque) {
         hidden ||= !!hit
@@ -518,9 +556,11 @@ async function createSceneRuntime(map: string, progress: (t: string) => void) {
       o.obj.visible = o.fade > 0.03
     })
     pointer.update()
-    me.fig.xray(hidden)
-    // the player is always outlined (seen through roofs too); anyone else while the pointer is on them
-    me.fig.outline(true, hidden)
+    if (!preview) {
+      me.fig.xray(hidden)
+      // the player is always outlined (seen through roofs too); anyone else while the pointer is on them
+      me.fig.outline(true, hidden)
+    }
     for (const a of people) a.fig.outline(a === pointer.hovered)
     for (const w of remotes.values()) w.fig.outline(w === pointer.hoveredWalker)
     for (const m of monsters) outlineShape(m.body, m.spawn.id === pointer.hoveredMonster)

@@ -6,7 +6,6 @@ export class PixelCamera {
   readonly focus: THREE.Vector3
   private readonly pitch = 0.82
   private readonly deadZone = 0.4
-  private readonly zooms = [1, 2]
   private centring = false
   private level = 0
   width = 1
@@ -19,8 +18,12 @@ export class PixelCamera {
     position: THREE.Vector3,
     private readonly pixelsPerUnit: number,
     private readonly onResize: (width: number, height: number, scale: number) => void,
+    /** screen pixels per rendered pixel at each zoom step, the furthest out first; below 1 draws finer than the screen to see more */
+    private readonly zooms: readonly number[] = [1, 2],
+    level = 0,
   ) {
     this.focus = position.clone()
+    this.level = Math.min(zooms.length - 1, Math.max(0, level))
   }
   resize = (width = this.width, height = this.height) => {
     this.width = Math.max(1, width)
@@ -36,6 +39,23 @@ export class PixelCamera {
     this.resize()
   }
   zoomLevel = () => ({ level: this.level, max: this.zooms.length - 1 })
+  /** Slide the point looked at so the ground follows a drag of (dx, dy) screen pixels. */
+  pan(dx: number, dy: number, yaw: number) {
+    const perPixel = (2 * this.distance * Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2))) / this.height
+    const across = -dx * perPixel,
+      along = (dy * perPixel) / Math.sin(this.pitch)
+    this.focus.x += Math.cos(yaw) * across - Math.sin(yaw) * along
+    this.focus.z += -Math.sin(yaw) * across - Math.cos(yaw) * along
+  }
+  /** Look straight at a point, with no still middle and no easing (a free camera). */
+  look(at: THREE.Vector3, yaw: number) {
+    const cam = this.camera,
+      dist = this.distance,
+      pitch = this.pitch
+    this.focus.copy(at)
+    cam.position.set(at.x + Math.sin(yaw) * Math.cos(pitch) * dist, at.y + Math.sin(pitch) * dist, at.z + Math.cos(yaw) * Math.cos(pitch) * dist)
+    cam.lookAt(at)
+  }
   update(meAt: THREE.Vector3, yaw: number, turned: boolean, dt: number) {
     const cam = this.camera,
       camFocus = this.focus,

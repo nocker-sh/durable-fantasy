@@ -19,8 +19,20 @@ const maps = sheet({
   refs: (m) => [...new Set(m.warps.map((w) => w.to.map))].map((id) => ({ sheet: "maps", id, as: "出口" })),
   top: () => <WorldGrid />,
   // by day and by night, from where you come in (scripts/shoot-maps.ts)
-  more: (m) =>
-    m.kind === "indoor"
+  more: (m) => [
+    {
+      title: "3D",
+      head: [],
+      wide: true,
+      rows: [
+        [
+          <a key="v" href={`/dev/view?map=${m.id}`} className="underline">
+            /dev/view?map={m.id} で、プレイヤーや画面の枠なしに見る
+          </a>,
+        ],
+      ],
+    },
+    ...(m.kind === "indoor"
       ? []
       : [
           {
@@ -37,7 +49,8 @@ const maps = sheet({
               ],
             ],
           },
-        ],
+        ]),
+  ],
 })
 
 /** The world grid as one table: a map's square links to it. */

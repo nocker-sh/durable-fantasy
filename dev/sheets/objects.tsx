@@ -1,5 +1,6 @@
 import { Thumb } from "../three-view.tsx"
 import { PROPS } from "#/dev/studio/props-catalog.ts"
+import { FURNISHINGS, furnishingAt } from "#/world/scene/construction/furnishings.ts"
 import { SIZES } from "#/world/town/fit.ts"
 import { HOUSES } from "#/world/town/houses.ts"
 import { INTERIORS } from "#/world/town/interiors.ts"
@@ -14,6 +15,18 @@ const OBJECTS: ObjectRow[] = [
   ...Object.entries(ROOM_FURNITURE).map(([kind, name]) => ({ id: `room-${kind}`, name, group: "店や公共の建物の中" })),
   ...PROPS.map((p) => ({ id: p.id, name: p.name, group: `外（${p.group}）` })),
 ]
+
+/** A piece of furniture is drawn in oak at the size the plans give it (construction/furnishings.ts). */
+const furnitureBuilds = new Map<string, ReturnType<typeof furnishingAt>>()
+function buildOf(id: string) {
+  const p = PROPS.find((x) => x.id === id)
+  if (p) return p.build
+  const s = SIZES[id]
+  if (!FURNISHINGS[id] || !s || s === "wall") return null
+  let b = furnitureBuilds.get(id)
+  if (!b) furnitureBuilds.set(id, (b = furnishingAt(id, s, "oak")))
+  return b
+}
 
 const planCount = (name: string) =>
   HOUSES.flatMap((h) => h.plan.furniture).reduce((n, f) => {
@@ -56,10 +69,10 @@ const objects = sheet<ObjectRow>({
       ? [...new Set(INTERIORS.filter((i) => i.furniture.some((f) => `room-${f.kind}` === o.id)).map((i) => i.house.id))].map((id) => ({ sheet: "houses", id, as: "置かれた建物" }))
       : [],
   icon: (o) => {
-    const p = PROPS.find((x) => x.id === o.id)
-    return p ? <Thumb id={`prop-${p.id}`} build={p.build} px={32} /> : null
+    const b = buildOf(o.id)
+    return b ? <Thumb id={`prop-${o.id}`} build={b} px={32} /> : null
   },
-  build: (o) => PROPS.find((p) => p.id === o.id)?.build ?? null,
+  build: (o) => buildOf(o.id),
 })
 
 export { objects }

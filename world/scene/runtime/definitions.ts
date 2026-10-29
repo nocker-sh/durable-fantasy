@@ -1,6 +1,7 @@
 import type * as THREE from "three"
-import { VILLAGE, type Layout } from "../world"
-import { MARKET, CRAFT, GATE, buildMarket, buildCraft, buildGate } from "../districts"
+import type { Layout } from "../world"
+import { buildMarket, buildCraft, buildGate } from "../districts"
+import { layoutOf } from "../../maps/layouts.ts"
 import { INDOOR, buildInterior } from "../interior"
 import { FIELD_LAYOUTS, FIELD_BUILDERS } from "../fields"
 import { dressHouses } from "../dressing"
@@ -13,14 +14,16 @@ const dressed = (map: string, build: (root: THREE.Group) => void) => (root: THRE
   dressHouses(root, map)
 }
 
-/** How each map's ground is laid out and built. */
-const MAP_SCENES: Record<string, { layout: Layout; build: (root: THREE.Group) => void; animals?: boolean; indoor?: boolean; centre: V2 }> = {
-  phanthiet: { layout: VILLAGE, build: dressed("phanthiet", buildTown), animals: true, centre: [19, 24] },
-  "phanthiet-market": { layout: MARKET, build: dressed("phanthiet-market", buildMarket), centre: [24, 24] },
-  "phanthiet-craft": { layout: CRAFT, build: dressed("phanthiet-craft", buildCraft), centre: [20, 23] },
-  "phanthiet-gate": { layout: GATE, build: dressed("phanthiet-gate", buildGate), centre: [24, 18] },
+/** How each map's ground is laid out and built; centre is where the residents face, middle (if not centre) where the /dev view first looks. */
+const MAP_SCENES: Record<string, { layout: Layout; build: (root: THREE.Group) => void; animals?: boolean; indoor?: boolean; centre: V2; middle?: V2 }> = {
+  phanthiet: { layout: layoutOf("phanthiet"), build: dressed("phanthiet", buildTown), animals: true, centre: [19, 24] },
+  "phanthiet-market": { layout: layoutOf("phanthiet-market"), build: dressed("phanthiet-market", buildMarket), centre: [24, 24] },
+  "phanthiet-craft": { layout: layoutOf("phanthiet-craft"), build: dressed("phanthiet-craft", buildCraft), centre: [20, 23] },
+  "phanthiet-gate": { layout: layoutOf("phanthiet-gate"), build: dressed("phanthiet-gate", buildGate), centre: [24, 18] },
   ...Object.fromEntries(Object.entries(FIELD_LAYOUTS).map(([id, layout]) => [id, { layout, build: FIELD_BUILDERS[id], centre: [24, 24] as V2 }])),
-  ...Object.fromEntries(INTERIORS.map((it) => [it.id, { layout: INDOOR, build: buildInterior(it), indoor: true, centre: [(it.x0 + it.x1) / 2, it.z1] as V2 }])),
+  ...Object.fromEntries(
+    INTERIORS.map((it) => [it.id, { layout: INDOOR, build: buildInterior(it), indoor: true, centre: [(it.x0 + it.x1) / 2, it.z1] as V2, middle: [(it.x0 + it.x1) / 2, (it.z0 + it.z1) / 2] as V2 }]),
+  ),
 }
 
 type SceneDefinition = (typeof MAP_SCENES)[string]

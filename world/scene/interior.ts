@@ -7,7 +7,14 @@ import { GB, colorMat } from "./gfx"
 import { barrel, bench, crate, fireLights, glowMats, M, sack, table, addSprite, type V2 } from "./build"
 import { basket, hanging, heap, GPPU } from "./goods"
 import { blocked, groundH, WN } from "./world"
+import { hash2 } from "./pix"
 import { INTERIORS, interiorRows, type Furniture, type Interior } from "../town/interiors.ts"
+import { HOUSEHOLDS } from "../town/houses.ts"
+import { Kit, furnish, paintOf, stockShelf, topOf, wood, woodOf, type Spot, type Stock, type Wood, type WoodId } from "./construction/furnishings.ts"
+import { fromBeams, hang as hangOn, hookOf, lying, ON_WALLS } from "./construction/belongings.ts"
+import { floorPlan } from "../town/floorplan.ts"
+import { ROOM_SCALE } from "../town/interiors.ts"
+import { SIZES } from "../town/fit.ts"
 
 import { INDOOR } from "../maps/ground-layouts.ts"
 
@@ -21,6 +28,7 @@ const COUNTER_H = 0.6
 const coal = colorMat(0xff8a3a)
 const rugMat = colorMat(0x7a2e2e)
 const rugEdge = colorMat(0xc89a4a)
+const rugMat2 = colorMat(0x3a4a6a)
 const windowMat = new THREE.MeshLambertMaterial({ color: 0x9ab8d0, emissive: new THREE.Color(0x6a88a8), emissiveIntensity: 0.5 })
 const cloth = [colorMat(0x8a3a3a), colorMat(0x3a5a7a), colorMat(0xc8b890), colorMat(0x4a6a3a), colorMat(0x6a4a7a)]
 const bottle = [colorMat(0x3a6a5a), colorMat(0x6a3a2a), colorMat(0x8aa8b0), colorMat(0x5a4a7a)]
@@ -35,6 +43,9 @@ const SHELF_GOODS: Record<string, string[]> = {
   crystal: ["jar", "jar", "clay"],
   buyer: ["fish", "clay", "egg"],
 }
+
+/** What each shop keeps on its open shelves. */
+const STOCK: Record<string, Stock> = { bakery: "bread", apothecary: "jars", crystal: "jars", tavern: "bottles", inn: "bottles", general: "sundries" }
 
 /** Hanging from the beams, by shop. */
 const HANGING: Record<string, string[]> = {
@@ -88,26 +99,6 @@ export function updateCutaways(cam: THREE.Vector3) {
   }
 }
 
-function shelf(root: THREE.Group, f: Furniture, y0: number, goods: string[], seed: number) {
-  const gb = new GB()
-  const { x, z, w, d } = f
-  const h = 1.7
-  gb.box(M.woodDark, M.woodDark, x - w / 2, y0, z - d / 2, x - w / 2 + 0.06, y0 + h, z + d / 2, 2)
-  gb.box(M.woodDark, M.woodDark, x + w / 2 - 0.06, y0, z - d / 2, x + w / 2, y0 + h, z + d / 2, 2)
-  gb.box(M.woodDark, null, x - w / 2, y0, z - d / 2, x + w / 2, y0 + h, z - d / 2 + 0.03, 2)
-  const boards = [0.05, 0.55, 1.05, 1.55]
-  for (const b of boards) gb.box(M.wood, M.wood, x - w / 2, y0 + b, z - d / 2, x + w / 2, y0 + b + 0.05, z + d / 2, 2)
-  root.add(gb.build())
-  // things on the three upper boards
-  const g = new THREE.Group()
-  g.position.set(x, 0, z + d / 2 - 0.12)
-  root.add(g)
-  boards.slice(1).forEach((b, row) => {
-    const kind = goods[(row + seed) % goods.length]
-    if (kind) addSprite(g, heap(kind, Math.round((w - 0.2) * GPPU), 18, seed * 7 + row), 0, y0 + b + 0.05, 0)
-  })
-}
-
 function bolts(root: THREE.Group, f: Furniture, y0: number, seed: number) {
   // cloth on the shelves of a tailor or weaver: rolled bolts in a row
   const gb = new GB()
@@ -143,18 +134,156 @@ function counter(root: THREE.Group, f: Furniture, y0: number, shop: string | und
   const { x, z, w, d } = f
   gb.box(M.woodV, M.woodDark, x - w / 2, y0, z - d / 2, x + w / 2, y0 + COUNTER_H - 0.06, z + d / 2, 2)
   gb.box(M.woodDark, M.wood, x - w / 2 - 0.05, y0 + COUNTER_H - 0.06, z - d / 2 - 0.05, x + w / 2 + 0.05, y0 + COUNTER_H, z + d / 2 + 0.05, 2)
+  root.add(gb.build())
+  counterGoods(root, f, y0, shop, seed)
+}
+
+/** What the shop sets out on its counter: bottles in a row, a basket of its goods. */
+function counterGoods(root: THREE.Group, f: Furniture, y0: number, shop: string | undefined, seed: number) {
+  const { x, z, w } = f
+  const top = y0 + (topOf(f.name ?? "") ?? COUNTER_H)
   if (shop === "apothecary" || shop === "crystal" || shop === "tavern" || shop === "inn") {
+    const gb = new GB()
     for (let k = 0; k < 4; k++) {
       const bx = x - w / 2 + 0.3 + k * 0.22
-      gb.cyl(bottle[(k + seed) % bottle.length], null, bx, z, y0 + COUNTER_H, y0 + COUNTER_H + 0.2, 0.05, 0.05, 6, 1)
+      gb.cyl(bottle[(k + seed) % bottle.length], null, bx, z, top, top + 0.2, 0.05, 0.05, 6, 1)
     }
+    root.add(gb.build())
   }
-  root.add(gb.build())
   const g = new THREE.Group()
   g.position.set(x + w / 2 - 0.4, 0, z + 0.1)
   root.add(g)
   const goods = SHELF_GOODS[shop ?? ""]
-  if (goods) addSprite(g, basket(goods[seed % goods.length], seed, 26, 22), 0, y0 + COUNTER_H, 0)
+  if (goods) addSprite(g, basket(goods[seed % goods.length], seed, 26, 22), 0, top, 0)
+}
+
+/**
+ * Which way a piece faces: away from the wall it stands nearest, out into the room. The room is
+ * laid out half again as large as life (interiors.ts ROOM_SCALE) so there is room to walk, but a
+ * chair drawn that wide would be a bench: each piece is drawn a little smaller than the floor it
+ * keeps, its back still to its wall.
+ */
+const SHRINK = 0.78
+/** how much larger than life the things on the walls and beams are drawn */
+const WALL_SCALE = 1.45
+function spotOf(it: Interior, f: Furniture, y0: number): Spot {
+  const gaps: [number, Spot["face"]][] = [
+    [f.z - f.d / 2 - it.z0, 0],
+    [f.x - f.w / 2 - it.x0, 1],
+    [it.x1 - (f.x + f.w / 2), 3],
+    [it.z1 - (f.z + f.d / 2), 2],
+  ]
+  const [gap, near] = gaps.reduce((a, b) => (b[0] < a[0] ? b : a))
+  const face = gap < 0.8 ? near : 0
+  if (f.kind === "hearth" || f.kind === "stair") return { x: f.x, z: f.z, w: f.w, d: f.d, y: y0, face }
+  const across = f.kind === "counter" ? 1 : SHRINK
+  const side = face === 1 || face === 3
+  const w = f.w * (side ? SHRINK : across),
+    d = f.d * (side ? across : SHRINK)
+  if (gap >= 0.8) return { x: f.x, z: f.z, w, d, y: y0, face }
+  // keep the back against the wall
+  const x = face === 1 ? f.x - f.w / 2 + w / 2 : face === 3 ? f.x + f.w / 2 - w / 2 : f.x
+  const z = face === 0 ? f.z - f.d / 2 + d / 2 : face === 2 ? f.z + f.d / 2 - d / 2 : f.z
+  return { x, z, w, d, y: y0, face }
+}
+
+/** The fire's light, flickering, in front of the hearth's mouth. */
+function fireLight(root: THREE.Group, s: Spot) {
+  const out = s.face === 0 ? [0, 1] : s.face === 2 ? [0, -1] : s.face === 1 ? [1, 0] : [-1, 0]
+  const depth = s.face === 1 || s.face === 3 ? s.w : s.d
+  const l = new THREE.PointLight(0xff8a3a, 2.2, 7, 1.4)
+  l.position.set(s.x + out[0] * (depth / 2 + 0.5), s.y + 0.6, s.z + out[1] * (depth / 2 + 0.5))
+  root.add(l)
+  fireLights.push({ light: l, base: 2.2, seed: s.x * 3 + s.z })
+}
+
+/** Tall pieces nothing is hung above. */
+const TALL = new Set(["shelf", "stair", "hearth", "loom", "rack", "partition"])
+
+/**
+ * The walls of each ground-floor room, dressed: the plan's wall pieces first (an axe rack, herbs
+ * hung to dry, the town map), then what every room of its use has, in the gaps between windows and
+ * tall furniture. Then what hangs from the beams, and a rug under the table.
+ */
+function dress(root: THREE.Group, gb: GB, it: Interior, y0: number, seed: number, wd: Wood) {
+  const plan = floorPlan(it.house.id)
+  const K = ROOM_SCALE
+  const windows = [it.x0 + (it.x1 - it.x0) * 0.3, it.x0 + (it.x1 - it.x0) * 0.7]
+  const pieces = it.house.plan.furniture
+    .filter((f) => !/（(外|2階)）$/.test(f))
+    .map((f) => f.replace(/×\d+$/, ""))
+    .filter((f) => SIZES[f] === "wall" && ON_WALLS[f] && f !== "大鍋")
+  const wallTraces = it.furniture.filter((f) => f.kind === "trace" && f.z - it.z0 < 0.3)
+  type Slot = { x: number; z: number; face: Spot["face"]; use: string; room: number }
+  const slots: Slot[] = []
+  plan.rooms
+    .filter((r) => r.floor === 0)
+    .forEach((r, ri) => {
+      const rx0 = it.x0 + r.x0 * K,
+        rx1 = it.x0 + r.x1 * K,
+        rz0 = it.z0 + r.z0 * K,
+        rz1 = it.z0 + r.z1 * K
+      const walls: { a: number; b: number; at: (t: number) => [number, number]; face: Spot["face"] }[] = []
+      if (r.z0 < 0.05) walls.push({ a: rx0, b: rx1, at: (t) => [t, it.z0], face: 0 })
+      if (r.x0 < 0.05) walls.push({ a: rz0, b: rz1, at: (t) => [it.x0, t], face: 1 })
+      if (r.x1 > plan.W - 0.05) walls.push({ a: rz0, b: rz1, at: (t) => [it.x1, t], face: 3 })
+      for (const w of walls) {
+        const n = Math.floor((w.b - w.a - 0.4) / 1.3)
+        for (let i = 0; i < n; i++) {
+          const t = w.a + 0.2 + (w.b - w.a - 0.4) * ((i + 0.5) / n)
+          const [x, z] = w.at(t)
+          if (w.face === 0 && windows.some((wx) => Math.abs(wx - x) < 0.75)) continue
+          if (w.face !== 0 && z > it.z1 - 1.2) continue // too near the cut-down front
+          if (wallTraces.some((f) => Math.hypot(f.x - x, f.z - z) < 0.8)) continue
+          const blocked = it.furniture.some((f) => TALL.has(f.kind) && Math.abs(x - f.x) < f.w / 2 + 0.45 && Math.abs(z - f.z) < f.d / 2 + 0.45)
+          if (!blocked) slots.push({ x, z, face: w.face, use: r.use, room: ri })
+        }
+      }
+    })
+  // the plan's own wall pieces go to work rooms first, then anywhere
+  const order = [...slots].sort((a, b) => Number(!/作業場|売り場|土間|貯蔵/.test(a.use)) - Number(!/作業場|売り場|土間|貯蔵/.test(b.use)))
+  const taken = new Set<Slot>()
+  for (const [i, piece] of pieces.entries()) {
+    const s = order.find((x) => !taken.has(x))
+    if (!s) break
+    taken.add(s)
+    const hook = hookOf(piece)
+    hangOn(new Kit(gb, { x: s.x, z: s.z, w: 1, d: 0.2, y: y0 + hook, face: s.face }, WALL_SCALE), wd, { piece }, seed + i * 17)
+  }
+  slots.forEach((s, i) => {
+    if (taken.has(s) || hash2(seed, i, 91) < 0.25) return
+    hangOn(new Kit(gb, { x: s.x, z: s.z, w: 1, d: 0.2, y: y0 + 1.5, face: s.face }, WALL_SCALE), wd, { use: s.use }, seed + i * 29)
+  })
+  // the beams, and rugs where people sit
+  plan.rooms
+    .filter((r) => r.floor === 0)
+    .forEach((r, ri) => {
+      const cx = it.x0 + ((r.x0 + r.x1) / 2) * K,
+        z = it.z0 + r.z0 * K + 0.5
+      if (/台所|貯蔵|作業場|食事|住まい/.test(r.use) && hash2(seed, ri, 93) > 0.3)
+        fromBeams(new Kit(gb, { x: cx, z, w: 1, d: 0.2, y: y0 + WALL_H - 0.05, face: 0 }, WALL_SCALE), r.use, seed + ri, it.house.shop === "apothecary")
+    })
+  for (const f of it.furniture) {
+    if (!/^(食卓|大きな食卓|長卓|卓)$/.test(f.name ?? "") && f.kind !== "hearth") continue
+    const rg = new GB()
+    const s = spotOf(it, f, y0)
+    const [w, d] = f.kind === "hearth" ? [Math.min(f.w, f.d) * 0.9, 0.9] : [s.w + 1.0, s.d + 1.0]
+    const front = f.kind === "hearth" ? new Kit(rg, s).at(0, (s.face === 1 || s.face === 3 ? s.w : s.d) / 2 + 0.55) : [s.x, s.z]
+    const rot = f.kind === "hearth" && (s.face === 1 || s.face === 3)
+    const [rw, rd] = rot ? [d, w] : [w, d]
+    rg.box(rugEdge, rugEdge, front[0] - rw / 2, y0, front[1] - rd / 2, front[0] + rw / 2, y0 + 0.008, front[1] + rd / 2, 2)
+    const rm = hash2(seed, Math.round(f.x * 10), 95) > 0.5 ? rugMat : rugMat2
+    rg.box(rm, rm, front[0] - rw / 2 + 0.08, y0 + 0.008, front[1] - rd / 2 + 0.08, front[0] + rw / 2 - 0.08, y0 + 0.012, front[1] + rd / 2 - 0.08, 2)
+    root.add(rg.build(false))
+  }
+}
+
+/** The wood of the household's furniture; a painted chest, bench or cradle where the house paints them. */
+function woodFor(it: Interior): (name: string) => WoodId {
+  const living = it.house.household ? HOUSEHOLDS.find((h) => h.id === it.house.household)?.living : it.house.kind === "public" ? "ゆとりがある" : undefined
+  const base = woodOf(living, it.house.seed)
+  const paints = living !== "慎ましい" && hash2(it.house.seed, 5, 73) > 0.55
+  return (name) => (paints && /^(衣装箱|長椅子|揺りかご)$/.test(name) ? paintOf(it.house.seed) : base)
 }
 
 function workbench(root: THREE.Group, f: Furniture, y0: number) {
@@ -394,14 +523,23 @@ export function buildInterior(it: Interior) {
 
     const props = new GB()
     let shelves = 0
-    for (const f of it.furniture) {
+    const woodOfPiece = woodFor(it)
+    it.furniture.forEach((f, k) => {
+      // a piece drawn as itself (construction/furnishings.ts); the rest by its kind below
+      const own = f.kind !== "trace" && f.kind !== "partition" && f.kind !== "lowwall" && f.kind !== "curtain" && f.kind !== "stair" && f.name
+      const spot = spotOf(it, f, y0)
+      if (own && furnish(props, f.name!, spot, wood(woodOfPiece(f.name!)), seed + k * 13)) {
+        if (f.kind === "counter") counterGoods(root, f, y0, shop, seed)
+        if (f.kind === "hearth") fireLight(root, spot)
+        return
+      }
       switch (f.kind) {
         case "counter":
           counter(root, f, y0, shop, seed)
           break
         case "shelf":
           if (shop === "tailor" || it.house.plan.workshop?.includes("機織り")) bolts(root, f, y0, seed + shelves)
-          else shelf(root, f, y0, SHELF_GOODS[shop ?? ""] ?? ["jar", "clay"], seed + shelves)
+          else stockShelf(props, f.name === "棚" ? { x: f.x, z: f.z, w: f.w, d: f.d, y: y0, face: 0 } : spot, wood(woodOfPiece(f.name ?? "棚")), seed + shelves * 11, STOCK[shop ?? ""] ?? "stores")
           shelves++
           break
         case "hearth":
@@ -458,19 +596,30 @@ export function buildInterior(it: Interior) {
           partition(root, f, y0)
           break
       }
-    }
+    })
     // the traces of the life lived here, where the plan lays them
     const tops = it.furniture.filter((f) => f.kind === "table" || f.kind === "workbench" || f.kind === "counter" || f.kind === "hearth")
     const heightAt = (x: number, z: number) => {
       const t = tops.find((f) => Math.abs(x - f.x) <= f.w / 2 + 0.05 && Math.abs(z - f.z) <= f.d / 2 + 0.05)
-      return y0 + (!t ? 0.02 : t.kind === "hearth" ? 1.06 : t.kind === "counter" ? COUNTER_H : t.kind === "workbench" ? 0.82 : 0.62)
+      return y0 + (!t ? 0.02 : t.kind === "hearth" ? 1.06 : (topOf(t.name ?? "") ?? (t.kind === "counter" ? COUNTER_H : t.kind === "workbench" ? 0.82 : 0.62)))
     }
     it.furniture
       .filter((f) => f.kind === "trace")
       .forEach((f, k) => {
         const onWall = f.z - it.z0 < 0.3
+        const name = f.name ?? ""
+        // flecks on the floor stay flecks; anything else is drawn as what it is, on a shelf if it is on a wall
+        if (!/床/.test(name) && !/くず|跡|粉|藁|羽根|籾/.test(name)) {
+          const y = onWall ? y0 + 1.3 : heightAt(f.x, f.z)
+          if (onWall && /前掛け|外套|服|帽子|膝掛け|皮/.test(name)) {
+            if (hangOn(new Kit(props, { x: f.x, z: it.z0, w: 1, d: 0.2, y: y + 0.5, face: 0 }, WALL_SCALE), wood(woodOfPiece("")), { piece: /皮/.test(name) ? "干した皮" : "吊るした服" }, seed + k)) return
+          }
+          if (onWall) props.box(M.wood, M.wood, f.x - 0.3, y - 0.035, it.z0, f.x + 0.3, y, it.z0 + 0.22, 1)
+          if (lying(new Kit(props, { x: f.x, z: onWall ? it.z0 + 0.11 : f.z, w: 0.5, d: 0.3, y, face: 0 }, 1.3), name, seed + k * 11)) return
+        }
         trace(root, props, f, y0, seed + k * 11, (x, z) => (onWall ? y0 + 1.3 : heightAt(x, z)))
       })
+    dress(root, props, it, y0, seed, wood(woodOfPiece("")))
     root.add(props.build())
     if (it.drying) {
       const line = indoorLaundry(it.drying.z1 - it.drying.z0, seed)

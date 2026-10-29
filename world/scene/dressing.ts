@@ -5,13 +5,14 @@
 // Nothing goes in front of a door or on the way to it.
 import * as THREE from "three"
 import { GB, colorMat, mat } from "./gfx"
-import { M, barrel, bucket, crate, sack, woodpile, addSprite, places, type V2 } from "./build"
-import { basket, hanging, GPPU } from "./goods"
-import { Rng } from "./pix"
-import { leafTex } from "./textures"
+import { M, barrel, bench, bucket, crate, sack, woodpile, addSprite, fence, movingObjects, places, type V2 } from "./build"
+import { basket, hanging, heap, GPPU } from "./goods"
+import { PixBuf, Rng } from "./pix"
+import { clothStripeTex, leafTex } from "./textures"
 import { blockCircle, blockRect, currentLayout, groundH, isFree, roadD } from "./world"
 import { THINGS, thingsFor } from "./things"
 import { HOUSEHOLDS, HOUSES, type HouseDef } from "../town/houses.ts"
+import { SHOPS, SHOP_KIND_NAME, type ShopKind } from "../core/shops.ts"
 import { ROUTINES } from "../town/routines.ts"
 import { RESIDENTS } from "../town/residents.ts"
 
@@ -202,6 +203,161 @@ export function rentSign(root: THREE.Group, x: number, z: number) {
   blockCircle(x, z, 0.15)
 }
 
+// ---------------------------------------------------------------- the way to the door and the kitchen bed
+
+const stepMat = colorMat(0x8a8478),
+  stepDark = colorMat(0x6e6a62)
+const bedEarth = colorMat(0x4a3428)
+
+/**
+ * Flat stones from the door to the nearest road, worn in by the household's comings and goings.
+ * It heads straight out of the door for a step, then each stone goes where the road is nearest,
+ * round anything standing. Nothing is laid if the road is not reached within a few tiles.
+ */
+function doorPath(gb: GB, h: HouseDef) {
+  const door = doorPoint(h)
+  if (roadD(door[0], door[1]) < 0.4) return
+  const [ox, oz] = OUT[h.door.side]
+  const stones: V2[] = []
+  let p: V2 = [door[0] + ox * 0.1, door[1] + oz * 0.1],
+    dir: V2 = [ox, oz]
+  for (let k = 0; k < 16; k++) {
+    stones.push(p)
+    if (roadD(p[0], p[1]) < 0) break
+    if (k >= 1) {
+      // of the ways ahead (never back towards the house), the one that comes nearest the road
+      let best: V2 | null = null,
+        bestD = Infinity
+      for (let a = -2; a <= 2; a++) {
+        const ang = Math.atan2(dir[1], dir[0]) + (a * Math.PI) / 8
+        const d: V2 = [Math.cos(ang), Math.sin(ang)]
+        const q: V2 = [p[0] + d[0] * 0.42, p[1] + d[1] * 0.42]
+        if (!isFree(q[0], q[1]) && roadD(q[0], q[1]) >= 0) continue
+        const rd = roadD(q[0], q[1]) + Math.abs(a) * 0.02
+        if (rd < bestD) {
+          bestD = rd
+          best = d
+        }
+      }
+      if (!best) return
+      dir = best
+    }
+    p = [p[0] + dir[0] * 0.42, p[1] + dir[1] * 0.42]
+  }
+  if (roadD(stones[stones.length - 1][0], stones[stones.length - 1][1]) >= 0) return
+  const r = new Rng(h.seed * 13 + 5)
+  for (const [x, z] of stones.slice(0, -1)) {
+    const w = 0.13 + r.next() * 0.05,
+      d = 0.1 + r.next() * 0.04
+    const jx = (r.next() - 0.5) * 0.08,
+      jz = (r.next() - 0.5) * 0.08
+    const y = groundH(x + jx, z + jz)
+    gb.box(r.next() < 0.3 ? stepDark : stepMat, stepMat, x + jx - w, y - 0.02, z + jz - d, x + jx + w, y + 0.035, z + jz + d, 1)
+  }
+  placed.push(`${h.id}:door-path`)
+}
+
+const BACK: Record<Side, Side> = { n: "s", s: "n", e: "w", w: "e" }
+
+/**
+ * A low fence round the ground behind the house, with a gap to go in by: where the household keeps
+ * its vegetables, its wood and its odds and ends. As deep as the ground allows, down to a tile and a
+ * half; none if the fence would cross a road, a door's way, someone's spot or another house.
+ */
+function backYard(root: THREE.Group, h: HouseDef): boolean {
+  const back = BACK[h.door.side]
+  const [ox, oz] = OUT[back]
+  // the back wall's two corners, a little in from the eaves
+  const [a, b]: [V2, V2] =
+    back === "n"
+      ? [
+          [h.x0 + 0.2, h.z0],
+          [h.x1 - 0.2, h.z0],
+        ]
+      : back === "s"
+        ? [
+            [h.x0 + 0.2, h.z1],
+            [h.x1 - 0.2, h.z1],
+          ]
+        : back === "e"
+          ? [
+              [h.x1, h.z0 + 0.2],
+              [h.x1, h.z1 - 0.2],
+            ]
+          : [
+              [h.x0, h.z0 + 0.2],
+              [h.x0, h.z1 - 0.2],
+            ]
+  const spots = [...Object.values(places), ...standing(h.map)]
+  const doors = HOUSES.filter((o) => o.map === h.map && o !== h).map(doorPoint)
+  for (const depth of [2.6, 2.2, 1.8, 1.5]) {
+    const pts: V2[] = [
+      [a[0] + ox * 0.15, a[1] + oz * 0.15],
+      [a[0] + ox * depth, a[1] + oz * depth],
+      [b[0] + ox * depth, b[1] + oz * depth],
+      [b[0] + ox * 0.15, b[1] + oz * 0.15],
+    ]
+    // the fence line itself: clear ground, off the roads and the ways to doors
+    let ok = true
+    for (let i = 0; i < pts.length - 1 && ok; i++) {
+      const [p, q] = [pts[i], pts[i + 1]]
+      const n = Math.ceil(Math.hypot(q[0] - p[0], q[1] - p[1]) / 0.25)
+      for (let k = 0; k <= n && ok; k++) {
+        const at: V2 = [p[0] + ((q[0] - p[0]) * k) / n, p[1] + ((q[1] - p[1]) * k) / n]
+        // the ends that meet the wall stand on the house's own eaves ground
+        if ((at[0] - a[0]) * ox + (at[1] - a[1]) * oz < 0.6) continue
+        ok = clear(h, at, 0.15)
+      }
+    }
+    if (!ok) continue
+    // and inside it nobody's spot and no other door
+    const [x0, x1] = [Math.min(...pts.map((p) => p[0])), Math.max(...pts.map((p) => p[0]))],
+      [z0, z1] = [Math.min(...pts.map((p) => p[1])), Math.max(...pts.map((p) => p[1]))]
+    const inside = (p: V2) => p[0] > x0 - 0.6 && p[0] < x1 + 0.6 && p[1] > z0 - 0.6 && p[1] < z1 + 0.6
+    if (spots.some(inside) || doors.some(inside)) continue
+    // the way in: a gap in the middle of the far side
+    const gate: V2 = [(pts[1][0] + pts[2][0]) / 2, (pts[1][1] + pts[2][1]) / 2]
+    fence(root, pts, [gate], 0.55)
+    placed.push(`${h.id}:back-yard`)
+    return true
+  }
+  return false
+}
+
+/** What each household grows in its bed by the house, the seed picking among the hardy ones. */
+const BED_CROPS = ["cabbage", "turnip", "onion", "carrot"] as const
+
+/** A raised bed of earth in a plank frame, with a few rows of greens: the household's own vegetables. */
+function kitchenBed(gb: GB, root: THREE.Group, x: number, z: number, alongX: boolean, seed: number) {
+  const [hw, hd] = alongX ? [0.7, 0.38] : [0.38, 0.7]
+  const y = groundH(x, z)
+  const top = y + 0.14
+  gb.box(bedEarth, bedEarth, x - hw, y - 0.05, z - hd, x + hw, top, z + hd, 1)
+  // the plank frame round it
+  for (const [ax, az, bx, bz] of [
+    [x - hw - 0.04, z - hd - 0.04, x + hw + 0.04, z - hd],
+    [x - hw - 0.04, z + hd, x + hw + 0.04, z + hd + 0.04],
+    [x - hw - 0.04, z - hd, x - hw, z + hd],
+    [x + hw, z - hd, x + hw + 0.04, z + hd],
+  ])
+    gb.box(M.wood, M.woodDark, ax, y - 0.05, az, bx, top + 0.03, bz, 1)
+  const kind = BED_CROPS[seed % BED_CROPS.length]
+  const r = new Rng(seed)
+  const looks = [0, 1, 2].map((i) => {
+    const b = new PixBuf(18, 16)
+    b.blit(heap(kind, 18, 14, seed + i), 0, 2)
+    return b
+  })
+  // two rows along the bed, a gap here and there where something was pulled
+  for (const row of [-0.5, 0.5])
+    for (let t = -0.55; t <= 0.56; t += 0.37) {
+      if (r.next() < 0.2) continue
+      const [px, pz] = alongX ? [x + t, z + row * hd] : [x + row * hw, z + t]
+      addSprite(root, looks[r.int(3)], px, top - 0.02, pz, 48)
+    }
+  blockRect(x - hw - 0.05, z - hd - 0.05, x + hw + 0.05, z + hd + 0.05)
+}
+
 // ---------------------------------------------------------------- per house
 
 function dress(root: THREE.Group, gb: GB, h: HouseDef) {
@@ -237,6 +393,7 @@ function dress(root: THREE.Group, gb: GB, h: HouseDef) {
   }
   if (!hh || !h.plan.hearth) return
 
+  backYard(root, h)
   // fuel for the hearth: more wood for a bigger, better-off house
   const len = hh.living === "ゆとりがある" ? 1.6 : hh.living === "ふつう" ? 1.2 : 0.9
   put(
@@ -352,6 +509,18 @@ function dress(root: THREE.Group, gb: GB, h: HouseDef) {
       },
       0,
     )
+  // a bed of vegetables at the back or the side, for any household with the ground for it
+  const bed = (from: number) =>
+    put(
+      0.85,
+      (s) => along(h, s, 1.15, 0.5),
+      (p, s) => {
+        kitchenBed(gb, root, p[0], p[1], s === "n" || s === "s", h.seed)
+        placed.push(`${h.id}:kitchen-bed`)
+      },
+      from,
+    )
+  if (!bed(2)) bed(0)
   // the small things of everyday life along the walls: ash brooms, lidded water, kindling, a stool, a cat
   for (const [k, id] of thingsFor(hh.id, hh.living, false).entries()) placeThing(root, gb, h, id, sides[(k + 1) % 4], r)
   if (t === "farm" && h.kind === "home")
@@ -364,11 +533,13 @@ function dress(root: THREE.Group, gb: GB, h: HouseDef) {
       },
       1,
     )
+  // last, so the stones go round whatever now stands by the house
+  doorPath(gb, h)
   void r
 }
 
-/** Boards by shop doors: 営業中 while someone minds the counter, 準備中 otherwise (index.ts turns them). */
-export const shopBoards: { shop: string; open: THREE.Object3D; shut: THREE.Object3D }[] = []
+/** Boards by shop doors: 営業中 while someone minds the counter, 準備中 otherwise (index.ts turns them); wares set out by the door go with 営業中. */
+export const shopBoards: { shop: string; open: THREE.Object3D; shut: THREE.Object3D; wares?: THREE.Object3D }[] = []
 
 function boardTex(text: string, ink: string, ground: string) {
   const c = document.createElement("canvas")
@@ -414,6 +585,105 @@ function shopBoard(root: THREE.Group, h: HouseDef) {
     shut = make(SHUT_MAT())
   shut.visible = false
   shopBoards.push({ shop: h.shop, open, shut })
+}
+
+// ---------------------------------------------------------------- shop fronts
+
+/** What the hanging sign over a shop's door says: the trade, short. */
+const SIGN_WORD: Partial<Record<string, string>> = { tavern: "酒場", inn: "宿", smithy: "鍛冶", woodworker: "木工", leather: "革", bakery: "パン" }
+const signWord = (shop: string, kind: ShopKind) => SIGN_WORD[shop] ?? SHOP_KIND_NAME[kind].split("・")[0]
+/** The awning's stripes, by trade. */
+const AWNING: Record<ShopKind, [string, string]> = {
+  food: ["cMustard", "cLinen"],
+  inn: ["cWine", "cLinen"],
+  weapon: ["cGray", "cLinen"],
+  armor: ["cBrown", "cLinen"],
+  tools: ["cGreen", "cLinen"],
+  medicine: ["cGreen", "cCream"],
+  crystal: ["cBlue", "cLinen"],
+  tailor: ["cRed", "cCream"],
+  buyer: ["cBrown", "cCream"],
+}
+/** What a shop sets out on a bench by its door while it is open, where it can be drawn: only things it sells. */
+const SET_OUT: Partial<Record<string, string[]>> = { tavern: ["jug", "jug"], inn: ["jug"], apothecary: ["herb", "herb", "herb"], bakery: ["bread", "roll", "bread"] }
+
+function signTex(word: string) {
+  const c = document.createElement("canvas")
+  c.width = 64
+  c.height = 40
+  const g = c.getContext("2d")!
+  g.fillStyle = "#3a2a20"
+  g.fillRect(0, 0, 64, 40)
+  g.fillStyle = "#a88a60"
+  g.fillRect(3, 3, 58, 34)
+  g.fillStyle = "#2a1c14"
+  g.font = `bold ${word.length > 2 ? 15 : 20}px "DotGothic16", sans-serif`
+  g.textAlign = "center"
+  g.textBaseline = "middle"
+  g.fillText(word, 32, 21)
+  const t = new THREE.CanvasTexture(c)
+  t.magFilter = THREE.NearestFilter
+  t.colorSpace = THREE.SRGBColorSpace
+  return t
+}
+
+/**
+ * The front of a shop: a striped awning over the door, a sign hung out on an iron arm so it is read
+ * from along the street, and, where the wares can be drawn, a bench of them by the door while it is open.
+ */
+function shopFront(root: THREE.Group, gb: GB, h: HouseDef) {
+  const def = h.shop ? SHOPS[h.shop as keyof typeof SHOPS] : undefined
+  if (!def) return
+  const [dx, dz] = doorPoint(h)
+  const [ox, oz] = OUT[h.door.side]
+  // along the wall, and the wall's face (the door point is half a tile out)
+  const [ax, az] = [-oz, ox]
+  const wx = dx - ox * 0.5,
+    wz = dz - oz * 0.5
+  const y = groundH(dx, dz)
+  // the awning: from the wall above the door, sloping down and out
+  const [s1, s2] = AWNING[def.kind]
+  const cloth = mat(clothStripeTex(s1, s2, h.seed), { alpha: true, side: THREE.DoubleSide })
+  const half = 0.95
+  const at = (u: number, out: number, up: number): [number, number, number] => [wx + ax * u + ox * out, y + up, wz + az * u + oz * out]
+  gb.quad(cloth, at(-half, 0.02, 2.05), at(half, 0.02, 2.05), at(half, 0.85, 1.72), at(-half, 0.85, 1.72), 0.5, 0)
+  for (const u of [-half, half]) {
+    const [bx, by, bz] = at(u, 0.45, 1.86)
+    gb.box(M.iron, null, bx - 0.02, by - 0.02, bz - 0.02, bx + 0.02, by + 0.02, bz + 0.02, 1)
+  }
+  // the sign: an iron arm out from the wall beside the door, a board under it facing along the street
+  const side = 1.45
+  const [px, py, pz] = at(-side, 0, 2.25)
+  const [ex, , ez] = at(-side, 0.75, 2.25)
+  gb.box(M.iron, null, Math.min(px, ex) - 0.025, py, Math.min(pz, ez) - 0.025, Math.max(px, ex) + 0.025, py + 0.05, Math.max(pz, ez) + 0.025, 1)
+  const tex = new THREE.MeshLambertMaterial({ map: signTex(signWord(h.shop!, def.kind)) })
+  for (const flip of [0, Math.PI]) {
+    const board = new THREE.Mesh(new THREE.PlaneGeometry(0.55, 0.34), tex)
+    const [cx, cy, cz] = at(-side, 0.45, 1.98)
+    board.position.set(cx + ax * (flip ? -0.015 : 0.015), cy, cz + az * (flip ? -0.015 : 0.015))
+    board.rotation.y = Math.atan2(ax, az) + flip
+    root.add(board)
+  }
+  // the wares: on a bench on the other side of the door, set out only while the shop is open
+  const goods = SET_OUT[h.shop!]
+  if (!goods) return
+  const [bx, bz]: V2 = [dx + ax * 1.15 - ox * 0.1, dz + az * 1.15 - oz * 0.1]
+  if (!clear(h, [bx, bz], 0.35)) return
+  const wares = new THREE.Group()
+  const wb = new GB()
+  const alongX = Math.abs(ax) > 0.5
+  bench(wb, bx, bz, 0.9, alongX)
+  wares.add(wb.build())
+  goods.forEach((g, i) => {
+    const t = (i - (goods.length - 1) / 2) * 0.28
+    addSprite(wares, basket(g, h.seed + i, 16, 14), bx + ax * t, groundH(bx, bz) + 0.42, bz + az * t)
+  })
+  blockRect(bx - (alongX ? 0.5 : 0.2), bz - (alongX ? 0.2 : 0.5), bx + (alongX ? 0.5 : 0.2), bz + (alongX ? 0.2 : 0.5))
+  root.add(wares)
+  movingObjects.add(wares)
+  const board = shopBoards.find((b) => b.shop === h.shop)
+  if (board) board.wares = wares
+  placed.push(`${h.id}:shop-front`)
 }
 
 /** Set one of the small things (things.ts) by a house's wall: hung on it, leant on it, or stood a step out. */
@@ -488,6 +758,7 @@ export function dressHouses(root: THREE.Group, map: string) {
     if (h.map === map) {
       dress(root, gb, h)
       shopBoard(root, h)
+      shopFront(root, gb, h)
     }
   dressStreets(gb, map)
   ;(globalThis as { __dressed?: string[] }).__dressed = [...placed]

@@ -3,7 +3,7 @@ import { places } from "../build"
 import type { Anim } from "../figure"
 import { lap } from "../../diagnostics.ts"
 import { keyTurn } from "../turn"
-import { createSceneRuntime } from "./create.ts"
+import { createSceneRuntime, type SceneOptions } from "./create.ts"
 import type { SceneEvents, ResidentInfo, Cell, WalkerInfo, Avatar } from "./types.ts"
 import { cellOf } from "./grid.ts"
 
@@ -19,11 +19,12 @@ export class MapScene {
     private el: HTMLElement,
     private ev: SceneEvents,
     readonly map = "phanthiet",
+    private options: SceneOptions = {},
   ) {
     if (getComputedStyle(el).position === "static") el.style.position = "relative"
     el.style.overflow = "hidden"
     Object.assign(this.layer.style, { position: "absolute", inset: "0", pointerEvents: "none", overflow: "hidden" })
-    createSceneRuntime(map, (t) => this.ev.progress(t)).then(
+    createSceneRuntime(map, (t) => this.ev.progress(t), options).then(
       (runtime) => {
         if (this.alive) this.attach(runtime)
         else runtime.dispose()
@@ -200,8 +201,11 @@ export class MapScene {
     this.runtime = runtime
     runtime.events = this.ev
     this.el.appendChild(runtime.renderer.domElement)
-    this.el.appendChild(this.layer)
-    runtime.setLayer(this.layer)
+    // the preview shows the town alone: no names or bubbles over it
+    if (!this.options.preview) {
+      this.el.appendChild(this.layer)
+      runtime.setLayer(this.layer)
+    }
     const resize = () => runtime.resize(this.el.clientWidth, this.el.clientHeight)
     this.ro = new ResizeObserver(resize)
     this.ro.observe(this.el)

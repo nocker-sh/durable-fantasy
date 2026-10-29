@@ -1,6 +1,7 @@
 // Who makes what, and how their things turn out (game-system.md §4.2.1). A made thing carries its
 // maker's name ("イルムガルトの回復薬") and a quality; the maker's hand shows in how the qualities
 // fall, how it works, what it costs and what is said of it. Players' things use the plain recipe.
+import { IRON_WEAPONS } from "./items/weapons"
 import { ITEMS, QUALITY_EFFECT, QUALITY_PRICE, type ItemIcon, type ItemId, type Quality } from "./items.ts"
 
 export interface Trait {
@@ -52,6 +53,7 @@ export const MAKERS: Record<string, Partial<Record<ItemId, Trait>>> = {
     "honey-cake": { tiers: steady, note: "ウルリケの巣箱の蜜を使う。" },
   },
   ギュンター: {
+    ...Object.fromEntries(IRON_WEAPONS.map((id) => [id, { tiers: ordinary, note: "ギュンターが形に合わせて鉄を鍛えた武器。" }])),
     "short-sword": { tiers: ordinary, note: "ギュンターが刃を鍛え、木の柄に革を巻いた片手剣。" },
     dagger: { tiers: ordinary, note: "ギュンターが鍛えた短い刃。手入れしやすい形にしてある。" },
     "iron-sword": { tiers: ordinary, note: "ギュンターの炉で鍛え、重心を確かめた剣。" },

@@ -91,7 +91,12 @@ export function kindOf(name: string): FurnitureKind | null {
   if (/^(作業台|木工台|調合台|搾り台|なめし桶|台所の台)$/.test(n)) return "workbench"
   if (/^(鎧掛け|槍立て|止まり木)$/.test(n)) return "rack"
   if (/^(機織り機|糸車)$/.test(n)) return "loom"
-  if (/^(衣装箱|金庫)$/.test(n)) return "chest"
+  if (/^(衣装箱|金庫|長持|箪笥|洗面台)$/.test(n)) return "chest"
+  if (/^(腰掛け)$/.test(n)) return "chair"
+  if (/^(帽子掛け|鳥かご)$/.test(n)) return "rack"
+  if (/^(火鉢|焼き入れの桶)$/.test(n)) return "barrel"
+  if (/^(パン籠|薪入れ|薬草の籠)$/.test(n)) return "crate"
+  if (/^(削り馬)$/.test(n)) return "workbench"
   if (n === "階段") return "stair"
   return null
 }
