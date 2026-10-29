@@ -5,9 +5,9 @@
 // Nothing goes in front of a door or on the way to it.
 import * as THREE from "three"
 import { GB, colorMat, mat } from "./gfx"
-import { M, barrel, bucket, crate, sack, woodpile, addSprite, places, type V2 } from "./build"
-import { basket, hanging, GPPU } from "./goods"
-import { Rng } from "./pix"
+import { M, barrel, bucket, crate, sack, woodpile, addSprite, fence, places, type V2 } from "./build"
+import { basket, hanging, heap, GPPU } from "./goods"
+import { PixBuf, Rng } from "./pix"
 import { leafTex } from "./textures"
 import { blockCircle, blockRect, currentLayout, groundH, isFree, roadD } from "./world"
 import { THINGS, thingsFor } from "./things"
@@ -202,6 +202,143 @@ export function rentSign(root: THREE.Group, x: number, z: number) {
   blockCircle(x, z, 0.15)
 }
 
+// ---------------------------------------------------------------- the way to the door and the kitchen bed
+
+const stepMat = colorMat(0x8a8478),
+  stepDark = colorMat(0x6e6a62)
+const bedEarth = colorMat(0x4a3428)
+
+/**
+ * Flat stones from the door to the nearest road, worn in by the household's comings and goings.
+ * It heads straight out of the door for a step, then each stone goes where the road is nearest,
+ * round anything standing. Nothing is laid if the road is not reached within a few tiles.
+ */
+function doorPath(gb: GB, h: HouseDef) {
+  const door = doorPoint(h)
+  if (roadD(door[0], door[1]) < 0.4) return
+  const [ox, oz] = OUT[h.door.side]
+  const stones: V2[] = []
+  let p: V2 = [door[0] + ox * 0.1, door[1] + oz * 0.1],
+    dir: V2 = [ox, oz]
+  for (let k = 0; k < 16; k++) {
+    stones.push(p)
+    if (roadD(p[0], p[1]) < 0) break
+    if (k >= 1) {
+      // of the ways ahead (never back towards the house), the one that comes nearest the road
+      let best: V2 | null = null,
+        bestD = Infinity
+      for (let a = -2; a <= 2; a++) {
+        const ang = Math.atan2(dir[1], dir[0]) + (a * Math.PI) / 8
+        const d: V2 = [Math.cos(ang), Math.sin(ang)]
+        const q: V2 = [p[0] + d[0] * 0.42, p[1] + d[1] * 0.42]
+        if (!isFree(q[0], q[1]) && roadD(q[0], q[1]) >= 0) continue
+        const rd = roadD(q[0], q[1]) + Math.abs(a) * 0.02
+        if (rd < bestD) {
+          bestD = rd
+          best = d
+        }
+      }
+      if (!best) return
+      dir = best
+    }
+    p = [p[0] + dir[0] * 0.42, p[1] + dir[1] * 0.42]
+  }
+  if (roadD(stones[stones.length - 1][0], stones[stones.length - 1][1]) >= 0) return
+  const r = new Rng(h.seed * 13 + 5)
+  for (const [x, z] of stones.slice(0, -1)) {
+    const w = 0.13 + r.next() * 0.05,
+      d = 0.1 + r.next() * 0.04
+    const jx = (r.next() - 0.5) * 0.08,
+      jz = (r.next() - 0.5) * 0.08
+    const y = groundH(x + jx, z + jz)
+    gb.box(r.next() < 0.3 ? stepDark : stepMat, stepMat, x + jx - w, y - 0.02, z + jz - d, x + jx + w, y + 0.035, z + jz + d, 1)
+  }
+  placed.push(`${h.id}:door-path`)
+}
+
+const BACK: Record<Side, Side> = { n: "s", s: "n", e: "w", w: "e" }
+
+/**
+ * A low fence round the ground behind the house, with a gap to go in by: where the household keeps
+ * its vegetables, its wood and its odds and ends. As deep as the ground allows, down to a tile and a
+ * half; none if the fence would cross a road, a door's way, someone's spot or another house.
+ */
+function backYard(root: THREE.Group, h: HouseDef): boolean {
+  const back = BACK[h.door.side]
+  const [ox, oz] = OUT[back]
+  // the back wall's two corners, a little in from the eaves
+  const [a, b]: [V2, V2] =
+    back === "n" ? [[h.x0 + 0.2, h.z0], [h.x1 - 0.2, h.z0]] : back === "s" ? [[h.x0 + 0.2, h.z1], [h.x1 - 0.2, h.z1]] : back === "e" ? [[h.x1, h.z0 + 0.2], [h.x1, h.z1 - 0.2]] : [[h.x0, h.z0 + 0.2], [h.x0, h.z1 - 0.2]]
+  const spots = [...Object.values(places), ...standing(h.map)]
+  const doors = HOUSES.filter((o) => o.map === h.map && o !== h).map(doorPoint)
+  for (const depth of [2.6, 2.2, 1.8, 1.5]) {
+    const pts: V2[] = [
+      [a[0] + ox * 0.15, a[1] + oz * 0.15],
+      [a[0] + ox * depth, a[1] + oz * depth],
+      [b[0] + ox * depth, b[1] + oz * depth],
+      [b[0] + ox * 0.15, b[1] + oz * 0.15],
+    ]
+    // the fence line itself: clear ground, off the roads and the ways to doors
+    let ok = true
+    for (let i = 0; i < pts.length - 1 && ok; i++) {
+      const [p, q] = [pts[i], pts[i + 1]]
+      const n = Math.ceil(Math.hypot(q[0] - p[0], q[1] - p[1]) / 0.25)
+      for (let k = 0; k <= n && ok; k++) {
+        const at: V2 = [p[0] + ((q[0] - p[0]) * k) / n, p[1] + ((q[1] - p[1]) * k) / n]
+        // the ends that meet the wall stand on the house's own eaves ground
+        if ((at[0] - a[0]) * ox + (at[1] - a[1]) * oz < 0.6) continue
+        ok = clear(h, at, 0.15)
+      }
+    }
+    if (!ok) continue
+    // and inside it nobody's spot and no other door
+    const [x0, x1] = [Math.min(...pts.map((p) => p[0])), Math.max(...pts.map((p) => p[0]))],
+      [z0, z1] = [Math.min(...pts.map((p) => p[1])), Math.max(...pts.map((p) => p[1]))]
+    const inside = (p: V2) => p[0] > x0 - 0.6 && p[0] < x1 + 0.6 && p[1] > z0 - 0.6 && p[1] < z1 + 0.6
+    if (spots.some(inside) || doors.some(inside)) continue
+    // the way in: a gap in the middle of the far side
+    const gate: V2 = [(pts[1][0] + pts[2][0]) / 2, (pts[1][1] + pts[2][1]) / 2]
+    fence(root, pts, [gate], 0.55)
+    placed.push(`${h.id}:back-yard`)
+    return true
+  }
+  return false
+}
+
+/** What each household grows in its bed by the house, the seed picking among the hardy ones. */
+const BED_CROPS = ["cabbage", "turnip", "onion", "carrot"] as const
+
+/** A raised bed of earth in a plank frame, with a few rows of greens: the household's own vegetables. */
+function kitchenBed(gb: GB, root: THREE.Group, x: number, z: number, alongX: boolean, seed: number) {
+  const [hw, hd] = alongX ? [0.7, 0.38] : [0.38, 0.7]
+  const y = groundH(x, z)
+  const top = y + 0.14
+  gb.box(bedEarth, bedEarth, x - hw, y - 0.05, z - hd, x + hw, top, z + hd, 1)
+  // the plank frame round it
+  for (const [ax, az, bx, bz] of [
+    [x - hw - 0.04, z - hd - 0.04, x + hw + 0.04, z - hd],
+    [x - hw - 0.04, z + hd, x + hw + 0.04, z + hd + 0.04],
+    [x - hw - 0.04, z - hd, x - hw, z + hd],
+    [x + hw, z - hd, x + hw + 0.04, z + hd],
+  ])
+    gb.box(M.wood, M.woodDark, ax, y - 0.05, az, bx, top + 0.03, bz, 1)
+  const kind = BED_CROPS[seed % BED_CROPS.length]
+  const r = new Rng(seed)
+  const looks = [0, 1, 2].map((i) => {
+    const b = new PixBuf(18, 16)
+    b.blit(heap(kind, 18, 14, seed + i), 0, 2)
+    return b
+  })
+  // two rows along the bed, a gap here and there where something was pulled
+  for (const row of [-0.5, 0.5])
+    for (let t = -0.55; t <= 0.56; t += 0.37) {
+      if (r.next() < 0.2) continue
+      const [px, pz] = alongX ? [x + t, z + row * hd] : [x + row * hw, z + t]
+      addSprite(root, looks[r.int(3)], px, top - 0.02, pz, 48)
+    }
+  blockRect(x - hw - 0.05, z - hd - 0.05, x + hw + 0.05, z + hd + 0.05)
+}
+
 // ---------------------------------------------------------------- per house
 
 function dress(root: THREE.Group, gb: GB, h: HouseDef) {
@@ -237,6 +374,7 @@ function dress(root: THREE.Group, gb: GB, h: HouseDef) {
   }
   if (!hh || !h.plan.hearth) return
 
+  backYard(root, h)
   // fuel for the hearth: more wood for a bigger, better-off house
   const len = hh.living === "ゆとりがある" ? 1.6 : hh.living === "ふつう" ? 1.2 : 0.9
   put(
@@ -352,6 +490,18 @@ function dress(root: THREE.Group, gb: GB, h: HouseDef) {
       },
       0,
     )
+  // a bed of vegetables at the back or the side, for any household with the ground for it
+  const bed = (from: number) =>
+    put(
+      0.85,
+      (s) => along(h, s, 1.15, 0.5),
+      (p, s) => {
+        kitchenBed(gb, root, p[0], p[1], s === "n" || s === "s", h.seed)
+        placed.push(`${h.id}:kitchen-bed`)
+      },
+      from,
+    )
+  if (!bed(2)) bed(0)
   // the small things of everyday life along the walls: ash brooms, lidded water, kindling, a stool, a cat
   for (const [k, id] of thingsFor(hh.id, hh.living, false).entries()) placeThing(root, gb, h, id, sides[(k + 1) % 4], r)
   if (t === "farm" && h.kind === "home")
@@ -364,6 +514,8 @@ function dress(root: THREE.Group, gb: GB, h: HouseDef) {
       },
       1,
     )
+  // last, so the stones go round whatever now stands by the house
+  doorPath(gb, h)
   void r
 }
 
