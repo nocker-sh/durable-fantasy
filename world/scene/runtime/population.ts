@@ -71,6 +71,7 @@ async function createPopulation(scene: THREE.Scene, map: string, world: SceneDef
       const open = shopOpen(b.shop as keyof typeof SHOPS, min)
       b.open.visible = open
       b.shut.visible = !open
+      if (b.wares) b.wares.visible = open
     }
     for (const [place, st] of Object.entries(stalls)) {
       const open = manned.has(place)

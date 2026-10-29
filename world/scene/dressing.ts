@@ -5,13 +5,14 @@
 // Nothing goes in front of a door or on the way to it.
 import * as THREE from "three"
 import { GB, colorMat, mat } from "./gfx"
-import { M, barrel, bucket, crate, sack, woodpile, addSprite, fence, places, type V2 } from "./build"
+import { M, barrel, bench, bucket, crate, sack, woodpile, addSprite, fence, movingObjects, places, type V2 } from "./build"
 import { basket, hanging, heap, GPPU } from "./goods"
 import { PixBuf, Rng } from "./pix"
-import { leafTex } from "./textures"
+import { clothStripeTex, leafTex } from "./textures"
 import { blockCircle, blockRect, currentLayout, groundH, isFree, roadD } from "./world"
 import { THINGS, thingsFor } from "./things"
 import { HOUSEHOLDS, HOUSES, type HouseDef } from "../town/houses.ts"
+import { SHOPS, SHOP_KIND_NAME, type ShopKind } from "../core/shops.ts"
 import { ROUTINES } from "../town/routines.ts"
 import { RESIDENTS } from "../town/residents.ts"
 
@@ -268,7 +269,25 @@ function backYard(root: THREE.Group, h: HouseDef): boolean {
   const [ox, oz] = OUT[back]
   // the back wall's two corners, a little in from the eaves
   const [a, b]: [V2, V2] =
-    back === "n" ? [[h.x0 + 0.2, h.z0], [h.x1 - 0.2, h.z0]] : back === "s" ? [[h.x0 + 0.2, h.z1], [h.x1 - 0.2, h.z1]] : back === "e" ? [[h.x1, h.z0 + 0.2], [h.x1, h.z1 - 0.2]] : [[h.x0, h.z0 + 0.2], [h.x0, h.z1 - 0.2]]
+    back === "n"
+      ? [
+          [h.x0 + 0.2, h.z0],
+          [h.x1 - 0.2, h.z0],
+        ]
+      : back === "s"
+        ? [
+            [h.x0 + 0.2, h.z1],
+            [h.x1 - 0.2, h.z1],
+          ]
+        : back === "e"
+          ? [
+              [h.x1, h.z0 + 0.2],
+              [h.x1, h.z1 - 0.2],
+            ]
+          : [
+              [h.x0, h.z0 + 0.2],
+              [h.x0, h.z1 - 0.2],
+            ]
   const spots = [...Object.values(places), ...standing(h.map)]
   const doors = HOUSES.filter((o) => o.map === h.map && o !== h).map(doorPoint)
   for (const depth of [2.6, 2.2, 1.8, 1.5]) {
@@ -519,8 +538,8 @@ function dress(root: THREE.Group, gb: GB, h: HouseDef) {
   void r
 }
 
-/** Boards by shop doors: 営業中 while someone minds the counter, 準備中 otherwise (index.ts turns them). */
-export const shopBoards: { shop: string; open: THREE.Object3D; shut: THREE.Object3D }[] = []
+/** Boards by shop doors: 営業中 while someone minds the counter, 準備中 otherwise (index.ts turns them); wares set out by the door go with 営業中. */
+export const shopBoards: { shop: string; open: THREE.Object3D; shut: THREE.Object3D; wares?: THREE.Object3D }[] = []
 
 function boardTex(text: string, ink: string, ground: string) {
   const c = document.createElement("canvas")
@@ -566,6 +585,105 @@ function shopBoard(root: THREE.Group, h: HouseDef) {
     shut = make(SHUT_MAT())
   shut.visible = false
   shopBoards.push({ shop: h.shop, open, shut })
+}
+
+// ---------------------------------------------------------------- shop fronts
+
+/** What the hanging sign over a shop's door says: the trade, short. */
+const SIGN_WORD: Partial<Record<string, string>> = { tavern: "酒場", inn: "宿", smithy: "鍛冶", woodworker: "木工", leather: "革", bakery: "パン" }
+const signWord = (shop: string, kind: ShopKind) => SIGN_WORD[shop] ?? SHOP_KIND_NAME[kind].split("・")[0]
+/** The awning's stripes, by trade. */
+const AWNING: Record<ShopKind, [string, string]> = {
+  food: ["cMustard", "cLinen"],
+  inn: ["cWine", "cLinen"],
+  weapon: ["cGray", "cLinen"],
+  armor: ["cBrown", "cLinen"],
+  tools: ["cGreen", "cLinen"],
+  medicine: ["cGreen", "cCream"],
+  crystal: ["cBlue", "cLinen"],
+  tailor: ["cRed", "cCream"],
+  buyer: ["cBrown", "cCream"],
+}
+/** What a shop sets out on a bench by its door while it is open, where it can be drawn: only things it sells. */
+const SET_OUT: Partial<Record<string, string[]>> = { tavern: ["jug", "jug"], inn: ["jug"], apothecary: ["herb", "herb", "herb"], bakery: ["bread", "roll", "bread"] }
+
+function signTex(word: string) {
+  const c = document.createElement("canvas")
+  c.width = 64
+  c.height = 40
+  const g = c.getContext("2d")!
+  g.fillStyle = "#3a2a20"
+  g.fillRect(0, 0, 64, 40)
+  g.fillStyle = "#a88a60"
+  g.fillRect(3, 3, 58, 34)
+  g.fillStyle = "#2a1c14"
+  g.font = `bold ${word.length > 2 ? 15 : 20}px "DotGothic16", sans-serif`
+  g.textAlign = "center"
+  g.textBaseline = "middle"
+  g.fillText(word, 32, 21)
+  const t = new THREE.CanvasTexture(c)
+  t.magFilter = THREE.NearestFilter
+  t.colorSpace = THREE.SRGBColorSpace
+  return t
+}
+
+/**
+ * The front of a shop: a striped awning over the door, a sign hung out on an iron arm so it is read
+ * from along the street, and, where the wares can be drawn, a bench of them by the door while it is open.
+ */
+function shopFront(root: THREE.Group, gb: GB, h: HouseDef) {
+  const def = h.shop ? SHOPS[h.shop as keyof typeof SHOPS] : undefined
+  if (!def) return
+  const [dx, dz] = doorPoint(h)
+  const [ox, oz] = OUT[h.door.side]
+  // along the wall, and the wall's face (the door point is half a tile out)
+  const [ax, az] = [-oz, ox]
+  const wx = dx - ox * 0.5,
+    wz = dz - oz * 0.5
+  const y = groundH(dx, dz)
+  // the awning: from the wall above the door, sloping down and out
+  const [s1, s2] = AWNING[def.kind]
+  const cloth = mat(clothStripeTex(s1, s2, h.seed), { alpha: true, side: THREE.DoubleSide })
+  const half = 0.95
+  const at = (u: number, out: number, up: number): [number, number, number] => [wx + ax * u + ox * out, y + up, wz + az * u + oz * out]
+  gb.quad(cloth, at(-half, 0.02, 2.05), at(half, 0.02, 2.05), at(half, 0.85, 1.72), at(-half, 0.85, 1.72), 0.5, 0)
+  for (const u of [-half, half]) {
+    const [bx, by, bz] = at(u, 0.45, 1.86)
+    gb.box(M.iron, null, bx - 0.02, by - 0.02, bz - 0.02, bx + 0.02, by + 0.02, bz + 0.02, 1)
+  }
+  // the sign: an iron arm out from the wall beside the door, a board under it facing along the street
+  const side = 1.45
+  const [px, py, pz] = at(-side, 0, 2.25)
+  const [ex, , ez] = at(-side, 0.75, 2.25)
+  gb.box(M.iron, null, Math.min(px, ex) - 0.025, py, Math.min(pz, ez) - 0.025, Math.max(px, ex) + 0.025, py + 0.05, Math.max(pz, ez) + 0.025, 1)
+  const tex = new THREE.MeshLambertMaterial({ map: signTex(signWord(h.shop!, def.kind)) })
+  for (const flip of [0, Math.PI]) {
+    const board = new THREE.Mesh(new THREE.PlaneGeometry(0.55, 0.34), tex)
+    const [cx, cy, cz] = at(-side, 0.45, 1.98)
+    board.position.set(cx + ax * (flip ? -0.015 : 0.015), cy, cz + az * (flip ? -0.015 : 0.015))
+    board.rotation.y = Math.atan2(ax, az) + flip
+    root.add(board)
+  }
+  // the wares: on a bench on the other side of the door, set out only while the shop is open
+  const goods = SET_OUT[h.shop!]
+  if (!goods) return
+  const [bx, bz]: V2 = [dx + ax * 1.15 - ox * 0.1, dz + az * 1.15 - oz * 0.1]
+  if (!clear(h, [bx, bz], 0.35)) return
+  const wares = new THREE.Group()
+  const wb = new GB()
+  const alongX = Math.abs(ax) > 0.5
+  bench(wb, bx, bz, 0.9, alongX)
+  wares.add(wb.build())
+  goods.forEach((g, i) => {
+    const t = (i - (goods.length - 1) / 2) * 0.28
+    addSprite(wares, basket(g, h.seed + i, 16, 14), bx + ax * t, groundH(bx, bz) + 0.42, bz + az * t)
+  })
+  blockRect(bx - (alongX ? 0.5 : 0.2), bz - (alongX ? 0.2 : 0.5), bx + (alongX ? 0.5 : 0.2), bz + (alongX ? 0.2 : 0.5))
+  root.add(wares)
+  movingObjects.add(wares)
+  const board = shopBoards.find((b) => b.shop === h.shop)
+  if (board) board.wares = wares
+  placed.push(`${h.id}:shop-front`)
 }
 
 /** Set one of the small things (things.ts) by a house's wall: hung on it, leant on it, or stood a step out. */
@@ -640,6 +758,7 @@ export function dressHouses(root: THREE.Group, map: string) {
     if (h.map === map) {
       dress(root, gb, h)
       shopBoard(root, h)
+      shopFront(root, gb, h)
     }
   dressStreets(gb, map)
   ;(globalThis as { __dressed?: string[] }).__dressed = [...placed]
