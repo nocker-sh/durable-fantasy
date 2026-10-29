@@ -2,9 +2,9 @@ import * as THREE from "three"
 import { BillboardBatch } from "../../../lib/graphics/billboards.ts"
 import { N } from "../world"
 import { litSprites, toTex } from "../gfx"
-import { glowMats, fireLights, chimneys, houseGlows, lamps } from "../build"
+import { glowMats, fireLights, chimneys, houseGlows, houseShutters, lamps } from "../build"
 import { daylight, dusk } from "../../core/clock.ts"
-import { lampLit, windowsLit } from "../../town/schedule.ts"
+import { lampLit, shuttersShut, windowsLit } from "../../town/schedule.ts"
 import { HOUSES } from "../../town/houses.ts"
 import { view } from "../actors"
 import { PixBuf } from "../pix"
@@ -117,6 +117,16 @@ function createLighting(scene: THREE.Scene, world: SceneDefinition, wm: THREE.Sh
     for (const g of houseGlows) {
       const h = houseOf.get(g.house)
       g.mat.emissiveIntensity = h && windowsLit(h, clockMin) ? 0.9 + (1 - d) * 0.7 : 0
+    }
+    // and shuts its shutters while it sleeps by day
+    const shut = new Map<string, boolean>()
+    for (const s of houseShutters) {
+      let k = shut.get(s.house)
+      if (k === undefined) {
+        const h = houseOf.get(s.house)
+        shut.set(s.house, (k = !!h && shuttersShut(h, clockMin)))
+      }
+      s.mat.map = k ? s.shut : s.open
     }
     view.tint.set(T.tint)
     for (const m of litSprites) m.color.copy(view.tint)

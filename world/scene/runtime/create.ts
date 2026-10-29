@@ -530,25 +530,27 @@ async function createSceneRuntime(map: string, progress: (t: string) => void, op
     occlusionRay.set(cam.position, hitPoint.copy(head).sub(cam.position).normalize())
     const maxD = cam.position.distanceTo(head)
     let hidden = false
-    occluders.forEach((o) => {
-      const hit = occlusionRay.intersectBox(o.box, hitPoint) && hitPoint.distanceTo(cam.position) < maxD - 0.3
-      if (o.opaque) {
-        hidden ||= !!hit
-        return
-      }
-      const want = hit ? o.min : 1
-      if (o.fade === want) return
-      o.fade += (want - o.fade) * Math.min(1, dt * 8)
-      if (Math.abs(o.fade - want) < 0.01) o.fade = want
-      o.obj.traverse((c) => {
-        const mm = (c as THREE.Mesh).material as THREE.Material | undefined
-        if (!mm) return
-        mm.transparent = o.fade < 1
-        mm.opacity = o.fade
-        mm.depthWrite = o.fade >= 1
+    // (the preview has no one to keep in sight: everything stays solid)
+    if (!preview)
+      occluders.forEach((o) => {
+        const hit = occlusionRay.intersectBox(o.box, hitPoint) && hitPoint.distanceTo(cam.position) < maxD - 0.3
+        if (o.opaque) {
+          hidden ||= !!hit
+          return
+        }
+        const want = hit ? o.min : 1
+        if (o.fade === want) return
+        o.fade += (want - o.fade) * Math.min(1, dt * 8)
+        if (Math.abs(o.fade - want) < 0.01) o.fade = want
+        o.obj.traverse((c) => {
+          const mm = (c as THREE.Mesh).material as THREE.Material | undefined
+          if (!mm) return
+          mm.transparent = o.fade < 1
+          mm.opacity = o.fade
+          mm.depthWrite = o.fade >= 1
+        })
+        o.obj.visible = o.fade > 0.03
       })
-      o.obj.visible = o.fade > 0.03
-    })
     pointer.update()
     if (!preview) {
       me.fig.xray(hidden)

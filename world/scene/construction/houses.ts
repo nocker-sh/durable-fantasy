@@ -5,7 +5,7 @@ import { roofTex, thatchTex, wallTex, gableTex, signTex } from "../textures"
 import { HOUSES, enterable, floorsOf, type HouseDef } from "../../town/houses.ts"
 import { houseStyle, type HouseStyle } from "../../town/style.ts"
 import { groundH, blockRect, roadD, isFree } from "../world"
-import { houseGlows, glowMats, type V2, chimneys, occluder, places, animateObject } from "./registry.ts"
+import { houseGlows, houseShutters, glowMats, type V2, chimneys, occluder, places, animateObject } from "./registry.ts"
 import { M } from "./materials.ts"
 import { woodpile, barrel } from "./furniture.ts"
 
@@ -29,8 +29,12 @@ function glowify(m: THREE.MeshLambertMaterial, glow: PixBuf | null) {
 }
 
 function wallMat(w: number, h: number, seed: number, opts: Partial<Parameters<typeof wallTex>[0]> = {}) {
-  const [b, g] = wallTex({ w, h, floors: 1, timber: true, seed, flowers: true, ...opts })
-  return glowify(new THREE.MeshLambertMaterial({ map: toTex(b, false) }), g)
+  const all = { w, h, floors: 1, timber: true, seed, flowers: true, ...opts }
+  const [b, g] = wallTex(all)
+  const m = glowify(new THREE.MeshLambertMaterial({ map: toTex(b, false) }), g)
+  // a household's house can shut its windows: the same wall with the shutters closed, swapped in by the hour
+  if (glowOwner && all.windows) houseShutters.push({ house: glowOwner, mat: m, open: m.map!, shut: toTex(wallTex({ ...all, shut: true })[0], false) })
+  return m
 }
 
 // ---------------------------------------------------------------- houses

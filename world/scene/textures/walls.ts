@@ -19,6 +19,8 @@ export interface WallOpts {
   material?: "plaster" | "stone" | "board"
   /** leaded diamond panes, four square panes, or a small shuttered window */
   windowKind?: "leaded" | "square" | "small"
+  /** the shutters closed over the windows (a household asleep by day); the same wall otherwise */
+  shut?: boolean
   /** a plain plank door, an arched one, or a double door */
   doorKind?: "plank" | "arched" | "double"
 }
@@ -163,7 +165,18 @@ export function wallTex(o: WallOpts): [PixBuf, PixBuf | null] {
       b.set(x, top + 10, pick("timber", 0.55, x, 0))
       b.set(x, top + 11, pick("timber", 0.3, x, 0))
     }
-    for (const side of [-1, 1]) {
+    // shut: the two leaves swung in over the panes, meeting in the middle, the hinges on the frame
+    if (o.shut)
+      for (let y = top - 1; y <= top + winH; y++)
+        for (let x = x0 - 1; x <= x0 + winW; x++) {
+          const k = (x - x0 + 1) % 4
+          const meet = Math.abs(x - cx + 0.5) < 1
+          const z = Math.abs(y - (top + 4)) < 1 || Math.abs(y - (top + winH - 5)) < 1
+          let l = meet ? 0.22 : z ? 0.3 : k === 0 ? 0.35 : k === 1 ? 0.68 : 0.55
+          l += (vnoise(x, y, 0.3, 5) - 0.5) * 0.15
+          b.set(x, y, pick(shutter, l, x, y, 0.3))
+        }
+    for (const side of o.shut ? [] : [-1, 1]) {
       const sx0 = side < 0 ? x0 - 12 : x0 + winW + 2
       for (let y = top - 2; y <= top + winH + 1; y++)
         for (let x = sx0; x < sx0 + 10; x++) {

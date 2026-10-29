@@ -44,6 +44,27 @@ export function windowsLit(h: HouseDef, min: number): boolean {
 }
 
 /**
+ * Are this house's shutters closed at `min`. An empty house keeps them shut. A household shuts them
+ * when it goes to sleep with the day coming up and opens them when the first of it is up: in the
+ * light of day, while someone sleeps at home and nobody is up inside. The guardhouse always has a
+ * shift awake, so it never shuts.
+ */
+export function shuttersShut(h: HouseDef, min: number): boolean {
+  if (h.kind === "vacant" || !h.household) return h.kind === "vacant"
+  if (h.household === "guards" || !h.plan.hearth) return false
+  if (windowsLit(h, min) || upIndoors(h, min)) return false
+  // the dark hours of this house (as for its lamp): shutters are for keeping the day out
+  const on = H(15, 50) + Math.round(spread(h.seed, 3) * 80),
+    off = H(9, 10) + Math.round(spread(h.seed, 4) * 80)
+  if (within(min, on, off)) return false
+  const members = HOUSEHOLDS.find((x) => x.id === h.household)?.members ?? []
+  return members.some((name) => {
+    const s = slotAt(name, min)
+    return s?.where === "home" && s.doing.includes("眠")
+  })
+}
+
+/**
  * The street lamps: the guard lights them one after another at dusk, starting at 16:40 and taking a
  * minute or so for each, and puts them out in the same order once the day is up.
  */

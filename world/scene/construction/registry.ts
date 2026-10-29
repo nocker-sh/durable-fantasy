@@ -11,6 +11,9 @@ export const fireLights: { light: THREE.PointLight; base: number; seed: number }
 /** Window glows, by the house they belong to: lit by that household's hours (town/schedule.ts). */
 export const houseGlows: { house: string; mat: THREE.MeshLambertMaterial }[] = []
 
+/** Wall faces with windows, by house: the shutters are swung shut (`shut` drawn) while the household sleeps by day. */
+export const houseShutters: { house: string; mat: THREE.MeshLambertMaterial; open: THREE.Texture; shut: THREE.Texture }[] = []
+
 /** Street lamps, lit one after another at dusk. */
 export const lamps: { light: THREE.PointLight; glow: THREE.MeshLambertMaterial; x: number; z: number }[] = []
 
@@ -41,6 +44,7 @@ export function resetRegistries() {
   chimneys.length = 0
   occluders.length = 0
   houseGlows.length = 0
+  houseShutters.length = 0
   lamps.length = 0
   litSprites.length = 0
   for (const k of Object.keys(stalls)) delete stalls[k]
@@ -65,6 +69,7 @@ export function occluder(obj: THREE.Object3D, min = 0.22, opaque = false) {
       copies.set(was, (copy = was.clone()))
       // a glowing window is lit through its copy from now on
       for (const g of houseGlows) if (g.mat === was) g.mat = copy
+      for (const s of houseShutters) if (s.mat === was) s.mat = copy
       const k = glowMats.indexOf(was)
       if (k >= 0) glowMats[k] = copy
     }
