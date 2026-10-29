@@ -47,6 +47,24 @@ type V2 = [number, number]
 export type { Resident } from "./resident.ts"
 import type { Resident } from "./resident.ts"
 
+import { residents as r_miller } from "./residents/miller.ts"
+import { residents as r_tenant_a } from "./residents/tenant-a.ts"
+import { residents as r_tenant_b } from "./residents/tenant-b.ts"
+import { residents as r_butcher } from "./residents/butcher.ts"
+import { residents as r_dairy } from "./residents/dairy.ts"
+import { residents as r_breakfast } from "./residents/breakfast.ts"
+import { residents as r_sweepers } from "./residents/sweepers.ts"
+import { residents as r_watch } from "./residents/watch.ts"
+import { residents as r_loggers } from "./residents/loggers.ts"
+import { residents as r_charcoal } from "./residents/charcoal.ts"
+import { residents as r_porters } from "./residents/porters.ts"
+import { residents as r_nanny } from "./residents/nanny.ts"
+import { residents as r_lodging } from "./residents/lodging.ts"
+import { residents as r_carpenter } from "./residents/carpenter.ts"
+import { residents as r_riverfish } from "./residents/riverfish.ts"
+import { residents as r_elders2 } from "./residents/elders2.ts"
+import { residents as r_nightstall } from "./residents/nightstall.ts"
+
 const LISTED: Resident[] = [
   smith["ギュンター"],
   smith["ペーター"],
@@ -142,6 +160,62 @@ const LISTED: Resident[] = [
   teacher["ベンヤミン"],
   retired["エドガー"],
   retired["マルグリット"],
+  // the households that came with the three shifts
+  r_miller["ベルトラム"],
+  r_miller["イルゼ"],
+  r_miller["クラウス"],
+  r_tenant_a["オスカー"],
+  r_tenant_a["ヨハンナ"],
+  r_tenant_a["ヴァレンティン"],
+  r_tenant_a["エリーゼ"],
+  r_tenant_b["ヴェンデル"],
+  r_tenant_b["アグネス"],
+  r_tenant_b["ルートヴィヒ"],
+  r_tenant_b["イルマ"],
+  r_butcher["アルブレヒト"],
+  r_butcher["ギーゼラ"],
+  r_butcher["バスティアン"],
+  r_dairy["レーニ"],
+  r_dairy["フーゴ"],
+  r_dairy["ピア"],
+  r_breakfast["オッティリエ"],
+  r_breakfast["ベンノ"],
+  r_breakfast["ユッタ"],
+  r_sweepers["グスタフ"],
+  r_sweepers["ヴィルマ"],
+  r_sweepers["エリアス"],
+  r_watch["コンラート"],
+  r_watch["ヘンリケ"],
+  r_watch["ロータル"],
+  r_loggers["アンゼルム"],
+  r_loggers["ルーペルト"],
+  r_loggers["フロリアン"],
+  r_charcoal["ゼヴェリン"],
+  r_charcoal["ヴァルトラウト"],
+  r_charcoal["ティル"],
+  r_porters["インゴ"],
+  r_porters["カルラ"],
+  r_porters["ベルント"],
+  r_nanny["アンネリー"],
+  r_nanny["エルナ"],
+  r_lodging["ヘルタ"],
+  r_lodging["キリアン"],
+  r_lodging["ヴィープケ"],
+  r_lodging["ネーレ"],
+  r_lodging["レオポルト"],
+  r_carpenter["フォルカー"],
+  r_carpenter["ジビレ"],
+  r_carpenter["ウルリヒ"],
+  r_carpenter["パウリーネ"],
+  r_riverfish["クーノ"],
+  r_riverfish["テーダ"],
+  r_riverfish["モーリッツ"],
+  r_elders2["エルヴィン"],
+  r_elders2["アーデルハイト"],
+  r_nightstall["ドミニク"],
+  r_nightstall["レア"],
+  r_nightstall["リヌス"],
+  shepherd["レージ"],
 ]
 
 /** Everyone, with shopkeepers moved behind the counters of the shops you walk into. */

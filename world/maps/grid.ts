@@ -25,6 +25,8 @@ export const WORLD: readonly Square[] = [
   { at: [2, 0], map: "phanthiet-craft", walls: ["s"] },
   { at: [3, 0], city: "クイニョン" },
   { at: [1, 1], map: "phanthiet-gate", walls: ["e"] },
+  // the tenant farms, inside the town's bounds: in from the shopping street above and the gate's lane
+  { at: [0, 1], map: "phanthiet-fields", walls: ["s", "w"] },
   // the forest lies outside the town wall: the way in is from the forest's edge below
   { at: [2, 1], map: "deep-forest", walls: ["n", "w"] },
   { at: [3, 1], map: "quynhon-gate" },

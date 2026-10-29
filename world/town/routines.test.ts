@@ -6,6 +6,7 @@ import { RESIDENTS } from "./residents.ts"
 import { ROUTINES, slotAt, spotAt, workSpot } from "./routines.ts"
 import { HOUSEHOLDS, HOUSES } from "./houses.ts"
 import { windowsLit } from "./schedule.ts"
+import { SHIFTS } from "./shifts.ts"
 
 const EVERY = Array.from({ length: 48 }, (_, k) => k * 30)
 
@@ -88,27 +89,24 @@ describe("everyone's day", () => {
     }
   })
 
-  it("by night the town is up: from dusk to dawn, half the town or more is out or minding a shop, and some are always in the streets", () => {
-    for (let m = 18 * 60; m < 31 * 60; m += 30) {
-      const min = m % 1440
-      const seen = Object.values(MAPS).flatMap((map) => npcsAt(map, min).map((n) => ({ map, name: n.name })))
+  it("the town works in three shifts, each a fifth of the town or more (town.md「三交代」)", () => {
+    for (const [shift, names] of Object.entries(SHIFTS)) expect(names.length, shift).toBeGreaterThanOrEqual(Math.ceil(RESIDENTS.length / 5))
+  })
+
+  it("at every hour, three in ten or more are out or minding a shop, and some are always in the streets", () => {
+    for (const m of EVERY) {
+      const seen = Object.values(MAPS).flatMap((map) => npcsAt(map, m).map((n) => ({ map, name: n.name })))
       const out = seen.filter((x) => x.map.kind !== "indoor").length
-      expect(seen.length, `${min / 60}h up`).toBeGreaterThanOrEqual(Math.ceil(RESIDENTS.length / 2))
-      expect(out, `${min / 60}h in the streets`).toBeGreaterThanOrEqual(6)
+      expect(seen.length, `${m / 60}h up`).toBeGreaterThanOrEqual(Math.ceil((RESIDENTS.length * 3) / 10))
+      expect(out, `${m / 60}h in the streets`).toBeGreaterThanOrEqual(6)
     }
   })
 
-  it("the streets are quieter by day than by night, and most of the town sleeps through the day", () => {
-    const outside = (m: number) =>
-      Object.values(MAPS)
-        .filter((x) => x.kind !== "indoor")
-        .reduce((n, x) => n + npcsAt(x, m).length, 0)
-    const avg = (hours: number[]) => hours.reduce((n, h) => n + outside(h * 60), 0) / hours.length
-    expect(avg([11, 12, 13, 14, 15])).toBeLessThan(avg([21, 22, 23, 0, 1, 2, 3, 4, 5]))
-    for (const h of [11, 12, 13, 14]) {
-      const asleep = RESIDENTS.filter((r) => /眠|昼寝/.test(slotAt(r.name, h * 60)?.doing ?? "")).length
-      expect(asleep, `${h}h asleep`).toBeGreaterThan(RESIDENTS.length / 2)
-    }
+  it("the people about change with the shifts: the night shift keeps the night, the morning shift the dawn", () => {
+    const about = (names: readonly string[], m: number) => names.filter((n) => Object.values(MAPS).some((map) => npcsAt(map, m).some((x) => x.name === n))).length
+    expect(about(SHIFTS["夜番"], 22 * 60)).toBeGreaterThan(about(SHIFTS["夜番"], 11 * 60))
+    expect(about(SHIFTS["朝番"], 5 * 60)).toBeGreaterThan(about(SHIFTS["朝番"], 20 * 60))
+    expect(about(SHIFTS["昼番"], 12 * 60)).toBeGreaterThan(about(SHIFTS["昼番"], 1 * 60))
   })
 
   it("the town is busier by night than by day, and someone is always about", () => {

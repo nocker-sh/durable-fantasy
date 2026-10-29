@@ -138,6 +138,9 @@ export function buildTown(root: THREE.Group) {
     )
   })
   places.garden = [currentLayout().gardens[1].x0 + 1, currentLayout().gardens[1].z1 - 0.6]
+  // the back houses' well, beside the last garden
+  well(root, 10.9, 41.6)
+  places.well3 = [12, 41.6]
 
   // fields, pens, pasture
   crops(root, currentLayout().fields[1], "cabbage", 50)

@@ -90,6 +90,24 @@ export const THINGS_BY_HOUSEHOLD: Record<string, readonly string[]> = {
   hunter: ["boots", "sawhorse", "log-basket", "wood-stack", "drying-hide"],
   teacher: ["stool", "boots", "cat", "bench", "bird-feeder"],
   retired: ["stool", "birdcage", "crock", "cat", "bench", "flower-box", "bird-feeder"],
+  // the households of the three shifts
+  miller: ["sack-pile", "hand-cart", "cat", "ash-sieve"],
+  "tenant-a": ["wheelbarrow", "basket-stack", "tool-rack", "stool"],
+  "tenant-b": ["basket-stack", "tool-rack", "washtub", "bench"],
+  butcher: ["washtub", "wood-stack", "drying-hide", "crate-stack"],
+  dairy: ["milk-churns", "washtub", "hay-bale", "stool"],
+  breakfast: ["clay-jars", "wood-stack", "onion-string", "bench"],
+  sweepers: ["roof-rake", "wheelbarrow", "ash-sieve", "boots"],
+  watch: ["hand-lantern", "stool", "boots"],
+  loggers: ["sawhorse", "wood-stack", "log-basket", "boots"],
+  charcoal: ["sack-pile", "wood-stack", "ash-sieve", "hand-cart"],
+  porters: ["hand-cart", "rope-coil", "covered-goods", "bench"],
+  nanny: ["washtub", "bench", "cat", "flower-box"],
+  lodging: ["boots", "stool", "washtub", "bench"],
+  carpenter: ["sawhorse", "ladder", "tool-rack", "wood-stack"],
+  riverfish: ["washtub", "bucket-yoke", "rope-coil", "clay-jars"],
+  elders2: ["stool", "bench", "flower-box", "bird-feeder", "crock"],
+  nightstall: ["hand-lantern", "clay-jars", "crate-stack", "stool"],
 }
 
 export function thingsFor(trade: string | undefined, living: string | undefined, vacant: boolean): string[] {

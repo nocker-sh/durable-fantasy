@@ -1,6 +1,6 @@
 import type { Sheet, Ref } from "./schema.ts"
 import { items, itemArt } from "./items.tsx"
-import { npcs, households, houses, relations } from "./people.tsx"
+import { npcs, households, houses, relations, ledger } from "./people.tsx"
 import { maps, world } from "./maps.tsx"
 import { shops, batches, makers } from "./shops.tsx"
 import { recipes, stations, commissions, errands, nodes } from "./crafting.tsx"
@@ -15,6 +15,7 @@ export const SHEETS: Sheet[] = [
   npcs,
   households,
   houses,
+  ledger,
   maps,
   shops,
   batches,

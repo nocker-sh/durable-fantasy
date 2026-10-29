@@ -1,6 +1,6 @@
 // What residents say when spoken to. Each line may say when it fits: the part of
 // the day, what they are doing, who is standing nearby, how well they know you, what kind of day it
-// is. The most fitting lines are said first. Lines are written per resident, by the district they live in (square.ts, market.ts, craft.ts, gate.ts).
+// is. The most fitting lines are said first. Lines are written per resident, by the district they live in (square.ts, market.ts, craft.ts, gate.ts, fields.ts).
 import type { ErrandProgress } from "../../core/errands.ts"
 import type { Phase } from "../../core/clock.ts"
 import type { TownEvent } from "../events.ts"

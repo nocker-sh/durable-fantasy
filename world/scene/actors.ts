@@ -1,7 +1,7 @@
 import * as THREE from "three"
 import { walkH, isFree } from "./world"
 import { findPath } from "./path"
-import { places, type V2, pigMesh, sheepMesh, addSprite } from "./build"
+import { places, type V2, pigMesh, sheepMesh, cowMesh, addSprite } from "./build"
 import { toTex } from "./gfx"
 import { henFrames, catFrames, GPPU } from "./goods"
 import { Rng } from "./pix"
@@ -569,9 +569,18 @@ const scaled = (o: THREE.Object3D, s: number) => {
   return o
 }
 
-export function spawnAnimals(scene: THREE.Object3D) {
+export function spawnAnimals(scene: THREE.Object3D, map = "phanthiet") {
   const r = new Rng(5)
-  for (let i = 0; i < 9; i++) critters.push(new SpriteCritter(scene, henFrames(i), GPPU * 0.75, i < 6 ? [36.2, 17.9, 40.2, 21.5] : [17, 20.6, 22, 23], 0.7, "hen"))
+  if (map === "phanthiet-fields") {
+    // the butcher's pigs in the sties, the dairy's cows and goats out on the pasture
+    for (let i = 0; i < 6; i++) critters.push(new MeshCritter(scene, scaled(pigMesh(), 0.75), [40.7, 26.2, 44.8, 29.8], 0.35 + r.next() * 0.2))
+    for (let i = 0; i < 5; i++) critters.push(new MeshCritter(scene, scaled(cowMesh(), 0.9), [29.4, 38.4, 43.6, 45.1], 0.22 + r.next() * 0.1))
+    for (let i = 0; i < 6; i++) critters.push(new MeshCritter(scene, scaled(sheepMesh(), 0.7), [29.4, 38.4, 43.6, 45.1], 0.3 + r.next() * 0.15))
+    for (let i = 0; i < 5; i++) critters.push(new SpriteCritter(scene, henFrames(i), GPPU * 0.75, [3, 21.8, 9, 22.8], 0.7, "hen"))
+    critters.push(new SpriteCritter(scene, catFrames(1), GPPU * 0.7, [33, 20.8, 38, 21.6], 0.9, "cat"))
+    return
+  }
+  for (let i = 0; i < 9; i++) critters.push(new SpriteCritter(scene, henFrames(i), GPPU * 0.75, i < 6 ? [38.4, 18.4, 40.9, 20.7] : [17, 20.6, 22, 23], 0.7, "hen"))
   critters.push(new SpriteCritter(scene, catFrames(0), GPPU * 0.7, [14.4, 21.8, 17.4, 23.4], 0.9, "cat"))
   critters.push(new SpriteCritter(scene, catFrames(1), GPPU * 0.7, [20, 26.6, 24, 28], 0.9, "cat"))
   critters.push(new SpriteCritter(scene, catFrames(2), GPPU * 0.7, [12, 32, 17, 33.4], 0.9, "cat"))

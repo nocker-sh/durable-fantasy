@@ -5,6 +5,8 @@ import { lines as tinker } from "./households/tinker.ts"
 import { lines as hunter } from "./households/hunter.ts"
 import { lines as teacher } from "./households/teacher.ts"
 import { lines as retired } from "./households/retired.ts"
+import { lines as watch } from "./households/watch.ts"
+import { lines as porters } from "./households/porters.ts"
 import type { Line } from "./line.ts"
 
 export const LINES: Record<string, readonly Line[]> = {
@@ -28,4 +30,10 @@ export const LINES: Record<string, readonly Line[]> = {
   ベンヤミン: teacher["ベンヤミン"],
   エドガー: retired["エドガー"],
   マルグリット: retired["マルグリット"],
+  コンラート: watch["コンラート"],
+  ヘンリケ: watch["ヘンリケ"],
+  ロータル: watch["ロータル"],
+  インゴ: porters["インゴ"],
+  カルラ: porters["カルラ"],
+  ベルント: porters["ベルント"],
 }

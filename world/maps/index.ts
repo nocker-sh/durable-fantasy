@@ -7,6 +7,7 @@ import { RESIDENTS } from "../town/residents.ts"
 import { ROUTINES, spotAt, workSpot, type Spot } from "../town/routines.ts"
 import craft from "./phanthiet-craft.json"
 import gate from "./phanthiet-gate.json"
+import fields from "./phanthiet-fields.json"
 import market from "./phanthiet-market.json"
 import town from "./phanthiet.json"
 import south_meadow from "./south-meadow.json"
@@ -90,6 +91,15 @@ const STREETS = {
     ...grid(gate),
     warps: [],
     spawn: [48, 40],
+    assets: { sprites: SPRITES },
+  },
+  "phanthiet-fields": {
+    id: "phanthiet-fields",
+    name: "ファンティエット ― 西の畑",
+    kind: "town",
+    ...grid(fields),
+    warps: [],
+    spawn: [42, 46],
     assets: { sprites: SPRITES },
   },
 } satisfies Record<string, MapDefinition>

@@ -86,7 +86,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void, op
     lap(`scene: merged ${merged.before} meshes into ${merged.after}`)
   }
   scene.add(town)
-  if (world.animals) spawnAnimals(scene)
+  if (world.animals) spawnAnimals(scene, map)
 
   const environment = createEnvironment(scene)
   const { people, ids, personOf, applySchedule } = await createPopulation(scene, map, world, progress, tick)

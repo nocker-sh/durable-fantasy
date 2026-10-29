@@ -2,6 +2,7 @@ import { houses as square } from "./houses/square.ts"
 import { houses as market } from "./houses/market.ts"
 import { houses as craft } from "./houses/craft.ts"
 import { houses as gate } from "./houses/gate.ts"
+import { houses as fields } from "./houses/fields.ts"
 
 // Households and the buildings they live and work in (.docs/town.md). Every resident belongs to
 // one household; every household has one home, sized for it: one bed per member, a hearth in
@@ -30,7 +31,7 @@ export const HOUSEHOLDS: readonly Household[] = [
     living: "慎ましい",
     trade: "ライ麦と小麦、キャベツ、芋、鶏と豚、巣箱の蜜。麦はカールが風車で挽いて粉にする。町の食料の出どころ",
   },
-  { id: "shepherd", name: "羊飼いのマティアス", members: ["マティアス"], living: "慎ましい", trade: "羊の毛と乳とチーズ。毛は仕立て屋とベルタへ、チーズはパン屋と酒場へ" },
+  { id: "shepherd", name: "羊飼いのマティアスと姪のレージ", members: ["マティアス", "レージ"], living: "慎ましい", trade: "羊の毛と乳とチーズ。毛は仕立て屋とベルタへ、チーズはパン屋と酒場へ。姪のレージが昼の放牧を手伝う" },
   { id: "woodcutter", name: "木こりのヨーゼフ", members: ["ヨーゼフ"], living: "慎ましい", trade: "薪と炭と原木。町じゅうの暖炉と炉の燃料。森のきのこを宿へ" },
   {
     id: "priest",
@@ -126,9 +127,27 @@ export const HOUSEHOLDS: readonly Household[] = [
     trade: "寄り合い所で子どもに読み書きを教える（給金は寄り合いから）。ドロテアは産婆",
   },
   { id: "retired", name: "エドガーとマルグリット", members: ["エドガー", "マルグリット"], living: "慎ましい", trade: "隠居。エドガーは元の門番で、寄り合いから少し出る" },
+  // ---------------------------------------------------------------- the households that came with the three shifts (town.md「暮らしの時間」)
+  { id: "miller", name: "粉屋のベルトラム", members: ["ベルトラム", "イルゼ", "クラウス"], living: "ふつう", trade: "風車で麦を挽く。麦はカールとオスカーとヴェンデルの畑から、粉はマルタとゲルダとオッティリエへ。挽き賃は粉で受け取る" },
+  { id: "tenant-a", name: "小作のオスカーとヨハンナ", members: ["オスカー", "ヨハンナ", "ヴァレンティン", "エリーゼ"], living: "慎ましい", trade: "西の畑でライ麦と野菜を作る小作。畑はヴィルヘルムから借りて、地代は麦で払う。野菜はグレーテとオッティリエへ" },
+  { id: "tenant-b", name: "小作のヴェンデルとアグネス", members: ["ヴェンデル", "アグネス", "ルートヴィヒ", "イルマ"], living: "慎ましい", trade: "西の畑の小作。麦はベルトラムの風車へ、芋と蕪は朝市で売る。イルマは糸を紡いでベルタに納める" },
+  { id: "butcher", name: "肉屋のアルブレヒト", members: ["アルブレヒト", "ギーゼラ", "バスティアン"], living: "ふつう", trade: "西の畑で豚を飼い、つぶして肉と腸詰めを朝市で売る。脂はアガーテのろうそくへ、燻した肉は宿と酒場へ。餌は小作の屑芋" },
+  { id: "dairy", name: "乳屋のレーニ", members: ["レーニ", "フーゴ", "ピア"], living: "慎ましい", trade: "牛と山羊の乳としぼり汁、チーズ。乳はオッティリエの食堂とゲルダの宿へ、残りは朝市で。干し草は小作から" },
+  { id: "breakfast", name: "朝の食堂のオッティリエ", members: ["オッティリエ", "ベンノ", "ユッタ"], living: "ふつう", trade: "夜番が眠る前と朝番が起きた後に、粥とスープを出す食堂。粉はベルトラム、乳はレーニ、野菜はヨハンナから" },
+  { id: "sweepers", name: "道掃きのグスタフとヴィルマ", members: ["グスタフ", "ヴィルマ", "エリアス"], living: "慎ましい", trade: "通りの灰を掃いて集め、モニカに渡す。給金は寄り合いから。孫のエリアスが手伝う" },
+  { id: "watch", name: "衛兵の宿舎", members: ["コンラート", "ヘンリケ", "ロータル"], living: "ふつう", trade: "朝・昼・夜の三交代で門と通りを見回る。給金は寄り合いから。オイゲンたち詰所の番と組む" },
+  { id: "loggers", name: "木こりの兄弟", members: ["アンゼルム", "ルーペルト", "フロリアン"], living: "慎ましい", trade: "昼のうちに樹海の入り口で木を伐り、荷車で運んで薪にして町じゅうへ売る。原木はゴットフリートとフォルカーへ" },
+  { id: "charcoal", name: "炭焼きのゼヴェリン", members: ["ゼヴェリン", "ヴァルトラウト", "ティル"], living: "慎ましい", trade: "樹海の入り口の窯で炭を焼く。炭はギュンターとベアトリクスとクルトへ。窯の夜の番は息子のティル" },
+  { id: "porters", name: "荷担ぎのインゴ", members: ["インゴ", "カルラ", "ベルント"], living: "慎ましい", trade: "倉庫と門の荷の上げ下ろし。ヒルデから日当。カルラは倉庫の帳簿を手伝う" },
+  { id: "nanny", name: "子守りのアンネリー", members: ["アンネリー", "エルナ"], living: "慎ましい", trade: "夜番の家の子を昼に預かり、クリスティアンの読み書きの手伝いもする。預かり賃は親から" },
+  { id: "lodging", name: "下宿屋のヘルタ", members: ["ヘルタ", "キリアン", "ヴィープケ", "ネーレ", "レオポルト"], living: "ふつう", trade: "下宿の家賃。下宿人はブルーノ、イルムガルト、マグダレーナ、マルタの店で昼番や朝番として働く" },
+  { id: "carpenter", name: "大工のフォルカー", members: ["フォルカー", "ジビレ", "ウルリヒ", "パウリーネ"], living: "ふつう", trade: "家と屋根と柵の修理、荷車作り。材木はアンゼルムから、釘はギュンターから。師匠はエルヴィン" },
+  { id: "riverfish", name: "川漁師のクーノ", members: ["クーノ", "テーダ", "モーリッツ"], living: "慎ましい", trade: "夜明け前に川で魚を獲り、朝市で売る。網はテーダが繕う。海の漁はヤコブ、川はクーノ" },
+  { id: "elders2", name: "エルヴィンとアーデルハイト", members: ["エルヴィン", "アーデルハイト"], living: "慎ましい", trade: "隠居。エルヴィンは元の大工で、フォルカーの師匠。寄り合いから少し出る。日なたで木の匙を削る" },
+  { id: "nightstall", name: "夜市の汁物屋", members: ["ドミニク", "レア", "リヌス"], living: "慎ましい", trade: "夜市で汁物を売る。野菜はグレーテ、肉はアルブレヒト、薪はアンゼルムから" },
 ]
 
-export const HOUSES: readonly HouseDef[] = [...square, ...market, ...craft, ...gate]
+export const HOUSES: readonly HouseDef[] = [...square, ...market, ...craft, ...gate, ...fields]
 
 /** The household someone belongs to. */
 export const householdOf = (name: string) => HOUSEHOLDS.find((h) => h.members.includes(name))

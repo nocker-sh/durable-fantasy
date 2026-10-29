@@ -7,6 +7,9 @@ import { lines as buyer } from "./households/buyer.ts"
 import { lines as mapmaker } from "./households/mapmaker.ts"
 import { lines as scribe } from "./households/scribe.ts"
 import { lines as candle } from "./households/candle.ts"
+import { lines as breakfast } from "./households/breakfast.ts"
+import { lines as lodging } from "./households/lodging.ts"
+import { lines as nightstall } from "./households/nightstall.ts"
 import type { Line } from "./line.ts"
 
 export const LINES: Record<string, readonly Line[]> = {
@@ -28,4 +31,15 @@ export const LINES: Record<string, readonly Line[]> = {
   アガーテ: candle["アガーテ"],
   ジーモン: candle["ジーモン"],
   フェリックス: candle["フェリックス"],
+  オッティリエ: breakfast["オッティリエ"],
+  ベンノ: breakfast["ベンノ"],
+  ユッタ: breakfast["ユッタ"],
+  ヘルタ: lodging["ヘルタ"],
+  キリアン: lodging["キリアン"],
+  ヴィープケ: lodging["ヴィープケ"],
+  ネーレ: lodging["ネーレ"],
+  レオポルト: lodging["レオポルト"],
+  ドミニク: nightstall["ドミニク"],
+  レア: nightstall["レア"],
+  リヌス: nightstall["リヌス"],
 }

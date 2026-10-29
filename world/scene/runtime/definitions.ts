@@ -1,6 +1,6 @@
 import type * as THREE from "three"
 import type { Layout } from "../world"
-import { buildMarket, buildCraft, buildGate } from "../districts"
+import { buildMarket, buildCraft, buildGate, buildFields } from "../districts"
 import { layoutOf } from "../../maps/layouts.ts"
 import { INDOOR, buildInterior } from "../interior"
 import { FIELD_LAYOUTS, FIELD_BUILDERS } from "../fields"
@@ -26,6 +26,7 @@ const MAP_SCENES: Record<string, SceneDefinition> = {
   "phanthiet-market": { layout: layoutOf("phanthiet-market"), build: dressed("phanthiet-market", buildMarket), centre: [24, 24] },
   "phanthiet-craft": { layout: layoutOf("phanthiet-craft"), build: dressed("phanthiet-craft", buildCraft), centre: [20, 23] },
   "phanthiet-gate": { layout: layoutOf("phanthiet-gate"), build: dressed("phanthiet-gate", buildGate), centre: [24, 18] },
+  "phanthiet-fields": { layout: layoutOf("phanthiet-fields"), build: dressed("phanthiet-fields", buildFields), animals: true, centre: [21, 23] },
   ...Object.fromEntries(Object.entries(FIELD_LAYOUTS).map(([id, layout]) => [id, { layout, build: FIELD_BUILDERS[id], centre: [24, 24] as V2 }])),
   ...Object.fromEntries(INTERIORS.map((it) => [it.id, room(it)])),
 }

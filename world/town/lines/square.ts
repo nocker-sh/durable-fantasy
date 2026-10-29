@@ -12,6 +12,10 @@ import { lines as shepherd } from "./households/shepherd.ts"
 import { lines as priest } from "./households/priest.ts"
 import { lines as carter } from "./households/carter.ts"
 import { lines as lamp } from "./households/lamp.ts"
+import { lines as miller } from "./households/miller.ts"
+import { lines as sweepers } from "./households/sweepers.ts"
+import { lines as riverfish } from "./households/riverfish.ts"
+import { lines as elders2 } from "./households/elders2.ts"
 import type { Line } from "./line.ts"
 
 export const LINES: Record<string, readonly Line[]> = {
@@ -52,4 +56,16 @@ export const LINES: Record<string, readonly Line[]> = {
   アウグスト: lamp["アウグスト"],
   ヘートヴィヒ: lamp["ヘートヴィヒ"],
   ティム: lamp["ティム"],
+  ベルトラム: miller["ベルトラム"],
+  イルゼ: miller["イルゼ"],
+  クラウス: miller["クラウス"],
+  グスタフ: sweepers["グスタフ"],
+  ヴィルマ: sweepers["ヴィルマ"],
+  エリアス: sweepers["エリアス"],
+  クーノ: riverfish["クーノ"],
+  テーダ: riverfish["テーダ"],
+  モーリッツ: riverfish["モーリッツ"],
+  エルヴィン: elders2["エルヴィン"],
+  アーデルハイト: elders2["アーデルハイト"],
+  レージ: shepherd["レージ"],
 }

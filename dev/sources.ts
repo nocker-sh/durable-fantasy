@@ -3,8 +3,9 @@
 // game exports a new table that is in neither list, so nothing in the game goes unshown.
 export const SOURCES: Record<string, readonly string[]> = {
   items: ["ITEMS", "ITEM_IDS", "ITEM_ICONS", "WEAPONS", "IRON_WEAPONS"],
-  npcs: ["RESIDENTS", "RESIDENT_LOOKS", "PEOPLE", "ROUTINES"],
+  npcs: ["RESIDENTS", "RESIDENT_LOOKS", "PEOPLE", "ROUTINES", "SHIFTS"],
   households: ["HOUSEHOLDS"],
+  ledger: ["UNITS", "PER_HEAD", "DAILY_OUTPUT", "TRADE_FIRES"],
   houses: ["HOUSES", "INTERIORS", "INDOOR_WORLDS", "OUT_FRONT", "TRACES"],
   maps: ["MAPS", "OPEN_FIELDS", "TOWN_SPAWN"],
   shops: ["SHOPS"],
@@ -70,6 +71,7 @@ export const NOT_TABLES: readonly string[] = [
   // how the scene lays out and draws
   "CRAFT",
   "GATE",
+  "FIELDS",
   "MARKET",
   "VILLAGE",
   "INDOOR",

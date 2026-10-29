@@ -30,9 +30,11 @@ import {
   type V2,
 } from "./build"
 import { groundH, isFree, N, roadD, riverD, blockRect, currentLayout } from "./world"
-import { MARKET, CRAFT, GATE } from "../maps/ground-layouts.ts"
+import { MARKET, CRAFT, GATE, FIELDS } from "../maps/ground-layouts.ts"
+import { crops, wheatField } from "./construction/crops.ts"
+import { trough } from "./construction/workshops.ts"
 
-export { MARKET, CRAFT, GATE }
+export { MARKET, CRAFT, GATE, FIELDS }
 
 /** A ring of trees around the edge, keeping the roads and their ends clear. */
 function forestRing(root: THREE.Group, seed: number, depth = 5) {
@@ -62,6 +64,8 @@ export function buildMarket(root: THREE.Group) {
 
   // the little square with its well, a few stalls and benches
   well(root, 24, 24)
+  // and the back street's well, for the houses south of the night stalls
+  well(root, 12.5, 33)
   // the night market: street sellers' stalls, put up when they come and gone when they leave (economy.md §4.6)
   const night: [string, number, number, Parameters<typeof stall>[3], [string, string]][] = [
     ["nm1", 15.5, 27.6, ["bread", "bread", "jug"], ["cWine", "cLinen"]], // Elsa's fried dough, Berta's old clothes later
@@ -108,6 +112,7 @@ export function buildMarket(root: THREE.Group) {
   places.crystal = [35.7, 22.6]
   places.buyer = [4.5, 22.6]
   places.marketWell = [24, 25.6]
+  places.marketWell2 = [12.5, 34.6]
 }
 
 /** A night stall's lamp under the awning, and steam off the food (both go with the stall). */
@@ -175,6 +180,8 @@ export function buildCraft(root: THREE.Group) {
   buildHouses(root, "phanthiet-craft")
   // the lane's own well: quenching at the forge and the tanner's vats need water
   well(root, 24.5, 30.5)
+  // and one at the west end, for the loggers' and the charcoal burners' houses
+  well(root, 9.5, 37)
   // yards: a second forge, timber, hides drying
   forge(root, 16.6, 26.4)
   const gb = new GB()
@@ -206,6 +213,8 @@ export function buildCraft(root: THREE.Group) {
   places.woodworker = [15, 22.4]
   places.leatherworker = [27.2, 22.2]
   places.craftForge = [16.6, 27.4]
+  places.craftWell = [24.5, 29.4]
+  places.craftWell2 = [9.5, 35.4]
 }
 
 /** The road south to the gate in the town wall, with the warehouse and the guards. */
@@ -238,6 +247,8 @@ export function buildGate(root: THREE.Group) {
   root.add(gb.build())
   buildHouses(root, "phanthiet-gate")
   well(root, 24, 18)
+  // the west lane's own well, for the hunter's, the teacher's and the watch's houses
+  well(root, 6.5, 33)
   fence(
     root,
     [
@@ -272,4 +283,83 @@ export function buildGate(root: THREE.Group) {
   places.gateGuard2 = [25.4, 38.4]
   places.guide = [25.8, 18.2]
   places.gateWell = [24, 19.6]
+  places.gateWell2 = [6.5, 34.6]
+}
+
+/** A fenced rect with a gap for its gate. */
+function pen(root: THREE.Group, r: { x0: number; z0: number; x1: number; z1: number }, gate: V2, h: number) {
+  fence(
+    root,
+    [
+      [r.x0, r.z0],
+      [r.x1, r.z0],
+      [r.x1, r.z1],
+      [r.x0, r.z1],
+      [r.x0, r.z0],
+    ],
+    [gate],
+    h,
+  )
+}
+
+/** The tenant farms west of the town: rye and vegetables, the dairy's pasture, the butcher's sties. */
+export function buildFields(root: THREE.Group) {
+  buildHouses(root, "phanthiet-fields")
+  const L = currentLayout()
+  wheatField(root, L.fields[0])
+  wheatField(root, L.fields[1])
+  crops(root, L.fields[2], "cabbage", 61)
+  crops(root, L.fields[3], "turnip", 62)
+  // the farmers' well where the lanes meet
+  well(root, 18.1, 25.7)
+  const P = L.pigpen,
+    Q = L.pasture
+  pen(root, P, [P.x0, P.z0 + 1.2], 0.65)
+  pen(root, Q, [Q.x0 + 1, Q.z0], 0.75)
+  const gb = new GB()
+  trough(gb, P.x1 - 0.6, P.z1 - 0.5, true)
+  trough(gb, Q.x0 + 2.4, Q.z0 + 1.1, true)
+  trough(gb, Q.x1 - 1.2, Q.z1 - 1.4, false)
+  // the butcher's yard: the block, the brine, the smoke wood
+  table(gb, 38.9, 25.4, 1.1, 0.6)
+  barrel(gb, 39.6, 27.2)
+  barrel(gb, 38.6, 28.4, 0.5, 0.3)
+  woodpile(gb, 38.4, 29.5, 1.2, 3, true)
+  // the dairy's churns and the tenants' tools by their doors
+  barrel(gb, 29.2, 24.4, 0.5, 0.25)
+  crate(gb, 9.6, 22.0, 0.45)
+  sack(gb, 16.1, 21.0)
+  sack(gb, 3.5, 21.0)
+  bench(gb, 19.9, 24.8, 1.2, true)
+  root.add(gb.build())
+  cart(root, 16.6, 15.8, 0.6, "hay")
+  haystack(root, 1.8, 25.5, 0.8)
+  haystack(root, 45.6, 37, 0.9)
+  haystack(root, 45.4, 39.2, 0.75)
+  for (const [x, z] of [
+    [21.8, 20.6],
+    [10, 24.2],
+    [21.2, 28],
+  ] as V2[])
+    lantern(root, x, z)
+  shrubs(
+    root,
+    [
+      [16.5, 15.2],
+      [22.6, 15.6],
+      [37.8, 15.4],
+      [19.4, 36.2],
+    ],
+    19,
+  )
+  forestRing(root, 91, 3)
+
+  places.fieldsWell = [18.1, 26.8]
+  places.rye = [15.5, 8]
+  places.rye2 = [23.5, 9]
+  places.cabbages = [17, 36]
+  places.turnips = [25.5, 31.5]
+  places.sties = [P.x0 - 0.5, P.z0 + 1.2]
+  places.butcherYard = [38.6, 26.4]
+  places.meadow = [Q.x0 + 1, Q.z0 - 0.6]
 }

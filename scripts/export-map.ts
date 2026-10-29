@@ -18,6 +18,7 @@ for (const map of only.length
       "phanthiet-market",
       "phanthiet-craft",
       "phanthiet-gate",
+      "phanthiet-fields",
       "south-meadow",
       "red-dunes",
       "sea-cliff",
