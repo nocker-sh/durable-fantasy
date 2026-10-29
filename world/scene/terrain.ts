@@ -338,12 +338,24 @@ function groundColor(x: number, z: number, sx: number, sy: number): RGB {
       return dirt(x, z, sx, sy, 0.48)
     }
   if (inRect(x, z, layout().pasture)) return grass(x, z, sx, sy, "grass", 0.06)
+  // the way worn from each door to the road (maps/layouts.ts): bare in the middle, the grass beaten
+  // down and thin at its sides, wider at the door where feet turn
+  const td = trailD(x, z) + (vnoise(x, z, 1.8, 131) - 0.5) * 0.22
+  if (td < 0.42) {
+    if (td < 0.2 && hash2(sx, sy, 132) > 0.08) return hash2(sx, sy, 133) > 0.96 ? lvl("stone", 1) : dirt(x, z, sx, sy, 0.4 + vnoise(x, z, 2.2, 134) * 0.15)
+    if (hash2(sx >> 1, sy >> 1, 135) > 0.5 - (0.42 - td)) return lvl("grass", 1)
+  }
+  // hoarfrost lingering in the shaded hollows, pale on the grass tips
+  if (hash2(sx, sy, 81) > 0.985 && vnoise(x, z, 0.45, 136) > 0.6) return lvl("frost", 3)
   // fallen leaves blown into drifts
   if (vnoise(x, z, 0.7, 114) > 0.72 && hash2(sx >> 1, sy >> 1, 115) > 0.9) return pick("autumn", 0.3 + hash2(sx, sy, 116) * 0.6, sx, sy)
   // wilder outside town
   const town = Math.hypot((x - 19) / 20, (z - 26) / 19)
   if (town > 0.95 + wob) return grass(x, z, sx, sy, "wild", 0.02)
-  return grass(x, z, sx, sy)
+  // broad patches of drier, yellower grass and of lusher, so a yard does not read as one flat green
+  const dry = vnoise(x, z, 0.16, 137)
+  if (dry > 0.63) return grass(x, z, sx, sy, "wild", 0.04)
+  return grass(x, z, sx, sy, "grass", dry < 0.35 ? 0.06 : 0)
 }
 
 /** The ground of the fields outside town. */
