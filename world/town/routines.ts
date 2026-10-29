@@ -82,7 +82,7 @@ export const ROUTINES: Record<string, readonly Slot[]> = {
   ゲルダ: [
     at("07:30", "home", "眠る"),
     at("14:30", "work", "宿を切り盛りする"),
-    at("22:30", { map: "phanthiet", cell: [51, 57] }, "宿の前を掃いて灯りを足す"),
+    at("22:30", { map: "phanthiet", cell: [51, 55] }, "宿の前を掃いて灯りを足す"),
     at("23:00", "work", "宿を切り盛りする"),
   ],
   ヨーゼフ: [at("09:00", P("forest-edge", "kiln"), "炭焼き窯の番と木を伐る"), at("13:00", "work", "薪を割って、薪と炭を売る"), at("16:30", "tavern", "一杯やる"), at("18:00", "home", "眠る")],
@@ -203,7 +203,7 @@ export const ROUTINES: Record<string, readonly Slot[]> = {
     at("17:00", "work", "店先でパンの籠を持つ"),
     at("19:30", { map: "phanthiet", cell: [38, 46] }, "夜市の灯りの下で遊ぶ"),
     at("21:00", "work", "店先でパンの籠を持つ"),
-    at("02:30", { map: "phanthiet", cell: [23, 46] }, "母の窯の火を見に行く"),
+    at("02:30", { map: "phanthiet", cell: [23, 44] }, "母の窯の火を見に行く"),
   ],
   ニーナ: [at("08:30", "home", "眠る"), at("16:00", "work", "給仕をする")],
   ゼップ: [at("07:00", "home", "眠る"), at("14:00", "work", "煮込みの仕込みをする")],

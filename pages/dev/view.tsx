@@ -70,9 +70,12 @@ function MapViewer() {
       { preview: true, at: query.has("x") && query.has("z") ? [x, z] : undefined, zoom: query.has("zoom") ? Number(query.get("zoom")) : undefined, turn: Number(query.get("turn")) || 0 },
     )
     scene.current = s
+    // for scripts (scripts/export-map.ts reads the walk grid and the named places from here)
+    ;(window as unknown as { view?: MapScene }).view = s
     return () => {
       s.destroy()
       scene.current = null
+      delete (window as unknown as { view?: MapScene }).view
     }
   }, [map, known, query])
 

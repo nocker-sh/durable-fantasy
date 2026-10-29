@@ -5,6 +5,8 @@
 import { SHOPS, type ShopId } from "../core/shops.ts"
 import { HOUSEHOLDS, HOUSES, enterable, type HouseDef } from "./houses.ts"
 import { floorPlan } from "./floorplan.ts"
+import { TILE_M } from "./fit.ts"
+import { ELBOW_M, WALL_GAP_M } from "./floorplan/geometry.ts"
 
 export type Cell = readonly [number, number]
 
@@ -63,7 +65,7 @@ export interface Interior {
   arrive: Cell
   /** where the shopkeeper stands, behind the counter */
   keeper: Cell
-  /** Clothes dried along an entrance-room wall, above the walking floor. */
+  /** Clothes dried on a line along the west wall, above the walking floor. */
   drying?: { x: number; z0: number; z1: number }
   furniture: readonly Furniture[]
 }
@@ -73,8 +75,8 @@ export const interiorId = (h: HouseDef) => `${h.map.split("-")[0]}-in-${h.id}`
 
 const cellOf = (x: number, z: number): Cell => [Math.floor(x * 2), Math.floor(z * 2)]
 
-/** Metres in the plan to tiles in the room: rooms are drawn half again as large as life, so a walkway is a cell wide. */
-export const ROOM_SCALE = 1.5
+/** Metres in the plan to tiles in the room: life size, the same scale as the town outside (fit.ts TILE_M), so a house is as many tiles inside as out. */
+export const ROOM_SCALE = 1 / TILE_M
 
 /** What each piece of the plan is drawn as. */
 export function kindOf(name: string): FurnitureKind | null {
@@ -104,15 +106,15 @@ export function kindOf(name: string): FurnitureKind | null {
 const DIVIDER_KIND = { 壁: "partition", 腰壁: "lowwall", カーテン: "curtain", 棚: "shelf" } as const
 
 /** Build one floor for inspection; only INTERIORS registers playable rooms. */
-export function interiorPlan(h: HouseDef, floor = 0): Interior {
-  const plan = floorPlan(h.id)
+export function interiorPlan(h: HouseDef, floor = 0, plan = floorPlan(h.id)): Interior {
   const K = ROOM_SCALE
   const w = plan.W * K,
     d = plan.D * K
-  const x0 = CENTRE - w / 2,
-    x1 = CENTRE + w / 2,
-    z0 = CENTRE - d / 2,
-    z1 = CENTRE + d / 2
+  // the room's corner on a cell's corner, so the plan's walk grid (floorplan/geometry.ts walkCells) is the game's
+  const x0 = Math.round((CENTRE - w / 2) * 2) / 2,
+    x1 = x0 + w,
+    z0 = Math.round((CENTRE - d / 2) * 2) / 2,
+    z1 = z0 + d
   const at = (r: { x0: number; z0: number; x1: number; z1: number }) => ({ x: x0 + ((r.x0 + r.x1) / 2) * K, z: z0 + ((r.z0 + r.z1) / 2) * K, w: (r.x1 - r.x0) * K, d: (r.z1 - r.z0) * K })
   const furniture: Furniture[] = []
   for (const p of plan.pieces) {
@@ -126,9 +128,8 @@ export function interiorPlan(h: HouseDef, floor = 0): Interior {
   // the keeper stands behind the counter (between it and the back partition), else at the back of the room
   const counter = furniture.find((f) => f.kind === "counter")
   const keeper = counter ? cellOf(counter.x, counter.z - counter.d / 2 - 0.35) : cellOf(CENTRE + 0.25, z0 + 1.0)
-  const entrance = plan.rooms.find((room) => room.floor === floor && room.name === "土間")
-  const drying =
-    floor === 0 && ["fisher", "greengrocer", "fruit"].includes(h.household ?? "") && entrance ? { x: x0 + 0.12, z0: z0 + entrance.z0 * K + 0.2, z1: z0 + entrance.z1 * K - 0.2 } : undefined
+  // a life-size entry is too short to dry much in: the line runs the length of the west wall, over the room and the entry both
+  const drying = floor === 0 && ["fisher", "greengrocer", "fruit"].includes(h.household ?? "") ? { x: x0 + 0.12, z0: z0 + 0.3, z1: z1 - 0.3 } : undefined
   return { drying, house: h, floor, id: interiorId(h), x0, z0, x1, z1, door, arrive: [door[0], door[1] - 2], keeper, furniture }
 }
 
@@ -144,8 +145,10 @@ export function interiorRows(it: Interior): string[] {
     for (let i = 0; i < INDOOR_SIZE; i++) {
       const x = (i + 0.5) / 2,
         z = (j + 0.5) / 2
-      let free = x > it.x0 + 0.2 && x < it.x1 - 0.2 && z > it.z0 + 0.2 && z < it.z1 - 0.2
-      if (free) for (const f of it.furniture) if (f.solid && Math.abs(x - f.x) < f.w / 2 + 0.15 && Math.abs(z - f.z) < f.d / 2 + 0.15) free = false
+      const gap = WALL_GAP_M / TILE_M,
+        elbow = ELBOW_M / TILE_M
+      let free = x > it.x0 + gap && x < it.x1 - gap && z > it.z0 + gap && z < it.z1 - gap
+      if (free) for (const f of it.furniture) if (f.solid && Math.abs(x - f.x) < f.w / 2 + elbow && Math.abs(z - f.z) < f.d / 2 + elbow) free = false
       if (i === it.door[0] && j === it.door[1]) free = true
       row += free ? "." : "#"
     }

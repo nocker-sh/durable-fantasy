@@ -199,14 +199,39 @@ export const VILLAGE: Layout = {
       w: 0.65,
       kind: "dirt",
     },
+    // the lane past the back of the inn down to the washing place
     {
       pts: catmull([
-        [19.2, 33.4],
-        [24, 33.5],
-        [28.7, 33.6],
+        [19.4, 36.4],
+        [24, 36.5],
+        [27.4, 36.4],
+        [29.5, 35.4],
+        [29.3, 33.4],
       ]),
       w: 0.7,
       kind: "cobble",
+    },
+    // the lane behind the north side of the square, to the lamplighter's and the brother's doors
+    {
+      pts: catmull([
+        [17.4, 15.2],
+        [19.2, 12.85],
+        [24, 12.65],
+        [30, 12.65],
+      ]),
+      w: 0.45,
+      kind: "pave",
+    },
+    // the back lane west off the south road, between the rows of cottages
+    {
+      pts: catmull([
+        [18.6, 34],
+        [12, 34],
+        [6, 34.1],
+        [1.2, 34],
+      ]),
+      w: 0.5,
+      kind: "pave",
     },
     {
       pts: catmull([
@@ -227,22 +252,22 @@ export const VILLAGE: Layout = {
   bridge: { x0: 29.0, x1: 34.6, z0: 21.15, z1: 22.85 },
   fields: [
     { x0: 38.6, z0: 1.5, x1: 44, z1: 9.5, axis: "x" },
-    { x0: 38.6, z0: 10.6, x1: 42, z1: 14, axis: "z" },
+    { x0: 38.2, z0: 10.4, x1: 40.8, z1: 14.6, axis: "z" },
   ],
   pigpen: { x0: 36.4, z0: 25.8, x1: 40.2, z1: 29.2 },
   pasture: { x0: 42.4, z0: 30.4, x1: 47, z1: 40.5 },
   graveyard: { x0: 4, z0: 7.6, x1: 8.6, z1: 11.3 },
   gardens: [
-    { x0: 3.4, z0: 32.6, x1: 6.6, z1: 35.2 },
-    { x0: 9, z0: 20.4, x1: 11.6, z1: 22.8 },
-    { x0: 13.2, z0: 36.2, x1: 16.2, z1: 38.4 },
+    { x0: 1.6, z0: 40.6, x1: 5.6, z1: 43.4 },
+    { x0: 6, z0: 19.4, x1: 8.8, z1: 22.4 },
+    { x0: 7.4, z0: 40.2, x1: 11, z1: 42.6 },
   ],
   dirtPatches: [
-    [11.4, 26.8, 14, 30.4], // smithy yard
-    [11.6, 20.6, 15.6, 22.6], // bakery yard
-    [36.6, 16, 39.4, 19.6], // coop yard
-    [26, 33.9, 28.8, 37.4], // drying yard
-    [2.2, 20.6, 4.4, 23.6], // woodcutter
+    [12.3, 28.4, 16.8, 33], // smithy yard
+    [10, 18.3, 14.8, 22], // bakery yard
+    [38.2, 18.2, 41, 20.8], // coop yard
+    [22, 37.6, 28.5, 40.4], // drying yard
+    [2.2, 19, 4.6, 23.6], // woodcutter
   ],
   town: [18, 26, 18, 17],
   seed: 7,

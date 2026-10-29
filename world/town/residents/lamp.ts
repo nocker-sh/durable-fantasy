@@ -4,7 +4,7 @@ const residents = {
   アウグスト: {
     name: "アウグスト",
     job: "灯り直し",
-    at: [25.5, 14.3],
+    at: [24.6, 11.95],
     item: "hammer",
     look: {
       legs: "straight",
@@ -26,7 +26,7 @@ const residents = {
   ヘートヴィヒ: {
     name: "ヘートヴィヒ",
     job: "編み物",
-    at: [23.4, 14.5],
+    at: [22.6, 11.9],
     item: null,
     look: {
       skirt: "long",
@@ -47,7 +47,7 @@ const residents = {
   ティム: {
     name: "ティム",
     job: "子ども",
-    at: [24.5, 15.4],
+    at: [25.3, 12.0],
     item: null,
     look: {
       legs: "breeches",

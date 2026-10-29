@@ -1,57 +1,18 @@
 import { describe, expect, it } from "vitest"
 import { HOUSES, enterable } from "./houses.ts"
 import { planOf, type FloorPlan, type Rect } from "./floorplan.ts"
+import { walkCells } from "./floorplan/geometry.ts"
 
 const PLANS = HOUSES.map((h) => ({ h, p: planOf(h) }))
 const lived = PLANS.filter(({ h }) => h.plan.hearth && h.kind !== "vacant")
 const overlap = (a: Rect, b: Rect) => a.x0 < b.x1 - 1e-6 && b.x0 < a.x1 - 1e-6 && a.z0 < b.z1 - 1e-6 && b.z0 < a.z1 - 1e-6
 const touchesWall = (r: Rect, p: FloorPlan) => r.x0 < 0.3 || r.z0 < 0.3 || r.x1 > p.W - 0.3 || r.z1 > p.D - 0.3
 
-/** Cells (20 cm) on a floor someone can stand in: clear of walls, partitions and solid furniture by 20 cm. */
+/** The game's own walk grid on a floor (floorplan/geometry.ts walkCells, the grid interiors.ts draws the rooms with). */
 function walkGrid(p: FloorPlan, floor: number) {
-  const C = 0.2,
-    nx = Math.ceil(p.W / C),
-    nz = Math.ceil(p.D / C)
-  const free = new Uint8Array(nx * nz)
-  const blockers: Rect[] = [...p.pieces.filter((x) => x.floor === floor && x.solid), ...p.dividers.filter((d) => d.floor === floor)]
-  for (let j = 0; j < nz; j++)
-    for (let i = 0; i < nx; i++) {
-      const x = (i + 0.5) * C,
-        z = (j + 0.5) * C,
-        m = 0.18
-      const me = { x0: x - m, z0: z - m, x1: x + m, z1: z + m }
-      free[j * nx + i] = x > m && z > m && x < p.W - m && z < p.D - m && !blockers.some((b) => overlap(me, b)) ? 1 : 0
-    }
-  const cellOf = (x: number, z: number) => [Math.min(nx - 1, Math.max(0, Math.floor(x / C))), Math.min(nz - 1, Math.max(0, Math.floor(z / C)))]
-  /** Can one walk from (x, z) to within `reach` of the rect? */
-  const reach = (from: [number, number], to: Rect, within = 0.6) => {
-    const [si, sj] = cellOf(from[0], from[1])
-    const seen = new Uint8Array(nx * nz),
-      queue = [sj * nx + si]
-    seen[queue[0]] = 1
-    while (queue.length) {
-      const k = queue.shift()!,
-        i = k % nx,
-        j = Math.floor(k / nx)
-      const x = (i + 0.5) * C,
-        z = (j + 0.5) * C
-      if (x > to.x0 - within && x < to.x1 + within && z > to.z0 - within && z < to.z1 + within) return true
-      for (const [di, dj] of [
-        [1, 0],
-        [-1, 0],
-        [0, 1],
-        [0, -1],
-      ]) {
-        const ii = i + di,
-          jj = j + dj,
-          q = jj * nx + ii
-        if (ii < 0 || jj < 0 || ii >= nx || jj >= nz || seen[q] || !free[q]) continue
-        seen[q] = 1
-        queue.push(q)
-      }
-    }
-    return false
-  }
+  const g = walkCells(p.W, p.D, [...p.pieces.filter((x) => x.floor === floor && x.solid), ...p.dividers.filter((d) => d.floor === floor)])
+  /** Can one walk from (x, z) to a cell next to the rect? */
+  const reach = (from: [number, number], to: Rect) => g.reaches(g.flood(from), to)
   return { reach }
 }
 

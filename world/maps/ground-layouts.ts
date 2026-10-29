@@ -54,11 +54,11 @@ export const MARKET: Layout = {
     // the back alley behind the north row: washing, barrels, the kitchen doors
     {
       pts: catmull([
-        [2.5, 16.2],
-        [12, 16.1],
-        [24, 16.2],
-        [36, 16.3],
-        [45, 16.2],
+        [1.5, 16],
+        [12, 15.9],
+        [24, 16],
+        [36, 16.05],
+        [45.5, 16],
       ]),
       w: 0.5,
       kind: "pave",
@@ -100,7 +100,7 @@ export const CRAFT: Layout = {
   dirtPatches: [
     [14, 25, 19, 29],
     [24, 25, 29, 28.6],
-    [8, 17.2, 12.6, 20.6],
+    [11.1, 17.2, 12.6, 20.6],
   ],
   town: [20, 24, 18, 14],
   seed: 13,

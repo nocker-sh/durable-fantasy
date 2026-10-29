@@ -278,6 +278,8 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
     const fl = new Floor(floor, W, D, dividers)
     // the stair comes up at the back of the east wall: its head and landing stay clear
     if (stairRect) fl.add({ name: "階段の口", floor, ...stairRect, solid: true, wall: true }, stairFoot)
+    // one comes up at the stair's head, and must reach every bed from there
+    if (stairFoot) fl.from = centre(stairFoot)
     // rooms side by side across the floor, a passage along the front to reach them all
     const passage = 1.0
     // each room as wide as its beds need (a bed and a half of width each), the rest shared out
@@ -317,6 +319,7 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
         const s = sizeOf(name)!
         const p = fl.againstWall(name, s.w, s.d, s.front, room, deep ? ["n", "w", "e"] : ["s", "w", "e"], b % 2 ? 1 : 0)
         if (!p) unplaced.push(`${name}（2階）`)
+        else fl.targets.push(p)
         bedRoom++
       }
     // what else lives upstairs: chests at the beds' feet, the loom by a window, the shelves of stores

@@ -159,13 +159,12 @@ function counterGoods(root: THREE.Group, f: Furniture, y0: number, shop: string 
 
 /**
  * Which way a piece faces: away from the wall it stands nearest, out into the room. The room is
- * laid out half again as large as life (interiors.ts ROOM_SCALE) so there is room to walk, but a
- * chair drawn that wide would be a bench: each piece is drawn a little smaller than the floor it
- * keeps, its back still to its wall.
+ * laid out life size (interiors.ts ROOM_SCALE), the same as the town outside, so each piece is
+ * drawn the size of the floor it takes, its back to its wall.
  */
-const SHRINK = 0.78
+const SHRINK = 1
 /** how much larger than life the things on the walls and beams are drawn */
-const WALL_SCALE = 1.45
+const WALL_SCALE = 1
 function spotOf(it: Interior, f: Furniture, y0: number): Spot {
   const gaps: [number, Spot["face"]][] = [
     [f.z - f.d / 2 - it.z0, 0],
@@ -267,7 +266,7 @@ function dress(root: THREE.Group, gb: GB, it: Interior, y0: number, seed: number
     if (!/^(食卓|大きな食卓|長卓|卓)$/.test(f.name ?? "") && f.kind !== "hearth") continue
     const rg = new GB()
     const s = spotOf(it, f, y0)
-    const [w, d] = f.kind === "hearth" ? [Math.min(f.w, f.d) * 0.9, 0.9] : [s.w + 1.0, s.d + 1.0]
+    const [w, d] = f.kind === "hearth" ? [Math.min(f.w, f.d) * 0.9, 0.9] : [s.w + 0.7, s.d + 0.7]
     const front = f.kind === "hearth" ? new Kit(rg, s).at(0, (s.face === 1 || s.face === 3 ? s.w : s.d) / 2 + 0.55) : [s.x, s.z]
     const rot = f.kind === "hearth" && (s.face === 1 || s.face === 3)
     const [rw, rd] = rot ? [d, w] : [w, d]

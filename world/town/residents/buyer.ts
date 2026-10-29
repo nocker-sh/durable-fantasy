@@ -28,7 +28,7 @@ const residents = {
     map: "phanthiet-market",
     name: "カスパー",
     job: "荷運び",
-    at: [3.5, 25.6],
+    at: [6.2, 22.4],
     item: "sack",
     look: {
       legs: "tucked",

@@ -79,13 +79,13 @@ export function buildMarket(root: THREE.Group) {
   bench(gb, 24, 20.4, 1.3, true)
   barrel(gb, 19.6, 21.6)
   barrel(gb, 19.2, 22.2, 0.6, 0.24)
-  crate(gb, 28.6, 21.4)
-  crate(gb, 28.6, 21.4, 0.4, groundH(28.6, 21.4) + 0.4)
-  sack(gb, 14.4, 22.4)
-  sack(gb, 14.8, 22.6)
-  bench(gb, 8.1, 22.5, 0.9, true) // by the tavern door, clear of it
+  crate(gb, 26.2, 21.0)
+  crate(gb, 26.2, 21.0, 0.4, groundH(26.2, 21.0) + 0.4)
+  sack(gb, 19.2, 20.4)
+  sack(gb, 19.6, 20.6)
+  bench(gb, 6.2, 26.2, 0.9, true) // by the tavern door, clear of it
   root.add(gb.build())
-  for (const x of [3, 14, 21, 27, 34, 45]) lantern(root, x, 22.4)
+  for (const x of [7.6, 12.8, 20.5, 27, 32.7, 38.7, 44.8]) lantern(root, x, 22.5)
   for (const x of [9, 30, 39]) lantern(root, x, 25.8)
   shrubs(
     root,
@@ -93,7 +93,7 @@ export function buildMarket(root: THREE.Group) {
       [14.6, 26.6],
       [27.2, 26.4],
       [20.6, 21.4],
-      [33.8, 22.4],
+      [32.7, 22.3],
       [8.6, 31.4],
     ],
     3,
@@ -101,12 +101,12 @@ export function buildMarket(root: THREE.Group) {
   backAlley(root)
   forestRing(root, 61)
 
-  places.tavern = [6.4, 22.6]
-  places.apothecary = [11.9, 22.4]
-  places.general = [17.1, 22.5]
-  places.tailor = [30.7, 22.4]
-  places.crystal = [36.1, 22.5]
-  places.buyer = [5.8, 25.7]
+  places.tavern = [5.6, 25.9]
+  places.apothecary = [10.2, 22.6]
+  places.general = [15.9, 22.6]
+  places.tailor = [29.95, 22.6]
+  places.crystal = [35.7, 22.6]
+  places.buyer = [4.5, 22.6]
   places.marketWell = [24, 25.6]
 }
 
@@ -137,18 +137,26 @@ function stallDressing(g: THREE.Object3D, steam: boolean) {
 }
 
 /**
- * The alley behind the shopping street's north row. Empty bottles wait behind the tavern
- * for the brewery, herbs grow
- * in pots behind the apothecary, a rain barrel stands under each eave.
+ * The alley behind the shopping street's north row, and the back of the tavern across the street.
+ * Empty bottles wait behind the tavern for the brewery, herbs grow in pots behind the apothecary,
+ * a rain barrel stands under each eave.
  */
 function backAlley(root: THREE.Group) {
   const gb = new GB()
   // behind the tavern: crates of empty bottles going back to the brewery, a spare barrel
-  crate(gb, 4.4, 15.0, 0.5)
-  crate(gb, 4.4, 15.0, 0.4, groundH(4.4, 15.0) + 0.4)
-  barrel(gb, 6.6, 14.9, 0.6, 0.26)
-  // rain barrels under the eaves
-  for (const x of [11.2, 16.4, 33.0, 36.8, 41.4]) barrel(gb, x, 17.0, 0.55, 0.24)
+  crate(gb, 3.2, 34.8, 0.5)
+  crate(gb, 3.2, 34.8, 0.4, groundH(3.2, 34.8) + 0.4)
+  barrel(gb, 5.6, 34.7, 0.6, 0.26)
+  // rain barrels under the eaves, between the houses
+  for (const [x, z] of [
+    [7.55, 17.9],
+    [12.75, 17.9],
+    [18.9, 18.2],
+    [32.65, 18.0],
+    [38.7, 18.0],
+    [44.2, 18.4],
+  ] as V2[])
+    barrel(gb, x, z, 0.55, 0.24)
   // behind the general store: sacks waiting to be shelved
   sack(gb, 17.8, 15.0)
   sack(gb, 18.2, 15.2)
@@ -172,7 +180,7 @@ export function buildCraft(root: THREE.Group) {
   const gb = new GB()
   anvil(gb, 17.6, 27.8)
   woodpile(gb, 14.6, 28.4, 1.6, 4, true)
-  woodpile(gb, 11.4, 18.6, 1.4, 3, false)
+  woodpile(gb, 11.85, 18.8, 1.4, 3, false)
   barrel(gb, 18.8, 26.2, 0.55, 0.3)
   crate(gb, 25.4, 25.6)
   crate(gb, 26.2, 25.8, 0.4)

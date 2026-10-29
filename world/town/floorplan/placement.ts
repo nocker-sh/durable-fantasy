@@ -1,5 +1,5 @@
 import type { Placed, Rect, Divider } from "./types.ts"
-import { overlap, rect, inside } from "./geometry.ts"
+import { overlap, rect, inside, walkCells } from "./geometry.ts"
 
 /** One floor being filled: what is there already, and the room each thing may go in. */
 class Floor {
@@ -25,49 +25,13 @@ class Floor {
     return this.reachable(r)
   }
 
-  /** With `extra` standing too, can one still walk from the door to every target? (20 cm cells, 18 cm of elbow room) */
+  /** With `extra` standing too, can one still walk from the door to every target, on the game's own grid (geometry.ts walkCells)? */
   reachable(extra: Rect | null = null): boolean {
     if (!this.from || !this.targets.length) return true
-    const C = 0.2,
-      nx = Math.ceil(this.W / C),
-      nz = Math.ceil(this.D / C),
-      m = 0.18
     const blockers: Rect[] = [...this.pieces.filter((p) => p.solid), ...this.dividers.filter((d) => d.floor === this.floor), ...(extra ? [extra] : [])]
-    const free = (i: number, j: number) => {
-      const x = (i + 0.5) * C,
-        z = (j + 0.5) * C
-      if (x < m || z < m || x > this.W - m || z > this.D - m) return false
-      const me = { x0: x - m, z0: z - m, x1: x + m, z1: z + m }
-      return !blockers.some((b) => overlap(me, b))
-    }
-    const si = Math.min(nx - 1, Math.floor(this.from[0] / C)),
-      sj = Math.min(nz - 1, Math.floor(this.from[1] / C))
-    const seen = new Uint8Array(nx * nz),
-      queue = [sj * nx + si]
-    seen[queue[0]] = 1
-    const left = new Set(this.targets)
-    while (queue.length && left.size) {
-      const k = queue.shift()!,
-        i = k % nx,
-        j = Math.floor(k / nx)
-      const x = (i + 0.5) * C,
-        z = (j + 0.5) * C
-      for (const t of left) if (x > t.x0 - 0.5 && x < t.x1 + 0.5 && z > t.z0 - 0.5 && z < t.z1 + 0.5) left.delete(t)
-      for (const [di, dj] of [
-        [1, 0],
-        [-1, 0],
-        [0, 1],
-        [0, -1],
-      ]) {
-        const ii = i + di,
-          jj = j + dj,
-          q = jj * nx + ii
-        if (ii < 0 || jj < 0 || ii >= nx || jj >= nz || seen[q] || !free(ii, jj)) continue
-        seen[q] = 1
-        queue.push(q)
-      }
-    }
-    return left.size === 0
+    const g = walkCells(this.W, this.D, blockers)
+    const seen = g.flood(this.from)
+    return this.targets.every((t) => g.reaches(seen, t))
   }
 
   add(p: Placed, front: Rect | null) {

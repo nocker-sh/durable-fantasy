@@ -56,8 +56,8 @@ export function buildTown(root: THREE.Group) {
   bench(pb, 18.5, 21.3, 1.3, true)
   places.bench = [18.5, 21.45]
   bench(pb, 24.0, 24.8, 1.3, false)
-  barrel(pb, 11.55, 19.7)
-  barrel(pb, 11.5, 20.35, 0.6, 0.24) // the bakery's water and flour barrels, by its west wall
+  barrel(pb, 10.35, 18.8)
+  barrel(pb, 10.3, 19.45, 0.6, 0.24) // the bakery's water and flour barrels, in the corner of its yard
   crate(pb, 23.6, 22.2)
   crate(pb, 23.6, 22.2, 0.4, groundH(23.6, 22.2) + 0.4)
   sack(pb, 17.4, 28.2)
@@ -69,32 +69,34 @@ export function buildTown(root: THREE.Group) {
   lantern(root, 18.0, 17.6)
   lantern(root, 28.6, 21.0)
   lantern(root, 10.6, 24.2)
+  lantern(root, 9.5, 33.3) // the back lane
+  lantern(root, 26.05, 12.0) // the lane behind the north side
 
-  // bakery yard: the oven at the west end, the door at the east, Hans's bread board beside it
-  oven(root, 12.6, 21.6)
-  places.oven = [12.6, 22.85]
+  // bakery yard, in front of the shop: the oven at the west end, Hans's bread board at the east, by the square
+  oven(root, 11.0, 20.6)
+  places.oven = [11.0, 21.85]
   const bk = new GB()
-  table(bk, 15.4, 22.3, 1.0, 0.55)
-  places.knead = [15.4, 21.75] // Hans sells from here
-  woodpile(bk, 10.5, 18.8, 1.2, 3, false)
-  sack(bk, 16.4, 20.85)
-  sack(bk, 16.75, 21.0)
-  sack(bk, 16.55, 21.35)
+  table(bk, 14.0, 20.8, 1.0, 0.55)
+  places.knead = [14.0, 20.25] // Hans sells from here
+  woodpile(bk, 8.95, 16.0, 1.2, 3, false)
+  sack(bk, 14.6, 19.0)
+  sack(bk, 14.9, 19.15)
+  sack(bk, 14.7, 19.5)
   root.add(bk.build())
-  addSprite(root, basket("bread", 7, 30, 24), 15.2, groundH(15.4, 22.3) + 0.62, 22.3)
-  addSprite(root, basket("roll" as Goods, 8, 26, 22), 15.7, groundH(15.4, 22.3) + 0.62, 22.35)
+  addSprite(root, basket("bread", 7, 30, 24), 13.8, groundH(14.0, 20.8) + 0.62, 20.8)
+  addSprite(root, basket("roll" as Goods, 8, 26, 22), 14.3, groundH(14.0, 20.8) + 0.62, 20.85)
 
-  // smithy yard
-  forge(root, 11.6, 27.6)
-  places.forge = [11.6, 28.55]
+  // smithy yard, east of the smithy's door, open to the square
+  forge(root, 14.4, 29.4)
+  places.forge = [14.4, 30.35]
   const sm = new GB()
-  anvil(sm, 12.6, 29.0)
-  places.anvil = [12.6, 29.7]
-  barrel(sm, 13.6, 27.6, 0.55, 0.3) // quench
-  woodpile(sm, 9.6, 27.4, 1.3, 3, true)
-  crate(sm, 13.7, 30.2, 0.45)
+  anvil(sm, 15.4, 31.4)
+  places.anvil = [15.4, 32.1]
+  barrel(sm, 16.2, 29.4, 0.55, 0.3) // quench
+  woodpile(sm, 13.0, 32.4, 1.3, 3, true)
+  crate(sm, 16.3, 32.5, 0.45)
   root.add(sm.build())
-  for (let i = 0; i < 3; i++) flatDecal(root, clutter("chips", i), 12.2 + i * 0.5, 30.2 - i * 0.3, 40)
+  for (let i = 0; i < 3; i++) flatDecal(root, clutter("chips", i), 14.6 + i * 0.5, 31.8 - i * 0.3, 40)
 
   // woodcutter
   const wc = new GB()
@@ -107,17 +109,17 @@ export function buildTown(root: THREE.Group) {
   root.add(wc.build())
   for (let i = 0; i < 4; i++) flatDecal(root, clutter("chips", 10 + i), 3.6 + (i % 2) * 0.6, 23.5 + (i >> 1) * 0.6, 40, i)
 
-  places.hang = [27.4, 35.4]
+  places.hang = [25.2, 39.0]
 
   // inn: tables and barrels
   const inn = new GB()
-  table(inn, 20.5, 27.9 + 4.5 - 4.4, 1.0, 0.6)
-  bench(inn, 20.5, 28.55, 1.0, true)
-  barrel(inn, 26.9, 28.5)
-  barrel(inn, 27.3, 29.1)
-  barrel(inn, 26.95, 29.7, 0.6, 0.25)
+  table(inn, 22.4, 27.3, 1.0, 0.6)
+  bench(inn, 22.4, 27.9, 1.0, true)
+  barrel(inn, 26.6, 27.7)
+  barrel(inn, 27.2, 28.0)
+  barrel(inn, 26.8, 27.1, 0.6, 0.25)
   root.add(inn.build())
-  places.innFront = [24.2, 27.8]
+  places.innFront = [24.5, 27.7]
 
   // gardens
   currentLayout().gardens.forEach((g, i) => {
@@ -173,20 +175,20 @@ export function buildTown(root: THREE.Group) {
     0.75,
   )
   places.pasture = [Q.x0 - 0.5, Q.z0 + 0.7]
-  haystack(root, 46.2, 11.0)
-  haystack(root, 46.4, 9.4, 0.85)
-  haystack(root, 39.4, 20.8, 0.8)
-  cart(root, 39.3, 11.2, 0.3, "hay")
+  haystack(root, 46.0, 6.6)
+  haystack(root, 46.2, 8.6, 0.85)
+  haystack(root, 39.4, 21.4, 0.8)
+  cart(root, 36.6, 6.0, 0.3, "hay")
   cart(root, 24.2, 20.6, -1.2, "cabbage")
-  cart(root, 27.6, 36.6, 0, "barrels")
+  cart(root, 28.6, 41.6, 0, "barrels")
   const fm = new GB()
-  sack(fm, 39.7, 18.6)
-  sack(fm, 40.05, 18.8)
-  crate(fm, 40.0, 19.4, 0.45)
-  bucket(fm, 37.4, 18.3, undefined, false)
-  woodpile(fm, 46.6, 19.8, 1.6, 4, false)
+  sack(fm, 40.2, 18.7)
+  sack(fm, 40.55, 18.9)
+  crate(fm, 40.5, 19.5, 0.45)
+  bucket(fm, 38.6, 18.6, undefined, false)
+  woodpile(fm, 45.6, 15.75, 1.6, 4, false)
   root.add(fm.build())
-  places.coop = [37.8, 18.6]
+  places.coop = [39.4, 19.2]
 
   // windmill
   windmill(root, 45.0, 4.0)
@@ -194,20 +196,20 @@ export function buildTown(root: THREE.Group) {
   // flowerbeds & bushes around town
   const fl = new Rng(4)
   for (const [x, z] of [
-    [11.6, 20.2],
     [16.6, 19.6],
     [21.8, 19.4],
-    [12.4, 31.8],
+    [6.6, 32.8],
     [17.0, 33.0],
-    [21.2, 33.0],
+    [20.6, 33.4],
     [25.2, 23.8],
     [8.6, 23.6],
-    [6.8, 26.8],
-    [12.3, 36.5],
-    [20.6, 37.5],
+    [6.4, 26.6],
+    [11.9, 39.6],
+    [20.6, 39.0],
+    [26.2, 12.0],
   ] as V2[]) {
     const r = 0.35 + fl.next() * 0.2
-    if (roadD(x, z) > r + 0.35) bush(root, x, z, r, "leaf2", true)
+    if (roadD(x, z) > r + 0.35 && isFree(x, z)) bush(root, x, z, r, "leaf2", true)
   }
 
   // trees: town + forest ring
@@ -216,17 +218,16 @@ export function buildTown(root: THREE.Group) {
     [18.8, 9],
     [14, 10.6],
     [5, 4.4],
-    [4.4, 13.2],
-    [9.8, 14.5],
-    [26.4, 21],
-    [11.2, 38.8],
-    [24.8, 39.4],
+    [1.6, 12.6],
+    [26.4, 21.2],
+    [12.6, 43.6],
+    [16.6, 41],
     [29.4, 26.4],
     [36.2, 30.6],
     [38.2, 34.8],
-    [9.2, 31.8],
-    [1.8, 27.6],
-    [23.2, 7.8],
+    [1.2, 32.4],
+    [30.2, 44],
+    [23.2, 5.6],
   ]
   townTrees.forEach(([x, z], i) => tree(root, x, z, 0.9 + tr.next() * 0.35, i % 4 === 0 ? "autumn" : i % 3 === 0 ? "leaf2" : "leaf", i))
   for (let i = 0; i < 260; i++) {
