@@ -26,6 +26,8 @@
 
 どの家も、間取りの家具を実寸で並べて通路が取れ、住む人数に比べて広すぎないことを確かめる（`world/town/fit.ts`、`fit.test.ts`）。
 
+人の住む家には、仕事にかかわらず暮らしの道具が揃う。人数分の寝台と椅子のほか、食卓、水甕、薪入れ、衣装箱、食べ物の置き場（保存食の棚や籠）を必ず置き、間取りの中に場所を取る（`world/town/house-plan.ts` の `ESSENTIALS`。家の表に書いていなければ足す）。灯りは部屋ごとに吊りランプを描く。入れない民家の中も同じ間取りから作り、/dev/view で見られる（`phanthiet-in-h3`、2 階は `phanthiet-in-h3@1`）。
+
 世帯と建物の一覧は `world/town/houses.ts`、間取りは `world/town/floorplan.ts`。
 
 ## 家の見た目

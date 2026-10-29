@@ -25,7 +25,7 @@ import { tickSprites } from "../sprite-pool"
 import { exposeScene, lap } from "../../diagnostics.ts"
 import { Ashfall, dustAll } from "../ash"
 import { findPath } from "../path"
-import { MAP_SCENES } from "./definitions.ts"
+import { MAP_SCENES, sceneOf } from "./definitions.ts"
 import { diorama } from "./settings.ts"
 import { createTerrain } from "./terrain.ts"
 import { createEnvironment, createLighting } from "./lighting.ts"
@@ -47,7 +47,7 @@ export interface SceneOptions {
 
 async function createSceneRuntime(map: string, progress: (t: string) => void, options: SceneOptions = {}) {
   const preview = !!options.preview
-  const world = MAP_SCENES[map] ?? MAP_SCENES.phanthiet
+  const world = sceneOf(map) ?? MAP_SCENES.phanthiet
   progress("地面を描いています…")
   // the ground and the plan's fields come from workers or from an earlier visit; only then is the plan used
   const ground = await groundOf(map)

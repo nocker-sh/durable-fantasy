@@ -157,7 +157,8 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
           e.name = `placed:${e.name}`
         }
       })
-    f0.clear.push({ x0: corner.x0, z0: corner.z0, x1: corner.x1, z1: corner.z1 })
+    // the corner and the curtain drawn across it later stay clear
+    f0.clear.push({ x0: corner.x0, z0: corner.z0, x1: corner.x1, z1: corner.z1 + DIV })
   }
   // the hearth in the middle of the room they live in, and the table at it
   let hearth: Placed | null = null

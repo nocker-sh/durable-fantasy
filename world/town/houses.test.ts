@@ -3,6 +3,8 @@ import { RESIDENTS } from "./residents.ts"
 import { SHOPS } from "../core/shops.ts"
 import { ITEMS } from "../core/items.ts"
 import { HOUSEHOLDS, HOUSES, bedsOf, enterable, floorsOf, seatsOf } from "./houses.ts"
+import { ESSENTIALS, missing } from "./house-plan.ts"
+import { floorPlan } from "./floorplan.ts"
 
 describe("households and houses hang together", () => {
   it("every resident belongs to exactly one household", () => {
@@ -25,6 +27,14 @@ describe("households and houses hang together", () => {
       expect(homes, hh.id).toHaveLength(1)
       const extra = homes[0].kind === "public" && homes[0].shop === "inn" ? 3 : 0 // the inn's guest beds
       expect(bedsOf(homes[0]), hh.id).toBe(hh.members.length + extra)
+    }
+  })
+
+  it("every household lives with the things of everyday life: a table, water, firewood, a chest, food put by, and they all find a place in the plan", () => {
+    for (const h of HOUSES.filter((x) => x.household && x.plan.rooms.some((r) => r.beds))) {
+      expect(missing(h.plan.furniture), h.name).toEqual([])
+      const placed = new Set(floorPlan(h.id).pieces.map((p) => p.name))
+      for (const [name, re] of ESSENTIALS) expect([...placed].some((n) => re.test(n)), `${h.name}: ${name}`).toBe(true)
     }
   })
 

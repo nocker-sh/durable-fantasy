@@ -2,7 +2,7 @@ import "#/dev/dev.css"
 import { useEffect, useRef, useState } from "react"
 import { MapScene, diorama } from "#/world/scene/index.ts"
 import { spritesPending } from "#/world/scene/sprite-pool.ts"
-import { MAP_SCENES } from "#/world/scene/runtime/definitions.ts"
+import { MAP_SCENES, sceneOf } from "#/world/scene/runtime/definitions.ts"
 import { MAPS } from "#/world/maps/index.ts"
 import { formatTime, jstMinutes, parseTime } from "#/world/core/clock.ts"
 import { MAP_KIND } from "#/dev/sheets/shared.tsx"
@@ -12,7 +12,8 @@ import { useNoCanvasMenu } from "#/hooks/use-no-canvas-menu.ts"
  * One map as the game draws it, with nobody playing: no player, no windows, no names, no server.
  * Everything is a query, to put together freely:
  * /dev/view?map=phanthiet-market&time=21:00&x=24&z=24&zoom=0&turn=2&ui=0
- * map: the map (the square if left out); time: the hour it is held at; x and z: where to look (world
+ * map: the map (the square if left out), or the inside of any building, homes too, with @1 for the
+ * floor above (phanthiet-in-h3@1); time: the hour it is held at; x and z: where to look (world
  * units); zoom: 0 is furthest out; turn: the view turned by that many 45° steps; blur=0 drops the
  * soft blur at the screen's edge; ui=0 hides the small panel too (H toggles it).
  * body[data-ready] is "1" once the map is drawn and lit by the clock (for screenshots), "missing"
@@ -41,7 +42,7 @@ function MapViewer() {
   const [panel, setPanel] = useState(query.get("ui") !== "0")
   const [loading, setLoading] = useState<string | null>("読み込んでいます…")
   const map = query.get("map") ?? "phanthiet"
-  const known = map in MAP_SCENES
+  const known = !!sceneOf(map)
 
   useEffect(() => {
     if (!known) document.body.dataset.ready = "missing"

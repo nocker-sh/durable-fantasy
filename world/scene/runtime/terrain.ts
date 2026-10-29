@@ -1,12 +1,11 @@
 import * as THREE from "three"
 import { N, WATER_Y } from "../world"
-import { INTERIORS } from "../../town/interiors.ts"
 import { meshHeights } from "../terrain"
 import { stoneTex } from "../textures"
 import { toTex } from "../gfx"
 import { lap } from "../../diagnostics.ts"
 import type { PixBuf } from "../pix"
-import { type SceneDefinition, MAP_SCENES } from "./definitions.ts"
+import type { SceneDefinition } from "./definitions.ts"
 
 async function createTerrain(scene: THREE.Scene, world: SceneDefinition, ground: PixBuf, progress: (text: string) => void, tick: () => Promise<unknown>) {
   const groundCanvas = document.createElement("canvas")
@@ -18,7 +17,7 @@ async function createTerrain(scene: THREE.Scene, world: SceneDefinition, ground:
     const g = groundCanvas.getContext("2d")!
     g.fillStyle = "#0c0a10"
     g.fillRect(0, 0, ground.w, ground.h)
-    const it = INTERIORS.find((i) => MAP_SCENES[i.id] === world)!
+    const it = world.interior!
     const k = ground.w / N
     g.fillStyle = "#6a4a32"
     g.fillRect(it.x0 * k, it.z0 * k, (it.x1 - it.x0) * k, (it.z1 - it.z0) * k)
