@@ -1,7 +1,7 @@
 import * as THREE from "three"
 import { GeometryBuilder as GB } from "#/lib/graphics/geometry-builder"
 import { toTexture as toTex } from "#/lib/graphics/to-texture"
-import { signTex } from "#/world/scene/textures/signs"
+import { createSignTexture } from "#/world/scene/textures/create-sign-texture"
 import type { V2 } from "#/world/scene/construction/registry"
 import { animateObject } from "#/world/scene/construction/animate-object"
 import { M } from "#/world/scene/construction/materials"
@@ -36,7 +36,7 @@ export function hangSign(props: Props) {
     repeat: 2,
   })
   props.root.add(gb.build())
-  const sm = new THREE.MeshLambertMaterial({ map: toTex(signTex(props.o.sign!), false), side: THREE.DoubleSide })
+  const sm = new THREE.MeshLambertMaterial({ map: toTex(createSignTexture(props.o.sign!), false), side: THREE.DoubleSide })
   const p = new THREE.Mesh(new THREE.PlaneGeometry(0.6, 0.45), sm)
   p.position.set(wx + nx * 0.45, yb - 0.26, wz + nz * 0.45)
   p.rotation.y = Math.atan2(nx, nz) + Math.PI / 2
