@@ -9,8 +9,8 @@ import { Rng } from "./random"
 describe("map-independent engine", () => {
   it("routes around obstacles, observes live changes, and keeps grids independent", () => {
     const blocked = new Uint8Array(25)
-    const paths = new GridPathfinder(blocked, 5)
-    const other = new GridPathfinder(new Uint8Array(25), 5)
+    const paths = new GridPathfinder({ blocked, size: 5, resolution: 1, clearance: 0.2 })
+    const other = new GridPathfinder({ blocked: new Uint8Array(25), size: 5, resolution: 1, clearance: 0.2 })
     for (let z = 0; z < 5; z++) blocked[z * 5 + 2] = 1
     expect(paths.find([0.5, 0.5], [4.5, 0.5], true)).toBeNull()
     expect(other.find([0.5, 0.5], [4.5, 0.5], true)).not.toBeNull()
@@ -23,8 +23,8 @@ describe("map-independent engine", () => {
 
   it("keeps diagonal corners closed and converts grid centers to world units", () => {
     const blocked = new Uint8Array([0, 1, 1, 0])
-    expect(new GridPathfinder(blocked, 2).find([0.5, 0.5], [1.5, 1.5], true)).toBeNull()
-    expect(new GridPathfinder(new Uint8Array(9), 3, 2).find([0.25, 0.25], [1.25, 0.25], true)).toEqual([
+    expect(new GridPathfinder({ blocked, size: 2, resolution: 1, clearance: 0.2 }).find([0.5, 0.5], [1.5, 1.5], true)).toBeNull()
+    expect(new GridPathfinder({ blocked: new Uint8Array(9), size: 3, resolution: 2, clearance: 0.2 }).find([0.25, 0.25], [1.25, 0.25], true)).toEqual([
       [0.25, 0.25],
       [0.75, 0.25],
       [1.25, 0.25],
@@ -34,7 +34,7 @@ describe("map-independent engine", () => {
   it("handles blocked destinations and retains exact free destinations after smoothing", () => {
     const blocked = new Uint8Array(25)
     blocked[12] = 1
-    const paths = new GridPathfinder(blocked, 5)
+    const paths = new GridPathfinder({ blocked, size: 5, resolution: 1, clearance: 0.2 })
     const route = paths.find([0.5, 0.5], [2.5, 2.5], true)!
     expect(route.at(-1)).not.toEqual([2.5, 2.5])
     expect(route.every(([x, z]) => !blocked[Math.floor(z) * 5 + Math.floor(x)])).toBe(true)

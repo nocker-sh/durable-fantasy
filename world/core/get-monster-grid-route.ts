@@ -14,7 +14,7 @@ export function getMonsterGridRoute(props: Props): V2[] | Error {
   if (navigation instanceof Error) return navigation
   const grid = navigation.layout
   const clamp = (x: number, z: number): V2 => [Math.min(props.area[2], Math.max(props.area[0], x)), Math.min(props.area[3], Math.max(props.area[1], z))]
-  const path = new GridPathfinder(navigation.blocked, grid.size).find(
+  const path = new GridPathfinder({ blocked: navigation.blocked, size: grid.size, resolution: 1, clearance: 0 }).find(
     [props.from[0] * scale - grid.ox, props.from[1] * scale - grid.oz],
     [props.to[0] * scale - grid.ox, props.to[1] * scale - grid.oz],
     true,
