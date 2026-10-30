@@ -123,7 +123,7 @@ export function createWalkers(scene: THREE.Scene, onPickPlayer: (id: string) => 
   /** what the player is doing with their hands for a moment (chopping, picking, fishing) */
   let action: { anim: Anim; until: number } | null = null
   /** Step along the path from cell centre to cell centre; returns true while walking. */
-  const follower = new PathFollower(STEP_SPEED)
+  const follower = new PathFollower({ speed: STEP_SPEED })
   function stepWalker(w: Walker, dt: number, elapsed = dt) {
     if (!w.path.length && w === me && action && performance.now() < action.until) {
       w.t += (dt * Math.PI * 2) / ANIM_DUR[action.anim]

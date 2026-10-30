@@ -1,35 +1,23 @@
-import type { Vector2Tuple } from "#/lib/engine/vector2-types"
+import { advancePathWaypoint } from "#/lib/engine/advance-path-waypoint"
+import type { PathAdvance, PathFollowerState } from "#/lib/engine/path-follower-types"
+
+type Props = Readonly<{ speed: number }>
 
 /** Consumes a distance budget across waypoints, independent of render frequency. */
 export class PathFollower {
-  constructor(private readonly speed: number) {}
+  readonly #props: Props
 
-  advance(state: { pos: Vector2Tuple; path: Vector2Tuple[] }, seconds: number): number | null {
+  constructor(props: Props) {
+    this.#props = Object.freeze({ ...props })
+    Object.freeze(this)
+  }
+
+  advance(state: PathFollowerState, seconds: number): number | null {
     if (!Number.isFinite(seconds) || seconds <= 0) return null
-    let remaining = this.speed * seconds
-    let consumed = 0
-    let heading: number | null = null
-    for (const point of state.path) {
-      const dx = point[0] - state.pos[0]
-      const dz = point[1] - state.pos[1]
-      const distance = Math.hypot(dx, dz)
-      if (distance === 0) {
-        consumed++
-        continue
-      }
-      if (remaining <= 0) break
-      heading = Math.atan2(dx, dz)
-      if (distance > remaining) {
-        state.pos[0] += (dx / distance) * remaining
-        state.pos[1] += (dz / distance) * remaining
-        break
-      }
-      state.pos[0] = point[0]
-      state.pos[1] = point[1]
-      remaining -= distance
-      consumed++
-    }
-    if (consumed) state.path.splice(0, consumed)
-    return heading
+
+    const progress: PathAdvance = { remaining: this.#props.speed * seconds, consumed: 0, heading: null }
+    for (const point of state.path) if (!advancePathWaypoint({ position: state.pos, point, progress })) break
+    if (progress.consumed) state.path.splice(0, progress.consumed)
+    return progress.heading
   }
 }
