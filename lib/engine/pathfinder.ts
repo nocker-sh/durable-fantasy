@@ -1,3 +1,5 @@
+import { MinPriorityQueue } from "#/lib/engine/min-priority-queue"
+
 export type V2 = [number, number]
 
 /** A* on a square grid. Occupancy is read live so callers can update obstacles. */
@@ -27,47 +29,18 @@ export class GridPathfinder {
     const cost = new Float32Array(this.size * this.size).fill(Infinity)
     const prev = new Int32Array(this.size * this.size).fill(-1)
     const closed = new Uint8Array(this.size * this.size)
-    const heap: [number, number][] = []
-    const push = (f: number, k: number) => {
-      heap.push([f, k])
-      let i = heap.length - 1
-      while (i > 0) {
-        const p = (i - 1) >> 1
-        if (heap[p][0] <= heap[i][0]) break
-        ;[heap[p], heap[i]] = [heap[i], heap[p]]
-        i = p
-      }
-    }
-    const pop = () => {
-      const top = heap[0],
-        last = heap.pop()!
-      if (heap.length) {
-        heap[0] = last
-        let i = 0
-        for (;;) {
-          const l = i * 2 + 1,
-            r = l + 1
-          let m = i
-          if (l < heap.length && heap[l][0] < heap[m][0]) m = l
-          if (r < heap.length && heap[r][0] < heap[m][0]) m = r
-          if (m === i) break
-          ;[heap[m], heap[i]] = [heap[i], heap[m]]
-          i = m
-        }
-      }
-      return top
-    }
+    const queue = new MinPriorityQueue<number>()
     const h = (k: number) => {
       const dx = Math.abs((k % this.size) - g[0]),
         dy = Math.abs(((k / this.size) | 0) - g[1])
       return Math.max(dx, dy) + 0.414 * Math.min(dx, dy)
     }
     cost[S] = 0
-    push(h(S), S)
+    queue.push(h(S), S)
     let iter = 0
-    while (heap.length && iter++ < 40000) {
-      const kState = pop(),
-        k = kState[1]
+    while (queue.size && iter++ < 40000) {
+      const k = queue.pop()
+      if (k === null) break
       if (closed[k]) continue
       closed[k] = 1
       if (k === G) break
@@ -85,7 +58,7 @@ export class GridPathfinder {
           if (c < cost[nk]) {
             cost[nk] = c
             prev[nk] = k
-            push(c + h(nk), nk)
+            queue.push(c + h(nk), nk)
           }
         }
     }
