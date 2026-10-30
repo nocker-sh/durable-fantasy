@@ -181,7 +181,7 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 ## 資料の平面と描画への投影
 
-`world/town/floorplan/authored-floor-plan.ts` は個別の部屋のグリッドと配置を実寸の `FloorPlan` へ変換する純粋な処理である。入力の共有型は `authored-types.ts` に置き、全体の寸法の検査は `assert-authored-plan-dimensions.ts`、外壁に収まる開口の検査と外壁面への投影は `get-authored-entrance.ts` と `get-authored-entrance-opening.ts` に分ける。部屋の原点と家具の矩形を同じ倍率で移し、壁の連続したセルをまとめ、戸のセルを埋めない。部屋の境界どうしが同じ壁または戸を共有することだけを許し、内部の重複、未被覆の床、範囲外の家具は拒否する。家具の名前から似た形を推測せず、資料の `runtime_kind` と `runtime_solid` を使う。種類の定義は `world/town/furniture-kinds.ts`、明示した種類の検査は `parse-furniture-kind.ts` に分ける。既存の名前の判定は `get-furniture-kind.ts` に順序を持つ規則として残し、資料の明示した種類の代わりにはしない。
+`world/town/floorplan/authored-floor-plan.ts` は個別の部屋のグリッドと配置を実寸の `FloorPlan` へ変換する純粋な処理である。入力の共有型は `authored-types.ts` に置き、全体の寸法の検査は `assert-authored-plan-dimensions.ts`、外壁に収まる開口の検査と外壁面への投影は `get-authored-entrance.ts` と `get-authored-entrance-opening.ts` に分ける。部屋と家具の検査・投影は `get-authored-room-projection.ts` と個別の検査・矩形変換に分ける。被覆と壁の索引は階・行・列の数値で保持し、被覆の検査後に `get-authored-wall-dividers.ts` が階・行・列の順で壁の区間を投影する。部屋の原点と家具の矩形を同じ倍率で移し、壁の連続したセルをまとめ、戸のセルを埋めない。部屋の境界どうしが同じ壁または戸を共有することだけを許し、内部の重複、未被覆の床、範囲外の家具は拒否する。家具の名前から似た形を推測せず、資料の `runtime_kind` と `runtime_solid` を使う。種類の定義は `world/town/furniture-kinds.ts`、明示した種類の検査は `parse-furniture-kind.ts` に分ける。既存の名前の判定は `get-furniture-kind.ts` に順序を持つ規則として残し、資料の明示した種類の代わりにはしない。
 
 `scale-room-piece-dimensions.ts` は配置の座標変換と分けて、家具の実寸の付属情報を室内の倍率へ一度だけ変換する。椅子と足掛けは `scale-seat.ts`、卓の天板・脚と膝の空間は `scale-work-surface.ts` を使う。炉・棚・寝台も各部品の変換を使い、向き・階・グリッドの矩形は元の配置に保つ。描画の位置を決める変換で実寸を重ねて掛けない。
 
