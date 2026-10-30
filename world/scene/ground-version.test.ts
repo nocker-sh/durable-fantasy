@@ -7,7 +7,9 @@ it("invalidates stored ground when any local painting dependency changes", () =>
   const versionSource = readFileSync(versionFile, "utf8")
   const patterns = [...versionSource.matchAll(/"([^"\n]+\.ts)"/g)].map((match) => match[1])
   const fingerprinted = new Set(patterns.flatMap((pattern) => globSync(pattern, { cwd: dirname(versionFile) }).map((file) => resolve(dirname(versionFile), file))))
-  const pending = ["world/scene/paint-ground.ts", "world/scene/mesh-heights.ts", "world/scene/world.ts", "world/scene/set-layout.ts", "world/scene/ground-h.ts"].map((file) => resolve(file))
+  const pending = ["world/scene/paint-ground.ts", "world/scene/mesh-heights.ts", "world/scene/world.ts", "world/scene/set-layout.ts", "world/scene/ground-h.ts", "world/maps/layouts.ts"].map((file) =>
+    resolve(file),
+  )
   const visited = new Set<string>()
   while (pending.length) {
     const file = pending.pop()
