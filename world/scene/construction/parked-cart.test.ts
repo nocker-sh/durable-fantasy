@@ -8,7 +8,7 @@ import { HOUSES } from "#/world/town/houses"
 import { interiorPlan } from "#/world/town/interior-plan"
 import { interiorRows } from "#/world/town/interior-rows"
 import { buildInterior } from "#/world/scene/build-interior"
-import { INDOOR } from "#/world/maps/ground-layouts"
+import { INDOOR } from "#/world/maps/layouts/indoor"
 import { setLayout } from "#/world/scene/set-layout"
 
 it("keeps the bed, wheels, supports and full shafts in both parking orientations without flattening the wheels", () => {

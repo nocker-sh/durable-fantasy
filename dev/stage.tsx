@@ -1,6 +1,6 @@
 import { getCameraFacingBounds } from "#/lib/graphics/get-camera-facing-bounds"
 import * as THREE from "three"
-import { INDOOR } from "#/world/maps/ground-layouts"
+import { INDOOR } from "#/world/maps/layouts/indoor"
 import { setLayout } from "#/world/scene/set-layout"
 import { resetRegistries } from "#/world/scene/construction/reset-registries"
 import { critters } from "#/world/scene/critters"

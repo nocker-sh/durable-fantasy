@@ -2,7 +2,11 @@
 // workers that paint the ground, so both see the same map. Data only: nothing here draws.
 import { SQUARE_LAYOUT } from "#/world/maps/layout"
 import type { Layout } from "#/world/maps/layout-types"
-import { CRAFT, FIELD_LAYOUTS, GATE, INDOOR, MARKET } from "#/world/maps/ground-layouts"
+import { CRAFT } from "#/world/maps/layouts/craft"
+import { GATE } from "#/world/maps/layouts/gate"
+import { INDOOR } from "#/world/maps/layouts/indoor"
+import { MARKET } from "#/world/maps/layouts/market"
+import { FIELD_LAYOUTS } from "#/world/maps/ground-layouts"
 import { HOUSES } from "#/world/town/houses"
 import { getHouseDoorTrail } from "#/world/maps/get-house-door-trail"
 

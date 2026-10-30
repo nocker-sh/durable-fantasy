@@ -13,7 +13,8 @@ import { initWalk } from "#/world/scene/init-walk"
 import { addWalkSurfaces } from "#/world/scene/add-walk-surfaces"
 import { walkH } from "#/world/scene/walk-h"
 import { groundH } from "#/world/scene/ground-h"
-import { MARKET, INDOOR } from "#/world/maps/ground-layouts"
+import { MARKET } from "#/world/maps/layouts/market"
+import { INDOOR } from "#/world/maps/layouts/indoor"
 const house = HOUSES.find((h) => h.id === "h-m5")!
 afterEach(() => {
   setLayout(INDOOR)

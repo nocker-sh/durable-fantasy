@@ -8,7 +8,7 @@ import { interiorPlan } from "#/world/town/interior-plan"
 import { interiorRows } from "#/world/town/interior-rows"
 import { getFurnitureKind } from "#/world/town/get-furniture-kind"
 import { buildInterior } from "#/world/scene/build-interior"
-import { INDOOR } from "#/world/maps/ground-layouts"
+import { INDOOR } from "#/world/maps/layouts/indoor"
 import { Group } from "three"
 import { setLayout } from "#/world/scene/set-layout"
 

@@ -26,7 +26,7 @@
 
 A* 探索のコスト・前のセル・候補の展開は `lib/engine/grid-path-search.ts` に分ける。探索ごとに独立した作業配列を作り、障害物の更新を読み、同じ優先度の候補の順も維持する。`lib/engine/grid-pathfinder.ts` は端点の補正と探索・経路の短縮を組み立てる。設定の検査は `assert-pathfinder-grid.ts`、設定の共有型は `grid-pathfinder-types.ts` に置く。経路探索と曲線の平面座標は `vector2-types.ts` の `Vector2Tuple` を直接参照し、処理のクラスを型だけの依存元にしない。塞がれた端点の補正は `lib/engine/get-nearby-free-grid-cell.ts` が持ち、候補の範囲と周回・行の順を保つ。前のセルへの参照からの経路点の復元は `lib/engine/get-grid-waypoints.ts` が担い、開始点へ届かない参照や循環から部分的な経路を作らない。
 
-地面の形と配置の共有型は `world/maps/layout-types.ts`、地形の機能がないことを表す定数は `empty-layout-features.ts` に置く。中央の広場と周囲の地区の配置は `layout.ts` の `SQUARE_LAYOUT` が持つ。河川の座標列は一度だけ生成し、共同洗濯場の基準位置も同じ点列から求める。`lib/engine/get-nearest-polyline-x.ts` は行に最も近い標本の x 座標を返し、標本の間の補間とは区別する。
+地面の形と配置の共有型は `world/maps/layout-types.ts`、地形の機能がないことを表す定数は `empty-layout-features.ts` に置く。中央の広場と周囲の地区の配置は `layout.ts` の `SQUARE_LAYOUT` が持つ。河川の座標列は一度だけ生成し、共同洗濯場の基準位置も同じ点列から求める。`lib/engine/get-nearest-polyline-x.ts` は行に最も近い標本の x 座標を返し、標本の間の補間とは区別する。各地区と野外の地面は `world/maps/layouts/` に一つずつ置き、`ground-layouts.ts` は野外の定義の対応と外縁を加えた配置だけを組み立てる。共通の空き地の初期値は `ground-layout-bases.ts`、土道の補間は `get-dirt-road.ts`、海岸・砂丘・崖・峠はそれぞれの地形関数を使う。`with-rimmed-layout.ts` は元の地形に閉じた外縁の高さを加え、`get-ground-rim-height.ts` は同じ位置のノイズを各辺で共有する。
 
 `world/maps/layouts.ts` は地図の選択と町の踏み跡を加えた配置の保持を担当する。地図名は `Map` で照会し、継承したプロパティを地図として使わない。戸口の壁ごとの座標と外向きは `get-house-door-approach.ts`、描画用の踏み跡は `get-house-door-trail.ts`、道路上の最近点は `get-nearest-road-point.ts` が持つ。線分への射影は `lib/engine/get-nearest-segment-point.ts` を使う。踏み跡は通行判定を変えない。地面の保存識別子には地図選択・踏み跡の計算・家と戸口の定義も含め、参照の検査は地図選択からの依存も辿る。識別子の組立ては `lib/engine/get-source-fingerprint.ts`、文字列のハッシュは `get-string-hash.ts` に分ける。既存の保存形式に合わせてパス順の内容を結合し、文字列は UTF-16 の各符号単位を順に処理する。
 
