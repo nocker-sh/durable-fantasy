@@ -1,3 +1,4 @@
+import { getWorkKitBoxError } from "#/scripts/lib/get-work-kit-box-error"
 import type { z } from "zod"
 import type { roomWorkUseSchema } from "#/scripts/lib/room-work-use-schema"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
@@ -26,11 +27,19 @@ export function getRoomWorkUseError(props: Props): Error | null {
   )
     return new Error("Work use has no matching household storage compartment")
   if (storage.owner !== resident.title && storage.owner !== resident.household && !storage.owners?.includes(resident.title)) return new Error("Work kit storage belongs to another resident")
-  if (use.kit.owner !== use.resident || [use.kit.proposed_box_maker, use.kit.proposed_needle_maker].some((id) => props.documents.get(id)?.kind !== "residents"))
+  if (
+    use.kit.owner !== use.resident ||
+    [use.kit.proposed_box_maker, use.kit.proposed_needle_maker, ...(use.kit.box?.contents.flatMap((piece) => piece.makers) ?? [])].some((id) => props.documents.get(id)?.kind !== "residents")
+  )
     return new Error("Work kit has invalid ownership or makers")
   if (use.routine_source.key !== resident.title || !Object.hasOwn(props.routines, resident.title) || !props.routines[resident.title]?.some((slot) => slot.doing === use.routine_source.doing))
     return new Error("Work use has no matching routine activity")
-  const dependencies = [use.resident, use.storage_room, use.kit.proposed_box_maker, use.kit.proposed_needle_maker]
+  if (use.status === "designed" && !use.kit.box) return new Error("Work kit has no dimensioned box")
+  if (use.kit.box) {
+    const error = getWorkKitBoxError({ box: use.kit.box, owner: use.kit.owner, documents: props.documents })
+    if (error) return error
+  }
+  const dependencies = [use.resident, use.storage_room, use.kit.proposed_box_maker, use.kit.proposed_needle_maker, ...(use.kit.box?.contents.flatMap((piece) => piece.makers) ?? [])]
   const declared = props.room.design_dependencies
   if (!Array.isArray(declared) || dependencies.some((id) => !declared.includes(id))) return new Error("Work use has missing design dependencies")
   if (props.room.design_gate === "通過" && use.status !== "designed") return new Error("Work use is still proposed")

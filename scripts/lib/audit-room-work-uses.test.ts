@@ -116,3 +116,41 @@ it("does not interpret inherited object properties as a resident routine", () =>
   f.use.routine_source.key = "toString"
   expect(auditRoomWorkUses(f.documents, f.routines)).toContain("room: Work use has no matching routine activity")
 })
+
+it("does not complete a work use without a dimensioned kit box", () => {
+  const f = fixture()
+  f.use.status = "designed"
+  f.use.pending = []
+  expect(auditRoomWorkUses(f.documents, f.routines)).toContain("room: Work kit has no dimensioned box")
+})
+
+it("includes closed-box packing in the room audit", () => {
+  const f = fixture()
+  const box = {
+    width_m: 0.01,
+    height_m: 0.01,
+    depth_m: 0.01,
+    wall_thickness_m: 0.01,
+    lid_thickness_m: 0.01,
+    clearance_m: 0,
+    contents: [{ id: "tool", name: "Tool", owner: "resident-b", makers: ["maker"], source: "test", origin_m: [0, 0, 0], size_m: [0.001, 0.001, 0.001] }],
+  }
+  f.room.work_uses = [{ ...f.use, kit: { ...f.use.kit, box } }]
+  expect(auditRoomWorkUses(f.documents, f.routines)).toContain("room: Invalid storage box wall or lid")
+})
+
+it("requires dependency gates for additional parcel makers", () => {
+  const f = fixture()
+  f.documents.set("second-maker", document("second-maker", "residents"))
+  const box = {
+    width_m: 0.3,
+    height_m: 0.1,
+    depth_m: 0.2,
+    wall_thickness_m: 0.01,
+    lid_thickness_m: 0.01,
+    clearance_m: 0,
+    contents: [{ id: "tool", name: "Tool", owner: "resident-b", makers: ["maker", "second-maker"], source: "test", origin_m: [0, 0, 0], size_m: [0.01, 0.01, 0.01] }],
+  }
+  f.room.work_uses = [{ ...f.use, kit: { ...f.use.kit, box } }]
+  expect(auditRoomWorkUses(f.documents, f.routines)).toContain("room: Work use has missing design dependencies")
+})
