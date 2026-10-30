@@ -1,3 +1,4 @@
+import { getShortenedPath } from "#/lib/engine/get-shortened-path"
 import { MinPriorityQueue } from "#/lib/engine/min-priority-queue"
 
 export type V2 = [number, number]
@@ -72,16 +73,7 @@ export class GridPathfinder {
     const pts: V2[] = cells.map((k) => [((k % this.size) + 0.5) / this.resolution, (((k / this.size) | 0) + 0.5) / this.resolution])
     if (grid) return pts
     pts[pts.length - 1] = this.free(Math.floor(to[0] * this.resolution), Math.floor(to[1] * this.resolution)) ? [to[0], to[1]] : pts[pts.length - 1]
-    // string pulling
-    const out: V2[] = [pts[0]]
-    let a = 0
-    while (a < pts.length - 1) {
-      let b = pts.length - 1
-      while (b > a + 1 && !this.los(pts[a], pts[b])) b--
-      out.push(pts[b])
-      a = b
-    }
-    return out
+    return getShortenedPath({ points: pts, isVisible: (from, to) => this.los(from, to) })
   }
 
   private los(a: V2, b: V2): boolean {
