@@ -3,16 +3,16 @@ export class CyclicSchedule<T extends { from: number }> {
   private readonly entries: readonly T[]
 
   constructor(entries: readonly T[]) {
+    if (entries.some((entry) => !Number.isFinite(entry.from)) || new Set(entries.map((entry) => entry.from)).size !== entries.length)
+      throw new RangeError("Schedule boundaries must be finite and distinct")
+
     this.entries = [...entries].sort((a, b) => a.from - b.from)
   }
 
   at(time: number): T | null {
+    if (!Number.isFinite(time)) throw new RangeError("Schedule time must be finite")
+
     const entries = this.entries
-    for (let i = 0; i < entries.length; i++) {
-      const from = entries[i].from
-      const to = entries[(i + 1) % entries.length].from
-      if (from <= to ? time >= from && time < to : time >= from || time < to) return entries[i]
-    }
-    return entries[0] ?? null
+    return entries.find((entry, index) => time >= entry.from && (index === entries.length - 1 || time < entries[index + 1].from)) ?? entries.at(-1) ?? null
   }
 }
