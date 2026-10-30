@@ -1,10 +1,14 @@
 // Food, drinks and medicine share recovery, fullness and timed-effect rules.
-import { takeFromSlot } from "./bag.ts"
-import { ITEMS } from "./items.ts"
-import { effectOf } from "./makers.ts"
-import { MAX_STAMINA, fullNow, type PlayerState } from "./player.ts"
-import { derive } from "./stats.ts"
-import { accept, reject, type Transition } from "./transition.ts"
+import { takeFromSlot } from "#/world/core/take-from-slot"
+import { ITEMS } from "#/world/core/items/catalog"
+import { effectOf } from "#/world/core/effect-of"
+import { MAX_STAMINA } from "#/world/core/player-rules"
+import { fullNow } from "#/world/core/full-now"
+import type { PlayerState } from "#/world/core/player-types"
+import { derive } from "#/world/core/derive"
+import { accept } from "#/world/core/accept"
+import { reject } from "#/world/core/reject"
+import type { Transition } from "#/world/core/transition"
 
 export function consume(state: PlayerState, index: number, now: number): Transition {
   const slot = state.bag[index]

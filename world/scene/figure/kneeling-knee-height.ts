@@ -1,0 +1,1 @@
+export const KNEELING_KNEE_HEIGHT = 0.09

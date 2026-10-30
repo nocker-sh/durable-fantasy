@@ -1,4 +1,4 @@
-interface LabelPosition {
+type LabelPosition = {
   visible: boolean
   x?: number
   y?: number
@@ -8,7 +8,12 @@ interface LabelPosition {
 export class ScreenLabels {
   private readonly positions = new WeakMap<HTMLElement, LabelPosition>()
 
-  place(element: HTMLElement, visible: boolean, x = 0, y = 0) {
+  place(inputProps: { element: HTMLElement; visible: boolean; x?: number; y?: number }) {
+    const element = inputProps.element
+    const visible = inputProps.visible
+    const x = inputProps.x === undefined ? 0 : inputProps.x
+    const y = inputProps.y === undefined ? 0 : inputProps.y
+
     let previous = this.positions.get(element)
     if (!previous) {
       previous = { visible: !visible }

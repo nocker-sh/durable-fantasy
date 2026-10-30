@@ -1,9 +1,18 @@
 import { describe, expect, it } from "vitest"
-import { findPathCells } from "../test/path.ts"
-import { MAPS, TALK_CELLS, cellDistance, isOpen, spotsOn, walkable } from "./index.ts"
-import { WORLD_NODES } from "./world-map.ts"
-import { GRID_SIZE, OPPOSITE, STEP, WORLD, across, squareAt, squareOf, type Side } from "./grid.ts"
-import { NODES, REACH } from "../core/gather.ts"
+import { findPathCells } from "../test/path"
+import { MAPS, TALK_CELLS } from "#/world/maps"
+import { cellDistance } from "#/world/maps/cell-distance"
+import { isOpen } from "#/world/maps/is-open"
+import { spotsOn } from "#/world/maps/spots-on"
+import { walkable } from "#/world/maps/walkable"
+import { WORLD_NODES } from "./world-map"
+import { GRID_SIZE, OPPOSITE, STEP, WORLD } from "#/world/maps/grid"
+import { across } from "#/world/maps/across"
+import { squareAt } from "#/world/maps/square-at"
+import { squareOf } from "#/world/maps/square-of"
+import { type Side } from "#/world/maps/grid-types"
+import { NODES } from "#/world/core/gather"
+import { REACH } from "#/world/core/gather-rules"
 
 describe("every map can be walked through", () => {
   for (const map of Object.values(MAPS)) {

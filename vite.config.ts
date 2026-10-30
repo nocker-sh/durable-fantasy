@@ -1,24 +1,10 @@
 import { fileURLToPath } from "node:url"
 import tailwindcss from "@tailwindcss/vite"
-import { defineConfig, normalizePath, type Plugin } from "vite"
+import { defineConfig } from "vite-plus"
+import type { PluginOption } from "vite"
+import { devSourceModules } from "./dev/vite/dev-source-modules"
 import { voidPlugin } from "void"
 import { voidReact } from "@void/react/plugin"
-
-// /dev/[sheet] also matches source URLs such as /dev/db.tsx. Let Vite serve those
-// modules through its filesystem URL before Void's page routing handles the request.
-function devSourceModules(): Plugin {
-  const root = normalizePath(fileURLToPath(new URL(".", import.meta.url))).replace(/\/$/, "")
-  return {
-    name: "dev-source-modules",
-    apply: "serve",
-    configureServer(server) {
-      server.middlewares.use((request, _response, next) => {
-        if (request.url && /^\/dev\/.*\.(?:[cm]?[jt]sx?|css)(?:\?|$)/.test(request.url)) request.url = `/@fs/${root}${request.url}`
-        next()
-      })
-    },
-  }
-}
 
 // Portless supplies HOST and PORT; direct Vite use has a stable local fallback.
 const port = Number(process.env.PORT || 5173)
@@ -32,31 +18,44 @@ const localServer = {
   allowedHosts: ["durable-fantasy.localhost"],
 }
 
-export default defineConfig({
-  plugins: [devSourceModules(), tailwindcss(), voidPlugin(), voidReact({ react: { compiler: true } })],
-  // one style everywhere: double quotes, no semicolons, long lines kept as they are written
-  fmt: {
-    singleQuote: false,
-    semi: false,
-    printWidth: 200,
-    ignorePatterns: [
-      "components/ui/**",
-      "**/*.md",
-      ".docs/**",
-      "public/**",
-      "world/maps/*.json",
-      "void.lock.json",
-      "package-lock.json",
-      ".void/**",
-      "dist/**",
-      "scripts/houses-doc.ts",
-      "scripts/items-doc.ts",
-      "scripts/people-doc.ts",
-    ],
-  },
-  lint: {
-    ignorePatterns: [".void/**", "dist/**", "public/**"],
-  },
-  server: { ...localServer, port, watch: { ignored: [/\.json$/] } },
-  preview: { ...localServer, port: process.env.PORT ? port : 4173 },
+export default defineConfig(() => {
+  const plugins: PluginOption[] = []
+  if (!process.env.VITEST) plugins.push(devSourceModules(fileURLToPath(new URL(".", import.meta.url))), tailwindcss(), voidPlugin(), voidReact({ react: { compiler: true } }))
+
+  return {
+    plugins,
+    test: {
+      include: ["world/**/*.test.ts", "lib/**/*.test.ts", "components/**/*.test.ts", "dev/**/*.test.ts", "scripts/lib/**/*.test.ts"],
+      environment: "node",
+      maxWorkers: 1,
+      isolate: true,
+      server: { deps: { inline: ["void"] } },
+    },
+    // one style everywhere: double quotes, no semicolons, long lines kept as they are written
+    fmt: {
+      singleQuote: false,
+      semi: false,
+      printWidth: 200,
+      ignorePatterns: [
+        "**/*.md",
+        ".docs/**",
+        "public/**",
+        "world/maps/*.json",
+        "void.lock.json",
+        "pnpm-lock.yaml",
+        ".void/**",
+        "dist/**",
+        "scripts/houses-doc.ts",
+        "scripts/items-doc.ts",
+        "scripts/people-doc.ts",
+      ],
+    },
+    lint: {
+      plugins: ["typescript", "import", "unicorn", "oxc"],
+      rules: { "typescript/consistent-type-definitions": ["error", "type"], "import/extensions": ["error", "never", { checkTypeImports: true }] },
+      ignorePatterns: [".void/**", "dist/**", "public/**"],
+    },
+    server: { ...localServer, port, watch: { ignored: [/\.json$/] } },
+    preview: { ...localServer, port: process.env.PORT ? port : 4173 },
+  }
 })

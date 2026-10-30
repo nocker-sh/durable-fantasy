@@ -1,7 +1,8 @@
-import type { ItemId } from "#/world/core/items.ts"
-import type { SkillId } from "#/world/core/skills.ts"
-import { iconUrl, uiIconUrl } from "#/world/art/icons.ts"
-import type { SpriteName } from "#/world/art/pixel-art.ts"
+import type { ItemId } from "#/world/core/items/catalog"
+import type { SkillId } from "#/world/core/skill-types"
+import { iconUrl } from "#/world/art/icon-url"
+import { uiIconUrl } from "#/world/art/ui-icon-url"
+import type { SpriteName } from "#/world/art/pixel-art"
 
 /** How a skill looks on the bar: a picture of its own, or the thing it is done with. */
 const SKILL_ICON: Record<SkillId, { ui: SpriteName } | { item: ItemId }> = {

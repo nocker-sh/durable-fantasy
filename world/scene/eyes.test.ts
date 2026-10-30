@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vite-plus/test"
-import { PixBuf } from "./pix.ts"
-import { ANIMS, EYE_DARK, FH, FW, eyesDrawn, renderFrame, type Look } from "./figure.ts"
-import { RESIDENTS, RESIDENT_LOOKS } from "../town/residents.ts"
+import { PixelBuffer as PixBuf } from "../../lib/graphics/pixel-buffer"
+import { ANIMS } from "#/world/scene/figure/animation"
+import { EYE_DARK, FH, FW, eyesDrawn } from "#/world/scene/figure/render"
+import { renderFrame } from "#/world/scene/figure/render-frame"
+import type { Look } from "#/world/scene/figure/look"
+import { RESIDENTS, RESIDENT_LOOKS } from "../town/residents"
 
 const dark = (b: PixBuf, x: number, y: number) => {
   const k = (y * b.w + x) * 4
@@ -10,7 +13,7 @@ const dark = (b: PixBuf, x: number, y: number) => {
 
 function frame(look: Look, view: number, f: number, item: (typeof RESIDENTS)[number]["item"]) {
   const b = new PixBuf(FW, FH)
-  renderFrame(look, "idle", f, view, item, b, 0, 0)
+  renderFrame({ L: look, anim: "idle", f: f, view: view, item: item, out: b, ox: 0, oy: 0 })
   return b
 }
 

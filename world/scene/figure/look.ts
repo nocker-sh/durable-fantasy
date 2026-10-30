@@ -1,10 +1,10 @@
 // ---------------------------------------------------------------- looks
-/** fringe designs, after the Animal Crossing set (zigzag, flicked, fringe back, devillock, …) */
+/** Fringe designs (zigzag, flicked, fringe back, devillock, …) */
 export const FRINGES = ["swept", "curtain", "blunt", "spiky", "zigzag", "flicked", "back", "pompadour", "devillock", "slant", "dangle", "natural"] as const
 
 export type Fringe = (typeof FRINGES)[number]
 
-export interface Look {
+export type Look = {
   sex: "f" | "m"
   age?: "child" | "adult" | "old"
   skin: "skin1" | "skin2" | "skin3"

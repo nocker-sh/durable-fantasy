@@ -1,19 +1,24 @@
 // Work left with a resident craftsman (economy.md §3): what they will make, from what, for how much
 // and how long; and what you have left with them, with when it will be ready.
-import { useDeadlineClock } from "#/hooks/use-deadline-clock.ts"
-import { REASON_TEXT } from "#/world/core/commands.ts"
-import { countItem } from "#/world/core/bag.ts"
-import { formatTime, jstMinutes } from "#/world/core/clock.ts"
-import { COMMISSIONS, MAX_ORDERS, commissionOf } from "#/world/core/commissions.ts"
-import { friendPrice } from "#/world/core/errands.ts"
-import { ITEMS, QUALITIES } from "#/world/core/items.ts"
-import { displayName } from "#/world/core/makers.ts"
-import { useGame, useGameState } from "#/components/game/context.tsx"
-import { Button } from "#/components/game/button.tsx"
-import { Gold } from "#/components/game/gold.tsx"
-import { Slot } from "#/components/game/slot.tsx"
-import { Window } from "#/components/game/window.tsx"
-import { ItemTooltip } from "./item-tooltip.tsx"
+import { useDeadlineClock } from "#/hooks/use-deadline-clock"
+import { REASON_TEXT } from "#/world/core/commands"
+import { countItem } from "#/world/core/count-item"
+import { formatTime } from "#/world/core/format-time"
+import { jstMinutes } from "#/world/core/jst-minutes"
+import { COMMISSIONS } from "#/world/core/commissions"
+import { MAX_ORDERS } from "#/world/core/commission-rules"
+import { commissionOf } from "#/world/core/commission-of"
+import { friendPrice } from "#/world/core/friend-price"
+import { ITEMS } from "#/world/core/items/catalog"
+import { QUALITIES } from "#/world/core/items/kinds"
+import { displayName } from "#/world/core/display-name"
+import { useGame } from "#/hooks/use-game"
+import { useGameState } from "#/hooks/use-game-state"
+import { Button } from "#/components/game/button"
+import { Gold } from "#/components/game/gold"
+import { Slot } from "#/components/game/slot"
+import { Window } from "#/components/game/window"
+import { ItemTooltip } from "./item-tooltip"
 
 export function CommissionWindow() {
   const game = useGame()
@@ -21,7 +26,10 @@ export function CommissionWindow() {
   const player = useGameState((s) => s.player)
   const busy = useGameState((s) => s.busy)
   const mine = (player?.orders ?? []).map((o, index) => ({ o, index, job: commissionOf(o.commission)! })).filter((x) => x.job?.craftsman === who)
-  const until = mine.reduce((latest, { o }) => Math.max(latest, o.readyAt), 0)
+  const until = mine.reduce((latest, inputProps) => {
+    const o = inputProps.o
+    return Math.max(latest, o.readyAt)
+  }, 0)
   const now = useDeadlineClock(until, 10_000)
   if (!who || !player) return null
   const jobs = COMMISSIONS.filter((c) => c.craftsman === who)
@@ -31,7 +39,11 @@ export function CommissionWindow() {
         <div className="mb-2.5">
           <p className="mb-1 font-head text-xs text-brass-hi">頼んである物</p>
           <ul className="flex flex-col gap-1">
-            {mine.map(({ o, index, job }) => {
+            {mine.map((inputProps2) => {
+              const o = inputProps2.o
+              const index = inputProps2.index
+              const job = inputProps2.job
+
               const ready = o.readyAt <= now
               return (
                 <li key={index} className="ui-well flex items-center gap-2.5 p-1.5">

@@ -1,22 +1,36 @@
 import { useState } from "react"
-import { useDeadlineClock } from "#/hooks/use-deadline-clock.ts"
-import { apply } from "#/world/core/apply.ts"
-import { REASON_TEXT } from "#/world/core/commands.ts"
+import { useDeadlineClock } from "#/hooks/use-deadline-clock"
+import { apply } from "#/world/core/apply"
+import { REASON_TEXT } from "#/world/core/commands"
 // Skills (game-system.md §9, ui.md §3.10): the life skills' levels and their next milestones, what
 // anyone can do (sit, first aid), and the arts of the weapon in hand. Drag an icon to the shortcut bar.
-import { STAT_NAME, type Stat } from "#/world/core/growth.ts"
-import { GATHER_SKILL_NAME, ITEMS, type Skill } from "#/world/core/items.ts"
-import { LIFE_CAP, LIFE_MILESTONE_TEXT, LIFE_SKILLS, LIFE_TOTAL_CAP, forgottenLifeExp, lifeExpAt, lifeLevel, lifeTotal, nextMilestone } from "#/world/core/life.ts"
-import type { PlayerState } from "#/world/core/player.ts"
-import { SKILLS, SKILL_IDS, artsOf, isArt, skillOf, type SkillId } from "#/world/core/skills.ts"
-import { standing } from "#/world/core/stats.ts"
-import { useGame, useGameState } from "#/components/game/context.tsx"
-import { Button } from "#/components/game/button.tsx"
-import { Meter } from "#/components/game/meter.tsx"
-import { Window } from "#/components/game/window.tsx"
-import { useWindow } from "./use-window.ts"
-import { startDrag } from "./drag.ts"
-import { skillIconUrl } from "./skill-icon.ts"
+import { STAT_NAME } from "#/world/core/growth-rules"
+import type { Stat } from "#/world/core/growth-types"
+import { GATHER_SKILL_NAME } from "#/world/core/items/kinds"
+import { ITEMS } from "#/world/core/items/catalog"
+import type { Skill } from "#/world/core/items/kinds"
+import { LIFE_CAP, LIFE_MILESTONE_TEXT, LIFE_SKILLS, LIFE_TOTAL_CAP } from "#/world/core/life-rules"
+import { forgottenLifeExp } from "#/world/core/forgotten-life-exp"
+import { lifeExpAt } from "#/world/core/life-exp-at"
+import { lifeLevel } from "#/world/core/life-level"
+import { lifeTotal } from "#/world/core/life-total"
+import { nextMilestone } from "#/world/core/next-milestone"
+import type { PlayerState } from "#/world/core/player-types"
+import { SKILLS } from "#/world/core/skills"
+import { SKILL_IDS } from "#/world/core/skill-ids"
+import { artsOf } from "#/world/core/arts-of"
+import { isArt } from "#/world/core/is-art"
+import { skillOf } from "#/world/core/skill-of"
+import type { SkillId } from "#/world/core/skill-types"
+import { standing } from "#/world/core/standing"
+import { useGame } from "#/hooks/use-game"
+import { useGameState } from "#/hooks/use-game-state"
+import { Button } from "#/components/game/button"
+import { Meter } from "#/components/game/meter"
+import { Window } from "#/components/game/window"
+import { useWindow } from "./use-window"
+import { startDrag } from "#/components/hud/start-drag"
+import { skillIconUrl } from "./skill-icon"
 
 const KIND = { action: "動作", strike: "戦技", spell: "術", prayer: "祈り" } as const
 const needName = (k: string) => (k in STAT_NAME ? STAT_NAME[k as Stat] : GATHER_SKILL_NAME[k as Skill])
@@ -25,7 +39,9 @@ export function SkillsWindow() {
   const win = useWindow("skills")
   const game = useGame()
   const busy = useGameState((s) => s.busy)
-  const [forget, setForget] = useState<{ skill: Skill; exp: number } | null>(null)
+  const forgetState = useState<{ skill: Skill; exp: number } | null>(null),
+    forget = forgetState[0],
+    setForget = forgetState[1]
   const player = useGameState((s) => s.player)
   // Recovery can make a skill usable even when there is no cooldown pending.
   const now = useDeadlineClock(win.open ? Infinity : 0)
@@ -141,7 +157,11 @@ export function SkillsWindow() {
   )
 }
 
-function SkillRow({ id, player, now }: { id: SkillId; player: PlayerState; now: number }) {
+function SkillRow(inputProps: { id: SkillId; player: PlayerState; now: number }) {
+  const id = inputProps.id
+  const player = inputProps.player
+  const now = inputProps.now
+
   const game = useGame()
   const busy = useGameState((s) => s.busy)
   const sk = skillOf(id)
@@ -175,11 +195,15 @@ function SkillRow({ id, player, now }: { id: SkillId; player: PlayerState; now: 
       {isArt(sk) && (
         <div className="flex flex-wrap gap-x-2 font-head text-[11px]">
           <span className="text-text-dim">{sk.weapons.map((w) => ITEMS[w].name).join("・")}</span>
-          {Object.entries(sk.needs).map(([k, n]) => (
-            <span key={k} className={standing(player, k as Stat | Skill) < (n ?? 0) ? "text-bad" : ""}>
-              {needName(k)} {n}
-            </span>
-          ))}
+          {Object.entries(sk.needs).map((entry) => {
+            const k = entry[0]
+            const n = entry[1]
+            return (
+              <span key={k} className={standing(player, k as Stat | Skill) < (n ?? 0) ? "text-bad" : ""}>
+                {needName(k)} {n}
+              </span>
+            )
+          })}
         </div>
       )}
       <p className="font-body text-[12px] text-text-dim">{SKILLS[id].text}</p>

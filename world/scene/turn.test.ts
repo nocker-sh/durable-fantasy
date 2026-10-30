@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest"
-import { STEP, dragTurn, keyTurn, walkDirection } from "./turn.ts"
+import { STEP } from "#/world/scene/turn"
+import { dragTurn } from "#/world/scene/drag-turn"
+import { keyTurn } from "#/world/scene/key-turn"
+import { walkDirection } from "#/world/scene/walk-direction"
 
 /** Where a point east of the player shows on screen after a turn (the camera stands at yaw, looking at the player). */
 function screenX(yaw: number, point: [number, number]) {

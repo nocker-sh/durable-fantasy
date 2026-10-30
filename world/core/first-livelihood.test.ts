@@ -1,9 +1,10 @@
 import { expect, it } from "vitest"
 import { apply } from "./apply"
-import { countItem } from "./bag"
+import { countItem } from "#/world/core/count-item"
 import type { Command, ServerCommand } from "./commands"
-import { ITEMS } from "./items"
-import { loadPlayer, newPlayer } from "./player"
+import { ITEMS } from "#/world/core/items/catalog"
+import { loadPlayer } from "#/world/core/load-player"
+import { newPlayer } from "#/world/core/new-player"
 
 // Exercise real starting resources and skill levels, without seeding inventory or experience.
 // This core journey does not exercise movement, shop hours or shared node reservations.

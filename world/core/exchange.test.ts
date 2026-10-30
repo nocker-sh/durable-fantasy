@@ -1,5 +1,18 @@
 import { describe, expect, it } from "vitest"
-import { book, cancel, emptyExchange, escrowFor, expire, place, parseSymbol, takeInbox, TRADE_FEE, type ExchangeState } from "./exchange.ts"
+import { book } from "#/world/core/book"
+import { cancel } from "#/world/core/cancel"
+import { expire } from "#/world/core/expire"
+import { place } from "#/world/core/place"
+
+import { emptyExchange } from "#/world/core/empty-exchange"
+import { escrowFor } from "#/world/core/escrow-for"
+
+import { parseSymbol } from "#/world/core/parse-symbol"
+import { TRADE_FEE } from "#/world/core/exchange-rules"
+import type { ExchangeState } from "#/world/core/exchange-types"
+
+import { emptyClaims } from "#/world/core/empty-claims"
+import { reserveInbox } from "#/world/core/reserve-inbox"
 
 const sell = (s: ExchangeState, owner: string, price: number, qty: number, at = 0, symbol = "log") => place(s, { owner, name: owner, side: "sell", symbol, price, qty }, at).state
 const buy = (s: ExchangeState, owner: string, price: number, qty: number, at = 0, market = false, symbol = "log") => place(s, { owner, name: owner, side: "buy", symbol, price, qty, market }, at)
@@ -65,9 +78,9 @@ describe("the exchange", () => {
     expect(goldIn(s)).toBe(goldPut)
     expect(itemsIn(s)).toBe(itemsPut)
     expect(s.orders).toHaveLength(0)
-    const taken = takeInbox(s, "X")
-    expect(taken.state.inbox.X).toBeUndefined()
-    expect(taken.inbox.items.reduce((a, i) => a + i.count, 0)).toBeGreaterThan(0)
+    const taken = reserveInbox(s, emptyClaims(), "X")
+    expect(taken.ex.inbox.X).toBeUndefined()
+    expect(taken.claim.inbox.items.reduce((a, i) => a + i.count, 0)).toBeGreaterThan(0)
   })
 
   it("made things trade by quality, and the maker comes with them", () => {
@@ -90,4 +103,63 @@ describe("the exchange", () => {
     s = buy(s, "Y", 8, 1, 3).state
     expect(s.history.log.at(-1)).toMatchObject({ open: 10, high: 10, low: 8, close: 8, volume: 3 })
   })
+})
+
+it("limits market purchases to the escrowed budget across price levels", () => {
+  let state = sell(emptyExchange(), "first", 9, 1, 0)
+  state = sell(state, "second", 11, 1, 1)
+  const within = buy(state, "buyer", 10, 2, 2, true)
+  expect(within.fills.map((fill) => [fill.price, fill.qty])).toEqual([
+    [9, 1],
+    [11, 1],
+  ])
+  expect(within.order).toBeNull()
+  expect(within.state.inbox.buyer.items).toEqual([{ item: "log", count: 2 }])
+  expect(goldIn(within.state)).toBe(20)
+
+  const costly = buy(sell(emptyExchange(), "seller", 11, 2), "buyer", 10, 2, 1, true)
+  expect(costly.fills.map((fill) => fill.qty)).toEqual([1])
+  expect(costly.state.inbox.buyer.gold).toBe(9)
+  expect(costly.order).toBeNull()
+  expect(goldIn(costly.state)).toBe(20)
+  expect(itemsIn(costly.state)).toBe(2)
+
+  const unaffordable = buy(sell(emptyExchange(), "seller", 21, 1), "buyer", 10, 2, 1, true)
+  expect(unaffordable.fills).toEqual([])
+  expect(unaffordable.state.inbox.buyer.gold).toBe(20)
+  expect(goldIn(unaffordable.state)).toBe(20)
+})
+
+it("conserves every coin and item across mixed market and limit orders at changing prices", () => {
+  let state = emptyExchange()
+  let gold = 0,
+    items = 0
+  for (let i = 0; i < 80; i++) {
+    const side = i % 2 ? "sell" : "buy"
+    const price = ((i * 17) % 23) + 1
+    const qty = (i % 5) + 1
+    if (side === "buy") gold += price * qty
+    else items += qty
+    state = place(state, { owner: `owner-${i}`, name: "取引人", side, symbol: "log", price, qty, market: i % 3 === 0 }, i).state
+    expect(goldIn(state)).toBe(gold)
+    expect(itemsIn(state)).toBe(items)
+  }
+  for (const order of state.orders.filter((_, i) => i % 3 === 0)) state = cancel(state, order.owner, order.id)!
+  state = expire(state, 8 * 86_400_000)
+  expect(goldIn(state)).toBe(gold)
+  expect(itemsIn(state)).toBe(items)
+  expect(state.orders).toHaveLength(0)
+})
+
+it("retains queue order on both sides when price and timestamp are identical", () => {
+  const firstAsk = sell(emptyExchange(), "Z", 10, 1, 5)
+  const asks = sell(firstAsk, "A", 10, 1, 5)
+  const bought = buy(asks, "buyer", 10, 1, 6)
+  expect(bought.fills.map((fill) => fill.seller)).toEqual(["Z"])
+  expect(bought.state.orders.map((order) => order.owner)).toEqual(["A"])
+  const firstBid = buy(emptyExchange(), "Z", 10, 1, 5).state
+  const bids = buy(firstBid, "A", 10, 1, 5).state
+  const sold = place(bids, { owner: "seller", name: "ハンス", side: "sell", symbol: "log", price: 10, qty: 1 }, 6)
+  expect(sold.fills.map((fill) => fill.buyer)).toEqual(["Z"])
+  expect(sold.state.orders.map((order) => order.owner)).toEqual(["A"])
 })

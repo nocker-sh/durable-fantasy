@@ -2,22 +2,29 @@
 // right edge, and the experience bar along the bottom. Drag items here from the bag, or skills
 // from the skills window; right-click a shortcut to clear it.
 import { useState, type DragEvent, type MouseEvent } from "react"
-import { countItem } from "#/world/core/bag.ts"
-import { REASON_TEXT } from "#/world/core/commands.ts"
-import { SKILLS, artBlocked, skillKey, skillOfKey } from "#/world/core/skills.ts"
-import type { WindowId } from "#/world/game.ts"
-import { useGame, useGameState } from "#/components/game/context.tsx"
+import { countItem } from "#/world/core/count-item"
+import { REASON_TEXT } from "#/world/core/commands"
+import { SKILLS } from "#/world/core/skills"
+import { artBlocked } from "#/world/core/art-blocked"
+import { skillKey } from "#/world/core/skill-key"
+import { skillOfKey } from "#/world/core/skill-of-key"
+import type { WindowId } from "#/world/state"
+import { useGame } from "#/hooks/use-game"
+import { useGameState } from "#/hooks/use-game-state"
 import { type LucideIcon, Map, Settings, ShoppingBag, SquareStar, Shirt, Users } from "lucide-react"
-import { expToNext } from "#/world/core/growth.ts"
-import { Kbd } from "#/components/game/kbd.tsx"
-import { Slot } from "#/components/game/slot.tsx"
-import { Tooltip, TooltipContent, TooltipTrigger } from "#/components/game/tooltip.tsx"
-import { ItemTooltip } from "./item-tooltip.tsx"
-import type { ItemId } from "#/world/core/items.ts"
-import { carriesItem, readDrag } from "./drag.ts"
+import { expToNext } from "#/world/core/exp-to-next"
+import { Kbd } from "#/components/game/kbd"
+import { Slot } from "#/components/game/slot"
+import { Tooltip } from "#/components/game/tooltip"
+import { TooltipContent } from "#/components/game/tooltip-content"
+import { TooltipTrigger } from "#/components/game/tooltip-trigger"
+import { ItemTooltip } from "./item-tooltip"
+import type { ItemId } from "#/world/core/items/catalog"
+import { carriesItem } from "#/components/hud/carries-item"
+import { readDrag } from "#/components/hud/read-drag"
 
-import { useDeadlineClock } from "#/hooks/use-deadline-clock.ts"
-import { skillIconUrl } from "./skill-icon.ts"
+import { useDeadlineClock } from "#/hooks/use-deadline-clock"
+import { skillIconUrl } from "./skill-icon"
 
 const KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
 
@@ -35,7 +42,9 @@ export function Hotbar() {
   const game = useGame()
   const player = useGameState((s) => s.player)
   const windows = useGameState((s) => s.windows)
-  const [over, setOver] = useState<number | null>(null)
+  const overState = useState<number | null>(null),
+    over = overState[0],
+    setOver = overState[1]
 
   const drop = (index: number) => (event: DragEvent) => {
     event.preventDefault()
@@ -128,7 +137,13 @@ export function Hotbar() {
   )
 }
 
-function MenuButton({ label, keys, icon: Icon, active, onClick }: { label: string; keys: string; icon: LucideIcon; active: boolean; onClick: () => void }) {
+function MenuButton(inputProps: { label: string; keys: string; icon: LucideIcon; active: boolean; onClick: () => void }) {
+  const label = inputProps.label
+  const keys = inputProps.keys
+  const Icon = inputProps.icon
+  const active = inputProps.active
+  const onClick = inputProps.onClick
+
   return (
     <Tooltip>
       <TooltipTrigger

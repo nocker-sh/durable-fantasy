@@ -2,18 +2,23 @@
 // name, you (with your facing), other players, residents, shops and warps. Click to walk there; the
 // title bar switches between a small and a large map.
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react"
-import { shopMarkers } from "#/world/maps/shop-markers.ts"
-import { formatTime, phase } from "#/world/core/clock.ts"
-import { useGame, useGameState } from "#/components/game/context.tsx"
-import { TitleButton, Window } from "#/components/game/window.tsx"
-import { useWindow } from "./use-window.ts"
+import { shopMarkers } from "#/world/maps/shop-markers"
+import { formatTime } from "#/world/core/format-time"
+import { phase } from "#/world/core/phase"
+import { useGame } from "#/hooks/use-game"
+import { useGameState } from "#/hooks/use-game-state"
+import { TitleButton } from "#/components/game/title-button"
+import { Window } from "#/components/game/window"
+import { useWindow } from "./use-window"
 
 const SIZES = [168, 256] as const
 
 export function Minimap() {
   const game = useGame()
   const win = useWindow("minimap")
-  const [large, setLarge] = useState(() => localStorage.getItem("ui-minimap/large") === "1")
+  const largeState = useState(() => localStorage.getItem("ui-minimap/large") === "1"),
+    large = largeState[0],
+    setLarge = largeState[1]
   const SIZE = SIZES[large ? 1 : 0]
   const canvas = useRef<HTMLCanvasElement>(null)
   const me = useGameState((s) => s.me)
@@ -48,25 +53,39 @@ export function Minimap() {
     ctx.imageSmoothingEnabled = false
     ctx.drawImage(ground, 0, 0, SIZE, SIZE)
     const at = (x: number, z: number) => [Math.round(x * scale), Math.round(z * scale)] as const
-    const square = (x: number, z: number, r: number, fill: string) => {
-      const [px, pz] = at(x, z)
+    const square = (inputProps2: { x: number; z: number; r: number; fill: string }) => {
+      const x = inputProps2.x
+      const z = inputProps2.z
+      const r = inputProps2.r
+      const fill = inputProps2.fill
+
+      const pxState = at(x, z),
+        px = pxState[0],
+        pz = pxState[1]
       ctx.fillStyle = "#0b0c15"
       ctx.fillRect(px - r - 1, pz - r - 1, r * 2 + 2, r * 2 + 2)
       ctx.fillStyle = fill
       ctx.fillRect(px - r, pz - r, r * 2, r * 2)
     }
-    for (const n of npcs) square(n.x, n.z, 1, "#e8dcc0")
-    for (const [i, j] of map.warps) {
-      const [px, pz] = at((i + 0.5) / 2, (j + 0.5) / 2)
+    for (const n of npcs) square({ x: n.x, z: n.z, r: 1, fill: "#e8dcc0" })
+    for (const entry of map.warps) {
+      const i = entry[0]
+      const j = entry[1]
+
+      const pxState2 = at((i + 0.5) / 2, (j + 0.5) / 2),
+        px = pxState2[0],
+        pz = pxState2[1]
       ctx.strokeStyle = "#b8d0ff"
       ctx.lineWidth = 2
       ctx.beginPath()
       ctx.arc(px, pz, 4, 0, Math.PI * 2)
       ctx.stroke()
     }
-    for (const p of players) square(p.x, p.z, 2, "#8fd0e0")
+    for (const p of players) square({ x: p.x, z: p.z, r: 2, fill: "#8fd0e0" })
     // you: an arrow along your facing (heading 0 faces +z, which is down on the map)
-    const [px, pz] = at(me.x, me.z)
+    const pxState3 = at(me.x, me.z),
+      px = pxState3[0],
+      pz = pxState3[1]
     const dx = Math.sin(me.heading),
       dz = Math.cos(me.heading)
     ctx.save()
@@ -122,7 +141,10 @@ export function Minimap() {
           className="block cursor-pointer rounded-md shadow-[0_0_0_1px_rgb(255_255_255/0.08)] [image-rendering:pixelated]"
         />
         {!loading &&
-          shops.map(({ cell, shops: sellers }) => {
+          shops.map((inputProps) => {
+            const cell = inputProps.cell
+            const sellers = inputProps.shops
+
             const open = sellers.some((s) => s.open)
             const label = sellers.map((s) => `${s.name}：${s.open ? "営業中" : "準備中"}`).join("\n")
             const x = (cell[0] + 0.5) / 2,
@@ -133,7 +155,7 @@ export function Minimap() {
                 type="button"
                 title={label}
                 aria-label={label}
-                onClick={() => game.walkTo(x, z)}
+                onClick={() => game.walkTo(x, z, { snapToWarp: false })}
                 className="absolute flex size-3.5 -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-sm focus-visible:outline-2 focus-visible:outline-white"
                 style={{ left: (x / game.mapSize) * SIZE, top: (z / game.mapSize) * SIZE }}
               >

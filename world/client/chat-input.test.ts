@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { parseChatInput } from "./chat-input.ts"
+import { parseChatInput } from "./chat-input"
 
 it.each(["/w", "/w エルナ 内緒", "/w\nエルナ 内緒"])("does not turn an unsupported private command into public speech: %s", (text) => {
   expect(parseChatInput(text)?.kind).toBe("unavailable")

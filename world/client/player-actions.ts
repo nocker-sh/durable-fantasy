@@ -1,15 +1,24 @@
-import { apply } from "../core/apply.ts"
-import type { GameSession } from "./session.ts"
-import { skillOf, skillOfKey, type SkillId } from "../core/skills.ts"
-import { stationAt } from "../town/stations.ts"
-import { nodeOf } from "../core/gather.ts"
-import { gatheringTool } from "../core/gathering-tool.ts"
-import { sellable, type Quality, type Skill } from "../core/items.ts"
-import { REASON_TEXT } from "../core/commands.ts"
-import type { Stat } from "../core/growth.ts"
-import { ITEMS, type ItemId, type Slot } from "../core/items.ts"
-import type { NECK_RAMPS, HotbarEntry, NeckKind } from "../core/player.ts"
-import type { GameContext } from "./context.ts"
+import { sameStack } from "#/world/core/same-stack"
+import type { Stack } from "#/world/core/bag-types"
+import { apply } from "../core/apply"
+import type { GameSession } from "#/world/client/game-session"
+import { skillOf } from "#/world/core/skill-of"
+import { skillOfKey } from "#/world/core/skill-of-key"
+import type { SkillId } from "#/world/core/skill-types"
+import { stationAt } from "../town/stations"
+import { nodeOf } from "#/world/core/node-of"
+import { gatheringTool } from "../core/gathering-tool"
+import { sellable } from "#/world/core/items/sellable"
+import type { Quality, Skill } from "#/world/core/items/kinds"
+import { REASON_TEXT } from "../core/commands"
+import type { Stat } from "#/world/core/growth-types"
+import { ITEMS } from "#/world/core/items/catalog"
+import type { ItemId } from "#/world/core/items/catalog"
+import type { Slot } from "#/world/core/items/kinds"
+import type { NECK_RAMPS } from "#/world/core/player-rules"
+import type { HotbarEntry } from "#/world/core/player-types"
+import type { NeckKind } from "#/world/core/player-types"
+import type { GameContext } from "./context"
 
 export class PlayerActions {
   constructor(
@@ -19,7 +28,12 @@ export class PlayerActions {
     this.target.session.socket?.send({ type: "revive" })
   }
 
-  buy(item: ItemId, count = 1, q?: Quality, price?: number) {
+  buy(inputProps: { item: ItemId; count?: number; q?: Quality; price?: number }) {
+    const item = inputProps.item
+    const count = inputProps.count === undefined ? 1 : inputProps.count
+    const q = inputProps.q
+    const price = inputProps.price
+
     const shop = this.target.session.state.get().shop
     if (!shop) return
     void this.target.run({ type: "buy", shop, item, count, ...(q !== undefined ? { q } : {}), ...(price !== undefined ? { price } : {}) }).then(() => this.target.lookAtShop())
@@ -57,7 +71,9 @@ export class PlayerActions {
   }
 
   collect(index: number) {
-    void this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "collect", seq, index }))
+    const orders = this.target.session.state.get().player?.orders
+    if (!orders?.[index]) return
+    void this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "collect", seq, index, orders }))
   }
 
   openBoard(symbol?: string) {
@@ -88,12 +104,20 @@ export class PlayerActions {
     this.openBoard()
   }
 
-  store(slot: number, count: number) {
-    void this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "storage", seq, action: "store", index: slot, count }))
+  store(slot: number, count: number, expectedStack?: Stack) {
+    const stack = this.target.session.state.get().player?.bag[slot]
+    if (!stack) return
+    if (expectedStack && !sameStack(stack, expectedStack)) {
+      this.target.notify(REASON_TEXT.ITEM_CHANGED, "bad")
+      return
+    }
+    void this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "storage", seq, action: "store", index: slot, count, stack }))
   }
 
   retrieve(index: number, count: number) {
-    void this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "storage", seq, action: "retrieve", index, count }))
+    const stack = this.target.session.state.get().player?.storage[index]
+    if (!stack) return
+    void this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "storage", seq, action: "retrieve", index, count, stack }))
   }
 
   useSkill(skill: SkillId) {
@@ -118,26 +142,32 @@ export class PlayerActions {
 
   sell(slot: number, count = 1) {
     const shop = this.target.session.state.get().shop
-    if (shop) void this.target.run({ type: "sell", shop, slot, count }).then(() => this.target.lookAtShop())
+    const expectedStack = this.target.session.state.get().player?.bag[slot]
+    if (shop && expectedStack) void this.target.run({ type: "sell", shop, slot, count, expectedStack }).then(() => this.target.lookAtShop())
   }
 
   useSlot(slot: number) {
     const stack = this.target.session.state.get().player?.bag[slot]
     if (!stack) return
-    if (ITEMS[stack.item].equip) void this.target.run({ type: "equip", slot })
-    else void this.target.run({ type: "use", slot })
+    if (ITEMS[stack.item].equip) void this.target.run({ type: "equip", slot, expectedStack: stack })
+    else void this.target.run({ type: "use", slot, expectedStack: stack })
   }
 
-  equip(slot: number, to?: Slot) {
-    void this.target.run({ type: "equip", slot, to })
+  equip(slot: number, to?: Slot, expectedStack = this.target.session.state.get().player?.bag[slot] ?? undefined) {
+    if (!expectedStack) return
+    void this.target.run({ type: "equip", slot, to, expectedStack })
   }
 
-  unequip(slot: Slot) {
-    void this.target.run({ type: "unequip", slot })
+  unequip(slot: Slot, expectedStack?: Stack) {
+    const player = this.target.session.state.get().player,
+      item = player?.equipment[slot]
+    const selected = expectedStack ?? (item ? { item, count: 1, ...player?.worn[slot] } : undefined)
+    if (selected) void this.target.run({ type: "unequip", slot, expectedStack: selected })
   }
 
-  moveSlot(from: number, to: number) {
-    if (from !== to) void this.target.run({ type: "move", from, to })
+  moveSlot(from: number, to: number, expectedStack = this.target.session.state.get().player?.bag[from] ?? undefined) {
+    const expectedTarget = this.target.session.state.get().player?.bag[to] ?? null
+    if (from !== to && expectedStack) void this.target.run({ type: "move", from, to, expectedStack, expectedTarget })
   }
 
   forgetLife(skill: Skill, exp: number) {
@@ -161,7 +191,12 @@ export class PlayerActions {
     else void this.target.run({ type: "use-item", item: item as ItemId })
   }
 
-  setProfile(name: string, look: number, neck: NeckKind, neckRamp: (typeof NECK_RAMPS)[number]) {
+  setProfile(inputProps: { name: string; look: number; neck: NeckKind; neckRamp: (typeof NECK_RAMPS)[number] }) {
+    const name = inputProps.name
+    const look = inputProps.look
+    const neck = inputProps.neck
+    const neckRamp = inputProps.neckRamp
+
     return this.target.run({ type: "profile", name, look, neck, neckRamp })
   }
 }

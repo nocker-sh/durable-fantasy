@@ -4,7 +4,7 @@
 // own transform: it is an anchor, and what stands under it merges under it, never above.
 import * as THREE from "three"
 
-export interface MergeOptions {
+export type MergeOptions = {
   /** objects whose transform or visibility changes later (what is under them merges under them) */
   anchors: Iterable<THREE.Object3D>
   /** objects whose local transforms change after construction */

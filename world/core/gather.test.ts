@@ -1,16 +1,25 @@
 import { describe, expect, it } from "vitest"
-import { apply } from "./apply.ts"
-import { addItem, countItem, emptyBag } from "./bag.ts"
-import { NODES, nodeOf, yieldOf } from "./gather.ts"
-import { GATHER_EXP, LIFE_CAP, LIFE_TOTAL_CAP, lifeExpAt, lifeLevel } from "./life.ts"
-import { emptyEquipment } from "./player.ts"
-import { emptyNature, giveOne, leftAt, takeOne } from "./nature.ts"
-import { player } from "../test/helpers.ts"
+import { apply } from "./apply"
+import { addItem } from "#/world/core/add-item"
+import { countItem } from "#/world/core/count-item"
+import { emptyBag } from "#/world/core/empty-bag"
+import { NODES } from "#/world/core/gather"
+import { nodeOf } from "#/world/core/node-of"
+import { yieldOf } from "#/world/core/yield-of"
+import { GATHER_EXP, LIFE_CAP, LIFE_TOTAL_CAP } from "#/world/core/life-rules"
+import { lifeExpAt } from "#/world/core/life-exp-at"
+import { lifeLevel } from "#/world/core/life-level"
+import { emptyEquipment } from "#/world/core/empty-equipment"
+import { emptyNature } from "#/world/core/nature/empty-nature"
+import { giveOne } from "#/world/core/nature/give-one"
+import { leftAt } from "#/world/core/nature/left-at"
+import { takeOne } from "#/world/core/nature/take-one"
+import { player } from "#/world/test/player"
 
 const tree = NODES.find((n) => n.kind === "tree")!
 const herb = NODES.find((n) => n.kind === "herbs")!
 const withAxe = (dur?: number) => {
-  const bag = addItem(emptyBag(), "wood-axe", 1, { q: 1, by: "ギュンター" })!
+  const bag = addItem({ bag: emptyBag(), item: "wood-axe", count: 1, mark: { q: 1, by: "ギュンター" } })!
   return dur === undefined ? bag : bag.map((s) => (s ? { ...s, dur } : s))
 }
 
@@ -57,10 +66,10 @@ describe("gathering", () => {
 
   it("rarer things turn up only past a milestone, and more come at levels 4 and 8", () => {
     const n = nodeOf("deep-forest-mushrooms-1")!
-    const seen = (level: number) => new Set(Array.from({ length: 200 }, (_, i) => yieldOf(n, level, 1, i / 200).item))
+    const seen = (level: number) => new Set(Array.from({ length: 200 }, (_, i) => yieldOf({ node: n, level: level, power: 1, roll: i / 200 }).item))
     expect(seen(3).has("blue-herb")).toBe(false)
     expect(seen(4).has("blue-herb")).toBe(true)
-    expect([0, 2, 4, 8].map((lv) => yieldOf(herb, lv, 1, 0.5).count)).toEqual([1, 1, 2, 3])
+    expect([0, 2, 4, 8].map((lv) => yieldOf({ node: herb, level: lv, power: 1, roll: 0.5 }).count)).toEqual([1, 1, 2, 3])
   })
 
   it("a life skill stops at its cap, and all of them together stop at the ceiling", () => {

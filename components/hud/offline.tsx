@@ -1,6 +1,6 @@
 // The way to the room is lost (the socket closed); it is made again on its own.
-import { useGameState } from "#/components/game/context.tsx"
-import { Between } from "./loading.tsx"
+import { useGameState } from "#/hooks/use-game-state"
+import { Between } from "#/components/hud/between"
 
 export function Offline() {
   const lost = useGameState((s) => s.online === "offline" && !s.loading)

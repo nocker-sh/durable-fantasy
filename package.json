@@ -3,14 +3,38 @@
   "private": true,
   "type": "module",
   "imports": {
-    "#/*": "./*"
+    "#/*": "./*",
+    "#resources/world/maps/phanthiet-craft": "./world/maps/phanthiet-craft.json",
+    "#resources/world/maps/phanthiet-gate": "./world/maps/phanthiet-gate.json",
+    "#resources/world/maps/phanthiet-market": "./world/maps/phanthiet-market.json",
+    "#resources/world/maps/phanthiet": "./world/maps/phanthiet.json",
+    "#resources/world/maps/south-meadow": "./world/maps/south-meadow.json",
+    "#resources/world/maps/red-dunes": "./world/maps/red-dunes.json",
+    "#resources/world/maps/sea-cliff": "./world/maps/sea-cliff.json",
+    "#resources/world/maps/net-sheds": "./world/maps/net-sheds.json",
+    "#resources/world/maps/forest-edge": "./world/maps/forest-edge.json",
+    "#resources/world/maps/deep-forest": "./world/maps/deep-forest.json",
+    "#resources/world/maps/quynhon-gate": "./world/maps/quynhon-gate.json",
+    "#resources/world/maps/mountain-pass": "./world/maps/mountain-pass.json",
+    "#resources/world/maps/hue-gate": "./world/maps/hue-gate.json",
+    "#resources/world/scene/anims": "./world/scene/anims.json",
+    "#resources/components/hud/character-creation": "./components/hud/character-creation.css",
+    "#resources/packages/fontsource/shippori-mincho/400": "@fontsource/shippori-mincho/400.css",
+    "#resources/dev/debug": "./dev/debug.css",
+    "#resources/components/game/game": "./components/game/game.css",
+    "#resources/dev/dev": "./dev/dev.css",
+    "#resources/scripts/lib/wait-ready": "./scripts/lib/wait-ready.mjs",
+    "#resources/scripts/lib/create-character": "./scripts/lib/create-character.mjs",
+    "#resources/scripts/lib/walk-to-map": "./scripts/lib/walk-to-map.mjs",
+    "#resources/scripts/lib/configure-cpu": "./scripts/lib/configure-cpu.mjs"
   },
   "scripts": {
     "dev": "portless run vp dev",
     "build": "vp build",
     "preview": "vp preview",
     "test": "vp test run",
-    "typecheck": "vp exec void prepare && tsc --noEmit -p .",
+    "typecheck": "vp exec void prepare && tsc --noEmit -p . && tsc --noEmit -p scripts/tsconfig.settings.json && tsc --noEmit -p scripts/tsconfig.bake.json",
+    "check:settings": "bun scripts/check-settings.ts",
     "lint": "vp lint",
     "test:dev-pages": "bun scripts/dev-overflow.ts"
   },
@@ -30,6 +54,7 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^24.19.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@types/three": "^0.170.0",
@@ -46,9 +71,6 @@
     "vitest": "^4.1.12",
     "void": "1.1.12"
   },
-  "overrides": {
-    "vite": "$vite"
-  },
   "devEngines": {
     "runtime": {
       "name": "node",
@@ -56,5 +78,5 @@
       "onFail": "download"
     }
   },
-  "packageManager": "npm@11.19.1"
+  "packageManager": "pnpm@10.34.7"
 }

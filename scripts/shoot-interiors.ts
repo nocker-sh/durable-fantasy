@@ -4,7 +4,7 @@ import { mkdirSync } from "node:fs"
 import { homedir } from "node:os"
 import { join } from "node:path"
 import { chromium } from "playwright-core"
-import { INTERIORS } from "../world/town/interiors.ts"
+import { INTERIORS } from "#/world/town/interiors"
 
 const BASE = process.env.BASE ?? "https://durable-fantasy.localhost"
 const out = process.argv[2] ?? join(homedir(), "Pictures", "durable-fantasy-houses")

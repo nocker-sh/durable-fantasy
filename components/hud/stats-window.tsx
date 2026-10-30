@@ -1,11 +1,17 @@
 // Stats (ui.md §3.9): name, level and experience, the six stats with a + each, and the
 // values that follow from them.
-import { STATS, STAT_NAME, MAX_LEVEL, MAX_STAT, expToNext, statCost } from "#/world/core/growth.ts"
-import { useGame, useGameState } from "#/components/game/context.tsx"
-import { Button } from "#/components/game/button.tsx"
-import { Meter } from "#/components/game/meter.tsx"
-import { Window } from "#/components/game/window.tsx"
-import { useWindow } from "./use-window.ts"
+import { STATS } from "#/world/core/growth-rules"
+import { STAT_NAME } from "#/world/core/growth-rules"
+import { MAX_LEVEL } from "#/world/core/growth-rules"
+import { MAX_STAT } from "#/world/core/growth-rules"
+import { expToNext } from "#/world/core/exp-to-next"
+import { statCost } from "#/world/core/stat-cost"
+import { useGame } from "#/hooks/use-game"
+import { useGameState } from "#/hooks/use-game-state"
+import { Button } from "#/components/game/button"
+import { Meter } from "#/components/game/meter"
+import { Window } from "#/components/game/window"
+import { useWindow } from "./use-window"
 
 export function StatsWindow() {
   const game = useGame()
@@ -77,12 +83,16 @@ export function StatsWindow() {
           </div>
         </div>
         <dl className="flex flex-col gap-1 font-head text-xs">
-          {derivedRows.map(([label, value]) => (
-            <div key={label} className="flex h-[18px] items-center justify-between">
-              <dt className="text-text-dim">{label}</dt>
-              <dd className="tabular-nums">{value}</dd>
-            </div>
-          ))}
+          {derivedRows.map((entry) => {
+            const label = entry[0]
+            const value = entry[1]
+            return (
+              <div key={label} className="flex h-[18px] items-center justify-between">
+                <dt className="text-text-dim">{label}</dt>
+                <dd className="tabular-nums">{value}</dd>
+              </div>
+            )
+          })}
         </dl>
       </div>
       <p className="mt-2 font-body text-[11px] leading-relaxed text-text-dim">能力値の横の加減算は装備の補正。装備・技の条件は補正前の能力値で判定します。</p>

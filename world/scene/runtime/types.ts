@@ -1,8 +1,8 @@
-import type { Look, Item } from "../figure"
+import type { Look, Item } from "#/world/scene/figure/look"
 
 export type Cell = [number, number]
 
-export interface ResidentInfo {
+export type ResidentInfo = {
   id: number
   name: string
   job: string
@@ -10,7 +10,7 @@ export interface ResidentInfo {
   z: number
 }
 
-export interface WalkerInfo {
+export type WalkerInfo = {
   id: string
   name: string
   x: number
@@ -18,7 +18,7 @@ export interface WalkerInfo {
   walking: boolean
 }
 
-export interface SceneEvents {
+export type SceneEvents = {
   /** loading progress text while the scene builds */
   progress(text: string): void
   ready(): void
@@ -29,7 +29,7 @@ export interface SceneEvents {
   reach(id: number): void
   /** the player reached a gathering spot they clicked (core/gather.ts) */
   gatherAt(node: string): void
-  /** the player reached a station they clicked (core/crafting.ts) */
+  /** the player reached a station they clicked (core/station-of.ts) */
   stationAt(station: string): void
   /** the player is in reach of the creature they are fighting and their blow is due */
   swing(monster: string): void
@@ -39,7 +39,7 @@ export interface SceneEvents {
   pickPlayer?(id: string): void
 }
 
-export interface Avatar {
+export type Avatar = {
   name: string
   look: Look
   held: Item

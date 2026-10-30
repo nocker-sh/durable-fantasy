@@ -1,8 +1,13 @@
-import * as React from "react";
-import { Input as InputPrimitive } from "@base-ui/react/input";
-import { cn } from "cn";
+import { withoutKeys } from "#/lib/engine/without-keys"
+import * as React from "react"
+import { Input as InputPrimitive } from "@base-ui/react/input"
+import { cn } from "cn"
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+function Input(inputProps: React.ComponentProps<"input">) {
+  const className = inputProps.className
+  const type = inputProps.type
+  const props = withoutKeys(inputProps, ["className", "type"])
+
   return (
     <InputPrimitive
       type={type}
@@ -13,7 +18,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
       )}
       {...props}
     />
-  );
+  )
 }
 
-export { Input };
+export { Input }

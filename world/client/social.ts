@@ -1,5 +1,5 @@
-import type { GameSession } from "./session.ts"
-import type { GameContext } from "./context.ts"
+import type { GameSession } from "#/world/client/game-session"
+import type { GameContext } from "./context"
 
 export class SocialActions {
   constructor(

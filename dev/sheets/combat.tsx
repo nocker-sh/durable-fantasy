@@ -1,14 +1,16 @@
-import { Thumb } from "../three-view.tsx"
-import { LATER_SPOTS } from "#/world/core/gather.ts"
-import { STAT_NAME } from "#/world/core/growth.ts"
-import { GATHER_SKILL_NAME, GATHER_SKILLS } from "#/world/core/items.ts"
-import { LIFE_MILESTONE_TEXT, LIFE_SKILLS, MILESTONES } from "#/world/core/life.ts"
-import { MONSTER_KINDS, SPAWNS } from "#/world/core/monsters.ts"
-import { SKILLS, skillOf } from "#/world/core/skills.ts"
-import { hareBody, slimeBody } from "#/world/scene/fields.ts"
-import type { Build } from "../three-view.tsx"
-import { sheet } from "./schema.ts"
-import { needsText } from "./shared.tsx"
+import { ObjectThumbnail } from "#/dev/object-thumbnail"
+import { LATER_SPOTS } from "#/world/core/gather"
+import { STAT_NAME } from "#/world/core/growth-rules"
+import { GATHER_SKILL_NAME, GATHER_SKILLS } from "#/world/core/items/kinds"
+import { LIFE_MILESTONE_TEXT, LIFE_SKILLS, MILESTONES } from "#/world/core/life-rules"
+import { MONSTER_KINDS, SPAWNS } from "#/world/core/monsters"
+import { HARE_BODY_PARTS } from "#/world/core/monster-body-shapes"
+import { SKILLS } from "#/world/core/skills"
+import { skillOf } from "#/world/core/skill-of"
+import { createMonsterBody } from "#/world/scene/create-monster-body"
+import type { Build } from "#/dev/three-view"
+import { sheet } from "./schema"
+import { needsText } from "#/dev/sheets/needs-text"
 
 const monsterBuilds = new Map<string, Build>()
 
@@ -18,8 +20,7 @@ function monsterBuild(id: string): Build {
   if (!b) {
     const k = MONSTER_KINDS[id]
     b = (root, x, z) => {
-      const body = k.look === "slime" ? slimeBody(k.color ?? 0x8ac06a) : hareBody()
-      if (id === "blue-slime") body.scale.setScalar(1.2)
+      const body = createMonsterBody(k)
       body.position.set(x, 0.2, z)
       root.add(body)
     }
@@ -45,12 +46,22 @@ const monsters = sheet({
     { label: "再出現(秒)", get: (id) => MONSTER_KINDS[id].respawn, w: "w-20" },
     { label: "叩かれると", get: (id) => (MONSTER_KINDS[id].atk ? "反撃する" : "逃げる"), w: "w-20" },
   ],
-  icon: (id) => <Thumb id={`monster-${id}`} build={monsterBuild(id)} px={32} />,
+  icon: (id) => <ObjectThumbnail id={`monster-${id}`} build={monsterBuild(id)} px={32} />,
   refs: (id) => [
     ...MONSTER_KINDS[id].drops.map((d) => ({ sheet: "items", id: d.item, as: `落とす ${Math.round(d.chance * 100)}%` })),
     ...[...new Set(SPAWNS.filter((s) => s.kind === id).map((s) => s.map))].map((m) => ({ sheet: "maps", id: m, as: `出る ×${SPAWNS.filter((s) => s.kind === id && s.map === m).length}` })),
   ],
   build: monsterBuild,
+  more: (id) =>
+    MONSTER_KINDS[id].look === "slime"
+      ? []
+      : [
+          {
+            title: "身体の部材（拡大前）",
+            head: ["部材", "材質", "位置", "寸法", "影"],
+            rows: HARE_BODY_PARTS.map((part, index) => [index + 1, part.material, part.position.join(", "), part.dimensions.join(", "), part.castsShadow ? "あり" : "なし"]),
+          },
+        ],
 })
 
 const skills = sheet({

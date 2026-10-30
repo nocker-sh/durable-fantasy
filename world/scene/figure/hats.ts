@@ -1,12 +1,24 @@
-import type { BodyContext } from "./context.ts"
-import type { HeadContext } from "./head.ts"
-import type { HairContext } from "./hair.ts"
-import { dot, sub } from "../../../lib/graphics/ray/vector.ts"
-import { solid, hash01 } from "../../../lib/graphics/ray/primitives.ts"
-import { limbSd } from "../../../lib/graphics/ray/distance.ts"
+import type { BodyContext } from "./context"
+import type { HeadContext } from "./head"
+import type { HairContext } from "./hair"
+import { dotVector3 as dot } from "../../../lib/engine/dot-vector3"
+import { subtractVector3 as sub } from "../../../lib/engine/subtract-vector3"
+import { createSolidSurfaceMaterial } from "../../../lib/graphics/ray/create-solid-surface-material"
+import { hashSurfacePoint } from "../../../lib/graphics/ray/hash-surface-point"
+import { limbSd } from "#/lib/graphics/ray/limb-sd"
 
 function buildHats(context: BodyContext & HeadContext & HairContext) {
-  const { L, headR, H, push, headLocal, hs, U, shoulderY, shW, hc } = context
+  const LSource = context,
+    L = LSource.L,
+    headR = LSource.headR,
+    H = LSource.H,
+    push = LSource.push,
+    headLocal = LSource.headLocal,
+    hs = LSource.hs,
+    U = LSource.U,
+    shoulderY = LSource.shoulderY,
+    shW = LSource.shW,
+    hc = LSource.hc
   // ---- hats
   const hatRamp = L.hatRamp ?? "cLinen"
   if (L.hat === "hood") {
@@ -36,7 +48,7 @@ function buildHats(context: BodyContext & HeadContext & HairContext) {
       },
     })
     const tip = H([0, 0.16, -0.36])
-    push({ kind: "cone", a: H([0, 0.06, -0.2]), b: tip, r: 0.14 * hs, r2: 0.02 * hs, m: solid(hatRamp, -0.05) })
+    push({ kind: "cone", a: H([0, 0.06, -0.2]), b: tip, r: 0.14 * hs, r2: 0.02 * hs, m: createSolidSurfaceMaterial(hatRamp, -0.05) })
     push({
       kind: "cone",
       a: U([0, shoulderY - 0.12, -0.02]),
@@ -55,7 +67,7 @@ function buildHats(context: BodyContext & HeadContext & HairContext) {
       b: c0,
       r,
       r2: 0,
-      m: (p, n) => [hatRamp, Math.sin(Math.atan2(n[0], n[2]) * 5 + n[1] * 4) * 0.06 + (hash01(p) > 0.86 ? 0.15 : 0)],
+      m: (p, n) => [hatRamp, Math.sin(Math.atan2(n[0], n[2]) * 5 + n[1] * 4) * 0.06 + (hashSurfacePoint(p) > 0.86 ? 0.15 : 0)],
       clip: (p) => {
         const hl = headLocal(p)
         const a = Math.atan2(hl[0], hl[2]),
@@ -64,8 +76,8 @@ function buildHats(context: BodyContext & HeadContext & HairContext) {
       },
     })
     const k1 = H([0, 0.08, -0.3])
-    push({ kind: "sph", a: k1, b: k1, r: 0.055 * hs, r2: 0, m: solid(hatRamp, 0.05) })
-    for (const sd of [-1, 1]) push({ kind: "cap", a: k1, b: H([sd * 0.05, -0.08, -0.33]), r: 0.028 * hs, r2: 0, m: solid(hatRamp, -0.05) })
+    push({ kind: "sph", a: k1, b: k1, r: 0.055 * hs, r2: 0, m: createSolidSurfaceMaterial(hatRamp, 0.05) })
+    for (const sd of [-1, 1]) push({ kind: "cap", a: k1, b: H([sd * 0.05, -0.08, -0.33]), r: 0.028 * hs, r2: 0, m: createSolidSurfaceMaterial(hatRamp, -0.05) })
   } else if (L.hat === "coif") {
     // white linen cap with a frilled edge, ties under the chin
     const r = headR * 1.5
@@ -95,8 +107,8 @@ function buildHats(context: BodyContext & HeadContext & HairContext) {
     push({ kind: "cone", a: H([0, 0.21, -0.01]), b: H([0, 0.48, -0.02]), r: 0.4 * hs, r2: 0.32 * hs, m: (p) => ["thatch", p[1] - hc[1] < 0.26 * hs ? -0.25 : 0] })
   } else if (L.hat === "cap") {
     // soft cloth cap, gathered at the crown (not a chef's toque)
-    push({ kind: "cone", a: H([0, 0.16, -0.02]), b: H([0, 0.27, -0.03]), r: 0.38 * hs, r2: 0.39 * hs, m: solid(L.hatRamp ?? "cCream", 0) })
-    push({ kind: "sph", a: H([0, 0.29, -0.04]), b: [0, 0, 0], r: 0.4 * hs, r2: 0, sy: 0.5, m: solid(L.hatRamp ?? "cCream", 0.05) })
+    push({ kind: "cone", a: H([0, 0.16, -0.02]), b: H([0, 0.27, -0.03]), r: 0.38 * hs, r2: 0.39 * hs, m: createSolidSurfaceMaterial(L.hatRamp ?? "cCream", 0) })
+    push({ kind: "sph", a: H([0, 0.29, -0.04]), b: [0, 0, 0], r: 0.4 * hs, r2: 0, sy: 0.5, m: createSolidSurfaceMaterial(L.hatRamp ?? "cCream", 0.05) })
   } else if (L.hat === "helm") {
     // open-faced sallet: a steel bowl down to the brows, cheek plates and a nasal bar
     const c0 = H([0, 0.03, -0.01]),
@@ -120,8 +132,8 @@ function buildHats(context: BodyContext & HeadContext & HairContext) {
         return Math.cos(a) > 0.35 ? yN > 0.3 - (1 - Math.cos(a)) * 0.7 : yN > -0.55
       },
     })
-    push({ kind: "cap", a: H([0, 0.17, 0.31]), b: H([0, -0.02, 0.33]), r: 0.022 * hs, r2: 0, m: solid(hatRamp, 0.15) })
-    push({ kind: "cap", a: H([-0.25, 0.33, -0.02]), b: H([0.25, 0.33, -0.02]), r: 0.02 * hs, r2: 0, m: solid(hatRamp, 0.25) }) // crest ridge
+    push({ kind: "cap", a: H([0, 0.17, 0.31]), b: H([0, -0.02, 0.33]), r: 0.022 * hs, r2: 0, m: createSolidSurfaceMaterial(hatRamp, 0.15) })
+    push({ kind: "cap", a: H([-0.25, 0.33, -0.02]), b: H([0.25, 0.33, -0.02]), r: 0.02 * hs, r2: 0, m: createSolidSurfaceMaterial(hatRamp, 0.25) }) // crest ridge
   } else if (L.hat === "greathelm") {
     // great helm: a flat-topped steel pot hiding the face, with a dark eye slit and breaths
     const a0 = H([0, -0.3, 0]),
@@ -141,9 +153,9 @@ function buildHats(context: BodyContext & HeadContext & HairContext) {
         return [hatRamp, (dot(n, l) > 0.7 ? 0.3 : 0) + (Math.abs(hl[1] + 0.28 * hs) < 0.03 * hs ? -0.25 : 0)]
       },
     })
-    push({ kind: "sph", a: b0, b: b0, r: r * 0.94, r2: 0, sy: 0.3, m: solid(hatRamp, 0.2) })
+    push({ kind: "sph", a: b0, b: b0, r: r * 0.94, r2: 0, sy: 0.3, m: createSolidSurfaceMaterial(hatRamp, 0.2) })
   } else if (L.hat === "beret") {
-    push({ kind: "sph", a: H([0.03, 0.33, -0.03]), b: [0, 0, 0], r: 0.4 * hs, r2: 0, sy: 0.34, m: solid(hatRamp, 0) })
+    push({ kind: "sph", a: H([0.03, 0.33, -0.03]), b: [0, 0, 0], r: 0.4 * hs, r2: 0, sy: 0.34, m: createSolidSurfaceMaterial(hatRamp, 0) })
   }
   if (L.plume && (L.hat === "helm" || L.hat === "greathelm")) {
     // a feather plume sweeping back off the crown

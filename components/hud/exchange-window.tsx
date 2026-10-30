@@ -1,16 +1,23 @@
 // The exchange board (economy.md §5): pick a thing, see who sells and buys at what price and how it
 // has gone these past days, put up an order, take yours down, collect what changed hands.
 import { useState } from "react"
-import { escrowFor, parseSymbol, symbolKey, TRADE_FEE } from "#/world/core/exchange.ts"
-import { ITEMS, QUALITIES, sellable, type ItemId } from "#/world/core/items.ts"
-import { displayName } from "#/world/core/makers.ts"
-import { useGame, useGameState } from "#/components/game/context.tsx"
-import { Button } from "#/components/game/button.tsx"
-import { Gold } from "#/components/game/gold.tsx"
-import { Input } from "#/components/game/input.tsx"
-import { Slot } from "#/components/game/slot.tsx"
-import { Stepper } from "#/components/game/stepper.tsx"
-import { Window } from "#/components/game/window.tsx"
+import { escrowFor } from "#/world/core/escrow-for"
+import { parseSymbol } from "#/world/core/parse-symbol"
+import { symbolKey } from "#/world/core/symbol-key"
+import { TRADE_FEE } from "#/world/core/exchange-rules"
+import { ITEMS } from "#/world/core/items/catalog"
+import { QUALITIES } from "#/world/core/items/kinds"
+import { sellable } from "#/world/core/items/sellable"
+import type { ItemId } from "#/world/core/items/catalog"
+import { displayName } from "#/world/core/display-name"
+import { useGame } from "#/hooks/use-game"
+import { useGameState } from "#/hooks/use-game-state"
+import { Button } from "#/components/game/button"
+import { Gold } from "#/components/game/gold"
+import { Input } from "#/components/game/input"
+import { Slot } from "#/components/game/slot"
+import { Stepper } from "#/components/game/stepper"
+import { Window } from "#/components/game/window"
 
 /** Everything that can be traded: plain things as they are, made things by quality. */
 const SYMBOLS = (Object.keys(ITEMS) as ItemId[])
@@ -27,10 +34,18 @@ export function ExchangeWindow() {
   const board = useGameState((s) => s.board)
   const player = useGameState((s) => s.player)
   const busy = useGameState((s) => s.busy)
-  const [side, setSide] = useState<"buy" | "sell">("buy")
-  const [price, setPrice] = useState("")
-  const [qty, setQty] = useState(1)
-  const [filter, setFilter] = useState("")
+  const sideState = useState<"buy" | "sell">("buy"),
+    side = sideState[0],
+    setSide = sideState[1]
+  const priceState = useState(""),
+    price = priceState[0],
+    setPrice = priceState[1]
+  const qtyState = useState(1),
+    qty = qtyState[0],
+    setQty = qtyState[1]
+  const filterState = useState(""),
+    filter = filterState[0],
+    setFilter = filterState[1]
   if (!board || !player) return null
   const sym = parseSymbol(board.symbol)
   const v = board.view
@@ -39,7 +54,9 @@ export function ExchangeWindow() {
   const p = Number(price) || (side === "buy" ? bestAsk : bestBid) || (sym ? Math.max(1, Math.round(ITEMS[sym.item].price * 0.8)) : 1)
   const slot = sym ? player.bag.findIndex((s) => s?.item === sym.item && s.q === sym.q) : -1
   const have = slot >= 0 ? player.bag[slot]!.count : 0
-  const { gold: needs, fee } = escrowFor(side, p, qty)
+  const needsSource = escrowFor(side, p, qty),
+    needs = needsSource.gold,
+    fee = needsSource.fee
   const reason = side === "sell" ? (have < qty ? "手元に足りない" : player.gold < fee ? "出品料が足りない" : null) : player.gold < needs ? "所持金が足りない" : null
   const candles = (v?.history ?? []).slice(-14)
   const hi = Math.max(1, ...candles.map((c) => c.high)),

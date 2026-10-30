@@ -1,5 +1,5 @@
 // Everyone else on the map, as the room last reported them, and which of the room's players is us.
-import type { Cell, MapPlayer } from "../protocol.ts"
+import type { Cell, MapPlayer } from "#/world/protocol"
 
 export class Others {
   private players = new Map<string, MapPlayer>()

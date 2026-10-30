@@ -3,7 +3,7 @@
 // cold, from age, from partings, from a world slowly coming apart (world.md). Their lines are in
 // town/lines/; tests check the relations against the households and each other.
 
-export interface Person {
+export type Person = {
   /** a few words of character */
   traits: readonly string[]
   /** how they talk: first person, how they address you, endings */
@@ -112,7 +112,7 @@ export const PEOPLE: Record<string, Person> = {
 
 export type RelationKind = "夫婦" | "親子" | "姉妹" | "兄妹" | "祖父と孫" | "祖母と孫" | "兄弟" | "師弟" | "幼なじみ" | "友人" | "仕事仲間" | "取引相手" | "ぎこちない"
 
-export interface Relation {
+export type Relation = {
   a: string
   b: string
   kind: RelationKind

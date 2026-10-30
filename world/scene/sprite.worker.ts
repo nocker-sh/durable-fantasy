@@ -1,9 +1,13 @@
 // Renders villager sprite frames off the main thread, one frame per message. The frame goes back
 // as an ImageBitmap (transferred) with a PNG of it for the page to keep in IndexedDB.
-import { ANIMS, FH, FW, renderFrame, type AnimSpec, type Anim, type Item, type Look } from "./figure"
-import { PixBuf } from "./pix"
+import { ANIMS } from "#/world/scene/figure/animation"
+import { FH, FW } from "#/world/scene/figure/render"
+import { renderFrame } from "#/world/scene/figure/render-frame"
+import type { AnimSpec, Anim } from "#/world/scene/figure/animation"
+import type { Item, Look } from "#/world/scene/figure/look"
+import { PixelBuffer as PixBuf } from "../../lib/graphics/pixel-buffer"
 
-export interface FrameJob {
+export type FrameJob = {
   key: string
   look: Look
   anim: string
@@ -12,13 +16,13 @@ export interface FrameJob {
   view: number
   f: number
 }
-export interface FrameDone {
+export type FrameDone = {
   key: string
   bitmap: ImageBitmap
   png: Blob | null
 }
 
-export interface FrameFailed {
+export type FrameFailed = {
   key: string
   failed: true
 }
@@ -33,7 +37,7 @@ self.onmessage = async (event: MessageEvent<FrameJob>) => {
     // Clips registered by the studio are not in this worker's animation table yet.
     ANIMS[job.anim as Anim] ??= job.spec
     const buf = new PixBuf(FW, FH)
-    renderFrame(job.look, job.anim as Anim, job.f, job.view, job.item, buf, 0, 0)
+    renderFrame({ L: job.look, anim: job.anim as Anim, f: job.f, view: job.view, item: job.item, out: buf, ox: 0, oy: 0 })
     ctx.clearRect(0, 0, FW, FH)
     ctx.putImageData(new ImageData(buf.data, FW, FH), 0, 0)
     // Persistence is optional: an encoding failure must not discard a rendered frame.

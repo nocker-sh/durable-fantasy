@@ -1,27 +1,27 @@
 import type { ReactNode } from "react"
-import type { Build } from "../three-view.tsx"
+import type { Build } from "#/dev/three-view"
 
 /** A pointer from one row to another: the sheet, the row's ID, and what it is to this row. */
-export interface Ref {
+export type Ref = {
   sheet: string
   id: string
   as: string
 }
 
-export interface Col<T> {
+export type Col<T> = {
   label: string
   get: (r: T) => ReactNode
   /** a fixed width (Tailwind), for short columns */ w?: string
 }
 
-export interface Part {
+export type Part = {
   title: string
   head: string[]
   rows: ReactNode[][]
   /** across the whole page */ wide?: boolean
 }
 
-export interface Sheet<T = any> {
+export type Sheet<T = any> = {
   id: string
   label: string
   rows: () => readonly T[]

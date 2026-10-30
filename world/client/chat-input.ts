@@ -4,7 +4,8 @@ export type ChatInput = { kind: "message"; text: string; shout: boolean } | { ki
 export function parseChatInput(input: string): ChatInput | null {
   const text = input.trim()
   if (!text) return null
-  const [command] = text.split(/\s+/, 1)
+  const commandState = text.split(/\s+/, 1),
+    command = commandState[0]
   if (command === "/p") {
     const said = text.slice(2).trim().slice(0, 140)
     return said ? { kind: "party", text: said } : null

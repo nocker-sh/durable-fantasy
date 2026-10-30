@@ -1,5 +1,7 @@
-import { home, bed, room } from "../house-plan.ts"
-import type { HouseDef } from "../house-types.ts"
+import { home } from "#/world/town/home"
+import { bed } from "#/world/town/bed"
+import { room } from "#/world/town/room"
+import type { HouseDef } from "../house-types"
 
 const houses: readonly HouseDef[] = [
   {
@@ -18,7 +20,11 @@ const houses: readonly HouseDef[] = [
     door: { side: "s", u: 2.6 },
     seed: 1,
     sign: "bread",
-    plan: home([room("店先", 0), room("台所", 0), bed("マルタとローザの寝室", 1, 2), bed("ハンスの部屋", 1, 1)], ["窯（外）", "売り台", "粉箱", "食卓", "パン籠×2", "腰掛け", "寝台×3", "衣装箱", "椅子×3"], "パン窯"),
+    plan: home(
+      [room("店先", 0), room("台所", 0), bed("マルタとローザの寝室", 1, 2), bed("ハンスの部屋", 1, 1)],
+      ["窯（外）", "売り台", "粉箱", "食卓", "パン籠×2", "腰掛け", "寝台×3", "衣装箱", "椅子×3"],
+      "パン窯",
+    ),
   },
   {
     id: "h1",

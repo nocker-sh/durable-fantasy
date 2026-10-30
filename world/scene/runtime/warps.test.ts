@@ -2,7 +2,7 @@ import { expect, it, vi } from "vitest"
 import * as THREE from "three"
 import { WarpMarkers } from "./warps"
 
-vi.mock("../world", async (original) => ({ ...(await original<typeof import("../world")>()), walkH: () => 2 }))
+vi.mock("#/world/scene/walk-h", () => ({ walkH: () => 2 }))
 
 it("reuses one geometry and material through repeated exit list changes", () => {
   const scene = new THREE.Scene()

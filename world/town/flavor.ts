@@ -3,7 +3,7 @@
 // to the world's history; it keeps to what world.md has settled, seen from everyday life.
 // A passage with `at` belongs to that map and is shown when going there; the rest go anywhere.
 
-export interface Flavor {
+export type Flavor = {
   text: string
   at?: string
 }

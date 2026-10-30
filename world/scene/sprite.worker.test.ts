@@ -1,6 +1,8 @@
 import { afterEach, expect, it, vi } from "vitest"
 const { renderFrame } = vi.hoisted(() => ({ renderFrame: vi.fn() }))
-vi.mock("./figure", () => ({ ANIMS: { idle: {} }, FW: 1, FH: 1, renderFrame }))
+vi.mock("#/world/scene/figure/animation", () => ({ ANIMS: { idle: {} } }))
+vi.mock("#/world/scene/figure/render", () => ({ FW: 1, FH: 1 }))
+vi.mock("#/world/scene/figure/render-frame", () => ({ renderFrame }))
 vi.mock("./pix", () => ({
   PixBuf: class {
     data = new Uint8ClampedArray(4)

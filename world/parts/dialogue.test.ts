@@ -1,10 +1,13 @@
 import { afterEach, expect, it, vi } from "vitest"
-import { choicesFor, linesFor } from "./dialogue"
+import { choicesFor } from "#/world/parts/choices-for"
+import { linesFor } from "#/world/parts/lines-for"
 import { createGameState } from "../client/initial-state"
-import { player, bagWith } from "../test/helpers"
-import { dayOf, errandProgress } from "../core/errands"
+import { player } from "#/world/test/player"
+import { bagWith } from "#/world/test/bag-with"
+import { errandProgress } from "#/world/core/errand-progress"
+import { dayOf } from "#/world/core/day-of"
 import { ALL_LINES } from "../town/lines"
-import { errandOf } from "../core/errands"
+import { errandOf } from "#/world/core/errand-of"
 
 const now = Date.UTC(2026, 9, 26, 12)
 const taken = (id: string, done = false) => ({ id, day: dayOf(now), done })
@@ -34,11 +37,11 @@ it("selects actual resident lines for the current task and excludes premature th
   const state = { ...createGameState().get(), player: player({ errands: [taken("irmgard-herbs")], bag: bagWith(["blue-herb", 2]) }) }
   const ready = ALL_LINES["イルムガルト"].find((line) => line.errand?.state === "ready")!.text
   const done = ALL_LINES["イルムガルト"].find((line) => line.errand?.state === "done")!.text
-  expect(linesFor(state, "イルムガルト", "spoken", now)).toContain(ready)
-  expect(linesFor(state, "イルムガルト", "spoken", now)).not.toContain(done)
+  expect(linesFor({ state: state, name: "イルムガルト", spokenKey: "spoken", now: now })).toContain(ready)
+  expect(linesFor({ state: state, name: "イルムガルト", spokenKey: "spoken", now: now })).not.toContain(done)
   state.player = { ...state.player, errands: [taken("irmgard-herbs", true)] }
-  expect(linesFor(state, "イルムガルト", "spoken", now)).toContain(done)
-  expect(linesFor(state, "イルムガルト", "spoken", now)).not.toContain(ready)
+  expect(linesFor({ state: state, name: "イルムガルト", spokenKey: "spoken", now: now })).toContain(done)
+  expect(linesFor({ state: state, name: "イルムガルト", spokenKey: "spoken", now: now })).not.toContain(ready)
 })
 
 it("references existing errands involving the speaker", () => {
@@ -46,8 +49,8 @@ it("references existing errands involving the speaker", () => {
     for (const line of lines) {
       if (!line.errand) continue
       const errand = errandOf(line.errand.id)
-      expect(errand).toBeDefined()
-      expect([errand!.from, errand!.to]).toContain(name)
+      if (!errand) throw Error(`Unknown errand: ${line.errand.id}`)
+      expect([errand.from, ...(errand.kind === "deliver" ? [errand.to] : [])]).toContain(name)
     }
 })
 
@@ -57,7 +60,7 @@ it.each(["taken", "ready", "done"] as const)("the smith responds to scrap progre
     ...createGameState().get(),
     player: player({ errands: [taken("gunter-scrap", progress === "done")], bag: bagWith(["rusty-scrap", progress === "ready" ? 3 : 1]) }),
   }
-  const selected = linesFor(state, "ギュンター", "spoken", now)
+  const selected = linesFor({ state: state, name: "ギュンター", spokenKey: "spoken", now: now })
   for (const line of ALL_LINES["ギュンター"].filter((line) => line.errand?.id === "gunter-scrap")) {
     if (line.errand!.state === progress) expect(selected).toContain(line.text)
     else expect(selected).not.toContain(line.text)
@@ -80,18 +83,19 @@ it("offers shopping only with the on-duty keeper of a shared shop", () => {
 
 it.each(["beatrix-ingots", "gottfried-logs", "rudolf-fur"])("keeps the craftsperson's dialogue in step with %s", (id) => {
   const errand = errandOf(id)!
+  if (errand.kind !== "bring") throw Error("Expected a bring errand")
   vi.stubGlobal("localStorage", { getItem: () => JSON.stringify([errand.from]), setItem: vi.fn() })
   const state = { ...createGameState().get(), player: player() }
   const lines = ALL_LINES[errand.from].filter((line) => line.errand?.id === id)
   expect(lines).toHaveLength(3)
   for (const progress of ["taken", "ready", "done"] as const) {
-    state.player = player({ errands: [taken(id, progress === "done")], bag: progress === "ready" ? bagWith([errand.wants!.item, errand.wants!.count]) : player().bag })
-    const pages = linesFor(state, errand.from, "spoken", now)
+    state.player = player({ errands: [taken(id, progress === "done")], bag: progress === "ready" ? bagWith([errand.wants.item, errand.wants.count]) : player().bag })
+    const pages = linesFor({ state: state, name: errand.from, spokenKey: "spoken", now: now })
     for (const line of lines) {
       if (line.errand!.state === progress) expect(pages).toContain(line.text)
       else expect(pages).not.toContain(line.text)
     }
   }
-  const tomorrow = linesFor(state, errand.from, "spoken", now + 86400000)
+  const tomorrow = linesFor({ state: state, name: errand.from, spokenKey: "spoken", now: now + 86400000 })
   for (const line of lines) expect(tomorrow).not.toContain(line.text)
 })

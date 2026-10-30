@@ -9,13 +9,33 @@ function sources(directory: string): string[] {
   })
 }
 
+function dependencyTarget(file: string, dependency: string): string | null {
+  if (dependency.startsWith("#/")) return resolve(dependency.slice(2))
+  if (dependency.startsWith(".")) return resolve(dirname(file), dependency)
+  return null
+}
+
+function graphicsDependencyAllowed(file: string, dependency: string): boolean {
+  const target = dependencyTarget(file, dependency)
+  return dependency === "three" || (target !== null && [resolve("lib/graphics"), resolve("lib/engine")].some((base) => target.startsWith(base + sep)))
+}
+
+it("resolves root aliases without allowing graphics to reach world, UI or escaped directories", () => {
+  const file = resolve("lib/graphics/ray/example.ts")
+  for (const dependency of ["#/lib/graphics/ray/primitive-types", "#/lib/engine/lerp-vector3", "./primitive-types", "../../engine/lerp-vector3", "three"])
+    expect(graphicsDependencyAllowed(file, dependency)).toBe(true)
+  for (const dependency of ["#/world/scene/figure/body", "#/components/game/game", "#/lib/graphics/../../world/state", "react", "three/../world"])
+    expect(graphicsDependencyAllowed(file, dependency)).toBe(false)
+})
+
 it("game engine dependencies stay inside the engine", () => {
   const directory = resolve("lib/engine")
   for (const file of sources(directory)) {
     const source = readFileSync(file, "utf8")
     const imports = [...source.matchAll(/(?:from\s*|import\s*\()['"]([^'"]+)['"]/g)].map((match) => match[1])
     for (const dependency of imports) {
-      const allowed = dependency.startsWith("./") && resolve(dirname(file), dependency).startsWith(directory + sep)
+      const target = dependencyTarget(file, dependency)
+      const allowed = target !== null && target.startsWith(directory + sep)
       expect(allowed, `${file} imports ${dependency}`).toBe(true)
     }
   }
@@ -45,10 +65,51 @@ it("graphics dependencies stay inside graphics, engine, or Three.js", () => {
     const source = readFileSync(file, "utf8")
     const imports = [...source.matchAll(/(?:from\s*|import\s*\()['"]([^'"]+)['"]/g)].map((match) => match[1])
     for (const dependency of imports) {
-      const target = resolve(dirname(file), dependency)
-      expect(dependency === "three" || (dependency.startsWith(".") && [directory, resolve("lib/engine")].some((base) => target.startsWith(base + sep))), `${file} imports ${dependency}`).toBe(true)
+      expect(graphicsDependencyAllowed(file, dependency), `${file} imports ${dependency}`).toBe(true)
     }
   }
+})
+
+// Static import clauses may span lines; statement-ending semicolons are optional.
+function runtimeDependencies(source: string): string[] {
+  const imports = [...source.matchAll(/^import[ \t]+(?!type\b)((?:[\w$]+\s*,\s*)?(?:\{[^}]*\}|\*\s+as\s+[\w$]+)|[\w$]+)\s+from\s+["']([^"']+)["']/gm)]
+  const exports = [...source.matchAll(/^export[ \t]+(?!type\b)(\{[^}]*\}|\*(?:\s+as\s+\w+)?)\s+from\s+["']([^"']+)["']/gm)]
+  const dependencies = [...imports, ...exports]
+    .filter(([, clause]) => {
+      return (
+        !clause.trim().startsWith("{") ||
+        clause
+          .replace(/[{}]/g, "")
+          .split(",")
+          .some((part) => part.trim() && !part.trim().startsWith("type "))
+      )
+    })
+    .map(([, , specifier]) => specifier)
+  const sideEffects = [...source.matchAll(/^import[ \t]+["']([^"']+)["']/gm)].map(([, specifier]) => specifier)
+  return [...dependencies, ...sideEffects]
+}
+
+it("reads runtime dependencies with and without semicolons, excluding type-only clauses", () => {
+  expect(
+    runtimeDependencies(`
+import { value, type Shape } from "./value.ts"
+import Default from "./default.ts";
+import DefaultAndNamed, { named } from "./combined.ts"
+import * as namespace from "./namespace.ts"
+import {
+  multiline,
+  type Other,
+} from "./multiline.ts"
+import type { Shape } from "./type.ts"
+import { type Shape, type Other } from "./inline-types.ts"
+export { value } from "./export.ts"
+export * from "./star.ts";
+export * as namespace from "./export-namespace.ts"
+export type { Shape } from "./export-type.ts"
+export { type Shape } from "./export-inline-type.ts"
+import "./side-effect.ts"
+`),
+  ).toEqual(["./value.ts", "./default.ts", "./combined.ts", "./namespace.ts", "./multiline.ts", "./export.ts", "./star.ts", "./export-namespace.ts", "./side-effect.ts"])
 })
 
 it("application modules have no circular runtime imports", () => {
@@ -57,20 +118,9 @@ it("application modules have no circular runtime imports", () => {
   const graph = new Map<string, string[]>()
   for (const file of files) {
     const source = readFileSync(file, "utf8")
-    const imports = [...source.matchAll(/^import\s+(?!type\b)([^;]+?)\s+from\s+["']([^"']+)["'];/gm)]
-    const exports = [...source.matchAll(/^export\s+(?!type\b)(\{[^}]*\}|\*(?:\s+as\s+\w+)?)\s+from\s+["']([^"']+)["'];/gm)]
     const dependencies: string[] = []
-    for (const [, clause, specifier] of [...imports, ...exports]) {
+    for (const specifier of runtimeDependencies(source)) {
       if (specifier.includes("?raw")) continue
-      if (
-        clause.trim().startsWith("{") &&
-        clause
-          .replace(/[{}]/g, "")
-          .split(",")
-          .filter((part) => part.trim())
-          .every((part) => part.trim().startsWith("type "))
-      )
-        continue
       if (!specifier.startsWith(".") && !specifier.startsWith("#/")) continue
       const target = specifier.startsWith("#/") ? resolve(specifier.slice(2)) : resolve(dirname(file), specifier)
       const resolved = [target, `${target}.ts`, `${target}.tsx`, resolve(target, "index.ts"), resolve(target, "index.tsx")].find((path) => known.has(path))

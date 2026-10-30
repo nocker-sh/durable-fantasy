@@ -1,8 +1,10 @@
+import * as terrainWalkHModule from "#/world/scene/walk-h"
 import { afterEach, expect, it, vi } from "vitest"
 import * as THREE from "three"
-import { critters, spawnAnimals, type Critter } from "./animals"
-import * as terrain from "./world"
-import type { V2 } from "./construction/registry.ts"
+import { critters } from "#/world/scene/critters"
+import { spawnAnimals } from "#/world/scene/spawn-animals"
+import { type Critter } from "#/world/scene/animal-types"
+import type { V2 } from "#/world/scene/construction/registry"
 
 afterEach(() => {
   critters.length = 0
@@ -13,10 +15,13 @@ type Animal = Critter & { pos: V2; target: V2; wait: number }
 
 it("keeps all town animals and their animation while reusing stationary terrain samples", () => {
   vi.spyOn(Math, "random").mockReturnValue(0.5)
-  const ground = vi.spyOn(terrain, "walkH").mockImplementation((x, z) => x / 10 + z / 20)
+  const ground = vi.spyOn(terrainWalkHModule, "walkH").mockImplementation((x, z) => x / 10 + z / 20)
   const root = new THREE.Group()
   spawnAnimals(root)
   expect(critters).toHaveLength(23)
+  expect(new Set(critters.map((animal) => animal.obj.userData.animalId)).size).toBe(23)
+  expect(critters[0].obj.userData.animalId).toBe("hen-1")
+  expect(critters.at(-1)!.obj.userData.animalId).toBe("sheep-7")
   expect(critters.filter((c) => c.obj instanceof THREE.Sprite)).toHaveLength(12)
   const right = new THREE.Vector3(1, 0, 0)
   const animals = critters as Animal[]
@@ -43,4 +48,13 @@ it("keeps all town animals and their animation while reusing stationary terrain 
     else expect(animal.obj.position.y - groundY).toBeGreaterThan(0)
   }
   expect(ground).toHaveBeenCalledTimes(25)
+})
+
+it("does not construct another district's animals or sample its terrain", () => {
+  const ground = vi.spyOn(terrainWalkHModule, "walkH")
+  const root = new THREE.Group()
+  spawnAnimals(root, "phanthiet-market")
+  expect(critters).toHaveLength(0)
+  expect(root.children).toHaveLength(0)
+  expect(ground).not.toHaveBeenCalled()
 })

@@ -1,12 +1,12 @@
-import type { Stat } from "../growth.ts"
-import type { Skill, Grade, ItemKind, Rarity, GatherSkill } from "./kinds.ts"
-import type { ItemIcon } from "./icons.ts"
+import type { Stat } from "#/world/core/growth-types"
+import type { Skill, Grade, ItemKind, Rarity, GatherSkill } from "./kinds"
+import type { ItemIcon } from "./icons"
 
 /** Where an equipment item goes; accessories fit either accessory slot. */
 /** neck is for looks: a worn neck wrap replaces the one chosen in the character screen */
 export type EquipPart = "head" | "neck" | "body" | "weapon" | "shield" | "feet" | "accessory"
 
-export interface Equipment {
+export type Equipment = {
   part: EquipPart
   /** attack added to ATK (weapons) */
   atk?: number
@@ -26,7 +26,7 @@ export interface Equipment {
   look?: { neck: "muffler" | "stole" | "scarf"; neckRamp: string; neckStripe?: string }
 }
 
-export interface ItemDefinition {
+export type ItemDefinition = {
   name: string
   kind: ItemKind
   rarity: Rarity

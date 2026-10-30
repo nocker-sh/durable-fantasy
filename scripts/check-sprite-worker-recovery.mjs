@@ -1,6 +1,6 @@
 import { chromium } from "playwright-core"
 import { mkdir } from "node:fs/promises"
-import { createCharacter } from "./lib/game-browser.mjs"
+import { createCharacter } from "#resources/scripts/lib/create-character"
 
 const browser = await chromium.launch({ channel: "chrome", args: ["--disable-http2"] })
 try {
@@ -33,8 +33,8 @@ try {
   })
   await createCharacter(page)
   await page.evaluate(async () => {
-    const { LOOKS } = await import("/world/game.ts")
-    const { spriteFrame } = await import("/world/scene/sprite-pool.ts")
+    const { LOOKS } = await import("/world/game")
+    const { spriteFrame } = await import("/world/scene/sprite-pool")
     await new Promise((resolve, reject) => {
       let poll
       const deadline = setTimeout(() => {

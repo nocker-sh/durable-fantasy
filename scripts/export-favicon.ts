@@ -1,6 +1,6 @@
 // Rebuild the browser icon from the game's compass: bun scripts/export-favicon.ts.
 import { writeFileSync } from "node:fs"
-import { SPRITES } from "../world/art/pixel-art.ts"
+import { SPRITES } from "#/world/art/pixel-art"
 
 const icon = SPRITES.compass
 const colors = new Map<string, string[]>()
@@ -15,7 +15,13 @@ for (let y = 0; y < icon.h; y++)
     paths.push(`M${x} ${y}h1v1h-1z`)
     colors.set(color, paths)
   }
-const paths = [...colors].map(([color, pixels]) => `<path fill="#${color}" d="${pixels.join("")}"/>`).join("")
+const paths = [...colors]
+  .map((entry) => {
+    const color = entry[0]
+    const pixels = entry[1]
+    return `<path fill="#${color}" d="${pixels.join("")}"/>`
+  })
+  .join("")
 writeFileSync(
   new URL("../public/favicon.svg", import.meta.url),
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${icon.w} ${icon.h}" width="32" height="32" shape-rendering="crispEdges">${paths}</svg>\n`,

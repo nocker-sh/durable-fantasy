@@ -69,7 +69,14 @@ export class BillboardBatch {
     this.mesh.frustumCulled = false
   }
 
-  set(index: number, x: number, y: number, z: number, size: number, opacity: number) {
+  set(inputProps: { index: number; x: number; y: number; z: number; size: number; opacity: number }) {
+    const index = inputProps.index
+    const x = inputProps.x
+    const y = inputProps.y
+    const z = inputProps.z
+    const size = inputProps.size
+    const opacity = inputProps.opacity
+
     this.centers[index * 3] = x
     this.centers[index * 3 + 1] = y
     this.centers[index * 3 + 2] = z

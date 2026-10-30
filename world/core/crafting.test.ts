@@ -1,16 +1,27 @@
 import { describe, expect, it } from "vitest"
-import { apply } from "./apply.ts"
-import { addItem, countItem, emptyBag, type Bag } from "./bag.ts"
-import { RECIPES, craftedQuality, recipeOf } from "./crafting.ts"
-import { STATIONS } from "../town/stations.ts"
-import { ITEMS, type ItemId } from "./items.ts"
-import { MAPS, walkable } from "../maps/index.ts"
-import { player } from "../test/helpers.ts"
-import { craftExp, lifeExpAt } from "./life.ts"
+import { apply } from "./apply"
+import { addItem } from "#/world/core/add-item"
+import { countItem } from "#/world/core/count-item"
+import { emptyBag } from "#/world/core/empty-bag"
+import type { Bag } from "#/world/core/bag-types"
+import { RECIPES } from "#/world/core/recipes/catalog"
+import { craftedQuality } from "#/world/core/crafted-quality"
+import { recipeOf } from "#/world/core/recipe-of"
+import { STATIONS } from "../town/stations"
+import { ITEMS } from "#/world/core/items/catalog"
+import type { ItemId } from "#/world/core/items/catalog"
+import { MAPS } from "#/world/maps"
+import { cellDistance } from "#/world/maps/cell-distance"
+import { walkable } from "#/world/maps/walkable"
+import { player } from "#/world/test/player"
+import { findPathCells } from "../test/path"
+import { REACH } from "#/world/core/gather-rules"
+import { craftExp } from "#/world/core/craft-exp"
+import { lifeExpAt } from "#/world/core/life-exp-at"
 
 const at = (skill: string, level: number) => ({ ...player().life, [skill]: lifeExpAt(level) })
 
-const bag = (...items: [ItemId, number][]): Bag => items.reduce<Bag>((b, [id, n]) => addItem(b, id, n)!, emptyBag())
+const bag = (...items: [ItemId, number][]): Bag => items.reduce<Bag>((b, [id, n]) => addItem({ bag: b, item: id, count: n })!, emptyBag())
 
 describe("making things", () => {
   it("cooks soup at the hearth: takes the inputs and the fee, gives the soup with your name on it", () => {
@@ -83,9 +94,17 @@ describe("making things", () => {
     }
     for (const s of STATIONS) {
       expect(MAPS[s.map], s.id).toBeDefined()
-      expect(s.cell[0] < MAPS[s.map].size, s.id).toBe(true)
+      const map = MAPS[s.map]
+      expect(
+        s.cell.every((value) => Number.isSafeInteger(value) && value >= 0 && value < map.size),
+        s.id,
+      ).toBe(true)
+      expect(walkable(map, map.spawn), `${s.id}: spawn`).toBe(true)
+      expect(
+        findPathCells(map, map.spawn, (cell) => cellDistance(cell, s.cell) <= REACH + 1),
+        `${s.id}: usable from the entrance`,
+      ).toBe(true)
     }
-    void walkable
   })
 })
 

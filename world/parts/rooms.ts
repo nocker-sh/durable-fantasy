@@ -1,16 +1,16 @@
 // Which room to be in: the parallel town (channels.ts), the channel of each map the directory
 // picks, and the next map's room opened ahead while walking up to the way into it.
 import { connect, type VoidSocket } from "void/ws"
-import { roomName } from "../channels.ts"
-import type { MapId } from "../maps/index.ts"
+import { roomName } from "#/world/room-name"
+import type { MapId } from "#/world/maps/types"
 
 export type RoomSocket = VoidSocket<"/map/:mapId">
-export interface Channel {
+export type Channel = {
   channel: number
   channels: Record<number, number>
 }
 /** A room got ready before arriving: its channel, its socket once opened, and whether it is open yet. */
-export interface Standby {
+export type Standby = {
   map: MapId
   channel: Promise<Channel>
   socket: RoomSocket | null

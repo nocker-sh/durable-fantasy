@@ -1,8 +1,13 @@
 import { describe, expect, it } from "vitest"
-import { HOUSES } from "../town/houses.ts"
-import { layoutOf } from "./layouts.ts"
-import { currentLayout, roadD, setLayout } from "../scene/world.ts"
-import { MAPS, cellDistance, walkable, type Cell } from "./index.ts"
+import { HOUSES } from "#/world/town/houses"
+import { layoutOf } from "./layouts"
+import { currentLayout } from "#/world/scene/current-layout"
+import { roadD } from "#/world/scene/road-d"
+import { setLayout } from "#/world/scene/set-layout"
+import { MAPS } from "#/world/maps"
+import { cellDistance } from "#/world/maps/cell-distance"
+import { walkable } from "#/world/maps/walkable"
+import { type Cell } from "#/world/maps/types"
 
 /** The cells one can walk to from a map's spawn. */
 function reachableFrom(map: (typeof MAPS)[string], from: Cell): Set<number> {

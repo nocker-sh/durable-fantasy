@@ -1,20 +1,24 @@
-import { PixBuf, pick, RAMPS, type RGB, hex } from "../pix"
+import { PixelBuffer as PixBuf } from "../../../lib/graphics/pixel-buffer"
+import { pick } from "#/world/scene/pick"
+import { RAMPS } from "#/world/scene/pix"
+import { type RGB } from "../../../lib/graphics/pixel-types"
+import { hexToRgb as hex } from "../../../lib/graphics/hex-to-rgb"
 
 // ---------------------------------------------------------------- small icons
 export function signTex(kind: string): PixBuf {
   const b = new PixBuf(24, 18)
   b.fill((x, y) => {
     const edge = x === 0 || y === 0 || x === 23 || y === 17
-    return pick("wood", edge ? 0.25 : 0.62 + (y % 4 === 0 ? -0.15 : 0), x, y, 0.3)
+    return pick({ ramp: "wood", b: edge ? 0.25 : 0.62 + (y % 4 === 0 ? -0.15 : 0), x: x, y: y, dither: 0.3 })
   })
   const g = RAMPS.gold
-  const ink = (x: number, y: number, c: RGB) => b.set(x, y, c)
+  const ink = (x: number, y: number, c: RGB) => b.set({ x: x, y: y, color: c })
   if (kind === "bread") {
     for (let y = 6; y < 13; y++)
       for (let x = 5; x < 19; x++) {
         if (Math.hypot((x - 12) / 7, (y - 9.5) / 3.6) > 1) continue
         const l = 0.75 - ((y - 6) / 7) * 0.4 + ((x - 4) % 4 === 0 && y < 9 ? -0.35 : 0)
-        ink(x, y, pick("cMustard", l, x, y, 0.3))
+        ink(x, y, pick({ ramp: "cMustard", b: l, x: x, y: y, dither: 0.3 }))
       }
   } else if (kind === "anvil") {
     const I = RAMPS.iron
@@ -46,7 +50,7 @@ export function signTex(kind: string): PixBuf {
       ink(11, y, RAMPS.glass[3])
       ink(12, y, RAMPS.glass[2])
     }
-    for (let y = 7; y < 15; y++) for (let x = 7; x < 17; x++) if (Math.hypot(x - 11.5, y - 10.5) < 4.2) ink(x, y, pick("cRed", 0.8 - (y - 7) / 10 - (x - 7) / 30, x, y, 0.3))
+    for (let y = 7; y < 15; y++) for (let x = 7; x < 17; x++) if (Math.hypot(x - 11.5, y - 10.5) < 4.2) ink(x, y, pick({ ramp: "cRed", b: 0.8 - (y - 7) / 10 - (x - 7) / 30, x: x, y: y, dither: 0.3 }))
     ink(10, 8, RAMPS.cLinen[4])
   } else if (kind === "crystal") {
     const c: RGB[] = ["#3a6a88", "#8fd0e0", "#e8ffff"].map(hex)
@@ -64,7 +68,7 @@ export function signTex(kind: string): PixBuf {
   } else if (kind === "shield") {
     for (let y = 3; y < 15; y++) {
       const w = y < 10 ? 6 : 6 - (y - 9) * 1.2
-      for (let x = Math.round(12 - w); x < Math.round(12 + w); x++) ink(x, y, pick(x < 12 ? "cRed" : "cBlue", 0.6, x, y, 0.2))
+      for (let x = Math.round(12 - w); x < Math.round(12 + w); x++) ink(x, y, pick({ ramp: x < 12 ? "cRed" : "cBlue", b: 0.6, x: x, y: y, dither: 0.2 }))
     }
     for (let y = 3; y < 15; y++) ink(12, y, g[3])
   } else if (kind === "bow") {
@@ -79,7 +83,8 @@ export function signTex(kind: string): PixBuf {
     ink(19, 10, RAMPS.iron[3])
   } else if (kind === "hide") {
     for (let y = 4; y < 14; y++)
-      for (let x = 6; x < 18; x++) if (Math.hypot((x - 11.5) / 6, (y - 9) / 5) < 1 + Math.sin(x + y) * 0.08) ink(x, y, pick("leather", 0.55 + Math.sin(x * 1.3) * 0.08, x, y, 0.3))
+      for (let x = 6; x < 18; x++)
+        if (Math.hypot((x - 11.5) / 6, (y - 9) / 5) < 1 + Math.sin(x + y) * 0.08) ink(x, y, pick({ ramp: "leather", b: 0.55 + Math.sin(x * 1.3) * 0.08, x: x, y: y, dither: 0.3 }))
   } else if (kind === "scale") {
     // balance scales for the buyer
     for (let y = 4; y < 15; y++) ink(12, y, g[2])
@@ -90,7 +95,7 @@ export function signTex(kind: string): PixBuf {
     }
     for (let x = 9; x < 16; x++) ink(x, 15, g[2])
   } else if (kind === "bag") {
-    for (let y = 6; y < 15; y++) for (let x = 6; x < 18; x++) if (Math.hypot((x - 11.5) / 6, (y - 10.5) / 4.6) < 1) ink(x, y, pick("leather", 0.7 - (y - 6) / 14, x, y, 0.3))
+    for (let y = 6; y < 15; y++) for (let x = 6; x < 18; x++) if (Math.hypot((x - 11.5) / 6, (y - 10.5) / 4.6) < 1) ink(x, y, pick({ ramp: "leather", b: 0.7 - (y - 6) / 14, x: x, y: y, dither: 0.3 }))
     for (let x = 9; x < 15; x++) ink(x, 5, RAMPS.leather[1])
     ink(11, 4, g[3])
     ink(12, 4, g[3])

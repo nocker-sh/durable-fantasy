@@ -4,23 +4,21 @@
 
 export type V2 = [number, number]
 
-import { Polyline } from "../../lib/engine/polyline.ts"
+import { Polyline } from "../../lib/engine/polyline"
 export const catmull = Polyline.catmull
-
-export { smooth } from "../../lib/engine/math.ts"
 
 // ------------------------------------------------------------------ layout
 // Each map describes its ground with a Layout (scene/world.ts swaps it in and recomputes the
 // fields). A feature a map does not have sits far outside it (OFF).
 
-export interface Road {
+export type Road = {
   pts: V2[]
   w: number
   kind: "cobble" | "dirt" | "pave"
 }
 export type Rect = { x0: number; z0: number; x1: number; z1: number }
 
-export interface Layout {
+export type Layout = {
   /** river centre line and half width; OFF_LINE for none */
   river: V2[]
   riverHW: number
@@ -48,7 +46,7 @@ export interface Layout {
   /** how rolling the ground is inside and outside the town */
   relief: [number, number]
   /** a field's own landform, applied over the rolling ground: dunes, a sea cliff, a pass */
-  shape?: (x: number, z: number, h: number, roadD: number) => number
+  shape?: (inputProps: { x: number; z: number; h: number; roadD: number }) => number
   /** a field's ground: what grows or lies where no road or yard is (terrain.ts) */
   biome?: "meadow" | "dune" | "coast" | "forest" | "pass"
   /** fog colour and range (in tiles beyond the player), for haze over dunes or mist in the forest */
@@ -81,11 +79,14 @@ const rx30 = riverX0(
 export function riverX0(z: number, river: V2[]): number {
   let best = 1e9,
     bx = 0
-  for (const [x, zz] of river)
+  for (const entry of river) {
+    const x = entry[0]
+    const zz = entry[1]
     if (Math.abs(zz - z) < best) {
       best = Math.abs(zz - z)
       bx = x
     }
+  }
   return bx
 }
 
@@ -241,7 +242,7 @@ export const VILLAGE: Layout = {
     [11.4, 26.8, 14, 30.4], // smithy yard
     [11.6, 20.6, 15.6, 22.6], // bakery yard
     [36.6, 16, 39.4, 19.6], // coop yard
-    [26, 33.9, 28.8, 37.4], // drying yard
+    [26, 33.9, 28.8, 37.4], // greengrocer's yard; clothes dry indoors
     [2.2, 20.6, 4.4, 23.6], // woodcutter
   ],
   town: [18, 26, 18, 17],

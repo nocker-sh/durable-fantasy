@@ -1,3 +1,4 @@
+import { withoutKeys } from "#/lib/engine/without-keys"
 // Copied from the dev shadcn Progress and restyled as a gem bar (ui.md §6.1): a rounded glass
 // tube filled with red or blue, the numbers beside it.
 import { Progress as ProgressPrimitive } from "@base-ui/react/progress"
@@ -16,16 +17,17 @@ const fill = cva("h-full rounded-full transition-[width] duration-300 ease-out",
   defaultVariants: { tone: "hp" },
 })
 
-function Meter({
-  className,
-  label,
-  value,
-  max,
-  tone,
-  showValue = true,
-  icon,
-  ...props
-}: Omit<ProgressPrimitive.Root.Props, "value"> & VariantProps<typeof fill> & { label?: string; value: number; max: number; showValue?: boolean; icon?: string }) {
+function Meter(inputProps: Omit<ProgressPrimitive.Root.Props, "value"> & VariantProps<typeof fill> & { label?: string; value: number; max: number; showValue?: boolean; icon?: string }) {
+  const className = inputProps.className
+  const label = inputProps.label
+  const value = inputProps.value
+  const max = inputProps.max
+  const tone = inputProps.tone
+  const showValueValue = inputProps.showValue
+  const showValue = showValueValue === undefined ? true : showValueValue
+  const icon = inputProps.icon
+  const props = withoutKeys(inputProps, ["className", "label", "value", "max", "tone", "showValue", "icon"])
+
   return (
     <ProgressPrimitive.Root value={Math.min(value, max)} max={Math.max(1, max)} data-slot="meter" className={cn("flex items-center gap-1.5", className)} {...props}>
       {icon && <img src={icon} alt="" aria-hidden className="size-[18px] shrink-0" />}

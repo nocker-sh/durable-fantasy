@@ -1,13 +1,22 @@
+import { wearGatheringTool } from "#/world/core/wear-gathering-tool"
 // Gathering transition after the dispatcher's recovery and fallen-player checks.
 // Node distance and shared stock are checked by the map room before this command.
-import { addItem, type Stack } from "./bag.ts"
-import type { ServerCommand } from "./commands.ts"
-import { GATHER_STAMINA, nodeOf, yieldOf } from "./gather.ts"
-import { ITEMS, type ItemId, type Quality } from "./items.ts"
-import { GATHER_EXP, gainLife, lifeLevel } from "./life.ts"
-import { warmNow, type PlayerState } from "./player.ts"
-import { gatheringTool } from "./gathering-tool.ts"
-import { accept, reject, type Transition } from "./transition.ts"
+import { addItem } from "#/world/core/add-item"
+import type { ServerCommand } from "./commands"
+import { GATHER_STAMINA } from "#/world/core/gather-rules"
+import { nodeOf } from "#/world/core/node-of"
+import { yieldOf } from "#/world/core/yield-of"
+import { ITEMS } from "#/world/core/items/catalog"
+import type { Quality } from "#/world/core/items/kinds"
+import { GATHER_EXP } from "#/world/core/life-rules"
+import { gainLife } from "#/world/core/gain-life"
+import { lifeLevel } from "#/world/core/life-level"
+import { warmNow } from "#/world/core/warm-now"
+import type { PlayerState } from "#/world/core/player-types"
+import { gatheringTool } from "./gathering-tool"
+import { accept } from "#/world/core/accept"
+import { reject } from "#/world/core/reject"
+import type { Transition } from "#/world/core/transition"
 
 export function gather(state: PlayerState, command: Extract<ServerCommand, { type: "gather" }>, now: number): Transition {
   const node = nodeOf(command.node)
@@ -18,32 +27,14 @@ export function gather(state: PlayerState, command: Extract<ServerCommand, { typ
   if (state.stamina < cost) return reject("EXHAUSTED")
   const power = selected?.power ?? 1
   const level = lifeLevel(state.life[node.skill])
-  const got = yieldOf(node, level, power, command.roll)
-  const bag: (Stack | null)[] = [...state.bag]
-  let equipment = state.equipment,
-    worn = state.worn
-  let broke: ItemId | null = null
-  if (selected) {
-    const tool = selected.stack
-    const dur = (tool.dur ?? 1) - 1
-    if (selected.source === "weapon") {
-      if (dur <= 0) {
-        broke = tool.item
-        equipment = { ...equipment, weapon: null }
-        const { weapon: _, ...rest } = worn
-        worn = rest
-      } else worn = { ...worn, weapon: { ...state.worn.weapon, dur } }
-    } else if (dur <= 0) {
-      broke = tool.item
-      bag[selected.index] = null
-    } else bag[selected.index] = { ...tool, dur }
-  }
+  const got = yieldOf({ node, level, power, roll: command.roll })
+  const wornTool = wearGatheringTool({ player: state, selected })
   const made = ITEMS[got.item].made ? { q: 1 as Quality, by: state.name } : undefined
-  const added = addItem(bag, got.item, got.count, made)
+  const added = addItem({ bag: wornTool.bag, item: got.item, count: got.count, mark: made })
   if (!added) return reject("BAG_FULL")
   const grown = gainLife(state.life, node.skill, GATHER_EXP)
   return accept(
-    { ...state, bag: added, equipment, worn, stamina: state.stamina - cost, life: grown.life },
-    { type: "gathered", item: got.item, count: got.count, skill: node.skill, level: grown.level, up: grown.up, broke },
+    { ...state, bag: added, equipment: wornTool.equipment, worn: wornTool.worn, stamina: state.stamina - cost, life: grown.life },
+    { type: "gathered", item: got.item, count: got.count, skill: node.skill, level: grown.level, up: grown.up, broke: wornTool.broke },
   )
 }

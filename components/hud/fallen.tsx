@@ -1,8 +1,9 @@
 // Fallen (game-system.md §8): the quiet screen, what was lost, and the way back to town.
-import { deathPenalty } from "#/world/core/combat.ts"
-import { expToNext } from "#/world/core/growth.ts"
-import { useGame, useGameState } from "#/components/game/context.tsx"
-import { Between } from "./loading.tsx"
+import { deathPenalty } from "#/world/core/death-penalty"
+import { expToNext } from "#/world/core/exp-to-next"
+import { useGame } from "#/hooks/use-game"
+import { useGameState } from "#/hooks/use-game-state"
+import { Between } from "#/components/hud/between"
 
 export function Fallen() {
   const game = useGame()

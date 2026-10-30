@@ -1,13 +1,27 @@
 // Commands a player can send to change their own data, and why one can be refused.
 import { z } from "zod"
-import { BAG_SIZE, type Stack } from "./bag.ts"
-import { STATS, type Stat } from "./growth.ts"
-import { SLOTS, type CraftSkill, type GatherSkill, type ItemId, type Quality, type Slot } from "./items.ts"
-import { HOTBAR_SIZE, LOOK_COUNT, NECK_KINDS, NECK_RAMPS, hotbarEntry, itemId, profileNameSchema } from "./player.ts"
-import { isShopId, type ShopId } from "./shops.ts"
-import { LIFE_SKILLS } from "./life.ts"
-import { SKILL_IDS, type SkillId } from "./skills.ts"
-import type { Thread } from "./threads.ts"
+import { BAG_SIZE } from "#/world/core/bag-rules"
+import type { Stack } from "#/world/core/bag-types"
+import { STATS } from "#/world/core/growth-rules"
+import type { Stat } from "#/world/core/growth-types"
+import { SLOTS } from "#/world/core/items/kinds"
+import type { CraftSkill, GatherSkill, Quality, Slot } from "#/world/core/items/kinds"
+import type { ItemId } from "#/world/core/items/catalog"
+import { stackSchema } from "#/world/core/player-schema"
+import { HOTBAR_SIZE } from "#/world/core/player-rules"
+import { LOOK_COUNT } from "#/world/core/player-rules"
+import { NECK_KINDS } from "#/world/core/player-rules"
+import { NECK_RAMPS } from "#/world/core/player-rules"
+import { hotbarEntry } from "#/world/core/player-schema"
+import { itemId } from "#/world/core/player-schema"
+import { profileNameSchema } from "#/world/core/player-schema"
+import { isShopId } from "#/world/core/is-shop-id"
+import type { ShopId } from "#/world/core/shop-types"
+import { LIFE_SKILLS } from "#/world/core/life-rules"
+import { SKILL_IDS } from "#/world/core/skill-ids"
+import type { SkillId } from "#/world/core/skill-types"
+import type { Order } from "#/world/core/commission-types"
+import type { Thread } from "#/world/core/threads"
 
 const shopId = z.custom<ShopId>((value) => typeof value === "string" && isShopId(value), "unknown shop")
 const slotIndex = z
@@ -28,13 +42,13 @@ export const commandSchema = z.discriminatedUnion("type", [
     q: z.literal([0, 1, 2, 3] as const).optional(),
     /** the price the buyer saw; refused if it moved */ price: z.number().int().min(1).optional(),
   }),
-  z.object({ type: z.literal("sell"), shop: shopId, slot: slotIndex, count }),
-  z.object({ type: z.literal("use"), slot: slotIndex }),
+  z.object({ type: z.literal("sell"), shop: shopId, slot: slotIndex, count, expectedStack: stackSchema.optional() }),
+  z.object({ type: z.literal("use"), slot: slotIndex, expectedStack: stackSchema.optional() }),
   z.object({ type: z.literal("use-item"), item: itemId }),
-  z.object({ type: z.literal("move"), from: slotIndex, to: slotIndex }),
+  z.object({ type: z.literal("move"), from: slotIndex, to: slotIndex, expectedStack: stackSchema.optional(), expectedTarget: stackSchema.nullable().optional() }),
   /** wear the item in a bag slot; `to` picks one of two accessory slots */
-  z.object({ type: z.literal("equip"), slot: slotIndex, to: equipSlot.optional() }),
-  z.object({ type: z.literal("unequip"), slot: equipSlot }),
+  z.object({ type: z.literal("equip"), slot: slotIndex, to: equipSlot.optional(), expectedStack: stackSchema.optional() }),
+  z.object({ type: z.literal("unequip"), slot: equipSlot, expectedStack: stackSchema.optional() }),
   z.object({ type: z.literal("raise"), stat: z.enum(STATS) }),
   z.object({ type: z.literal("forget-life"), skill: z.enum(LIFE_SKILLS), exp: z.number().int().nonnegative() }),
   /** skills (core/skills.ts): first aid or a prayer on yourself, sit down to rest, get up */
@@ -74,7 +88,7 @@ export type ServerCommand =
   | { type: "craft"; recipe: string; station: string; roll: number }
   /** leave work with a craftsman the room has checked is at their counter */
   | { type: "order"; commission: string; roll: number }
-  | { type: "collect"; index: number }
+  | { type: "collect"; index: number; expectedOrders: readonly Order[] }
   /** the exchange holds goods or gold while an order is up (core/exchange.ts) */
   | { type: "escrow-sell"; slot: number; qty: number; fee: number }
   | { type: "escrow-buy"; gold: number }
@@ -90,9 +104,9 @@ export type ServerCommand =
   /** fallen, they come to in town: half HP, a little experience lost */
   | { type: "revive" }
   /** leave a lot with the warehouse, or take one back (the room has checked the keeper is at her counter) */
-  | { type: "store"; slot: number; count: number }
-  | { type: "retrieve"; index: number; count: number }
-  /** a face-to-face trade (core/trade.ts): the room takes what one side put up, then hands over the other's */
+  | { type: "store"; slot: number; count: number; expectedStack: Stack | null }
+  | { type: "retrieve"; index: number; count: number; expectedStack: Stack | null }
+  /** a face-to-face trade (core/check-trade.ts): the room takes what one side put up, then hands over the other's */
   | { type: "trade-out"; offer: { lots: readonly { slot: number; count: number }[]; gold: number } }
   | { type: "trade-in"; stacks: readonly Stack[]; gold: number }
   /** join or leave a party (core/party.ts) */
@@ -145,6 +159,8 @@ export type Reason =
   | "WRONG_STATION"
   | "NOT_SKILLED"
   | "MISSING_INPUTS"
+  | "ITEM_CHANGED"
+  | "ORDER_CHANGED"
   | "TOO_MANY_ORDERS"
   | "NOT_READY"
   | "NOT_WANTED"
@@ -236,6 +252,8 @@ export const REASON_TEXT: Record<Reason, string> = {
   MISSING_INPUTS: "材料が足りない。",
   TOO_MANY_ORDERS: "頼めるのは三つまで。先に受け取ろう。",
   NOT_READY: "まだできていない。",
+  ORDER_CHANGED: "品物を選び直して。",
+  ITEM_CHANGED: "品物を選び直して。",
   NOT_WANTED: "もう十分ある。今は買い取れない、と言われた。",
   NO_ERRAND: "今日はもう頼まれていない。",
   TOO_MANY_ERRANDS: "頼まれごとは一度に三つまで。",

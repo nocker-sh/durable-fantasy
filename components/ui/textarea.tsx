@@ -1,7 +1,11 @@
-import * as React from "react";
-import { cn } from "cn";
+import { withoutKeys } from "#/lib/engine/without-keys"
+import * as React from "react"
+import { cn } from "cn"
 
-function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
+function Textarea(inputProps: React.ComponentProps<"textarea">) {
+  const className = inputProps.className
+  const props = withoutKeys(inputProps, ["className"])
+
   return (
     <textarea
       data-slot="textarea"
@@ -11,7 +15,7 @@ function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
       )}
       {...props}
     />
-  );
+  )
 }
 
-export { Textarea };
+export { Textarea }

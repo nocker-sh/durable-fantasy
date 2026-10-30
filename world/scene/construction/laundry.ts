@@ -1,19 +1,33 @@
 import * as THREE from "three"
-import { GB, toTex } from "../gfx"
-import { laundry, GPPU } from "../goods"
-import { groundH, blockCircle } from "../world"
-import { M } from "./materials.ts"
-import { animateObject } from "./registry.ts"
+import { GeometryBuilder as GB } from "#/lib/graphics/geometry-builder"
+import { toTexture as toTex } from "../../../lib/graphics/to-texture"
+import { laundry } from "#/world/scene/laundry"
+import { GPPU } from "#/world/scene/goods"
+import { groundH } from "#/world/scene/ground-h"
+import { blockCircle } from "#/world/scene/block-circle"
+import { M } from "./materials"
+import { animateObject } from "#/world/scene/construction/animate-object"
 
-export function laundryLine(root: THREE.Group, ax: number, az: number, bx: number, bz: number, seed: number) {
+export function laundryLine(inputProps: { root: THREE.Group; ax: number; az: number; bx: number; bz: number; seed: number }) {
+  const root = inputProps.root
+  const ax = inputProps.ax
+  const az = inputProps.az
+  const bx = inputProps.bx
+  const bz = inputProps.bz
+  const seed = inputProps.seed
+
   const gb = new GB()
   const ya = groundH(ax, az),
     yb = groundH(bx, bz)
-  for (const [x, z, y] of [
+  for (const entry of [
     [ax, az, ya],
     [bx, bz, yb],
   ]) {
-    gb.box(M.woodV, M.woodDark, x - 0.05, y - 0.2, z - 0.05, x + 0.05, y + 1.75, z + 0.05, 2)
+    const x = entry[0]
+    const z = entry[1]
+    const y = entry[2]
+
+    gb.box({ side: M.woodV, top: M.woodDark, x0: x - 0.05, y0: y - 0.2, z0: z - 0.05, x1: x + 0.05, y1: y + 1.75, z1: z + 0.05, repeat: 2 })
     blockCircle(x, z, 0.15)
   }
   const L = Math.hypot(bx - ax, bz - az)

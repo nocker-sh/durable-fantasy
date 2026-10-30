@@ -1,9 +1,8 @@
-// The party (game-system.md §10, core/party.ts): each member's HP and where they are, under our own
-// frame. The leader chooses whether experience is each one's own or shared evenly.
-import { useGame, useGameState } from "#/components/game/context.tsx"
-import { Button } from "#/components/game/button.tsx"
-import { Meter } from "#/components/game/meter.tsx"
-import { Panel } from "#/components/game/panel.tsx"
+import { useGame } from "#/hooks/use-game"
+import { useGameState } from "#/hooks/use-game-state"
+import { Button } from "#/components/game/button"
+import { Meter } from "#/components/game/meter"
+import { Panel } from "#/components/game/panel"
 
 export function PartyFrame() {
   const game = useGame()
@@ -39,24 +38,6 @@ export function PartyFrame() {
           </li>
         ))}
       </ul>
-    </Panel>
-  )
-}
-
-/** Someone asks us into their party. */
-export function PartyAsk() {
-  const game = useGame()
-  const ask = useGameState((s) => s.partyAsk)
-  if (!ask) return null
-  return (
-    <Panel className="pointer-events-auto absolute top-36 left-1/2 flex -translate-x-1/2 items-center gap-2 p-2">
-      <span className="font-body text-[13px]">{ask.name}からパーティの誘い</span>
-      <Button size="sm" variant="primary" onClick={() => game.answerParty(true)}>
-        入る
-      </Button>
-      <Button size="sm" onClick={() => game.answerParty(false)}>
-        断る
-      </Button>
     </Panel>
   )
 }

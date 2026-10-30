@@ -1,7 +1,7 @@
-import type { Look, Item } from "../scene/figure.ts"
+import type { Look, Item } from "#/world/scene/figure/look"
 type V2 = [number, number]
 
-export interface Resident {
+export type Resident = {
   name: string
   job: string
   look: Look

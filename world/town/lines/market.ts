@@ -1,13 +1,13 @@
-import { lines as tavern } from "./households/tavern.ts"
-import { lines as apothecary } from "./households/apothecary.ts"
-import { lines as general } from "./households/general.ts"
-import { lines as tailor } from "./households/tailor.ts"
-import { lines as crystal } from "./households/crystal.ts"
-import { lines as buyer } from "./households/buyer.ts"
-import { lines as mapmaker } from "./households/mapmaker.ts"
-import { lines as scribe } from "./households/scribe.ts"
-import { lines as candle } from "./households/candle.ts"
-import type { Line } from "./line.ts"
+import { lines as tavern } from "./households/tavern"
+import { lines as apothecary } from "./households/apothecary"
+import { lines as general } from "./households/general"
+import { lines as tailor } from "./households/tailor"
+import { lines as crystal } from "./households/crystal"
+import { lines as buyer } from "./households/buyer"
+import { lines as mapmaker } from "./households/mapmaker"
+import { lines as scribe } from "./households/scribe"
+import { lines as candle } from "./households/candle"
+import type { Line } from "#/world/town/lines/line"
 
 export const LINES: Record<string, readonly Line[]> = {
   フランツ: tavern["フランツ"],

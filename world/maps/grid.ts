@@ -5,17 +5,7 @@
 // be walled (a town wall, a cliff, the sea), and then nothing crosses it. The ways between maps, the world map and the
 // /dev grid are all worked out from this table.
 
-export type Side = "n" | "e" | "s" | "w"
-
-export interface Square {
-  /** column (west to east) and row (north to south) */
-  at: readonly [number, number]
-  /** the map here, or a city not built yet */
-  map?: string
-  city?: string
-  /** sides nothing crosses */
-  walls?: readonly Side[]
-}
+import type { Side, Square } from "#/world/maps/grid-types"
 
 export const GRID_SIZE = { cols: 5, rows: 5 } as const
 
@@ -41,13 +31,3 @@ export const WORLD: readonly Square[] = [
 
 export const STEP: Record<Side, readonly [number, number]> = { n: [0, -1], e: [1, 0], s: [0, 1], w: [-1, 0] }
 export const OPPOSITE: Record<Side, Side> = { n: "s", e: "w", s: "n", w: "e" }
-
-export const squareOf = (map: string) => WORLD.find((s) => s.map === map)
-export const squareAt = (col: number, row: number) => WORLD.find((s) => s.at[0] === col && s.at[1] === row)
-
-/** The square across a side, if the side is open on both squares. */
-export function across(sq: Square, side: Side): Square | undefined {
-  const o = squareAt(sq.at[0] + STEP[side][0], sq.at[1] + STEP[side][1])
-  if (!o || sq.walls?.includes(side) || o.walls?.includes(OPPOSITE[side])) return undefined
-  return o
-}

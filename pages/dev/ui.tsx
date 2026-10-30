@@ -1,6 +1,6 @@
-import { Button } from "#/components/ui/button.tsx"
-import { DevPage } from "#/dev/catalog.tsx"
-import { SHOPS } from "#/world/core/shops.ts"
+import { Button } from "#/components/ui/button"
+import { DevPage } from "#/dev/catalog"
+import { SHOPS } from "#/world/core/shops"
 
 const WINDOWS = ["status", "hotbar", "chat", "inventory", "equipment", "stats", "worldmap", "shop", "dialogue", "system", "character", "loading", "fallen", "offline", "failed"] as const
 

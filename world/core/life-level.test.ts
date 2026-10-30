@@ -1,5 +1,7 @@
 import { expect, it } from "vitest"
-import { LIFE_FINAL, lifeExpAt, lifeLevel } from "./life"
+import { LIFE_FINAL } from "#/world/core/life-rules"
+import { lifeExpAt } from "#/world/core/life-exp-at"
+import { lifeLevel } from "#/world/core/life-level"
 
 // The published progression formula, independent of the lookup implementation.
 const totalAt = (level: number) => Array.from({ length: level }, (_, i) => Math.round(40 * (i + 1) ** 1.5)).reduce((sum, n) => sum + n, 0)

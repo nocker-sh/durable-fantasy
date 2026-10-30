@@ -1,8 +1,9 @@
 import { expect, it } from "vitest"
 import { gatheringTool } from "./gathering-tool"
 import { apply } from "./apply"
-import { NODES } from "./gather"
-import { player, bagWith } from "../test/helpers"
+import { NODES } from "#/world/core/gather"
+import { player } from "#/world/test/player"
+import { bagWith } from "#/world/test/bag-with"
 
 const tree = NODES.find((node) => node.kind === "tree")!
 it.each([0, 1, 2] as const)("wears only the selected axe when bag quality is %s", (q) => {

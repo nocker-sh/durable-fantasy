@@ -1,11 +1,18 @@
+import * as terrainWalkHModule from "#/world/scene/walk-h"
+import * as terrainIsFreeModule from "#/world/scene/is-free"
 import { afterEach, expect, it, vi } from "vitest"
 import * as THREE from "three"
-import { approachMonster, burst, updateMonsterHealth, updateMonsters, type MonsterView } from "./monsters"
-import * as terrain from "./world"
-import { slimeBody } from "./fields"
-import { SPAWNS, MONSTER_KINDS, MonsterMotion } from "../core/monsters"
+import { approachMonster } from "#/world/scene/approach-monster"
+import { burst } from "#/world/scene/burst"
+import { updateMonsterHealth } from "#/world/scene/update-monster-health"
+import { updateMonsters } from "#/world/scene/update-monsters"
+import type { MonsterView } from "#/world/scene/monsters"
+import { slimeBody } from "#/world/scene/fields/slime-body"
+import { SPAWNS, MONSTER_KINDS } from "#/world/core/monsters"
+import { MonsterMotion } from "#/world/core/monster-motion"
 
-vi.mock("./world", async (original) => ({ ...(await original<typeof import("./world")>()), isFree: () => true, walkH: () => 0 }))
+vi.mock("#/world/scene/is-free", () => ({ isFree: () => true }))
+vi.mock("#/world/scene/walk-h", () => ({ walkH: () => 0 }))
 afterEach(() => vi.restoreAllMocks())
 
 function fixture() {
@@ -14,7 +21,7 @@ function fixture() {
   root.add(body)
   const monster: MonsterView = {
     spawn: SPAWNS[0],
-    motion: new MonsterMotion(SPAWNS[0], () => true),
+    motion: new MonsterMotion({ spawn: SPAWNS[0], free: () => true }),
     body,
     pos: [30, 30],
     hp: 0,
@@ -34,15 +41,15 @@ it("releases expired burst geometry and materials while retaining the shared cre
   const shared = vi.spyOn(texture, "dispose")
   burst(monster, root, 0)
   expect(root.children).toHaveLength(5)
-  updateMonsters([monster], root, 1199)
+  updateMonsters({ list: [monster], root: root, now: 1199 })
   expect(geometry).not.toHaveBeenCalled()
-  updateMonsters([monster], root, 1200)
+  updateMonsters({ list: [monster], root: root, now: 1200 })
   expect(root.children).toEqual([monster.body])
   expect(monster.burst).toBeNull()
   expect(geometry).toHaveBeenCalledTimes(4)
   expect(material).toHaveBeenCalledTimes(4)
   expect(shared).not.toHaveBeenCalled()
-  updateMonsters([monster], root, 1300)
+  updateMonsters({ list: [monster], root: root, now: 1300 })
   expect(geometry).toHaveBeenCalledTimes(4)
 })
 
@@ -57,7 +64,7 @@ it("cleans up an interrupted burst and does not retain resources over repeated f
     expect(root.children).toHaveLength(5)
   }
   expect(geometry).toHaveBeenCalledTimes(400)
-  updateMonsters([monster], root, 1300)
+  updateMonsters({ list: [monster], root: root, now: 1300 })
   expect(root.children).toHaveLength(1)
   expect(geometry).toHaveBeenCalledTimes(404)
   expect(material).toHaveBeenCalledTimes(404)
@@ -71,7 +78,7 @@ it("turns at the same speed at 30 and 60 fps", () => {
     monster.back = 0
     let now = 0
     while (monster.motion.at(now).moving) now += 100
-    for (let frame = 0; frame < fps; frame++) updateMonsters([monster], root, now, 1, 1 / fps)
+    for (let frame = 0; frame < fps; frame++) updateMonsters({ list: [monster], root: root, now: now, yaw: 1, dt: 1 / fps })
     return monster.body.rotation.y
   }
   expect(turn(60)).toBeCloseTo(turn(30), 12)
@@ -81,39 +88,39 @@ it("reuses standing terrain height and position storage while preserving animati
   const { root, monster } = fixture()
   monster.hp = 30
   monster.back = 0
-  const motion = vi.spyOn(monster.motion, "at").mockReturnValue({ x: 30, z: 30, moving: false })
-  const height = vi.spyOn(terrain, "walkH").mockImplementation((x, z) => x / 10 + z / 20)
+  const motion = vi.spyOn(MonsterMotion.prototype, "at").mockReturnValue({ x: 30, z: 30, moving: false })
+  const height = vi.spyOn(terrainWalkHModule, "walkH").mockImplementation((x, z) => x / 10 + z / 20)
   const position = monster.pos
   for (let frame = 0; frame < 60; frame++) {
     const now = (frame * 1000) / 60
-    updateMonsters([monster], root, now)
+    updateMonsters({ list: [monster], root: root, now: now })
     expect(monster.body.position.y).toBeCloseTo(4.56)
     expect(monster.body.scale.y).toBeCloseTo((1 + Math.sin(now / 700 + monster.body.id) * 0.035) * (MONSTER_KINDS[monster.spawn.kind].size ?? 1))
   }
   expect(height).toHaveBeenCalledTimes(1)
   expect(monster.pos).toBe(position)
   motion.mockReturnValue({ x: 31, z: 30, moving: true })
-  updateMonsters([monster], root, 1000)
+  updateMonsters({ list: [monster], root: root, now: 1000 })
   expect(height).toHaveBeenCalledTimes(2)
   expect(monster.body.position.y).toBeCloseTo(4.6 + 0.06 + Math.abs(Math.sin(1000 / 220)) * 0.09)
 })
 
 it("shares one ground sample among burst pieces and resamples after hidden movement", () => {
   const { root, monster } = fixture()
-  const motion = vi.spyOn(monster.motion, "at").mockReturnValue({ x: 30, z: 30, moving: false })
-  const height = vi.spyOn(terrain, "walkH").mockReturnValue(2)
+  const motion = vi.spyOn(MonsterMotion.prototype, "at").mockReturnValue({ x: 30, z: 30, moving: false })
+  const height = vi.spyOn(terrainWalkHModule, "walkH").mockReturnValue(2)
   burst(monster, root, 0)
-  updateMonsters([monster], root, 600)
+  updateMonsters({ list: [monster], root: root, now: 600 })
   expect(height).toHaveBeenCalledTimes(1)
   for (const bit of monster.burst!.bits) expect(bit.position.y).toBeCloseTo(2.45)
-  updateMonsters([monster], root, 1200)
+  updateMonsters({ list: [monster], root: root, now: 1200 })
   motion.mockReturnValue({ x: 32, z: 30, moving: false })
-  updateMonsters([monster], root, 1300)
+  updateMonsters({ list: [monster], root: root, now: 1300 })
   expect(height).toHaveBeenCalledTimes(1)
   monster.hp = 30
   monster.back = 0
   height.mockReturnValue(3)
-  updateMonsters([monster], root, 1400)
+  updateMonsters({ list: [monster], root: root, now: 1400 })
   expect(height).toHaveBeenCalledTimes(2)
   expect(monster.body.position.y).toBeCloseTo(3.06)
 })
@@ -146,19 +153,19 @@ it("writes a monster HP bar only when its displayed percentage changes", () => {
 
 it("skips invisible recovery frames and resumes at the current clock position", () => {
   const { root, monster } = fixture()
-  const motion = vi.spyOn(monster.motion, "at")
-  const height = vi.spyOn(terrain, "walkH")
-  for (let frame = 0; frame < 600; frame++) updateMonsters([monster], root, frame * 16)
+  const motion = vi.spyOn(MonsterMotion.prototype, "at")
+  const height = vi.spyOn(terrainWalkHModule, "walkH")
+  for (let frame = 0; frame < 600; frame++) updateMonsters({ list: [monster], root: root, now: frame * 16 })
   expect(monster.body.visible).toBe(false)
   expect(motion).not.toHaveBeenCalled()
   expect(height).not.toHaveBeenCalled()
   // Passing the recovery time alone cannot override the authoritative zero HP.
-  updateMonsters([monster], root, 100000)
+  updateMonsters({ list: [monster], root: root, now: 100000 })
   expect(motion).not.toHaveBeenCalled()
   monster.hp = MONSTER_KINDS[monster.spawn.kind].hp
   const now = 100001
-  const expected = new MonsterMotion(monster.spawn, () => true).at(now)
-  updateMonsters([monster], root, now)
+  const expected = new MonsterMotion({ spawn: monster.spawn, free: () => true }).at(now)
+  updateMonsters({ list: [monster], root: root, now: now })
   expect(monster.body.visible).toBe(true)
   expect(monster.pos).toEqual([expected.x, expected.z])
   expect(motion).toHaveBeenCalledWith(now)
@@ -168,7 +175,7 @@ it("skips invisible recovery frames and resumes at the current clock position", 
 it("tries another attack position when the first free position has no route", () => {
   const { monster } = fixture()
   const walk = vi.fn().mockReturnValueOnce(false).mockReturnValueOnce(true)
-  expect(approachMonster(monster, [25, 30], 1.6, walk)).toBe(true)
+  expect(approachMonster({ m: monster, from: [25, 30], reach: 1.6, tryWalk: walk })).toBe(true)
   expect(walk).toHaveBeenCalledTimes(2)
   const [first, second] = walk.mock.calls.map(([point]) => point)
   expect(second).not.toEqual(first)
@@ -177,9 +184,9 @@ it("tries another attack position when the first free position has no route", ()
 
 it("skips blocked positions without pathfinding and stops after the first accepted route", () => {
   const { monster } = fixture()
-  const free = vi.spyOn(terrain, "isFree").mockReturnValueOnce(false).mockReturnValue(true)
+  const free = vi.spyOn(terrainIsFreeModule, "isFree").mockReturnValueOnce(false).mockReturnValue(true)
   const walk = vi.fn(() => true)
-  expect(approachMonster(monster, [25, 30], 1.6, walk)).toBe(true)
+  expect(approachMonster({ m: monster, from: [25, 30], reach: 1.6, tryWalk: walk })).toBe(true)
   expect(free).toHaveBeenCalledTimes(2)
   expect(walk).toHaveBeenCalledTimes(1)
 })
@@ -187,6 +194,6 @@ it("skips blocked positions without pathfinding and stops after the first accept
 it("finishes an unsuccessful search without accepting an unreachable position", () => {
   const { monster } = fixture()
   const walk = vi.fn(() => false)
-  expect(approachMonster(monster, [25, 30], 1.6, walk)).toBe(false)
+  expect(approachMonster({ m: monster, from: [25, 30], reach: 1.6, tryWalk: walk })).toBe(false)
   expect(walk).toHaveBeenCalledTimes(8)
 })

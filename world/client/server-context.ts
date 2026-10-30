@@ -1,12 +1,12 @@
-import type { GameContext } from "./context.ts"
-import type { Cell, MapPlayer, ServerMessage } from "../protocol.ts"
-import type { MapId } from "../maps/index.ts"
-import type { GameEvent, Command, Reason } from "../core/commands.ts"
-import type { PlayerState } from "../core/player.ts"
-import type { Avatar } from "../scene/index.ts"
+import type { GameContext } from "./context"
+import type { Cell, MapPlayer, ServerMessage } from "#/world/protocol"
+import type { MapId } from "#/world/maps/types"
+import type { GameEvent, Command, Reason } from "../core/commands"
+import type { PlayerState } from "#/world/core/player-types"
+import type { Avatar } from "#/world/scene/runtime/types"
 
 /** Effects of server messages on the active session. */
-export interface ServerMessageContext extends GameContext {
+export type ServerMessageContext = GameContext & {
   preview(command: Command): Reason | null
   onServer(message: ServerMessage): void
   wayBeside(at: Cell | null): MapId | null

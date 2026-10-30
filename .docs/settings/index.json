@@ -1,0 +1,2786 @@
+{
+  "version": 1,
+  "status": "設計中",
+  "entries": [
+    {
+      "id": "building-bakery",
+      "kind": "buildings",
+      "file": "buildings/building-bakery.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-bakery-1",
+      "kind": "rooms",
+      "file": "rooms/room-bakery-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-bakery-2",
+      "kind": "rooms",
+      "file": "rooms/room-bakery-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-bakery-3",
+      "kind": "rooms",
+      "file": "rooms/room-bakery-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-bakery-4",
+      "kind": "rooms",
+      "file": "rooms/room-bakery-4.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h1",
+      "kind": "buildings",
+      "file": "buildings/building-h1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h1-1",
+      "kind": "rooms",
+      "file": "rooms/room-h1-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h1-2",
+      "kind": "rooms",
+      "file": "rooms/room-h1-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h1-3",
+      "kind": "rooms",
+      "file": "rooms/room-h1-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h1-4",
+      "kind": "rooms",
+      "file": "rooms/room-h1-4.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h1-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h1-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h1-landing",
+      "kind": "rooms",
+      "file": "rooms/room-h1-landing.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h2",
+      "kind": "buildings",
+      "file": "buildings/building-h2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h2-1",
+      "kind": "rooms",
+      "file": "rooms/room-h2-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h2-2",
+      "kind": "rooms",
+      "file": "rooms/room-h2-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-inn",
+      "kind": "buildings",
+      "file": "buildings/building-inn.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-inn-1",
+      "kind": "rooms",
+      "file": "rooms/room-inn-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-inn-2",
+      "kind": "rooms",
+      "file": "rooms/room-inn-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-inn-3",
+      "kind": "rooms",
+      "file": "rooms/room-inn-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-inn-4",
+      "kind": "rooms",
+      "file": "rooms/room-inn-4.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-inn-5",
+      "kind": "rooms",
+      "file": "rooms/room-inn-5.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-inn-6",
+      "kind": "rooms",
+      "file": "rooms/room-inn-6.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h3",
+      "kind": "buildings",
+      "file": "buildings/building-h3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h3-1",
+      "kind": "rooms",
+      "file": "rooms/room-h3-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h3-2",
+      "kind": "rooms",
+      "file": "rooms/room-h3-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h3-3",
+      "kind": "rooms",
+      "file": "rooms/room-h3-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h3-4",
+      "kind": "rooms",
+      "file": "rooms/room-h3-4.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h4",
+      "kind": "buildings",
+      "file": "buildings/building-h4.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h4-1",
+      "kind": "rooms",
+      "file": "rooms/room-h4-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h4-2",
+      "kind": "rooms",
+      "file": "rooms/room-h4-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h5",
+      "kind": "buildings",
+      "file": "buildings/building-h5.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h5-1",
+      "kind": "rooms",
+      "file": "rooms/room-h5-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h5-2",
+      "kind": "rooms",
+      "file": "rooms/room-h5-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h6",
+      "kind": "buildings",
+      "file": "buildings/building-h6.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h6-1",
+      "kind": "rooms",
+      "file": "rooms/room-h6-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h6-2",
+      "kind": "rooms",
+      "file": "rooms/room-h6-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h6-3",
+      "kind": "rooms",
+      "file": "rooms/room-h6-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h7",
+      "kind": "buildings",
+      "file": "buildings/building-h7.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h7-1",
+      "kind": "rooms",
+      "file": "rooms/room-h7-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h7-2",
+      "kind": "rooms",
+      "file": "rooms/room-h7-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h8",
+      "kind": "buildings",
+      "file": "buildings/building-h8.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h8-1",
+      "kind": "rooms",
+      "file": "rooms/room-h8-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h8-2",
+      "kind": "rooms",
+      "file": "rooms/room-h8-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h8-3",
+      "kind": "rooms",
+      "file": "rooms/room-h8-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h8-4",
+      "kind": "rooms",
+      "file": "rooms/room-h8-4.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h8-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h8-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-smithy",
+      "kind": "buildings",
+      "file": "buildings/building-smithy.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-smithy-1",
+      "kind": "rooms",
+      "file": "rooms/room-smithy-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-smithy-2",
+      "kind": "rooms",
+      "file": "rooms/room-smithy-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h9",
+      "kind": "buildings",
+      "file": "buildings/building-h9.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h9-1",
+      "kind": "rooms",
+      "file": "rooms/room-h9-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h9-2",
+      "kind": "rooms",
+      "file": "rooms/room-h9-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h9-3",
+      "kind": "rooms",
+      "file": "rooms/room-h9-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h10",
+      "kind": "buildings",
+      "file": "buildings/building-h10.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h10-1",
+      "kind": "rooms",
+      "file": "rooms/room-h10-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h10-2",
+      "kind": "rooms",
+      "file": "rooms/room-h10-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-barn",
+      "kind": "buildings",
+      "file": "buildings/building-barn.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-barn-1",
+      "kind": "rooms",
+      "file": "rooms/room-barn-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-barn-2",
+      "kind": "rooms",
+      "file": "rooms/room-barn-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-farmhouse",
+      "kind": "buildings",
+      "file": "buildings/building-farmhouse.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-farmhouse-1",
+      "kind": "rooms",
+      "file": "rooms/room-farmhouse-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-farmhouse-2",
+      "kind": "rooms",
+      "file": "rooms/room-farmhouse-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-farmhouse-3",
+      "kind": "rooms",
+      "file": "rooms/room-farmhouse-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-farmhouse-4",
+      "kind": "rooms",
+      "file": "rooms/room-farmhouse-4.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-farmhouse-5",
+      "kind": "rooms",
+      "file": "rooms/room-farmhouse-5.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-coop",
+      "kind": "buildings",
+      "file": "buildings/building-coop.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-coop-1",
+      "kind": "rooms",
+      "file": "rooms/room-coop-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-tavern",
+      "kind": "buildings",
+      "file": "buildings/building-tavern.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-tavern-1",
+      "kind": "rooms",
+      "file": "rooms/room-tavern-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-tavern-2",
+      "kind": "rooms",
+      "file": "rooms/room-tavern-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-tavern-3",
+      "kind": "rooms",
+      "file": "rooms/room-tavern-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-tavern-4",
+      "kind": "rooms",
+      "file": "rooms/room-tavern-4.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-tavern-5",
+      "kind": "rooms",
+      "file": "rooms/room-tavern-5.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-apothecary",
+      "kind": "buildings",
+      "file": "buildings/building-apothecary.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-apothecary-1",
+      "kind": "rooms",
+      "file": "rooms/room-apothecary-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-apothecary-2",
+      "kind": "rooms",
+      "file": "rooms/room-apothecary-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-apothecary-3",
+      "kind": "rooms",
+      "file": "rooms/room-apothecary-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-apothecary-4",
+      "kind": "rooms",
+      "file": "rooms/room-apothecary-4.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-apothecary-5",
+      "kind": "rooms",
+      "file": "rooms/room-apothecary-5.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-general",
+      "kind": "buildings",
+      "file": "buildings/building-general.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-general-1",
+      "kind": "rooms",
+      "file": "rooms/room-general-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-general-2",
+      "kind": "rooms",
+      "file": "rooms/room-general-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-general-3",
+      "kind": "rooms",
+      "file": "rooms/room-general-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-tailor",
+      "kind": "buildings",
+      "file": "buildings/building-tailor.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-tailor-1",
+      "kind": "rooms",
+      "file": "rooms/room-tailor-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-tailor-2",
+      "kind": "rooms",
+      "file": "rooms/room-tailor-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-tailor-3",
+      "kind": "rooms",
+      "file": "rooms/room-tailor-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-tailor-4",
+      "kind": "rooms",
+      "file": "rooms/room-tailor-4.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-tailor-5",
+      "kind": "rooms",
+      "file": "rooms/room-tailor-5.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-crystal",
+      "kind": "buildings",
+      "file": "buildings/building-crystal.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-crystal-1",
+      "kind": "rooms",
+      "file": "rooms/room-crystal-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-crystal-2",
+      "kind": "rooms",
+      "file": "rooms/room-crystal-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-crystal-3",
+      "kind": "rooms",
+      "file": "rooms/room-crystal-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h-m1",
+      "kind": "buildings",
+      "file": "buildings/building-h-m1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m1-1",
+      "kind": "rooms",
+      "file": "rooms/room-h-m1-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m1-2",
+      "kind": "rooms",
+      "file": "rooms/room-h-m1-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m1-3",
+      "kind": "rooms",
+      "file": "rooms/room-h-m1-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-buyer",
+      "kind": "buildings",
+      "file": "buildings/building-buyer.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-buyer-1",
+      "kind": "rooms",
+      "file": "rooms/room-buyer-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-buyer-2",
+      "kind": "rooms",
+      "file": "rooms/room-buyer-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-buyer-3",
+      "kind": "rooms",
+      "file": "rooms/room-buyer-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h-m2",
+      "kind": "buildings",
+      "file": "buildings/building-h-m2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m2-1",
+      "kind": "rooms",
+      "file": "rooms/room-h-m2-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m2-2",
+      "kind": "rooms",
+      "file": "rooms/room-h-m2-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m2-3",
+      "kind": "rooms",
+      "file": "rooms/room-h-m2-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m2-4",
+      "kind": "rooms",
+      "file": "rooms/room-h-m2-4.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h-m3",
+      "kind": "buildings",
+      "file": "buildings/building-h-m3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m3-1",
+      "kind": "rooms",
+      "file": "rooms/room-h-m3-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m3-2",
+      "kind": "rooms",
+      "file": "rooms/room-h-m3-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h-m4",
+      "kind": "buildings",
+      "file": "buildings/building-h-m4.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m4-1",
+      "kind": "rooms",
+      "file": "rooms/room-h-m4-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h-m5",
+      "kind": "buildings",
+      "file": "buildings/building-h-m5.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m5-1",
+      "kind": "rooms",
+      "file": "rooms/room-h-m5-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m5-2",
+      "kind": "rooms",
+      "file": "rooms/room-h-m5-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-armorer",
+      "kind": "buildings",
+      "file": "buildings/building-armorer.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-armorer-1",
+      "kind": "rooms",
+      "file": "rooms/room-armorer-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-armorer-2",
+      "kind": "rooms",
+      "file": "rooms/room-armorer-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-armorer-3",
+      "kind": "rooms",
+      "file": "rooms/room-armorer-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-armorer-4",
+      "kind": "rooms",
+      "file": "rooms/room-armorer-4.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-woodworker",
+      "kind": "buildings",
+      "file": "buildings/building-woodworker.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-woodworker-1",
+      "kind": "rooms",
+      "file": "rooms/room-woodworker-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-woodworker-2",
+      "kind": "rooms",
+      "file": "rooms/room-woodworker-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-woodworker-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-woodworker-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-woodworker-kitchen",
+      "kind": "rooms",
+      "file": "rooms/room-woodworker-kitchen.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-leather",
+      "kind": "buildings",
+      "file": "buildings/building-leather.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-leather-1",
+      "kind": "rooms",
+      "file": "rooms/room-leather-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-leather-2",
+      "kind": "rooms",
+      "file": "rooms/room-leather-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-leather-3",
+      "kind": "rooms",
+      "file": "rooms/room-leather-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h-c1",
+      "kind": "buildings",
+      "file": "buildings/building-h-c1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c1-1",
+      "kind": "rooms",
+      "file": "rooms/room-h-c1-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c1-2",
+      "kind": "rooms",
+      "file": "rooms/room-h-c1-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c1-3",
+      "kind": "rooms",
+      "file": "rooms/room-h-c1-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h-c2",
+      "kind": "buildings",
+      "file": "buildings/building-h-c2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c2-1",
+      "kind": "rooms",
+      "file": "rooms/room-h-c2-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c2-2",
+      "kind": "rooms",
+      "file": "rooms/room-h-c2-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h-c3",
+      "kind": "buildings",
+      "file": "buildings/building-h-c3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c3-1",
+      "kind": "rooms",
+      "file": "rooms/room-h-c3-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c3-2",
+      "kind": "rooms",
+      "file": "rooms/room-h-c3-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c3-3",
+      "kind": "rooms",
+      "file": "rooms/room-h-c3-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h-c4",
+      "kind": "buildings",
+      "file": "buildings/building-h-c4.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c4-1",
+      "kind": "rooms",
+      "file": "rooms/room-h-c4-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c4-2",
+      "kind": "rooms",
+      "file": "rooms/room-h-c4-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c4-3",
+      "kind": "rooms",
+      "file": "rooms/room-h-c4-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h-c5",
+      "kind": "buildings",
+      "file": "buildings/building-h-c5.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c5-1",
+      "kind": "rooms",
+      "file": "rooms/room-h-c5-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c5-2",
+      "kind": "rooms",
+      "file": "rooms/room-h-c5-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c5-3",
+      "kind": "rooms",
+      "file": "rooms/room-h-c5-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-warehouse",
+      "kind": "buildings",
+      "file": "buildings/building-warehouse.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-warehouse-1",
+      "kind": "rooms",
+      "file": "rooms/room-warehouse-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-warehouse-2",
+      "kind": "rooms",
+      "file": "rooms/room-warehouse-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-warehouse-3",
+      "kind": "rooms",
+      "file": "rooms/room-warehouse-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-guardhouse",
+      "kind": "buildings",
+      "file": "buildings/building-guardhouse.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-guardhouse-1",
+      "kind": "rooms",
+      "file": "rooms/room-guardhouse-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-guardhouse-2",
+      "kind": "rooms",
+      "file": "rooms/room-guardhouse-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-guardhouse-3",
+      "kind": "rooms",
+      "file": "rooms/room-guardhouse-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-guardhouse-4",
+      "kind": "rooms",
+      "file": "rooms/room-guardhouse-4.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h-g1",
+      "kind": "buildings",
+      "file": "buildings/building-h-g1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g1-1",
+      "kind": "rooms",
+      "file": "rooms/room-h-g1-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g1-2",
+      "kind": "rooms",
+      "file": "rooms/room-h-g1-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h-g2",
+      "kind": "buildings",
+      "file": "buildings/building-h-g2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g2-1",
+      "kind": "rooms",
+      "file": "rooms/room-h-g2-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g2-2",
+      "kind": "rooms",
+      "file": "rooms/room-h-g2-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g2-3",
+      "kind": "rooms",
+      "file": "rooms/room-h-g2-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g2-4",
+      "kind": "rooms",
+      "file": "rooms/room-h-g2-4.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h-g4",
+      "kind": "buildings",
+      "file": "buildings/building-h-g4.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g4-1",
+      "kind": "rooms",
+      "file": "rooms/room-h-g4-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g4-2",
+      "kind": "rooms",
+      "file": "rooms/room-h-g4-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g4-3",
+      "kind": "rooms",
+      "file": "rooms/room-h-g4-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g4-4",
+      "kind": "rooms",
+      "file": "rooms/room-h-g4-4.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h-g5",
+      "kind": "buildings",
+      "file": "buildings/building-h-g5.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g5-1",
+      "kind": "rooms",
+      "file": "rooms/room-h-g5-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g5-2",
+      "kind": "rooms",
+      "file": "rooms/room-h-g5-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g5-3",
+      "kind": "rooms",
+      "file": "rooms/room-h-g5-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g5-4",
+      "kind": "rooms",
+      "file": "rooms/room-h-g5-4.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h-g6",
+      "kind": "buildings",
+      "file": "buildings/building-h-g6.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g6-1",
+      "kind": "rooms",
+      "file": "rooms/room-h-g6-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g6-2",
+      "kind": "rooms",
+      "file": "rooms/room-h-g6-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h-g3",
+      "kind": "buildings",
+      "file": "buildings/building-h-g3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g3-1",
+      "kind": "rooms",
+      "file": "rooms/room-h-g3-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g3-2",
+      "kind": "rooms",
+      "file": "rooms/room-h-g3-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "resident-ギュンター",
+      "kind": "residents",
+      "file": "residents/resident-ギュンター.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ペーター",
+      "kind": "residents",
+      "file": "residents/resident-ペーター.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-マルタ",
+      "kind": "residents",
+      "file": "residents/resident-マルタ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ハンス",
+      "kind": "residents",
+      "file": "residents/resident-ハンス.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-リーゼル",
+      "kind": "residents",
+      "file": "residents/resident-リーゼル.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-アンナ",
+      "kind": "residents",
+      "file": "residents/resident-アンナ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-クララ",
+      "kind": "residents",
+      "file": "residents/resident-クララ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-エルザ",
+      "kind": "residents",
+      "file": "residents/resident-エルザ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-オットー",
+      "kind": "residents",
+      "file": "residents/resident-オットー.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-グレーテ",
+      "kind": "residents",
+      "file": "residents/resident-グレーテ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ヤコブ",
+      "kind": "residents",
+      "file": "residents/resident-ヤコブ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-フリッツ",
+      "kind": "residents",
+      "file": "residents/resident-フリッツ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ミア",
+      "kind": "residents",
+      "file": "residents/resident-ミア.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ヴィルヘルム",
+      "kind": "residents",
+      "file": "residents/resident-ヴィルヘルム.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ゲルダ",
+      "kind": "residents",
+      "file": "residents/resident-ゲルダ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ヨーゼフ",
+      "kind": "residents",
+      "file": "residents/resident-ヨーゼフ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ウルリケ",
+      "kind": "residents",
+      "file": "residents/resident-ウルリケ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-カール",
+      "kind": "residents",
+      "file": "residents/resident-カール.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-マティアス",
+      "kind": "residents",
+      "file": "residents/resident-マティアス.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ベネディクト",
+      "kind": "residents",
+      "file": "residents/resident-ベネディクト.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ディーター",
+      "kind": "residents",
+      "file": "residents/resident-ディーター.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ゾフィー",
+      "kind": "residents",
+      "file": "residents/resident-ゾフィー.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ベルタ",
+      "kind": "residents",
+      "file": "residents/resident-ベルタ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ルカス",
+      "kind": "residents",
+      "file": "residents/resident-ルカス.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ヘレナ",
+      "kind": "residents",
+      "file": "residents/resident-ヘレナ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-フランツ",
+      "kind": "residents",
+      "file": "residents/resident-フランツ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-イルムガルト",
+      "kind": "residents",
+      "file": "residents/resident-イルムガルト.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ブルーノ",
+      "kind": "residents",
+      "file": "residents/resident-ブルーノ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-マグダレーナ",
+      "kind": "residents",
+      "file": "residents/resident-マグダレーナ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-コンスタンティン",
+      "kind": "residents",
+      "file": "residents/resident-コンスタンティン.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ラインホルト",
+      "kind": "residents",
+      "file": "residents/resident-ラインホルト.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ベアトリクス",
+      "kind": "residents",
+      "file": "residents/resident-ベアトリクス.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ゴットフリート",
+      "kind": "residents",
+      "file": "residents/resident-ゴットフリート.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ルドルフ",
+      "kind": "residents",
+      "file": "residents/resident-ルドルフ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-オイゲン",
+      "kind": "residents",
+      "file": "residents/resident-オイゲン.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-テオ",
+      "kind": "residents",
+      "file": "residents/resident-テオ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ヒルデ",
+      "kind": "residents",
+      "file": "residents/resident-ヒルデ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ローザ",
+      "kind": "residents",
+      "file": "residents/resident-ローザ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ゼップ",
+      "kind": "residents",
+      "file": "residents/resident-ゼップ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ニーナ",
+      "kind": "residents",
+      "file": "residents/resident-ニーナ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ゲルトルート",
+      "kind": "residents",
+      "file": "residents/resident-ゲルトルート.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ヴァルター",
+      "kind": "residents",
+      "file": "residents/resident-ヴァルター.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-クレメンス",
+      "kind": "residents",
+      "file": "residents/resident-クレメンス.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-パウル",
+      "kind": "residents",
+      "file": "residents/resident-パウル.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-レナ",
+      "kind": "residents",
+      "file": "residents/resident-レナ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ヨナス",
+      "kind": "residents",
+      "file": "residents/resident-ヨナス.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-アウグスト",
+      "kind": "residents",
+      "file": "residents/resident-アウグスト.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ヘートヴィヒ",
+      "kind": "residents",
+      "file": "residents/resident-ヘートヴィヒ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ティム",
+      "kind": "residents",
+      "file": "residents/resident-ティム.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-エミール",
+      "kind": "residents",
+      "file": "residents/resident-エミール.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-フェルディナント",
+      "kind": "residents",
+      "file": "residents/resident-フェルディナント.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-リリー",
+      "kind": "residents",
+      "file": "residents/resident-リリー.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-マックス",
+      "kind": "residents",
+      "file": "residents/resident-マックス.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-エーファ",
+      "kind": "residents",
+      "file": "residents/resident-エーファ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ロッテ",
+      "kind": "residents",
+      "file": "residents/resident-ロッテ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-カスパー",
+      "kind": "residents",
+      "file": "residents/resident-カスパー.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-エーリヒ",
+      "kind": "residents",
+      "file": "residents/resident-エーリヒ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-マリー",
+      "kind": "residents",
+      "file": "residents/resident-マリー.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ハンナ",
+      "kind": "residents",
+      "file": "residents/resident-ハンナ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-アガーテ",
+      "kind": "residents",
+      "file": "residents/resident-アガーテ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ジーモン",
+      "kind": "residents",
+      "file": "residents/resident-ジーモン.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-フェリックス",
+      "kind": "residents",
+      "file": "residents/resident-フェリックス.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ルイーゼ",
+      "kind": "residents",
+      "file": "residents/resident-ルイーゼ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-アントン",
+      "kind": "residents",
+      "file": "residents/resident-アントン.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ハインリヒ",
+      "kind": "residents",
+      "file": "residents/resident-ハインリヒ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-テレーゼ",
+      "kind": "residents",
+      "file": "residents/resident-テレーゼ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-アデーレ",
+      "kind": "residents",
+      "file": "residents/resident-アデーレ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-エマ",
+      "kind": "residents",
+      "file": "residents/resident-エマ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ニクラス",
+      "kind": "residents",
+      "file": "residents/resident-ニクラス.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-フリーダ",
+      "kind": "residents",
+      "file": "residents/resident-フリーダ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ローゼマリー",
+      "kind": "residents",
+      "file": "residents/resident-ローゼマリー.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-マルクス",
+      "kind": "residents",
+      "file": "residents/resident-マルクス.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-カタリーナ",
+      "kind": "residents",
+      "file": "residents/resident-カタリーナ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ダニエル",
+      "kind": "residents",
+      "file": "residents/resident-ダニエル.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-イダ",
+      "kind": "residents",
+      "file": "residents/resident-イダ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ベルンハルト",
+      "kind": "residents",
+      "file": "residents/resident-ベルンハルト.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-モニカ",
+      "kind": "residents",
+      "file": "residents/resident-モニカ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-トビアス",
+      "kind": "residents",
+      "file": "residents/resident-トビアス.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-シュテファン",
+      "kind": "residents",
+      "file": "residents/resident-シュテファン.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ヴェロニカ",
+      "kind": "residents",
+      "file": "residents/resident-ヴェロニカ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ゲオルク",
+      "kind": "residents",
+      "file": "residents/resident-ゲオルク.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-クルト",
+      "kind": "residents",
+      "file": "residents/resident-クルト.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ザビーネ",
+      "kind": "residents",
+      "file": "residents/resident-ザビーネ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ヨハン",
+      "kind": "residents",
+      "file": "residents/resident-ヨハン.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-リナ",
+      "kind": "residents",
+      "file": "residents/resident-リナ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ファルク",
+      "kind": "residents",
+      "file": "residents/resident-ファルク.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ブリギッテ",
+      "kind": "residents",
+      "file": "residents/resident-ブリギッテ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ロルフ",
+      "kind": "residents",
+      "file": "residents/resident-ロルフ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-クリスティアン",
+      "kind": "residents",
+      "file": "residents/resident-クリスティアン.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ドロテア",
+      "kind": "residents",
+      "file": "residents/resident-ドロテア.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ラウラ",
+      "kind": "residents",
+      "file": "residents/resident-ラウラ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ベンヤミン",
+      "kind": "residents",
+      "file": "residents/resident-ベンヤミン.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-エドガー",
+      "kind": "residents",
+      "file": "residents/resident-エドガー.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-マルグリット",
+      "kind": "residents",
+      "file": "residents/resident-マルグリット.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "map-phanthiet",
+      "kind": "maps",
+      "file": "maps/map-phanthiet.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-phanthiet-market",
+      "kind": "maps",
+      "file": "maps/map-phanthiet-market.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-phanthiet-craft",
+      "kind": "maps",
+      "file": "maps/map-phanthiet-craft.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-phanthiet-gate",
+      "kind": "maps",
+      "file": "maps/map-phanthiet-gate.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-south-meadow",
+      "kind": "maps",
+      "file": "maps/map-south-meadow.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-red-dunes",
+      "kind": "maps",
+      "file": "maps/map-red-dunes.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-sea-cliff",
+      "kind": "maps",
+      "file": "maps/map-sea-cliff.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-net-sheds",
+      "kind": "maps",
+      "file": "maps/map-net-sheds.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-forest-edge",
+      "kind": "maps",
+      "file": "maps/map-forest-edge.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-deep-forest",
+      "kind": "maps",
+      "file": "maps/map-deep-forest.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-quynhon-gate",
+      "kind": "maps",
+      "file": "maps/map-quynhon-gate.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-mountain-pass",
+      "kind": "maps",
+      "file": "maps/map-mountain-pass.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-hue-gate",
+      "kind": "maps",
+      "file": "maps/map-hue-gate.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-phanthiet-in-bakery",
+      "kind": "maps",
+      "file": "maps/map-phanthiet-in-bakery.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-phanthiet-in-inn",
+      "kind": "maps",
+      "file": "maps/map-phanthiet-in-inn.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-phanthiet-in-tavern",
+      "kind": "maps",
+      "file": "maps/map-phanthiet-in-tavern.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-phanthiet-in-apothecary",
+      "kind": "maps",
+      "file": "maps/map-phanthiet-in-apothecary.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-phanthiet-in-general",
+      "kind": "maps",
+      "file": "maps/map-phanthiet-in-general.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-phanthiet-in-tailor",
+      "kind": "maps",
+      "file": "maps/map-phanthiet-in-tailor.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-phanthiet-in-crystal",
+      "kind": "maps",
+      "file": "maps/map-phanthiet-in-crystal.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-phanthiet-in-buyer",
+      "kind": "maps",
+      "file": "maps/map-phanthiet-in-buyer.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-phanthiet-in-h-m5",
+      "kind": "maps",
+      "file": "maps/map-phanthiet-in-h-m5.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-phanthiet-in-armorer",
+      "kind": "maps",
+      "file": "maps/map-phanthiet-in-armorer.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-phanthiet-in-woodworker",
+      "kind": "maps",
+      "file": "maps/map-phanthiet-in-woodworker.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-phanthiet-in-leather",
+      "kind": "maps",
+      "file": "maps/map-phanthiet-in-leather.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-phanthiet-in-h-c2",
+      "kind": "maps",
+      "file": "maps/map-phanthiet-in-h-c2.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-phanthiet-in-warehouse",
+      "kind": "maps",
+      "file": "maps/map-phanthiet-in-warehouse.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "monster-slime",
+      "kind": "monsters",
+      "file": "monsters/monster-slime.md",
+      "source": "world/core/monsters.ts"
+    },
+    {
+      "id": "monster-blue-slime",
+      "kind": "monsters",
+      "file": "monsters/monster-blue-slime.md",
+      "source": "world/core/monsters.ts"
+    },
+    {
+      "id": "monster-sand-slime",
+      "kind": "monsters",
+      "file": "monsters/monster-sand-slime.md",
+      "source": "world/core/monsters.ts"
+    },
+    {
+      "id": "monster-moss-slime",
+      "kind": "monsters",
+      "file": "monsters/monster-moss-slime.md",
+      "source": "world/core/monsters.ts"
+    },
+    {
+      "id": "monster-ash-hare",
+      "kind": "monsters",
+      "file": "monsters/monster-ash-hare.md",
+      "source": "world/core/monsters.ts"
+    },
+    {
+      "id": "monster-hare",
+      "kind": "monsters",
+      "file": "monsters/monster-hare.md",
+      "source": "world/core/monsters.ts"
+    },
+    {
+      "id": "town-phanthiet",
+      "kind": "towns",
+      "file": "towns/town-phanthiet.md",
+      "source": ".docs/world/world.md"
+    },
+    {
+      "id": "town-quynhon",
+      "kind": "towns",
+      "file": "towns/town-quynhon.md",
+      "source": ".docs/world/world.md"
+    },
+    {
+      "id": "town-hue",
+      "kind": "towns",
+      "file": "towns/town-hue.md",
+      "source": ".docs/world/world.md"
+    },
+    {
+      "id": "room-bakery-landing",
+      "kind": "rooms",
+      "file": "rooms/room-bakery-landing.md",
+      "source": "rooms/room-bakery-1.md"
+    },
+    {
+      "id": "facility-square-well",
+      "kind": "facilities",
+      "file": "facilities/facility-square-well.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "facility-market-well",
+      "kind": "facilities",
+      "file": "facilities/facility-market-well.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "facility-gate-well",
+      "kind": "facilities",
+      "file": "facilities/facility-gate-well.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "facility-square-washing",
+      "kind": "facilities",
+      "file": "facilities/facility-square-washing.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "facility-bakery-oven",
+      "kind": "facilities",
+      "file": "facilities/facility-bakery-oven.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "facility-h8-privy",
+      "kind": "facilities",
+      "file": "facilities/facility-h8-privy.md",
+      "source": ".docs/settings/buildings/building-h8.md"
+    },
+    {
+      "id": "facility-h8-treatment",
+      "kind": "facilities",
+      "file": "facilities/facility-h8-treatment.md",
+      "source": ".docs/settings/buildings/building-h8.md"
+    },
+    {
+      "id": "facility-h8-nonfood-plot",
+      "kind": "facilities",
+      "file": "facilities/facility-h8-nonfood-plot.md",
+      "source": ".docs/settings/buildings/building-h8.md"
+    },
+    {
+      "id": "room-h9-kitchen",
+      "kind": "rooms",
+      "file": "rooms/room-h9-kitchen.md"
+    },
+    {
+      "id": "room-h9-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h9-stairs.md"
+    },
+    {
+      "id": "room-farmhouse-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-farmhouse-stairs.md"
+    },
+    {
+      "id": "facility-h7-garden",
+      "kind": "facilities",
+      "file": "facilities/facility-h7-garden.md"
+    },
+    {
+      "id": "facility-h6-garden",
+      "kind": "facilities",
+      "file": "facilities/facility-h6-garden.md"
+    },
+    {
+      "id": "facility-h4-garden",
+      "kind": "facilities",
+      "file": "facilities/facility-h4-garden.md"
+    },
+    {
+      "id": "building-chapel",
+      "kind": "buildings",
+      "file": "buildings/building-chapel.md"
+    },
+    {
+      "id": "room-chapel-hall",
+      "kind": "rooms",
+      "file": "rooms/room-chapel-hall.md"
+    },
+    {
+      "id": "room-chapel-records",
+      "kind": "rooms",
+      "file": "rooms/room-chapel-records.md"
+    },
+    {
+      "id": "room-chapel-care",
+      "kind": "rooms",
+      "file": "rooms/room-chapel-care.md"
+    },
+    {
+      "id": "room-inn-lower-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-inn-lower-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-inn-upper-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-inn-upper-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-inn-hall",
+      "kind": "rooms",
+      "file": "rooms/room-inn-hall.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-inn-drying",
+      "kind": "rooms",
+      "file": "rooms/room-inn-drying.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-tavern-lower-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-tavern-lower-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-tavern-upper-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-tavern-upper-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-tavern-upper-hall",
+      "kind": "rooms",
+      "file": "rooms/room-tavern-upper-hall.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-tavern-drying",
+      "kind": "rooms",
+      "file": "rooms/room-tavern-drying.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-tavern-max",
+      "kind": "rooms",
+      "file": "rooms/room-tavern-max.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-smithy-household",
+      "kind": "rooms",
+      "file": "rooms/room-smithy-household.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-smithy-lower-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-smithy-lower-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-smithy-upper-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-smithy-upper-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-smithy-peter",
+      "kind": "rooms",
+      "file": "rooms/room-smithy-peter.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-general-lower-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-general-lower-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-general-upper-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-general-upper-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-general-household",
+      "kind": "rooms",
+      "file": "rooms/room-general-household.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-warehouse-lower-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-warehouse-lower-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-warehouse-upper-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-warehouse-upper-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-warehouse-household",
+      "kind": "rooms",
+      "file": "rooms/room-warehouse-household.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-leather-lower-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-leather-lower-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-leather-upper-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-leather-upper-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-leather-household",
+      "kind": "rooms",
+      "file": "rooms/room-leather-household.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-crystal-lower-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-crystal-lower-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-crystal-upper-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-crystal-upper-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-crystal-household",
+      "kind": "rooms",
+      "file": "rooms/room-crystal-household.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-apothecary-lower-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-apothecary-lower-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-apothecary-upper-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-apothecary-upper-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-apothecary-upper-hall",
+      "kind": "rooms",
+      "file": "rooms/room-apothecary-upper-hall.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-apothecary-household",
+      "kind": "rooms",
+      "file": "rooms/room-apothecary-household.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-tailor-lower-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-tailor-lower-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-tailor-upper-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-tailor-upper-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-tailor-upper-hall",
+      "kind": "rooms",
+      "file": "rooms/room-tailor-upper-hall.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-tailor-household",
+      "kind": "rooms",
+      "file": "rooms/room-tailor-household.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-buyer-raw-store",
+      "kind": "rooms",
+      "file": "rooms/room-buyer-raw-store.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-buyer-lower-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-buyer-lower-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-buyer-upper-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-buyer-upper-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-buyer-kaspar",
+      "kind": "rooms",
+      "file": "rooms/room-buyer-kaspar.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-buyer-upper-hall",
+      "kind": "rooms",
+      "file": "rooms/room-buyer-upper-hall.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-buyer-household",
+      "kind": "rooms",
+      "file": "rooms/room-buyer-household.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-armorer-lower-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-armorer-lower-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-armorer-upper-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-armorer-upper-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-armorer-upper-hall",
+      "kind": "rooms",
+      "file": "rooms/room-armorer-upper-hall.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-armorer-household",
+      "kind": "rooms",
+      "file": "rooms/room-armorer-household.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m2-entry",
+      "kind": "rooms",
+      "file": "rooms/room-h-m2-entry.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m2-oil-store",
+      "kind": "rooms",
+      "file": "rooms/room-h-m2-oil-store.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m2-lower-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h-m2-lower-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m2-upper-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h-m2-upper-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m2-upper-hall",
+      "kind": "rooms",
+      "file": "rooms/room-h-m2-upper-hall.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m2-drying",
+      "kind": "rooms",
+      "file": "rooms/room-h-m2-drying.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c1-entry",
+      "kind": "rooms",
+      "file": "rooms/room-h-c1-entry.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c1-materials",
+      "kind": "rooms",
+      "file": "rooms/room-h-c1-materials.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c1-lower-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h-c1-lower-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c1-upper-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h-c1-upper-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c1-upper-hall",
+      "kind": "rooms",
+      "file": "rooms/room-h-c1-upper-hall.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c1-kitchen",
+      "kind": "rooms",
+      "file": "rooms/room-h-c1-kitchen.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c1-drying",
+      "kind": "rooms",
+      "file": "rooms/room-h-c1-drying.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "facility-pottery-kiln",
+      "kind": "facilities",
+      "file": "facilities/facility-pottery-kiln.md",
+      "source": "world/town/houses/craft.ts"
+    },
+    {
+      "id": "room-h-g4-entry",
+      "kind": "rooms",
+      "file": "rooms/room-h-g4-entry.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g4-processing",
+      "kind": "rooms",
+      "file": "rooms/room-h-g4-processing.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g4-lower-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h-g4-lower-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g4-upper-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h-g4-upper-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g4-upper-hall",
+      "kind": "rooms",
+      "file": "rooms/room-h-g4-upper-hall.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g4-drying",
+      "kind": "rooms",
+      "file": "rooms/room-h-g4-drying.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c5-entry",
+      "kind": "rooms",
+      "file": "rooms/room-h-c5-entry.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c5-processing",
+      "kind": "rooms",
+      "file": "rooms/room-h-c5-processing.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c5-lower-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h-c5-lower-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c5-upper-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h-c5-upper-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c5-upper-hall",
+      "kind": "rooms",
+      "file": "rooms/room-h-c5-upper-hall.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c5-drying",
+      "kind": "rooms",
+      "file": "rooms/room-h-c5-drying.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c5-monica",
+      "kind": "rooms",
+      "file": "rooms/room-h-c5-monica.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c5-tobias",
+      "kind": "rooms",
+      "file": "rooms/room-h-c5-tobias.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m1-office",
+      "kind": "rooms",
+      "file": "rooms/room-h-m1-office.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m1-entry",
+      "kind": "rooms",
+      "file": "rooms/room-h-m1-entry.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m1-lower-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h-m1-lower-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m1-upper-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h-m1-upper-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m1-upper-hall",
+      "kind": "rooms",
+      "file": "rooms/room-h-m1-upper-hall.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m1-drying",
+      "kind": "rooms",
+      "file": "rooms/room-h-m1-drying.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c3-work",
+      "kind": "rooms",
+      "file": "rooms/room-h-c3-work.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c3-entry",
+      "kind": "rooms",
+      "file": "rooms/room-h-c3-entry.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c3-lower-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h-c3-lower-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c3-upper-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h-c3-upper-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c3-niklas",
+      "kind": "rooms",
+      "file": "rooms/room-h-c3-niklas.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c3-frieda",
+      "kind": "rooms",
+      "file": "rooms/room-h-c3-frieda.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c3-upper-hall",
+      "kind": "rooms",
+      "file": "rooms/room-h-c3-upper-hall.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c3-drying",
+      "kind": "rooms",
+      "file": "rooms/room-h-c3-drying.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c4-tools",
+      "kind": "rooms",
+      "file": "rooms/room-h-c4-tools.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c4-lye",
+      "kind": "rooms",
+      "file": "rooms/room-h-c4-lye.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c4-entry",
+      "kind": "rooms",
+      "file": "rooms/room-h-c4-entry.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c4-lower-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h-c4-lower-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c4-upper-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h-c4-upper-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c4-upper-hall",
+      "kind": "rooms",
+      "file": "rooms/room-h-c4-upper-hall.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c4-drying",
+      "kind": "rooms",
+      "file": "rooms/room-h-c4-drying.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g2-repair",
+      "kind": "rooms",
+      "file": "rooms/room-h-g2-repair.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g2-grinding",
+      "kind": "rooms",
+      "file": "rooms/room-h-g2-grinding.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g2-entry",
+      "kind": "rooms",
+      "file": "rooms/room-h-g2-entry.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g2-lower-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h-g2-lower-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g2-upper-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h-g2-upper-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g2-upper-hall",
+      "kind": "rooms",
+      "file": "rooms/room-h-g2-upper-hall.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g2-drying",
+      "kind": "rooms",
+      "file": "rooms/room-h-g2-drying.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g5-study",
+      "kind": "rooms",
+      "file": "rooms/room-h-g5-study.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g5-care",
+      "kind": "rooms",
+      "file": "rooms/room-h-g5-care.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g5-entry",
+      "kind": "rooms",
+      "file": "rooms/room-h-g5-entry.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g5-lower-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h-g5-lower-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g5-upper-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h-g5-upper-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g5-upper-hall",
+      "kind": "rooms",
+      "file": "rooms/room-h-g5-upper-hall.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g5-drying",
+      "kind": "rooms",
+      "file": "rooms/room-h-g5-drying.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-guardhouse-gear",
+      "kind": "rooms",
+      "file": "rooms/room-guardhouse-gear.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-guardhouse-entry",
+      "kind": "rooms",
+      "file": "rooms/room-guardhouse-entry.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-guardhouse-dining",
+      "kind": "rooms",
+      "file": "rooms/room-guardhouse-dining.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-guardhouse-lower-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-guardhouse-lower-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-guardhouse-upper-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-guardhouse-upper-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-guardhouse-upper-hall",
+      "kind": "rooms",
+      "file": "rooms/room-guardhouse-upper-hall.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-guardhouse-drying",
+      "kind": "rooms",
+      "file": "rooms/room-guardhouse-drying.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-guardhouse-stefan",
+      "kind": "rooms",
+      "file": "rooms/room-guardhouse-stefan.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-guardhouse-veronika",
+      "kind": "rooms",
+      "file": "rooms/room-guardhouse-veronika.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m5-lower-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h-m5-lower-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-m5-upper-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h-m5-upper-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c2-weaving",
+      "kind": "rooms",
+      "file": "rooms/room-h-c2-weaving.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c2-entry",
+      "kind": "rooms",
+      "file": "rooms/room-h-c2-entry.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c2-mixing",
+      "kind": "rooms",
+      "file": "rooms/room-h-c2-mixing.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c2-lower-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h-c2-lower-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-c2-upper-stairs",
+      "kind": "rooms",
+      "file": "rooms/room-h-c2-upper-stairs.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "facility-craft-forge",
+      "kind": "facilities",
+      "file": "facilities/facility-craft-forge.md",
+      "source": "world/town/craft-yard.ts"
+    },
+    {
+      "id": "map-phanthiet-in-h-m5-floor-2",
+      "kind": "maps",
+      "file": "maps/map-phanthiet-in-h-m5-floor-2.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "facility-h7-wool-preparation",
+      "kind": "facilities",
+      "file": "facilities/facility-h7-wool-preparation.md",
+      "source": "world/town/residents/shepherd.ts"
+    },
+    {
+      "id": "map-hue-quarter",
+      "kind": "maps",
+      "file": "maps/map-hue-quarter.md",
+      "source": ".docs/settings/towns/town-hue.md"
+    },
+    {
+      "id": "building-hue-ludwig",
+      "kind": "buildings",
+      "file": "buildings/building-hue-ludwig.md",
+      "source": ".docs/settings/towns/town-hue.md"
+    },
+    {
+      "id": "room-hue-ludwig-1",
+      "kind": "rooms",
+      "file": "rooms/room-hue-ludwig-1.md",
+      "source": ".docs/settings/towns/town-hue.md"
+    },
+    {
+      "id": "room-hue-ludwig-2",
+      "kind": "rooms",
+      "file": "rooms/room-hue-ludwig-2.md",
+      "source": ".docs/settings/towns/town-hue.md"
+    },
+    {
+      "id": "resident-ルードヴィヒ",
+      "kind": "residents",
+      "file": "residents/resident-ルードヴィヒ.md",
+      "source": ".docs/settings/towns/town-hue.md"
+    },
+    {
+      "id": "room-hue-ludwig-hall",
+      "kind": "rooms",
+      "file": "rooms/room-hue-ludwig-hall.md",
+      "source": ".docs/settings/towns/town-hue.md"
+    },
+    {
+      "id": "room-hue-ludwig-wash",
+      "kind": "rooms",
+      "file": "rooms/room-hue-ludwig-wash.md",
+      "source": ".docs/settings/towns/town-hue.md"
+    },
+    {
+      "id": "room-hue-ludwig-toilet",
+      "kind": "rooms",
+      "file": "rooms/room-hue-ludwig-toilet.md",
+      "source": ".docs/settings/towns/town-hue.md"
+    },
+    {
+      "id": "room-hue-ludwig-fuel",
+      "kind": "rooms",
+      "file": "rooms/room-hue-ludwig-fuel.md",
+      "source": ".docs/settings/towns/town-hue.md"
+    },
+    {
+      "id": "facility-square-pasture",
+      "kind": "facilities",
+      "file": "facilities/facility-square-pasture.md",
+      "source": "world/scene/construction/town.ts"
+    },
+    {
+      "id": "facility-square-windmill",
+      "kind": "facilities",
+      "file": "facilities/facility-square-windmill.md",
+      "source": "world/scene/construction/town.ts"
+    }
+  ]
+}

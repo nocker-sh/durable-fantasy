@@ -1,12 +1,18 @@
-import * as React from "react";
-import { cn } from "cn";
-import { ChevronsUpDown } from "lucide-react";
+import { withoutKeys } from "#/lib/engine/without-keys"
+import * as React from "react"
+import { cn } from "cn"
+import { ChevronsUpDown } from "lucide-react"
 
 type NativeSelectProps = Omit<React.ComponentProps<"select">, "size"> & {
-  size?: "sm" | "default";
-};
+  size?: "sm" | "default"
+}
 
-function NativeSelect({ className, size = "default", ...props }: NativeSelectProps) {
+export function NativeSelect(inputProps: NativeSelectProps) {
+  const className = inputProps.className
+  const sizeValue = inputProps.size
+  const size = sizeValue === undefined ? "default" : sizeValue
+  const props = withoutKeys(inputProps, ["className", "size"])
+
   return (
     <div className={cn("group/native-select relative w-fit has-[select:disabled]:opacity-50", className)} data-slot="native-select-wrapper" data-size={size}>
       <select
@@ -22,15 +28,5 @@ function NativeSelect({ className, size = "default", ...props }: NativeSelectPro
         data-slot="native-select-icon"
       />
     </div>
-  );
+  )
 }
-
-function NativeSelectOption({ className, ...props }: React.ComponentProps<"option">) {
-  return <option data-slot="native-select-option" className={cn("bg-[Canvas] text-[CanvasText]", className)} {...props} />;
-}
-
-function NativeSelectOptGroup({ className, ...props }: React.ComponentProps<"optgroup">) {
-  return <optgroup data-slot="native-select-optgroup" className={cn("bg-[Canvas] text-[CanvasText]", className)} {...props} />;
-}
-
-export { NativeSelect, NativeSelectOptGroup, NativeSelectOption };

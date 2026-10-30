@@ -2,7 +2,7 @@
 // up, taken down and what changed hands is collected. Nobody minds it; it is open at every hour.
 // It copies the board at the foot of the world tree: a paper pinned there shows on the board in
 // every town's 寄り合い所, which is why it is one board for every town. Its fees go to the 寄り合い.
-import { INTERIORS } from "./interiors.ts"
+import { INTERIORS } from "#/world/town/interiors"
 
 const hall = INTERIORS.find((i) => i.house.id === "h-m5")!
 

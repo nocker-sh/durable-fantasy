@@ -1,10 +1,12 @@
 import { expect, it } from "vitest"
 import { apply } from "./apply"
-import { dropsOf, MONSTER_KINDS, SPAWNS } from "./monsters"
-import { derive } from "./stats"
-import { countItem } from "./bag"
-import { lifeExpAt } from "./life"
-import { bagWith, player } from "../test/helpers"
+import { dropsOf } from "#/world/core/drops-of"
+import { MONSTER_KINDS, SPAWNS } from "#/world/core/monsters"
+import { derive } from "#/world/core/derive"
+import { countItem } from "#/world/core/count-item"
+import { lifeExpAt } from "#/world/core/life-exp-at"
+import { bagWith } from "#/world/test/bag-with"
+import { player } from "#/world/test/player"
 
 it("turns loot from a spawned forest animal into a wearable charm", () => {
   const spawn = SPAWNS.find((s) => s.kind === "ash-hare")!

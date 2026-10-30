@@ -1,5 +1,6 @@
-import { hex } from "../../scene/pix.ts"
-import { hexes, k } from "./palette.ts"
+import { hexToRgb as hex } from "../../../lib/graphics/hex-to-rgb"
+import { hexes } from "#/world/art/items/hexes"
+import { k } from "#/world/art/items/palette"
 
 const BLOB = [
   "................",

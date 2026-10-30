@@ -1,7 +1,8 @@
 // Which windows are open and in what order (front-most last), remembered between visits, and the
 // modal screen over everything (ui.md §3).
-import type { Store } from "../../lib/engine/store.ts"
-import { DEFAULT_WINDOWS, type GameState, type ModalId, type WindowId } from "../state.ts"
+import type { Store } from "../../lib/engine/store"
+import { DEFAULT_WINDOWS } from "#/world/state"
+import type { GameState, ModalId, WindowId } from "#/world/state"
 
 const KNOWN: readonly WindowId[] = ["minimap", "chat", "syslog", "inventory", "equipment", "stats", "worldmap", "errands", "skills", "friends"]
 
@@ -39,7 +40,8 @@ export class Windows {
 
   /** Bring a window to the front. */
   focus(id: WindowId) {
-    const { windows } = this.state.get()
+    const windowsSource = this.state.get(),
+      windows = windowsSource.windows
     if (windows[windows.length - 1] !== id && windows.includes(id)) this.state.set((s) => ({ ...s, windows: [...windows.filter((w) => w !== id), id] }))
   }
 

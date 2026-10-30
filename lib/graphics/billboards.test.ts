@@ -1,15 +1,15 @@
 import { describe, expect, it } from "vitest"
 import * as THREE from "three"
-import { BillboardBatch } from "./billboards.ts"
+import { BillboardBatch } from "./billboards"
 
 describe("billboard batching", () => {
   it("sorts transparent particles back to front with their size and opacity", () => {
     const batch = new BillboardBatch(new THREE.Texture(), 3)
     const camera = new THREE.PerspectiveCamera()
     camera.updateMatrixWorld()
-    batch.set(0, 1, 0, -2, 0.2, 0.1)
-    batch.set(1, 2, 0, -8, 0.6, 0.5)
-    batch.set(2, 3, 0, -4, 0.4, 0.3)
+    batch.set({ index: 0, x: 1, y: 0, z: -2, size: 0.2, opacity: 0.1 })
+    batch.set({ index: 1, x: 2, y: 0, z: -8, size: 0.6, opacity: 0.5 })
+    batch.set({ index: 2, x: 3, y: 0, z: -4, size: 0.4, opacity: 0.3 })
     batch.prepare(camera)
     const g = batch.mesh.geometry
     expect(g.instanceCount).toBe(3)
@@ -27,8 +27,8 @@ describe("billboard batching", () => {
     const parent = new THREE.Group()
     parent.rotation.y = Math.PI
     parent.add(batch.mesh)
-    batch.set(0, 0, 0, -2, 1, 1)
-    batch.set(1, 0, 0, -8, 1, 1)
+    batch.set({ index: 0, x: 0, y: 0, z: -2, size: 1, opacity: 1 })
+    batch.set({ index: 1, x: 0, y: 0, z: -8, size: 1, opacity: 1 })
     batch.prepare(new THREE.PerspectiveCamera())
     expect(batch.mesh.geometry.getAttribute("offset").getZ(0)).toBe(-2)
     batch.dispose()

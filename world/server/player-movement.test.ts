@@ -1,7 +1,7 @@
 import { afterEach, expect, it, vi } from "vitest"
-import { Player } from "../../durable-objects/player.ts"
-import { player } from "../test/helpers.ts"
-import type { Cell } from "../protocol.ts"
+import { Player } from "../../durable-objects/player"
+import { player } from "#/world/test/player"
+import type { Cell } from "#/world/protocol"
 
 vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }))
 afterEach(() => vi.useRealTimers())
@@ -58,28 +58,31 @@ it("persists the place of a fall and rejects movement until revival, including a
   vi.setSystemTime(1000)
   const f = fixture(),
     p = f.restart()
-  expect(await p.walk("connection", route)).toBe(true)
+  expect(await p.walk({ connection: "connection", route: route })).toBe(true)
   vi.setSystemTime(1250) // one whole cell traversed, the next still pending
   const fallen = await p.run({ type: "hurt", amount: 100, by: "スライム" })
   expect(fallen.ok && fallen.state.hp).toBe(0)
   expect(
-    await p.walk("connection", [
-      [11, 10],
-      [12, 10],
-    ]),
+    await p.walk({
+      connection: "connection",
+      route: [
+        [11, 10],
+        [12, 10],
+      ],
+    }),
   ).toBe(false)
-  expect(await p.travel("connection", "phanthiet", [20, 20])).toBe(false)
+  expect(await p.travel({ connection: "connection", map: "phanthiet", at: [20, 20] })).toBe(false)
   vi.setSystemTime(10000)
   const resumed = f.restart()
-  expect(await resumed.arrive(1, "south-meadow", "new-connection")).toMatchObject({ accepted: true, at: [11, 10] })
-  expect(await resumed.walk("new-connection", route)).toBe(false)
+  expect(await resumed.arrive({ world: 1, map: "south-meadow", connection: "new-connection" })).toMatchObject({ accepted: true, at: [11, 10] })
+  expect(await resumed.walk({ connection: "new-connection", route: route })).toBe(false)
   const revived = await resumed.run({ type: "revive" })
   if (!revived.ok) throw Error(revived.reason)
   expect(revived.state.hp).toBeGreaterThan(0)
-  expect(await resumed.travel("new-connection", revived.state.savePoint.map, revived.state.savePoint.cell as Cell)).toBe(true)
-  await resumed.arrive(1, revived.state.savePoint.map, "town-connection")
-  expect(await resumed.walk("old-connection", route)).toBe(false)
-  expect(await resumed.walk("town-connection", route)).toBe(true)
+  expect(await resumed.travel({ connection: "new-connection", map: revived.state.savePoint.map, at: revived.state.savePoint.cell as Cell })).toBe(true)
+  await resumed.arrive({ world: 1, map: revived.state.savePoint.map, connection: "town-connection" })
+  expect(await resumed.walk({ connection: "old-connection", route: route })).toBe(false)
+  expect(await resumed.walk({ connection: "town-connection", route: route })).toBe(true)
 })
 
 it("rolls back the fall and frozen location together if saving fails", async () => {
@@ -87,7 +90,7 @@ it("rolls back the fall and frozen location together if saving fails", async () 
   vi.setSystemTime(1000)
   const f = fixture(),
     p = f.restart()
-  await p.walk("connection", route)
+  await p.walk({ connection: "connection", route: route })
   vi.setSystemTime(1250)
   f.failNextSave()
   await expect(p.run({ type: "hurt", amount: 100, by: "スライム" })).rejects.toThrow("Storage unavailable")
@@ -95,5 +98,5 @@ it("rolls back the fall and frozen location together if saving fails", async () 
   vi.setSystemTime(10000)
   const resumed = f.restart()
   expect((await resumed.read()).hp).toBe(10)
-  expect(await resumed.arrive(1, "south-meadow", "new-connection")).toMatchObject({ accepted: true, at: [13, 10] })
+  expect(await resumed.arrive({ world: 1, map: "south-meadow", connection: "new-connection" })).toMatchObject({ accepted: true, at: [13, 10] })
 })

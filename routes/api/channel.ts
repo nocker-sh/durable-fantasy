@@ -1,9 +1,9 @@
 // Which channel of a map to join in a parallel town, and how full each one is (game-system.md §1.1).
 import { z } from "zod"
 import { defineHandler } from "void"
-import { WORLDS } from "#/world/channels.ts"
-import { isMapId } from "#/world/maps/index.ts"
-import { Directory } from "../../durable-objects/directory.ts"
+import { WORLDS } from "#/world/channels"
+import { isMapId } from "#/world/maps/is-map-id"
+import { Directory } from "../../durable-objects/directory"
 
 const whole = z.string().transform(Number).pipe(z.number().int().min(1))
 const query = z.object({
@@ -13,7 +13,9 @@ const query = z.object({
   friend: whole.optional(),
 })
 
-export const GET = defineHandler.withValidator({ query })(async (_c, { query: q }) => {
-  const town = Directory.get(`town-${q.world}`)
-  return { channel: await town.choose(q.map, q.want, q.friend), channels: await town.channels(q.map) }
+const handler = defineHandler.withValidator({ query })
+
+export const GET = handler(async (_context, input) => {
+  const town = Directory.get(`town-${input.query.world}`)
+  return { channel: await town.choose({ map: input.query.map, want: input.query.want, friend: input.query.friend }), channels: await town.channels(input.query.map) }
 })

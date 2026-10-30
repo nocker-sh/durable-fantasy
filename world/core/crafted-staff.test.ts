@@ -1,9 +1,10 @@
 import { expect, it } from "vitest"
 import { apply } from "./apply"
-import { artsOf } from "./skills"
-import { loadPlayer } from "./player"
-import { lifeExpAt } from "./life"
-import { bagWith, player } from "../test/helpers"
+import { artsOf } from "#/world/core/arts-of"
+import { loadPlayer } from "#/world/core/load-player"
+import { lifeExpAt } from "#/world/core/life-exp-at"
+import { bagWith } from "#/world/test/bag-with"
+import { player } from "#/world/test/player"
 
 it("crafts a staff at the current woodwork milestone and uses its spell and prayer", () => {
   const base = player()

@@ -1,0 +1,160 @@
+/* Dedicated creation screen. Controls and typography follow DESIGN.md and game.css. */
+.character-creation {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  z-index: 90;
+  display: grid;
+  align-items: center;
+  overflow-y: auto;
+  pointer-events: auto;
+  color: var(--color-text);
+  background: var(--color-panel-solid);
+  font-family: var(--font-body);
+}
+.creation-shell {
+  width: min(100%, 900px);
+  margin: auto;
+  padding: 32px;
+}
+.creation-title {
+  margin-bottom: 28px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+}
+.creation-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 48px;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+}
+.creation-appearance {
+  min-width: 0;
+}
+.creation-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+}
+.creation-portrait {
+  height: 280px;
+  max-width: none;
+  image-rendering: pixelated;
+}
+.creation-look-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 12px 0 20px;
+}
+.creation-look-navigation > button {
+  width: 28px;
+  height: 28px;
+}
+.creation-looks {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 5px;
+}
+.creation-looks button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 66px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: var(--color-raised);
+  cursor: pointer;
+}
+.creation-looks button:hover {
+  background: var(--color-raised-hi);
+}
+.creation-looks button[aria-pressed="true"] {
+  border-color: var(--color-brass);
+  background: var(--color-raised-hi);
+}
+.creation-looks button:focus-visible {
+  outline: 1px solid var(--color-text);
+  outline-offset: 2px;
+}
+.creation-looks img {
+  height: 48px;
+  max-width: none;
+}
+.creation-details {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+.creation-details input {
+  height: 40px;
+  font-size: 15px;
+}
+.creation-details .flex > button {
+  height: 32px;
+  flex: 1;
+}
+.creation-colors {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+  padding-top: 10px;
+}
+.creation-colors > button {
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+}
+.creation-submit {
+  margin-top: 8px;
+}
+.creation-submit .creation-start {
+  width: 100%;
+  height: 40px;
+  font-size: 14px;
+}
+@media (max-width: 620px) {
+  .creation-shell {
+    max-width: 420px;
+    padding: 24px;
+  }
+  .creation-title {
+    margin-bottom: 12px;
+    font-size: 16px;
+  }
+  .creation-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+  .creation-stage {
+    height: 228px;
+  }
+  .creation-portrait {
+    height: 220px;
+  }
+  .creation-looks {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .creation-looks button {
+    min-height: 58px;
+  }
+  .creation-looks img {
+    height: 44px;
+  }
+  .creation-details {
+    gap: 20px;
+  }
+}

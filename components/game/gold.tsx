@@ -1,8 +1,11 @@
 // An amount of gold with a pixel coin.
 import { cn } from "cn"
-import { uiIconUrl } from "#/world/art/icons.ts"
+import { uiIconUrl } from "#/world/art/ui-icon-url"
 
-function Gold({ amount, className }: { amount: number; className?: string }) {
+function Gold(inputProps: { amount: number; className?: string }) {
+  const amount = inputProps.amount
+  const className = inputProps.className
+
   return (
     <span className={cn("inline-flex items-center gap-1 font-head tabular-nums", className)}>
       <img aria-hidden src={uiIconUrl("coin", 16)} alt="" className="size-4" />

@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest"
-import { daylight, dusk, jstMinutes, parseTime, phase, within } from "./clock.ts"
+import { daylight } from "#/world/core/daylight"
+import { dayOf } from "#/world/core/day-of"
+import { dusk } from "#/world/core/dusk"
+import { jstMinutes } from "#/world/core/jst-minutes"
+import { parseTime } from "#/world/core/parse-time"
+import { phase } from "#/world/core/phase"
+import { within } from "#/world/core/within"
 
 describe("the clock and the light", () => {
   it("runs on Japan time", () => {
@@ -25,4 +31,16 @@ describe("the clock and the light", () => {
     expect(within(parseTime("06:59")!, parseTime("16:00")!, parseTime("07:00")!)).toBe(true)
     expect(within(parseTime("12:00")!, parseTime("16:00")!, parseTime("07:00")!)).toBe(false)
   })
+})
+
+it.each([
+  ["2026-10-26T21:00:00Z", "2026-10-26", "2026-10-27"],
+  ["2025-12-31T21:00:00Z", "2025-12-31", "2026-01-01"],
+  ["2024-02-28T21:00:00Z", "2024-02-28", "2024-02-29"],
+  ["2024-02-29T21:00:00Z", "2024-02-29", "2024-03-01"],
+])("turns the errand and friendship day over at six in Japan: %s", (at, before, after) => {
+  const now = Date.parse(at)
+  expect(dayOf(now - 1)).toBe(before)
+  expect(dayOf(now)).toBe(after)
+  expect(dayOf(now + 86_400_000 - 1)).toBe(after)
 })

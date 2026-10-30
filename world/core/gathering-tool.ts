@@ -1,19 +1,22 @@
-import type { Stack } from "./bag.ts"
-import { ITEMS, QUALITY_EFFECT, type GatherSkill } from "./items.ts"
-import type { PlayerState } from "./player.ts"
+import type { Stack } from "#/world/core/bag-types"
+import { ITEMS } from "#/world/core/items/catalog"
+import { QUALITY_EFFECT } from "#/world/core/items/kinds"
+import type { GatherSkill } from "#/world/core/items/kinds"
+import type { PlayerState } from "#/world/core/player-types"
 
 type GatheringTool = { stack: Stack; power: number } & ({ source: "bag"; index: number } | { source: "weapon" })
 
 /** Best usable tool, comparing quality-adjusted power; the held tool wins ties. */
 export function gatheringTool(state: Pick<PlayerState, "bag" | "equipment" | "worn">, skill: GatherSkill): GatheringTool | null {
-  let selected: GatheringTool | null = null
-  for (const [index, stack] of state.bag.entries()) {
-    if (!stack || (stack.dur ?? 0) <= 0) continue
+  const selected = state.bag.reduce<GatheringTool | null>((best, stack, index) => {
+    if (!stack || (stack.dur ?? 0) <= 0) return best
     const tool = ITEMS[stack.item].tool
-    if (tool?.skill !== skill) continue
+    if (tool?.skill !== skill) return best
     const power = tool.power * QUALITY_EFFECT[stack.q ?? 1]
-    if (!selected || power > selected.power) selected = { source: "bag", index, stack, power }
-  }
+    if (best && !(power > best.power)) return best
+
+    return { source: "bag", index, stack, power }
+  }, null)
   const item = state.equipment.weapon
   const worn = state.worn.weapon
   const tool = item && ITEMS[item].tool

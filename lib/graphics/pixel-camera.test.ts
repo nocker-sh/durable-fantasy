@@ -1,10 +1,10 @@
 import * as THREE from "three"
 import { expect, it, vi } from "vitest"
-import { PixelCamera } from "./pixel-camera.ts"
+import { PixelCamera } from "./pixel-camera"
 
 it("keeps the pixel scale and projection consistent when resizing and zooming", () => {
   const resize = vi.fn()
-  const camera = new PixelCamera(new THREE.Vector3(2, 3, 4), 48, resize)
+  const camera = new PixelCamera({ position: new THREE.Vector3(2, 3, 4), pixelsPerUnit: 48, onResize: resize })
   camera.resize(800, 600)
   const distance = camera.distance
   expect(resize).toHaveBeenLastCalledWith(800, 600, 1)
@@ -18,11 +18,11 @@ it("keeps the pixel scale and projection consistent when resizing and zooming", 
 })
 
 it("holds the central region still and follows a turn around the same focus", () => {
-  const camera = new PixelCamera(new THREE.Vector3(0, 0, 0), 48, () => {})
+  const camera = new PixelCamera({ position: new THREE.Vector3(0, 0, 0), pixelsPerUnit: 48, onResize: () => {} })
   camera.resize(800, 600)
-  camera.update(new THREE.Vector3(0, 0, 0), 0, false, 1 / 60)
+  camera.update({ meAt: new THREE.Vector3(0, 0, 0), yaw: 0, turned: false, dt: 1 / 60 })
   expect(camera.focus.toArray()).toEqual([0, 0, 0])
-  camera.update(new THREE.Vector3(0, 0, 0), Math.PI / 2, true, 1 / 60)
+  camera.update({ meAt: new THREE.Vector3(0, 0, 0), yaw: Math.PI / 2, turned: true, dt: 1 / 60 })
   expect(camera.focus.toArray()).toEqual([0, 0, 0])
   expect(camera.camera.position.x).toBeGreaterThan(0)
   expect(camera.camera.position.z).toBeCloseTo(0)

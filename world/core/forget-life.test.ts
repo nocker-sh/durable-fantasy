@@ -1,8 +1,12 @@
 import { expect, it } from "vitest"
 import { apply } from "./apply"
 import { commandSchema } from "./commands"
-import { forgottenLifeExp, gainLife, lifeExpAt, lifeLevel, lifeTotal } from "./life"
-import { player } from "../test/helpers"
+import { forgottenLifeExp } from "#/world/core/forgotten-life-exp"
+import { gainLife } from "#/world/core/gain-life"
+import { lifeExpAt } from "#/world/core/life-exp-at"
+import { lifeLevel } from "#/world/core/life-level"
+import { lifeTotal } from "#/world/core/life-total"
+import { player } from "#/world/test/player"
 
 it("frees a level at the total cap so another profession can grow without refunding experience", () => {
   const before = player({ life: { ...player().life, woodcutting: lifeExpAt(8), fishing: lifeExpAt(8), cooking: lifeExpAt(8) } })

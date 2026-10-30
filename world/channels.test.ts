@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest"
-import { CHANNEL_CAP, CHANNEL_SLACK, chooseChannel, hometownOf, parseRoom, roomName, WORLDS } from "./channels.ts"
+import { CHANNEL_CAP, CHANNEL_SLACK, WORLDS } from "#/world/channels"
+import { chooseChannel } from "#/world/choose-channel"
+import { hometownOf } from "#/world/hometown-of"
+import { parseRoom } from "#/world/parse-room"
+import { roomName } from "#/world/room-name"
 
 describe("parallel towns and channels", () => {
   it("names rooms and reads the names back", () => {

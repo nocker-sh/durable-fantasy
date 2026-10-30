@@ -1,13 +1,14 @@
 // The system menu and the screens it opens (ui.md §3.14): character, controls, back to the game.
 import { useEffect } from "react"
-import { useGame, useGameState } from "#/components/game/context.tsx"
-import { Button } from "#/components/game/button.tsx"
-import { Kbd } from "#/components/game/kbd.tsx"
-import { Modal } from "#/components/game/modal.tsx"
-import { CHANNEL_CAP } from "#/world/channels.ts"
+import { useGame } from "#/hooks/use-game"
+import { useGameState } from "#/hooks/use-game-state"
+import { Button } from "#/components/game/button"
+import { Kbd } from "#/components/game/kbd"
+import { Modal } from "#/components/game/modal"
+import { CHANNEL_CAP } from "#/world/channels"
 
-import { CharacterScreen } from "./character-screen.tsx"
-import { Welcome } from "./welcome.tsx"
+import { CharacterScreen } from "./character-screen"
+import { Welcome } from "./welcome"
 
 export function SystemModals() {
   const modal = useGameState((s) => s.modal)
@@ -118,16 +119,20 @@ function Controls() {
   return (
     <Modal title="操作一覧" onClose={() => game.openModal("system")} className="w-[380px]">
       <dl className="grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-1.5 font-body text-[13px]">
-        {CONTROLS.map(([keys, what]) => (
-          <div key={what} className="contents">
-            <dt className="flex gap-1">
-              {keys.map((k) => (
-                <Kbd key={k}>{k}</Kbd>
-              ))}
-            </dt>
-            <dd>{what}</dd>
-          </div>
-        ))}
+        {CONTROLS.map((entry) => {
+          const keys = entry[0]
+          const what = entry[1]
+          return (
+            <div key={what} className="contents">
+              <dt className="flex gap-1">
+                {keys.map((k) => (
+                  <Kbd key={k}>{k}</Kbd>
+                ))}
+              </dt>
+              <dd>{what}</dd>
+            </div>
+          )
+        })}
       </dl>
       <div className="mt-4 flex justify-end">
         <Button onClick={() => game.openModal("system")}>戻る</Button>

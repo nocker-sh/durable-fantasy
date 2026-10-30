@@ -14,14 +14,20 @@ export class PixelCamera {
   get scale() {
     return this.zooms[this.level]
   }
-  constructor(
-    position: THREE.Vector3,
-    private readonly pixelsPerUnit: number,
-    private readonly onResize: (width: number, height: number, scale: number) => void,
-    /** screen pixels per rendered pixel at each zoom step, the furthest out first; below 1 draws finer than the screen to see more */
-    private readonly zooms: readonly number[] = [1, 2],
-    level = 0,
-  ) {
+  private readonly pixelsPerUnit: number
+  private readonly onResize: (width: number, height: number, scale: number) => void
+  /** Screen pixels per rendered pixel, from the furthest zoom out; values below one render finer pixels. */
+  private readonly zooms: readonly number[]
+  constructor(inputProps2: { position: THREE.Vector3; pixelsPerUnit: number; onResize: (width: number, height: number, scale: number) => void; zooms?: readonly number[]; level?: number }) {
+    const position = inputProps2.position
+    const pixelsPerUnit = inputProps2.pixelsPerUnit
+    const onResize = inputProps2.onResize
+    const zooms = inputProps2.zooms === undefined ? [1, 2] : inputProps2.zooms
+    const level = inputProps2.level === undefined ? 0 : inputProps2.level
+    this.pixelsPerUnit = pixelsPerUnit
+    this.onResize = onResize
+    this.zooms = zooms
+
     this.focus = position.clone()
     this.level = Math.min(zooms.length - 1, Math.max(0, level))
   }
@@ -56,7 +62,12 @@ export class PixelCamera {
     cam.position.set(at.x + Math.sin(yaw) * Math.cos(pitch) * dist, at.y + Math.sin(pitch) * dist, at.z + Math.cos(yaw) * Math.cos(pitch) * dist)
     cam.lookAt(at)
   }
-  update(meAt: THREE.Vector3, yaw: number, turned: boolean, dt: number) {
+  update(inputProps: { meAt: THREE.Vector3; yaw: number; turned: boolean; dt: number }) {
+    const meAt = inputProps.meAt
+    const yaw = inputProps.yaw
+    const turned = inputProps.turned
+    const dt = inputProps.dt
+
     const cam = this.camera,
       camFocus = this.focus,
       dist = this.distance,

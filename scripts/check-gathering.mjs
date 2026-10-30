@@ -1,5 +1,8 @@
 // Fresh character walks through real exits and gathers with server distance checks.
-import { configureCpu, createCharacter, waitReady, walkToMap } from "./lib/game-browser.mjs"
+import { configureCpu } from "#resources/scripts/lib/configure-cpu"
+import { createCharacter } from "#resources/scripts/lib/create-character"
+import { waitReady } from "#resources/scripts/lib/wait-ready"
+import { walkToMap } from "#resources/scripts/lib/walk-to-map"
 import { chromium } from "playwright-core"
 import { mkdir, writeFile } from "node:fs/promises"
 const browser = await chromium.launch({ channel: "chrome", args: ["--disable-http2"] })

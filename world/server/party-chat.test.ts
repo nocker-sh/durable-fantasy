@@ -1,6 +1,6 @@
 import { expect, it, vi } from "vitest"
 vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }))
-import { Party } from "../../durable-objects/party.ts"
+import { Party } from "../../durable-objects/party"
 const member = (owner: string) => ({ owner, name: owner, level: 1, hp: 10, maxHp: 10, map: owner, at: 0 })
 it("persists member boundaries and chat cursors across real Void state reloads", async () => {
   const saved = new Map<string, unknown>()
@@ -23,7 +23,7 @@ it("persists member boundaries and chat cursors across real Void state reloads",
   expect(await restart().chat("b", 0)).toEqual({ seq: 0, lines: [] })
   expect(await restart().say("a", "仲間だけ")).toBeNull()
   const writes = context.storage.put.mock.calls.length
-  const { party, chat: first } = await restart().poll("b", { ...member("b"), hp: 7 }, 0)
+  const { party, chat: first } = await restart().poll({ owner: "b", status: { ...member("b"), hp: 7 }, after: 0 })
   expect(party.members.find((member) => member.owner === "b")?.hp).toBe(7)
   expect(context.storage.put).toHaveBeenCalledTimes(writes + 1)
   expect(first?.lines.map((line) => line.text)).toEqual(["仲間だけ"])

@@ -66,7 +66,8 @@ export class GridPathfinder {
     push(h(S), S)
     let iter = 0
     while (heap.length && iter++ < 40000) {
-      const [, k] = pop()
+      const kState = pop(),
+        k = kState[1]
       if (closed[k]) continue
       closed[k] = 1
       if (k === G) break
@@ -116,13 +117,16 @@ export class GridPathfinder {
       const t = i / n,
         x = a[0] + (b[0] - a[0]) * t,
         z = a[1] + (b[1] - a[1]) * t
-      for (const [ox, oz] of [
+      for (const entry of [
         [0.2, 0.2],
         [-0.2, 0.2],
         [0.2, -0.2],
         [-0.2, -0.2],
-      ])
+      ]) {
+        const ox = entry[0]
+        const oz = entry[1]
         if (!this.free(Math.floor((x + ox) * this.resolution), Math.floor((z + oz) * this.resolution))) return false
+      }
     }
     return true
   }

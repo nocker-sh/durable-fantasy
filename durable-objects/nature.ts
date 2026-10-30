@@ -1,32 +1,40 @@
-// The gathering spots of one parallel town (economy.md §1): one Durable Object, so two players at
-// the same tree take turns and it never gives more than it has.
+// Shared gathering resources and persisted attempts for one parallel town (economy.md §1).
 import { defineDurableState } from "void/durable"
-import { NODES } from "#/world/core/gather.ts"
-import { emptyNature, giveOne, leftAt, takeOne, type NatureState } from "#/world/core/nature.ts"
+import { NODES } from "#/world/core/gather"
+import { leftAt } from "#/world/core/nature/left-at"
+import { initialNatureRecord } from "#/world/server/initial-nature-record"
+import { natureMigrations } from "#/world/server/nature-migrations"
+import { restoreNature } from "#/world/server/restore-nature"
+import { beginGather } from "#/world/server/begin-gather"
+import { finishGather } from "#/world/server/finish-gather"
+import { recoverGathering } from "#/world/server/recover-gathering"
+import { Player } from "./player"
 
+const players = (owner: string) => Player.get(owner)
 export const Nature = defineDurableState({
-  initialState: { nature: emptyNature() as NatureState },
+  initialState: initialNatureRecord,
+  version: 1,
+  migrations: natureMigrations,
   methods: {
-    /** How much every spot on a map has left. */
     left(context, map: string): Record<string, number> {
+      restoreNature(context.state.nature)
       const now = Date.now()
       return Object.fromEntries(NODES.filter((n) => n.map === map).map((n) => [n.id, leftAt(context.state.nature, n.id, now)]))
     },
-    /** Take one go; the number left after, or -1 when it was already spent. */
-    take(context, id: string): number {
-      const now = Date.now()
-      const next = takeOne(context.state.nature, id, now)
-      if (!next) return -1
-      context.state.nature = next
-      return leftAt(next, id, now)
+    beginGather(context, input: { owner: string; connection: string; seq: number; node: string }) {
+      const owner = input.owner
+      const connection = input.connection
+      const seq = input.seq
+      const node = input.node
+
+      return beginGather({ context: context, players: players, owner: owner, connection: connection, seq: seq, node: node })
     },
-    /** Put a go back (the player could not carry it). */
-    give(context, id: string): number {
-      const now = Date.now()
-      context.state.nature = giveOne(context.state.nature, id, now)
-      return leftAt(context.state.nature, id, now)
+    finishGather(context, owner: string, id: number) {
+      return finishGather({ context: context, players: players, owner: owner, id: id })
     },
   },
+  alarm(context) {
+    return recoverGathering(context, players)
+  },
 })
-
 export default Nature

@@ -1,9 +1,15 @@
 import { describe, expect, it } from "vitest"
-import { apply } from "./apply.ts"
-import { BAG_SIZE, addItem, countItem, emptyBag } from "./bag.ts"
-import { ITEMS, sellPrice } from "./items.ts"
-import { SHOPS, shopOfKeeper } from "./shops.ts"
-import { bagWith, player } from "../test/helpers.ts"
+import { apply } from "./apply"
+import { BAG_SIZE } from "#/world/core/bag-rules"
+import { addItem } from "#/world/core/add-item"
+import { countItem } from "#/world/core/count-item"
+import { emptyBag } from "#/world/core/empty-bag"
+import { ITEMS } from "#/world/core/items/catalog"
+import { sellPrice } from "#/world/core/items/sell-price"
+import { SHOPS } from "#/world/core/shops"
+import { shopOfKeeper } from "#/world/core/shop-of-keeper"
+import { bagWith } from "#/world/test/bag-with"
+import { player } from "#/world/test/player"
 
 describe("shop", () => {
   it("maps every merchant to a shop", () => {
@@ -38,7 +44,7 @@ describe("shop", () => {
   })
 
   it("refuses when the bag is full", () => {
-    const full = player({ gold: 10_000, bag: addItem(emptyBag(), "dagger", BAG_SIZE)! })
+    const full = player({ gold: 10_000, bag: addItem({ bag: emptyBag(), item: "dagger", count: BAG_SIZE })! })
     expect(apply(full, { type: "buy", shop: "fruit", item: "apple", count: 1 })).toEqual({ ok: false, reason: "BAG_FULL" })
   })
 

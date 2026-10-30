@@ -3,3 +3,7 @@ dev/
 # Keep generated game sprites; exclude browser checks and other temporary output.
 /tmp/*
 !/tmp/sprites/
+
+# Generation state and incomplete writes are never game assets.
+/tmp/sprites/.bake-plan.json
+/tmp/sprites/*.pending

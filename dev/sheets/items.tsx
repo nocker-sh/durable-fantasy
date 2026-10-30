@@ -1,13 +1,20 @@
-import { Pixel } from "./shared.tsx"
-import { STAT_NAME } from "#/world/core/growth.ts"
-import { ITEMS, ITEM_IDS, KIND_NAME, QUALITIES, RARITY_NAME, SLOT_NAME, sellPrice } from "#/world/core/items.ts"
-import { priceOf, qualitiesOf } from "#/world/core/makers.ts"
-import { SHOPS, shopBuys, type ShopId } from "#/world/core/shops.ts"
-import { iconUrl } from "#/world/art/icons.ts"
-import { ITEM_SPRITES } from "#/world/art/item-art.ts"
-import { sheet } from "./schema.ts"
-import { effects, needsText } from "./shared.tsx"
-import { texUrl } from "./art.tsx"
+import { Pixel } from "#/dev/sheets/pixel"
+import { STAT_NAME } from "#/world/core/growth-rules"
+import { ITEMS } from "#/world/core/items/catalog"
+import { ITEM_IDS } from "#/world/core/items/item-ids"
+import { KIND_NAME, QUALITIES, RARITY_NAME, SLOT_NAME } from "#/world/core/items/kinds"
+import { sellPrice } from "#/world/core/items/sell-price"
+import { priceOf } from "#/world/core/price-of"
+import { qualitiesOf } from "#/world/core/qualities-of"
+import { SHOPS } from "#/world/core/shops"
+import { shopBuys } from "#/world/core/shop-buys"
+import type { ShopId } from "#/world/core/shop-types"
+import { iconUrl } from "#/world/art/icon-url"
+import { ITEM_SPRITES } from "#/world/art/items/catalog"
+import { sheet } from "./schema"
+import { effects } from "#/dev/sheets/effects"
+import { needsText } from "#/dev/sheets/needs-text"
+import { texUrl } from "./art"
 
 // ---------------------------------------------------------------- the sheets
 
@@ -55,7 +62,11 @@ const items = sheet({
                   d.equip.part === "accessory" ? SLOT_NAME.accessory1 : SLOT_NAME[d.equip.part],
                   needsText(d.equip.needs ?? {}),
                   Object.entries(d.equip.scale ?? {})
-                    .map(([k, g]) => `${STAT_NAME[k as keyof typeof STAT_NAME]}${g}`)
+                    .map((entry) => {
+                      const k = entry[0]
+                      const g = entry[1]
+                      return `${STAT_NAME[k as keyof typeof STAT_NAME]}${g}`
+                    })
                     .join(" "),
                   d.equip.delay ?? "",
                 ],

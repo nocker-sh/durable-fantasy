@@ -1,10 +1,14 @@
 import { describe, expect, it } from "vitest"
-import { phase, type Phase } from "../../core/clock.ts"
-import { RESIDENTS } from "../residents.ts"
-import { fit, pick, type Situation } from "./line.ts"
-import { ALL_LINES } from "./index.ts"
-import { RELATIONS } from "../people.ts"
-import { ROUTINES, slotAt } from "../routines.ts"
+import { phase } from "#/world/core/phase"
+import type { Phase } from "#/world/core/clock-types"
+import { RESIDENTS } from "../residents"
+import { fit } from "#/world/town/lines/fit"
+import { pick } from "#/world/town/lines/pick"
+import type { Situation } from "#/world/town/lines/line"
+import { ALL_LINES } from "./index"
+import { RELATIONS } from "../people"
+import { ROUTINES } from "#/world/town/routines"
+import { slotAt } from "#/world/town/slot-at"
 
 const EVERY = Array.from({ length: 96 }, (_, k) => k * 15)
 const asleep = (name: string, m: number) => {
@@ -66,7 +70,7 @@ describe("what residents say", () => {
 
   it("the best-fitting line comes first, and a conversation never repeats itself", () => {
     const s: Situation = { phase: "夜", doing: "夜市で揚げ菓子を売る", nearby: new Set(), friend: 0, event: "寒波", firstTime: false }
-    const pages = pick(ALL_LINES["エルザ"], s, 3, 7)
+    const pages = pick({ lines: ALL_LINES["エルザ"], s: s, pages: 3, seed: 7 })
     expect(new Set(pages).size).toBe(pages.length)
     const top = ALL_LINES["エルザ"].find((l) => l.text === pages[0])!
     expect(fit(top, s)).toBeGreaterThan(0)

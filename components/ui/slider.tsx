@@ -1,8 +1,18 @@
-import { Slider as SliderPrimitive } from "@base-ui/react/slider";
-import { cn } from "cn";
+import { withoutKeys } from "#/lib/engine/without-keys"
+import { Slider as SliderPrimitive } from "@base-ui/react/slider"
+import { cn } from "cn"
 
-function Slider({ className, defaultValue, value, min = 0, max = 100, ...props }: SliderPrimitive.Root.Props) {
-  const _values = Array.isArray(value) ? value : Array.isArray(defaultValue) ? defaultValue : [min, max];
+function Slider(inputProps: SliderPrimitive.Root.Props) {
+  const className = inputProps.className
+  const defaultValue = inputProps.defaultValue
+  const value = inputProps.value
+  const minValue = inputProps.min
+  const min = minValue === undefined ? 0 : minValue
+  const maxValue = inputProps.max
+  const max = maxValue === undefined ? 100 : maxValue
+  const props = withoutKeys(inputProps, ["className", "defaultValue", "value", "min", "max"])
+
+  const _values = Array.isArray(value) ? value : Array.isArray(defaultValue) ? defaultValue : [min, max]
 
   return (
     <SliderPrimitive.Root
@@ -31,7 +41,7 @@ function Slider({ className, defaultValue, value, min = 0, max = 100, ...props }
         ))}
       </SliderPrimitive.Control>
     </SliderPrimitive.Root>
-  );
+  )
 }
 
-export { Slider };
+export { Slider }

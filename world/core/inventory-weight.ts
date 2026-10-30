@@ -1,10 +1,9 @@
-import { ITEMS } from "./items.ts"
-import type { PlayerState } from "./player.ts"
+import { ITEMS } from "#/world/core/items/catalog"
+import type { PlayerState } from "#/world/core/player-types"
 
 /** Everything carried: the bag and what is worn. */
 export function carried(state: Pick<PlayerState, "bag" | "equipment">): number {
-  let total = 0
-  for (const s of state.bag) if (s) total += ITEMS[s.item].weight * s.count
-  for (const id of Object.values(state.equipment)) if (id) total += ITEMS[id].weight
-  return total
+  const bagWeight = state.bag.reduce((weight, stack) => weight + (stack ? ITEMS[stack.item].weight * stack.count : 0), 0)
+
+  return Object.values(state.equipment).reduce((weight, item) => weight + (item ? ITEMS[item].weight : 0), bagWeight)
 }

@@ -1,96 +1,96 @@
-import { recipe as r, type Recipe } from "./definition.ts"
+import { recipe as r, type Recipe } from "./definition"
 
 export const COOKING_RECIPES: readonly Recipe[] = [
   // cooking at the hearth: firewood for the fire, what grows and swims for the pot
-  r(
-    "cabbage-soup",
-    "cooking",
-    "hearth",
-    [
+  r({
+    id: "cabbage-soup",
+    skill: "cooking",
+    station: "hearth",
+    inputs: [
       ["cabbage", 1],
       ["onion", 1],
       ["firewood", 1],
     ],
-    ["cabbage-soup", 2],
-  ),
-  r(
-    "mushroom-soup",
-    "cooking",
-    "hearth",
-    [
+    output: ["cabbage-soup", 2],
+  }),
+  r({
+    id: "mushroom-soup",
+    skill: "cooking",
+    station: "hearth",
+    inputs: [
       ["mushroom", 2],
       ["onion", 1],
       ["firewood", 1],
     ],
-    ["mushroom-soup", 2],
-    2,
-  ),
-  r(
-    "fish-soup",
-    "cooking",
-    "hearth",
-    [
+    output: ["mushroom-soup", 2],
+    min: 2,
+  }),
+  r({
+    id: "fish-soup",
+    skill: "cooking",
+    station: "hearth",
+    inputs: [
       ["sea-fish", 2],
       ["onion", 1],
       ["firewood", 1],
     ],
-    ["fish-soup", 2],
-    2,
-  ),
-  r(
-    "skewer",
-    "cooking",
-    "hearth",
-    [
+    output: ["fish-soup", 2],
+    min: 2,
+  }),
+  r({
+    id: "skewer",
+    skill: "cooking",
+    station: "hearth",
+    inputs: [
       ["trout", 1],
       ["charcoal", 1],
     ],
-    ["skewer", 2],
-  ),
-  r(
-    "smoked-fish",
-    "cooking",
-    "hearth",
-    [
+    output: ["skewer", 2],
+  }),
+  r({
+    id: "smoked-fish",
+    skill: "cooking",
+    station: "hearth",
+    inputs: [
       ["sea-fish", 2],
       ["firewood", 1],
     ],
-    ["smoked-fish", 2],
-  ),
-  r(
-    "herb-tea",
-    "cooking",
-    "hearth",
-    [
+    output: ["smoked-fish", 2],
+  }),
+  r({
+    id: "herb-tea",
+    skill: "cooking",
+    station: "hearth",
+    inputs: [
       ["herb", 2],
       ["firewood", 1],
     ],
-    ["herb-tea", 2],
-  ),
-  r(
-    "stew",
-    "cooking",
-    "hearth",
-    [
+    output: ["herb-tea", 2],
+  }),
+  r({
+    id: "stew",
+    skill: "cooking",
+    station: "hearth",
+    inputs: [
       ["hot-milk", 1],
       ["carrot", 1],
       ["turnip", 1],
       ["firewood", 1],
     ],
-    ["stew", 2],
-    4,
-  ),
-  r(
-    "mushroom-stew",
-    "cooking",
-    "hearth",
-    [
+    output: ["stew", 2],
+    min: 4,
+  }),
+  r({
+    id: "mushroom-stew",
+    skill: "cooking",
+    station: "hearth",
+    inputs: [
       ["mushroom", 2],
       ["turnip", 1],
       ["rye-bread", 1],
       ["firewood", 1],
     ],
-    ["mushroom-stew", 2],
-    8,
-  ),
+    output: ["mushroom-stew", 2],
+    min: 8,
+  }),
 ]

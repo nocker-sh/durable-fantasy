@@ -1,19 +1,31 @@
-import type { SpriteManifest } from "../baked"
-import { MAPS } from "../../maps/index.ts"
+import { SPRITE_RENDER_VERSION } from "../sprite-render-version"
+import { OptionalCacheAccess } from "../../../lib/engine/optional-cache-access"
+import { isSpriteManifest } from "../is-sprite-manifest"
+import type { SpriteManifest } from "../sprite-manifest-types"
+import { MAPS } from "../../maps/index"
 
 const SPRITES = MAPS.phanthiet.assets.sprites
+const manifestAccess = new OptionalCacheAccess(5000)
 
-/** The baked residents' manifest, asked for once (every map uses the same one). */
+/** Every map shares one bounded request; unavailable baked images leave procedural drawing usable. */
 let manifestP: Promise<SpriteManifest | null> | null = null
 
 export function spriteManifest(): Promise<SpriteManifest | null> {
-  manifestP ??= fetch(`${SPRITES}/sprites.json`)
-    .then((r) => (r.ok ? (r.json() as Promise<SpriteManifest>) : null))
-    .catch(() => {
-      manifestP = null
-      return null
-    })
-  return manifestP
+  return (manifestP ??= loadManifest())
+}
+
+async function loadManifest(): Promise<SpriteManifest | null> {
+  const controller = new AbortController()
+  try {
+    return await manifestAccess.run(async () => {
+      const response = await fetch(`${SPRITES}/sprites.json`, { signal: controller.signal, cache: "no-cache" })
+      if (!response.ok) return null
+      const manifest: unknown = await response.json()
+      return isSpriteManifest(manifest) && manifest.rendererVersion === SPRITE_RENDER_VERSION ? manifest : null
+    }, null)
+  } finally {
+    controller.abort()
+  }
 }
 
 export { SPRITES }

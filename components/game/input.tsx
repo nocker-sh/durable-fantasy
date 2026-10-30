@@ -1,8 +1,13 @@
+import { withoutKeys } from "#/lib/engine/without-keys"
 // Copied from the dev shadcn Input and restyled: ecru text in a sunken strip.
 import { Input as InputPrimitive } from "@base-ui/react/input"
 import { cn } from "cn"
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+function Input(inputProps: React.ComponentProps<"input">) {
+  const className = inputProps.className
+  const type = inputProps.type
+  const props = withoutKeys(inputProps, ["className", "type"])
+
   return (
     <InputPrimitive
       type={type}

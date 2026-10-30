@@ -5,7 +5,7 @@ import { mkdirSync } from "node:fs"
 import { homedir } from "node:os"
 import { join } from "node:path"
 import { chromium } from "playwright-core"
-import { MAPS } from "../world/maps/index.ts"
+import { MAPS } from "../world/maps/index"
 
 const BASE = process.env.BASE ?? "https://durable-fantasy.localhost"
 const out = join(homedir(), "Pictures", "durable-fantasy-maps"),
@@ -20,13 +20,18 @@ const browser = await chromium.launch({
   args: ["--use-angle=metal", "--window-size=1280,860", "--disable-background-timer-throttling", "--disable-renderer-backgrounding", "--disable-backgrounding-occluded-windows"],
 })
 for (const m of maps)
-  for (const [when, time] of [
+  for (const entry of [
     ["day", "12:00"],
     ["night", "21:00"],
   ] as const) {
+    const when = entry[0]
+    const time = entry[1]
+
     // a fresh page each time: a running game page is slow to let go of
     const page = await browser.newPage({ ignoreHTTPSErrors: true, viewport: { width: 1280, height: 800 } })
-    const [x, z] = [m.size / 4, m.size / 4]
+    const xState = [m.size / 4, m.size / 4],
+      x = xState[0],
+      z = xState[1]
     for (let tries = 0; tries < 3; tries++) {
       await page.goto(`${BASE}/?map=${m.id}&x=${x}&z=${z}&time=${time}`, { waitUntil: "domcontentloaded" })
       if (

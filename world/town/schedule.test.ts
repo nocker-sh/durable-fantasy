@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest"
-import { parseTime } from "../core/clock.ts"
-import { HOUSES } from "./houses.ts"
-import { lampLit, shuttersShut, windowsLit } from "./schedule.ts"
+import { parseTime } from "#/world/core/parse-time"
+import { HOUSES } from "#/world/town/houses"
+import { lampLit } from "#/world/town/lamp-lit"
+import { shuttersShut } from "#/world/town/shutters-shut"
+import { windowsLit } from "#/world/town/windows-lit"
 
 const at = (t: string) => parseTime(t)!
 

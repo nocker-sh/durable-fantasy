@@ -2,9 +2,9 @@ import { expect, it } from "vitest"
 import * as THREE from "three"
 import { indoorLaundry } from "./indoor-laundry"
 import { SceneResources } from "../../../lib/graphics/scene-resources"
-import { HOUSES } from "../../town/houses"
-import { interiorPlan } from "../../town/interiors"
-import { updaters } from "./registry"
+import { HOUSES } from "#/world/town/houses"
+import { interiorPlan } from "#/world/town/interior-plan"
+import { updaters } from "#/world/scene/construction/registry"
 
 it("draws the washers' indoor lines with one still mesh inside each entrance room", () => {
   const before = updaters.length

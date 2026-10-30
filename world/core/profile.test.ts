@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest"
-import { commandSchema } from "./commands.ts"
-import { apply } from "./apply.ts"
-import { loadPlayer, newPlayer, profileNameSchema } from "./player.ts"
+import { commandSchema } from "./commands"
+import { apply } from "./apply"
+import { loadPlayer } from "#/world/core/load-player"
+import { newPlayer } from "#/world/core/new-player"
+import { profileNameSchema } from "#/world/core/player-schema"
 
 describe("character creation", () => {
   it("keeps creation pending until a saved profile is accepted", () => {

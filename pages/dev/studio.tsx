@@ -1,12 +1,23 @@
 import { useEffect, useRef, useState } from "react"
-import { Button } from "#/components/ui/button.tsx"
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "#/components/ui/field.tsx"
-import { NativeSelect, NativeSelectOption } from "#/components/ui/native-select.tsx"
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "#/components/ui/sidebar.tsx"
-import { Slider } from "#/components/ui/slider.tsx"
-import { CATEGORIES, MOTIONS, type Motion } from "#/dev/studio/motions.ts"
-import { AGE, CLOTH, DEFAULT_LOOK, HAIR, HATS, NECKS, ITEMS, PRESETS, SEX, SKIN, STYLES } from "#/dev/studio/options.ts"
-import { Stage, type Item, type Look, type StageState } from "#/dev/studio/stage.ts"
+import { Button } from "#/components/ui/button"
+import { Field } from "#/components/ui/field"
+import { FieldDescription } from "#/components/ui/field-description"
+import { FieldGroup } from "#/components/ui/field-group"
+import { FieldLabel } from "#/components/ui/field-label"
+import { NativeSelect } from "#/components/ui/native-select"
+import { NativeSelectOption } from "#/components/ui/native-select-option"
+import { Sidebar } from "#/components/ui/sidebar"
+import { SidebarContent } from "#/components/ui/sidebar-content"
+import { SidebarGroup } from "#/components/ui/sidebar-group"
+import { SidebarGroupContent } from "#/components/ui/sidebar-group-content"
+import { SidebarGroupLabel } from "#/components/ui/sidebar-group-label"
+import { SidebarMenu } from "#/components/ui/sidebar-menu"
+import { SidebarMenuButton } from "#/components/ui/sidebar-menu-button"
+import { SidebarMenuItem } from "#/components/ui/sidebar-menu-item"
+import { Slider } from "#/components/ui/slider"
+import { CATEGORIES, MOTIONS, type Motion } from "#/dev/studio/motions"
+import { AGE, CLOTH, DEFAULT_LOOK, HAIR, HATS, NECKS, ITEMS, PRESETS, SEX, SKIN, STYLES } from "#/dev/studio/options"
+import { Stage, type Item, type Look, type StageState } from "#/dev/studio/stage"
 
 /** A look field, its label and its choices; "" stands for none. */
 type Choice = {
@@ -47,22 +58,38 @@ export default function StudioPage() {
 
   const stage = useRef<Stage | null>(null)
 
-  const [preset, setPreset] = useState(PRESETS[0][0])
+  const presetState = useState(PRESETS[0][0]),
+    preset = presetState[0],
+    setPreset = presetState[1]
 
-  const [look, setLook] = useState<Look>(DEFAULT_LOOK)
+  const lookState = useState<Look>(DEFAULT_LOOK),
+    look = lookState[0],
+    setLook = lookState[1]
 
-  const [item, setItem] = useState<Item>(null)
+  const itemState = useState<Item>(null),
+    item = itemState[0],
+    setItem = itemState[1]
 
-  const [motion, setMotion] = useState<Motion | null>(null)
+  const motionState = useState<Motion | null>(null),
+    motion = motionState[0],
+    setMotion = motionState[1]
 
-  const [zoom, setZoom] = useState(3)
+  const zoomState = useState(3),
+    zoom = zoomState[0],
+    setZoom = zoomState[1]
 
-  const [state, setState] = useState<StageState | null>(null)
+  const stateState = useState<StageState | null>(null),
+    state = stateState[0],
+    setState = stateState[1]
 
   useEffect(() => {
     if (!canvas.current) return
 
+    document.body.dataset.ready = "0"
     const created = new Stage(canvas.current, DEFAULT_LOOK, null)
+    created.onReady = () => {
+      document.body.dataset.ready = "1"
+    }
 
     created.onChange = (next) =>
       setState((shown) => (shown && shown.tx === next.tx && shown.ty === next.ty && shown.dir === next.dir && shown.clip === next.clip && shown.walking === next.walking ? shown : next))
@@ -72,6 +99,7 @@ export default function StudioPage() {
     return () => {
       created.destroy()
       stage.current = null
+      delete document.body.dataset.ready
     }
   }, [])
 
@@ -89,7 +117,10 @@ export default function StudioPage() {
   }
 
   const choosePreset = (name: string) => {
-    const found = PRESETS.find(([label]) => label === name)
+    const found = PRESETS.find((entry) => {
+      const label = entry[0]
+      return label === name
+    })
     if (!found) return
     setPreset(name)
     wear(found[1], found[2])
@@ -122,11 +153,14 @@ export default function StudioPage() {
                 <Field>
                   <FieldLabel>装備セット</FieldLabel>
                   <NativeSelect size="sm" value={preset} onChange={(event) => choosePreset(event.target.value)}>
-                    {PRESETS.map(([name]) => (
-                      <NativeSelectOption key={name} value={name}>
-                        {name}
-                      </NativeSelectOption>
-                    ))}
+                    {PRESETS.map((entry2) => {
+                      const name = entry2[0]
+                      return (
+                        <NativeSelectOption key={name} value={name}>
+                          {name}
+                        </NativeSelectOption>
+                      )
+                    })}
                   </NativeSelect>
                 </Field>
                 {CHOICES.map((choice) => (
@@ -134,22 +168,30 @@ export default function StudioPage() {
                     <FieldLabel>{choice.label}</FieldLabel>
                     <NativeSelect size="sm" value={String(look[choice.key] ?? "")} onChange={(event) => change(choice.key, event.target.value)}>
                       {choice.none && <NativeSelectOption value="">{choice.none}</NativeSelectOption>}
-                      {choice.options.map(([value, label]) => (
-                        <NativeSelectOption key={label} value={value ?? ""}>
-                          {label}
-                        </NativeSelectOption>
-                      ))}
+                      {choice.options.map((entry3) => {
+                        const value = entry3[0]
+                        const label = entry3[1]
+                        return (
+                          <NativeSelectOption key={label} value={value ?? ""}>
+                            {label}
+                          </NativeSelectOption>
+                        )
+                      })}
                     </NativeSelect>
                   </Field>
                 ))}
                 <Field>
                   <FieldLabel>持ち物</FieldLabel>
                   <NativeSelect size="sm" value={item ?? ""} onChange={(event) => wear(look, (event.target.value || null) as Item)}>
-                    {ITEMS.map(([value, label]) => (
-                      <NativeSelectOption key={label} value={value ?? ""}>
-                        {label}
-                      </NativeSelectOption>
-                    ))}
+                    {ITEMS.map((entry4) => {
+                      const value = entry4[0]
+                      const label = entry4[1]
+                      return (
+                        <NativeSelectOption key={label} value={value ?? ""}>
+                          {label}
+                        </NativeSelectOption>
+                      )
+                    })}
                   </NativeSelect>
                 </Field>
               </FieldGroup>

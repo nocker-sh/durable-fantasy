@@ -1,10 +1,19 @@
 import { describe, expect, it } from "vitest"
-import { apply, makerAt } from "./apply.ts"
-import { addItem, countItem, emptyBag, moveSlot } from "./bag.ts"
-import { displayName, effectOf, priceOf, qualitiesOf, MAKERS } from "./makers.ts"
-import { ITEMS, type ItemId } from "./items.ts"
-import { SHOPS } from "./shops.ts"
-import { player } from "../test/helpers.ts"
+import { apply } from "./apply"
+import { makerAt } from "#/world/core/maker-at"
+import { addItem } from "#/world/core/add-item"
+import { countItem } from "#/world/core/count-item"
+import { emptyBag } from "#/world/core/empty-bag"
+import { moveSlot } from "#/world/core/move-slot"
+import { displayName } from "#/world/core/display-name"
+import { effectOf } from "#/world/core/effect-of"
+import { priceOf } from "#/world/core/price-of"
+import { qualitiesOf } from "#/world/core/qualities-of"
+import { MAKERS } from "#/world/core/makers"
+import { ITEMS } from "#/world/core/items/catalog"
+import type { ItemId } from "#/world/core/items/catalog"
+import { SHOPS } from "#/world/core/shops"
+import { player } from "#/world/test/player"
 
 describe("quality and makers", () => {
   it("a made thing carries its maker's name, and better quality works better and costs more", () => {
@@ -23,9 +32,9 @@ describe("quality and makers", () => {
   })
 
   it("only the same thing of the same quality by the same maker stacks", () => {
-    let bag = addItem(emptyBag(), "potion", 2, { q: 1, by: "イルムガルト" })!
-    bag = addItem(bag, "potion", 1, { q: 2, by: "イルムガルト" })!
-    bag = addItem(bag, "potion", 1, { q: 1, by: "ゲルダ" })!
+    let bag = addItem({ bag: emptyBag(), item: "potion", count: 2, mark: { q: 1, by: "イルムガルト" } })!
+    bag = addItem({ bag: bag, item: "potion", count: 1, mark: { q: 2, by: "イルムガルト" } })!
+    bag = addItem({ bag: bag, item: "potion", count: 1, mark: { q: 1, by: "ゲルダ" } })!
     expect(bag.filter(Boolean)).toHaveLength(3)
     expect(countItem(bag, "potion")).toBe(4)
     expect(countItem(bag, "potion", { by: "ゲルダ" })).toBe(1)

@@ -1,70 +1,107 @@
+import { CHAPEL } from "../../town/chapel"
 import * as THREE from "three"
-import { GB, toTex } from "../gfx"
-import { Rng } from "../pix"
-import { ashlarTex } from "../textures"
-import { groundH, blockRect, blockCircle, currentLayout } from "../world"
-import { M } from "./materials.ts"
-import { glowify } from "./houses.ts"
-import { occluder, animateObject, places } from "./registry.ts"
-import { fence } from "./fences.ts"
+import { GeometryBuilder as GB } from "#/lib/graphics/geometry-builder"
+import { toTexture as toTex } from "../../../lib/graphics/to-texture"
+import { Rng } from "#/lib/engine/random"
+import { ashlarTex } from "#/world/scene/textures/ashlar-tex"
+import { groundH } from "#/world/scene/ground-h"
+import { blockRect } from "#/world/scene/block-rect"
+import { blockCircle } from "#/world/scene/block-circle"
+import { currentLayout } from "#/world/scene/current-layout"
+import { M } from "./materials"
+import { glowify } from "#/world/scene/construction/helpers/houses/glowify"
+import { occluder } from "#/world/scene/construction/occluder"
+import { animateObject } from "#/world/scene/construction/animate-object"
+import { places } from "#/world/scene/construction/registry"
+import { fence } from "#/world/scene/construction/fence"
 
 // ---------------------------------------------------------------- chapel
 export function chapel(root: THREE.Group) {
   const gb = new GB()
-  const x0 = 8,
-    x1 = 15,
-    z0 = 3,
-    z1 = 7
-  const y0 = groundH(11, 5) + 0.05,
-    H = 3.4
-  gb.box(M.stoneDark, M.ashlar, x0 - 0.1, y0 - 0.5, z0 - 0.1, x1 + 0.1, y0 + 0.15, z1 + 0.1, 4)
+  const x0Source = CHAPEL.body,
+    x0 = x0Source.x0,
+    x1 = x0Source.x1,
+    z0 = x0Source.z0,
+    z1 = x0Source.z1,
+    H = x0Source.height
+  const y0 = groundH(11, 5) + 0.05
+  gb.box({ side: M.stoneDark, top: M.ashlar, x0: x0 - CHAPEL.baseMargin, y0: y0 - 0.5, z0: z0 - CHAPEL.baseMargin, x1: x1 + CHAPEL.baseMargin, y1: y0 + 0.15, z1: z1 + CHAPEL.baseMargin, repeat: 4 })
   const yb = y0 + 0.15,
     yt = yb + H
-  const mk = (w: number, l: number[], door?: number, rose = false, seed = 9) => {
-    const [b, g] = ashlarTex(w, H, l, door, rose, seed)
+  const mk = (inputProps: { w: number; l: number[]; door?: number; rose?: boolean; seed?: number }) => {
+    const w = inputProps.w
+    const l = inputProps.l
+    const door = inputProps.door
+    const rose = inputProps.rose === undefined ? false : inputProps.rose
+    const seed = inputProps.seed === undefined ? 9 : inputProps.seed
+
+    const bState = ashlarTex({ w: w, h: H, lancets: l, door: door, rose: rose, seed: seed }),
+      b = bState[0],
+      g = bState[1]
     return glowify(new THREE.MeshLambertMaterial({ map: toTex(b, false) }), g)
   }
-  const sM = mk(x1 - x0, [1.2, 2.8, 4.4, 6], 3.6),
-    nM = mk(x1 - x0, [1.2, 2.8, 4.4, 6], undefined, false, 11)
-  const eM = mk(z1 - z0, [], undefined, true, 12),
-    wM = mk(z1 - z0, [2], undefined, false, 13)
-  gb.quad(sM, [x0, yb, z1], [x1, yb, z1], [x1, yt, z1], [x0, yt, z1])
-  gb.quad(nM, [x1, yb, z0], [x0, yb, z0], [x0, yt, z0], [x1, yt, z0])
-  gb.quad(eM, [x1, yb, z1], [x1, yb, z0], [x1, yt, z0], [x1, yt, z1])
-  gb.quad(wM, [x0, yb, z0], [x0, yb, z1], [x0, yt, z1], [x0, yt, z0])
+  const sM = mk({ w: x1 - x0, l: [1.2, 2.8, 4.4, 6], door: CHAPEL.doorOffset }),
+    nM = mk({ w: x1 - x0, l: [1.2, 2.8, 4.4, 6], door: undefined, rose: false, seed: 11 })
+  const eM = mk({ w: z1 - z0, l: [], door: undefined, rose: true, seed: 12 }),
+    wM = mk({ w: z1 - z0, l: [2], door: undefined, rose: false, seed: 13 })
+  gb.quad({ material: sM, a: [x0, yb, z1], b: [x1, yb, z1], c: [x1, yt, z1], d: [x0, yt, z1] })
+  gb.quad({ material: nM, a: [x1, yb, z0], b: [x0, yb, z0], c: [x0, yt, z0], d: [x1, yt, z0] })
+  gb.quad({ material: eM, a: [x1, yb, z1], b: [x1, yb, z0], c: [x1, yt, z0], d: [x1, yt, z1] })
+  gb.quad({ material: wM, a: [x0, yb, z0], b: [x0, yb, z1], c: [x0, yt, z1], d: [x0, yt, z0] })
   // buttresses
   for (const x of [x0 + 0.1, x0 + 2.4, x0 + 4.6, x1 - 0.1])
-    for (const z of [z0 - 0.35, z1]) {
-      gb.box(M.ashlar, M.ashlar, x - 0.2, yb - 0.3, z, x + 0.2, yt - 0.9, z + 0.35, 4)
+    for (const z of [z0 - CHAPEL.buttressDepth, z1]) {
+      gb.box({ side: M.ashlar, top: M.ashlar, x0: x - 0.2, y0: yb - 0.3, z0: z, x1: x + 0.2, y1: yt - 0.9, z1: z + CHAPEL.buttressDepth, repeat: 4 })
     }
   const cz = (z0 + z1) / 2,
     rh = 2.3,
-    ov = 0.25,
+    ov = CHAPEL.roofOverhang,
     yE = yt - ov * (rh / 2),
     yR = yt + rh
-  gb.quad(M.slate, [x0 - ov, yE, z1 + ov], [x1 + ov, yE, z1 + ov], [x1 + ov, yR, cz], [x0 - ov, yR, cz], 4, 4)
-  gb.quad(M.slate, [x1 + ov, yE, z0 - ov], [x0 - ov, yE, z0 - ov], [x0 - ov, yR, cz], [x1 + ov, yR, cz], 4, 4)
-  gb.tri(M.ashlar, [x1, yt, z1], [x1, yt, z0], [x1, yR, cz], [0, 0], [1, 0], [0.5, 0.6])
-  gb.tri(M.ashlar, [x0, yt, z0], [x0, yt, z1], [x0, yR, cz], [0, 0], [1, 0], [0.5, 0.6])
+  gb.quad({ material: M.slate, a: [x0 - ov, yE, z1 + ov], b: [x1 + ov, yE, z1 + ov], c: [x1 + ov, yR, cz], d: [x0 - ov, yR, cz], repeatU: 4, repeatV: 4 })
+  gb.quad({ material: M.slate, a: [x1 + ov, yE, z0 - ov], b: [x0 - ov, yE, z0 - ov], c: [x0 - ov, yR, cz], d: [x1 + ov, yR, cz], repeatU: 4, repeatV: 4 })
+  gb.tri({ material: M.ashlar, a: [x1, yt, z1], b: [x1, yt, z0], c: [x1, yR, cz], uvA: [0, 0], uvB: [1, 0], uvC: [0.5, 0.6] })
+  gb.tri({ material: M.ashlar, a: [x0, yt, z0], b: [x0, yt, z1], c: [x0, yR, cz], uvA: [0, 0], uvB: [1, 0], uvC: [0.5, 0.6] })
   // bell tower at west end
-  const tx0 = 5.6,
-    tx1 = 8,
-    tz0 = 3.8,
-    tz1 = 6.2,
-    th = 6.2
-  gb.box(M.ashlar, null, tx0, y0 - 0.5, tz0, tx1, yb + th, tz1, 4)
+  const tx0Source = CHAPEL.tower,
+    tx0 = tx0Source.x0,
+    tx1 = tx0Source.x1,
+    tz0 = tx0Source.z0,
+    tz1 = tx0Source.z1,
+    th = tx0Source.height
+  gb.box({ side: M.ashlar, top: null, x0: tx0, y0: y0 - 0.5, z0: tz0, x1: tx1, y1: yb + th, z1: tz1, repeat: 4 })
   // belfry openings: dark insets
-  for (const [a, b2, c, d] of [
+  for (const entry of [
     [tx0 + 0.7, tz1 + 0.01, tx1 - 0.7, tz1 + 0.02],
     [tx0 + 0.7, tz0 - 0.02, tx1 - 0.7, tz0 - 0.01],
-  ] as number[][])
-    gb.box(M.dark, null, a, yb + th - 1.5, b2, c, yb + th - 0.4, d, 2)
-  for (const [a, b2, c, d] of [
+  ] as number[][]) {
+    const a = entry[0]
+    const b2 = entry[1]
+    const c = entry[2]
+    const d = entry[3]
+    gb.box({ side: M.dark, top: null, x0: a, y0: yb + th - 1.5, z0: b2, x1: c, y1: yb + th - 0.4, z1: d, repeat: 2 })
+  }
+  for (const entry2 of [
     [tx0 - 0.02, tz0 + 0.7, tx0 - 0.01, tz1 - 0.7],
     [tx1 + 0.01, tz0 + 0.7, tx1 + 0.02, tz1 - 0.7],
-  ] as number[][])
-    gb.box(M.dark, null, a, yb + th - 1.5, b2, c, yb + th - 0.4, d, 2)
-  gb.box(M.ashlar, M.ashlar, tx0 - 0.12, yb + th, tz0 - 0.12, tx1 + 0.12, yb + th + 0.2, tz1 + 0.12, 4)
+  ] as number[][]) {
+    const a = entry2[0]
+    const b2 = entry2[1]
+    const c = entry2[2]
+    const d = entry2[3]
+    gb.box({ side: M.dark, top: null, x0: a, y0: yb + th - 1.5, z0: b2, x1: c, y1: yb + th - 0.4, z1: d, repeat: 2 })
+  }
+  gb.box({
+    side: M.ashlar,
+    top: M.ashlar,
+    x0: tx0 - CHAPEL.tower.capOverhang,
+    y0: yb + th,
+    z0: tz0 - CHAPEL.tower.capOverhang,
+    x1: tx1 + CHAPEL.tower.capOverhang,
+    y1: yb + th + 0.2,
+    z1: tz1 + CHAPEL.tower.capOverhang,
+    repeat: 4,
+  })
   const sy = yb + th + 0.2,
     sp = 3.4,
     mx = (tx0 + tx1) / 2,
@@ -76,17 +113,21 @@ export function chapel(root: THREE.Group) {
     [tx0 - 0.1, tz0 - 0.1],
   ]
   for (let i = 0; i < 4; i++) {
-    const [ax, az] = pts[i],
-      [bx, bz] = pts[(i + 1) % 4]
-    gb.tri(M.slate, [ax, sy, az], [bx, sy, bz], [mx, sy + sp, mz], [0, 0], [0.6, 0], [0.3, 0.85])
+    const axState = pts[i],
+      ax = axState[0],
+      az = axState[1],
+      bxState = pts[(i + 1) % 4],
+      bx = bxState[0],
+      bz = bxState[1]
+    gb.tri({ material: M.slate, a: [ax, sy, az], b: [bx, sy, bz], c: [mx, sy + sp, mz], uvA: [0, 0], uvB: [0.6, 0], uvC: [0.3, 0.85] })
   }
   const cg = gb.build()
   root.add(cg)
   occluder(cg)
   // cross
   const c = new GB()
-  c.box(M.iron, M.iron, mx - 0.03, sy + sp, mz - 0.03, mx + 0.03, sy + sp + 0.6, mz + 0.03, 1)
-  c.box(M.iron, M.iron, mx - 0.03, sy + sp + 0.35, mz - 0.2, mx + 0.03, sy + sp + 0.41, mz + 0.2, 1)
+  c.box({ side: M.iron, top: M.iron, x0: mx - 0.03, y0: sy + sp, z0: mz - 0.03, x1: mx + 0.03, y1: sy + sp + 0.6, z1: mz + 0.03, repeat: 1 })
+  c.box({ side: M.iron, top: M.iron, x0: mx - 0.03, y0: sy + sp + 0.35, z0: mz - 0.2, x1: mx + 0.03, y1: sy + sp + 0.41, z1: mz + 0.2, repeat: 1 })
   root.add(c.build())
   // bell
   const bell = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.38, 0.6, 10), new THREE.MeshLambertMaterial({ color: 0x9a7a3a }))
@@ -95,9 +136,9 @@ export function chapel(root: THREE.Group) {
   animateObject(bell, (t) => {
     bell.rotation.x = Math.sin(t * 0.7) * Math.max(0, Math.sin(t * 0.05)) * 0.35
   })
-  blockRect(x0 - 0.5, z0 - 0.5, x1 + 0.2, z1 + 0.4)
-  blockRect(tx0 - 0.2, tz0 - 0.2, tx1, tz1 + 0.2)
-  places.chapelDoor = [x0 + 3.6, z1 + 0.8]
+  blockRect({ x0: x0 - 0.5, z0: z0 - 0.5, x1: x1 + 0.2, z1: z1 + 0.4 })
+  blockRect({ x0: tx0 - 0.2, z0: tz0 - 0.2, x1: tx1, z1: tz1 + 0.2 })
+  places.chapelDoor = [x0 + CHAPEL.doorOffset, z1 + CHAPEL.approachOffset]
   // graveyard
   const g2 = new GB()
   const G = currentLayout().graveyard
@@ -109,26 +150,26 @@ export function chapel(root: THREE.Group) {
         zz = z + (r.next() - 0.5) * 0.2,
         yy = groundH(xx, zz)
       if (r.next() < 0.5) {
-        g2.box(M.stone, M.stone, xx - 0.17, yy - 0.1, zz - 0.05, xx + 0.17, yy + 0.42, zz + 0.05, 2)
+        g2.box({ side: M.stone, top: M.stone, x0: xx - 0.17, y0: yy - 0.1, z0: zz - 0.05, x1: xx + 0.17, y1: yy + 0.42, z1: zz + 0.05, repeat: 2 })
       } else {
-        g2.box(M.woodDark, M.woodDark, xx - 0.03, yy - 0.1, zz - 0.03, xx + 0.03, yy + 0.55, zz + 0.03, 2)
-        g2.box(M.woodDark, M.woodDark, xx - 0.17, yy + 0.33, zz - 0.03, xx + 0.17, yy + 0.39, zz + 0.03, 2)
+        g2.box({ side: M.woodDark, top: M.woodDark, x0: xx - 0.03, y0: yy - 0.1, z0: zz - 0.03, x1: xx + 0.03, y1: yy + 0.55, z1: zz + 0.03, repeat: 2 })
+        g2.box({ side: M.woodDark, top: M.woodDark, x0: xx - 0.17, y0: yy + 0.33, z0: zz - 0.03, x1: xx + 0.17, y1: yy + 0.39, z1: zz + 0.03, repeat: 2 })
       }
-      g2.box(M.leaf2, null, xx - 0.2, yy - 0.05, zz + 0.08, xx + 0.2, yy + 0.02, zz + 0.6, 2)
+      g2.box({ side: M.leaf2, top: null, x0: xx - 0.2, y0: yy - 0.05, z0: zz + 0.08, x1: xx + 0.2, y1: yy + 0.02, z1: zz + 0.6, repeat: 2 })
       blockCircle(xx, zz + 0.2, 0.3)
     }
   root.add(g2.build())
-  fence(
-    root,
-    [
+  fence({
+    root: root,
+    pts: [
       [G.x0, G.z0],
       [G.x1, G.z0],
       [G.x1, G.z1],
       [G.x0, G.z1],
       [G.x0, G.z0],
     ],
-    [[G.x1 - 0.2, (G.z0 + G.z1) / 2]],
-    0.6,
-  )
+    gaps: [[G.x1 - 0.2, (G.z0 + G.z1) / 2]],
+    h: 0.6,
+  })
   places.graveyard = [G.x1 + 0.6, (G.z0 + G.z1) / 2]
 }

@@ -35,3 +35,29 @@ it("keeps a stable snapshot when the source path changes", () => {
   expect(path.distance(2, 2)).toBe(2)
   expect(Polyline.distance(2, 2, points)).toBe(0)
 })
+
+it("keeps endpoint, repeated-point and empty-path distance semantics", () => {
+  expect(new Polyline([]).distance(2, 3)).toBe(Math.sqrt(1e9))
+  const repeated = new Polyline([
+    [1, 2],
+    [1, 2],
+  ])
+  expect(repeated.distance(4, 6)).toBe(5)
+  const segment = new Polyline([
+    [0, 0],
+    [4, 0],
+  ])
+  expect(segment.distance(-3, 4)).toBe(5)
+  expect(segment.distance(7, 4)).toBe(5)
+  expect(segment.distance(2, 3)).toBe(3)
+})
+
+it("prevents replacing behavior on an immutable path snapshot", () => {
+  const path = new Polyline([
+    [0, 0],
+    [4, 0],
+  ])
+  expect(Object.isFrozen(path)).toBe(true)
+  expect(Reflect.set(path, "distance", () => 0)).toBe(false)
+  expect(path.distance(2, 3)).toBe(3)
+})

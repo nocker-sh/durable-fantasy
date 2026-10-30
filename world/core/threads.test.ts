@@ -1,8 +1,12 @@
 import { describe, expect, it } from "vitest"
-import { apply } from "./apply.ts"
-import { hometownOf } from "../channels.ts"
-import { MAX_THREADS, keep, mayVisit, threadKey, threadOf } from "./threads.ts"
-import { player } from "../test/helpers.ts"
+import { apply } from "./apply"
+import { hometownOf } from "#/world/hometown-of"
+import { MAX_THREADS } from "#/world/core/threads"
+import { keep } from "#/world/core/keep"
+import { mayVisit } from "#/world/core/may-visit"
+import { threadKey } from "#/world/core/thread-key"
+import { threadOf } from "#/world/core/thread-of"
+import { player } from "#/world/test/player"
 
 const A = "6f1c2a9e-0b7d-4c55-9a11-2e3f4a5b6c7d",
   B = "a2b3c4d5-e6f7-4a8b-9c0d-1e2f3a4b5c6d"

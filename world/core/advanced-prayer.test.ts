@@ -1,11 +1,15 @@
 import { expect, it } from "vitest"
 import { apply } from "./apply"
 import { commandSchema } from "./commands"
-import { lifeExpAt } from "./life"
-import { emptyEquipment, loadPlayer } from "./player"
-import { artBlocked, artsOf, SKILLS } from "./skills"
-import { derive } from "./stats"
-import { bagWith, player } from "../test/helpers"
+import { lifeExpAt } from "#/world/core/life-exp-at"
+import { emptyEquipment } from "#/world/core/empty-equipment"
+import { loadPlayer } from "#/world/core/load-player"
+import { artBlocked } from "#/world/core/art-blocked"
+import { artsOf } from "#/world/core/arts-of"
+import { SKILLS } from "#/world/core/skills"
+import { derive } from "#/world/core/derive"
+import { bagWith } from "#/world/test/bag-with"
+import { player } from "#/world/test/player"
 
 const caster = () =>
   player({

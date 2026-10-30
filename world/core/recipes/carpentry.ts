@@ -1,65 +1,65 @@
-import { recipe as r, type Recipe } from "./definition.ts"
+import { recipe as r, type Recipe } from "./definition"
 
 export const CARPENTRY_RECIPES: readonly Recipe[] = [
   // the workbench: wood
-  r("firewood", "carpentry", "workbench", [["log", 1]], ["firewood", 2]),
-  r("plank", "carpentry", "workbench", [["log", 1]], ["plank", 2]),
-  r("wooden-stick", "carpentry", "workbench", [["plank", 1]], ["wooden-stick", 1]),
-  r(
-    "fishing-rod",
-    "carpentry",
-    "workbench",
-    [
+  r({ id: "firewood", skill: "carpentry", station: "workbench", inputs: [["log", 1]], output: ["firewood", 2] }),
+  r({ id: "plank", skill: "carpentry", station: "workbench", inputs: [["log", 1]], output: ["plank", 2] }),
+  r({ id: "wooden-stick", skill: "carpentry", station: "workbench", inputs: [["plank", 1]], output: ["wooden-stick", 1] }),
+  r({
+    id: "fishing-rod",
+    skill: "carpentry",
+    station: "workbench",
+    inputs: [
       ["plank", 1],
       ["yarn", 1],
     ],
-    ["fishing-rod", 1],
-    2,
-  ),
-  r(
-    "wooden-shield",
-    "carpentry",
-    "workbench",
-    [
+    output: ["fishing-rod", 1],
+    min: 2,
+  }),
+  r({
+    id: "wooden-shield",
+    skill: "carpentry",
+    station: "workbench",
+    inputs: [
       ["plank", 3],
       ["iron-ingot", 1],
     ],
-    ["wooden-shield", 1],
-    4,
-  ),
+    output: ["wooden-shield", 1],
+    min: 4,
+  }),
   // A carved shaft with a crystal fitted at the tip, for both spells and prayers.
-  r(
-    "oak-staff",
-    "carpentry",
-    "workbench",
-    [
+  r({
+    id: "oak-staff",
+    skill: "carpentry",
+    station: "workbench",
+    inputs: [
       ["plank", 2],
       ["small-crystal", 1],
     ],
-    ["oak-staff", 1],
-    4,
-  ),
-  r(
-    "short-bow",
-    "carpentry",
-    "workbench",
-    [
+    output: ["oak-staff", 1],
+    min: 4,
+  }),
+  r({
+    id: "short-bow",
+    skill: "carpentry",
+    station: "workbench",
+    inputs: [
       ["plank", 2],
       ["yarn", 2],
     ],
-    ["short-bow", 1],
-    8,
-  ),
-  r(
-    "prayer-necklace",
-    "carpentry",
-    "workbench",
-    [
+    output: ["short-bow", 1],
+    min: 8,
+  }),
+  r({
+    id: "prayer-necklace",
+    skill: "carpentry",
+    station: "workbench",
+    inputs: [
       ["plank", 2],
       ["small-crystal", 2],
       ["yarn", 1],
     ],
-    ["prayer-necklace", 1],
-    8,
-  ),
+    output: ["prayer-necklace", 1],
+    min: 8,
+  }),
 ]

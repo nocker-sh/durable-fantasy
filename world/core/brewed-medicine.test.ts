@@ -1,10 +1,14 @@
 import { expect, it } from "vitest"
 import { apply } from "./apply"
-import { RECIPES } from "./crafting"
-import { ITEMS, QUALITY_EFFECT, type ItemId } from "./items"
-import { LIFE_CAP, lifeExpAt } from "./life"
-import { loadPlayer } from "./player"
-import { bagWith, player } from "../test/helpers"
+import { RECIPES } from "#/world/core/recipes/catalog"
+import { ITEMS } from "#/world/core/items/catalog"
+import { QUALITY_EFFECT } from "#/world/core/items/kinds"
+import type { ItemId } from "#/world/core/items/catalog"
+import { LIFE_CAP } from "#/world/core/life-rules"
+import { lifeExpAt } from "#/world/core/life-exp-at"
+import { loadPlayer } from "#/world/core/load-player"
+import { bagWith } from "#/world/test/bag-with"
+import { player } from "#/world/test/player"
 
 it("keeps quality metadata on every consumable recipe", () => {
   for (const r of RECIPES) if (ITEMS[r.output.item].kind === "consumable") expect(ITEMS[r.output.item].made, r.id).toBe(true)

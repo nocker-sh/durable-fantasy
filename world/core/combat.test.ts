@@ -1,6 +1,10 @@
-import { startingStats } from "./growth.ts"
+import { startingStats } from "#/world/core/starting-stats"
 import { describe, expect, it } from "vitest"
-import { artSwing, deathPenalty, hitChance, swing, type Fighter } from "./combat.ts"
+import { artSwing } from "#/world/core/art-swing"
+import { deathPenalty } from "#/world/core/death-penalty"
+import { hitChance } from "#/world/core/hit-chance"
+import { swing } from "#/world/core/swing"
+import type { Fighter } from "#/world/core/combat-types"
 
 const sequence =
   (...values: number[]) =>
@@ -37,9 +41,20 @@ describe("combat", () => {
   it("an art's blow: a strike harder, a sure one always critical, a spell from a stat that never misses", () => {
     const me = fighter({ atk: 10, hit: 0 }),
       them = fighter({ flee: 0, def: 4 })
-    expect(artSwing({ kind: "strike", power: 2 }, startingStats(), me, them, sequence(0.99, 0.1, 0.5))).toEqual({ kind: "hit", damage: 16 })
-    expect(artSwing({ kind: "strike", power: 1, sure: true }, startingStats(), me, fighter({ flee: 500 }), sequence(0.99, 0.5))).toEqual({ kind: "critical", damage: 12 })
-    expect(artSwing({ kind: "spell", magic: { base: 4, per: 1.5, stat: "int" } }, { ...startingStats(), int: 10 }, me, fighter({ flee: 500, def: 4 }), sequence(0.5))).toEqual({
+    expect(artSwing({ art: { kind: "strike", power: 2 }, stats: startingStats(), attacker: me, target: them, random: sequence(0.99, 0.1, 0.5) })).toEqual({ kind: "hit", damage: 16 })
+    expect(artSwing({ art: { kind: "strike", power: 1, sure: true }, stats: startingStats(), attacker: me, target: fighter({ flee: 500 }), random: sequence(0.99, 0.5) })).toEqual({
+      kind: "critical",
+      damage: 12,
+    })
+    expect(
+      artSwing({
+        art: { kind: "spell", magic: { base: 4, per: 1.5, stat: "int" } },
+        stats: { ...startingStats(), int: 10 },
+        attacker: me,
+        target: fighter({ flee: 500, def: 4 }),
+        random: sequence(0.5),
+      }),
+    ).toEqual({
       kind: "hit",
       damage: 17,
     })

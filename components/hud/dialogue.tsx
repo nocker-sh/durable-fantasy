@@ -1,15 +1,18 @@
 // Bottom middle (ui.md §3.5): the conversation. The speaker's tag sits on the top edge; the text
 // types out; click or Space shows it all, then turns the page; the last page offers choices.
 import { useEffect, useState } from "react"
-import { revealed } from "#/world/game.ts"
-import { useGame, useGameState } from "#/components/game/context.tsx"
-import { Kbd } from "#/components/game/kbd.tsx"
-import { Panel } from "#/components/game/panel.tsx"
+import { revealed } from "#/world/revealed"
+import { useGame } from "#/hooks/use-game"
+import { useGameState } from "#/hooks/use-game-state"
+import { Kbd } from "#/components/game/kbd"
+import { Panel } from "#/components/game/panel"
 
 export function DialogueBox() {
   const game = useGame()
   const dialogue = useGameState((s) => s.dialogue)
-  const [now, setNow] = useState(() => performance.now())
+  const nowState = useState(() => performance.now()),
+    now = nowState[0],
+    setNow = nowState[1]
 
   // re-render each frame while the page is typing out
   useEffect(() => {

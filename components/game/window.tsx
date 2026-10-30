@@ -1,38 +1,13 @@
-// A game window (ui.md §5): a panel with a title bar. Drag it by the title bar, fold it to the
-// title bar with －, resize it from the corner grip if it allows. It remembers position, size and
-// folding, stays at least 80px on screen (also when the browser window shrinks) and comes to the
-// front when touched. Which windows are open, and their order, belong to the Game.
-import { useEffect, useRef, useState, type ReactNode, type PointerEvent as ReactPointerEvent } from "react"
+import { useEffect, useRef, useState } from "react"
+import type { ReactNode, PointerEvent as ReactPointerEvent } from "react"
 import { cn } from "cn"
-import { Kbd } from "./kbd.tsx"
+import { Kbd } from "#/components/game/kbd"
+import { keep } from "#/components/game/keep"
+import { TitleButton } from "#/components/game/title-button"
 
-type Layout = { x: number; y: number; w?: number; h?: number; folded?: boolean }
+export type Layout = { x: number; y: number; w?: number; h?: number; folded?: boolean }
 
-const keep = (l: Layout, el: HTMLElement | null): Layout => {
-  const w = el?.offsetWidth ?? l.w ?? 200
-  return {
-    ...l,
-    x: Math.round(Math.min(Math.max(l.x, 80 - w), window.innerWidth - 80)),
-    y: Math.round(Math.min(Math.max(l.y, 0), window.innerHeight - 32)),
-  }
-}
-
-function Window({
-  id,
-  title,
-  hotkey,
-  z,
-  onClose,
-  onFocus,
-  initial,
-  size,
-  tone = "solid",
-  actions,
-  className,
-  bodyClassName,
-  children,
-  footer,
-}: {
+export function Window(inputProps: {
   id: string
   title: ReactNode
   hotkey?: string
@@ -53,19 +28,37 @@ function Window({
   children: ReactNode
   footer?: ReactNode
 }) {
+  const id = inputProps.id
+  const title = inputProps.title
+  const hotkey = inputProps.hotkey
+  const z = inputProps.z
+  const onClose = inputProps.onClose
+  const onFocus = inputProps.onFocus
+  const initial = inputProps.initial
+  const size = inputProps.size
+  const toneValue = inputProps.tone
+  const tone = toneValue === undefined ? "solid" : toneValue
+  const actions = inputProps.actions
+  const className = inputProps.className
+  const bodyClassName = inputProps.bodyClassName
+  const children = inputProps.children
+  const footer = inputProps.footer
+
   const ref = useRef<HTMLDivElement>(null)
-  const [layout, setLayout] = useState<Layout | null>(null)
+  const layoutState = useState<Layout | null>(null),
+    layout = layoutState[0],
+    setLayout = layoutState[1]
   const key = `ui-window/${id}`
 
   useEffect(() => {
-    let saved: Layout | null = null
+    const saved: { value: Layout | null } = { value: null }
     try {
-      saved = JSON.parse(localStorage.getItem(key) ?? "null")
+      saved.value = JSON.parse(localStorage.getItem(key) ?? "null")
     } catch {
-      saved = null
+      saved.value = null
     }
     const first: Layout = { ...initial(window.innerWidth, window.innerHeight), ...(size ? { w: size.initial[0], h: size.initial[1] } : {}) }
-    setLayout(keep({ ...first, ...saved }, ref.current))
+    setLayout(keep({ ...first, ...saved.value }, ref.current))
     const onResize = () => setLayout((l) => (l ? keep(l, ref.current) : l))
     window.addEventListener("resize", onResize)
     return () => window.removeEventListener("resize", onResize)
@@ -80,15 +73,15 @@ function Window({
     event.preventDefault()
     event.stopPropagation()
     const start = { x: event.clientX, y: event.clientY, layout }
-    let last = layout
+    const last = { value: layout }
     const move = (e: PointerEvent) => {
-      last = keep(apply(start.layout, e.clientX - start.x, e.clientY - start.y), ref.current)
-      setLayout(last)
+      last.value = keep(apply(start.layout, e.clientX - start.x, e.clientY - start.y), ref.current)
+      setLayout(last.value)
     }
     const up = () => {
       window.removeEventListener("pointermove", move)
       window.removeEventListener("pointerup", up)
-      save(last)
+      save(last.value)
     }
     window.addEventListener("pointermove", move)
     window.addEventListener("pointerup", up)
@@ -124,7 +117,10 @@ function Window({
       )}
     >
       <div
-        onPointerDown={(e) => !(e.target as HTMLElement).closest("button") && drag(e, (l, dx, dy) => ({ ...l, x: l.x + dx, y: l.y + dy }))}
+        onPointerDown={(e) => {
+          if (e.target instanceof Element && e.target.closest("button")) return
+          drag(e, (l, dx, dy) => ({ ...l, x: l.x + dx, y: l.y + dy }))
+        }}
         className="ui-titlebar flex h-8 shrink-0 cursor-grab items-center gap-2 pr-1.5 pl-3 active:cursor-grabbing"
       >
         <span className="truncate font-head text-[12px] font-bold text-white">{title}</span>
@@ -157,19 +153,3 @@ function Window({
     </section>
   )
 }
-
-function TitleButton({ label, onClick, children }: { label: string; onClick: () => void; children: ReactNode }) {
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      title={label}
-      onClick={onClick}
-      className="flex size-6 cursor-pointer items-center justify-center rounded-md font-head text-[14px] leading-none text-text-dim hover:bg-white/10 hover:text-white"
-    >
-      {children}
-    </button>
-  )
-}
-
-export { Window, TitleButton }

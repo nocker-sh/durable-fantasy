@@ -1,0 +1,5 @@
+export const PARTY_CHAT_LIMIT = 60
+export const PARTY_CHAT_AGE = 5 * 60_000
+export const PARTY_CHAT_MESSAGE_LENGTH = 140
+export const PARTY_CHAT_RECENT_ATTEMPTS = 2
+export const PARTY_CHAT_RATE_WINDOW_MS = 1000

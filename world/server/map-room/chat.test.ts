@@ -1,9 +1,10 @@
 import { afterEach, expect, it, vi } from "vitest"
-import { HEARING_CELLS } from "../../protocol.ts"
-import { player } from "../../test/helpers.ts"
-import { mapPlayer, type Presence } from "./presence.ts"
-import type { Ctx } from "./context.ts"
-import { HANDLERS } from "./chat.ts"
+import { HEARING_CELLS } from "#/world/protocol"
+import { player } from "#/world/test/player"
+import { mapPlayer } from "#/world/server/map-room/map-player"
+import type { Presence } from "#/world/server/map-room/presence"
+import type { Ctx } from "./context"
+import { HANDLERS } from "./chat"
 
 afterEach(() => {
   vi.restoreAllMocks()

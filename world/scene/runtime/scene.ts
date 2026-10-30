@@ -1,49 +1,72 @@
-import { N, blocked } from "../world"
-import { places } from "../build"
-import type { Anim } from "../figure"
-import { lap } from "../../diagnostics.ts"
-import { keyTurn } from "../turn"
-import { createSceneRuntime, type SceneOptions } from "./create.ts"
-import type { SceneEvents, ResidentInfo, Cell, WalkerInfo, Avatar } from "./types.ts"
-import { cellOf } from "./grid.ts"
+import { N, blocked } from "#/world/scene/world"
+import { places } from "#/world/scene/construction/registry"
+import type { Anim } from "#/world/scene/figure/animation"
+import { lap } from "#/world/lap"
+import { keyTurn } from "#/world/scene/key-turn"
+import { createSceneRuntime } from "./create"
+import type { SceneOptions } from "./scene-options"
+import type { SceneEvents, ResidentInfo, Cell, WalkerInfo, Avatar } from "./types"
+import { cellOf } from "#/world/scene/runtime/cell-of"
 
 type SceneRuntime = Awaited<ReturnType<typeof createSceneRuntime>>
 
 export class MapScene {
   private alive = true
+  private construction = new AbortController()
   private ro?: ResizeObserver
   private runtime?: SceneRuntime
   private layer = document.createElement("div")
 
-  constructor(
-    private el: HTMLElement,
-    private ev: SceneEvents,
-    readonly map = "phanthiet",
-    private options: SceneOptions = {},
-  ) {
+  private el: HTMLElement
+  private ev: SceneEvents
+  readonly map: string
+  private options: SceneOptions
+  constructor(inputProps2: { element: HTMLElement; events: SceneEvents; map?: string; options?: SceneOptions }) {
+    const el = inputProps2.element
+    const ev = inputProps2.events
+    const map = inputProps2.map === undefined ? "phanthiet" : inputProps2.map
+    const options = inputProps2.options === undefined ? {} : inputProps2.options
+    this.el = el
+    this.ev = ev
+    this.map = map
+    this.options = options
+
     if (getComputedStyle(el).position === "static") el.style.position = "relative"
     el.style.overflow = "hidden"
     Object.assign(this.layer.style, { position: "absolute", inset: "0", pointerEvents: "none", overflow: "hidden" })
-    createSceneRuntime(map, (t) => this.ev.progress(t), options).then(
+    createSceneRuntime(
+      map,
+      (t) => {
+        if (this.alive) this.ev.progress(t)
+      },
+      { signal: this.construction.signal, options },
+    ).then(
       (runtime) => {
         if (this.alive) this.attach(runtime)
         else runtime.dispose()
       },
-      (error) => this.ev.failed?.(error),
+      (error) => {
+        if (this.alive) this.ev.failed?.(error)
+      },
     )
   }
 
   destroy() {
     this.alive = false
+    this.construction.abort()
     this.ro?.disconnect()
-    if (this.runtime) {
-      this.runtime.running = false
-      this.runtime.renderer.domElement.remove()
-      this.runtime.events = null
-      this.runtime.clearRemotes()
-      this.runtime.dispose()
+    const runtime = this.runtime
+    this.runtime = undefined
+    try {
+      if (runtime) {
+        runtime.running = false
+        runtime.renderer.domElement.remove()
+        runtime.events = null
+        runtime.dispose()
+      }
+    } finally {
+      this.layer.remove()
     }
-    this.layer.remove()
   }
 
   get ready() {
@@ -102,7 +125,15 @@ export class MapScene {
   }
   /** The named spots on this map (where residents stand), in cells. */
   places(): Record<string, [number, number]> {
-    return Object.fromEntries(Object.entries(places).map(([k, [x, z]]) => [k, [Math.floor(x * 2), Math.floor(z * 2)]]))
+    return Object.fromEntries(
+      Object.entries(places).map((entry) => {
+        const k = entry[0]
+        const nestedValue = entry[1]
+        const x = nestedValue[0]
+        const z = nestedValue[1]
+        return [k, [Math.floor(x * 2), Math.floor(z * 2)]]
+      }),
+    )
   }
   /** Mark the warp cells on the ground. */
   setWarps(cells: readonly (readonly [number, number])[]) {
@@ -146,8 +177,14 @@ export class MapScene {
   setWild(states: Readonly<Record<string, { hp: number; back: number }>>) {
     this.runtime?.setWild(states)
   }
-  struck(id: string, kind: "miss" | "hit" | "critical", damage: number, hp: number, back: number) {
-    this.runtime?.struck(id, kind, damage, hp, back)
+  struck(inputProps: { id: string; kind: "miss" | "hit" | "critical"; damage: number; hp: number; back: number }) {
+    const id = inputProps.id
+    const kind = inputProps.kind
+    const damage = inputProps.damage
+    const hp = inputProps.hp
+    const back = inputProps.back
+
+    this.runtime?.struck({ id: id, kind: kind, damage: damage, hp: hp, back: back })
   }
   /** A blow taken by the player ('me') or someone else on the map: the number floats up from them. */
   hurt(who: string, kind: "miss" | "hit" | "critical", damage: number) {

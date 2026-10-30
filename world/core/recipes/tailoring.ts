@@ -1,75 +1,75 @@
-import { recipe as r, type Recipe } from "./definition.ts"
+import { recipe as r, type Recipe } from "./definition"
 
 export const TAILORING_RECIPES: readonly Recipe[] = [
   // the loom and spinning wheel: fleece spun to yarn, woven to a muffler
-  r("yarn", "tailoring", "loom", [["white-fleece", 1]], ["yarn", 2]),
-  r("cloth-hat", "tailoring", "loom", [["yarn", 2]], ["cloth-hat", 1], 2),
-  r(
-    "leather-boots",
-    "tailoring",
-    "loom",
-    [
+  r({ id: "yarn", skill: "tailoring", station: "loom", inputs: [["white-fleece", 1]], output: ["yarn", 2] }),
+  r({ id: "cloth-hat", skill: "tailoring", station: "loom", inputs: [["yarn", 2]], output: ["cloth-hat", 1], min: 2 }),
+  r({
+    id: "leather-boots",
+    skill: "tailoring",
+    station: "loom",
+    inputs: [
       ["tanned-leather", 2],
       ["yarn", 1],
     ],
-    ["leather-boots", 1],
-    2,
-  ),
-  r("wool-muffler", "tailoring", "loom", [["yarn", 3]], ["wool-muffler", 1], 2),
-  r("striped-muffler", "tailoring", "loom", [["yarn", 4]], ["striped-muffler", 1], 4),
-  r(
-    "fur-stole",
-    "tailoring",
-    "loom",
-    [
+    output: ["leather-boots", 1],
+    min: 2,
+  }),
+  r({ id: "wool-muffler", skill: "tailoring", station: "loom", inputs: [["yarn", 3]], output: ["wool-muffler", 1], min: 2 }),
+  r({ id: "striped-muffler", skill: "tailoring", station: "loom", inputs: [["yarn", 4]], output: ["striped-muffler", 1], min: 4 }),
+  r({
+    id: "fur-stole",
+    skill: "tailoring",
+    station: "loom",
+    inputs: [
       ["soft-fur", 3],
       ["yarn", 2],
     ],
-    ["fur-stole", 1],
-    4,
-  ),
-  r(
-    "traveller-coat",
-    "tailoring",
-    "loom",
-    [
+    output: ["fur-stole", 1],
+    min: 4,
+  }),
+  r({
+    id: "traveller-coat",
+    skill: "tailoring",
+    station: "loom",
+    inputs: [
       ["yarn", 4],
       ["soft-fur", 1],
     ],
-    ["traveller-coat", 1],
-    4,
-  ),
-  r(
-    "leather-armor",
-    "tailoring",
-    "loom",
-    [
+    output: ["traveller-coat", 1],
+    min: 4,
+  }),
+  r({
+    id: "leather-armor",
+    skill: "tailoring",
+    station: "loom",
+    inputs: [
       ["tanned-leather", 5],
       ["yarn", 2],
     ],
-    ["leather-armor", 1],
-    8,
-  ),
-  r(
-    "wool-cape",
-    "tailoring",
-    "loom",
-    [
+    output: ["leather-armor", 1],
+    min: 8,
+  }),
+  r({
+    id: "wool-cape",
+    skill: "tailoring",
+    station: "loom",
+    inputs: [
       ["yarn", 6],
       ["soft-fur", 1],
     ],
-    ["wool-cape", 1],
-    8,
-  ),
-  r(
-    "fang-charm",
-    "tailoring",
-    "loom",
-    [
+    output: ["wool-cape", 1],
+    min: 8,
+  }),
+  r({
+    id: "fang-charm",
+    skill: "tailoring",
+    station: "loom",
+    inputs: [
       ["sharp-fang", 3],
       ["yarn", 1],
     ],
-    ["fang-charm", 1],
-    4,
-  ),
+    output: ["fang-charm", 1],
+    min: 4,
+  }),
 ]

@@ -1,16 +1,19 @@
 // The bag (ui.md §3.7): 6 × 4 slots of 48px. Drag to rearrange or onto the shortcut bar,
 // double-click to use or wear; with a shop open, right-click picks the item to sell.
-import { displayName } from "#/world/core/makers.ts"
+import { displayName } from "#/world/core/display-name"
 import { useState, type DragEvent } from "react"
-import { BAG_SIZE } from "#/world/core/bag.ts"
-import { ITEMS } from "#/world/core/items.ts"
-import { useGame, useGameState } from "#/components/game/context.tsx"
-import { Gold } from "#/components/game/gold.tsx"
-import { Slot } from "#/components/game/slot.tsx"
-import { Window } from "#/components/game/window.tsx"
-import { ItemTooltip } from "./item-tooltip.tsx"
-import { carriesItem, readDrag, startDrag } from "./drag.ts"
-import { useWindow } from "./use-window.ts"
+import { BAG_SIZE } from "#/world/core/bag-rules"
+import { ITEMS } from "#/world/core/items/catalog"
+import { useGame } from "#/hooks/use-game"
+import { useGameState } from "#/hooks/use-game-state"
+import { Gold } from "#/components/game/gold"
+import { Slot } from "#/components/game/slot"
+import { Window } from "#/components/game/window"
+import { ItemTooltip } from "./item-tooltip"
+import { carriesItem } from "#/components/hud/carries-item"
+import { readDrag } from "#/components/hud/read-drag"
+import { startDrag } from "#/components/hud/start-drag"
+import { useWindow } from "./use-window"
 
 export function InventoryWindow() {
   const game = useGame()
@@ -20,7 +23,9 @@ export function InventoryWindow() {
   const shop = useGameState((s) => s.shop)
   const storage = useGameState((s) => s.storage)
   const trade = useGameState((s) => s.trade)
-  const [over, setOver] = useState<number | null>(null)
+  const overState = useState<number | null>(null),
+    over = overState[0],
+    setOver = overState[1]
   if (!win.open) return null
   const bag = player?.bag ?? Array.from({ length: BAG_SIZE }, () => null)
 
@@ -29,8 +34,8 @@ export function InventoryWindow() {
     setOver(null)
     const drag = readDrag(event)
     if (!drag) return
-    if ("slot" in drag) game.moveSlot(drag.slot, index)
-    else if ("worn" in drag) game.unequip(drag.worn)
+    if ("slot" in drag) game.moveSlot(drag.slot, index, drag.stack)
+    else if ("worn" in drag) game.unequip(drag.worn, drag.stack)
   }
 
   return (
@@ -77,7 +82,7 @@ export function InventoryWindow() {
               over={over === index}
               draggable={!!stack}
               aria-label={stack ? `${displayName(stack.item, stack.by)} ×${stack.count}` : "空き"}
-              onDragStart={(e) => stack && startDrag(e, { item: stack.item, slot: index }, game.iconUrl(stack.item))}
+              onDragStart={(e) => stack && startDrag(e, { item: stack.item, slot: index, stack }, game.iconUrl(stack.item))}
               onDragOver={(e) => {
                 if (!carriesItem(e)) return
                 e.preventDefault()

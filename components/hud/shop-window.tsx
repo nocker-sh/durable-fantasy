@@ -1,32 +1,49 @@
 // A shop (ui.md §3.6), opened from the conversation: buy from the stock, or pick from the bag to
 // sell. Buttons grey out with the reason when the server would refuse.
 import { useEffect, useState } from "react"
-import { REASON_TEXT } from "#/world/core/commands.ts"
-import { roomFor } from "#/world/core/bag.ts"
-import { ITEMS, QUALITIES, QUALITY_PRICE, sellable } from "#/world/core/items.ts"
-import { SHOPS } from "#/world/core/shops.ts"
-import { makerAt, sellsFor, shopFriend } from "#/world/core/apply.ts"
-import { friendPrice } from "#/world/core/errands.ts"
-import { displayName, priceOf, qualitiesOf } from "#/world/core/makers.ts"
-import { formatTime, jstMinutes } from "#/world/core/clock.ts"
-import type { Offer } from "#/world/game.ts"
-import { useGame, useGameState } from "#/components/game/context.tsx"
-import { Button } from "#/components/game/button.tsx"
-import { Gold } from "#/components/game/gold.tsx"
-import { Slot } from "#/components/game/slot.tsx"
-import { Stepper } from "#/components/game/stepper.tsx"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/game/tabs.tsx"
-import { Tooltip, TooltipContent, TooltipTrigger } from "#/components/game/tooltip.tsx"
-import { Window } from "#/components/game/window.tsx"
-import { ItemTooltip } from "./item-tooltip.tsx"
+import { REASON_TEXT } from "#/world/core/commands"
+import { roomFor } from "#/world/core/room-for"
+import { ITEMS } from "#/world/core/items/catalog"
+import { QUALITIES, QUALITY_PRICE } from "#/world/core/items/kinds"
+import { sellable } from "#/world/core/items/sellable"
+import { SHOPS } from "#/world/core/shops"
+import { makerAt } from "#/world/core/maker-at"
+import { sellsFor } from "#/world/core/sells-for"
+import { shopFriend } from "#/world/core/shop-friend"
+import { friendPrice } from "#/world/core/friend-price"
+import { displayName } from "#/world/core/display-name"
+import { priceOf } from "#/world/core/price-of"
+import { qualitiesOf } from "#/world/core/qualities-of"
+import { formatTime } from "#/world/core/format-time"
+import { jstMinutes } from "#/world/core/jst-minutes"
+import type { Offer } from "#/world/state"
+import { useGame } from "#/hooks/use-game"
+import { useGameState } from "#/hooks/use-game-state"
+import { Button } from "#/components/game/button"
+import { Gold } from "#/components/game/gold"
+import { Slot } from "#/components/game/slot"
+import { Stepper } from "#/components/game/stepper"
+import { Tabs } from "#/components/game/tabs"
+import { TabsContent } from "#/components/game/tabs-content"
+import { TabsList } from "#/components/game/tabs-list"
+import { TabsTrigger } from "#/components/game/tabs-trigger"
+import { Tooltip } from "#/components/game/tooltip"
+import { TooltipContent } from "#/components/game/tooltip-content"
+import { TooltipTrigger } from "#/components/game/tooltip-trigger"
+import { Window } from "#/components/game/window"
+import { ItemTooltip } from "./item-tooltip"
 
 export function ShopWindow() {
   const game = useGame()
   const shop = useGameState((s) => s.shop)
   const player = useGameState((s) => s.player)
   const stock = useGameState((s) => s.stock)
-  const [tab, setTab] = useState("buy")
-  const [picked, setPicked] = useState<number | null>(null)
+  const tabState = useState("buy"),
+    tab = tabState[0],
+    setTab = tabState[1]
+  const pickedState = useState<number | null>(null),
+    picked = pickedState[0],
+    setPicked = pickedState[1]
 
   // right-clicking in the bag picks an item to sell
   useEffect(() => {
@@ -83,19 +100,27 @@ export function ShopWindow() {
   )
 }
 
-function BuyRow({ offer }: { offer: Offer }) {
+function BuyRow(inputProps: { offer: Offer }) {
+  const offer = inputProps.offer
+
   const game = useGame()
   const player = useGameState((s) => s.player)
   const shop = useGameState((s) => s.shop)!
   const busy = useGameState((s) => s.busy)
-  const [count, setCount] = useState(1)
-  const { item, price, left, next } = offer
+  const countState = useState(1),
+    count = countState[0],
+    setCount = countState[1]
+  const itemSource = offer,
+    item = itemSource.item,
+    price = itemSource.price,
+    left = itemSource.left,
+    next = itemSource.next
   const d = ITEMS[item]
   const q = d.made ? offer.q : undefined
   const by = d.made ? makerAt(shop, item) : undefined
   const list = priceOf(item, offer.q, by)
   const mark = by ? { q: offer.q, by } : undefined
-  // what we pay: the shop's price, less a friend's discount (core/errands.ts)
+  // what we pay: the shop's price, less a friend's discount (core/friend-price.ts)
   const pay = player ? friendPrice(price, shopFriend(player, shop)) : price
   const affordable = player ? Math.floor(player.gold / pay) : 0
   const max = Math.max(1, Math.min(99, affordable, left ?? 99, player ? roomFor(player.bag, item, mark) : 1))
@@ -108,7 +133,7 @@ function BuyRow({ offer }: { offer: Offer }) {
       size="sm"
       disabled={!!reason || busy}
       onClick={() => {
-        game.buy(item, n, q, price)
+        game.buy({ item: item, count: n, q: q, price: price })
         setCount(1)
       }}
     >
@@ -152,12 +177,17 @@ function BuyRow({ offer }: { offer: Offer }) {
   )
 }
 
-function SellPanel({ picked, onPick }: { picked: number | null; onPick: (slot: number | null) => void }) {
+function SellPanel(inputProps2: { picked: number | null; onPick: (slot: number | null) => void }) {
+  const picked = inputProps2.picked
+  const onPick = inputProps2.onPick
+
   const game = useGame()
   const shop = useGameState((s) => s.shop)
   const player = useGameState((s) => s.player)
   const busy = useGameState((s) => s.busy)
-  const [count, setCount] = useState(1)
+  const countState2 = useState(1),
+    count = countState2[0],
+    setCount = countState2[1]
   const stock = useGameState((s) => s.stock)
   const bag = player?.bag ?? []
   const stack = picked !== null ? bag[picked] : null

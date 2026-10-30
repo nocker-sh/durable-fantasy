@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest"
-import { RESIDENTS } from "./residents.ts"
-import { HOUSEHOLDS, householdOf as household } from "./houses.ts"
-import { APART, PEOPLE, RELATIONS } from "./people.ts"
-import { MAPS, npcsAt } from "../maps/index.ts"
+import { RESIDENTS } from "./residents"
+import { HOUSEHOLDS } from "#/world/town/houses"
+import { householdOf as household } from "#/world/town/household-of"
+import { APART, PEOPLE, RELATIONS } from "./people"
+import { MAPS } from "#/world/maps"
+import { npcsAt } from "#/world/maps/npcs-at"
 
 const ageOf = (name: string) => RESIDENTS.find((r) => r.name === name)?.look.age ?? "adult"
 const householdOf = (name: string) => household(name)?.id

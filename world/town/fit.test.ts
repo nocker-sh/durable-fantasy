@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest"
-import { HOUSEHOLDS, HOUSES } from "./houses.ts"
-import { AISLE, TILE_M, fitHouse, piecesOf, rowsDepth } from "./fit.ts"
+import { HOUSEHOLDS, HOUSES } from "#/world/town/houses"
+import { AISLE, TILE_M } from "#/world/town/fit"
+import { fitHouse } from "#/world/town/fit-house"
+import { piecesOf } from "#/world/town/pieces-of"
+import { rowsDepth } from "#/world/town/rows-depth"
 // whether each building holds its furniture is checked by laying it out for real (floorplan.test.ts)
 
 describe("homes that hold the lives in them (town.md「世帯と建物」)", () => {

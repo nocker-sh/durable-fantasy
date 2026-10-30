@@ -1,16 +1,17 @@
-import "#/components/game/game.css"
+import "#resources/components/game/game"
 import { lazy, Suspense, useEffect, useRef, useState } from "react"
-import { Game } from "#/world/game.ts"
-import { GameProvider } from "#/components/game/context.tsx"
-import { Hud } from "#/components/hud/hud.tsx"
-import { useNoCanvasMenu } from "#/hooks/use-no-canvas-menu.ts"
+import { Game } from "#/world/game"
+import { GameProvider } from "#/components/game/game-provider"
+import { Hud } from "#/components/hud/hud"
+import { useNoCanvasMenu } from "#/hooks/use-no-canvas-menu"
 
 // the debug panel and its styles only exist in dev builds
-const DebugPanel = import.meta.env.DEV ? lazy(() => import("#/dev/debug-entry.tsx")) : null
+const DebugPanel = import.meta.env.DEV ? lazy(() => import("#/dev/debug-panel")) : null
 
 /** The game: the Game draws the world into the stage; the HUD is React over it. */
 export default function HomePage() {
-  const [game] = useState(() => new Game())
+  const gameState = useState(() => new Game()),
+    game = gameState[0]
   useNoCanvasMenu()
   const stage = useRef<HTMLDivElement>(null)
 

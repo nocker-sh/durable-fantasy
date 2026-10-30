@@ -1,14 +1,16 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
 import type { VoidSocket } from "void/ws"
-import type { GameState } from "../state.ts"
-import type { MapScene } from "../scene/index.ts"
-import { player } from "../test/helpers.ts"
-import { RoomClient } from "./room-client.ts"
-import { GameSession, createSessionContext } from "./session.ts"
-import { DialogueActions } from "./dialogue.ts"
-import { SocialActions } from "./social.ts"
-import { STORAGE_KEEPER } from "../core/storage.ts"
-import { remoteAvatar } from "./identity.ts"
+import type { GameState } from "#/world/state"
+import type { MapScene } from "#/world/scene/runtime/scene"
+import { player } from "#/world/test/player"
+import { ServerMessages } from "./server-messages"
+import { RoomClient } from "./room-client"
+import { GameSession } from "#/world/client/game-session"
+import { createSessionContext } from "#/world/client/create-session-context"
+import { DialogueActions } from "./dialogue"
+import { SocialActions } from "./social"
+import { STORAGE_KEEPER } from "#/world/core/storage/rules"
+import { remoteAvatar } from "#/world/client/remote-avatar"
 
 function fixture() {
   const session = new GameSession()
@@ -249,4 +251,43 @@ describe("client controllers", () => {
     new SocialActions(context).askTrade("other-player")
     expect(send).toHaveBeenCalledWith({ type: "trade-ask", target: "other-player" })
   })
+})
+
+it("acknowledges a successful delayed command without reverting a newer state or replaying its events", async () => {
+  const { session, client, callbacks } = fixture()
+  callbacks.update({ player: player({ revision: 1, sitting: true }) })
+  const pending = client.run({ type: "stand" })
+  const newer = player({ revision: 3, sitting: true, gold: 5 })
+  callbacks.update({ player: newer })
+  session.waiting.get(1)!({ ok: true, state: player({ revision: 2, sitting: false, gold: 10 }), events: [{ type: "stood" }] })
+  expect(await pending).toBe(true)
+  expect(session.state.get().player).toEqual(newer)
+  expect(callbacks.setPlayer).not.toHaveBeenCalled()
+  expect(callbacks.report).not.toHaveBeenCalled()
+  expect(session.waiting.size).toBe(0)
+  expect(session.state.get().busy).toBe(false)
+})
+
+it("resets creature publication scope when connecting to another channel", () => {
+  const { session, client, context } = fixture()
+  session.wild = { first: { hp: 0, back: 5000, revision: 100 } }
+  const socket = { on: vi.fn(() => () => {}) } as unknown as VoidSocket<"/map/:mapId">
+  session.socket = socket
+  client.listen(socket)
+  expect(session.wild).toEqual({})
+  context.getScene = () => null
+  new ServerMessages(context).handle({ type: "wild", revision: 1, monsters: { first: { hp: 20, back: 0 } } })
+  expect(session.wild.first).toEqual({ hp: 20, back: 0, revision: 1 })
+})
+
+it.each([0, 1390, null])("joins using the current dev clock, including midnight and a return to real time: %s", (minute) => {
+  const { session, client, send } = fixture()
+  session.others.clear()
+  session.arriveAt = [1, 2]
+  session.state.set({ ...session.state.get(), clock: { min: minute ?? 720, held: minute !== null } })
+  client.join()
+  const message = send.mock.calls[0][0]
+  expect(message.type).toBe("join")
+  if (minute === null) expect(message).not.toHaveProperty("time")
+  else expect(message.time).toBe(minute)
 })

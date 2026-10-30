@@ -1,8 +1,10 @@
 import { expect, it } from "vitest"
-import { equipmentDefense, derive } from "./stats"
-import { ITEMS } from "./items"
+import { equipmentDefense } from "#/world/core/equipment-defense"
+import { derive } from "#/world/core/derive"
+import { ITEMS } from "#/world/core/items/catalog"
+import { ITEM_IDS } from "#/world/core/items/item-ids"
 import { apply } from "./apply"
-import { player } from "../test/helpers"
+import { player } from "#/world/test/player"
 
 it.each([
   [0, 5],
@@ -14,11 +16,19 @@ it.each([
 })
 
 it("preserves unmarked and non-crafted armor defense", () => {
-  expect(equipmentDefense("leather-armor")).toBe(6)
-  expect(equipmentDefense("traveller-coat", 3)).toBe(3)
+  for (const id of ITEM_IDS) {
+    expect(equipmentDefense(id)).toBe(ITEMS[id].equip?.def ?? 0)
+    if (!ITEMS[id].made) expect(equipmentDefense(id, 3)).toBe(ITEMS[id].equip?.def ?? 0)
+  }
   const p = player()
   const armor = { ...p, equipment: { ...p.equipment, body: "leather-armor" as const } }
   expect(derive(armor).def - derive(p).def).toBe(6)
+})
+
+it("applies crafted clothing quality while preserving unmarked clothing", () => {
+  expect(ITEMS["traveller-coat"].made).toBe(true)
+  expect(equipmentDefense("traveller-coat")).toBe(3)
+  expect(equipmentDefense("traveller-coat", 3)).toBe(4)
 })
 
 it.each([

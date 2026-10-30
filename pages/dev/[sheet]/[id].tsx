@@ -1,11 +1,13 @@
 import { useParams } from "@void/react"
-import { DevPage } from "#/dev/catalog.tsx"
-import { sheetOf } from "#/dev/db.tsx"
-import { SheetRow } from "#/dev/db-view.tsx"
-import { DETAIL } from "#/dev/details.tsx"
+import { DevPage } from "#/dev/catalog"
+import { sheetOf } from "#/dev/sheets/sheet-of"
+import { SheetRow } from "#/dev/sheet-row"
+import { DETAIL } from "#/dev/details"
 
 export default function RowPage() {
-  const { sheet, id } = useParams<{ sheet: string; id: string }>()
+  const sheetSource = useParams<{ sheet: string; id: string }>(),
+    sheet = sheetSource.sheet,
+    id = sheetSource.id
   const s = sheetOf(sheet)
   const key = decodeURIComponent(id)
   const Extra = DETAIL[sheet]

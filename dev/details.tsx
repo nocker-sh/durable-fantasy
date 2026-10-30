@@ -1,18 +1,24 @@
 // What some sheets' rows show beyond their tables: a resident drawn from every side and in motion,
 // a map's walkable cells from above.
 import { useEffect, useRef, type ComponentType } from "react"
-import { shopOfKeeper } from "#/world/core/shops.ts"
-import { MAPS } from "#/world/maps/index.ts"
-import { FH, FW, buildSheetStrip, type Anim } from "#/world/scene/figure.ts"
-import { RESIDENTS, RESIDENT_LOOKS } from "#/world/town/residents.ts"
-import { Grid } from "./db-view.tsx"
-import { floorPlan } from "#/world/town/floorplan.ts"
+import { shopOfKeeper } from "#/world/core/shop-of-keeper"
+import { MAPS } from "#/world/maps/index"
+import { FH, FW } from "#/world/scene/figure/render"
+import { buildSheetStrip } from "#/world/scene/figure/build-sheet-strip"
+import type { Anim } from "#/world/scene/figure/animation"
+import { RESIDENTS, RESIDENT_LOOKS } from "#/world/town/residents"
+import { Grid } from "#/dev/grid"
+import { floorPlan } from "#/world/town/floorplan/floor-plan"
 
 /** One direction of one motion, playing at 8 frames a second. */
-function Strip({ index, anim, view }: { index: number; anim: Anim; view: number }) {
+function Strip(inputProps: { index: number; anim: Anim; view: number }) {
+  const index = inputProps.index
+  const anim = inputProps.anim
+  const view = inputProps.view
+
   const ref = useRef<HTMLCanvasElement>(null)
   useEffect(() => {
-    const strip = buildSheetStrip(RESIDENT_LOOKS[index], anim, RESIDENTS[index].item, view)
+    const strip = buildSheetStrip({ L: RESIDENT_LOOKS[index], anim: anim, item: RESIDENTS[index].item, view: view })
     const n = strip.w / FW,
       c = ref.current!,
       ctx = c.getContext("2d")!
@@ -37,19 +43,31 @@ const MOTIONS: [Anim, string][] = [
   ["sit", "座る"],
 ]
 
-function Resident({ id }: { id: string }) {
+function Resident(inputProps2: { id: string }) {
+  const id = inputProps2.id
+
   const index = RESIDENTS.findIndex((r) => r.name === id)
   if (index < 0) return null
   return (
     <section className="flex min-w-0 flex-col gap-1 lg:col-span-3">
       <h2 className="text-xs font-medium text-muted-foreground">見た目</h2>
-      <Grid head={["", ...VIEWS]} widths={["w-12"]} rows={MOTIONS.map(([a, label]) => [label, ...VIEWS.map((_, v) => <Strip key={v} index={index} anim={a} view={v} />)])} />
+      <Grid
+        head={["", ...VIEWS]}
+        widths={["w-12"]}
+        rows={MOTIONS.map((entry) => {
+          const a = entry[0]
+          const label = entry[1]
+          return [label, ...VIEWS.map((_, v) => <Strip key={v} index={index} anim={a} view={v} />)]
+        })}
+      />
     </section>
   )
 }
 
 /** Free and blocked cells, exits (blue), residents (yellow, red for shopkeepers) and where players appear (green). */
-function Plan({ id }: { id: string }) {
+function Plan(inputProps3: { id: string }) {
+  const id = inputProps3.id
+
   const ref = useRef<HTMLCanvasElement>(null)
   const m = MAPS[id]
   useEffect(() => {
@@ -81,7 +99,9 @@ function Plan({ id }: { id: string }) {
 const DIV_COLOR: Record<string, string> = { 壁: "#3a3448", 腰壁: "#7a6a58", カーテン: "#b04a4a", 棚: "#8a5a2a" }
 
 /** A building's floor plan, a floor at a time, to scale (floorplan.ts). */
-function House({ id }: { id: string }) {
+function House(inputProps4: { id: string }) {
+  const id = inputProps4.id
+
   const p = floorPlan(id)
   const S = 60
   return (
@@ -104,7 +124,7 @@ function House({ id }: { id: string }) {
                 .filter((r) => r.floor === floor)
                 .map((r, k) => (
                   <text key={k} x={(r.x0 + 0.1) * S} y={(r.z0 + 0.3) * S} fontSize={13} fill="#6a5a4a">
-                    {r.name}（{r.use}）
+                    {p.authored ? (/階段/.test(r.name) ? "階段" : r.name.replace(/^\d+階 /, "")) : `${r.name}（${r.use}）`}
                   </text>
                 ))}
               {p.dividers
@@ -116,6 +136,7 @@ function House({ id }: { id: string }) {
                 .filter((x) => x.floor === floor)
                 .map((x, k) => (
                   <g key={k}>
+                    <title>{x.name}</title>
                     <rect
                       x={x.x0 * S}
                       y={x.z0 * S}
@@ -126,7 +147,7 @@ function House({ id }: { id: string }) {
                       strokeDasharray={x.solid ? undefined : "3 2"}
                     />
                     <text x={((x.x0 + x.x1) / 2) * S} y={((x.z0 + x.z1) / 2) * S + 4} fontSize={10} textAnchor="middle" fill="#2a2018">
-                      {x.name.length > 8 ? x.name.slice(0, 8) + "…" : x.name}
+                      {x.label ?? (x.name.length > 8 ? x.name.slice(0, 8) + "…" : x.name)}
                     </text>
                   </g>
                 ))}

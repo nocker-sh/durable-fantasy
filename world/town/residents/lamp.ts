@@ -1,4 +1,4 @@
-import type { Resident } from "../resident.ts"
+import type { Resident } from "../resident"
 
 const residents = {
   アウグスト: {

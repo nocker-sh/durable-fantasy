@@ -1,11 +1,14 @@
 import { expect, it } from "vitest"
 import { apply } from "./apply"
-import { countItem } from "./bag"
-import { RECIPES, stationOf } from "./crafting"
-import { lifeExpAt } from "./life"
-import { ITEMS, sellPrice } from "./items"
-import { artsOf } from "./skills"
-import { bagWith, player } from "../test/helpers"
+import { countItem } from "#/world/core/count-item"
+import { RECIPES } from "#/world/core/recipes/catalog"
+import { stationOf } from "#/world/core/station-of"
+import { lifeExpAt } from "#/world/core/life-exp-at"
+import { ITEMS } from "#/world/core/items/catalog"
+import { sellPrice } from "#/world/core/items/sell-price"
+import { artsOf } from "#/world/core/arts-of"
+import { bagWith } from "#/world/test/bag-with"
+import { player } from "#/world/test/player"
 
 it.each(["fang-charm", "hand-axe", "battle-axe", "spear", "mace", "short-sword"])("turns gathered materials into usable %s with maker and quality", (id) => {
   const recipe = RECIPES.find((r) => r.id === id)!

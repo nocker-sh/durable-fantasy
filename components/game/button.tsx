@@ -1,3 +1,4 @@
+import { withoutKeys } from "#/lib/engine/without-keys"
 // Copied from the dev shadcn Button and restyled (ui.md §6.4): a raised navy plate that lights
 // its edge on hover and sinks when pressed.
 import { Button as ButtonPrimitive } from "@base-ui/react/button"
@@ -24,7 +25,14 @@ const buttonVariants = cva(
   },
 )
 
-function Button({ className, variant = "default", size = "default", ...props }: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+function Button(inputProps: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+  const className = inputProps.className
+  const variantValue = inputProps.variant
+  const variant = variantValue === undefined ? "default" : variantValue
+  const sizeValue = inputProps.size
+  const size = sizeValue === undefined ? "default" : sizeValue
+  const props = withoutKeys(inputProps, ["className", "variant", "size"])
+
   return <ButtonPrimitive data-slot="button" className={cn(buttonVariants({ variant, size, className }))} {...props} />
 }
 

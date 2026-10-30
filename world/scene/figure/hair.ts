@@ -1,12 +1,28 @@
-import type { BodyContext } from "./context.ts"
-import type { HeadContext } from "./head.ts"
-import { type SurfaceMaterial, solid } from "../../../lib/graphics/ray/primitives.ts"
-import { dot, type V3, add, mv, mul } from "../../../lib/graphics/ray/vector.ts"
-import { limbSd } from "../../../lib/graphics/ray/distance.ts"
-import { type Fringe, FRINGES } from "./look.ts"
+import type { BodyContext } from "./context"
+import type { HeadContext } from "./head"
+import { createSolidSurfaceMaterial } from "../../../lib/graphics/ray/create-solid-surface-material"
+import type { SurfaceMaterial } from "../../../lib/graphics/ray/primitive-types"
+import { dotVector3 as dot } from "../../../lib/engine/dot-vector3"
+import { type Vector3Tuple as V3 } from "../../../lib/engine/vector3-types"
+import { addVector3 as add } from "../../../lib/engine/add-vector3"
+import { multiplyMatrix3Vector as mv } from "../../../lib/engine/multiply-matrix3-vector"
+import { scaleVector3 as mul } from "../../../lib/engine/scale-vector3"
+import { limbSd } from "#/lib/graphics/ray/limb-sd"
+import { type Fringe, FRINGES } from "./look"
 
 function buildHair(context: BodyContext & HeadContext) {
-  const { L, hc, M, hs, headR, SQ, push, along, m0, m1, m2 } = context
+  const LSource = context,
+    L = LSource.L,
+    hc = LSource.hc,
+    M = LSource.M,
+    hs = LSource.hs,
+    headR = LSource.headR,
+    SQ = LSource.SQ,
+    push = LSource.push,
+    along = LSource.along,
+    m0 = LSource.m0,
+    m1 = LSource.m1,
+    m2 = LSource.m2
   // ---- hair: a snug cap plus tapered locks (bangs, face-framing side locks,
   // a jagged back) so the silhouette reads as anime hair rather than a helmet
   const hairRamp = L.hair
@@ -22,7 +38,16 @@ function buildHair(context: BodyContext & HeadContext) {
   ]
   // quadratic bezier lock in head space, tapering from w at the root to a point
   // wave: sideways S-curve (amplitude in head units, number of half waves)
-  const lock = (p0: V3, p1: V3, p2: V3, w: number, segs = 4, tipW = 0.004, wave = 0, waves = 2) => {
+  const lock = (inputProps: { p0: V3; p1: V3; p2: V3; w: number; segs?: number; tipW?: number; wave?: number; waves?: number }) => {
+    const p0 = inputProps.p0
+    const p1 = inputProps.p1
+    const p2 = inputProps.p2
+    const w = inputProps.w
+    const segs = inputProps.segs === undefined ? 4 : inputProps.segs
+    const tipW = inputProps.tipW === undefined ? 0.004 : inputProps.tipW
+    const wave = inputProps.wave === undefined ? 0 : inputProps.wave
+    const waves = inputProps.waves === undefined ? 2 : inputProps.waves
+
     const az0 = Math.atan2(p2[0], p2[2])
     const side: V3 = [Math.cos(az0), 0, -Math.sin(az0)]
     const grp = ++lockN
@@ -45,6 +70,8 @@ function buildHair(context: BodyContext & HeadContext) {
     const lk = limbSd(pts, rs)
     push({
       kind: "sdf",
+      bounds: lk.bounds,
+      capsuleBounds: lk.capsuleBounds,
       a: lk.c,
       b: lk.c,
       r: lk.r,
@@ -205,23 +232,30 @@ function buildHair(context: BodyContext & HeadContext) {
         const te = tipEl(az, k + 3)
         // the bezier never reaches its middle point, so that sits well out to keep the lock proud of the mass
         if (covered) {
-          lock(sp(az * 0.8, L.hat === "helm" ? 0.05 : 0.4, 0.9), sp(az * 0.82, -0.1, 1.04), sp(az * 0.82 + d * 0.05, Math.max(te, -0.75), 1.07), 0.12, 5, 0.012)
+          lock({ p0: sp(az * 0.8, L.hat === "helm" ? 0.05 : 0.4, 0.9), p1: sp(az * 0.82, -0.1, 1.04), p2: sp(az * 0.82 + d * 0.05, Math.max(te, -0.75), 1.07), w: 0.12, segs: 5, tipW: 0.012 })
           continue
         } // side locks out of the hood opening
-        lock(sp(az, rootEl, 0.9), sp(az, (1.1 + te) / 2 + 0.1, midR), sp(az + d * 0.12, te, soft ? 1.1 : 1.24), (0.19 + 0.03 * jit(k)) * lw, 5, 0.012)
+        lock({ p0: sp(az, rootEl, 0.9), p1: sp(az, (1.1 + te) / 2 + 0.1, midR), p2: sp(az + d * 0.12, te, soft ? 1.1 : 1.24), w: (0.19 + 0.03 * jit(k)) * lw, segs: 5, tipW: 0.012 })
       }
       const nF = fr === "back" || fr === "pompadour" ? 3 : 4
       for (let k = 0; k < nF; k++) {
         const az = -0.95 + ((k + 0.5) / nF) * 1.9
         const te = Math.max(0.1, Math.min(0.9, front(az) - 0.1 - 0.1 * jit(k + 11))) // over the brows, stopping at the eyes
         const sw = fr === "swept" || fr === "slant" ? d * 0.25 : fr === "curtain" ? Math.sign(az) * 0.2 : 0
-        lock(sp(az * 0.4 - sw * 0.5, Math.min(1.3, rootEl), 0.9), sp(az, (1.2 + te) / 2 + 0.12, midR), sp(az + sw, te, covered ? 1.06 : soft ? 1.1 : 1.2), 0.15 * lw, 5, 0.01)
+        lock({
+          p0: sp(az * 0.4 - sw * 0.5, Math.min(1.3, rootEl), 0.9),
+          p1: sp(az, (1.2 + te) / 2 + 0.12, midR),
+          p2: sp(az + sw, te, covered ? 1.06 : soft ? 1.1 : 1.2),
+          w: 0.15 * lw,
+          segs: 5,
+          tipW: 0.01,
+        })
       }
       // a few on top so the crown reads as clumps too
       if (!L.hat)
         for (let k = 0; k < 3; k++) {
           const az = -Math.PI + (k / 3) * Math.PI * 2 + 0.5
-          lock(sp(az, 1.55, 0.9), sp(az, 1.3, 1.3), sp(az + 0.2, 0.95, 1.2), 0.17, 3, 0.03)
+          lock({ p0: sp(az, 1.55, 0.9), p1: sp(az, 1.3, 1.3), p2: sp(az + 0.2, 0.95, 1.2), w: 0.17, segs: 3, tipW: 0.03 })
         }
       if (long) push({ kind: "cone", a: H([0, -0.45, -0.17]), b: H([0, -0.02, -0.1]), r: 0.13 * hs, r2: 0.2 * hs, m: strand, ln: true })
       if (st === "braid") {
@@ -230,22 +264,22 @@ function buildHair(context: BodyContext & HeadContext) {
             const pt = H([sd * (0.22 - k * 0.006), -0.14 - k * 0.062, -0.02 + k * 0.004])
             push({ kind: "sph", a: pt, b: pt, r: (0.048 - k * 0.004) * hs, r2: 0, sy: 0.85, m: (p, n) => [hairRamp, n[1] > 0 ? 0.12 : -0.08], ln: true })
           }
-          lock([sd * 0.19, -0.5, 0.01], [sd * 0.2, -0.58, 0.0], [sd * 0.22, -0.64, 0.0], 0.03, 2)
+          lock({ p0: [sd * 0.19, -0.5, 0.01], p1: [sd * 0.2, -0.58, 0.0], p2: [sd * 0.22, -0.64, 0.0], w: 0.03, segs: 2 })
           const rb = H([sd * 0.19, -0.5, 0.01])
-          push({ kind: "sph", a: rb, b: rb, r: 0.028 * hs, r2: 0, m: solid(L.apron ?? "cRed", 0.1) })
+          push({ kind: "sph", a: rb, b: rb, r: 0.028 * hs, r2: 0, m: createSolidSurfaceMaterial(L.apron ?? "cRed", 0.1) })
         }
       }
       if (st === "pony") {
         const tie: V3 = [0, 0.1, -0.28]
         const t0 = H([0, 0.12, -0.33])
         void tie
-        push({ kind: "sph", a: t0, b: t0, r: 0.035 * hs, r2: 0, m: solid(L.apron ?? "cRed", 0.05) })
-        lock([0, 0.12, -0.34], [0, 0.02, -0.48], [0.02, -0.36, -0.4], 0.11, 6, 0.05)
+        push({ kind: "sph", a: t0, b: t0, r: 0.035 * hs, r2: 0, m: createSolidSurfaceMaterial(L.apron ?? "cRed", 0.05) })
+        lock({ p0: [0, 0.12, -0.34], p1: [0, 0.02, -0.48], p2: [0.02, -0.36, -0.4], w: 0.11, segs: 6, tipW: 0.05 })
       }
       if (st === "bun" && L.hat !== "coif" && L.hat !== "kerchief") {
         const pt = H([0, 0.21, -0.29])
         push({ kind: "sph", a: pt, b: pt, r: 0.105 * hs, r2: 0, m: strand, ln: true })
-        lock([0, 0.18, -0.34], [0.1, 0.14, -0.4], [0.15, 0.04, -0.36], 0.03, 2)
+        lock({ p0: [0, 0.18, -0.34], p1: [0.1, 0.14, -0.4], p2: [0.15, 0.04, -0.36], w: 0.03, segs: 2 })
       }
       if (curly)
         for (let k = 0; k < 8; k++) {
@@ -255,7 +289,7 @@ function buildHair(context: BodyContext & HeadContext) {
           push({ kind: "sph", a: pt, b: pt, r: 0.075 * hs, r2: 0, m: strand, ln: true })
         }
       // ahoge
-      if (!L.hat && seed % 3 === 0) lock(sp(0.3, 1.35, 0.98), sp(0.1, 1.5, 1.5), sp(0.9, 1.2, 1.45), 0.03, 4, 0.004)
+      if (!L.hat && seed % 3 === 0) lock({ p0: sp(0.3, 1.35, 0.98), p1: sp(0.1, 1.5, 1.5), p2: sp(0.9, 1.2, 1.45), w: 0.03, segs: 4, tipW: 0.004 })
     }
   }
   return { H }

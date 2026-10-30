@@ -2,15 +2,27 @@
 // and buying the rest leave you better off than doing everything yourself? And with how high a
 // ceiling on the life skills' levels together does that still hold (game-system.md §9.1)?
 // Run: bun scripts/economy-sim.ts (prints the tables summed up in economy.md §7).
-import { RECIPES, STAMINA_PER_CRAFT, craftedQuality, failChance } from "../world/core/crafting.ts"
-import { STATIONS } from "../world/town/stations.ts"
-import { GATHER_STAMINA, NODES, yieldOf, type NodeDef } from "../world/core/gather.ts"
-import { ITEMS, QUALITY_PRICE, sellPrice, type ItemId, type Skill } from "../world/core/items.ts"
-import { LIFE_CAP, LIFE_FINAL, LIFE_TOTAL_CAP, MILESTONES } from "../world/core/life.ts"
-import { effectOf, priceOf } from "../world/core/makers.ts"
-import { LISTING_FEE, TRADE_FEE } from "../world/core/exchange.ts"
-import { OPEN_FIELDS } from "../world/maps/index.ts"
-import { SHOPS } from "../world/core/shops.ts"
+import { RECIPES } from "#/world/core/recipes/catalog"
+import { STAMINA_PER_CRAFT } from "#/world/core/crafting-rules"
+import { craftedQuality } from "#/world/core/crafted-quality"
+import { failChance } from "#/world/core/fail-chance"
+import { STATIONS } from "../world/town/stations"
+import { GATHER_STAMINA } from "#/world/core/gather-rules"
+import { NODES } from "#/world/core/gather"
+import { yieldOf } from "#/world/core/yield-of"
+import type { NodeDef } from "#/world/core/gather-types"
+import { ITEMS } from "#/world/core/items/catalog"
+import { QUALITY_PRICE } from "#/world/core/items/kinds"
+import { sellPrice } from "#/world/core/items/sell-price"
+import type { ItemId } from "#/world/core/items/catalog"
+import type { Skill } from "#/world/core/items/kinds"
+import { LIFE_CAP, LIFE_FINAL, LIFE_TOTAL_CAP, MILESTONES } from "#/world/core/life-rules"
+import { effectOf } from "#/world/core/effect-of"
+import { priceOf } from "#/world/core/price-of"
+import { LISTING_FEE, TRADE_FEE } from "#/world/core/exchange-rules"
+
+import { OPEN_FIELDS } from "../world/maps/index"
+import { SHOPS } from "#/world/core/shops"
 
 // ---------------------------------------------------------------- assumptions (one evening of play)
 const MINUTES = 120
@@ -40,7 +52,7 @@ function goYield(kind: NodeDef["kind"], level: number): Partial<Record<ItemId, n
   const node = NODES.find((n) => n.kind === kind && OPEN_FIELDS.concat(["phanthiet"]).includes(n.map))!
   const out: Partial<Record<ItemId, number>> = {}
   for (let i = 0; i < 200; i++) {
-    const y = yieldOf(node, Math.min(level, LIFE_CAP), 1, (i + 0.5) / 200)
+    const y = yieldOf({ node, level: Math.min(level, LIFE_CAP), power: 1, roll: (i + 0.5) / 200 })
     out[y.item] = (out[y.item] ?? 0) + (y.count + perGoAbove8(level)) / 200
   }
   return out
@@ -61,7 +73,10 @@ function qualityPrice(level: number): number {
 /** The best food to buy for work: the most stamina for how full it makes you, and its price per point. */
 function bestFood(): { item: ItemId; perFull: number; perPoint: number } {
   let best = { item: "porridge" as ItemId, perFull: 0, perPoint: Infinity }
-  for (const [id, it] of Object.entries(ITEMS) as [ItemId, (typeof ITEMS)[ItemId]][]) {
+  for (const entry of Object.entries(ITEMS) as [ItemId, (typeof ITEMS)[ItemId]][]) {
+    const id = entry[0]
+    const it = entry[1]
+
     const e = effectOf(id, 1)
     if (!it.use || e.stamina <= 0 || e.full <= 0) continue
     const perFull = e.stamina / e.full
@@ -71,7 +86,7 @@ function bestFood(): { item: ItemId; perFull: number; perPoint: number } {
 }
 const staminaBudget = (perFull: number) => 100 + FULLNESS * perFull
 
-interface Day {
+type Day = {
   name: string
   levels: string
   gold: number
@@ -83,7 +98,11 @@ interface Day {
 type Levels = Partial<Record<Skill, number>>
 const show = (l: Levels, names: Record<string, string>) =>
   Object.entries(l)
-    .map(([s, n]) => `${names[s]} ${n}`)
+    .map((entry2) => {
+      const s = entry2[0]
+      const n = entry2[1]
+      return `${names[s]} ${n}`
+    })
     .join("・")
 const NAMES: Record<string, string> = { woodcutting: "木こり", foraging: "採取", fishing: "釣り", cooking: "料理", carpentry: "木工" }
 
@@ -225,7 +244,7 @@ for (const capped of [false, true]) {
 // milestone brings its own things (economy.md §2.1). A spreads the ceiling over three chains (six
 // skills); B takes one chain to 64. Both sell on the exchange and buy what they do not gather.
 
-interface Chain {
+type Chain = {
   name: string
   gather: Skill
   craft: Skill
@@ -254,7 +273,7 @@ function chainYield(c: Chain, level: number): Partial<Record<ItemId, number>> {
   const nodes = c.spots.map((k, i) => NODES.find((n) => n.kind === k && n.map === c.maps[i])!)
   for (const node of nodes)
     for (let i = 0; i < 200; i++) {
-      const y = yieldOf(node, level, 1, (i + 0.5) / 200)
+      const y = yieldOf({ node, level, power: 1, roll: (i + 0.5) / 200 })
       out[y.item] = (out[y.item] ?? 0) + (y.count + perGoAbove8(level)) / 200 / nodes.length
     }
   return out
@@ -266,7 +285,13 @@ const chainCapacity = (c: Chain) => NODES.filter((n) => c.spots.includes(n.kind)
  * craft level allows from what was gathered (buying the rest of the inputs), sell all on the exchange.
  * `capped`: the spots hold only so much (alone at them).
  */
-function runChain(c: Chain, g: number, k: number, goes: number, capped: boolean): number {
+function runChain(inputProps: { c: Chain; g: number; k: number; goes: number; capped: boolean }): number {
+  const c = inputProps.c
+  const g = inputProps.g
+  const k = inputProps.k
+  const goes = inputProps.goes
+  const capped = inputProps.capped
+
   const recipes = RECIPES.filter((r) => r.skill === c.craft && r.min <= k).sort((a, b) => sale(b.output.item) * b.output.count - sale(a.output.item) * a.output.count)
   const per = chainYield(c, g)
   // try every split of the goes between gathering and making, keep the best
@@ -276,7 +301,11 @@ function runChain(c: Chain, g: number, k: number, goes: number, capped: boolean)
     if (capped) gatherGoes = Math.min(gatherGoes, chainCapacity(c))
     const laterGoes = c.later && g >= LIFE_FINAL ? Math.min(gatherGoes * 0.1, capped ? LATER_SPOT.max + MINUTES / LATER_SPOT.regen : Infinity) : 0
     const have: Partial<Record<ItemId, number>> = {}
-    for (const [id, n] of Object.entries(per) as [ItemId, number][]) have[id] = n * (gatherGoes - laterGoes)
+    for (const entry3 of Object.entries(per) as [ItemId, number][]) {
+      const id = entry3[0]
+      const n = entry3[1]
+      have[id] = n * (gatherGoes - laterGoes)
+    }
     if (c.later && laterGoes) have[c.later] = (have[c.later] ?? 0) + laterGoes * (1 + perGoAbove8(g))
     let craftGoes = goes * (1 - share),
       gold = 0
@@ -297,7 +326,11 @@ function runChain(c: Chain, g: number, k: number, goes: number, capped: boolean)
       craftGoes -= n
     }
     // what is left over is sold as it is
-    for (const [id, n] of Object.entries(have) as [ItemId, number][]) gold += Math.max(0, n) * sale(id)
+    for (const entry4 of Object.entries(have) as [ItemId, number][]) {
+      const id = entry4[0]
+      const n = entry4[1]
+      gold += Math.max(0, n) * sale(id)
+    }
     const stamina = gatherGoes * cold + (goes * (1 - share) - craftGoes) * STAMINA_PER_CRAFT
     gold -= stamina * bestFood().perPoint
     best = Math.max(best, gold)
@@ -313,11 +346,11 @@ function finalA(total: number, capped: boolean): { gold: number; levels: Levels 
     levels[s] = Math.min(LIFE_FINAL, Math.floor(total / skills.length) + (i < total % skills.length ? 1 : 0))
   })
   const goes = ((MINUTES - 7 * TRAVEL_PER_PLACE) * 60) / GO_SECONDS / CHAINS.length
-  return { gold: Math.round(CHAINS.reduce((a, c) => a + runChain(c, levels[c.gather]!, levels[c.craft]!, goes, capped), 0)), levels }
+  return { gold: Math.round(CHAINS.reduce((a, c) => a + runChain({ c: c, g: levels[c.gather]!, k: levels[c.craft]!, goes: goes, capped: capped }), 0)), levels }
 }
 function finalB(capped: boolean): { gold: number; chain: Chain } {
   const goes = ((MINUTES - 3 * TRAVEL_PER_PLACE) * 60) / GO_SECONDS
-  return CHAINS.map((c) => ({ gold: Math.round(runChain(c, LIFE_FINAL, LIFE_FINAL, goes, capped)), chain: c })).sort((a, b) => b.gold - a.gold)[0]
+  return CHAINS.map((c) => ({ gold: Math.round(runChain({ c: c, g: LIFE_FINAL, k: LIFE_FINAL, goes: goes, capped: capped })), chain: c })).sort((a, b) => b.gold - a.gold)[0]
 }
 
 const SKILL_NAMES: Record<string, string> = { ...NAMES, alchemy: "調合" }

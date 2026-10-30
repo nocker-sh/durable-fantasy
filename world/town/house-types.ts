@@ -1,13 +1,14 @@
+import type { AuthoredPlan } from "#/world/town/floorplan/authored"
 export type HouseKind = "home" | "shop" | "public" | "workshop" | "farm" | "vacant"
 
-export interface Room {
+export type Room = {
   name: string
   floor: number
   /** beds in the room */
   beds?: number
 }
 
-export interface Plan {
+export type Plan = {
   rooms: readonly Room[]
   /** every lived-in building has one, so its chimney smokes */
   hearth: boolean
@@ -18,7 +19,8 @@ export interface Plan {
   furniture: readonly string[]
 }
 
-export interface HouseDef {
+export type HouseDef = {
+  authored?: AuthoredPlan
   id: string
   map: string
   kind: HouseKind
@@ -43,7 +45,7 @@ export interface HouseDef {
   plan: Plan
 }
 
-export interface Household {
+export type Household = {
   id: string
   name: string
   /** resident names (world/scene/residents.ts) */

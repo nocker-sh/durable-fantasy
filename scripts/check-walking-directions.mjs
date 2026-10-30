@@ -12,7 +12,7 @@ try {
   await page.evaluate(async () => {
     const r = window.game.scene.runtime
     r.events = { ...r.events, walk: () => {} }
-    const { isFree, walkH } = await import("/world/scene/world.ts")
+    const { isFree, walkH } = await import("/world/scene/world")
     let cell
     for (let j = 20; j < 76 && !cell; j++)
       for (let i = 20; i < 76 && !cell; i++) {

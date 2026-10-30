@@ -1,9 +1,10 @@
 import { beforeEach, expect, it, vi } from "vitest"
 const calls = vi.hoisted(() => ({ read: vi.fn(), say: vi.fn(), chat: vi.fn() }))
-vi.mock("../../../durable-objects/player.ts", () => ({ Player: { get: () => calls } }))
-vi.mock("../../../durable-objects/party.ts", () => ({ Party: { get: () => calls } }))
-import { HANDLERS, deliverPartyChat } from "./party-chat.ts"
-import type { Ctx } from "./context.ts"
+vi.mock("../../../durable-objects/player", () => ({ Player: { get: () => calls } }))
+vi.mock("../../../durable-objects/party", () => ({ Party: { get: () => calls } }))
+import { HANDLERS } from "#/world/server/map-room/party-chat"
+import { deliverPartyChat } from "#/world/server/map-room/deliver-party-chat"
+import type { Ctx } from "./context"
 function fixture() {
   const send = vi.fn(async () => {})
   const context = { me: { owner: "self", party: "group", player: { name: "エルナ" } }, ctx: { connection: { state: {}, send } } } as unknown as Ctx

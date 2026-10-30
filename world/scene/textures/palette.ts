@@ -1,4 +1,5 @@
-import { RAMPS, type RGB } from "../pix"
+import { RAMPS } from "#/world/scene/pix"
+import { type RGB } from "../../../lib/graphics/pixel-types"
 
 export const PPU = 32
 

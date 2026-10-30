@@ -1,8 +1,9 @@
 import { expect, it } from "vitest"
 import { apply } from "./apply"
-import { derive } from "./stats"
-import { emptyEquipment, loadPlayer } from "./player"
-import { player } from "../test/helpers"
+import { derive } from "#/world/core/derive"
+import { emptyEquipment } from "#/world/core/empty-equipment"
+import { loadPlayer } from "#/world/core/load-player"
+import { player } from "#/world/test/player"
 
 const caster = (faith: number) =>
   player({

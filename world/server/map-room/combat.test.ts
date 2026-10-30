@@ -1,17 +1,24 @@
-import { afterEach, expect, it, vi } from "vitest"
-import { emptyWild, hit } from "../../core/wild.ts"
-import { MONSTER_KINDS, SPAWNS, monsterAt } from "../../core/monsters.ts"
-import { mapPlayer } from "./presence.ts"
-import type { Ctx } from "./context.ts"
-import { player } from "../../test/helpers.ts"
+import { afterEach, beforeEach, expect, it, vi } from "vitest"
+import { emptyWild } from "#/world/core/wild/empty-wild"
+import { hit } from "#/world/core/wild/hit"
+import { MONSTER_KINDS, SPAWNS } from "#/world/core/monsters"
+import { monsterAt } from "#/world/core/monster-at"
+import { mapPlayer } from "#/world/server/map-room/map-player"
+import type { Ctx } from "./context"
+import { player } from "#/world/test/player"
 
 vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }))
-const calls = vi.hoisted(() => ({ read: vi.fn(), run: vi.fn(), strike: vi.fn() }))
-vi.mock("../../../durable-objects/player.ts", () => ({ Player: { get: () => calls } }))
-vi.mock("../../../durable-objects/wild.ts", () => ({ Wild: { get: () => calls } }))
-vi.mock("../../../durable-objects/party.ts", () => ({ Party: { get: vi.fn() } }))
-vi.mock("../../maps/index.ts", () => ({ walkable: () => true }))
-import { HANDLERS } from "./combat.ts"
+const calls = vi.hoisted(() => ({ read: vi.fn(), readCombat: vi.fn(), run: vi.fn(), strike: vi.fn(), beginStrike: vi.fn(), deliverStrike: vi.fn() }))
+vi.mock("../../../durable-objects/player", () => ({ Player: { get: () => calls } }))
+vi.mock("../../../durable-objects/wild", () => ({ Wild: { get: () => calls } }))
+vi.mock("../../../durable-objects/party", () => ({ Party: { get: vi.fn() } }))
+vi.mock("#/world/maps/walkable", () => ({ walkable: () => true }))
+import { HANDLERS } from "./combat"
+
+beforeEach(() => {
+  calls.beginStrike.mockResolvedValue({ ok: true, id: 1 })
+  calls.readCombat.mockImplementation(async () => ({ player: await calls.read(), life: 0 }))
+})
 
 afterEach(() => {
   vi.useRealTimers()
@@ -22,10 +29,10 @@ it.each(["hunter", "other"])("does not broadcast a blow or retaliate when %s att
   vi.useFakeTimers()
   vi.setSystemTime(1000)
   const spawn = SPAWNS.find((s) => s.kind === "slime")!
-  const beaten = hit(emptyWild(), spawn.id, MONSTER_KINDS[spawn.kind].hp, 999, "hunter")
-  calls.strike.mockImplementation(async (id, damage, who) => {
-    const result = hit(beaten.state, id, damage, Date.now(), who)
-    return { ...result, back: result.state.back[id] ?? 0 }
+  const beaten = hit({ state: emptyWild(), id: spawn.id, damage: MONSTER_KINDS[spawn.kind].hp, now: 999, player: "hunter" })
+  calls.beginStrike.mockImplementation(async (id, damage, who) => {
+    const result = hit({ state: beaten.state, id: id, damage: damage, now: Date.now(), player: who })
+    return result.refused ? { ok: false, reason: result.reason } : { ok: true, id: 1 }
   })
   const p = player()
   calls.read.mockResolvedValue(p)
@@ -39,10 +46,11 @@ it.each(["hunter", "other"])("does not broadcast a blow or retaliate when %s att
     map: {},
     me: { owner, player: mapPlayer("connection", p, cell), route: [cell], since: 1000 },
     save: vi.fn(),
-    standUp: vi.fn(async () => {}),
+    standUp: vi.fn(async () => true),
   } as unknown as Ctx
   await HANDLERS.attack!(context, { type: "attack", monster: spawn.id })
-  expect(calls.strike).toHaveBeenCalledOnce()
+  expect(calls.beginStrike).toHaveBeenCalledOnce()
+  expect(calls.strike).not.toHaveBeenCalled()
   expect(send).toHaveBeenCalledWith({ type: "refused", what: "attack", monster: spawn.id, reason: "TARGET_GONE" })
   expect(broadcast).not.toHaveBeenCalled()
   expect(calls.run).not.toHaveBeenCalled()
@@ -62,7 +70,7 @@ it.each([
   const send = vi.fn(async () => {})
   const broadcast = vi.fn(async () => {})
   const save = vi.fn()
-  const standUp = vi.fn(async () => {})
+  const standUp = vi.fn(async () => true)
   const context = {
     ctx: { params: { mapId: "field" }, connection: { send }, room: { broadcast } },
     key: { map: spawn.map },
@@ -87,8 +95,8 @@ it("persists retaliation even if the attack broadcast and result delivery fail",
     const spawn = SPAWNS.find((s) => s.kind === "slime")!
     const p = player()
     calls.read.mockResolvedValue(p)
-    calls.strike.mockResolvedValue({ refused: false, beaten: false, hp: 1, back: 0 })
-    calls.run.mockResolvedValue({ ok: true, state: { ...p, hp: 5 }, events: [] })
+    calls.strike.mockResolvedValue({ refused: false, beaten: false, hp: 1, back: 0, counter: { kind: "hit", damage: 1 } })
+    calls.deliverStrike.mockResolvedValue([{ owner: "hunter", result: { ok: true, state: { ...p, hp: 5 }, events: [] } }])
     const at = monsterAt(spawn, Date.now(), () => true)
     const cell: [number, number] = [Math.floor(at.x * 2), Math.floor(at.z * 2)]
     const context = {
@@ -101,13 +109,39 @@ it("persists retaliation even if the attack broadcast and result delivery fail",
       map: {},
       me: { owner: "hunter", player: mapPlayer("connection", p, cell), route: [cell], since: Date.now() },
       save: vi.fn(),
-      standUp: vi.fn(async () => {}),
+      standUp: vi.fn(async () => true),
     } as unknown as Ctx
     await HANDLERS.attack!(context, { type: "attack", monster: spawn.id })
-    expect(calls.run).toHaveBeenCalledExactlyOnceWith({ type: "hurt", amount: expect.any(Number), by: MONSTER_KINDS[spawn.kind].name })
+    expect(calls.deliverStrike).toHaveBeenCalledExactlyOnceWith("hunter", 1)
+    expect(calls.run).not.toHaveBeenCalled()
     expect(warn).toHaveBeenCalledTimes(3)
   } finally {
     warn.mockRestore()
     random.mockRestore()
   }
+})
+
+it("does not reserve or pay for an attack when standing is refused", async () => {
+  const spawn = SPAWNS.find((s) => s.kind === "slime")!
+  const at = monsterAt(spawn, Date.now(), () => true)
+  const cell: [number, number] = [Math.floor(at.x * 2), Math.floor(at.z * 2)]
+  const p = player({ sitting: true })
+  calls.read.mockResolvedValue(p)
+  const send = vi.fn(async () => {}),
+    broadcast = vi.fn(async () => {}),
+    save = vi.fn()
+  const context = {
+    ctx: { params: { mapId: "field" }, connection: { send }, room: { broadcast } },
+    key: { map: spawn.map },
+    map: {},
+    me: { owner: "hunter", player: mapPlayer("connection", p, cell), route: [cell], since: Date.now(), sitting: true },
+    save,
+    standUp: async () => false,
+  } as unknown as Ctx
+  await HANDLERS.attack!(context, { type: "attack", monster: spawn.id })
+  expect(calls.beginStrike).not.toHaveBeenCalled()
+  expect(calls.strike).not.toHaveBeenCalled()
+  expect(save).not.toHaveBeenCalled()
+  expect(broadcast).not.toHaveBeenCalled()
+  expect(send).toHaveBeenCalledExactlyOnceWith({ type: "refused", what: "attack", monster: spawn.id, reason: "NOT_READY" })
 })

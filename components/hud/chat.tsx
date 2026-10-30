@@ -1,65 +1,27 @@
-// Chat (ui.md §3.4): bottom right, what people say with the line to type in (Enter opens it); and
-// the system log on the left, what happens (arriving, buying, being refused). Both resizable.
-import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from "react"
-import type React from "react"
-import type { ChatLine } from "#/world/game.ts"
-import { useGame, useGameState } from "#/components/game/context.tsx"
-import { Input } from "#/components/game/input.tsx"
-import { Kbd } from "#/components/game/kbd.tsx"
-import { Window } from "#/components/game/window.tsx"
-import { useWindow } from "./use-window.ts"
-
-const NAME_COLOR = (line: ChatLine) => (line.self ? "text-white" : line.channel === "npc" ? "text-npc" : "text-player")
-
-/** Keep a log scrolled to the newest line unless the reader has scrolled up. */
-function useStick(length: number) {
-  const log = useRef<HTMLDivElement>(null)
-  const stick = useRef(true)
-  useLayoutEffect(() => {
-    if (stick.current && log.current) log.current.scrollTop = log.current.scrollHeight
-  }, [length])
-  const onScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const el = e.currentTarget
-    stick.current = el.scrollHeight - el.scrollTop - el.clientHeight < 8
-  }
-  return { log, onScroll }
-}
-
-/** The system log (left, middle): arriving, buying, being refused. */
-export function SystemLog() {
-  const win = useWindow("syslog")
-  const chat = useGameState((s) => s.chat)
-  const lines = chat.filter((l) => l.channel === "system")
-  const { log, onScroll } = useStick(lines.length)
-  if (!win.open) return null
-  return (
-    <Window
-      id="syslog"
-      key={win.key}
-      {...win.props}
-      title="システムログ"
-      size={{ initial: [340, 170], min: [240, 100] }}
-      initial={(_, h) => ({ x: 16, y: Math.round(h / 2 - 40) })}
-      bodyClassName="flex flex-col p-0"
-    >
-      <div ref={log} onScroll={onScroll} className="ui-scroll min-h-0 flex-1 overflow-y-auto px-3 pb-2.5 font-body text-[12px] leading-[19px] text-white select-text">
-        {lines.map((line) => (
-          <p key={line.id}>{line.text}</p>
-        ))}
-      </div>
-    </Window>
-  )
-}
+import { useEffect, useRef, useState } from "react"
+import type { FormEvent } from "react"
+import { useGame } from "#/hooks/use-game"
+import { useGameState } from "#/hooks/use-game-state"
+import { Input } from "#/components/game/input"
+import { Kbd } from "#/components/game/kbd"
+import { Window } from "#/components/game/window"
+import { useWindow } from "#/components/hud/use-window"
+import { NAME_COLOR } from "#/components/hud/name_color"
+import { useStick } from "#/components/hud/use-stick"
 
 export function Chat() {
   const game = useGame()
   const win = useWindow("chat")
   const chat = useGameState((s) => s.chat)
   const typing = useGameState((s) => s.typing)
-  const [text, setText] = useState("")
+  const textState = useState(""),
+    text = textState[0],
+    setText = textState[1]
   const input = useRef<HTMLInputElement>(null)
   const lines = chat.filter((l) => l.channel !== "system")
-  const { log, onScroll } = useStick(lines.length)
+  const logSource = useStick(lines.length),
+    log = logSource.log,
+    onScroll = logSource.onScroll
 
   useEffect(() => {
     if (typing && !win.open) game.toggleWindow("chat")

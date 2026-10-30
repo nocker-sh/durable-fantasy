@@ -1,23 +1,36 @@
+import { withoutKeys } from "#/lib/engine/without-keys"
+import { notifyClient } from "./notifications"
 // The map room's handlers for commands on the player's own data: shops, gathering, making, commissions, storage, errands.
-import { STORAGE_KEEPER } from "../../core/storage.ts"
-import { storageOpen } from "../../town/warehouse.ts"
-import { Player } from "../../../durable-objects/player.ts"
-import { shopOf } from "../../core/commands.ts"
-import { SHOPS } from "../../core/shops.ts"
-import { sellable, type ItemId } from "../../core/items.ts"
-import { Market } from "../../../durable-objects/market.ts"
-import { Nature } from "../../../durable-objects/nature.ts"
-import { REACH, nodeOf } from "../../core/gather.ts"
-import { stationAt } from "../../town/stations.ts"
-import { commissionOf } from "../../core/commissions.ts"
-import type { Transition } from "../../core/apply.ts"
-import { TALK_CELLS, minutesToClose, npcCell, shopOpen } from "../../maps/index.ts"
-import type { Cell } from "../../protocol.ts"
-import type { Ctx, Handlers, Message } from "./context.ts"
-import { TOWN, timeFor, mapPlayer, near } from "./presence.ts"
+import { STORAGE_KEEPER } from "#/world/core/storage/rules"
+import { storageOpen } from "../../town/warehouse"
+import { Player } from "../../../durable-objects/player"
+import { shopOf } from "../../core/commands"
+import { SHOPS } from "#/world/core/shops"
+import { Market } from "../../../durable-objects/market"
+import { Nature } from "../../../durable-objects/nature"
+import { REACH } from "#/world/core/gather-rules"
+import { nodeOf } from "#/world/core/node-of"
+import { stationAt } from "../../town/stations"
+import { commissionOf } from "#/world/core/commission-of"
+import { sameCommissionOrders } from "#/world/core/same-commission-orders"
+import type { Transition } from "#/world/core/transition"
+import { TALK_CELLS } from "#/world/maps"
+import { minutesToClose } from "#/world/maps/minutes-to-close"
+import { npcCell } from "#/world/maps/npc-cell"
+import { shopOpen } from "#/world/maps/shop-open"
+import type { Cell } from "#/world/protocol"
+import type { Ctx, Handlers, Message } from "./context"
+import { TOWN } from "#/world/server/map-room/presence"
+import { timeFor } from "#/world/server/map-room/time-for"
+import { mapPlayer } from "#/world/server/map-room/map-player"
+import { near } from "#/world/server/map-room/near"
 
 async function command(roomCtx: Ctx, message: Message<"command">) {
-  const { ctx, map, me, save } = roomCtx
+  const ctxSource = roomCtx,
+    ctx = ctxSource.ctx,
+    map = ctxSource.map,
+    me = ctxSource.me,
+    save = ctxSource.save
   if (!me.player || !me.owner) return
   const shop = shopOf(message.command)
   // who of the shop's keepers is at the counter now: only they get to know the player
@@ -36,35 +49,15 @@ async function command(roomCtx: Ctx, message: Message<"command">) {
       return
     }
   }
-  // a purchase comes off the shared shelf first, at today's price (market Durable Object)
   const c = message.command
-  let price: number | undefined
-  if (c.type === "buy") {
-    const taken = await Market.get(TOWN).take(c.shop, c.item, c.q ?? 1, c.count, c.price, minutesToClose(c.shop, timeFor(me)))
-    if (!taken.ok) {
-      await ctx.connection.send({ type: "result", seq: message.seq, result: { ok: false, reason: taken.reason } })
-      return
-    }
-    price = taken.price
-  }
-  // a sale to the shop: its price now by its stock, and the stock goes up
-  let sold: { item: ItemId; count: number } | null = null
-  if (c.type === "sell") {
-    const slot = (await Player.get(me.owner).read()).bag[c.slot]
-    if (slot && sellable(slot.item)) {
-      price = await Market.get(TOWN).sell(c.shop, slot.item, c.count)
-      if (price === 0) {
-        await ctx.connection.send({ type: "result", seq: message.seq, result: { ok: false, reason: "NOT_WANTED" } })
-        return
-      }
-      sold = { item: slot.item, count: c.count }
-    }
-  }
-  const result = await Player.get(me.owner).run(c, { ...(price !== undefined ? { price } : {}), ...(onDuty ? { keepers: onDuty } : {}) })
-  if (!result.ok && c.type === "buy") await Market.get(TOWN).giveBack(c.shop, c.item, c.q ?? 1, c.count)
-  if (!result.ok && sold && c.type === "sell") await Market.get(TOWN).unsell(c.shop, sold.item, sold.count)
-  await ctx.connection.send({ type: "result", seq: message.seq, result })
-  if (result.ok && (c.type === "sit" || c.type === "stand")) save({ sitting: c.type === "sit" })
+  let result: Transition
+  if (c.type === "buy" || c.type === "sell") {
+    const market = Market.get(TOWN)
+    const request = await market.beginTrade({ owner: me.owner, connection: ctx.connection.id, seq: message.seq, command: c, keepers: onDuty ?? [], toClose: minutesToClose(c.shop, timeFor(me)) })
+    result = request.ok ? await market.finishTrade(me.owner, request.id) : request
+  } else result = await Player.get(me.owner).run(c, onDuty ? { keepers: onDuty } : {})
+  if (result.ok && (c.type === "sit" || c.type === "stand")) save({ sitting: result.state.sitting })
+  await notifyClient(ctx.connection.send({ type: "result", seq: message.seq, result }))
   // others see the new name, looks or weapon
   if (result.ok) {
     const next = mapPlayer(me.player.id, result.state, me.player.at)
@@ -78,31 +71,37 @@ async function command(roomCtx: Ctx, message: Message<"command">) {
       next.weapon !== me.player.weapon
     ) {
       save({ player: next, ready: result.state.profileComplete })
-      await ctx.room.broadcast({ type: "joined", player: next }, [ctx.connection.id])
+      await notifyClient(ctx.room.broadcast({ type: "joined", player: next }, [ctx.connection.id]))
     }
   }
   return
 }
 
 async function gather(roomCtx: Ctx, message: Message<"gather">) {
-  const { ctx, key, me } = roomCtx
+  const ctxSource2 = roomCtx,
+    ctx = ctxSource2.ctx,
+    key = ctxSource2.key,
+    me = ctxSource2.me
   if (!me.player || !me.owner || me.engaged) return
   const node = nodeOf(message.node)
   const answer = (result: Transition) => ctx.connection.send({ type: "result", seq: message.seq, result })
   if (!node || node.map !== key.map || !near(me, node.cell as Cell, REACH)) return answer({ ok: false, reason: "TOO_FAR" })
-  // take a go from the town's spot first, then give it to the player; put it back if they cannot take it
   const nature = Nature.get(`town-${key.world}`)
-  const left = await nature.take(node.id)
-  if (left < 0) return answer({ ok: false, reason: "SPENT" })
-  const result = await Player.get(me.owner).run({ type: "gather", node: node.id, roll: Math.random() })
-  const now = result.ok ? left : await nature.give(node.id)
+  const request = await nature.beginGather({ owner: me.owner, connection: ctx.connection.id, seq: message.seq, node: node.id })
+  if (!request.ok) return answer(request)
+  const leftSource = await nature.finishGather(me.owner, request.id),
+    left = leftSource.left,
+    result = withoutKeys(leftSource, ["left"])
   await answer(result)
-  await ctx.room.broadcast({ type: "nodes", left: { [node.id]: now } })
+  if (left !== undefined) await ctx.room.broadcast({ type: "nodes", left: { [node.id]: left } })
   return
 }
 
 async function craft(roomCtx: Ctx, message: Message<"craft">) {
-  const { ctx, key, me } = roomCtx
+  const ctxSource3 = roomCtx,
+    ctx = ctxSource3.ctx,
+    key = ctxSource3.key,
+    me = ctxSource3.me
   if (!me.player || !me.owner || me.engaged) return
   const station = stationAt(message.station)
   const answer = (result: Transition) => ctx.connection.send({ type: "result", seq: message.seq, result })
@@ -111,19 +110,30 @@ async function craft(roomCtx: Ctx, message: Message<"craft">) {
 }
 
 async function orderOrCollect(roomCtx: Ctx, message: Message<"order" | "collect">) {
-  const { ctx, map, me } = roomCtx
+  const ctxSource4 = roomCtx,
+    ctx = ctxSource4.ctx,
+    map = ctxSource4.map,
+    me = ctxSource4.me
   if (!me.player || !me.owner) return
   const answer = (result: Transition) => ctx.connection.send({ type: "result", seq: message.seq, result })
   // the craftsman has to be at their counter, and we beside them
-  const data = await Player.get(me.owner).read()
-  const job = commissionOf(message.type === "order" ? message.commission : (data.orders[message.index]?.commission ?? ""))
+  if (message.type === "collect") {
+    const data = await Player.get(me.owner).read()
+    if (!sameCommissionOrders(data.orders, message.orders)) return answer({ ok: false, reason: "ORDER_CHANGED" })
+  }
+  const job = commissionOf(message.type === "order" ? message.commission : (message.orders[message.index]?.commission ?? ""))
   const cell = job && npcCell(map, job.craftsman, timeFor(me))
   if (!job || !cell || !near(me, cell as Cell, TALK_CELLS + 1)) return answer({ ok: false, reason: "TOO_FAR" })
-  return answer(await Player.get(me.owner).run(message.type === "order" ? { type: "order", commission: job.id, roll: Math.random() } : { type: "collect", index: message.index }))
+  return answer(
+    await Player.get(me.owner).run(message.type === "order" ? { type: "order", commission: job.id, roll: Math.random() } : { type: "collect", index: message.index, expectedOrders: message.orders }),
+  )
 }
 
 async function storage(roomCtx: Ctx, message: Message<"storage">) {
-  const { ctx, map, me } = roomCtx
+  const ctxSource5 = roomCtx,
+    ctx = ctxSource5.ctx,
+    map = ctxSource5.map,
+    me = ctxSource5.me
   if (!me.player || !me.owner) return
   const answer = (result: Transition) => ctx.connection.send({ type: "result", seq: message.seq, result })
   // Hilde has to be at her counter, and we beside her
@@ -131,12 +141,19 @@ async function storage(roomCtx: Ctx, message: Message<"storage">) {
   if (!storageOpen(timeFor(me))) return answer({ ok: false, reason: "CLOSED" })
   if (!cell || !near(me, cell as Cell, TALK_CELLS + 1)) return answer({ ok: false, reason: "TOO_FAR" })
   return answer(
-    await Player.get(me.owner).run(message.action === "store" ? { type: "store", slot: message.index, count: message.count } : { type: "retrieve", index: message.index, count: message.count }),
+    await Player.get(me.owner).run(
+      message.action === "store"
+        ? { type: "store", slot: message.index, count: message.count, expectedStack: message.stack }
+        : { type: "retrieve", index: message.index, count: message.count, expectedStack: message.stack },
+    ),
   )
 }
 
 async function errand(roomCtx: Ctx, message: Message<"errand">) {
-  const { ctx, map, me } = roomCtx
+  const ctxSource6 = roomCtx,
+    ctx = ctxSource6.ctx,
+    map = ctxSource6.map,
+    me = ctxSource6.me
   if (!me.player || !me.owner) return
   const answer = (result: Transition) => ctx.connection.send({ type: "result", seq: message.seq, result })
   // the resident has to be where they are at this hour, and we beside them

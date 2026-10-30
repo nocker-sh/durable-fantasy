@@ -1,12 +1,13 @@
-// What the game shows, as one value the UI reads (components/game/context.tsx): the map, the player, the open
+// What the game shows, as one value the UI reads (hooks/use-game-state.ts): the map, the player, the open
 // windows and conversations. Game (game.ts) is the only writer.
-import type { ExchangeView, PartyView, TradeSideView } from "./protocol.ts"
-import type { ItemId, Quality } from "./core/items.ts"
-import type { PlayerState } from "./core/player.ts"
-import type { ShopId } from "./core/shops.ts"
-import type { Derived } from "./core/stats.ts"
-import type { MapId } from "./maps/index.ts"
-import type { ResidentInfo, WalkerInfo } from "./scene/index.ts"
+import type { ExchangeView, PartyView, TradeSideView } from "#/world/protocol"
+import type { ItemId } from "#/world/core/items/catalog"
+import type { Quality } from "#/world/core/items/kinds"
+import type { PlayerState } from "#/world/core/player-types"
+import type { ShopId } from "#/world/core/shop-types"
+import type { Derived } from "#/world/core/stats-types"
+import type { MapId } from "#/world/maps/types"
+import type { ResidentInfo, WalkerInfo } from "#/world/scene/runtime/types"
 
 /** Windows the player opens and closes (ui.md §3). */
 export type WindowId = "minimap" | "chat" | "syslog" | "inventory" | "equipment" | "stats" | "worldmap" | "errands" | "skills" | "friends"
@@ -19,7 +20,7 @@ export const KEPT_ON_ESC: readonly WindowId[] = ["minimap", "chat", "syslog"]
 export type ModalId = "system" | "character" | "help" | "channel" | "welcome"
 export type ChatChannel = "player" | "npc" | "system" | "party"
 
-export interface ChatLine {
+export type ChatLine = {
   id: number
   channel: ChatChannel
   name?: string
@@ -29,14 +30,14 @@ export interface ChatLine {
   shout?: boolean
 }
 
-export interface DialogueChoice {
+export type DialogueChoice = {
   label: string
   action: "shop" | "commission" | "storage" | "close" | "errand-ask" | "errand-take" | "errand-hand"
   /** the errand a choice is about (core/errands.ts) */
   errand?: string
 }
 
-export interface Dialogue {
+export type Dialogue = {
   resident: number
   name: string
   job: string
@@ -51,27 +52,18 @@ export interface Dialogue {
 /** Characters per second a conversation types out at. */
 export const TEXT_SPEED = 36
 
-/** How much of the current page is visible at `now`. */
-export function revealed(dialogue: Dialogue, now: number): number {
-  const text = dialogue.pages[dialogue.page]
-  if (!dialogue.shownAt) return text.length
-  return Math.min(text.length, Math.floor(((now - dialogue.shownAt) / 1000) * TEXT_SPEED))
-}
-
-export const fullyShown = (dialogue: Dialogue) => revealed(dialogue, performance.now()) >= dialogue.pages[dialogue.page].length
-
-export interface Notice {
+export type Notice = {
   id: number
   text: string
   tone: "info" | "good" | "bad"
 }
 
 /** An NPC as the minimap and the UI see it. */
-export interface Npc extends ResidentInfo {
+export type Npc = ResidentInfo & {
   role: "shop" | "other"
 }
 
-export interface GameState {
+export type GameState = {
   /** the loading screen: which map and how far along, or null once playing */
   loading: { map: string; text: string } | null
   /** the map could not be drawn (the scene failed to build) */
@@ -117,18 +109,18 @@ export interface GameState {
   board: { symbol: string; view: ExchangeView | null } | null
   /** the craftsman whose commissions are open (core/commissions.ts) */
   commission: string | null
-  /** the warehouse is open (core/storage.ts) */
+  /** the warehouse is open (core/storage/rules.ts) */
   storage: boolean
   /** another player picked by name: what can be done with them */
   playerMenu: { id: string; name: string } | null
   /** someone asking to trade with us */
   tradeAsk: { from: string; name: string } | null
-  /** our party (core/party.ts), and someone asking us into theirs */
+  /** our party (core/party/), and someone asking us into theirs */
   party: PartyView | null
   partyAsk: { from: string; name: string } | null
-  /** an open trade (core/trade.ts) */
+  /** an open trade (core/check-trade.ts) */
   trade: { with: string; name: string; mine: TradeSideView; lots: { slot: number; count: number }[]; theirs: TradeSideView } | null
-  /** the station whose recipes are open (core/crafting.ts) */
+  /** the station whose recipes are open (core/station-of.ts) */
   craft: string | null
   /** how much each gathering spot on this map has left, as the server last said */
   nodes: Readonly<Record<string, number>>
@@ -141,7 +133,7 @@ export interface GameState {
 }
 
 /** One line in a shop window: a thing, its quality, its price now, how many are left (null: plenty), the next batch (ms). */
-export interface Offer {
+export type Offer = {
   item: ItemId
   q: Quality
   price: number

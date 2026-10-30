@@ -1,17 +1,27 @@
-import type { Placed, Rect, Divider } from "./types.ts"
-import { overlap, rect, inside } from "./geometry.ts"
+import type { Placed, Rect, Divider } from "./types"
+import { overlap } from "#/world/town/floorplan/overlap"
+import { rect } from "#/world/town/floorplan/rect"
+import { inside } from "#/world/town/floorplan/inside"
 
 /** One floor being filled: what is there already, and the room each thing may go in. */
 class Floor {
   pieces: Placed[] = []
   /** places kept clear: the doorway, the foot of the stair, the space in front of things */
   clear: Rect[] = []
-  constructor(
-    readonly floor: number,
-    readonly W: number,
-    readonly D: number,
-    readonly dividers: Divider[],
-  ) {}
+  readonly floor: number
+  readonly W: number
+  readonly D: number
+  readonly dividers: Divider[]
+  constructor(inputProps2: { floor: number; width: number; depth: number; dividers: Divider[] }) {
+    const floor = inputProps2.floor
+    const W = inputProps2.width
+    const D = inputProps2.depth
+    const dividers = inputProps2.dividers
+    this.floor = floor
+    this.W = W
+    this.D = D
+    this.dividers = dividers
+  }
 
   /** where one comes in, and the places that must stay reachable from there (a stair's foot, a way through, the fire) */
   from: [number, number] | null = null
@@ -53,12 +63,15 @@ class Floor {
       const x = (i + 0.5) * C,
         z = (j + 0.5) * C
       for (const t of left) if (x > t.x0 - 0.5 && x < t.x1 + 0.5 && z > t.z0 - 0.5 && z < t.z1 + 0.5) left.delete(t)
-      for (const [di, dj] of [
+      for (const entry of [
         [1, 0],
         [-1, 0],
         [0, 1],
         [0, -1],
       ]) {
+        const di = entry[0]
+        const dj = entry[1]
+
         const ii = i + di,
           jj = j + dj,
           q = jj * nx + ii
@@ -79,10 +92,20 @@ class Floor {
    * Set a piece against one of the room's walls (or a partition), its long side along it, with its
    * clear space in front; the walls are tried in `sides` order, positions from `from` outward.
    */
-  againstWall(name: string, w: number, d: number, front: number, room: Rect, sides: ("n" | "e" | "s" | "w")[], from = 0.5): Placed | null {
+  againstWall(inputProps: { name: string; w: number; d: number; front: number; room: Rect; sides: ("n" | "e" | "s" | "w")[]; from?: number }): Placed | null {
+    const name = inputProps.name
+    const w = inputProps.w
+    const d = inputProps.d
+    const front = inputProps.front
+    const room = inputProps.room
+    const sides = inputProps.sides
+    const from = inputProps.from === undefined ? 0.5 : inputProps.from
+
     for (const side of sides) {
       const along = side === "n" || side === "s"
-      const [pw, pd] = along ? [w, d] : [d, w]
+      const pwState = along ? [w, d] : [d, w],
+        pw = pwState[0],
+        pd = pwState[1]
       const len = along ? room.x1 - room.x0 : room.z1 - room.z0
       const span = along ? pw : pd
       if (span > len + 1e-6) continue
@@ -94,7 +117,7 @@ class Floor {
         const a = (along ? room.x0 : room.z0) + span / 2 + off
         const x = along ? a : side === "w" ? room.x0 + pw / 2 : room.x1 - pw / 2
         const z = along ? (side === "n" ? room.z0 + pd / 2 : room.z1 - pd / 2) : a
-        const r = rect(x, z, pw, pd)
+        const r = rect({ x: x, z: z, w: pw, d: pd })
         const f: Rect =
           side === "n"
             ? { x0: r.x0, z0: r.z1, x1: r.x1, z1: r.z1 + front }
@@ -113,16 +136,29 @@ class Floor {
   }
 
   /** Set a piece standing free in the room, as near `at` as it will go, with clear space all round. */
-  near(name: string, w: number, d: number, front: number, room: Rect, at: [number, number], solid = true): Placed | null {
+  near(inputProps: { name: string; w: number; d: number; front: number; room: Rect; at: [number, number]; solid?: boolean }): Placed | null {
+    const name = inputProps.name
+    const w = inputProps.w
+    const d = inputProps.d
+    const front = inputProps.front
+    const room = inputProps.room
+    const at = inputProps.at
+    const solid = inputProps.solid === undefined ? true : inputProps.solid
+
     const cands: [number, number, number][] = []
     for (let x = room.x0 + w / 2; x <= room.x1 - w / 2 + 1e-6; x += 0.1) for (let z = room.z0 + d / 2; z <= room.z1 - d / 2 + 1e-6; z += 0.1) cands.push([x, z, Math.hypot(x - at[0], z - at[1])])
     cands.sort((a, b) => a[2] - b[2])
-    for (const [x, z] of cands)
-      for (const [pw, pd] of [
+    for (const entry2 of cands) {
+      const x = entry2[0]
+      const z = entry2[1]
+      for (const entry3 of [
         [w, d],
         [d, w],
       ]) {
-        const r = rect(x, z, pw, pd)
+        const pw = entry3[0]
+        const pd = entry3[1]
+
+        const r = rect({ x: x, z: z, w: pw, d: pd })
         const m = Math.min(front, 0.3)
         const f: Rect = { x0: r.x0 - m, z0: r.z0 - m, x1: r.x1 + m, z1: r.z1 + m }
         if (!inside(r, room)) continue
@@ -132,6 +168,7 @@ class Floor {
         this.add(p, solid ? { x0: r.x0 - Math.min(front, 0.6), z0: r.z1, x1: r.x1 + Math.min(front, 0.6), z1: r.z1 + Math.min(front, 0.6) } : null)
         return p
       }
+    }
     return null
   }
 }

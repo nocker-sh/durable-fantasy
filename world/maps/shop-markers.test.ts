@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest"
-import { SHOPS } from "../core/shops.ts"
-import { MAPS, shopOpen } from "./index.ts"
-import { INTERIORS, outsideDoor } from "../town/interiors.ts"
-import { shopMarkers } from "./shop-markers.ts"
+import { SHOPS } from "#/world/core/shops"
+import { MAPS } from "#/world/maps"
+import { shopOpen } from "#/world/maps/shop-open"
+import { INTERIORS } from "#/world/town/interiors"
+import { outsideDoor } from "#/world/town/outside-door"
+import { shopMarkers } from "./shop-markers"
 
 describe("shop minimap markers", () => {
   it("keeps every shop on its district map even when closed", () => {

@@ -1,6 +1,6 @@
 // Names and looks for players arriving in town. A new player gets a random name and look, and
 // can change both in the character window.
-import type { Look } from "../scene/figure.ts"
+import type { Look } from "#/world/scene/figure/look"
 
 const FIRST = [
   "リーンハルト",
@@ -28,7 +28,7 @@ export function randomName(random = Math.random): string {
   return name.length <= 16 ? name : pick(FIRST)
 }
 
-export interface LookPreset {
+export type LookPreset = {
   label: string
   look: Look
 }

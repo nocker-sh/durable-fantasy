@@ -1,5 +1,6 @@
 import { expect, it } from "vitest"
-import { readProfileDraft, writeProfileDraft } from "./profile-draft.ts"
+import { readProfileDraft } from "#/world/client/read-profile-draft"
+import { writeProfileDraft } from "#/world/client/write-profile-draft"
 
 it("restores an interrupted draft and removes it after confirmation", () => {
   const values = new Map<string, string>()

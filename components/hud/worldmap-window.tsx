@@ -1,11 +1,14 @@
 // The world map (ui.md §3.3): the maps as places joined by roads, where you are, and the cities
 // still beyond reach.
-import { useGameState } from "#/components/game/context.tsx"
-import { Window } from "#/components/game/window.tsx"
-import { MAPS, isOpen } from "#/world/maps/index.ts"
-import { GRID_SIZE, WORLD } from "#/world/maps/grid.ts"
-import { LOCKED_CITIES, WORLD_NODES, worldNodeOf, worldRoads } from "#/world/maps/world-map.ts"
-import { useWindow } from "./use-window.ts"
+import { useGameState } from "#/hooks/use-game-state"
+import { Window } from "#/components/game/window"
+import { MAPS } from "#/world/maps"
+import { isOpen } from "#/world/maps/is-open"
+import { GRID_SIZE, WORLD } from "#/world/maps/grid"
+import { LOCKED_CITIES, WORLD_NODES } from "#/world/maps/world-map"
+import { worldNodeOf } from "#/world/maps/world-node-of"
+import { worldRoads } from "#/world/maps/world-roads"
+import { useWindow } from "./use-window"
 
 const W = 360,
   H = 300
@@ -45,20 +48,24 @@ export function WorldmapWindow() {
               strokeDasharray="3 3"
             />
           ))}
-          {roads.map(([a, b]) => (
-            // a road into a closed field is drawn faint (game-system.md §1)
-            <line
-              key={a.id + b.id}
-              x1={px(a.x)}
-              y1={py(a.y)}
-              x2={px(b.x)}
-              y2={py(b.y)}
-              stroke={isOpen(a.id) && isOpen(b.id) ? "#b8a070" : "#6a6458"}
-              strokeWidth={2}
-              strokeDasharray={a.city && b.city ? undefined : isOpen(a.id) && isOpen(b.id) ? "4 3" : "2 4"}
-              opacity={isOpen(a.id) && isOpen(b.id) ? 0.75 : 0.5}
-            />
-          ))}
+          {roads.map((entry) => {
+            const a = entry[0]
+            const b = entry[1]
+            return (
+              // a road into a closed field is drawn faint (game-system.md §1)
+              <line
+                key={a.id + b.id}
+                x1={px(a.x)}
+                y1={py(a.y)}
+                x2={px(b.x)}
+                y2={py(b.y)}
+                stroke={isOpen(a.id) && isOpen(b.id) ? "#b8a070" : "#6a6458"}
+                strokeWidth={2}
+                strokeDasharray={a.city && b.city ? undefined : isOpen(a.id) && isOpen(b.id) ? "4 3" : "2 4"}
+                opacity={isOpen(a.id) && isOpen(b.id) ? 0.75 : 0.5}
+              />
+            )
+          })}
           {LOCKED_CITIES.map((c) => {
             const from = WORLD_NODES.find((n) => n.id === c.from)!
             return <line key={c.name} x1={px(from.x)} y1={py(from.y)} x2={px(c.x)} y2={py(c.y)} stroke="#6a6458" strokeWidth={2} strokeDasharray="2 4" />

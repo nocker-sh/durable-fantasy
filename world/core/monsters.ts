@@ -1,28 +1,4 @@
-// The creatures outside town (world.md: descendants of war-made creatures, ordinary animals now;
-// game-system.md §8). Slimes bounce about the meadow on their own business and never come for you,
-// though one that is struck strikes back;
-// beaten, a slime bursts into little ones that scatter and come back together later, and a hare
-// runs off into the grass. Where each one is follows from the clock alone, so the server and every
-// player see it in the same place without sending positions about.
-import type { ItemId } from "./items.ts"
-
-export interface MonsterKind {
-  name: string
-  hp: number
-  def: number
-  flee: number
-  /** how hard and how surely it strikes back when struck (0: it only runs) */
-  atk: number
-  hit: number
-  exp: number
-  drops: readonly { item: ItemId; chance: number }[]
-  /** seconds before it is back after being beaten */
-  respawn: number
-  /** how it looks (scene) */
-  look: "slime" | "hare"
-  color?: number
-  size?: number
-}
+import type { MonsterKind, Spawn } from "#/world/core/monster-types"
 
 export const MONSTER_KINDS: Record<string, MonsterKind> = {
   slime: {
@@ -113,42 +89,29 @@ export const MONSTER_KINDS: Record<string, MonsterKind> = {
   hare: { name: "野うさぎ", hp: 22, def: 0, flee: 25, atk: 0, hit: 0, exp: 7, respawn: 150, look: "hare", drops: [{ item: "soft-fur", chance: 0.55 }] },
 }
 
-export interface Spawn {
-  id: string
-  map: string
-  kind: keyof typeof MONSTER_KINDS
-  /** where it wanders, in tiles */ area: readonly [number, number, number, number]
+const many = (inputProps: { map: string; kind: Spawn["kind"]; n: number; area: Spawn["area"]; from?: number }): Spawn[] => {
+  const map = inputProps.map
+  const kind = inputProps.kind
+  const n = inputProps.n
+  const area = inputProps.area
+  const from = inputProps.from === undefined ? 0 : inputProps.from
+  return Array.from({ length: n }, (_, i) => ({ id: `${map}-${kind}-${from + i}`, map, kind, area }))
 }
-
-const many = (map: string, kind: Spawn["kind"], n: number, area: Spawn["area"], from = 0): Spawn[] => Array.from({ length: n }, (_, i) => ({ id: `${map}-${kind}-${from + i}`, map, kind, area }))
 
 export const SPAWNS: readonly Spawn[] = [
-  ...many("south-meadow", "slime", 6, [28, 28, 44, 42]),
-  ...many("south-meadow", "slime", 4, [8, 28, 20, 40], 6),
-  ...many("south-meadow", "blue-slime", 2, [36, 34, 44, 42]),
-  ...many("south-meadow", "hare", 4, [30, 6, 44, 20]),
-  ...many("red-dunes", "sand-slime", 2, [20, 17, 23, 20]),
-  ...many("red-dunes", "sand-slime", 2, [32, 14, 35, 17], 2),
-  ...many("forest-edge", "blue-slime", 3, [36, 30, 39, 33]),
-  ...many("forest-edge", "hare", 2, [9, 15, 12, 18]),
-  ...many("forest-edge", "ash-hare", 2, [9, 15, 12, 18]),
-  ...many("deep-forest", "moss-slime", 2, [15, 12, 18, 15]),
-  ...many("deep-forest", "moss-slime", 2, [30, 36, 33, 39], 2),
-  ...many("deep-forest", "blue-slime", 2, [6, 27, 9, 30]),
+  ...many({ map: "south-meadow", kind: "slime", n: 6, area: [28, 28, 44, 42] }),
+  ...many({ map: "south-meadow", kind: "slime", n: 4, area: [8, 28, 20, 40], from: 6 }),
+  ...many({ map: "south-meadow", kind: "blue-slime", n: 2, area: [36, 34, 44, 42] }),
+  ...many({ map: "south-meadow", kind: "hare", n: 4, area: [30, 6, 44, 20] }),
+  ...many({ map: "red-dunes", kind: "sand-slime", n: 2, area: [20, 17, 23, 20] }),
+  ...many({ map: "red-dunes", kind: "sand-slime", n: 2, area: [32, 14, 35, 17], from: 2 }),
+  ...many({ map: "forest-edge", kind: "blue-slime", n: 3, area: [36, 30, 39, 33] }),
+  ...many({ map: "forest-edge", kind: "hare", n: 2, area: [9, 15, 12, 18] }),
+  ...many({ map: "forest-edge", kind: "ash-hare", n: 2, area: [9, 15, 12, 18] }),
+  ...many({ map: "deep-forest", kind: "moss-slime", n: 2, area: [15, 12, 18, 15] }),
+  ...many({ map: "deep-forest", kind: "moss-slime", n: 2, area: [30, 36, 33, 39], from: 2 }),
+  ...many({ map: "deep-forest", kind: "blue-slime", n: 2, area: [6, 27, 9, 30] }),
 ]
-
-const spawnsById = new Map(SPAWNS.map((spawn) => [spawn.id, spawn]))
-const spawnsByMap = new Map<string, Spawn[]>()
-const noSpawns: readonly Spawn[] = []
-for (const spawn of SPAWNS) {
-  const group = spawnsByMap.get(spawn.map)
-  if (group) group.push(spawn)
-  else spawnsByMap.set(spawn.map, [spawn])
-}
-
-export const spawnOf = (id: string) => spawnsById.get(id)
-/** Stable definition order; callers must not change the shared map population. */
-export const spawnsOn = (map: string): readonly Spawn[] => spawnsByMap.get(map) ?? noSpawns
 
 /** How far you strike from, in tiles. */
 export const MELEE_REACH = 1.6
@@ -159,96 +122,3 @@ export const MELEE_REACH = 1.6
 export const CLAIM_MS = 30_000
 /** Stamina a fight costs when it is won. */
 export const FIGHT_STAMINA = 2
-
-function hash(a: string, n: number): number {
-  let h = 2166136261 ^ n
-  for (const c of a) {
-    h ^= c.charCodeAt(0)
-    h = Math.imul(h, 16777619)
-  }
-  h ^= h >>> 13
-  h = Math.imul(h, 0x5bd1e995)
-  h ^= h >>> 15
-  return (h >>> 0) / 4294967296
-}
-
-/**
- * They mostly sit where they are, quivering. Every twenty seconds or so one shuffles a short way
- * about its resting place (about a tile), taking two seconds over it; every five minutes or so it
- * settles somewhere else in its area.
- */
-const PERIOD = 20_000,
-  MOVE = 2_000,
-  SETTLE = 15
-
-/** Where it settles for a while: a point in its area; `free` keeps it off walls and water. */
-function homeAt(s: Spawn, stay: number, free: (x: number, z: number) => boolean): [number, number] {
-  const [x0, z0, x1, z1] = s.area
-  for (let k = 0; k < 6; k++) {
-    const x = x0 + hash(s.id, stay * 7 + k) * (x1 - x0),
-      z = z0 + hash(s.id, stay * 7 + k + 3) * (z1 - z0)
-    if (free(x, z)) return [x, z]
-  }
-  return [(x0 + x1) / 2, (z0 + z1) / 2]
-}
-
-/** A resting point for one stretch of time: a little way from where it has settled. */
-function restAt(s: Spawn, seg: number, free: (x: number, z: number) => boolean): [number, number] {
-  const [hx, hz] = homeAt(s, Math.floor(seg / SETTLE), free)
-  const [x0, z0, x1, z1] = s.area
-  const x = Math.min(x1, Math.max(x0, hx + (hash(s.id, seg * 11 + 1) - 0.5) * 1.2)),
-    z = Math.min(z1, Math.max(z0, hz + (hash(s.id, seg * 11 + 2) - 0.5) * 1.2))
-  return free(x, z) ? [x, z] : [hx, hz]
-}
-
-/** Where it is at time `t` (ms), and whether it is on the move. */
-export function monsterAt(s: Spawn, t: number, free: (x: number, z: number) => boolean = () => true): { x: number; z: number; moving: boolean } {
-  // each has its own beat, so they do not all shuffle at once
-  const tt = t + hash(s.id, 99) * PERIOD
-  const seg = Math.floor(tt / PERIOD),
-    into = tt - seg * PERIOD
-  const a = restAt(s, seg - 1, free),
-    b = restAt(s, seg, free)
-  return between(a, b, into)
-}
-
-function between(a: [number, number], b: [number, number], into: number) {
-  // a short shuffle takes two seconds; settling somewhere new, as long as its unhurried pace needs
-  const k = Math.min(1, into / Math.max(MOVE, Math.hypot(b[0] - a[0], b[1] - a[1]) * 900))
-  return { x: a[0] + (b[0] - a[0]) * k, z: a[1] + (b[1] - a[1]) * k, moving: k < 1 }
-}
-
-/** A scene's view of the same motion, retaining only current and adjacent resting points.
- * The walkability function must remain stable for this instance's lifetime.
- */
-export class MonsterMotion {
-  private readonly points = new Map<number, [number, number]>()
-  private readonly phase: number
-
-  constructor(
-    private readonly spawn: Spawn,
-    private readonly free: (x: number, z: number) => boolean,
-  ) {
-    this.phase = hash(spawn.id, 99) * PERIOD
-  }
-
-  private rest(segment: number): [number, number] {
-    const hit = this.points.get(segment)
-    if (hit) return hit
-    const point = restAt(this.spawn, segment, this.free)
-    this.points.set(segment, point)
-    if (this.points.size > 3) this.points.delete(this.points.keys().next().value!)
-    return point
-  }
-
-  at(time: number) {
-    const t = time + this.phase
-    const segment = Math.floor(t / PERIOD)
-    return between(this.rest(segment - 1), this.rest(segment), t - segment * PERIOD)
-  }
-}
-
-/** What a beaten one leaves: each drop rolled on its own (rolls from the server). */
-export function dropsOf(kind: MonsterKind, rolls: readonly number[]): ItemId[] {
-  return kind.drops.flatMap((d, i) => ((rolls[i] ?? 1) < d.chance ? [d.item] : []))
-}

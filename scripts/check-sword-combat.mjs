@@ -1,7 +1,9 @@
 // Development-only sword fixture; levels and stat points are earned through normal combat.
 // Exercise the real shortcut, SP payment, rejected duplicate attack and persisted cooldown.
 import { chromium } from "playwright-core"
-import { createCharacter, walkToMap, waitReady } from "./lib/game-browser.mjs"
+import { createCharacter } from "#resources/scripts/lib/create-character"
+import { walkToMap } from "#resources/scripts/lib/walk-to-map"
+import { waitReady } from "#resources/scripts/lib/wait-ready"
 let page
 let onRefusal
 const events = []
@@ -52,7 +54,7 @@ try {
   while (await page.evaluate(() => game.state.get().player.statPoints < 3)) {
     const progress = await page.evaluate(() => ({ level: game.state.get().player.level, exp: game.state.get().player.exp }))
     const spawnIds = await page.evaluate(async () => {
-      const { SPAWNS } = await import("/world/core/monsters.ts")
+      const { SPAWNS } = await import("/world/core/monsters")
       return SPAWNS.filter((s) => s.map === "south-meadow" && s.kind === "slime").map((s) => s.id)
     })
     const available = await page.waitForFunction((ids) => ids.find((id) => game.session.wild[id]?.hp > 0 && game.session.wild[id].back <= Date.now()) || false, spawnIds, { timeout: 120000 })
@@ -77,7 +79,7 @@ try {
     if (!(await game.run({ type: "equip", slot }))) throw Error("Starter weapon missing")
   })
   const target = await page.evaluate(async () => {
-    const { SPAWNS, monsterAt } = await import("/world/core/monsters.ts")
+    const { SPAWNS, monsterAt } = await import("/world/core/monsters")
     const cell = game.scene.playerCell()
     const candidates = SPAWNS.filter((s) => s.map === "south-meadow" && s.kind === "slime" && game.session.wild[s.id]?.hp > 0 && game.session.wild[s.id].back <= Date.now())
     const distance = (s) => {

@@ -1,14 +1,15 @@
+import * as terrainWalkHModule from "#/world/scene/walk-h"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import * as THREE from "three"
-import { Actor, Figure, view } from "./actors"
-import * as terrain from "./world"
-import { bakedStrip, spriteFrame } from "./sprite-pool"
+import { Actor } from "#/world/scene/actor"
+import { Figure } from "#/world/scene/figure/figure"
+import { view } from "#/world/scene/actors"
+import { bakedStrip } from "#/world/scene/baked-strip"
+import { spriteFrame } from "#/world/scene/sprite-frame"
 
-vi.mock("./sprite-pool", () => ({
-  lookKey: () => "test-look",
-  bakedStrip: vi.fn(() => undefined),
-  spriteFrame: vi.fn(() => null),
-}))
+vi.mock("#/world/scene/sprite-key", () => ({ lookKey: () => "test-look" }))
+vi.mock("#/world/scene/baked-strip", () => ({ bakedStrip: vi.fn(() => undefined) }))
+vi.mock("#/world/scene/sprite-frame", () => ({ spriteFrame: vi.fn(() => null) }))
 
 const look = { top: "cCream", bottom: "cGray", sex: "m", skin: "skin1", hair: "hBrown", style: "curly", eye: "cBlue" } as const
 
@@ -26,8 +27,8 @@ function canvasDocument() {
 
 it("reuses resident ground height while stationary and resamples after movement or relocation", () => {
   canvasDocument()
-  const height = vi.spyOn(terrain, "walkH").mockImplementation((x, z) => x / 10 + z / 20)
-  const actor = new Actor("エルナ", "", look, [20, 30], [], [], new THREE.Scene())
+  const height = vi.spyOn(terrainWalkHModule, "walkH").mockImplementation((x, z) => x / 10 + z / 20)
+  const actor = new Actor({ name: "エルナ", job: "", look: look, start: [20, 30], routine: [], lines: [], scene: new THREE.Scene() })
   for (let i = 0; i < 120; i++) actor.update(1 / 60, i / 60, () => {})
   expect(height).toHaveBeenCalledTimes(1)
   expect(actor.fig.root.position.y).toBe(3.5)
@@ -55,7 +56,7 @@ describe("figure resource lifetime", () => {
     figure.prefetch("idle", null)
     figure.prefetch("idle", null)
     expect(spriteFrame).toHaveBeenCalledTimes(8)
-    const done = vi.mocked(spriteFrame).mock.calls[0][6]!
+    const done = vi.mocked(spriteFrame).mock.calls[0][0].onReady!
     const release = vi.spyOn(THREE.Texture.prototype, "dispose")
     figure.dispose()
     expect(release).toHaveBeenCalledTimes(8)
@@ -75,7 +76,7 @@ describe("figure resource lifetime", () => {
     const figure = new Figure(look)
     const release = vi.spyOn(THREE.Texture.prototype, "dispose")
     figure.prefetch("idle", null)
-    const stale = vi.mocked(spriteFrame).mock.calls[0][6]!
+    const stale = vi.mocked(spriteFrame).mock.calls[0][0].onReady!
     figure.prefetch("walk", null)
     figure.prefetch("carry", null)
     expect(release).toHaveBeenCalledTimes(8)

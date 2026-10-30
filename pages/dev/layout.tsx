@@ -1,15 +1,25 @@
 // The one frame of every /dev page: the game's tables on the left, always open and still while the
 // page scrolls; the page on the right, which never runs wider than the window.
-import "#/dev/dev.css"
+import "#resources/dev/dev"
 import type { ReactNode } from "react"
 import { useRouter } from "@void/react"
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from "#/components/ui/sidebar.tsx"
-import { SHEETS } from "#/dev/db.tsx"
-import { useNoCanvasMenu } from "#/hooks/use-no-canvas-menu.ts"
+import { Sidebar } from "#/components/ui/sidebar"
+import { SidebarContent } from "#/components/ui/sidebar-content"
+import { SidebarGroup } from "#/components/ui/sidebar-group"
+import { SidebarGroupContent } from "#/components/ui/sidebar-group-content"
+import { SidebarInset } from "#/components/ui/sidebar-inset"
+import { SidebarMenu } from "#/components/ui/sidebar-menu"
+import { SidebarMenuButton } from "#/components/ui/sidebar-menu-button"
+import { SidebarMenuItem } from "#/components/ui/sidebar-menu-item"
+import { SidebarProvider } from "#/components/ui/sidebar-provider"
+import { SHEETS } from "#/dev/sheets/registry"
+import { useNoCanvasMenu } from "#/hooks/use-no-canvas-menu"
 
 const ignore = () => {}
 
-export default function DevLayout({ children }: { children: ReactNode }) {
+export default function DevLayout(inputProps: { children: ReactNode }) {
+  const children = inputProps.children
+
   useNoCanvasMenu()
   const at = useRouter().path.split("/")[2]
   const sheet = SHEETS.find((s) => s.id === at)

@@ -1,15 +1,18 @@
 import { describe, expect, it } from "vitest"
-import { apply } from "./apply.ts"
-import { addItem, emptyBag } from "./bag.ts"
-import { effectOf, priceOf } from "./makers.ts"
-import { DIGEST_MS, fullNow } from "./player.ts"
-import { player } from "../test/helpers.ts"
+import { apply } from "./apply"
+import { addItem } from "#/world/core/add-item"
+import { emptyBag } from "#/world/core/empty-bag"
+import { effectOf } from "#/world/core/effect-of"
+import { priceOf } from "#/world/core/price-of"
+import { DIGEST_MS } from "#/world/core/player-rules"
+import { fullNow } from "#/world/core/full-now"
+import { player } from "#/world/test/player"
 
 const MIN = 60_000
 
 describe("eating: stamina, fullness and warmth", () => {
   it("food gives stamina back, fills you up and warms you for a while", () => {
-    const p = player({ stamina: 20, bag: addItem(emptyBag(), "stew", 1, { q: 1, by: "ゲルダ" })! })
+    const p = player({ stamina: 20, bag: addItem({ bag: emptyBag(), item: "stew", count: 1, mark: { q: 1, by: "ゲルダ" } })! })
     const r = apply(p, { type: "use", slot: 0 }, { now: 1000 })
     expect(r.ok).toBe(true)
     if (!r.ok) return
@@ -19,7 +22,7 @@ describe("eating: stamina, fullness and warmth", () => {
   })
 
   it("you cannot eat past full, and fullness wears off with time", () => {
-    const p = player({ stamina: 0, full: 90, fullAt: 0, bag: addItem(emptyBag(), "stew", 2)! })
+    const p = player({ stamina: 0, full: 90, fullAt: 0, bag: addItem({ bag: emptyBag(), item: "stew", count: 2 })! })
     expect(apply(p, { type: "use", slot: 0 }, { now: 0 })).toEqual({ ok: false, reason: "TOO_FULL" })
     expect(fullNow(p, 30 * DIGEST_MS)).toBe(60)
     expect(apply(p, { type: "use", slot: 0 }, { now: 30 * DIGEST_MS }).ok).toBe(true)

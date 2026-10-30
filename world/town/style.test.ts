@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest"
-import { HOUSES } from "./houses.ts"
-import { houseStyle, lookKey, neighbours, wallsFor } from "./style.ts"
+import { HOUSES } from "#/world/town/houses"
+import { houseStyle } from "#/world/town/house-style"
+import { lookKey } from "#/world/town/look-key"
+import { neighbours } from "#/world/town/neighbours"
+import { wallsFor } from "#/world/town/walls-for"
 
 describe("each building looks like the life in it (town.md「家の見た目」)", () => {
   it("no two neighbours look the same: roof shape, walls, roof colour and windows together", () => {

@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from "vitest"
-import { OptionalCacheAccess } from "./optional-cache-access.ts"
+import { OptionalCacheAccess } from "./optional-cache-access"
 afterEach(() => vi.useRealTimers())
 
 it("returns a successful read without retaining a timer or disabling later reads", async () => {

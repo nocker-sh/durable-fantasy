@@ -1,8 +1,12 @@
 import { describe, expect, it } from "vitest"
-import { RESIDENTS } from "./residents.ts"
-import { SHOPS } from "../core/shops.ts"
-import { ITEMS } from "../core/items.ts"
-import { HOUSEHOLDS, HOUSES, bedsOf, enterable, floorsOf, seatsOf } from "./houses.ts"
+import { RESIDENTS } from "./residents"
+import { SHOPS } from "#/world/core/shops"
+import { ITEMS } from "#/world/core/items/catalog"
+import { HOUSEHOLDS, HOUSES } from "#/world/town/houses"
+import { bedsOf } from "#/world/town/beds-of"
+import { enterable } from "#/world/town/enterable"
+import { floorsOf } from "#/world/town/floors-of"
+import { seatsOf } from "#/world/town/house-seats-of"
 
 describe("households and houses hang together", () => {
   it("every resident belongs to exactly one household", () => {

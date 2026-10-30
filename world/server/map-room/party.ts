@@ -1,14 +1,19 @@
 // The map room's handlers for parties (core/party.ts).
-import { sendPartyChat } from "./party-chat.ts"
-import { Party } from "../../../durable-objects/party.ts"
-import { PARTY_MAX } from "../../core/party.ts"
-import { Player } from "../../../durable-objects/player.ts"
-import { derive } from "../../core/stats.ts"
-import type { Ctx, Handlers, Message } from "./context.ts"
-import { presence, setPresence, partyView } from "./presence.ts"
+import { sendPartyChat } from "#/world/server/map-room/send-party-chat"
+import { Party } from "../../../durable-objects/party"
+import { PARTY_MAX } from "#/world/core/party/rules"
+import { Player } from "../../../durable-objects/player"
+import { derive } from "#/world/core/derive"
+import type { Ctx, Handlers, Message } from "./context"
+import { presence } from "#/world/server/map-room/presence"
+import { setPresence } from "#/world/server/map-room/set-presence"
+import { partyView } from "#/world/server/map-room/party-view"
 
 async function partyInvite(roomCtx: Ctx, message: Message<"party-invite">) {
-  const { ctx, me, save } = roomCtx
+  const ctxSource = roomCtx,
+    ctx = ctxSource.ctx,
+    me = ctxSource.me,
+    save = ctxSource.save
   const them = ctx.room.getConnection(message.target)
   const other = them && presence(them)
   if (!me.player || !me.owner || !them || !other?.player || other.party || them.id === ctx.connection.id) {
@@ -32,7 +37,11 @@ async function partyInvite(roomCtx: Ctx, message: Message<"party-invite">) {
 }
 
 async function partyAnswer(roomCtx: Ctx, message: Message<"party-answer">) {
-  const { ctx, map, me, save } = roomCtx
+  const ctxSource2 = roomCtx,
+    ctx = ctxSource2.ctx,
+    map = ctxSource2.map,
+    me = ctxSource2.me,
+    save = ctxSource2.save
   const them = ctx.room.getConnection(message.from)
   const other = them && presence(them)
   if (!me.player || !me.owner || !them || !other?.owner || !other.player || other.inviting !== ctx.connection.id) return
@@ -64,7 +73,10 @@ async function partyAnswer(roomCtx: Ctx, message: Message<"party-answer">) {
 }
 
 async function partyLeave(roomCtx: Ctx, _message: Message<"party-leave">) {
-  const { ctx, me, save } = roomCtx
+  const ctxSource3 = roomCtx,
+    ctx = ctxSource3.ctx,
+    me = ctxSource3.me,
+    save = ctxSource3.save
   if (!me.owner || !me.party) return
   await Party.get(me.party).leave(me.owner)
   save({ party: null })
@@ -74,14 +86,20 @@ async function partyLeave(roomCtx: Ctx, _message: Message<"party-leave">) {
 }
 
 async function partyMode(roomCtx: Ctx, message: Message<"party-mode">) {
-  const { ctx, me } = roomCtx
+  const ctxSource4 = roomCtx,
+    ctx = ctxSource4.ctx,
+    me = ctxSource4.me
   if (!me.owner || !me.party) return
   await ctx.connection.send({ type: "party", view: partyView(await Party.get(me.party).setMode(me.owner, message.mode), me.owner) })
   return
 }
 
 async function partyLook(roomCtx: Ctx, message: Message<"party-look">) {
-  const { ctx, map, me, save } = roomCtx
+  const ctxSource5 = roomCtx,
+    ctx = ctxSource5.ctx,
+    map = ctxSource5.map,
+    me = ctxSource5.me,
+    save = ctxSource5.save
   if (!me.owner || !me.player) return
   if (!me.party) {
     await ctx.connection.send({ type: "party", view: null })
@@ -89,11 +107,13 @@ async function partyLook(roomCtx: Ctx, message: Message<"party-look">) {
   }
   // report how we are, and see how the others are
   const d = await Player.get(me.owner).read()
-  const { party: p, chat } = await Party.get(me.party).poll(
-    me.owner,
-    { name: me.player.name, level: d.level, hp: d.hp, maxHp: derive(d).maxHp, map: map.name, at: Date.now() },
-    message.chat?.party === me.party ? message.chat.seq : 0,
-  )
+  const pSource = await Party.get(me.party).poll({
+      owner: me.owner,
+      status: { name: me.player.name, level: d.level, hp: d.hp, maxHp: derive(d).maxHp, map: map.name, at: Date.now() },
+      after: message.chat?.party === me.party ? message.chat.seq : 0,
+    }),
+    p = pSource.party,
+    chat = pSource.chat
   if (!p.members.some((m) => m.owner === me.owner)) {
     // the party broke up while we were away
     save({ party: null })

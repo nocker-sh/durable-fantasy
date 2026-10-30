@@ -1,4 +1,4 @@
-import type { Line } from "../line.ts"
+import type { Line } from "#/world/town/lines/line"
 
 const lines = {
   クルト: [

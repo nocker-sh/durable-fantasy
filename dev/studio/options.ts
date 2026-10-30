@@ -1,5 +1,5 @@
 // Choices for the studio UI, with Japanese labels.
-import type { Item, Look } from "#/world/scene/figure.ts"
+import type { Item, Look } from "#/world/scene/figure/look"
 
 export const ITEMS: [Item, string][] = [
   [null, "なし"],

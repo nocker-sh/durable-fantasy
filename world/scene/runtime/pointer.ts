@@ -1,12 +1,13 @@
 import * as THREE from "three"
-import { walkH, isFree } from "../world"
-import type { V2 } from "../build"
-import type { Actor } from "../actors"
-import { critters } from "../animals"
-import { dragTurn } from "../turn"
-import type { Walker } from "./walker.ts"
-import { snap } from "./grid.ts"
-interface PointerScene {
+import { walkH } from "#/world/scene/walk-h"
+import { isFree } from "#/world/scene/is-free"
+import type { V2 } from "#/world/scene/construction/registry"
+import type { Actor } from "#/world/scene/actor"
+import { critters } from "#/world/scene/critters"
+import { dragTurn } from "#/world/scene/drag-turn"
+import type { Walker } from "./walker"
+import { snap } from "#/world/scene/runtime/snap"
+type PointerScene = {
   renderer: THREE.WebGLRenderer
   cam: THREE.Camera
   terrain: THREE.Object3D
@@ -25,7 +26,25 @@ interface PointerScene {
   zoom(delta: number): void
   clearFight(): void
 }
-export function createPointer({ renderer, cam, terrain, town, people, ids, remotes, cursor, movement, spotHit, monsterHit, approach, approachSpot, fight, walkTo, zoom, clearFight }: PointerScene) {
+export function createPointer(inputProps: PointerScene) {
+  const renderer = inputProps.renderer
+  const cam = inputProps.cam
+  const terrain = inputProps.terrain
+  const town = inputProps.town
+  const people = inputProps.people
+  const ids = inputProps.ids
+  const remotes = inputProps.remotes
+  const cursor = inputProps.cursor
+  const movement = inputProps.movement
+  const spotHit = inputProps.spotHit
+  const monsterHit = inputProps.monsterHit
+  const approach = inputProps.approach
+  const approachSpot = inputProps.approachSpot
+  const fight = inputProps.fight
+  const walkTo = inputProps.walkTo
+  const zoom = inputProps.zoom
+  const clearFight = inputProps.clearFight
+
   // ---------------------------------------------------------------- input (pointer only; keys belong to the Game)
   const ray = new THREE.Raycaster()
   const ndc = new THREE.Vector2()

@@ -1,8 +1,16 @@
-import { Table, TableBody, TableCell, TableRow } from "#/components/ui/table.tsx"
-import { GRID_SIZE, WORLD, across, squareAt, type Side, type Square } from "#/world/maps/grid.ts"
-import { MAPS } from "#/world/maps/index.ts"
-import { sheet } from "./schema.ts"
-import { MAP_KIND, mapName, ref } from "./shared.tsx"
+import { Table } from "#/components/ui/table"
+import { TableBody } from "#/components/ui/table-body"
+import { TableCell } from "#/components/ui/table-cell"
+import { TableRow } from "#/components/ui/table-row"
+import { GRID_SIZE, WORLD } from "#/world/maps/grid"
+import { across } from "#/world/maps/across"
+import { squareAt } from "#/world/maps/square-at"
+import { type Side, type Square } from "#/world/maps/grid-types"
+import { MAPS } from "#/world/maps/index"
+import { sheet } from "./schema"
+import { MAP_KIND } from "#/dev/sheets/shared"
+import { mapName } from "#/dev/sheets/map-name"
+import { ref } from "#/dev/sheets/ref"
 
 const maps = sheet({
   id: "maps",

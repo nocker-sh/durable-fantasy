@@ -1,11 +1,17 @@
 import { expect, it } from "vitest"
-import { apply } from "./apply.ts"
-import { artSwing, swing } from "./combat.ts"
-import { emptyEquipment, loadPlayer } from "./player.ts"
-import { ITEMS, ITEM_IDS, type Quality } from "./items.ts"
-import { SKILLS } from "./skills.ts"
-import { derive, equipmentAttack, scaling } from "./stats.ts"
-import { player } from "../test/helpers.ts"
+import { apply } from "./apply"
+import { artSwing } from "#/world/core/art-swing"
+import { swing } from "#/world/core/swing"
+import { emptyEquipment } from "#/world/core/empty-equipment"
+import { loadPlayer } from "#/world/core/load-player"
+import { ITEMS } from "#/world/core/items/catalog"
+import { ITEM_IDS } from "#/world/core/items/item-ids"
+import type { Quality } from "#/world/core/items/kinds"
+import { SKILLS } from "#/world/core/skills"
+import { derive } from "#/world/core/derive"
+import { equipmentAttack } from "#/world/core/equipment-attack"
+import { scaling } from "#/world/core/scaling"
+import { player } from "#/world/test/player"
 
 it("preserves the base attack of ordinary and unmarked weapons", () => {
   for (const id of ITEM_IDS) {
@@ -32,7 +38,9 @@ it.each<[Quality, number]>([
   expect(fighter.atk).toBe(1 + attack + scaling(ITEMS["short-sword"].equip, p.stats))
   const target = { atk: 1, def: 0, hit: 0, flee: 0, crit: 0 }
   expect(swing(fighter, target, () => 0.5)).toEqual({ kind: "hit", damage: fighter.atk })
-  expect(artSwing(SKILLS.lunge, fighter.stats, fighter, target, () => 0.5)).toEqual({ kind: "hit", damage: Math.round(fighter.atk * 1.6) })
+  expect(artSwing({ art: SKILLS.lunge, stats: fighter.stats, attacker: fighter, target: target, random: () => 0.5 })).toEqual({ kind: "hit", damage: Math.round(fighter.atk * 1.6) })
   const ordinary = derive({ ...saved, worn: { weapon: { q: 1 } } })
-  expect(artSwing(SKILLS.ember, fighter.stats, fighter, target, () => 0.5)).toEqual(artSwing(SKILLS.ember, ordinary.stats, ordinary, target, () => 0.5))
+  expect(artSwing({ art: SKILLS.ember, stats: fighter.stats, attacker: fighter, target: target, random: () => 0.5 })).toEqual(
+    artSwing({ art: SKILLS.ember, stats: ordinary.stats, attacker: ordinary, target: target, random: () => 0.5 }),
+  )
 })

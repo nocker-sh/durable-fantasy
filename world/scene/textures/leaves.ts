@@ -1,5 +1,7 @@
-import { PixBuf, hash2, RAMPS } from "../pix"
-import { lvl } from "./palette.ts"
+import { PixelBuffer as PixBuf } from "../../../lib/graphics/pixel-buffer"
+import { RAMPS } from "#/world/scene/pix"
+import { hash2 } from "../../../lib/engine/hash2"
+import { lvl } from "./palette"
 
 /**
  * Foliage as pixel art: little clusters of leaves (each lit at the upper left, shadowed below)

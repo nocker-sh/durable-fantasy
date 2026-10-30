@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from "vitest"
-import { loadPlayerId } from "./identity.ts"
+import { loadPlayerId } from "#/world/client/load-player-id"
 
 afterEach(() => vi.unstubAllGlobals())
 

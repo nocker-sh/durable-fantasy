@@ -1,6 +1,7 @@
 // Open state, stacking order and handlers for one of the Game's windows.
-import type { WindowId } from "#/world/game.ts"
-import { useGame, useGameState } from "#/components/game/context.tsx"
+import type { WindowId } from "#/world/state"
+import { useGame } from "#/hooks/use-game"
+import { useGameState } from "#/hooks/use-game-state"
 
 export function useWindow(id: WindowId) {
   const game = useGame()

@@ -2,7 +2,12 @@
 import type { ReactNode } from "react"
 import { cn } from "cn"
 
-function Modal({ title, onClose, className, children }: { title: string; onClose?: () => void; className?: string; children: ReactNode }) {
+function Modal(inputProps: { title: string; onClose?: () => void; className?: string; children: ReactNode }) {
+  const title = inputProps.title
+  const onClose = inputProps.onClose
+  const className = inputProps.className
+  const children = inputProps.children
+
   return (
     <div className="pointer-events-auto fixed inset-0 z-[90] flex items-center justify-center bg-black/45 animate-ui-in" onPointerDown={(e) => e.target === e.currentTarget && onClose?.()}>
       <section role="dialog" aria-modal aria-label={title} className={cn("ui-panel ui-corners flex flex-col p-[3px]", className)}>

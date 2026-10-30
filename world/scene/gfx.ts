@@ -1,8 +1,6 @@
 import * as THREE from "three"
-import type { PixelBuffer as PixBuf } from "../../lib/graphics/pixel-buffer.ts"
-import { toTex } from "../../lib/graphics/materials.ts"
-export { GeometryBuilder as GB } from "../../lib/graphics/geometry.ts"
-export { toTex, mat, colorMat } from "../../lib/graphics/materials.ts"
+import type { PixelBuffer as PixBuf } from "../../lib/graphics/pixel-buffer"
+import { toTexture as toTex } from "../../lib/graphics/to-texture"
 
 /**
  * Sprites are not lit by the scene's lights, so every pixel sprite (crops, goods, clutter) is

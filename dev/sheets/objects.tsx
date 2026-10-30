@@ -1,18 +1,25 @@
-import { Thumb } from "../three-view.tsx"
-import { PROPS } from "#/dev/studio/props-catalog.ts"
-import { FURNISHINGS, furnishingAt } from "#/world/scene/construction/furnishings.ts"
-import { SIZES } from "#/world/town/fit.ts"
-import { HOUSES } from "#/world/town/houses.ts"
-import { INTERIORS } from "#/world/town/interiors.ts"
-import { ROOM_FURNITURE } from "./shared.tsx"
-import { sheet } from "./schema.ts"
+import { buildParkedCart } from "#/dev/build-parked-cart"
+import { buildWaterJar } from "#/dev/build-water-jar"
+import { ObjectThumbnail } from "#/dev/object-thumbnail"
+import { PROPS } from "#/dev/studio/props-catalog"
+import { FURNISHINGS } from "#/world/scene/construction/furnishing-builders"
+import { furnishingAt } from "#/world/scene/construction/furnishing-at"
+import { SIZES } from "#/world/town/fit"
+import { HOUSES } from "#/world/town/houses"
+import { INTERIORS } from "#/world/town/interiors"
+import { ROOM_FURNITURE } from "#/dev/sheets/shared"
+import { sheet } from "./schema"
 
 /** Furniture in the house plans, the furniture drawn in rooms you walk into, and the things the maps are dressed with. */
 type ObjectRow = { id: string; name: string; group: string }
 
 const OBJECTS: ObjectRow[] = [
   ...Object.keys(SIZES).map((name) => ({ id: name, name, group: SIZES[name] === "wall" ? "壁に掛ける物" : "家具" })),
-  ...Object.entries(ROOM_FURNITURE).map(([kind, name]) => ({ id: `room-${kind}`, name, group: "店や公共の建物の中" })),
+  ...Object.entries(ROOM_FURNITURE).map((entry) => {
+    const kind = entry[0]
+    const name = entry[1]
+    return { id: `room-${kind}`, name, group: "店や公共の建物の中" }
+  }),
   ...PROPS.map((p) => ({ id: p.id, name: p.name, group: `外（${p.group}）` })),
 ]
 
@@ -24,7 +31,7 @@ function buildOf(id: string) {
   const s = SIZES[id]
   if (!FURNISHINGS[id] || !s || s === "wall") return null
   let b = furnitureBuilds.get(id)
-  if (!b) furnitureBuilds.set(id, (b = furnishingAt(id, s, "oak")))
+  if (!b) furnitureBuilds.set(id, (b = furnishingAt({ name: id, size: s, woodId: "oak" })))
   return b
 }
 
@@ -69,10 +76,16 @@ const objects = sheet<ObjectRow>({
       ? [...new Set(INTERIORS.filter((i) => i.furniture.some((f) => `room-${f.kind}` === o.id)).map((i) => i.house.id))].map((id) => ({ sheet: "houses", id, as: "置かれた建物" }))
       : [],
   icon: (o) => {
-    const b = buildOf(o.id)
-    return b ? <Thumb id={`prop-${o.id}`} build={b} px={32} /> : null
+    const p = PROPS.find((x) => x.id === o.id)
+    return p ? <ObjectThumbnail id={`prop-${p.id}`} build={p.build} px={32} /> : null
   },
-  build: (o) => buildOf(o.id),
+  build: (o) => {
+    const prop = PROPS.find((prop) => prop.id === o.id)
+    if (prop) return prop.build
+    if (o.id === "room-water-jar" || o.id === "水甕") return buildWaterJar
+    if (o.id === "room-parked-cart" || o.id === "荷車") return buildParkedCart
+    return buildOf(o.id)
+  },
 })
 
 export { objects }

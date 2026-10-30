@@ -1,5 +1,5 @@
-import { GridPathfinder, type V2 } from "../../lib/engine/pathfinder.ts"
-import { blocked, WN, WR } from "./world"
+import { GridPathfinder, type V2 } from "../../lib/engine/pathfinder"
+import { blocked, WN, WR } from "#/world/scene/world"
 
 const paths = new GridPathfinder(blocked, WN, WR)
 

@@ -1,16 +1,26 @@
-// The map room's handlers for face-to-face trades between players (core/trade.ts).
-import { TRADE_CELLS, TRADE_LOTS, checkTrade, emptyOffer } from "../../core/trade.ts"
-import type { Stack } from "../../core/bag.ts"
-import { Player } from "../../../durable-objects/player.ts"
-import { ITEMS } from "../../core/items.ts"
-import type { Ctx, Handlers, Message } from "./context.ts"
-import { type TradeSide, presence, setTrade, showTrade, reachable, near } from "./presence.ts"
+// The map room's handlers for face-to-face trades between players (core/check-trade.ts).
+import { TRADE_CELLS, TRADE_LOTS } from "#/world/core/trade-rules"
+import { checkTrade } from "#/world/core/check-trade"
+import { emptyOffer } from "#/world/core/empty-offer"
+import type { Stack } from "#/world/core/bag-types"
+import { Player } from "../../../durable-objects/player"
+import { ITEMS } from "#/world/core/items/catalog"
+import type { Ctx, Handlers, Message } from "./context"
+import type { TradeSide } from "#/world/server/map-room/presence"
+import { presence } from "#/world/server/map-room/presence"
+import { setTrade } from "#/world/server/map-room/set-trade"
+import { showTrade } from "#/world/server/map-room/show-trade"
+import { reachable } from "#/world/server/map-room/reachable"
+import { near } from "#/world/server/map-room/near"
 
 /** A connection can start a later trade with the same partner while an earlier handler awaits RPC. */
 const sameTrade = (a: TradeSide | undefined, b: TradeSide | undefined) => !!a && !!b && a.session === b.session && a.with === b.with
 
 async function tradeAsk(roomCtx: Ctx, message: Message<"trade-ask">) {
-  const { ctx, me, save } = roomCtx
+  const ctxSource = roomCtx,
+    ctx = ctxSource.ctx,
+    me = ctxSource.me,
+    save = ctxSource.save
   const them = ctx.room.getConnection(message.target)
   const other = them && presence(them)
   if (!me.player || !me.owner || me.trade?.open || me.down || me.engaged || !them || !other?.player || other.trade?.open || other.down || other.engaged || them.id === ctx.connection.id) {
@@ -27,7 +37,10 @@ async function tradeAsk(roomCtx: Ctx, message: Message<"trade-ask">) {
 }
 
 async function tradeAnswer(roomCtx: Ctx, message: Message<"trade-answer">) {
-  const { ctx, me, save } = roomCtx
+  const ctxSource2 = roomCtx,
+    ctx = ctxSource2.ctx,
+    me = ctxSource2.me,
+    save = ctxSource2.save
   const them = ctx.room.getConnection(message.from)
   const other = them && presence(them)
   if (!me.player || !them || other?.trade?.with !== ctx.connection.id || other.trade.open) return
@@ -57,7 +70,10 @@ async function tradeAnswer(roomCtx: Ctx, message: Message<"trade-answer">) {
 }
 
 async function tradeOffer(roomCtx: Ctx, message: Message<"trade-offer">) {
-  const { ctx, me, save } = roomCtx
+  const ctxSource3 = roomCtx,
+    ctx = ctxSource3.ctx,
+    me = ctxSource3.me,
+    save = ctxSource3.save
   const them = me.trade?.open ? ctx.room.getConnection(me.trade.with) : undefined
   if (!me.owner || !me.trade || !them || me.trade.locked || me.trade.settling) return
   const current = presence(ctx.connection).trade
@@ -98,7 +114,9 @@ async function tradeOffer(roomCtx: Ctx, message: Message<"trade-offer">) {
 }
 
 async function tradeLockOrTradeGo(roomCtx: Ctx, message: Message<"trade-lock" | "trade-go">) {
-  const { ctx, save } = roomCtx
+  const ctxSource4 = roomCtx,
+    ctx = ctxSource4.ctx,
+    save = ctxSource4.save
   const me = presence(ctx.connection)
   if (!sameTrade(me.trade, roomCtx.me.trade)) return
   const them = me.trade?.open ? ctx.room.getConnection(me.trade.with) : undefined
@@ -142,9 +160,13 @@ async function tradeLockOrTradeGo(roomCtx: Ctx, message: Message<"trade-lock" | 
   }
   let mayBePending = false
   try {
-    const [a, b, recordA, recordB] = await Promise.all([pa.read(), pb.read(), pa.tradeStatus(), pb.tradeStatus()])
+    const aState = await Promise.all([pa.read(), pb.read(), pa.tradeStatus(), pb.tradeStatus()]),
+      a = aState[0],
+      b = aState[1],
+      recordA = aState[2],
+      recordB = aState[3]
     if (recordA?.status === "prepared" || recordB?.status === "prepared") return finish("NOT_READY")
-    const why = checkTrade(a, mine.offer, b, other.trade.offer, Date.now())
+    const why = checkTrade({ playerA: a, offerA: mine.offer, playerB: b, offerB: other.trade.offer, now: Date.now() })
     if (why) return finish(why)
     const id = crypto.randomUUID()
     const local = { id, revision: (recordA?.proposal.revision ?? 0) + 1, offer: mine.offer, outgoing: mine.shown, incoming: other.trade.shown, gold: other.trade.offer.gold }
@@ -153,14 +175,16 @@ async function tradeLockOrTradeGo(roomCtx: Ctx, message: Message<"trade-lock" | 
     // All coordinator-to-peer calls follow the same owner ordering, preventing RPC wait cycles.
     const first = me.owner < other.owner
     const coordinator = first ? pa : pb
-    const started = await coordinator.beginTrade(first ? other.owner : me.owner, first ? local : remote, first ? remote : local)
+    const started = await coordinator.beginTrade({ peer: first ? other.owner : me.owner, local: first ? local : remote, remote: first ? remote : local })
     if (!started.ok) return finish(started.reason)
     // Each call is a separate durable save boundary. Alarms continue these steps if a reply is lost.
     await coordinator.advanceTrade()
     const job = await coordinator.advanceTrade()
     if (!job?.finished) return finish("PENDING")
     if (job.reason) return finish(job.reason)
-    const [stateA, stateB] = await Promise.all([pa.read(), pb.read()])
+    const stateAState = await Promise.all([pa.read(), pb.read()]),
+      stateA = stateAState[0],
+      stateB = stateAState[1]
     await Promise.allSettled([
       ctx.connection.send({ type: "result", seq: -1, result: { ok: true, state: stateA, events: [] } }),
       them.send({ type: "result", seq: -1, result: { ok: true, state: stateB, events: [] } }),
@@ -174,7 +198,9 @@ async function tradeLockOrTradeGo(roomCtx: Ctx, message: Message<"trade-lock" | 
 }
 
 async function tradeCancel(roomCtx: Ctx, _message: Message<"trade-cancel">) {
-  const { ctx, save } = roomCtx
+  const ctxSource5 = roomCtx,
+    ctx = ctxSource5.ctx,
+    save = ctxSource5.save
   const me = presence(ctx.connection)
   if (!sameTrade(me.trade, roomCtx.me.trade) || me.trade?.settling) return
   const them = me.trade ? ctx.room.getConnection(me.trade.with) : undefined

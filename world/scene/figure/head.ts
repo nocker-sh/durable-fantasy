@@ -1,9 +1,18 @@
-import { qrot } from "../../../lib/engine/quaternion.ts"
-import type { BodyContext } from "./context.ts"
-import { type M3, add, mv, type V3, mtv, sub } from "../../../lib/graphics/ray/vector.ts"
+import { qrot } from "../../../lib/engine/qrot"
+import type { BodyContext } from "./context"
+import { type Matrix3 as M3, type Vector3Tuple as V3 } from "../../../lib/engine/vector3-types"
+import { addVector3 as add } from "../../../lib/engine/add-vector3"
+import { multiplyMatrix3Vector as mv } from "../../../lib/engine/multiply-matrix3-vector"
+import { multiplyTransposedMatrix3Vector as mtv } from "../../../lib/engine/multiply-transposed-matrix3-vector"
+import { subtractVector3 as sub } from "../../../lib/engine/subtract-vector3"
 
 function buildHead(context: BodyContext) {
-  const { child, K, J, push, skin } = context
+  const childSource = context,
+    child = childSource.child,
+    K = childSource.K,
+    J = childSource.J,
+    push = childSource.push,
+    skin = childSource.skin
   // ---- head
   const headR = child ? 0.118 : 0.13
   const hs = headR / (child ? 0.265 : 0.285)
@@ -18,7 +27,10 @@ function buildHead(context: BodyContext) {
   // into head frame (z = face forward)
   // face: a rounded box (superellipsoid) rather than a ball: flat-ish front and sides,
   // the lower half narrowing into a jaw and a small forward chin
-  const [m0, m1, m2] = M
+  const m0State = M,
+    m0 = m0State[0],
+    m1 = m0State[1],
+    m2 = m0State[2]
   const headSd = (p: V3) => {
     // headLocal, inlined (hot)
     const x0 = p[0] - hc[0],

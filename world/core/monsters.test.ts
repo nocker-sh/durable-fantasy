@@ -1,12 +1,21 @@
+import { strictEqual } from "node:assert"
 import { describe, expect, it } from "vitest"
-import { apply } from "./apply.ts"
-import { CLAIM_MS, MONSTER_KINDS, SPAWNS, dropsOf, monsterAt, spawnOf, spawnsOn } from "./monsters.ts"
-import { emptyWild, fighting, hit, hpOf } from "./wild.ts"
-import { MAPS, walkable } from "../maps/index.ts"
-import { player } from "../test/helpers.ts"
-import { settle } from "./player.ts"
-import { derive } from "./stats.ts"
-import { expToNext } from "./growth.ts"
+import { apply } from "./apply"
+import { CLAIM_MS, MONSTER_KINDS, SPAWNS } from "#/world/core/monsters"
+import { dropsOf } from "#/world/core/drops-of"
+import { monsterAt } from "#/world/core/monster-at"
+import { spawnOf } from "#/world/core/spawn-of"
+import { spawnsOn } from "#/world/core/spawns-on"
+import { emptyWild } from "#/world/core/wild/empty-wild"
+import { fighting } from "#/world/core/wild/fighting"
+import { hit } from "#/world/core/wild/hit"
+import { hpOf } from "#/world/core/wild/hp-of"
+import { MAPS } from "#/world/maps"
+import { walkable } from "#/world/maps/walkable"
+import { player } from "#/world/test/player"
+import { settle } from "#/world/core/settle"
+import { derive } from "#/world/core/derive"
+import { expToNext } from "#/world/core/exp-to-next"
 
 const slime = SPAWNS.find((s) => s.kind === "slime")!
 
@@ -41,10 +50,10 @@ describe("the creatures outside town", () => {
     expect(new Set(forest.map((s) => s.map)).size).toBe(2)
     for (const spawn of forest) {
       const free = (x: number, z: number) => walkable(MAPS[spawn.map], [Math.floor(x * 2), Math.floor(z * 2)])
-      for (let z = spawn.area[1]; z <= spawn.area[3]; z += 0.5) for (let x = spawn.area[0]; x <= spawn.area[2]; x += 0.5) expect(free(x, z), spawn.id).toBe(true)
+      for (let z = spawn.area[1]; z <= spawn.area[3]; z += 0.5) for (let x = spawn.area[0]; x <= spawn.area[2]; x += 0.5) strictEqual(free(x, z), true, spawn.id)
       for (let time = 0; time < 86_400_000; time += 7311) {
         const at = monsterAt(spawn, time, free)
-        expect(free(at.x, at.z), spawn.id).toBe(true)
+        strictEqual(free(at.x, at.z), true, spawn.id)
       }
     }
   })
@@ -52,9 +61,9 @@ describe("the creatures outside town", () => {
   it("lets forest creatures share the existing claim, recovery and reward rules", () => {
     const spawn = SPAWNS.find((s) => s.kind === "moss-slime")!
     const kind = MONSTER_KINDS[spawn.kind]
-    const struck = hit(emptyWild(), spawn.id, 1, 0, "hunter")
-    expect(hit(struck.state, spawn.id, kind.hp, 1, "other").refused).toBe(true)
-    const beaten = hit(struck.state, spawn.id, kind.hp, 2, "hunter")
+    const struck = hit({ state: emptyWild(), id: spawn.id, damage: 1, now: 0, player: "hunter" })
+    expect(hit({ state: struck.state, id: spawn.id, damage: kind.hp, now: 1, player: "other" }).refused).toBe(true)
+    const beaten = hit({ state: struck.state, id: spawn.id, damage: kind.hp, now: 2, player: "hunter" })
     expect(beaten.beaten).toBe(true)
     expect(hpOf(beaten.state, spawn.id, 3)).toBe(0)
     expect(hpOf(beaten.state, spawn.id, 2 + kind.respawn * 1000)).toBe(kind.hp)
@@ -66,25 +75,25 @@ describe("the creatures outside town", () => {
   it("take blows until beaten, then are off for a while and come back whole", () => {
     let s = emptyWild()
     const max = MONSTER_KINDS.slime.hp
-    let r = hit(s, slime.id, 10, 0, "a")
+    let r = hit({ state: s, id: slime.id, damage: 10, now: 0, player: "a" })
     expect(r.hp).toBe(max - 10)
-    r = hit(r.state, slime.id, 999, 1, "a")
+    r = hit({ state: r.state, id: slime.id, damage: 999, now: 1, player: "a" })
     expect(r.beaten).toBe(true)
     s = r.state
     expect(hpOf(s, slime.id, 2)).toBe(0)
-    expect(hit(s, slime.id, 5, 3, "a").beaten).toBe(false) // already away
+    expect(hit({ state: s, id: slime.id, damage: 5, now: 3, player: "a" }).beaten).toBe(false) // already away
     expect(hpOf(s, slime.id, MONSTER_KINDS.slime.respawn * 1000 + 2)).toBe(max)
   })
 
   it("are the first striker's to finish; others' blows glance off until the fight lapses, and left alone they recover", () => {
-    const r = hit(emptyWild(), slime.id, 10, 0, "a")
-    const other = hit(r.state, slime.id, 10, 1000, "b")
+    const r = hit({ state: emptyWild(), id: slime.id, damage: 10, now: 0, player: "a" })
+    const other = hit({ state: r.state, id: slime.id, damage: 10, now: 1000, player: "b" })
     expect(other.refused).toBe(true)
     expect(other.hp).toBe(MONSTER_KINDS.slime.hp - 10)
     expect(fighting(r.state, slime.id, 1000)).toBe("a")
     // a's last blow was at 0: after CLAIM_MS it is anyone's, and whole again
     expect(hpOf(r.state, slime.id, CLAIM_MS)).toBe(MONSTER_KINDS.slime.hp)
-    const later = hit(r.state, slime.id, 10, CLAIM_MS, "b")
+    const later = hit({ state: r.state, id: slime.id, damage: 10, now: CLAIM_MS, player: "b" })
     expect(later.refused).toBe(false)
     expect(later.hp).toBe(MONSTER_KINDS.slime.hp - 10)
   })

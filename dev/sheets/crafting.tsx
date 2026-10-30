@@ -1,13 +1,16 @@
-import { Pixel } from "./shared.tsx"
-import { COMMISSIONS } from "#/world/core/commissions.ts"
-import { RECIPES } from "#/world/core/crafting.ts"
-import { STATIONS } from "#/world/town/stations.ts"
-import { ERRANDS } from "#/world/core/errands.ts"
-import { NODES } from "#/world/core/gather.ts"
-import { GATHER_SKILL_NAME, ITEMS } from "#/world/core/items.ts"
-import { iconUrl } from "#/world/art/icons.ts"
-import { mapName, NODE_KIND, ref, STATION_KIND } from "./shared.tsx"
-import { sheet } from "./schema.ts"
+import { Pixel } from "#/dev/sheets/pixel"
+import { COMMISSIONS } from "#/world/core/commissions"
+import { RECIPES } from "#/world/core/recipes/catalog"
+import { STATIONS } from "#/world/town/stations"
+import { ERRANDS } from "#/world/core/errands"
+import { NODES } from "#/world/core/gather"
+import { GATHER_SKILL_NAME } from "#/world/core/items/kinds"
+import { ITEMS } from "#/world/core/items/catalog"
+import { iconUrl } from "#/world/art/icon-url"
+import { mapName } from "#/dev/sheets/map-name"
+import { NODE_KIND, STATION_KIND } from "#/dev/sheets/shared"
+import { ref } from "#/dev/sheets/ref"
+import { sheet } from "./schema"
 
 const nodeName = (n: (typeof NODES)[number]) => `${mapName(n.map)}の${NODE_KIND[n.kind]} ${n.id.split("-").pop()}`
 
@@ -97,15 +100,19 @@ const errands = sheet({
   label: "頼まれごと",
   rows: () => ERRANDS,
   key: (e) => e.id,
-  name: (e) => (e.wants ? `${ITEMS[e.wants.item].name}×${e.wants.count}` : (e.parcel ?? e.id)),
+  name: (e) => (e.kind === "bring" ? `${ITEMS[e.wants.item].name}×${e.wants.count}` : e.parcel),
   kind: (e) => (e.kind === "bring" ? "持ってくる" : "届ける"),
   cols: [
     { label: "頼む人", get: (e) => e.from, w: "w-24" },
-    { label: "届け先", get: (e) => e.to ?? "", w: "w-24" },
+    { label: "届け先", get: (e) => (e.kind === "deliver" ? e.to : ""), w: "w-24" },
     { label: "報酬", get: (e) => e.gold, w: "w-12" },
     { label: "頼み", get: (e) => e.ask },
   ],
-  refs: (e) => [...ref("npcs", e.from, "頼む人"), ...ref("npcs", e.to, "届け先"), ...(e.wants ? [{ sheet: "items", id: e.wants.item, as: `欲しい ×${e.wants.count}` }] : [])],
+  refs: (e) => [
+    ...ref("npcs", e.from, "頼む人"),
+    ...(e.kind === "deliver" ? ref("npcs", e.to, "届け先") : []),
+    ...(e.kind === "bring" ? [{ sheet: "items", id: e.wants.item, as: `欲しい ×${e.wants.count}` }] : []),
+  ],
   more: (e) => [{ title: "台詞", head: ["頼むとき", "済んだとき"], rows: [[e.ask, e.thanks]] }],
 })
 

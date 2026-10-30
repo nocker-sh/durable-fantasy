@@ -1,7 +1,8 @@
 // An optional graphics cache that never answers must not prevent entry or resuming.
 import { chromium } from "playwright-core"
 import { mkdir } from "node:fs/promises"
-import { createCharacter, waitReady } from "./lib/game-browser.mjs"
+import { createCharacter } from "#resources/scripts/lib/create-character"
+import { waitReady } from "#resources/scripts/lib/wait-ready"
 const browser = await chromium.launch({ channel: "chrome", args: ["--disable-http2"] })
 try {
   const page = await browser.newPage({ ignoreHTTPSErrors: true, viewport: { width: 1280, height: 800 } })
@@ -13,8 +14,8 @@ try {
   await createCharacter(page)
   // Ask for a real generated frame and wait for its worker result, not just scene readiness.
   await page.evaluate(async () => {
-    const { LOOKS } = await import("/world/game.ts")
-    const { spriteFrame } = await import("/world/scene/sprite-pool.ts")
+    const { LOOKS } = await import("/world/game")
+    const { spriteFrame } = await import("/world/scene/sprite-pool")
     await new Promise((resolve, reject) => {
       const timer = setTimeout(() => reject(Error("Character frame did not render without cache")), 30000)
       const ready = () => {

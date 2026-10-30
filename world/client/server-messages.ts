@@ -1,12 +1,19 @@
-import type { GameSession } from "./session.ts"
-import { REASON_TEXT, type Reason } from "../core/commands.ts"
-import { isShopId } from "../core/shops.ts"
-import { MAPS, cellDistance, isMapId } from "../maps/index.ts"
-import type { Cell, ServerMessage } from "../protocol.ts"
-import { partyClosedText, threadClosedText, tradeClosedText } from "../parts/report.ts"
-import { lap } from "../diagnostics.ts"
-import type { Offer } from "../state.ts"
-import type { ServerMessageContext } from "./server-context.ts"
+import { currentCreature } from "#/world/client/current-creature"
+import { mergeWild } from "#/world/client/merge-wild"
+import { currentPublication } from "./player-publication"
+import type { GameSession } from "#/world/client/game-session"
+import { REASON_TEXT, type Reason } from "../core/commands"
+import { isShopId } from "#/world/core/is-shop-id"
+import { MAPS } from "#/world/maps"
+import { cellDistance } from "#/world/maps/cell-distance"
+import { isMapId } from "#/world/maps/is-map-id"
+import type { Cell, ServerMessage } from "#/world/protocol"
+import { partyClosedText } from "#/world/parts/party-closed-text"
+import { threadClosedText } from "#/world/parts/thread-closed-text"
+import { tradeClosedText } from "#/world/parts/trade-closed-text"
+import { lap } from "#/world/lap"
+import type { Offer } from "#/world/state"
+import type { ServerMessageContext } from "./server-context"
 
 export class ServerMessages {
   constructor(
@@ -40,8 +47,8 @@ export class ServerMessages {
         this.target.session.others.welcome(message.you, message.players)
         scene?.clearRemotes()
         for (const p of message.players) scene?.addRemote(p.id, this.target.avatarOf(p), p.at)
-        this.target.setPlayer(message.me)
-        if (message.me.party) this.target.session.socket?.send({ type: "party-look", chat: this.target.session.partyChat })
+        if (currentPublication(this.target.session.state.get().player, message.me)) this.target.setPlayer(message.me)
+        if (this.target.session.state.get().player?.party) this.target.session.socket?.send({ type: "party-look", chat: this.target.session.partyChat })
         this.target.maybeReady()
         return
       }
@@ -75,7 +82,7 @@ export class ServerMessages {
       case "result": {
         // a result nobody asked for (the spoils of a fight): take it comes
         if (message.seq === -1) {
-          if (message.result.ok) {
+          if (message.result.ok && currentPublication(this.target.session.state.get().player, message.result.state)) {
             this.target.setPlayer(message.result.state)
             for (const e of message.result.events) this.target.report(e)
           }
@@ -87,8 +94,16 @@ export class ServerMessages {
       }
       case "wild": {
         // kept for a scene still being built
-        this.target.session.wild = message.monsters
-        scene?.setWild(message.monsters)
+        const previous = this.target.session.wild
+        const next = mergeWild(previous, message.monsters, message.revision)
+        if (next === previous) return
+        this.target.session.wild = next
+        const target = this.target.session.fighting?.monster
+        if (target && next[target]?.hp === 0) {
+          this.target.session.fighting = null
+          scene?.stopFight(target)
+        }
+        scene?.setWild(next)
         return
       }
       case "thread-asked":
@@ -143,9 +158,12 @@ export class ServerMessages {
         return
       }
       case "struck": {
-        this.target.session.wild = { ...this.target.session.wild, [message.monster]: { hp: message.hp, back: message.back } }
+        const previous = this.target.session.wild[message.monster]
+        if (!currentCreature(previous, message.revision)) return
+        if (message.revision !== undefined && previous?.revision === message.revision) return
+        this.target.session.wild = { ...this.target.session.wild, [message.monster]: { hp: message.hp, back: message.back, ...(message.revision !== undefined ? { revision: message.revision } : {}) } }
         if (message.hp === 0 && this.target.session.fighting?.monster === message.monster) this.target.session.fighting = null
-        scene?.struck(message.monster, message.swing.kind, message.swing.kind === "miss" ? 0 : message.swing.damage, message.hp, message.back)
+        scene?.struck({ id: message.monster, kind: message.swing.kind, damage: message.swing.kind === "miss" ? 0 : message.swing.damage, hp: message.hp, back: message.back })
         return
       }
       case "exchange": {

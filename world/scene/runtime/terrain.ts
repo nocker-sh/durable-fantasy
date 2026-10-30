@@ -1,14 +1,22 @@
+import type { CleanupStack } from "../../../lib/engine/cleanup-stack"
 import * as THREE from "three"
-import { N, WATER_Y } from "../world"
-import { INTERIORS } from "../../town/interiors.ts"
-import { meshHeights } from "../terrain"
-import { stoneTex } from "../textures"
-import { toTex } from "../gfx"
-import { lap } from "../../diagnostics.ts"
-import type { PixBuf } from "../pix"
-import { type SceneDefinition, MAP_SCENES } from "./definitions.ts"
+import { N, WATER_Y } from "#/world/scene/world"
+import { INTERIORS } from "#/world/town/interiors"
+import { meshHeights } from "#/world/scene/mesh-heights"
+import { stoneTex } from "#/world/scene/textures/stone-tex"
+import { toTexture as toTex } from "../../../lib/graphics/to-texture"
+import { lap } from "#/world/lap"
+import type { PixelBuffer as PixBuf } from "../../../lib/graphics/pixel-buffer"
+import { type SceneDefinition, MAP_SCENES } from "./definitions"
 
-async function createTerrain(scene: THREE.Scene, world: SceneDefinition, ground: PixBuf, progress: (text: string) => void, tick: () => Promise<unknown>) {
+async function createTerrain(inputProps: { scene: THREE.Scene; world: SceneDefinition; ground: PixBuf; progress: (text: string) => void; tick: () => Promise<unknown>; resources: CleanupStack }) {
+  const scene = inputProps.scene
+  const world = inputProps.world
+  const ground = inputProps.ground
+  const progress = inputProps.progress
+  const tick = inputProps.tick
+  const resources = inputProps.resources
+
   const groundCanvas = document.createElement("canvas")
   groundCanvas.width = ground.w
   groundCanvas.height = ground.h
@@ -51,16 +59,16 @@ async function createTerrain(scene: THREE.Scene, world: SceneDefinition, ground:
         d = c + 1
       idx.push(a, c, b, b, c, d)
     }
-  const tg = new THREE.BufferGeometry()
+  const tg = resources.use(new THREE.BufferGeometry())
   tg.setAttribute("position", new THREE.BufferAttribute(pos, 3))
   tg.setAttribute("uv", new THREE.BufferAttribute(uv, 2))
   tg.setIndex(idx)
   tg.computeVertexNormals()
-  const gTex = toTex(ground, false)
+  const gTex = resources.use(toTex(ground, false))
   gTex.minFilter = THREE.NearestFilter
   gTex.generateMipmaps = false
-  const wallT = toTex(stoneTex("stone", 0.5, 21, 20, 11, 128))
-  const tm = new THREE.MeshLambertMaterial({ map: gTex })
+  const wallT = resources.use(toTex(stoneTex({ ramp: "stone", light: 0.5, seed: 21, bw: 20, bh: 11, size: 128 })))
+  const tm = resources.use(new THREE.MeshLambertMaterial({ map: gTex }))
   tm.onBeforeCompile = (sh) => {
     sh.uniforms.wallMap = { value: wallT }
     sh.vertexShader = sh.vertexShader
@@ -81,11 +89,12 @@ async function createTerrain(scene: THREE.Scene, world: SceneDefinition, ground:
   terrain.castShadow = true
   scene.add(terrain)
 
-  const wm = new THREE.ShaderMaterial({
-    transparent: true,
-    uniforms: { t: { value: 0 }, sky: { value: new THREE.Color(0xa6c2c2) } },
-    vertexShader: "varying vec3 vP; void main(){ vec4 w = modelMatrix * vec4(position,1.0); vP = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }",
-    fragmentShader: `
+  const wm = resources.use(
+    new THREE.ShaderMaterial({
+      transparent: true,
+      uniforms: { t: { value: 0 }, sky: { value: new THREE.Color(0xa6c2c2) } },
+      vertexShader: "varying vec3 vP; void main(){ vec4 w = modelMatrix * vec4(position,1.0); vP = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }",
+      fragmentShader: `
       varying vec3 vP; uniform float t; uniform vec3 sky;
       float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
       float n(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f); return mix(mix(h(i),h(i+vec2(1,0)),f.x), mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x), f.y); }
@@ -98,8 +107,9 @@ async function createTerrain(scene: THREE.Scene, world: SceneDefinition, ground:
         gl_FragColor = vec4(c, v > 0.78 ? 0.95 : 0.78);
         #include <colorspace_fragment>
       }`,
-  })
-  const water = new THREE.Mesh(new THREE.PlaneGeometry(N, N), wm)
+    }),
+  )
+  const water = new THREE.Mesh(resources.use(new THREE.PlaneGeometry(N, N)), wm)
   water.rotation.x = -Math.PI / 2
   water.position.set(N / 2, WATER_Y, N / 2)
   scene.add(water)

@@ -1,11 +1,19 @@
-import { SHOPS, type ShopId, type ShopDefinition } from "../core/shops.ts"
-import { RESIDENTS } from "../town/residents.ts"
-import { workSpot } from "../town/routines.ts"
-import { INTERIORS, outsideDoor } from "../town/interiors.ts"
-import { cellOfSpot, shopOpen, type Cell } from "./index.ts"
+import { SHOPS } from "#/world/core/shops"
+import type { ShopId } from "#/world/core/shop-types"
+import type { ShopDefinition } from "#/world/core/shop-types"
+import { RESIDENTS } from "../town/residents"
+import { workSpot } from "#/world/town/work-spot"
+import { INTERIORS } from "#/world/town/interiors"
+import { outsideDoor } from "#/world/town/outside-door"
+import { cellOfSpot } from "#/world/maps/cell-of-spot"
+import { shopOpen } from "#/world/maps/shop-open"
+import { type Cell } from "#/world/maps/types"
 
 /** Fixed pitches and counters stay on the map when their keepers leave. */
-const locations = (Object.entries(SHOPS) as [ShopId, ShopDefinition][]).flatMap(([id, shop]) => {
+const locations = (Object.entries(SHOPS) as [ShopId, ShopDefinition][]).flatMap((entry) => {
+  const id = entry[0]
+  const shop = entry[1]
+
   const keeper = RESIDENTS.find((r) => shop.keepers.includes(r.name))
   if (!keeper) return []
   const spot = shop.at ?? workSpot(keeper)

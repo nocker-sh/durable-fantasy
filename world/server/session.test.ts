@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
 const credentials = vi.hoisted(() => new Map<string, string>())
-vi.mock("../../durable-objects/player.ts", () => ({
+vi.mock("../../durable-objects/player", () => ({
   Player: {
     get: (id: string) => ({
       authenticate: async (hash: string) => credentials.get(id) === hash,
@@ -13,7 +13,9 @@ vi.mock("../../durable-objects/player.ts", () => ({
     }),
   },
 }))
-import { authenticatedPlayer, establishSession, sessionCookie } from "./session.ts"
+import { authenticatedPlayer } from "#/world/server/authenticated-player"
+import { establishSession } from "#/world/server/establish-session"
+import { sessionCookie } from "#/world/server/session-cookie"
 
 const origin = "http://durable-fantasy.localhost"
 const request = (cookie?: string, from = origin) => new Request(`${origin}/api/session`, { method: "POST", headers: { Origin: from, ...(cookie ? { Cookie: cookie } : {}) } })

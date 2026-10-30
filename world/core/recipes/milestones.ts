@@ -1,186 +1,186 @@
-import { recipe as r, type Recipe } from "./definition.ts"
+import { recipe as r, type Recipe } from "./definition"
 
 export const MILESTONES_RECIPES: readonly Recipe[] = [
   // past level 8 (economy.md §2.1): not to be made in v0.1, where life skills stop at 8
-  r(
-    "smoked-char",
-    "cooking",
-    "hearth",
-    [
+  r({
+    id: "smoked-char",
+    skill: "cooking",
+    station: "hearth",
+    inputs: [
       ["winter-char", 2],
       ["charcoal", 1],
     ],
-    ["smoked-char", 2],
-    16,
-  ),
-  r(
-    "feast-stew",
-    "cooking",
-    "hearth",
-    [
+    output: ["smoked-char", 2],
+    min: 16,
+  }),
+  r({
+    id: "feast-stew",
+    skill: "cooking",
+    station: "hearth",
+    inputs: [
       ["winter-char", 2],
       ["frost-lily", 1],
       ["hot-milk", 2],
       ["cabbage", 1],
       ["firewood", 2],
     ],
-    ["feast-stew", 4],
-    32,
-  ),
-  r(
-    "festival-cake",
-    "cooking",
-    "hearth",
-    [
+    output: ["feast-stew", 4],
+    min: 32,
+  }),
+  r({
+    id: "festival-cake",
+    skill: "cooking",
+    station: "hearth",
+    inputs: [
       ["root-dew", 1],
       ["honey-cake", 2],
       ["apple", 4],
       ["firewood", 1],
     ],
-    ["festival-cake", 4],
-    64,
-  ),
-  r(
-    "frost-potion",
-    "alchemy",
-    "hearth",
-    [
+    output: ["festival-cake", 4],
+    min: 64,
+  }),
+  r({
+    id: "frost-potion",
+    skill: "alchemy",
+    station: "hearth",
+    inputs: [
       ["frost-lily", 2],
       ["blue-herb", 2],
       ["blue-jelly", 1],
     ],
-    ["frost-potion", 2],
-    16,
-  ),
-  r(
-    "moss-oil",
-    "alchemy",
-    "hearth",
-    [
+    output: ["frost-potion", 2],
+    min: 16,
+  }),
+  r({
+    id: "moss-oil",
+    skill: "alchemy",
+    station: "hearth",
+    inputs: [
       ["crystal-moss", 2],
       ["frost-lily", 1],
       ["blue-potion", 1],
     ],
-    ["moss-oil", 2],
-    32,
-  ),
-  r(
-    "root-elixir",
-    "alchemy",
-    "hearth",
-    [
+    output: ["moss-oil", 2],
+    min: 32,
+  }),
+  r({
+    id: "root-elixir",
+    skill: "alchemy",
+    station: "hearth",
+    inputs: [
       ["root-dew", 1],
       ["crystal-moss", 2],
       ["frost-potion", 2],
     ],
-    ["root-elixir", 2],
-    64,
-  ),
-  r(
-    "black-oak-bow",
-    "carpentry",
-    "workbench",
-    [
+    output: ["root-elixir", 2],
+    min: 64,
+  }),
+  r({
+    id: "black-oak-bow",
+    skill: "carpentry",
+    station: "workbench",
+    inputs: [
       ["black-oak-heart", 2],
       ["yarn", 2],
     ],
-    ["black-oak-bow", 1],
-    16,
-  ),
-  r(
-    "amber-staff",
-    "carpentry",
-    "workbench",
-    [
+    output: ["black-oak-bow", 1],
+    min: 16,
+  }),
+  r({
+    id: "amber-staff",
+    skill: "carpentry",
+    station: "workbench",
+    inputs: [
       ["black-oak-heart", 1],
       ["amber-resin", 2],
       ["small-crystal", 1],
     ],
-    ["amber-staff", 1],
-    32,
-  ),
-  r(
-    "world-branch-staff",
-    "carpentry",
-    "workbench",
-    [
+    output: ["amber-staff", 1],
+    min: 32,
+  }),
+  r({
+    id: "world-branch-staff",
+    skill: "carpentry",
+    station: "workbench",
+    inputs: [
       ["world-branch", 1],
       ["amber-resin", 1],
       ["clear-crystal", 1],
     ],
-    ["world-branch-staff", 1],
-    64,
-  ),
-  r(
-    "steel-axe",
-    "smithing",
-    "forge",
-    [
+    output: ["world-branch-staff", 1],
+    min: 64,
+  }),
+  r({
+    id: "steel-axe",
+    skill: "smithing",
+    station: "forge",
+    inputs: [
       ["iron-ingot", 4],
       ["black-oak-heart", 1],
       ["charcoal", 2],
     ],
-    ["steel-axe", 1],
-    16,
-  ),
-  r(
-    "engine-steel-sword",
-    "smithing",
-    "forge",
-    [
+    output: ["steel-axe", 1],
+    min: 16,
+  }),
+  r({
+    id: "engine-steel-sword",
+    skill: "smithing",
+    station: "forge",
+    inputs: [
       ["engine-core", 2],
       ["iron-ingot", 2],
       ["black-oak-heart", 1],
       ["charcoal", 2],
     ],
-    ["engine-steel-sword", 1],
-    32,
-  ),
-  r(
-    "reforged-blade",
-    "smithing",
-    "forge",
-    [
+    output: ["engine-steel-sword", 1],
+    min: 32,
+  }),
+  r({
+    id: "reforged-blade",
+    skill: "smithing",
+    station: "forge",
+    inputs: [
       ["engine-core", 3],
       ["amber-resin", 1],
       ["small-crystal", 2],
       ["charcoal", 3],
     ],
-    ["reforged-blade", 1],
-    64,
-  ),
-  r(
-    "lined-coat",
-    "tailoring",
-    "loom",
-    [
+    output: ["reforged-blade", 1],
+    min: 64,
+  }),
+  r({
+    id: "lined-coat",
+    skill: "tailoring",
+    station: "loom",
+    inputs: [
       ["yarn", 6],
       ["soft-fur", 6],
     ],
-    ["lined-coat", 1],
-    16,
-  ),
-  r(
-    "frost-shawl",
-    "tailoring",
-    "loom",
-    [
+    output: ["lined-coat", 1],
+    min: 16,
+  }),
+  r({
+    id: "frost-shawl",
+    skill: "tailoring",
+    station: "loom",
+    inputs: [
       ["yarn", 6],
       ["frost-lily", 3],
       ["amber-resin", 1],
     ],
-    ["frost-shawl", 1],
-    32,
-  ),
-  r(
-    "woven-muffler",
-    "tailoring",
-    "loom",
-    [
+    output: ["frost-shawl", 1],
+    min: 32,
+  }),
+  r({
+    id: "woven-muffler",
+    skill: "tailoring",
+    station: "loom",
+    inputs: [
       ["yarn", 10],
       ["elder-scale", 1],
     ],
-    ["woven-muffler", 1],
-    64,
-  ),
+    output: ["woven-muffler", 1],
+    min: 64,
+  }),
 ]

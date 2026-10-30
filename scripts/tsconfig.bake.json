@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": ["node", "void/env", "vite/client"],
+    "paths": {
+      "#/*": ["../*"],
+      "void/routes": ["../.void/routes.d.ts"],
+      "/world/*": ["../world/*"],
+      "/scripts/*": ["./*"]
+    }
+  },
+  "include": ["bake-sprites.ts"]
+}

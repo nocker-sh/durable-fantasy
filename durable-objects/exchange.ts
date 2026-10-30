@@ -1,52 +1,51 @@
-// The exchange (economy.md §5): one Durable Object for every town, so all players meet in one book.
-// It holds what orders put up and what waits in each player's inbox; the map room moves goods and
-// gold between it and the player's own object.
+// One exchange for all towns. Void persists each operation; the server coordinator sequences RPCs.
 import { defineDurableState } from "void/durable"
-import { book, cancel, emptyExchange, expire, place, takeInbox, type Candle, type ExchangeState, type Fill, type Inbox, type Order } from "#/world/core/exchange.ts"
+import { Player } from "./player"
+import type { OrderIntent } from "#/world/core/exchange-types"
+import { initialExchangeRecord, exchangeMigrations } from "../world/server/exchange-record"
+import { beginExchangeOrder } from "#/world/server/begin-exchange-order"
+import { advanceExchangeOrder } from "#/world/server/advance-exchange-order"
+import { cancelExchangeOrder } from "#/world/server/cancel-exchange-order"
+import { reserveExchangeInbox } from "#/world/server/reserve-exchange-inbox"
+import { deliverExchangeInbox } from "#/world/server/deliver-exchange-inbox"
+import { viewExchange } from "#/world/server/view-exchange"
+import { recoverExchange } from "#/world/server/recover-exchange"
+import type { ExchangePlayer } from "#/world/server/exchange-coordinator"
+
+const players = (owner: string): ExchangePlayer => Player.get(owner)
 
 export const Exchange = defineDurableState({
-  initialState: { ex: emptyExchange() as ExchangeState },
+  initialState: initialExchangeRecord,
+  version: 2,
+  migrations: exchangeMigrations,
   methods: {
-    /** Put up an order whose goods or gold the room has already taken from the player. */
-    place(context, o: { owner: string; name: string; side: "buy" | "sell"; symbol: string; price: number; qty: number; market?: boolean; by?: string }): { order: Order | null; fills: Fill[] } {
-      const now = Date.now()
-      const r = place(expire(context.state.ex, now), o, now)
-      context.state.ex = r.state
-      return { order: r.order, fills: r.fills }
+    beginOrder(context, input: { owner: string; connection: string; seq: number; name: string; intent: OrderIntent }) {
+      const owner = input.owner
+      const connection = input.connection
+      const seq = input.seq
+      const name = input.name
+      const intent = input.intent
+
+      return beginExchangeOrder({ context: context, players: players, owner: owner, connection: connection, seq: seq, name: name, intent: intent })
     },
-    cancel(context, owner: string, id: string): boolean {
-      const next = cancel(expire(context.state.ex, Date.now()), owner, id)
-      if (!next) return false
-      context.state.ex = next
-      return true
+    place(context, owner: string, id: number) {
+      return advanceExchangeOrder({ context: context, players: players, owner: owner, id: id })
     },
-    /** Hand over a player's inbox (emptying it); `putBack` if they could not carry it. */
-    takeInbox(context, owner: string): Inbox {
-      const r = takeInbox(expire(context.state.ex, Date.now()), owner)
-      context.state.ex = r.state
-      return r.inbox
+    cancel(context, owner: string, id: string) {
+      return cancelExchangeOrder(context, owner, id)
     },
-    putBack(context, owner: string, inbox: Inbox) {
-      const box = (context.state.ex.inbox[owner] ??= { gold: 0, items: [] })
-      box.gold += inbox.gold
-      box.items.push(...inbox.items)
+    reserveInbox(context, owner: string) {
+      return reserveExchangeInbox(context, owner)
     },
-    /** One symbol's book and daily prices, and a player's own orders and inbox. */
-    look(context, symbol: string, owner: string): { book: ReturnType<typeof book>; history: Candle[]; mine: Order[]; inbox: Inbox; last: Order[] } {
-      context.state.ex = expire(context.state.ex, Date.now())
-      const ex = context.state.ex
-      return {
-        book: book(ex, symbol),
-        history: ex.history[symbol] ?? [],
-        mine: ex.orders.filter((o) => o.owner === owner),
-        inbox: ex.inbox[owner] ?? { gold: 0, items: [] },
-        // the sellers of this symbol, to choose a maker
-        last: ex.orders
-          .filter((o) => o.symbol === symbol && o.side === "sell")
-          .sort((a, b) => a.price - b.price)
-          .slice(0, 8),
-      }
+    deliverInbox(context, owner: string, id: number) {
+      return deliverExchangeInbox({ context: context, players: players, owner: owner, id: id })
     },
+    look(context, symbol: string, owner: string) {
+      return viewExchange(context, symbol, owner)
+    },
+  },
+  alarm(context) {
+    return recoverExchange(context, players)
   },
 })
 

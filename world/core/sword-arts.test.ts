@@ -1,10 +1,12 @@
 import { expect, it } from "vitest"
-import { apply } from "./apply.ts"
-import { artSwing } from "./combat.ts"
-import { loadPlayer } from "./player.ts"
-import { derive } from "./stats.ts"
-import { SKILLS, artBlocked, artsOf } from "./skills.ts"
-import { player } from "../test/helpers.ts"
+import { apply } from "./apply"
+import { artSwing } from "#/world/core/art-swing"
+import { loadPlayer } from "#/world/core/load-player"
+import { derive } from "#/world/core/derive"
+import { SKILLS } from "#/world/core/skills"
+import { artBlocked } from "#/world/core/art-blocked"
+import { artsOf } from "#/world/core/arts-of"
+import { player } from "#/world/test/player"
 
 it("unlocks a heavier sword blow with strength and preserves its cost and cooldown across a save", () => {
   const base = player()
@@ -25,11 +27,11 @@ it("unlocks a heavier sword blow with strength and preserves its cost and cooldo
   expect(apply(saved, { type: "hotbar", index: 2, item: "skill:hew" }).ok).toBe(true)
   const stats = derive(p)
   const target = { atk: 0, def: 4, hit: 0, flee: 0, crit: 0 }
-  const light = artSwing(SKILLS.lunge, stats.stats, stats, target, () => 0.5)
-  const heavy = artSwing(SKILLS.hew, stats.stats, stats, target, () => 0.5)
+  const light = artSwing({ art: SKILLS.lunge, stats: stats.stats, attacker: stats, target: target, random: () => 0.5 })
+  const heavy = artSwing({ art: SKILLS.hew, stats: stats.stats, attacker: stats, target: target, random: () => 0.5 })
   if (light.kind === "miss" || heavy.kind === "miss") throw Error("Expected hits")
   expect(heavy.damage).toBeGreaterThan(light.damage)
   expect(SKILLS.hew.sp).toBeGreaterThan(SKILLS.lunge.sp)
   expect(SKILLS.hew.cooldown).toBeGreaterThan(SKILLS.lunge.cooldown)
-  expect(artSwing(SKILLS.hew, stats.stats, stats, target, () => 0.999)).toEqual({ kind: "miss" })
+  expect(artSwing({ art: SKILLS.hew, stats: stats.stats, attacker: stats, target: target, random: () => 0.999 })).toEqual({ kind: "miss" })
 })

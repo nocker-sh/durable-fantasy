@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import * as THREE from "three"
-import { mergeStatic } from "./batch.ts"
+import { mergeStatic } from "./batch"
 
 const material = new THREE.MeshBasicMaterial()
 function box(x: number) {

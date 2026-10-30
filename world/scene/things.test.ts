@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
-import { HOUSEHOLDS } from "../town/houses.ts"
-import { THINGS, THINGS_BY_HOUSEHOLD, thingsFor } from "./things.ts"
+import { HOUSEHOLDS } from "#/world/town/houses"
+import { THINGS, THINGS_BY_HOUSEHOLD, thingsFor } from "#/world/scene/props/catalog"
 
 describe("the small things under the eaves", () => {
   it("every household keeps things of its own trade and life, and each is a thing there is", () => {

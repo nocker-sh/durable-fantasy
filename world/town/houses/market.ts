@@ -1,5 +1,7 @@
-import { home, bed, room } from "../house-plan.ts"
-import type { HouseDef } from "../house-types.ts"
+import { home } from "#/world/town/home"
+import { bed } from "#/world/town/bed"
+import { room } from "#/world/town/room"
+import type { HouseDef } from "../house-types"
 
 const houses: readonly HouseDef[] = [
   {
@@ -18,7 +20,10 @@ const houses: readonly HouseDef[] = [
     door: { side: "s", u: 2.2 },
     seed: 31,
     sign: "mug",
-    plan: home([room("酒場", 0), room("台所", 0), bed("フランツの部屋", 1, 1), room("酒蔵", 1), bed("奉公人の部屋", 1, 2)], ["カウンター", "卓×4", "樽", "暖炉", "酒の棚", "薪入れ", "帽子掛け", "寝台×3", "椅子×12"]),
+    plan: home(
+      [room("酒場", 0), room("台所", 0), bed("フランツの部屋", 1, 1), room("酒蔵", 1), bed("奉公人の部屋", 1, 2)],
+      ["カウンター", "卓×4", "樽", "暖炉", "酒の棚", "薪入れ", "帽子掛け", "寝台×3", "椅子×12"],
+    ),
   },
   {
     id: "apothecary",
@@ -36,7 +41,11 @@ const houses: readonly HouseDef[] = [
     door: { side: "s", u: 1.8 },
     seed: 32,
     sign: "potion",
-    plan: home([room("店先", 0), room("調合部屋", 0), bed("寝室", 1, 1), bed("エーファの寝間", 1, 1), room("乾燥部屋", 1)], ["薬棚", "調合台", "乳鉢", "吊るした薬草", "腰掛け", "洗面台", "薬草の籠", "寝台×2", "椅子×2"], "調合台"),
+    plan: home(
+      [room("店先", 0), room("調合部屋", 0), bed("寝室", 1, 1), bed("エーファの寝間", 1, 1), room("乾燥部屋", 1)],
+      ["薬棚", "調合台", "乳鉢", "吊るした薬草", "腰掛け", "洗面台", "薬草の籠", "寝台×2", "椅子×2"],
+      "調合台",
+    ),
   },
   {
     id: "general",

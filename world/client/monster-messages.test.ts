@@ -1,5 +1,5 @@
 import { expect, it, vi } from "vitest"
-import { ServerMessages } from "./server-messages.ts"
+import { ServerMessages } from "./server-messages"
 
 type Context = ConstructorParameters<typeof ServerMessages>[0]
 it("limits a delayed attack refusal to its original creature", () => {

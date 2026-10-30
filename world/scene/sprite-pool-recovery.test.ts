@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from "vitest"
-import type { Look } from "./figure"
+import type { Look } from "#/world/scene/figure/look"
 
 class WorkerStub {
   static all: WorkerStub[] = []
@@ -29,9 +29,16 @@ async function setup() {
   vi.stubGlobal("Worker", WorkerStub)
   vi.stubGlobal("navigator", { hardwareConcurrency: 2 })
   vi.stubGlobal("indexedDB", undefined)
-  const pool = await import("./sprite-pool")
+  const pool = {
+    ...(await import("#/world/scene/sprite-pool")),
+    ...(await import("#/world/scene/tick-sprites")),
+    ...(await import("#/world/scene/sprite-frame")),
+    ...(await import("#/world/scene/ready-frame")),
+    ...(await import("#/world/scene/sprites-pending")),
+    ...(await import("#/world/scene/baked-strip")),
+  }
   const delivered = vi.fn()
-  const request = (f: number) => pool.spriteFrame({} as Look, null, "idle", 0, f, 0, delivered, "test")
+  const request = (f: number) => pool.spriteFrame({ look: {} as Look, item: null, anim: "idle", view: 0, f: f, urgency: 0, onReady: delivered, id: "test" })
   return { ...pool, delivered, request }
 }
 afterEach(() => {

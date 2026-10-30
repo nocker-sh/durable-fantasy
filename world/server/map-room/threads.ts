@@ -1,12 +1,18 @@
 // The map room's handlers for swapping muffler threads (core/threads.ts).
-import { threadOf } from "../../core/threads.ts"
-import { TRADE_CELLS } from "../../core/trade.ts"
-import { Player } from "../../../durable-objects/player.ts"
-import type { Ctx, Handlers, Message } from "./context.ts"
-import { presence, setPresence, reachable, near } from "./presence.ts"
+import { threadOf } from "#/world/core/thread-of"
+import { TRADE_CELLS } from "#/world/core/trade-rules"
+import { Player } from "../../../durable-objects/player"
+import type { Ctx, Handlers, Message } from "./context"
+import { presence } from "#/world/server/map-room/presence"
+import { setPresence } from "#/world/server/map-room/set-presence"
+import { reachable } from "#/world/server/map-room/reachable"
+import { near } from "#/world/server/map-room/near"
 
 async function threadAsk(roomCtx: Ctx, message: Message<"thread-ask">) {
-  const { ctx, me, save } = roomCtx
+  const ctxSource = roomCtx,
+    ctx = ctxSource.ctx,
+    me = ctxSource.me,
+    save = ctxSource.save
   const them = ctx.room.getConnection(message.target)
   const other = them && presence(them)
   if (!me.player || !me.owner || !them || !other?.player || them.id === ctx.connection.id) return
@@ -20,7 +26,9 @@ async function threadAsk(roomCtx: Ctx, message: Message<"thread-ask">) {
 }
 
 async function threadAnswer(roomCtx: Ctx, message: Message<"thread-answer">) {
-  const { ctx, me } = roomCtx
+  const ctxSource2 = roomCtx,
+    ctx = ctxSource2.ctx,
+    me = ctxSource2.me
   const them = ctx.room.getConnection(message.from)
   const other = them && presence(them)
   if (!me.player || !me.owner || !them || !other?.owner || !other.player || other.threading !== ctx.connection.id) return

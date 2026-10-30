@@ -1,10 +1,11 @@
 import { expect, it } from "vitest"
 import { apply } from "./apply"
-import { countItem } from "./bag"
-import { lifeExpAt } from "./life"
-import { loadPlayer } from "./player"
-import { derive } from "./stats"
-import { bagWith, player } from "../test/helpers"
+import { countItem } from "#/world/core/count-item"
+import { lifeExpAt } from "#/world/core/life-exp-at"
+import { loadPlayer } from "#/world/core/load-player"
+import { derive } from "#/world/core/derive"
+import { bagWith } from "#/world/test/bag-with"
+import { player } from "#/world/test/player"
 
 it.each([
   { item: "leather-boots", part: "feet", leather: 2, yarn: 1, level: 2, defense: 1 },

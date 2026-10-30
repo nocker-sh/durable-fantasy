@@ -25,7 +25,7 @@ try {
     await page.getByRole("dialog", { name: "キャラクターを作る" }).waitFor({ timeout: 180000 })
     await ready(page)
     await page.getByRole("textbox", { name: "名前", exact: true }).fill(i ? "フリッツ" : "エルナ")
-    await page.getByRole("button", { name: "この姿で始める" }).click()
+    await page.getByRole("button", { name: "はじめる" }).click()
     await page.getByRole("button", { name: "町を歩く", exact: true }).click()
     console.log(`player ${i + 1} created`)
   }

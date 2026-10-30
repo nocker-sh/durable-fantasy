@@ -1,6 +1,10 @@
 {
   "extends": "./.void/tsconfig.json",
   "compilerOptions": {
+    "paths": {
+      "#/*": ["./*"],
+      "void/routes": ["./.void/routes.d.ts"]
+    },
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",

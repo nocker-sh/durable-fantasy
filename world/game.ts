@@ -1,44 +1,65 @@
-import { loadPlayerId, playerAvatar, remoteAvatar, STORAGE } from "./client/identity.ts"
-import { GameSession, createSessionContext } from "./client/session.ts"
-import { RoomClient } from "./client/room-client.ts"
-import { ServerMessages } from "./client/server-messages.ts"
-import type { ServerMessageContext } from "./client/server-context.ts"
-import { DialogueActions } from "./client/dialogue.ts"
-import { PlayerActions } from "./client/player-actions.ts"
-import { SocialActions } from "./client/social.ts"
+import { minimapTarget, type WalkTargetOptions } from "./client/minimap-target"
+import { currentPublication } from "./client/player-publication"
+import { loadPlayerId } from "#/world/client/load-player-id"
+import { playerAvatar } from "#/world/client/player-avatar"
+import { remoteAvatar } from "#/world/client/remote-avatar"
+import { STORAGE } from "#/world/client/identity"
+import { GameSession } from "#/world/client/game-session"
+import { createSessionContext } from "#/world/client/create-session-context"
+import { RoomClient } from "./client/room-client"
+import { ServerMessages } from "./client/server-messages"
+import type { ServerMessageContext } from "./client/server-context"
+import { DialogueActions } from "./client/dialogue"
+import { PlayerActions } from "./client/player-actions"
+import { SocialActions } from "./client/social"
 // The game, independent of any UI framework: state, the three.js scene, keyboard input, the map
 // room connection and the player's data. A UI reads `state` (subscribe + get) and calls the
 // methods; it keeps no game state or rules of its own. Specs: .docs/game-system.md, .docs/ui.md.
-import { EXCHANGE_BOARD } from "./town/boards.ts"
-import { STORAGE_KEEPER } from "./core/storage.ts"
-import { stationAt } from "./town/stations.ts"
-import { WORLDS, hometownOf } from "./channels.ts"
-import { jstMinutes, parseTime } from "./core/clock.ts"
-import { apply, carried } from "./core/apply.ts"
-import type { Command, GameEvent, Reason } from "./core/commands.ts"
-import type { ItemId } from "./core/items.ts"
-import { wornNeck, type NeckKind, type PlayerState } from "./core/player.ts"
-import { SHOPS, shopOfKeeper } from "./core/shops.ts"
-import { derive } from "./core/stats.ts"
-import { iconUrl, portraitUrl } from "./art/icons.ts"
-import { MAPS, TALK_CELLS, cellDistance, isMapId, isOpen, neighbours, shopOpen, type MapDefinition, type MapId, walkable } from "./maps/index.ts"
-import type { Cell } from "./protocol.ts"
-import { spritesPending } from "./scene/sprite-pool.ts"
-import { MapScene, spriteManifest, type WalkerInfo } from "./scene/index.ts"
-import { Windows } from "./parts/windows.ts"
-import { Keys } from "./parts/keys.ts"
-import { tell } from "./parts/report.ts"
-import { LOOKS } from "./town/travellers.ts"
-import { lap, lapEnd, lapStart } from "./diagnostics.ts"
-import { groundOf, prefetchGround } from "./scene/ground.ts"
+import { EXCHANGE_BOARD } from "./town/boards"
+import { STORAGE_KEEPER } from "#/world/core/storage/rules"
+import { stationAt } from "./town/stations"
+import { WORLDS } from "#/world/channels"
+import { hometownOf } from "#/world/hometown-of"
+import { jstMinutes } from "#/world/core/jst-minutes"
+import { parseTime } from "#/world/core/parse-time"
+import { apply } from "./core/apply"
+import { carried } from "#/world/core/inventory-weight"
+import type { Command, GameEvent, Reason } from "./core/commands"
+import type { ItemId } from "#/world/core/items/catalog"
+import { wornNeck } from "#/world/core/worn-neck"
+import type { NeckKind } from "#/world/core/player-types"
+import type { PlayerState } from "#/world/core/player-types"
+import { SHOPS } from "#/world/core/shops"
+import { shopOfKeeper } from "#/world/core/shop-of-keeper"
+import { derive } from "#/world/core/derive"
+import { iconUrl } from "#/world/art/icon-url"
+import { portraitUrl } from "#/world/art/portrait-url"
+import { MAPS, TALK_CELLS } from "#/world/maps"
+import { cellDistance } from "#/world/maps/cell-distance"
+import { isMapId } from "#/world/maps/is-map-id"
+import { isOpen } from "#/world/maps/is-open"
+import { neighbours } from "#/world/maps/neighbours"
+import { shopOpen } from "#/world/maps/shop-open"
+import { type MapDefinition, type MapId } from "#/world/maps/types"
+import { walkable } from "#/world/maps/walkable"
+import type { Cell } from "#/world/protocol"
+import { spritesPending } from "#/world/scene/sprites-pending"
+import { MapScene } from "#/world/scene/runtime/scene"
+import { spriteManifest } from "#/world/scene/runtime/assets"
+import { Windows } from "./parts/windows"
+import { Keys } from "./parts/keys"
+import { tell } from "#/world/parts/tell"
+import { LOOKS } from "./town/travellers"
+import { lap } from "#/world/lap"
+import { lapEnd } from "#/world/lap-end"
+import { lapStart } from "#/world/lap-start"
+import { groundOf } from "#/world/scene/ground-of"
+import { prefetchGround } from "#/world/scene/prefetch-ground"
 
 /** How near a way out (cells) the room beyond it is got ready. */
 const STANDBY_CELLS = 8
 
-export { LOOKS }
-export * from "./state.ts"
-import type { ChatLine, GameState, ModalId, Notice, Npc, WindowId } from "./state.ts"
-export type { WalkerInfo }
+import type { ChatLine, GameState, ModalId, Notice, Npc, WindowId } from "#/world/state"
 
 const CHAT_KEEP = 150
 
@@ -209,9 +230,9 @@ export class Game {
   // ------------------------------------------------------------------ moving and talking
 
   /** Walk to a point (the minimap). A point near a way out goes onto it, so a click on its mark takes you through. */
-  walkTo(x: number, z: number) {
-    const near = MAPS[this.state.get().map.id].warps.map((w) => ({ x: (w.at[0] + 0.5) / 2, z: (w.at[1] + 0.5) / 2 })).find((w) => Math.hypot(w.x - x, w.z - z) <= 3)
-    this.scene?.walkTo(near?.x ?? x, near?.z ?? z)
+  walkTo(x: number, z: number, options?: WalkTargetOptions) {
+    const target = minimapTarget({ x: x, z: z, warps: MAPS[this.state.get().map.id].warps, inputProps: options })
+    this.scene?.walkTo(target.x, target.z)
   }
 
   talkTo(resident: number) {
@@ -267,7 +288,8 @@ export class Game {
     if (!room) return
     const r = await fetch(`/api/channel?world=${room.world}&map=${this.state.get().map.id}`).catch(() => null)
     if (!r?.ok) return
-    const { channels } = (await r.json()) as { channels: Record<number, number> }
+    const channelsSource = (await r.json()) as { channels: Record<number, number> },
+      channels = channelsSource.channels
     this.update((s) => ({ room: s.room && { ...s.room, channels } }))
   }
 
@@ -293,7 +315,7 @@ export class Game {
   /** Leave a lot from a bag slot with the warehouse, or take one back. */
   store = this.playerActions.store.bind(this.playerActions)
   retrieve = this.playerActions.retrieve.bind(this.playerActions)
-  /** Trading face to face (core/trade.ts). */
+  /** Trading face to face (core/check-trade.ts). */
   askTrade = this.socialActions.askTrade.bind(this.socialActions)
   /** Skills (core/skills.ts): sit down or get up, see to a wound, pray, or strike with an art. */
   useSkill = this.playerActions.useSkill.bind(this.playerActions)
@@ -391,8 +413,15 @@ export class Game {
 
   /** Hold the clock at a time of day, or let it follow Japan's again (null). */
   setClock(min: number | null) {
-    this.update({ clock: { min: min ?? jstMinutes(Date.now()), held: min !== null } })
-    this.scene?.setClock(this.state.get().clock.min)
+    const before = this.state.get().clock
+    const clock = { min: min ?? jstMinutes(Date.now()), held: min !== null }
+    this.update({ clock })
+    const changed = before.held !== clock.held || (clock.held && before.min !== clock.min)
+    // Dev time is accepted at join; reconnect so server rules use the displayed time too.
+    if (import.meta.env.DEV && changed && this.session.others.you) {
+      this.session.wantChannel = this.state.get().room?.channel ?? null
+      this.rejoin()
+    } else this.scene?.setClock(clock.min)
   }
 
   toggleDebug() {
@@ -439,9 +468,9 @@ export class Game {
     }
     this.session.warping = false
     if (!this.scene && this.container) {
-      this.scene = new MapScene(
-        this.container,
-        {
+      this.scene = new MapScene({
+        element: this.container,
+        events: {
           progress: (text) => this.update((s) => ({ loading: s.loading && { ...s.loading, text } })),
           ready: () => this.onSceneReady(),
           failed: (error) => {
@@ -468,8 +497,8 @@ export class Game {
           stationAt: (station) => (station === "exchange-board" ? this.openBoard() : this.update({ craft: station })),
           tick: () => this.onTick(),
         },
-        id,
-      )
+        map: id,
+      })
     } else if (this.scene?.ready) this.onSceneReady()
     this.session.fullTries = 0
     this.session.wild = {}
@@ -509,6 +538,7 @@ export class Game {
 
   private setPlayer(player: PlayerState) {
     const before = this.state.get().player
+    if (!currentPublication(before, player)) return
     this.update({ player, derived: { ...derive(player), weight: carried(player) } })
     if (!player.profileComplete) this.openModal("character")
     this.scene?.setAttackDelay(derive(player).attackDelay)
@@ -522,7 +552,12 @@ export class Game {
   }
 
   /** A picture of a look preset with a given neck wrap (the character screen's preview). */
-  previewPortrait(look: number, neck: NeckKind, neckRamp: string, ready: (url: string) => void) {
+  previewPortrait(inputProps: { look: number; neck: NeckKind; neckRamp: string; ready: (url: string) => void }) {
+    const look = inputProps.look
+    const neck = inputProps.neck
+    const neckRamp = inputProps.neckRamp
+    const ready = inputProps.ready
+
     portraitUrl({ ...LOOKS[look].look, neck, neckRamp, neckStripe: undefined }, ready)
   }
 
@@ -569,7 +604,9 @@ export class Game {
     this.update({ me, players: scene.remotes(), npcs: scene.residents().map((r) => ({ ...r, role: npcRole(r.name, this.state.get().clock.min) })) })
     this.syncZoom()
     // walked away from the shopkeeper or the person being talked to
-    const { dialogue, shop } = this.state.get()
+    const dialogueSource = this.state.get(),
+      dialogue = dialogueSource.dialogue,
+      shop = dialogueSource.shop
     const range = TALK_CELLS / 2
     const near = (name: string) => {
       const r = this.state.get().npcs.find((x) => x.name === name)

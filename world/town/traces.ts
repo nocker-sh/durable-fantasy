@@ -2,7 +2,7 @@
 // chosen from who lives there, what they do and what they are like (town.md「人柄と台詞」). They take no
 // floor; floorplan.ts lays them on the table, at the hearth, by the door, on the wall or the floor.
 
-export interface Trace {
+export type Trace = {
   what: string
   on: "卓" | "炉" | "戸口" | "壁" | "床"
 }

@@ -1,0 +1,7 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": ["node", "void/env", "vite/client"]
+  },
+  "include": ["check-settings.ts", "export-authored-plans.ts", "lib/**/*.ts"]
+}

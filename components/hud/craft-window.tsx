@@ -1,16 +1,21 @@
 // A station's recipes (economy.md §2), opened by walking up to the hearth, workbench, loom or forge:
 // what each makes, what it takes and whether you have it, the life skill level it needs and the fee.
-import { REASON_TEXT } from "#/world/core/commands.ts"
-import { countItem } from "#/world/core/bag.ts"
-import { RECIPES, STAMINA_PER_CRAFT, stationOf } from "#/world/core/crafting.ts"
-import { GATHER_SKILL_NAME, ITEMS } from "#/world/core/items.ts"
-import { LIFE_CAP, lifeLevel } from "#/world/core/life.ts"
-import { useGame, useGameState } from "#/components/game/context.tsx"
-import { Button } from "#/components/game/button.tsx"
-import { Gold } from "#/components/game/gold.tsx"
-import { Slot } from "#/components/game/slot.tsx"
-import { Window } from "#/components/game/window.tsx"
-import { ItemTooltip } from "./item-tooltip.tsx"
+import { REASON_TEXT } from "#/world/core/commands"
+import { countItem } from "#/world/core/count-item"
+import { RECIPES } from "#/world/core/recipes/catalog"
+import { STAMINA_PER_CRAFT } from "#/world/core/crafting-rules"
+import { stationOf } from "#/world/core/station-of"
+import { GATHER_SKILL_NAME } from "#/world/core/items/kinds"
+import { ITEMS } from "#/world/core/items/catalog"
+import { LIFE_CAP } from "#/world/core/life-rules"
+import { lifeLevel } from "#/world/core/life-level"
+import { useGame } from "#/hooks/use-game"
+import { useGameState } from "#/hooks/use-game-state"
+import { Button } from "#/components/game/button"
+import { Gold } from "#/components/game/gold"
+import { Slot } from "#/components/game/slot"
+import { Window } from "#/components/game/window"
+import { ItemTooltip } from "./item-tooltip"
 
 export function CraftWindow() {
   const game = useGame()

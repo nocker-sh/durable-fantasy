@@ -3,8 +3,8 @@
 import { mkdirSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import { chromium } from "playwright-core"
-import { HOUSES } from "../world/town/houses.ts"
-import { floorPlan } from "../world/town/floorplan.ts"
+import { HOUSES } from "#/world/town/houses"
+import { floorPlan } from "#/world/town/floorplan/floor-plan"
 
 const base = process.env.BASE ?? "https://durable-fantasy.localhost"
 const out = process.argv[2] ?? "public/tmp/interiors"

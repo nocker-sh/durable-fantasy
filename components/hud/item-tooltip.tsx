@@ -1,27 +1,33 @@
 // What an item is (ui.md §6.5), shown on hover wherever an item appears.
 import type { ReactElement, ReactNode } from "react"
-import { usePlayerIfAny } from "#/components/game/context.tsx"
-import { fullDurability } from "#/world/core/bag.ts"
-import { artsOf, skillOf } from "#/world/core/skills.ts"
-import { equipmentAttack, equipmentDefense, standing } from "#/world/core/stats.ts"
-import { GATHER_SKILL_NAME, ITEMS, KIND_NAME, QUALITIES, QUALITY_PRICE, RARITY_NAME, sellPrice, sellable, type ItemId, type Quality } from "#/world/core/items.ts"
-import { displayName, effectOf, traitOf } from "#/world/core/makers.ts"
-import { STAT_NAME, type Stat } from "#/world/core/growth.ts"
-import type { Skill } from "#/world/core/items.ts"
-import { Gold } from "#/components/game/gold.tsx"
-import { RARITY } from "#/components/game/slot.tsx"
-import { Tooltip, TooltipContent, TooltipTrigger } from "#/components/game/tooltip.tsx"
+import { usePlayerIfAny } from "#/hooks/use-player-if-any"
+import { fullDurability } from "#/world/core/full-durability"
+import { artsOf } from "#/world/core/arts-of"
+import { skillOf } from "#/world/core/skill-of"
+import { equipmentAttack } from "#/world/core/equipment-attack"
+import { equipmentDefense } from "#/world/core/equipment-defense"
+import { standing } from "#/world/core/standing"
+import { GATHER_SKILL_NAME, KIND_NAME, QUALITIES, QUALITY_PRICE, RARITY_NAME } from "#/world/core/items/kinds"
+import { ITEMS } from "#/world/core/items/catalog"
+import { sellPrice } from "#/world/core/items/sell-price"
+import { sellable } from "#/world/core/items/sellable"
+import type { ItemId } from "#/world/core/items/catalog"
+import type { Quality } from "#/world/core/items/kinds"
+import { displayName } from "#/world/core/display-name"
+import { effectOf } from "#/world/core/effect-of"
+import { traitOf } from "#/world/core/trait-of"
+import { STAT_NAME } from "#/world/core/growth-rules"
+import type { Stat } from "#/world/core/growth-types"
+import type { Skill } from "#/world/core/items/kinds"
+import { Gold } from "#/components/game/gold"
+import { RARITY } from "#/components/game/slot"
+import { Tooltip } from "#/components/game/tooltip"
+import { TooltipContent } from "#/components/game/tooltip-content"
+import { TooltipTrigger } from "#/components/game/tooltip-trigger"
 
 const PART = { head: "頭", neck: "首巻き", body: "体", weapon: "武器", shield: "盾", feet: "足", accessory: "装飾品" } as const
 
-export function ItemTooltip({
-  item,
-  mark,
-  children,
-  hint,
-  side = "top",
-  open,
-}: {
+export function ItemTooltip(inputProps: {
   item: ItemId | null | undefined
   /** a made thing's quality and maker */ mark?: { q?: Quality; by?: string; dur?: number } | null
   children: ReactElement
@@ -29,6 +35,14 @@ export function ItemTooltip({
   side?: "top" | "right" | "left" | "bottom"
   /** hold it open (dev previews) */ open?: boolean
 }) {
+  const item = inputProps.item
+  const mark = inputProps.mark
+  const children = inputProps.children
+  const hint = inputProps.hint
+  const sideValue = inputProps.side
+  const side = sideValue === undefined ? "top" : sideValue
+  const open = inputProps.open
+
   const me = usePlayerIfAny()
   if (!item) return children
   const d = ITEMS[item]
@@ -109,12 +123,16 @@ export function ItemTooltip({
               <dd className="text-right">+{equipmentDefense(item, q)}</dd>
             </>
           ) : null}
-          {Object.entries(e?.bonus ?? {}).map(([key, n]) => (
-            <div key={key} className="contents">
-              <dt className="text-text-dim">{key === "maxHp" ? "最大 HP" : key === "maxSp" ? "最大 SP" : STAT_NAME[key as keyof typeof STAT_NAME]}</dt>
-              <dd className="text-right text-good">+{n}</dd>
-            </div>
-          ))}
+          {Object.entries(e?.bonus ?? {}).map((entry) => {
+            const key = entry[0]
+            const n = entry[1]
+            return (
+              <div key={key} className="contents">
+                <dt className="text-text-dim">{key === "maxHp" ? "最大 HP" : key === "maxSp" ? "最大 SP" : STAT_NAME[key as keyof typeof STAT_NAME]}</dt>
+                <dd className="text-right text-good">+{n}</dd>
+              </div>
+            )
+          })}
           {e?.twoHanded ? (
             <>
               <dt className="text-text-dim">持ち方</dt>
@@ -132,7 +150,11 @@ export function ItemTooltip({
               <dt className="text-text-dim">能力補正</dt>
               <dd className="text-right">
                 {Object.entries(e.scale)
-                  .map(([k, g]) => `${STAT_NAME[k as Stat]} ${g}`)
+                  .map((entry2) => {
+                    const k = entry2[0]
+                    const g = entry2[1]
+                    return `${STAT_NAME[k as Stat]} ${g}`
+                  })
                   .join("・")}
               </dd>
             </>
@@ -141,12 +163,16 @@ export function ItemTooltip({
             <>
               <dt className="text-text-dim">必要</dt>
               <dd className="text-right">
-                {Object.entries(e.needs).map(([k, n], i) => (
-                  <span key={k} className={me && standing(me, k as Stat | Skill) < (n ?? 0) ? "text-bad" : ""}>
-                    {i ? "・" : ""}
-                    {k in STAT_NAME ? STAT_NAME[k as Stat] : `${GATHER_SKILL_NAME[k as Skill]} Lv`} {n}
-                  </span>
-                ))}
+                {Object.entries(e.needs).map((entry3, i) => {
+                  const k = entry3[0]
+                  const n = entry3[1]
+                  return (
+                    <span key={k} className={me && standing(me, k as Stat | Skill) < (n ?? 0) ? "text-bad" : ""}>
+                      {i ? "・" : ""}
+                      {k in STAT_NAME ? STAT_NAME[k as Stat] : `${GATHER_SKILL_NAME[k as Skill]} Lv`} {n}
+                    </span>
+                  )
+                })}
               </dd>
             </>
           ) : null}

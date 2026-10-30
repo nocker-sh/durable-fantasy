@@ -1,9 +1,9 @@
 // Which ground plan each map is laid out on (layout.ts): read by the scene and by the
 // workers that paint the ground, so both see the same map. Data only: nothing here draws.
-import { VILLAGE, type Layout } from "./layout.ts"
-import { CRAFT, FIELD_LAYOUTS, GATE, INDOOR, MARKET } from "./ground-layouts.ts"
-import { HOUSES } from "../town/houses.ts"
-import type { HouseDef } from "../town/house-types.ts"
+import { VILLAGE, type Layout } from "./layout"
+import { CRAFT, FIELD_LAYOUTS, GATE, INDOOR, MARKET } from "./ground-layouts"
+import { HOUSES } from "#/world/town/houses"
+import type { HouseDef } from "../town/house-types"
 
 type V2 = [number, number]
 
@@ -15,8 +15,12 @@ function nearestOnRoads(layout: Layout, p: V2): V2 {
     bd = Infinity
   for (const r of layout.roads)
     for (let i = 0; i < r.pts.length - 1; i++) {
-      const [a, b] = [r.pts[i], r.pts[i + 1]]
-      const [dx, dz] = [b[0] - a[0], b[1] - a[1]]
+      const aState = [r.pts[i], r.pts[i + 1]],
+        a = aState[0],
+        b = aState[1]
+      const dxState = [b[0] - a[0], b[1] - a[1]],
+        dx = dxState[0],
+        dz = dxState[1]
       const t = Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dz) / (dx * dx + dz * dz || 1)))
       const q: V2 = [a[0] + dx * t, a[1] + dz * t]
       const d = Math.hypot(q[0] - p[0], q[1] - p[1])
@@ -28,26 +32,28 @@ function nearestOnRoads(layout: Layout, p: V2): V2 {
 /** The ground trodden from a house's door out to the road: straight out of the door, then the short way. */
 function doorTrail(layout: Layout, h: HouseDef): V2[] {
   const u = h.door.u
-  const [door, out]: [V2, V2] =
-    h.door.side === "s"
-      ? [
-          [h.x0 + u, h.z1 + 0.3],
-          [0, 1],
-        ]
-      : h.door.side === "n"
+  const doorState: [V2, V2] =
+      h.door.side === "s"
         ? [
-            [h.x1 - u, h.z0 - 0.3],
-            [0, -1],
+            [h.x0 + u, h.z1 + 0.3],
+            [0, 1],
           ]
-        : h.door.side === "e"
+        : h.door.side === "n"
           ? [
-              [h.x1 + 0.3, h.z1 - u],
-              [1, 0],
+              [h.x1 - u, h.z0 - 0.3],
+              [0, -1],
             ]
-          : [
-              [h.x0 - 0.3, h.z0 + u],
-              [-1, 0],
-            ]
+          : h.door.side === "e"
+            ? [
+                [h.x1 + 0.3, h.z1 - u],
+                [1, 0],
+              ]
+            : [
+                [h.x0 - 0.3, h.z0 + u],
+                [-1, 0],
+              ],
+    door = doorState[0],
+    out = doorState[1]
   const step: V2 = [door[0] + out[0] * 0.9, door[1] + out[1] * 0.9]
   return [door, step, nearestOnRoads(layout, step)]
 }

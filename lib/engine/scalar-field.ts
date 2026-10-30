@@ -5,10 +5,14 @@ export class ScalarField {
     readonly size: number,
     readonly resolution = 1,
   ) {}
+  /** Clamped grid index used by both interpolation and interval queries. */
+  gridCoordinate(value: number): number {
+    return Math.min(this.size - 1.001, Math.max(0, value * this.resolution))
+  }
   sample(x: number, z: number): number {
     const f = this.data
-    const u = Math.min(this.size - 1.001, Math.max(0, x * this.resolution)),
-      v = Math.min(this.size - 1.001, Math.max(0, z * this.resolution))
+    const u = this.gridCoordinate(x),
+      v = this.gridCoordinate(z)
     const i = Math.floor(u),
       j = Math.floor(v),
       fu = u - i,

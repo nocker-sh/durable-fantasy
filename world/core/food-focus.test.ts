@@ -1,9 +1,11 @@
 import { expect, it } from "vitest"
 import { apply } from "./apply"
-import { addItem, emptyBag } from "./bag"
-import { effectOf } from "./makers"
-import { loadPlayer, settle } from "./player"
-import { player } from "../test/helpers"
+import { addItem } from "#/world/core/add-item"
+import { emptyBag } from "#/world/core/empty-bag"
+import { effectOf } from "#/world/core/effect-of"
+import { loadPlayer } from "#/world/core/load-player"
+import { settle } from "#/world/core/settle"
+import { player } from "#/world/test/player"
 
 const rest = { maxHp: 100, maxSp: 100, regenHp: 1, regenSp: 2 }
 
@@ -20,7 +22,7 @@ it("applies only to recovery ticks after eating and before expiration, even acro
 })
 
 it("food grants focus, preserves a longer existing duration, and starts a fresh interval after expiry", () => {
-  const p = player({ bag: addItem(emptyBag(), "herb-tea", 3)! })
+  const p = player({ bag: addItem({ bag: emptyBag(), item: "herb-tea", count: 3 })! })
   const eaten = apply(p, { type: "use", slot: 0 }, { now: 1000 })
   expect(eaten.ok).toBe(true)
   if (!eaten.ok) return

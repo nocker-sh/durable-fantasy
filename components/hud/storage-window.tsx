@@ -1,35 +1,43 @@
-// The town warehouse (core/storage.ts): what you have left with Hilde. Right-click a lot to take it
+// The town warehouse (core/storage/rules.ts): what you have left with Hilde. Right-click a lot to take it
 // back; right-click a bag slot (or drag it here) to leave it, for a small charge on each lot.
 import { useEffect, useMemo, useState } from "react"
-import { STORAGE_SIZE, STORE_FEE } from "#/world/core/storage.ts"
-import { ITEMS } from "#/world/core/items.ts"
-import { displayName } from "#/world/core/makers.ts"
-import { useGame, useGameState } from "#/components/game/context.tsx"
-import { apply } from "#/world/core/apply.ts"
-import { REASON_TEXT } from "#/world/core/commands.ts"
-import { Button } from "#/components/game/button.tsx"
-import { Stepper } from "#/components/game/stepper.tsx"
-import { Gold } from "#/components/game/gold.tsx"
-import { Slot } from "#/components/game/slot.tsx"
-import { Window } from "#/components/game/window.tsx"
-import { ItemTooltip } from "./item-tooltip.tsx"
-import { carriesItem, readDrag } from "./drag.ts"
+import { STORAGE_SIZE, STORE_FEE } from "#/world/core/storage/rules"
+import { ITEMS } from "#/world/core/items/catalog"
+import { displayName } from "#/world/core/display-name"
+import { useGame } from "#/hooks/use-game"
+import { useGameState } from "#/hooks/use-game-state"
+import { apply } from "#/world/core/apply"
+import { REASON_TEXT } from "#/world/core/commands"
+import { Button } from "#/components/game/button"
+import { Stepper } from "#/components/game/stepper"
+import { Gold } from "#/components/game/gold"
+import { Slot } from "#/components/game/slot"
+import { Window } from "#/components/game/window"
+import { ItemTooltip } from "./item-tooltip"
+import { carriesItem } from "#/components/hud/carries-item"
+import { readDrag } from "#/components/hud/read-drag"
 
 export function StorageWindow() {
   const game = useGame()
   const open = useGameState((s) => s.storage)
   const player = useGameState((s) => s.player)
   const busy = useGameState((s) => s.busy)
-  const [over, setOver] = useState(false)
-  const [picked, setPicked] = useState<number | null>(null)
-  const [count, setCount] = useState(1)
+  const overState = useState(false),
+    over = overState[0],
+    setOver = overState[1]
+  const pickedState = useState<number | null>(null),
+    picked = pickedState[0],
+    setPicked = pickedState[1]
+  const countState = useState(1),
+    count = countState[0],
+    setCount = countState[1]
   useEffect(() => {
     if (!open) setPicked(null)
   }, [open])
   const selected = picked === null ? null : player?.storage[picked]
   const amount = Math.min(count, selected?.count ?? 1)
   const preview = useMemo(
-    () => (open && player && selected && picked !== null ? apply(player, { type: "retrieve", index: picked, count: amount }, { now: Date.now() }) : null),
+    () => (open && player && selected && picked !== null ? apply(player, { type: "retrieve", index: picked, count: amount, expectedStack: selected }, { now: Date.now() }) : null),
     [open, player, selected, picked, amount],
   )
   if (!open || !player) return null
@@ -67,8 +75,7 @@ export function StorageWindow() {
           setOver(false)
           const drag = readDrag(e)
           if (drag && "slot" in drag) {
-            const s = player.bag[drag.slot]
-            if (s) game.store(drag.slot, s.count)
+            game.store(drag.slot, drag.stack.count, drag.stack)
           }
         }}
       >

@@ -1,5 +1,5 @@
 import * as THREE from "three"
-export interface DioramaSettings {
+export type DioramaSettings = {
   enabled: boolean
   start: number
   falloff: number
@@ -54,8 +54,18 @@ function createState() {
 export class DioramaPostProcessing {
   private readonly state = createState()
   constructor(private readonly renderer: THREE.WebGLRenderer) {}
-  render(scene: THREE.Scene, cam: THREE.Camera, diorama: DioramaSettings, renderScale: number) {
-    const { rtScene, rtBlur, blur, postScene, postCam } = this.state
+  render(inputProps: { scene: THREE.Scene; cam: THREE.Camera; diorama: DioramaSettings; renderScale: number }) {
+    const scene = inputProps.scene
+    const cam = inputProps.cam
+    const diorama = inputProps.diorama
+    const renderScale = inputProps.renderScale
+
+    const rtSceneSource = this.state,
+      rtScene = rtSceneSource.rtScene,
+      rtBlur = rtSceneSource.rtBlur,
+      blur = rtSceneSource.blur,
+      postScene = rtSceneSource.postScene,
+      postCam = rtSceneSource.postCam
     const renderer = this.renderer
     if (!diorama.enabled) {
       renderer.setRenderTarget(null)

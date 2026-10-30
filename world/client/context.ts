@@ -1,12 +1,12 @@
-import type { GameSession } from "./session.ts"
-import type { GameState, ChatLine, Notice, WindowId } from "../state.ts"
-import type { Command } from "../core/commands.ts"
-import type { Cell } from "../protocol.ts"
-import type { MapId } from "../maps/index.ts"
-import type { MapScene } from "../scene/index.ts"
+import type { GameSession } from "#/world/client/game-session"
+import type { GameState, ChatLine, Notice, WindowId } from "#/world/state"
+import type { Command } from "../core/commands"
+import type { Cell } from "#/world/protocol"
+import type { MapId } from "#/world/maps/types"
+import type { MapScene } from "#/world/scene/runtime/scene"
 
 /** Services supplied to each controller. Controllers receive only the keys they use. */
-export interface GameContext {
+export type GameContext = {
   readonly session: GameSession
   getScene(): MapScene | null
   update(patch: Partial<GameState> | ((state: GameState) => Partial<GameState>)): void

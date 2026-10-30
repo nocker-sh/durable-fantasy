@@ -17,7 +17,7 @@ try {
   await page.getByRole("dialog", { name: "キャラクターを作る" }).waitFor({ timeout: 180000 })
   await page.waitForFunction(() => window.game?.state.get().loading === null, null, { timeout: 180000 })
   await page.getByRole("textbox", { name: "名前", exact: true }).fill("エルナ")
-  await page.getByRole("button", { name: "この姿で始める" }).click()
+  await page.getByRole("button", { name: "はじめる" }).click()
   await page.getByRole("button", { name: "町を歩く", exact: true }).click()
   console.log("Character created; town ready")
   const cdp = await page.context().newCDPSession(page)

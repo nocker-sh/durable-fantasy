@@ -2,7 +2,9 @@ import { useEffect, useState } from "react"
 
 /** Updates while a displayed deadline is pending; no timer once it expires. */
 export function useDeadlineClock(until: number, interval = 1000) {
-  const [now, setNow] = useState(() => Date.now())
+  const nowState = useState(() => Date.now()),
+    now = nowState[0],
+    setNow = nowState[1]
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | undefined
     const tick = () => {

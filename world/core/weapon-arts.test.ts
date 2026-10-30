@@ -1,13 +1,17 @@
 import { expect, it } from "vitest"
 import { apply } from "./apply"
-import { artSwing } from "./combat"
+import { artSwing } from "#/world/core/art-swing"
 import { commandSchema } from "./commands"
-import { startingStats } from "./growth"
-import { ITEMS, type ItemId } from "./items"
-import { emptyEquipment, loadPlayer } from "./player"
-import { SHOPS } from "./shops"
-import { SKILLS, artsOf, type SkillId } from "./skills"
-import { player } from "../test/helpers"
+import { startingStats } from "#/world/core/starting-stats"
+import { ITEMS } from "#/world/core/items/catalog"
+import type { ItemId } from "#/world/core/items/catalog"
+import { emptyEquipment } from "#/world/core/empty-equipment"
+import { loadPlayer } from "#/world/core/load-player"
+import { SHOPS } from "#/world/core/shops"
+import { SKILLS } from "#/world/core/skills"
+import { artsOf } from "#/world/core/arts-of"
+import type { SkillId } from "#/world/core/skill-types"
+import { player } from "#/world/test/player"
 
 const stats = { ...startingStats(), str: 16, dex: 14, int: 14, fth: 9, mnd: 7 }
 const equipped = (weapon: ItemId) => player({ hp: 10, sp: 20, stats, equipment: { ...emptyEquipment(), weapon } })
@@ -49,7 +53,7 @@ it("offers a faith prayer before learning woodcutting, retaining the stronger sp
 
 it("gives aimed arrows a sure critical and the advanced spell damage against armour", () => {
   const fighter = { atk: 20, def: 10, hit: 0, flee: 999, crit: 0 }
-  expect(artSwing(SKILLS.aim, stats, fighter, fighter, () => 0.99).kind).toBe("critical")
-  expect(artSwing(SKILLS.flare, stats, fighter, fighter, () => 0.5)).toEqual({ kind: "hit", damage: 34 })
+  expect(artSwing({ art: SKILLS.aim, stats: stats, attacker: fighter, target: fighter, random: () => 0.99 }).kind).toBe("critical")
+  expect(artSwing({ art: SKILLS.flare, stats: stats, attacker: fighter, target: fighter, random: () => 0.5 })).toEqual({ kind: "hit", damage: 34 })
   expect(apply({ ...equipped("oak-staff"), stats: { ...stats, int: 13 } }, { type: "art", skill: "flare" }, { now: 1000 })).toEqual({ ok: false, reason: "STAT_TOO_LOW" })
 })

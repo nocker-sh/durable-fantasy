@@ -1,7 +1,9 @@
 // The keyboard (ui.md §4): Esc closes the front-most thing, letters open windows, WASD and the
 // arrows walk while held. Single letters do nothing while typing in a field.
-import { HOTBAR_SIZE } from "../core/player.ts"
-import { KEPT_ON_ESC, fullyShown, type GameState, type ModalId, type WindowId } from "../state.ts"
+import { HOTBAR_SIZE } from "#/world/core/player-rules"
+import { KEPT_ON_ESC } from "#/world/state"
+import { fullyShown } from "#/world/fully-shown"
+import type { GameState, ModalId, WindowId } from "#/world/state"
 
 /** Keys that walk, and which way on screen: right is +x, up is +y. */
 const MOVE_KEYS: Record<string, [number, number]> = {
@@ -16,7 +18,7 @@ const MOVE_KEYS: Record<string, [number, number]> = {
 }
 
 /** What the keys can do to the game. */
-export interface KeyTarget {
+export type KeyTarget = {
   readonly state: { get(): GameState; subscribe(listener: () => void): () => void }
   toggleDebug(): void
   setTyping(typing: boolean): void

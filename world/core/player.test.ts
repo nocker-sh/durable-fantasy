@@ -1,11 +1,22 @@
+import { ITEMS } from "#/world/core/items/catalog"
+import { ITEM_ICONS } from "#/world/core/items/icons"
 import { describe, expect, it } from "vitest"
-import { apply } from "./apply.ts"
-import { countItem } from "./bag.ts"
-import { MAX_LEVEL, expToNext, gainExp, pointsForLevel, startingStats, statCost } from "./growth.ts"
-import { lifeExpAt, lifeLevel as lifeLevelOf } from "./life.ts"
-import { emptyEquipment, loadPlayer, newPlayer } from "./player.ts"
-import { derive } from "./stats.ts"
-import { bagWith, player } from "../test/helpers.ts"
+import { apply } from "./apply"
+import { countItem } from "#/world/core/count-item"
+import { MAX_LEVEL } from "#/world/core/growth-rules"
+import { expToNext } from "#/world/core/exp-to-next"
+import { gainExp } from "#/world/core/gain-exp"
+import { pointsForLevel } from "#/world/core/points-for-level"
+import { startingStats } from "#/world/core/starting-stats"
+import { statCost } from "#/world/core/stat-cost"
+import { lifeExpAt } from "#/world/core/life-exp-at"
+import { lifeLevel as lifeLevelOf } from "#/world/core/life-level"
+import { emptyEquipment } from "#/world/core/empty-equipment"
+import { loadPlayer } from "#/world/core/load-player"
+import { newPlayer } from "#/world/core/new-player"
+import { derive } from "#/world/core/derive"
+import { bagWith } from "#/world/test/bag-with"
+import { player } from "#/world/test/player"
 
 describe("growth", () => {
   it("a point raises a stat by one, whatever it is at", () => {
@@ -150,8 +161,7 @@ describe("items in use", () => {
 })
 
 describe("items", () => {
-  it("every item has a known icon and sensible numbers", async () => {
-    const { ITEMS, ITEM_ICONS } = await import("./items.ts")
+  it("every item has a known icon and sensible numbers", () => {
     for (const [id, d] of Object.entries(ITEMS)) {
       expect(ITEM_ICONS as readonly string[], id).toContain(d.icon)
       expect(d.stack, id).toBeGreaterThan(0)

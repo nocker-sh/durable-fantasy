@@ -1,17 +1,27 @@
-import { loadPlayer } from "./player.ts"
+import { loadPlayer } from "#/world/core/load-player"
 import { describe, expect, it } from "vitest"
-import { apply } from "./apply.ts"
-import { countItem } from "./bag.ts"
-import { RECIPES } from "./crafting.ts"
-import { DAY_TURNS, ERRANDS, FRIEND, MAX_ERRANDS, dayOf, errandToday, errandsOn, friendPrice } from "./errands.ts"
-import { NODES } from "./gather.ts"
-import { ITEMS, sellPrice } from "./items.ts"
-import { MONSTER_KINDS } from "./monsters.ts"
-import { MAPS, npcCell } from "../maps/index.ts"
-import { RESIDENTS } from "../town/residents.ts"
-import { SHOPS } from "./shops.ts"
-import { STORAGE_KEEPER } from "./storage.ts"
-import { bagWith, player } from "../test/helpers.ts"
+import { apply } from "./apply"
+import { countItem } from "#/world/core/count-item"
+import { RECIPES } from "#/world/core/recipes/catalog"
+import { ERRANDS } from "#/world/core/errands"
+import { MAX_ERRANDS } from "#/world/core/errand-rules"
+import { errandToday } from "#/world/core/errand-today"
+import { errandsOn } from "#/world/core/errands-on"
+import { FRIEND } from "#/world/core/friendship-rules"
+import { friendPrice } from "#/world/core/friend-price"
+import { DAY_TURNS } from "#/world/core/clock-rules"
+import { dayOf } from "#/world/core/day-of"
+import { NODES } from "#/world/core/gather"
+import { ITEMS } from "#/world/core/items/catalog"
+import { sellPrice } from "#/world/core/items/sell-price"
+import { MONSTER_KINDS } from "#/world/core/monsters"
+import { MAPS } from "#/world/maps"
+import { npcCell } from "#/world/maps/npc-cell"
+import { RESIDENTS } from "../town/residents"
+import { SHOPS } from "#/world/core/shops"
+import { STORAGE_KEEPER } from "#/world/core/storage/rules"
+import { bagWith } from "#/world/test/bag-with"
+import { player } from "#/world/test/player"
 
 const DAY0 = Date.parse("2026-10-21T03:00:00Z") // noon in Japan
 const D = 86_400_000
@@ -37,22 +47,22 @@ describe("errands", () => {
     ])
     for (const e of ERRANDS) {
       expect(names.has(e.from), e.id).toBe(true)
-      if (e.to) expect(names.has(e.to), e.id).toBe(true)
-      if (e.wants) expect(obtainable.has(e.wants.item), e.id).toBe(true)
+      if (e.kind === "deliver") expect(names.has(e.to), e.id).toBe(true)
+      if (e.kind === "bring") expect(obtainable.has(e.wants.item), e.id).toBe(true)
       expect(e.ask.length && e.thanks.length && e.gold > 0, e.id).toBeTruthy()
     }
   })
 
   it("buying the things to hand over never pays; gathering them pays more than selling them to a shop", () => {
-    for (const e of ERRANDS.filter((x) => x.wants)) {
-      const value = ITEMS[e.wants!.item].price * e.wants!.count
+    for (const e of ERRANDS.filter((x) => x.kind === "bring")) {
+      const value = ITEMS[e.wants.item].price * e.wants.count
       expect(e.gold, e.id).toBeLessThanOrEqual(value)
-      expect(e.gold, e.id).toBeGreaterThan(sellPrice(e.wants!.item) * e.wants!.count)
+      expect(e.gold, e.id).toBeGreaterThan(sellPrice(e.wants.item) * e.wants.count)
     }
   })
 
   it("everyone involved is out and about at some hour, so they can be found", () => {
-    for (const name of new Set(ERRANDS.flatMap((e) => [e.from, ...(e.to ? [e.to] : [])]))) {
+    for (const name of new Set(ERRANDS.flatMap((e) => [e.from, ...(e.kind === "deliver" ? [e.to] : [])]))) {
       const found = Array.from({ length: 96 }, (_, i) => i * 15).some((min) => Object.values(MAPS).some((m) => npcCell(m, name, min)))
       expect(found, name).toBe(true)
     }
@@ -63,7 +73,7 @@ describe("errands", () => {
     // minutes counted from when the errand day turns over
     const steps = Array.from({ length: 96 }, (_, i) => DAY_TURNS + i * 15)
     for (const e of ERRANDS) {
-      const hand = e.kind === "bring" ? e.from : e.to!
+      const hand = e.kind === "bring" ? e.from : e.to
       const ok = steps.some((a, i) => out(e.from, a) && steps.slice(i + 1).some((b) => out(hand, b)))
       expect(ok, e.id).toBe(true)
     }
@@ -168,10 +178,10 @@ describe("errands", () => {
     const sold = apply(p, { type: "sell", shop: "buyer", slot: 0, count: 1 }, { now: DAY0 })
     const again = sold.ok ? apply(sold.state, { type: "sell", shop: "buyer", slot: 0, count: 1 }, { now: DAY0 + 60_000 }) : sold
     expect(again.ok && again.state.friends["ラインホルト"]).toBe(FRIEND.bought)
-    const stored = again.ok ? apply(again.state, { type: "store", slot: 0, count: 1 }, { now: DAY0 }) : again
-    const twice = stored.ok ? apply(stored.state, { type: "store", slot: 0, count: 1 }, { now: DAY0 + 60_000 }) : stored
+    const stored = again.ok ? apply(again.state, { type: "store", slot: 0, count: 1, expectedStack: again.state.bag[0] }, { now: DAY0 }) : again
+    const twice = stored.ok ? apply(stored.state, { type: "store", slot: 0, count: 1, expectedStack: stored.state.bag[0] }, { now: DAY0 + 60_000 }) : stored
     expect(twice.ok && twice.state.friends[STORAGE_KEEPER]).toBe(FRIEND.bought)
-    const nextDay = twice.ok ? apply(twice.state, { type: "store", slot: 0, count: 1 }, { now: DAY0 + D }) : twice
+    const nextDay = twice.ok ? apply(twice.state, { type: "store", slot: 0, count: 1, expectedStack: twice.state.bag[0] }, { now: DAY0 + D }) : twice
     expect(nextDay.ok && nextDay.state.friends[STORAGE_KEEPER]).toBe(2 * FRIEND.bought)
     // other shops buying back is just trade
     const food = apply(player({ bag: bagWith(["herb", 1]) }), { type: "sell", shop: "general", slot: 0, count: 1 }, { now: DAY0 })

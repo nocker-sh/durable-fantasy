@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from "vitest"
-import type { Look } from "./figure"
+import type { Look } from "#/world/scene/figure/look"
 
 afterEach(() => {
   vi.useRealTimers()
@@ -21,7 +21,7 @@ it("delivers an oversized baked strip before closing it, then reloads it when ne
       return image
     }),
   )
-  const { bakedStrip } = await import("./sprite-pool.ts")
+  const bakedStrip = (await import("#/world/scene/baked-strip")).bakedStrip
   const delivered = vi.fn((image) => {
     expect(image.close).not.toHaveBeenCalled()
   })
@@ -41,7 +41,7 @@ it("shares a decoded strip across callers without fetching again", async () => {
     "createImageBitmap",
     vi.fn(async () => image),
   )
-  const { bakedStrip } = await import("./sprite-pool.ts")
+  const bakedStrip = (await import("#/world/scene/baked-strip")).bakedStrip
   const a = vi.fn(),
     b = vi.fn()
   bakedStrip("test-shared.png", 1, a)
@@ -74,16 +74,17 @@ it.each(["blocked", "throws"])("keeps worker capacity available when cache acces
       return {}
     },
   })
-  const { spriteFrame, spritesPending } = await import("./sprite-pool.ts")
+  const spriteFrame = (await import("#/world/scene/sprite-frame")).spriteFrame,
+    spritesPending = (await import("#/world/scene/sprites-pending")).spritesPending
   const delivered = vi.fn()
-  spriteFrame({} as Look, null, "idle", 0, 0, 0, delivered, "test")
+  spriteFrame({ look: {} as Look, item: null, anim: "idle", view: 0, f: 0, urgency: 0, onReady: delivered, id: "test" })
   await vi.advanceTimersByTimeAsync(5000)
   expect(jobs).toHaveLength(1)
   const bitmap = { width: 1, height: 1, close: vi.fn() }
   workers[0].onmessage?.({ data: { key: "test|idle|0|0", bitmap, png: new Blob() } })
   expect(delivered).toHaveBeenCalledWith(bitmap)
   expect(spritesPending()).toBe(0)
-  spriteFrame({} as Look, null, "idle", 0, 1, 0, delivered, "test")
+  spriteFrame({ look: {} as Look, item: null, anim: "idle", view: 0, f: 1, urgency: 0, onReady: delivered, id: "test" })
   await vi.advanceTimersByTimeAsync(0)
   expect(jobs).toHaveLength(2)
   await vi.advanceTimersByTimeAsync(5000)
@@ -105,9 +106,10 @@ it("releases a failed frame's worker, processes other frames and retries only af
   vi.stubGlobal("Worker", WorkerStub)
   vi.stubGlobal("navigator", { hardwareConcurrency: 2 })
   vi.stubGlobal("indexedDB", undefined)
-  const { spriteFrame, spritesPending } = await import("./sprite-pool.ts")
+  const spriteFrame = (await import("#/world/scene/sprite-frame")).spriteFrame,
+    spritesPending = (await import("#/world/scene/sprites-pending")).spritesPending
   const delivered = vi.fn()
-  const request = (f: number) => spriteFrame({} as Look, null, "idle", 0, f, 0, delivered, "test")
+  const request = (f: number) => spriteFrame({ look: {} as Look, item: null, anim: "idle", view: 0, f: f, urgency: 0, onReady: delivered, id: "test" })
   request(0)
   request(1)
   await vi.advanceTimersByTimeAsync(0)

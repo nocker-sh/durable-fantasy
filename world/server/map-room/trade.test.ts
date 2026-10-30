@@ -1,19 +1,21 @@
 import { describe, expect, it, vi } from "vitest"
 import type { WebSocketConnection } from "void/ws"
-import type { ServerMessage } from "../../protocol.ts"
-import type { Ctx } from "./context.ts"
-import { emptyOffer } from "../../core/trade.ts"
-import { mapPlayer, setPresence, type Presence } from "./presence.ts"
-import { player } from "../../test/helpers.ts"
+import type { ServerMessage } from "#/world/protocol"
+import type { Ctx } from "./context"
+import { emptyOffer } from "#/world/core/empty-offer"
+import { mapPlayer } from "#/world/server/map-room/map-player"
+import { setPresence } from "#/world/server/map-room/set-presence"
+import type { Presence } from "#/world/server/map-room/presence"
+import { player } from "#/world/test/player"
 
-vi.mock("../../../durable-objects/player.ts", () => ({
+vi.mock("../../../durable-objects/player", () => ({
   Player: {
     get: vi.fn(() => {
       throw new Error("Invitation must not mutate inventory")
     }),
   },
 }))
-import { HANDLERS } from "./trade.ts"
+import { HANDLERS } from "./trade"
 
 function connection(id: string, patch: Partial<Presence> = {}) {
   const state: Presence = {

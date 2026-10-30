@@ -1,9 +1,14 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { cn } from "cn";
+import { withoutKeys } from "#/lib/engine/without-keys"
 
-function Label({ className, ...props }: React.ComponentProps<"label">) {
+import * as React from "react"
+import { cn } from "cn"
+
+function Label(inputProps: React.ComponentProps<"label">) {
+  const className = inputProps.className
+  const props = withoutKeys(inputProps, ["className"])
+
   return (
     <label
       data-slot="label"
@@ -13,7 +18,7 @@ function Label({ className, ...props }: React.ComponentProps<"label">) {
       )}
       {...props}
     />
-  );
+  )
 }
 
-export { Label };
+export { Label }

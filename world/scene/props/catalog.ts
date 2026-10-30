@@ -1,9 +1,9 @@
-import type { Thing } from "./types.ts"
-import { ashThings } from "./ash.ts"
-import { waterThings } from "./water.ts"
-import { eavesThings } from "./eaves.ts"
-import { animalsThings } from "./animals.ts"
-import { workThings } from "./work.ts"
+import type { Thing } from "./types"
+import { ashThings } from "./ash"
+import { waterThings } from "./water"
+import { eavesThings } from "./eaves"
+import { animalsThings } from "./animals"
+import { workThings } from "./work"
 
 export const THINGS: Readonly<Record<string, Thing>> = {
   "ash-broom": ashThings["ash-broom"],

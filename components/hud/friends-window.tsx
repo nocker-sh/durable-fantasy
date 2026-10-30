@@ -1,10 +1,8 @@
-// Friends (world.md "マフラー", core/threads.ts): those you have swapped muffler threads with, and
-// their towns. Follow a thread across into a friend's town; your own muffler brings you home.
-import { useGame, useGameState } from "#/components/game/context.tsx"
-import { Button } from "#/components/game/button.tsx"
-import { Panel } from "#/components/game/panel.tsx"
-import { Window } from "#/components/game/window.tsx"
-import { useWindow } from "./use-window.ts"
+import { useGame } from "#/hooks/use-game"
+import { useGameState } from "#/hooks/use-game-state"
+import { Button } from "#/components/game/button"
+import { Window } from "#/components/game/window"
+import { useWindow } from "#/components/hud/use-window"
 
 export function FriendsWindow() {
   const game = useGame()
@@ -41,23 +39,5 @@ export function FriendsWindow() {
         {!threads.length && <li className="font-body text-[12px] text-text-faint">まだ誰とも糸を交換していない。別れ際、そばにいる人の名札を押すと、マフラーの糸を交換できる。</li>}
       </ul>
     </Window>
-  )
-}
-
-/** Someone offers to swap muffler threads. */
-export function ThreadAsk() {
-  const game = useGame()
-  const ask = useGameState((s) => s.threadAsk)
-  if (!ask) return null
-  return (
-    <Panel className="pointer-events-auto absolute top-48 left-1/2 flex -translate-x-1/2 items-center gap-2 p-2">
-      <span className="font-body text-[13px]">{ask.name}がマフラーの糸の交換を申し出ている</span>
-      <Button size="sm" variant="primary" onClick={() => game.answerThread(true)}>
-        交換する
-      </Button>
-      <Button size="sm" onClick={() => game.answerThread(false)}>
-        断る
-      </Button>
-    </Panel>
   )
 }

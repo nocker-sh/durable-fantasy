@@ -1,11 +1,17 @@
 import { expect, it } from "vitest"
-import { RECIPES, STATION_RULES } from "./crafting"
-import { ITEMS, QUALITY_PRICE, sellPrice, type Slot } from "./items"
-import { LIFE_CAP, lifeExpAt } from "./life"
+import { RECIPES } from "#/world/core/recipes/catalog"
+import { STATION_RULES } from "#/world/core/crafting-rules"
+import { ITEMS } from "#/world/core/items/catalog"
+import { QUALITY_PRICE } from "#/world/core/items/kinds"
+import { sellPrice } from "#/world/core/items/sell-price"
+import type { Slot } from "#/world/core/items/kinds"
+import { LIFE_CAP } from "#/world/core/life-rules"
+import { lifeExpAt } from "#/world/core/life-exp-at"
 import { apply } from "./apply"
-import { loadPlayer } from "./player"
-import { emptyBag } from "./bag"
-import { bagWith, player } from "../test/helpers"
+import { loadPlayer } from "#/world/core/load-player"
+import { emptyBag } from "#/world/core/empty-bag"
+import { bagWith } from "#/world/test/bag-with"
+import { player } from "#/world/test/player"
 
 const equipmentRecipes = RECIPES.filter((recipe) => ITEMS[recipe.output.item].equip)
 

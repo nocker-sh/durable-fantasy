@@ -1,7 +1,9 @@
 // Three independent identities: party speech crosses maps but never reaches bystanders.
 import { chromium } from "playwright-core"
 import { mkdir } from "node:fs/promises"
-import { createCharacter, waitReady, walkToMap } from "./lib/game-browser.mjs"
+import { createCharacter } from "#resources/scripts/lib/create-character"
+import { waitReady } from "#resources/scripts/lib/wait-ready"
+import { walkToMap } from "#resources/scripts/lib/walk-to-map"
 const browser = await chromium.launch({ channel: "chrome", args: ["--disable-http2"] })
 const errors = []
 const failedScripts = []

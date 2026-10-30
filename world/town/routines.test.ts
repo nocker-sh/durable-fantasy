@@ -1,11 +1,20 @@
+import { strictEqual } from "node:assert"
 import { describe, expect, it } from "vitest"
-import { daylight, within } from "../core/clock.ts"
-import { SHOPS } from "../core/shops.ts"
-import { MAPS, cellOfSpot, npcCell, npcsAt, shopOpen } from "../maps/index.ts"
-import { RESIDENTS } from "./residents.ts"
-import { ROUTINES, slotAt, spotAt, workSpot } from "./routines.ts"
-import { HOUSEHOLDS, HOUSES } from "./houses.ts"
-import { windowsLit } from "./schedule.ts"
+import { daylight } from "#/world/core/daylight"
+import { within } from "#/world/core/within"
+import { SHOPS } from "#/world/core/shops"
+import { MAPS } from "#/world/maps"
+import { cellOfSpot } from "#/world/maps/cell-of-spot"
+import { npcCell } from "#/world/maps/npc-cell"
+import { npcsAt } from "#/world/maps/npcs-at"
+import { shopOpen } from "#/world/maps/shop-open"
+import { RESIDENTS } from "./residents"
+import { ROUTINES } from "#/world/town/routines"
+import { slotAt } from "#/world/town/slot-at"
+import { spotAt } from "#/world/town/spot-at"
+import { workSpot } from "#/world/town/work-spot"
+import { HOUSEHOLDS, HOUSES } from "#/world/town/houses"
+import { windowsLit } from "#/world/town/windows-lit"
 
 const EVERY = Array.from({ length: 48 }, (_, k) => k * 30)
 
@@ -175,7 +184,7 @@ it("keeps every resident's schedule identical at all minutes and slot boundaries
     const times = [...Array.from({ length: 1440 }, (_, minute) => minute), ...slots.flatMap((slot) => [slot.from - 0.01, slot.from + 0.01])]
     for (const minute of times) {
       const expected = sorted.find((slot, i) => within(minute, slot.from, sorted[(i + 1) % sorted.length].from)) ?? sorted[0] ?? null
-      expect(slotAt(name, minute)).toBe(expected)
+      strictEqual(slotAt(name, minute), expected, `${name}: ${minute}`)
     }
   }
   expect(slotAt("unknown", 0)).toBeNull()

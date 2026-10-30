@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest"
-import { MAPS, cellDistance, npcCell, walkable } from "./maps/index.ts"
-import { cellsReached, validPath, type Cell } from "./protocol.ts"
+import { MAPS } from "#/world/maps"
+import { cellDistance } from "#/world/maps/cell-distance"
+import { npcCell } from "#/world/maps/npc-cell"
+import { walkable } from "#/world/maps/walkable"
+import { cellsReached } from "#/world/cells-reached"
+import { validPath } from "#/world/valid-path"
+import { clientMessage } from "#/world/protocol"
+import type { Cell } from "#/world/protocol"
 
 const town = MAPS.phanthiet
 const free = (c: Cell) => walkable(town, c)
@@ -62,4 +68,22 @@ describe("paths", () => {
     expect(reached.some((c) => cellDistance(c, [38, 75]) === 0)).toBe(true)
     expect(cellsReached(path, 100).at(-1)).toEqual(path.at(-1))
   })
+})
+
+it("requires a bounded, complete commission queue when collecting", () => {
+  const request = { type: "collect", seq: 7, index: 0 }
+  const order = { commission: "gunter-sword", readyAt: 1000, q: 1 }
+  expect(clientMessage.safeParse(request).success).toBe(false)
+  expect(clientMessage.safeParse({ ...request, orders: [order] }).success).toBe(true)
+  expect(clientMessage.safeParse({ ...request, orders: Array(4).fill(order) }).success).toBe(false)
+  expect(clientMessage.safeParse({ ...request, orders: [{ ...order, q: 4 }] }).success).toBe(false)
+})
+
+it("requires the selected stack including wear for warehouse requests", () => {
+  const request = { type: "storage", seq: 7, action: "store", index: 0, count: 1 }
+  expect(clientMessage.safeParse(request).success).toBe(false)
+  const stack = { item: "wood-axe", count: 1, q: 1, by: "ギュンター", dur: 3 }
+  const parsed = clientMessage.parse({ ...request, stack })
+  expect(parsed).toEqual({ ...request, stack })
+  expect(clientMessage.safeParse({ ...request, stack: { ...stack, dur: -1 } }).success).toBe(false)
 })

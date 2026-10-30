@@ -1,9 +1,10 @@
-import { eventOf } from "#/world/town/events.ts"
-import { REASON_TEXT } from "#/world/core/commands.ts"
-import { FLAVOR } from "#/world/town/flavor.ts"
-import { ALL_LINES } from "#/world/town/lines/index.ts"
-import { sheet } from "./schema.ts"
-import { ref, mapName } from "./shared.tsx"
+import { eventOf } from "#/world/town/event-of"
+import { REASON_TEXT } from "#/world/core/commands"
+import { FLAVOR } from "#/world/town/flavor"
+import { ALL_LINES } from "#/world/town/lines/index"
+import { sheet } from "./schema"
+import { ref } from "#/dev/sheets/ref"
+import { mapName } from "#/dev/sheets/map-name"
 
 type EventRow = { day: string; event: string }
 
@@ -30,7 +31,12 @@ type LineRow = { who: string; n: number }
 const lines = sheet<LineRow>({
   id: "lines",
   label: "台詞",
-  rows: () => Object.entries(ALL_LINES).flatMap(([who, ls]) => ls.map((_, n) => ({ who, n }))),
+  rows: () =>
+    Object.entries(ALL_LINES).flatMap((entry) => {
+      const who = entry[0]
+      const ls = entry[1]
+      return ls.map((_, n) => ({ who, n }))
+    }),
   key: (r) => `${r.who}-${r.n + 1}`,
   name: (r) => ALL_LINES[r.who][r.n].text,
   kind: (r) => r.who,

@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest"
-import { GridPathfinder } from "./pathfinder.ts"
-import { Polyline } from "./polyline.ts"
-import { ScalarField } from "./scalar-field.ts"
-import { LoadTimer } from "./laps.ts"
-import { Store } from "./store.ts"
-import { Rng } from "./random.ts"
+import { GridPathfinder } from "./pathfinder"
+import { Polyline } from "./polyline"
+import { ScalarField } from "./scalar-field"
+import { LoadTimer } from "./laps"
+import { Store } from "./store"
+import { Rng } from "./random"
 
 describe("map-independent engine", () => {
   it("routes around obstacles, observes live changes, and keeps grids independent", () => {

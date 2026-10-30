@@ -2,18 +2,24 @@
 // paths against the map's walk grid, checks distances for shops and warps, and runs commands on
 // each player's data through their Player Durable Object. Who is where lives on the connections,
 // so the room keeps nothing once the last player leaves.
-import { notifyClient } from "../../world/server/map-room/notifications.ts"
+import { standUp } from "../../world/server/map-room/posture"
 import { defineRoom } from "void/ws"
-import { KeyedQueue } from "#/lib/engine/keyed-queue.ts"
-import { Player } from "../../durable-objects/player.ts"
-import { Directory } from "../../durable-objects/directory.ts"
-import { parseRoom } from "#/world/channels.ts"
-import { MAPS, isMapId, isOpen, type MapDefinition } from "#/world/maps/index.ts"
-import { clientMessage, serverMessage } from "#/world/protocol.ts"
-import { HANDLERS } from "#/world/server/map-room/index.ts"
-import type { Ctx } from "#/world/server/map-room/context.ts"
-import { type Presence, presence, setTrade } from "#/world/server/map-room/presence.ts"
-import { authenticatedPlayer, sameOrigin } from "#/world/server/session.ts"
+import { KeyedQueue } from "#/lib/engine/keyed-queue"
+import { Player } from "../../durable-objects/player"
+import { Directory } from "../../durable-objects/directory"
+import { parseRoom } from "#/world/parse-room"
+import { MAPS } from "#/world/maps"
+import { isMapId } from "#/world/maps/is-map-id"
+import { isOpen } from "#/world/maps/is-open"
+import { type MapDefinition } from "#/world/maps/types"
+import { clientMessage, serverMessage } from "#/world/protocol"
+import { HANDLERS } from "#/world/server/map-room/index"
+import type { Ctx } from "#/world/server/map-room/context"
+import type { Presence } from "#/world/server/map-room/presence"
+import { presence } from "#/world/server/map-room/presence"
+import { setTrade } from "#/world/server/map-room/set-trade"
+import { authenticatedPlayer } from "#/world/server/authenticated-player"
+import { sameOrigin } from "#/world/server/same-origin"
 
 const messages = new KeyedQueue()
 
@@ -48,15 +54,8 @@ export default defineRoom({
       // Creation is saved before this connection can participate in the world.
       if (me.ready === false && message.type !== "join" && !(message.type === "command" && message.command.type === "profile")) return
       const save = (patch: Partial<Presence>) => ctx.connection.setState({ ...presence(ctx.connection), ...patch } satisfies Presence)
-      /** Someone sitting gets up before they walk off or strike. */
-      const standUp = async () => {
-        if (!me.sitting || !me.owner) return
-        save({ sitting: false })
-        const result = await Player.get(me.owner).run({ type: "stand" })
-        await notifyClient(ctx.connection.send({ type: "result", seq: -1, result }))
-      }
       const handle = HANDLERS[message.type] as ((c: Ctx, m: typeof message) => Promise<void>) | undefined
-      await handle?.({ ctx, key, map, me, save, standUp, receivedAt }, message)
+      await handle?.({ ctx, key, map, me, save, standUp: () => standUp({ ctx, me, save }), receivedAt }, message)
     })
   },
   async onClose(ctx) {

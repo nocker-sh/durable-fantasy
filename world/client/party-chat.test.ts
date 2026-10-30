@@ -1,5 +1,5 @@
 import { expect, it, vi } from "vitest"
-import { ServerMessages } from "./server-messages.ts"
+import { ServerMessages } from "./server-messages"
 
 type Context = ConstructorParameters<typeof ServerMessages>[0]
 it("deduplicates polled messages across map changes and ignores a departed party", () => {

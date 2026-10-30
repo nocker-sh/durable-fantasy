@@ -1,27 +1,29 @@
-// Dragging an item from the bag (or an equipment slot) onto another slot or the shortcut bar.
-import type { DragEvent } from "react"
-import type { ItemId, Slot } from "#/world/core/items.ts"
-import type { SkillId } from "#/world/core/skills.ts"
+import { z } from "zod"
+import { SLOTS } from "#/world/core/items/kinds"
+import { BAG_SIZE } from "#/world/core/bag-rules"
+import { itemId, stackSchema } from "#/world/core/player-schema"
+import { SKILL_IDS } from "#/world/core/skill-ids"
 
 export const ITEM_DRAG = "application/x-ui-item"
 
-/** What is dragged: an item from a bag slot or something worn, or a skill (onto the shortcut bar). */
-export type DragSource = { item: ItemId; slot: number } | { item: ItemId; worn: Slot } | { skill: SkillId }
+export const dragSourceSchema = z.union([
+  z
+    .object({
+      item: itemId,
+      slot: z
+        .number()
+        .int()
+        .min(0)
+        .max(BAG_SIZE - 1),
+      stack: stackSchema,
+    })
+    .strict()
+    .refine((s) => s.item === s.stack.item),
+  z
+    .object({ item: itemId, worn: z.enum(SLOTS), stack: stackSchema })
+    .strict()
+    .refine((s) => s.item === s.stack.item && s.stack.count === 1),
+  z.object({ skill: z.enum(SKILL_IDS) }).strict(),
+])
 
-export function startDrag(event: DragEvent, source: DragSource, icon: string) {
-  event.dataTransfer.setData(ITEM_DRAG, JSON.stringify(source))
-  event.dataTransfer.effectAllowed = "move"
-  const image = new Image()
-  image.src = icon
-  event.dataTransfer.setDragImage(image, 16, 16)
-}
-
-export function readDrag(event: DragEvent): DragSource | null {
-  try {
-    return JSON.parse(event.dataTransfer.getData(ITEM_DRAG))
-  } catch {
-    return null
-  }
-}
-
-export const carriesItem = (event: DragEvent) => event.dataTransfer.types.includes(ITEM_DRAG)
+export type DragSource = z.infer<typeof dragSourceSchema>

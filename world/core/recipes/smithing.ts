@@ -1,131 +1,142 @@
-import { recipe as r, type Recipe } from "./definition.ts"
+import { recipe as r, type Recipe } from "./definition"
 import { FORGED_WEAPON_RECIPES } from "./forged-weapons"
 
 export const SMITHING_RECIPES: readonly Recipe[] = [
   // the forge: scrap to iron, iron and wood to tools
-  r(
-    "iron-ingot",
-    "smithing",
-    "forge",
-    [
+  r({
+    id: "iron-ingot",
+    skill: "smithing",
+    station: "forge",
+    inputs: [
       ["rusty-scrap", 2],
       ["charcoal", 1],
     ],
-    ["iron-ingot", 1],
-  ),
-  r(
-    "wood-axe",
-    "smithing",
-    "forge",
-    [
+    output: ["iron-ingot", 1],
+  }),
+  r({
+    id: "wood-axe",
+    skill: "smithing",
+    station: "forge",
+    inputs: [
       ["iron-ingot", 1],
       ["plank", 1],
     ],
-    ["wood-axe", 1],
-    2,
-  ),
-  r(
-    "sickle",
-    "smithing",
-    "forge",
-    [
+    output: ["wood-axe", 1],
+    min: 2,
+  }),
+  r({
+    id: "sickle",
+    skill: "smithing",
+    station: "forge",
+    inputs: [
       ["iron-ingot", 1],
       ["plank", 1],
     ],
-    ["sickle", 1],
-    2,
-  ),
-  r(
-    "iron-helm",
-    "smithing",
-    "forge",
-    [
+    output: ["sickle", 1],
+    min: 2,
+  }),
+  r({
+    id: "iron-helm",
+    skill: "smithing",
+    station: "forge",
+    inputs: [
       ["iron-ingot", 2],
       ["tanned-leather", 1],
     ],
-    ["iron-helm", 1],
-    4,
-  ),
-  r(
-    "dagger",
-    "smithing",
-    "forge",
-    [
+    output: ["iron-helm", 1],
+    min: 4,
+  }),
+  r({
+    id: "chain-mail",
+    skill: "smithing",
+    station: "forge",
+    inputs: [
+      ["iron-ingot", 6],
+      ["tanned-leather", 1],
+    ],
+    output: ["chain-mail", 1],
+    min: 8,
+  }),
+  r({
+    id: "dagger",
+    skill: "smithing",
+    station: "forge",
+    inputs: [
       ["iron-ingot", 2],
       ["soft-fur", 1],
     ],
-    ["dagger", 1],
-    4,
-  ),
-  r(
-    "short-sword",
-    "smithing",
-    "forge",
-    [
+    output: ["dagger", 1],
+    min: 4,
+  }),
+  r({
+    id: "short-sword",
+    skill: "smithing",
+    station: "forge",
+    inputs: [
       ["iron-ingot", 2],
       ["plank", 1],
       ["tanned-leather", 1],
     ],
-    ["short-sword", 1],
-    4,
-  ),
-  r(
-    "iron-sword",
-    "smithing",
-    "forge",
-    [
+    output: ["short-sword", 1],
+    min: 4,
+  }),
+  r({
+    id: "iron-sword",
+    skill: "smithing",
+    station: "forge",
+    inputs: [
       ["iron-ingot", 3],
       ["plank", 1],
       ["soft-fur", 1],
     ],
-    ["iron-sword", 1],
-    8,
-  ),
-  r(
-    "hand-axe",
-    "smithing",
-    "forge",
-    [
+    output: ["iron-sword", 1],
+    min: 8,
+  }),
+  r({
+    id: "hand-axe",
+    skill: "smithing",
+    station: "forge",
+    inputs: [
       ["iron-ingot", 2],
       ["plank", 1],
     ],
-    ["hand-axe", 1],
-    4,
-  ),
-  r(
-    "battle-axe",
-    "smithing",
-    "forge",
-    [
+    output: ["hand-axe", 1],
+    min: 4,
+  }),
+  r({
+    id: "battle-axe",
+    skill: "smithing",
+    station: "forge",
+    inputs: [
       ["iron-ingot", 6],
       ["plank", 2],
       ["tanned-leather", 2],
     ],
-    ["battle-axe", 1],
-    8,
-  ),
-  r(
-    "spear",
-    "smithing",
-    "forge",
-    [
+    output: ["battle-axe", 1],
+    min: 8,
+  }),
+  r({
+    id: "spear",
+    skill: "smithing",
+    station: "forge",
+    inputs: [
       ["iron-ingot", 3],
       ["plank", 2],
       ["yarn", 1],
     ],
-    ["spear", 1],
-    8,
-  ),
-  r(
-    "mace",
-    "smithing",
-    "forge",
-    [
+    output: ["spear", 1],
+    min: 8,
+  }),
+  r({
+    id: "mace",
+    skill: "smithing",
+    station: "forge",
+    inputs: [
       ["iron-ingot", 4],
       ["plank", 1],
     ],
-    ["mace", 1],
-    8,
-  ),
+    output: ["mace", 1],
+    min: 8,
+  }),
   ...FORGED_WEAPON_RECIPES,
 ]

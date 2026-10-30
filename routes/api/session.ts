@@ -1,9 +1,9 @@
 import { z } from "zod"
 import { defineHandler } from "void"
-import { playerId } from "#/world/core/identity.ts"
-import { establishSession } from "#/world/server/session.ts"
+import { playerId } from "#/world/core/identity"
+import { establishSession } from "#/world/server/establish-session"
 
-export const POST = defineHandler.withValidator({
+const handler = defineHandler.withValidator({
   body: z.object({
     legacyId: playerId.optional(),
     proof: z
@@ -11,4 +11,6 @@ export const POST = defineHandler.withValidator({
       .regex(/^[a-f0-9]{64}$/)
       .optional(),
   }),
-})((context, { body }) => establishSession(context.req.raw, body.legacyId, body.proof))
+})
+
+export const POST = handler((context, input) => establishSession(context.req.raw, input.body.legacyId, input.body.proof))

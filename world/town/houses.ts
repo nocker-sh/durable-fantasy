@@ -1,16 +1,9 @@
-import { houses as square } from "./houses/square.ts"
-import { houses as market } from "./houses/market.ts"
-import { houses as craft } from "./houses/craft.ts"
-import { houses as gate } from "./houses/gate.ts"
-
-// Households and the buildings they live and work in (.docs/town.md). Every resident belongs to
-// one household; every household has one home, sized for it: one bed per member, a hearth in
-// every home (the town is cold all year), a workshop or shop where the trade needs one. The
-// scene builds each house from this table, so what you see outside matches what is inside.
-// Homes cannot be entered; shops and public buildings open onto indoor maps.
-
-import type { HouseDef, Household } from "./house-types.ts"
-export type { HouseKind, Room, Plan, HouseDef, Household } from "./house-types.ts"
+import hall from "#/world/town/floorplan/authored/h-m5"
+import { houses as square } from "#/world/town/houses/square"
+import { houses as market } from "#/world/town/houses/market"
+import { houses as craft } from "#/world/town/houses/craft"
+import { houses as gate } from "#/world/town/houses/gate"
+import type { HouseDef, Household } from "#/world/town/house-types"
 
 export const HOUSEHOLDS: readonly Household[] = [
   // ---------------------------------------------------------------- the market square
@@ -128,28 +121,32 @@ export const HOUSEHOLDS: readonly Household[] = [
   { id: "retired", name: "エドガーとマルグリット", members: ["エドガー", "マルグリット"], living: "慎ましい", trade: "隠居。エドガーは元の門番で、寄り合いから少し出る" },
 ]
 
-export const HOUSES: readonly HouseDef[] = [...square, ...market, ...craft, ...gate]
-
-/** The household someone belongs to. */
-export const householdOf = (name: string) => HOUSEHOLDS.find((h) => h.members.includes(name))
-
-/** Floors the outside shows: the highest room's floor + 1. */
-export const floorsOf = (h: HouseDef) => Math.max(...h.plan.rooms.map((r) => r.floor)) + 1
-
-export const bedsOf = (h: HouseDef) => h.plan.rooms.reduce((n, r) => n + (r.beds ?? 0), 0)
-
-/** Places to sit, read from the furniture: 椅子×n, a long bench seats three, a long table four a side. */
-export function seatsOf(h: HouseDef): number {
-  let n = 0
-  for (const f of h.plan.furniture) {
-    const count = Number(/×(\d+)/.exec(f)?.[1] ?? 1)
-    if (f.startsWith("椅子")) n += count
-    else if (/長椅子/.test(f)) n += 3 * count
-    else if (/揺り椅子/.test(f)) n += count
-    else if (f.startsWith("長卓")) n += 8 * count
+export const HOUSES: readonly HouseDef[] = [...square, ...market, ...craft, ...gate].map((h) => {
+  if (h.id !== hall.id) return h
+  const site = hall.exterior!,
+    x0State = site.bounds,
+    x0 = x0State[0],
+    z0 = x0State[1],
+    x1 = x0State[2],
+    z1 = x0State[3],
+    nxState = site.door.outward,
+    nx = nxState[0],
+    nz = nxState[1],
+    xState = site.door.point,
+    x = xState[0],
+    z = xState[1]
+  const side = nx === 1 ? "e" : nx === -1 ? "w" : nz === 1 ? "s" : "n"
+  const u = side === "s" ? x - x0 : side === "n" ? x1 - x : side === "e" ? z1 - z : z - z0
+  return {
+    ...h,
+    authored: hall,
+    x0,
+    z0,
+    x1,
+    z1,
+    axis: site.ridgeAxis,
+    roof: site.roof,
+    door: { side, u },
+    plan: { ...h.plan, rooms: h.plan.rooms.map((room, i) => ({ ...room, name: hall.rooms.find((r) => r.id === `room-${h.id}-${i + 1}`)!.name })) },
   }
-  return n
-}
-
-/** Buildings you can walk into: shops and public buildings (homes are private). */
-export const enterable = (h: HouseDef) => h.kind === "shop" || h.kind === "public"
+})

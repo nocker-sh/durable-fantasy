@@ -1,60 +1,91 @@
-import { OcclusionQuery } from "../../../lib/graphics/occlusion-query.ts"
+import { withCleanup } from "../../../lib/engine/with-cleanup"
+import { type CleanupStack } from "../../../lib/engine/cleanup-stack"
+import { disposeObjectTree } from "../../../lib/graphics/dispose-object-tree"
+import type { SceneOptions } from "./scene-options"
+import { SceneBuildQueue } from "./scene-build-queue"
+import type { PixelBuffer as PixBuf } from "../../../lib/graphics/pixel-buffer"
+import { OcclusionQuery } from "../../../lib/graphics/occlusion-query"
 import { ScreenLabels } from "../../../lib/graphics/screen-labels"
 import { PendingAction } from "./action-target"
 import { WarpMarkers } from "./warps"
 import { FrameLimiter } from "../../../lib/engine/frame-limiter"
-import { keyTurn, walkDirection } from "../turn"
-import { createGatheringSpots } from "./gathering.ts"
-import { createPointer } from "./pointer.ts"
-import { createPreviewControls } from "./preview.ts"
-import { PixelCamera } from "../../../lib/graphics/pixel-camera.ts"
-import { createWalkers } from "./walkers.ts"
-import { DioramaPostProcessing } from "../../../lib/graphics/post-processing.ts"
-import { mergeStatic } from "../../../lib/graphics/batch.ts"
+import { keyTurn } from "#/world/scene/key-turn"
+import { walkDirection } from "#/world/scene/walk-direction"
+import { createGatheringSpots } from "./gathering"
+import { createPointer } from "./pointer"
+import { createPreviewControls } from "./preview"
+import { PixelCamera } from "../../../lib/graphics/pixel-camera"
+import { createWalkers } from "./walkers"
+import { DioramaPostProcessing } from "../../../lib/graphics/post-processing"
+import { mergeStatic } from "../../../lib/graphics/batch"
 import * as THREE from "three"
-import { initWalk, walkH, isFree, setLayout } from "../world"
-import { updateCutaways } from "../interior"
-import { REACH } from "../../core/gather.ts"
-import { burst, makeMonsters, approachMonster, updateMonsterHealth, updateMonsters } from "../monsters"
-import { MELEE_REACH, MONSTER_KINDS } from "../../core/monsters.ts"
-import { groundOf } from "../ground"
-import { updaters, occluders, resetRegistries, houseGlows, lamps, stalls, movingObjects, type V2 } from "../build"
-import { daylight } from "../../core/clock.ts"
-import type { Anim } from "../figure"
-import { outlineShape } from "../outline"
-import { type Actor, view, FIG_PPU } from "../actors"
-import { critters, spawnAnimals } from "../animals"
-import { tickSprites } from "../sprite-pool"
-import { exposeScene, lap } from "../../diagnostics.ts"
-import { Ashfall, dustAll } from "../ash"
+import { initWalk } from "#/world/scene/init-walk"
+import { walkH } from "#/world/scene/walk-h"
+import { isFree } from "#/world/scene/is-free"
+import { setLayout } from "#/world/scene/set-layout"
+import { updateCutaways } from "#/world/scene/update-cutaways"
+import { REACH } from "#/world/core/gather-rules"
+import { burst } from "#/world/scene/burst"
+import { makeMonsters } from "#/world/scene/make-monsters"
+import { approachMonster } from "#/world/scene/approach-monster"
+import { updateMonsterHealth } from "#/world/scene/update-monster-health"
+import { updateMonsters } from "#/world/scene/update-monsters"
+import { MELEE_REACH, MONSTER_KINDS } from "#/world/core/monsters"
+import { groundOf } from "#/world/scene/ground-of"
+import { updaters, occluders, houseGlows, lamps, stalls, movingObjects } from "#/world/scene/construction/registry"
+import { resetRegistries } from "#/world/scene/construction/reset-registries"
+import type { V2 } from "#/world/scene/construction/registry"
+import { daylight } from "#/world/core/daylight"
+import type { Anim } from "#/world/scene/figure/animation"
+import { outlineShape } from "../../../lib/graphics/outline-shape"
+import type { Actor } from "#/world/scene/actor"
+import { view } from "#/world/scene/actors"
+import { FIG_PPU, FIG } from "#/world/scene/figure/display-scale"
+import { critters } from "#/world/scene/critters"
+import { spawnAnimals } from "#/world/scene/spawn-animals"
+import { tickSprites } from "#/world/scene/tick-sprites"
+import { exposeScene } from "#/world/expose-scene"
+import { lap } from "#/world/lap"
+import { Ashfall } from "#/world/scene/ashfall"
+import { dustAll } from "#/world/scene/dust-all"
 import { findPath } from "../path"
-import { MAP_SCENES } from "./definitions.ts"
-import { diorama } from "./settings.ts"
-import { createTerrain } from "./terrain.ts"
-import { createEnvironment, createLighting } from "./lighting.ts"
-import { createPopulation } from "./population.ts"
-import type { Cell, SceneEvents } from "./types.ts"
-import type { Walker } from "./walker.ts"
-import { center, CELL, cellOf, NAME_RANGE } from "./grid.ts"
+import { MAP_SCENES } from "./definitions"
+import { diorama } from "./settings"
+import { createTerrain } from "./terrain"
+import { createEnvironment } from "#/world/scene/runtime/helpers/lighting/create-environment"
+import { createLighting } from "#/world/scene/runtime/helpers/lighting/create-lighting"
+import { createPopulation } from "./population"
+import type { Cell, SceneEvents } from "./types"
+import type { Walker } from "./walker"
+import { center } from "#/world/scene/runtime/center"
+import { CELL, NAME_RANGE } from "#/world/scene/runtime/grid"
+import { cellOf } from "#/world/scene/runtime/cell-of"
 
-/** How a scene is shown: in the game, or (preview) as the /dev map view, with no player and a free camera. */
-export interface SceneOptions {
-  preview?: boolean
-  /** preview: where to look first, in world units (the map's middle if left out) */
-  at?: V2
-  /** preview: the zoom step to start at (0 is furthest out) */
-  zoom?: number
-  /** preview: the view turned by this many 45° steps from the game's own */
-  turn?: number
-}
+const builds = new SceneBuildQueue()
 
-async function createSceneRuntime(map: string, progress: (t: string) => void, options: SceneOptions = {}) {
-  const preview = !!options.preview
-  const world = MAP_SCENES[map] ?? MAP_SCENES.phanthiet
+async function createSceneRuntime(map: string, progress: (t: string) => void, input: { signal?: AbortSignal; options?: SceneOptions } = {}) {
+  input.signal?.throwIfAborted()
   progress("地面を描いています…")
-  // the ground and the plan's fields come from workers or from an earlier visit; only then is the plan used
+  // Painting can overlap; only construction touches shared layout and scene registries.
   const ground = await groundOf(map)
   lap("scene: ground painted")
+  return builds.run(() => buildSceneRuntime({ map, progress, ground, options: input.options ?? {} }), input.signal)
+}
+
+type BuildProps = { map: string; progress: (text: string) => void; ground: PixBuf; options: SceneOptions }
+
+async function buildSceneRuntime(props: BuildProps) {
+  return withCleanup((resources) => assembleSceneRuntime({ ...props, resources }))
+}
+
+async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStack }) {
+  const map = props.map,
+    progress = props.progress,
+    ground = props.ground,
+    resources = props.resources,
+    options = props.options,
+    preview = !!options.preview
+  const world = MAP_SCENES[map] ?? MAP_SCENES.phanthiet
   setLayout(world.layout)
   resetRegistries()
   critters.length = 0
@@ -64,6 +95,8 @@ async function createSceneRuntime(map: string, progress: (t: string) => void, op
   lap("scene: start")
   initWalk()
   const renderer = new THREE.WebGLRenderer({ antialias: false })
+  resources.defer(() => renderer.forceContextLoss())
+  resources.use(renderer)
   renderer.shadowMap.enabled = true
   renderer.shadowMap.type = THREE.BasicShadowMap
   // shadows are redrawn a few times a second and when the sun moves (frame()), not every frame
@@ -72,13 +105,18 @@ async function createSceneRuntime(map: string, progress: (t: string) => void, op
   renderer.outputColorSpace = THREE.SRGBColorSpace
   Object.assign(renderer.domElement.style, { display: "block", imageRendering: "pixelated", touchAction: "none" })
   const scene = new THREE.Scene()
+  resources.defer(() => disposeObjectTree(scene, (asset) => resources.release(asset)))
   exposeScene(scene)
 
-  const post = new DioramaPostProcessing(renderer)
-  const render = () => post.render(scene, cam, diorama, camera.scale)
+  const post = resources.use(new DioramaPostProcessing(renderer))
+  const render = () => post.render({ scene: scene, cam: cam, diorama: diorama, renderScale: camera.scale })
 
-  const { groundCanvas, wm, terrain } = await createTerrain(scene, world, ground, progress, tick)
+  const groundCanvasSource = await createTerrain({ scene: scene, world: world, ground: ground, progress: progress, tick: tick, resources: resources }),
+    groundCanvas = groundCanvasSource.groundCanvas,
+    wm = groundCanvasSource.wm,
+    terrain = groundCanvasSource.terrain
   const town = new THREE.Group()
+  scene.add(town)
   world.build(town)
   lap("scene: town built")
   // still things that share a material become one draw each; a house, a stall or a swaying crown
@@ -88,15 +126,32 @@ async function createSceneRuntime(map: string, progress: (t: string) => void, op
     const merged = mergeStatic(town, { anchors, moving: movingObjects })
     lap(`scene: merged ${merged.before} meshes into ${merged.after}`)
   }
-  scene.add(town)
-  if (world.animals) spawnAnimals(scene)
+  spawnAnimals(scene, map)
 
-  const environment = createEnvironment(scene)
-  const { people, ids, personOf, applySchedule } = await createPopulation(scene, map, world, progress, tick)
-  const walkers = createWalkers(scene, (id) => runtime.events?.pickPlayer?.(id))
-  const { me, movement, remotes, setAvatar, addRemote, updateRemote, removeRemote, clearRemotes, moveRemote, stepWalker, placeWalker, plate } = walkers
+  const environment = createEnvironment(scene, resources)
+  const peopleSource = await createPopulation({ scene: scene, map: map, world: world, progress: progress, tick: tick, own: (person) => resources.use(person.fig) }),
+    people = peopleSource.people,
+    ids = peopleSource.ids,
+    personOf = peopleSource.personOf,
+    applySchedule = peopleSource.applySchedule
+  const walkers = createWalkers(scene, (id) => runtime.events?.pickPlayer?.(id), world.figureMetres === undefined ? 1 : world.figureMetres / FIG)
+  resources.defer(() => walkers.clearRemotes())
+  resources.use(walkers.me.fig)
+  const meSource = walkers,
+    me = meSource.me,
+    movement = meSource.movement,
+    remotes = meSource.remotes,
+    setAvatar = meSource.setAvatar,
+    addRemote = meSource.addRemote,
+    updateRemote = meSource.updateRemote,
+    removeRemote = meSource.removeRemote,
+    clearRemotes = meSource.clearRemotes,
+    moveRemote = meSource.moveRemote,
+    stepWalker = meSource.stepWalker,
+    placeWalker = meSource.placeWalker,
+    plate = meSource.plate
   // warps: a soft ring of light on the ground
-  const warps = new WarpMarkers(scene)
+  const warps = resources.use(new WarpMarkers(scene))
 
   // destination marker and a cursor on the cell under the pointer
   const marker = new THREE.Mesh(new THREE.RingGeometry(0.16, 0.24, 16), new THREE.MeshBasicMaterial({ color: 0xffe080, transparent: true, opacity: 0.85, depthTest: false }))
@@ -116,10 +171,10 @@ async function createSceneRuntime(map: string, progress: (t: string) => void, op
   }
   const lookAt = options.at ?? world.middle ?? world.centre
   const start = preview ? new THREE.Vector3(lookAt[0], walkH(lookAt[0], lookAt[1]), lookAt[1]) : new THREE.Vector3(me.pos[0], walkH(me.pos[0], me.pos[1]), me.pos[1])
-  const camera = new PixelCamera(
-    start,
-    FIG_PPU,
-    (width, height, scale) => {
+  const camera = new PixelCamera({
+    position: start,
+    pixelsPerUnit: FIG_PPU,
+    onResize: (width, height, scale) => {
       const renderWidth = Math.ceil(width / scale),
         renderHeight = Math.ceil(height / scale)
       renderer.setPixelRatio(1)
@@ -128,14 +183,14 @@ async function createSceneRuntime(map: string, progress: (t: string) => void, op
       renderer.domElement.style.width = width + "px"
       renderer.domElement.style.height = height + "px"
     },
-    preview ? [0.5, 1, 2] : undefined,
-    preview ? (options.zoom ?? 1) : 0,
-  )
+    zooms: preview ? [0.5, 1, 2] : undefined,
+    level: preview ? (options.zoom ?? 1) : 0,
+  })
   const cam = camera.camera,
     camFocus = camera.focus
   const resize = camera.resize,
     zoom = camera.zoom
-  const lighting = createLighting(scene, world, wm, applySchedule, environment)
+  const lighting = createLighting({ scene: scene, world: world, wm: wm, applySchedule: applySchedule, environment: environment })
   const setClock = (min: number) => {
     lighting.setClock(min)
     shadowDirty = true
@@ -187,8 +242,12 @@ async function createSceneRuntime(map: string, progress: (t: string) => void, op
   /** One cell on along the held keys, turned by the camera: up on screen is away from the camera. */
   function stepHeld() {
     if (!held || frozen || me.path.length > 1) return
-    const [di, dj] = walkDirection(held, movement.yaw)
-    const [ci, cj] = cellOf(me.path.length ? me.path[0] : me.pos)
+    const diState = walkDirection(held, movement.yaw),
+      di = diState[0],
+      dj = diState[1]
+    const ciState = cellOf(me.path.length ? me.path[0] : me.pos),
+      ci = ciState[0],
+      cj = ciState[1]
     // straight on if it is free; on a slant blocked by a corner, slide along whichever side is open
     const tries: [number, number][] =
       di && dj
@@ -198,7 +257,10 @@ async function createSceneRuntime(map: string, progress: (t: string) => void, op
             [0, dj],
           ]
         : [[di, dj]]
-    for (const [a, b] of tries) {
+    for (const entry of tries) {
+      const a = entry[0]
+      const b = entry[1]
+
       const next = center([ci + a, cj + b])
       if (!isFree(next[0], next[1])) continue
       walkTo(next)
@@ -214,7 +276,10 @@ async function createSceneRuntime(map: string, progress: (t: string) => void, op
     marker.visible = false
   }
   // ---------------------------------------------------------------- gathering spots (core/gather.ts)
-  const { spots, setNodes, spotHit } = createGatheringSpots(town, map)
+  const spotsSource = createGatheringSpots(town, map),
+    spots = spotsSource.spots,
+    setNodes = spotsSource.setNodes,
+    spotHit = spotsSource.spotHit
   /** Walk up to a gathering spot, then have a go at it. */
   function approachSpot(id: string) {
     const s = spots.get(id)
@@ -278,7 +343,13 @@ async function createSceneRuntime(map: string, progress: (t: string) => void, op
       }
     }
   }
-  function struck(id: string, kind: "miss" | "hit" | "critical", damage: number, hp: number, back: number) {
+  function struck(inputProps: { id: string; kind: "miss" | "hit" | "critical"; damage: number; hp: number; back: number }) {
+    const id = inputProps.id
+    const kind = inputProps.kind
+    const damage = inputProps.damage
+    const hp = inputProps.hp
+    const back = inputProps.back
+
     const m = monsters.find((x) => x.spawn.id === id)
     if (!m) return
     if (hp >= 0) m.hp = hp
@@ -293,7 +364,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void, op
     el.textContent = kind === "miss" ? "ミス" : String(damage)
     walkers.layer?.appendChild(el)
     const v = new THREE.Vector3()
-    place(el, toScreen(m.pos, 0.5, v), v, 0)
+    place({ el: el, vis: toScreen({ pos: m.pos, h: 0.5, out: v }), p: v, dy: 0 })
     setTimeout(() => el.remove(), 900)
   }
 
@@ -305,7 +376,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void, op
     el.textContent = kind === "miss" ? "かわした" : String(damage)
     walkers.layer?.appendChild(el)
     const v = new THREE.Vector3()
-    place(el, toScreen(w.pos, w.fig.height * 0.9, v), v, 0)
+    place({ el: el, vis: toScreen({ pos: w.pos, h: w.fig.height * 0.9, out: v }), p: v, dy: 0 })
     setTimeout(() => el.remove(), 900)
   }
   let down = false
@@ -393,27 +464,11 @@ async function createSceneRuntime(map: string, progress: (t: string) => void, op
           action.endFight()
         },
       })
-  /** Let go of the window listeners and the GPU resources when the map is left. */
+  resources.use(pointer)
+  if (previewControls) resources.use(previewControls)
+  /** Release all construction resources together when the map is left. */
   function dispose() {
-    pointer.dispose()
-    previewControls?.dispose()
-    warps.dispose()
-    clearRemotes()
-    me.fig.dispose()
-    for (const person of people) person.fig.dispose()
-    scene.traverse((o) => {
-      const m = o as THREE.Mesh
-      m.geometry?.dispose()
-      const mats = Array.isArray(m.material) ? m.material : m.material ? [m.material] : []
-      for (const mm of mats) {
-        ;(mm as THREE.MeshBasicMaterial).map?.dispose()
-        mm.dispose()
-      }
-    })
-    environment.dispose()
-    post.dispose()
-    renderer.dispose()
-    renderer.forceContextLoss()
+    resources.dispose()
   }
 
   // ---------------------------------------------------------------- names (DOM over the canvas)
@@ -434,14 +489,24 @@ async function createSceneRuntime(map: string, progress: (t: string) => void, op
     walkers.layer = el
     for (const node of [me.label, ...residentLabels, ...monsters.map((m) => m.label), ...[...remotes.values()].map((w) => w.label), ...[...speech.values()].map((b) => b.el)]) el.appendChild(node)
   }
-  const toScreen = (pos: V2, h: number, out: THREE.Vector3, ground = walkH(pos[0], pos[1])) => {
+  const toScreen = (inputProps: { pos: V2; h: number; out: THREE.Vector3; ground?: number }) => {
+    const pos = inputProps.pos
+    const h = inputProps.h
+    const out = inputProps.out
+    const ground = inputProps.ground === undefined ? walkH(pos[0], pos[1]) : inputProps.ground
+
     out.set(pos[0], ground + h, pos[1]).project(cam)
     return out.z < 1 && Math.abs(out.x) < 1.1 && Math.abs(out.y) < 1.1
   }
   const labels = new ScreenLabels()
-  const place = (el: HTMLElement, vis: boolean, p: THREE.Vector3, dy = 0) => {
-    if (!vis) labels.place(el, false)
-    else labels.place(el, true, Math.round(((p.x + 1) / 2) * camera.width), Math.round(((1 - p.y) / 2) * camera.height) - dy)
+  const place = (inputProps: { el: HTMLElement; vis: boolean; p: THREE.Vector3; dy?: number }) => {
+    const el = inputProps.el
+    const vis = inputProps.vis
+    const p = inputProps.p
+    const dy = inputProps.dy === undefined ? 0 : inputProps.dy
+
+    if (!vis) labels.place({ element: el, visible: false })
+    else labels.place({ element: el, visible: true, x: Math.round(((p.x + 1) / 2) * camera.width), y: Math.round(((1 - p.y) / 2) * camera.height) - dy })
   }
   let hoveredLabel: HTMLElement | null = null
 
@@ -521,7 +586,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void, op
       camFocus.y = walkH(camFocus.x, camFocus.z) + 0.6
       camera.look(camFocus, movement.yaw)
     } else {
-      camera.update(followPosition.set(me.pos[0], me.fig.root.position.y + 0.6, me.pos[1]), movement.yawTarget, movement.yaw !== movement.yawTarget, dt)
+      camera.update({ meAt: followPosition.set(me.pos[0], me.fig.root.position.y + 0.6, me.pos[1]), yaw: movement.yawTarget, turned: movement.yaw !== movement.yawTarget, dt: dt })
       movement.yaw = movement.yawTarget
     }
 
@@ -536,25 +601,26 @@ async function createSceneRuntime(map: string, progress: (t: string) => void, op
     head.set(me.pos[0], me.fig.root.position.y + 0.9, me.pos[1])
     const occluded = occlusion.update(cam.position, head)
     let hidden = false
-    if (!preview) occluders.forEach((o, i) => {
-      const hit = occluded[i]
-      if (o.opaque) {
-        hidden ||= !!hit
-        return
-      }
-      const want = hit ? o.min : 1
-      if (o.fade === want) return
-      o.fade += (want - o.fade) * Math.min(1, dt * 8)
-      if (Math.abs(o.fade - want) < 0.01) o.fade = want
-      o.obj.traverse((c) => {
-        const mm = (c as THREE.Mesh).material as THREE.Material | undefined
-        if (!mm) return
-        mm.transparent = o.fade < 1
-        mm.opacity = o.fade
-        mm.depthWrite = o.fade >= 1
+    if (!preview)
+      occluders.forEach((o, i) => {
+        const hit = occluded[i]
+        if (o.opaque) {
+          hidden ||= !!hit
+          return
+        }
+        const want = hit ? o.min : 1
+        if (o.fade === want) return
+        o.fade += (want - o.fade) * Math.min(1, dt * 8)
+        if (Math.abs(o.fade - want) < 0.01) o.fade = want
+        o.obj.traverse((c) => {
+          const mm = (c as THREE.Mesh).material as THREE.Material | undefined
+          if (!mm) return
+          mm.transparent = o.fade < 1
+          mm.opacity = o.fade
+          mm.depthWrite = o.fade >= 1
+        })
+        o.obj.visible = o.fade > 0.03
       })
-      o.obj.visible = o.fade > 0.03
-    })
     pointer.update()
     if (!preview) {
       me.fig.xray(hidden)
@@ -569,15 +635,15 @@ async function createSceneRuntime(map: string, progress: (t: string) => void, op
     render()
 
     // names over heads: players always, residents when near or under the pointer
-    for (const w of [me, ...remotes.values()]) place(w.label, toScreen(w.pos, w.fig.height, v, w.fig.root.position.y), v, 2)
+    for (const w of [me, ...remotes.values()]) place({ el: w.label, vis: toScreen({ pos: w.pos, h: w.fig.height, out: v, ground: w.fig.root.position.y }), p: v, dy: 2 })
     // creatures: where the clock puts them; the one we fight, followed and struck when in reach
     const wall = Date.now()
-    updateMonsters(monsters, town, wall, movement.yaw, dt)
+    updateMonsters({ list: monsters, root: town, now: wall, yaw: movement.yaw, dt: dt })
     for (const m of monsters) {
       const kind = MONSTER_KINDS[m.spawn.kind]
       const show = m.body.visible && (m.spawn.id === action.fighting || m.hp < kind.hp || Math.hypot(m.pos[0] - me.pos[0], m.pos[1] - me.pos[1]) < 4)
       updateMonsterHealth(m)
-      place(m.label, show && toScreen(m.pos, 0.55, v, m.groundHeight), v, 2)
+      place({ el: m.label, vis: show && toScreen({ pos: m.pos, h: 0.55, out: v, ground: m.groundHeight }), p: v, dy: 2 })
     }
     const target = action.fighting ? monsters.find((m) => m.spawn.id === action.fighting) : undefined
     if (target && !target.body.visible) action.endFight()
@@ -586,7 +652,7 @@ async function createSceneRuntime(map: string, progress: (t: string) => void, op
       if (d > MELEE_REACH) {
         if (wall - lastRepath > 600) {
           lastRepath = wall
-          approachMonster(target, me.pos, MELEE_REACH, (point) => walkTo(point, true))
+          approachMonster({ m: target, from: me.pos, reach: MELEE_REACH, tryWalk: (point) => walkTo(point, true) })
         }
       } else {
         if (me.path.length > 1) {
@@ -610,19 +676,27 @@ async function createSceneRuntime(map: string, progress: (t: string) => void, op
     }
     people.forEach((a, i) => {
       const near = Math.hypot(a.pos[0] - me.pos[0], a.pos[1] - me.pos[1]) < NAME_RANGE || a === pointer.hovered
-      place(residentLabels[i], a.fig.root.visible && near && toScreen(a.pos, a.fig.height, v, a.fig.root.position.y), v, 2)
+      place({
+        el: residentLabels[i],
+        vis: a.fig.root.visible && near && toScreen({ pos: [a.fig.root.position.x, a.fig.root.position.z], h: a.fig.height, out: v, ground: a.fig.root.position.y }),
+        p: v,
+        dy: 2,
+      })
     })
     const now = performance.now()
     // bubbles sit above the name
-    for (const [w, b] of speech) {
+    for (const entry2 of speech) {
+      const w = entry2[0]
+      const b = entry2[1]
+
       if (now > b.until || (w !== me && !remotes.has(w.id))) {
         b.el.remove()
         speech.delete(w)
         continue
       }
-      place(b.el, toScreen(w.pos, w.fig.height, v, w.fig.root.position.y), v, 20)
+      place({ el: b.el, vis: toScreen({ pos: w.pos, h: w.fig.height, out: v, ground: w.fig.root.position.y }), p: v, dy: 20 })
     }
-    ashfall?.update(dt, t, camFocus, 1 - daylight(lighting.minutes))
+    ashfall?.update({ dt: dt, t: t, focus: camFocus, night: 1 - daylight(lighting.minutes) })
     frames++
     if (now - fpsAt >= 1000) {
       fpsNow = (frames * 1000) / (now - fpsAt)

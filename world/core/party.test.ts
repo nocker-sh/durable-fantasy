@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest"
-import { PARTY_MAX, emptyParty, join, leave, shareOut, type Member } from "./party.ts"
+import { PARTY_MAX } from "#/world/core/party/rules"
+import { emptyParty } from "#/world/core/party/empty-party"
+import { join } from "#/world/core/party/join"
+import { leave } from "#/world/core/party/leave"
+import { shareOut } from "#/world/core/party/share-out"
+import { type Member } from "#/world/core/party/types"
 
 const m = (owner: string, level = 1): Member => ({ owner, name: owner, level, hp: 10, maxHp: 10, map: "南の草原", at: 0 })
 
@@ -18,12 +23,17 @@ describe("parties", () => {
   })
 
   it("experience: each one's own, or shared evenly among those within fifteen levels", () => {
-    expect(shareOut(9, "own", { owner: "a", level: 1 }, [{ owner: "b", level: 1 }])).toEqual([{ owner: "a", exp: 9 }])
+    expect(shareOut({ exp: 9, mode: "own", killer: { owner: "a", level: 1 }, near: [{ owner: "b", level: 1 }] })).toEqual([{ owner: "a", exp: 9 }])
     expect(
-      shareOut(9, "even", { owner: "a", level: 1 }, [
-        { owner: "b", level: 3 },
-        { owner: "c", level: 30 },
-      ]),
+      shareOut({
+        exp: 9,
+        mode: "even",
+        killer: { owner: "a", level: 1 },
+        near: [
+          { owner: "b", level: 3 },
+          { owner: "c", level: 30 },
+        ],
+      }),
     ).toEqual([
       { owner: "a", exp: 5 },
       { owner: "b", exp: 4 },
@@ -31,10 +41,15 @@ describe("parties", () => {
   })
 
   it("an even share rounds down, the one who beat it gets what is left over, and the shares never pass the whole", () => {
-    const three = shareOut(10, "even", { owner: "a", level: 4 }, [
-      { owner: "b", level: 4 },
-      { owner: "c", level: 4 },
-    ])
+    const three = shareOut({
+      exp: 10,
+      mode: "even",
+      killer: { owner: "a", level: 4 },
+      near: [
+        { owner: "b", level: 4 },
+        { owner: "c", level: 4 },
+      ],
+    })
     expect(three).toEqual([
       { owner: "a", exp: 4 },
       { owner: "b", exp: 3 },
@@ -43,7 +58,7 @@ describe("parties", () => {
     for (let exp = 0; exp <= 40; exp++)
       for (let n = 0; n < PARTY_MAX; n++) {
         const near = Array.from({ length: n }, (_, i) => ({ owner: `m${i}`, level: 1 }))
-        const shares = shareOut(exp, "even", { owner: "k", level: 1 }, near)
+        const shares = shareOut({ exp: exp, mode: "even", killer: { owner: "k", level: 1 }, near: near })
         expect(
           shares.reduce((a, x) => a + x.exp, 0),
           `${exp} among ${n + 1}`,

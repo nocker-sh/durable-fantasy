@@ -1,12 +1,13 @@
 import { expect, it } from "vitest"
-import { RECIPES } from "./crafting"
-import { NODES } from "./gather"
-import { LIFE_CAP, lifeExpAt } from "./life"
-import { MONSTER_KINDS, SPAWNS } from "./monsters"
-import { SHOPS } from "./shops"
+import { RECIPES } from "#/world/core/recipes/catalog"
+import { NODES } from "#/world/core/gather"
+import { LIFE_CAP } from "#/world/core/life-rules"
+import { lifeExpAt } from "#/world/core/life-exp-at"
+import { MONSTER_KINDS, SPAWNS } from "#/world/core/monsters"
+import { SHOPS } from "#/world/core/shops"
 import { apply } from "./apply"
-import { countItem } from "./bag"
-import { player } from "../test/helpers"
+import { countItem } from "#/world/core/count-item"
+import { player } from "#/world/test/player"
 
 it("provides an obtainable source for every current recipe ingredient", () => {
   const reachable = new Set<string>(Object.values(SHOPS).flatMap((s) => [...s.stock]))

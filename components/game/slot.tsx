@@ -1,7 +1,8 @@
+import { withoutKeys } from "#/lib/engine/without-keys"
 // An item slot (ui.md §6.5): 48px, edged in the item's rarity colour, an icon, a count and a key.
 import { forwardRef } from "react"
 import { cn } from "cn"
-import type { Rarity } from "#/world/core/items.ts"
+import type { Rarity } from "#/world/core/items/kinds"
 
 const RARITY: Record<Rarity, string> = {
   common: "var(--color-rarity-common)",
@@ -28,7 +29,21 @@ type SlotProps = React.ComponentProps<"button"> & {
   round?: boolean
 }
 
-const Slot = forwardRef<HTMLButtonElement, SlotProps>(function Slot({ icon, rarity, count, keyHint, dim, over, placeholder, emptyIcon, round, className, children, style, ...props }, ref) {
+const Slot = forwardRef<HTMLButtonElement, SlotProps>(function Slot(inputProps, ref) {
+  const icon = inputProps.icon
+  const rarity = inputProps.rarity
+  const count = inputProps.count
+  const keyHint = inputProps.keyHint
+  const dim = inputProps.dim
+  const over = inputProps.over
+  const placeholder = inputProps.placeholder
+  const emptyIcon = inputProps.emptyIcon
+  const round = inputProps.round
+  const className = inputProps.className
+  const children = inputProps.children
+  const style = inputProps.style
+  const props = withoutKeys(inputProps, ["icon", "rarity", "count", "keyHint", "dim", "over", "placeholder", "emptyIcon", "round", "className", "children", "style"])
+
   const edge = icon && rarity ? RARITY[rarity] : "rgb(255 255 255 / 0.08)"
   return (
     <button

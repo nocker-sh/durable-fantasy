@@ -1,8 +1,15 @@
 // A small − n + quantity picker.
 import { cn } from "cn"
-import { Button } from "./button.tsx"
+import { Button } from "./button"
 
-function Stepper({ value, min = 1, max, onChange, className }: { value: number; min?: number; max: number; onChange: (value: number) => void; className?: string }) {
+function Stepper(inputProps: { value: number; min?: number; max: number; onChange: (value: number) => void; className?: string }) {
+  const value = inputProps.value
+  const minValue = inputProps.min
+  const min = minValue === undefined ? 1 : minValue
+  const max = inputProps.max
+  const onChange = inputProps.onChange
+  const className = inputProps.className
+
   const set = (v: number) => onChange(Math.max(min, Math.min(max, v)))
   return (
     <div className={cn("inline-flex items-center gap-1", className)}>

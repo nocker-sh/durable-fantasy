@@ -1,57 +1,41 @@
 import type * as THREE from "three"
-import { PixBuf, Rng, pick } from "../pix"
-import { heap, basket } from "../goods"
-import { groundH } from "../world"
-import type { Goods } from "./stalls.ts"
-import { addSprite } from "./sprites.ts"
-import { animateObject } from "./registry.ts"
+import { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
+import { Rng } from "#/lib/engine/random"
+import { heap } from "#/world/scene/heap"
+import { basket } from "#/world/scene/basket"
+import { groundH } from "#/world/scene/ground-h"
+import type { Goods } from "#/world/scene/construction/stalls"
+import { addSprite } from "#/world/scene/construction/add-sprite"
 
-export function crops(root: THREE.Group, f: { x0: number; z0: number; x1: number; z1: number; axis: "x" | "z" }, kind: Goods, seed: number) {
-  const r = new Rng(seed)
-  const spr = basket(kind, 0, 4, 4)
+type Props = {
+  root: THREE.Group
+  f: { x0: number; z0: number; x1: number; z1: number; axis: "x" | "z" }
+  kind: Goods
+  seed: number
+}
+
+export function crops(props: Props) {
+  const r = new Rng(props.seed)
+  const spr = basket({ kind: props.kind, seed: 0, w: 4, h: 4 })
   void spr
   const cache: PixBuf[] = []
-  for (let i = 0; i < 4; i++) {
+  for (const i = { value: 0 }; i.value < 4; i.value++) {
     const b = new PixBuf(18, 16)
-    const h = heap(kind, 18, 14, seed + i)
-    b.blit(h, 0, 2)
+    const h = heap({ kind: props.kind, w: 18, h: 14, seed: props.seed + i.value })
+    b.blit({ source: h, x: 0, y: 2 })
     cache.push(b)
   }
-  if (f.axis === "x") {
-    for (let z = f.z0 + 0.25; z < f.z1; z += 1 / 3)
-      for (let x = f.x0 + 0.3; x < f.x1 - 0.2; x += 0.42) {
+  if (props.f.axis === "x") {
+    for (const z = { value: props.f.z0 + 0.25 }; z.value < props.f.z1; z.value += 1 / 3)
+      for (const x = { value: props.f.x0 + 0.3 }; x.value < props.f.x1 - 0.2; x.value += 0.42) {
         if (r.next() < 0.15) continue
-        addSprite(root, cache[r.int(4)], x + (r.next() - 0.5) * 0.1, groundH(x, z) - 0.02, z, 48)
+        addSprite({ root: props.root, b: cache[r.int(4)], x: x.value + (r.next() - 0.5) * 0.1, y: groundH(x.value, z.value) - 0.02, z: z.value, ppu: 48 })
       }
   } else {
-    for (let x = f.x0 + 0.25; x < f.x1; x += 1 / 3)
-      for (let z = f.z0 + 0.3; z < f.z1 - 0.2; z += 0.42) {
+    for (const x = { value: props.f.x0 + 0.25 }; x.value < props.f.x1; x.value += 1 / 3)
+      for (const z = { value: props.f.z0 + 0.3 }; z.value < props.f.z1 - 0.2; z.value += 0.42) {
         if (r.next() < 0.15) continue
-        addSprite(root, cache[r.int(4)], x, groundH(x, z) - 0.02, z + (r.next() - 0.5) * 0.1, 48)
+        addSprite({ root: props.root, b: cache[r.int(4)], x: x.value, y: groundH(x.value, z.value) - 0.02, z: z.value + (r.next() - 0.5) * 0.1, ppu: 48 })
       }
   }
 }
-
-function wheatField(root: THREE.Group, f: { x0: number; z0: number; x1: number; z1: number }) {
-  const b = new PixBuf(64, 40)
-  const r = new Rng(5)
-  for (let k = 0; k < 70; k++) {
-    const x = r.int(62) + 1,
-      h = 22 + r.int(16)
-    for (let y = 0; y < h; y++) b.set(x, 39 - y, pick("thatch", 0.35 + (y / h) * 0.45, x, y))
-    for (let y = h - 6; y < h; y++) {
-      b.set(x - 1, 39 - y, pick("thatch", 0.8, x, y))
-      b.set(x + 1, 39 - y, pick("thatch", 0.6, x, y))
-    }
-  }
-  for (let z = f.z0 + 0.3; z < f.z1; z += 0.35)
-    for (let x = f.x0 + 0.5; x < f.x1 - 0.4; x += 0.9) {
-      const s = addSprite(root, b, x + (r.next() - 0.5) * 0.3, groundH(x, z) - 0.05, z, 64)
-      const ph = x * 0.7 + z * 0.3
-      animateObject(s, (t) => {
-        s.material.rotation = Math.sin(t * 1.2 + ph) * 0.04
-      })
-    }
-}
-
-export { wheatField }

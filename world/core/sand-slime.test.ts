@@ -1,10 +1,15 @@
 import { expect, it } from "vitest"
-import { MONSTER_KINDS, SPAWNS, dropsOf, monsterAt } from "./monsters"
-import { MAPS, walkable } from "../maps"
-import { emptyWild, hit, hpOf } from "./wild"
+import { MONSTER_KINDS, SPAWNS } from "#/world/core/monsters"
+import { dropsOf } from "#/world/core/drops-of"
+import { monsterAt } from "#/world/core/monster-at"
+import { MAPS } from "#/world/maps"
+import { walkable } from "#/world/maps/walkable"
+import { emptyWild } from "#/world/core/wild/empty-wild"
+import { hit } from "#/world/core/wild/hit"
+import { hpOf } from "#/world/core/wild/hp-of"
 import { apply } from "./apply"
-import { countItem } from "./bag"
-import { player } from "../test/helpers"
+import { countItem } from "#/world/core/count-item"
+import { player } from "#/world/test/player"
 
 const spawns = SPAWNS.filter((s) => s.kind === "sand-slime")
 it("provides a dune opponent between blue and moss slimes", () => {
@@ -27,9 +32,9 @@ it("turns scrap from two dune fights into iron while retaining claim and recover
   const kind = MONSTER_KINDS["sand-slime"]
   let p = player()
   for (const spawn of spawns.slice(0, 2)) {
-    const first = hit(emptyWild(), spawn.id, 1, 0, "hunter")
-    expect(hit(first.state, spawn.id, kind.hp, 1, "other").refused).toBe(true)
-    const beaten = hit(first.state, spawn.id, kind.hp, 2, "hunter")
+    const first = hit({ state: emptyWild(), id: spawn.id, damage: 1, now: 0, player: "hunter" })
+    expect(hit({ state: first.state, id: spawn.id, damage: kind.hp, now: 1, player: "other" }).refused).toBe(true)
+    const beaten = hit({ state: first.state, id: spawn.id, damage: kind.hp, now: 2, player: "hunter" })
     expect(beaten.beaten).toBe(true)
     expect(hpOf(beaten.state, spawn.id, 3)).toBe(0)
     expect(hpOf(beaten.state, spawn.id, 2 + kind.respawn * 1000)).toBe(kind.hp)

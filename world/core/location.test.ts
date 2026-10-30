@@ -1,6 +1,7 @@
 import { expect, it } from "vitest"
-import { locationAt, townLocation } from "./location.ts"
-import { CELLS_PER_SECOND } from "../protocol.ts"
+import { locationAt } from "#/world/core/location-at"
+import { townLocation } from "#/world/core/town-location"
+import { CELLS_PER_SECOND } from "#/world/protocol"
 
 it("starts legacy saves in town and advances only completed path segments", () => {
   const start = townLocation(2, 1000)

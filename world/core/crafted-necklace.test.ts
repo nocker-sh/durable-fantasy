@@ -1,10 +1,11 @@
 import { expect, it } from "vitest"
 import { apply } from "./apply"
-import { derive } from "./stats"
-import { lifeExpAt } from "./life"
-import { countItem } from "./bag"
-import { loadPlayer } from "./player"
-import { bagWith, player } from "../test/helpers"
+import { derive } from "#/world/core/derive"
+import { lifeExpAt } from "#/world/core/life-exp-at"
+import { countItem } from "#/world/core/count-item"
+import { loadPlayer } from "#/world/core/load-player"
+import { bagWith } from "#/world/test/bag-with"
+import { player } from "#/world/test/player"
 
 it("crafts and saves a necklace that strengthens a learned prayer through its faith bonus", () => {
   const base = player()

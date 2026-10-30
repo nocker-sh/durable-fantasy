@@ -1,7 +1,12 @@
+import { withoutKeys } from "#/lib/engine/without-keys"
 // Copied from the dev shadcn Kbd: a small keycap for shortcut hints.
 import { cn } from "cn"
 
-function Kbd({ className, children, ...props }: React.ComponentProps<"kbd">) {
+function Kbd(inputProps: React.ComponentProps<"kbd">) {
+  const className = inputProps.className
+  const children = inputProps.children
+  const props = withoutKeys(inputProps, ["className", "children"])
+
   // key names in Latin letters use the 8px pixel face; anything else the heading face
   const latin = typeof children === "string" && /^[\x20-\x7e]+$/.test(children)
   return (

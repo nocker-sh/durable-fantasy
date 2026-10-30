@@ -1,6 +1,6 @@
 import * as THREE from "three"
-import { walkH } from "../world"
-import { center } from "./grid"
+import { walkH } from "#/world/scene/walk-h"
+import { center } from "#/world/scene/runtime/center"
 
 /** Exit rings share geometry and material for the lifetime of one map. */
 export class WarpMarkers {

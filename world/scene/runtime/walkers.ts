@@ -1,15 +1,19 @@
 import type * as THREE from "three"
-import { PositionSample } from "../../../lib/engine/position-sample.ts"
+import { PositionSample } from "../../../lib/engine/position-sample"
 import { PathFollower } from "../../../lib/engine/path-follower"
-import { walkH } from "../world"
-import { ANIM_DUR, type Anim, type Look } from "../figure"
-import { Figure } from "../actors"
-import { wearable } from "../../town/residents.ts"
-import type { Avatar, Cell } from "./types.ts"
-import type { Walker } from "./walker.ts"
-import { snap, center, STEP_SPEED } from "./grid.ts"
+import { walkH } from "#/world/scene/walk-h"
+import { ANIM_DUR } from "#/world/scene/figure/animation"
+import type { Anim } from "#/world/scene/figure/animation"
+import type { Look } from "#/world/scene/figure/look"
+import { Figure } from "#/world/scene/figure/figure"
+import { wearable } from "../../town/residents"
+import type { Avatar, Cell } from "./types"
+import type { Walker } from "./walker"
+import { snap } from "#/world/scene/runtime/snap"
+import { center } from "#/world/scene/runtime/center"
+import { STEP_SPEED } from "#/world/scene/runtime/grid"
 
-export function createWalkers(scene: THREE.Scene, onPickPlayer: (id: string) => void) {
+export function createWalkers(scene: THREE.Scene, onPickPlayer: (id: string) => void, figureScale = 1) {
   // ---------------------------------------------------------------- walkers (the player and other players)
   let layer: HTMLElement | null = null
   const plate = (cls: string, text: string) => {
@@ -20,7 +24,7 @@ export function createWalkers(scene: THREE.Scene, onPickPlayer: (id: string) => 
     return el
   }
   function makeFigure(a: Avatar) {
-    const fig = new Figure(wearable(a.look))
+    const fig = new Figure(wearable(a.look), undefined, figureScale)
     fig.hold(a.held)
     scene.add(fig.root)
     return fig

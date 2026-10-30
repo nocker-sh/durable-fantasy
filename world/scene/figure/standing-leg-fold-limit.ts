@@ -1,0 +1,1 @@
+export const STANDING_LEG_FOLD_LIMIT = 0.4

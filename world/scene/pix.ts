@@ -1,8 +1,5 @@
-// DOM-free pixel buffers and palette ramps (the noise is lib/engine/noise.ts).
-
-import { hex, type RGB } from "../../lib/graphics/pixel-buffer.ts"
-export { hex, PixelBuffer as PixBuf, type RGB } from "../../lib/graphics/pixel-buffer.ts"
-export { Rng } from "../../lib/engine/random.ts"
+import { hexToRgb as hex } from "#/lib/graphics/hex-to-rgb"
+import type { RGB } from "#/lib/graphics/pixel-types"
 
 const RAMPS_HEX: Record<string, string[]> = {
   grass: ["#323d3c", "#3f5240", "#566a45", "#71834c", "#909b58", "#b2b26c"],
@@ -83,25 +80,7 @@ const RAMPS_HEX: Record<string, string[]> = {
 }
 
 export const RAMPS: Record<string, RGB[]> = {}
+
 for (const k in RAMPS_HEX) RAMPS[k] = RAMPS_HEX[k].map(hex)
 
 export const OUTLINE: RGB = hex("#221a26")
-
-const B = [
-  [0, 8, 2, 10],
-  [12, 4, 14, 6],
-  [3, 11, 1, 9],
-  [15, 7, 13, 5],
-]
-export function bayer(x: number, y: number): number {
-  return B[y & 3][x & 3] / 16 - 0.47
-}
-
-export function pick(ramp: string, b: number, x: number, y: number, dither = 0.7): RGB {
-  const r = RAMPS[ramp]
-  const n = r.length
-  const t = Math.min(1, Math.max(0, b)) * (n - 1) + bayer(x, y) * dither
-  return r[Math.min(n - 1, Math.max(0, Math.round(t)))]
-}
-
-export { hash2, vnoise, fbm } from "../../lib/engine/noise.ts"

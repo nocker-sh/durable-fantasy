@@ -1,21 +1,13 @@
-// Hand-drawn 16 × 16 pixel icons for armour and the game screen (ui.md §6.5), in the village's
-// colour ramps. Each sprite is rows of letters; a palette maps letters to colours, '.' is clear.
-// Drawn once and enlarged to 32px by icons.ts.
-import { OUTLINE, PixBuf, RAMPS, hex, type RGB } from "../scene/pix.ts"
+import { OUTLINE, RAMPS } from "#/world/scene/pix"
+import { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
+import { hexToRgb as hex } from "#/lib/graphics/hex-to-rgb"
+import type { RGB } from "#/lib/graphics/pixel-types"
+import { sprite } from "#/world/art/sprite"
 
-type Palette = Record<string, RGB>
-
-export function sprite(rows: readonly string[], palette: Palette): PixBuf {
-  const b = new PixBuf(rows[0].length, rows.length)
-  rows.forEach((row, y) =>
-    [...row].forEach((ch, x) => {
-      if (palette[ch]) b.set(x, y, palette[ch])
-    }),
-  )
-  return b
-}
+export type Palette = Record<string, RGB>
 
 const k = OUTLINE
+
 const r = (ramp: string, i: number) => RAMPS[ramp][i]
 
 export const SPRITES = {
@@ -359,11 +351,3 @@ export const SPRITES = {
 } satisfies Record<string, PixBuf>
 
 export type SpriteName = keyof typeof SPRITES
-
-/** The sprite as a dim silhouette, for an empty equipment slot. */
-export function silhouette(b: PixBuf): PixBuf {
-  const out = new PixBuf(b.w, b.h)
-  const shade: RGB = [52, 56, 80]
-  for (let y = 0; y < b.h; y++) for (let x = 0; x < b.w; x++) if (b.alpha(x, y)) out.set(x, y, shade, 160)
-  return out
-}

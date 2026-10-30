@@ -1,13 +1,20 @@
-import { ITEMS, ITEM_IDS } from "#/world/core/items.ts"
-import { uiIconUrl } from "#/world/art/icons.ts"
-import { SPRITES, type SpriteName } from "#/world/art/pixel-art.ts"
-import { RAMPS } from "#/world/scene/pix.ts"
-import { MOTIONS } from "#/dev/studio/motions.ts"
-import { ANIMS } from "#/world/scene/figure.ts"
-import { AGE as OPT_AGE, CLOTH, HAIR, HATS, ITEMS as HAND_ITEMS, NECKS, PRESETS, SEX, SKIN, STYLES } from "#/dev/studio/options.ts"
-import { LOOKS as TRAVELLER_LOOKS } from "#/world/town/travellers.ts"
-import { leafTex, rockTex, roofTex, stoneTex, thatchTex, woodTex } from "#/world/scene/textures.ts"
-import { sheet } from "./schema.ts"
+import { ITEMS } from "#/world/core/items/catalog"
+import { ITEM_IDS } from "#/world/core/items/item-ids"
+import { uiIconUrl } from "#/world/art/ui-icon-url"
+import { SPRITES } from "#/world/art/pixel-art"
+import type { SpriteName } from "#/world/art/pixel-art"
+import { RAMPS } from "#/world/scene/pix"
+import { MOTIONS } from "#/dev/studio/motions"
+import { ANIMS } from "#/world/scene/figure/animation"
+import { AGE as OPT_AGE, CLOTH, HAIR, HATS, ITEMS as HAND_ITEMS, NECKS, PRESETS, SEX, SKIN, STYLES } from "#/dev/studio/options"
+import { LOOKS as TRAVELLER_LOOKS } from "#/world/town/travellers"
+import { leafTex } from "#/world/scene/textures/leaves"
+import { rockTex } from "#/world/scene/textures/rock-tex"
+import { stoneTex } from "#/world/scene/textures/stone-tex"
+import { roofTex } from "#/world/scene/textures/roof-tex"
+import { thatchTex } from "#/world/scene/textures/thatch-tex"
+import { woodTex } from "#/world/scene/textures/wood-tex"
+import { sheet } from "./schema"
 
 const uiIcons = sheet<SpriteName>({
   id: "icons",
@@ -31,11 +38,11 @@ function texUrl(b: { w: number; h: number; data: Uint8ClampedArray }): string {
 }
 
 const TEXTURES: Record<string, { name: string; make: () => { w: number; h: number; data: Uint8ClampedArray } }> = {
-  stone: { name: "石積み", make: () => stoneTex() },
-  rock: { name: "岩", make: () => rockTex() },
-  wood: { name: "板", make: () => woodTex() },
-  roof: { name: "瓦", make: () => roofTex() },
-  slate: { name: "石板の屋根", make: () => roofTex("slate") },
+  stone: { name: "石積み", make: () => stoneTex({}) },
+  rock: { name: "岩", make: () => rockTex({}) },
+  wood: { name: "板", make: () => woodTex({}) },
+  roof: { name: "瓦", make: () => roofTex({}) },
+  slate: { name: "石板の屋根", make: () => roofTex({ ramp: "slate" }) },
   thatch: { name: "藁屋根", make: () => thatchTex() },
   leaf: { name: "葉", make: () => leafTex() },
   leaf2: { name: "葉（濃い）", make: () => leafTex("leaf2") },
@@ -128,7 +135,16 @@ const PART_GROUPS: [string, readonly (readonly [unknown, string])[]][] = [
 const parts = sheet<PartRow>({
   id: "parts",
   label: "見た目の部品",
-  rows: () => PART_GROUPS.flatMap(([group, list]) => list.map(([v, label]) => ({ group, value: String(v ?? "none"), label }))),
+  rows: () =>
+    PART_GROUPS.flatMap((entry) => {
+      const group = entry[0]
+      const list = entry[1]
+      return list.map((entry2) => {
+        const v = entry2[0]
+        const label = entry2[1]
+        return { group, value: String(v ?? "none"), label }
+      })
+    }),
   key: (r) => `${r.group}:${r.value}`,
   name: (r) => r.label,
   kind: (r) => r.group,
@@ -140,7 +156,13 @@ type PresetRow = { label: string; from: string }
 const presets = sheet<PresetRow>({
   id: "presets",
   label: "見た目の型",
-  rows: () => [...PRESETS.map(([label]) => ({ label, from: "装備セット" })), ...TRAVELLER_LOOKS.map((l) => ({ label: l.label, from: "旅人" }))],
+  rows: () => [
+    ...PRESETS.map((entry3) => {
+      const label = entry3[0]
+      return { label, from: "装備セット" }
+    }),
+    ...TRAVELLER_LOOKS.map((l) => ({ label: l.label, from: "旅人" })),
+  ],
   key: (r) => `${r.from}:${r.label}`,
   name: (r) => r.label,
   kind: (r) => r.from,

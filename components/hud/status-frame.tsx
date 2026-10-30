@@ -1,10 +1,16 @@
 // Top left (ui.md §3.1): no panel, thin bars over the scene — HP, SP, stamina — and how full and warm you are.
-import { useGameState } from "#/components/game/context.tsx"
-import { Meter } from "#/components/game/meter.tsx"
-import { uiIconUrl } from "#/world/art/icons.ts"
-import { REGEN_MS, DIGEST_MS, MAX_STAMINA, fullNow, settle, type PlayerState, type Rest } from "#/world/core/player.ts"
+import { useGameState } from "#/hooks/use-game-state"
+import { Meter } from "#/components/game/meter"
+import { uiIconUrl } from "#/world/art/ui-icon-url"
+import { REGEN_MS } from "#/world/core/player-rules"
+import { DIGEST_MS } from "#/world/core/player-rules"
+import { MAX_STAMINA } from "#/world/core/player-rules"
+import { fullNow } from "#/world/core/full-now"
+import { settle } from "#/world/core/settle"
+import type { PlayerState } from "#/world/core/player-types"
+import type { Rest } from "#/world/core/player-types"
 import { useEffect, useState } from "react"
-import { useDeadlineClock } from "#/hooks/use-deadline-clock.ts"
+import { useDeadlineClock } from "#/hooks/use-deadline-clock"
 
 export function StatusFrame() {
   const player = useGameState((s) => s.player)
@@ -20,9 +26,14 @@ export function StatusFrame() {
   )
 }
 
-/** HP and SP, coming back a little at a time while up and about (core/player.ts settle). */
-function HpSp({ player, rest }: { player: PlayerState; rest: Rest }) {
-  const [now, setNow] = useState(() => Date.now())
+/** HP and SP, coming back a little at a time while up and about (core/settle.ts). */
+function HpSp(inputProps: { player: PlayerState; rest: Rest }) {
+  const player = inputProps.player
+  const rest = inputProps.rest
+
+  const nowState = useState(() => Date.now()),
+    now = nowState[0],
+    setNow = nowState[1]
   const p = settle(player, rest, Math.max(now, Date.now()))
   const recovering = p.hp > 0 && (p.hp < rest.maxHp || p.sp < rest.maxSp)
   useEffect(() => {
@@ -39,7 +50,12 @@ function HpSp({ player, rest }: { player: PlayerState; rest: Rest }) {
 }
 
 /** How full you are and how long you will stay warm (game-system.md §3.6), ticking by the minute. */
-function Body({ full, fullAt, warmUntil, focusUntil }: { full: number; fullAt: number; warmUntil: number; focusUntil: number }) {
+function Body(inputProps2: { full: number; fullAt: number; warmUntil: number; focusUntil: number }) {
+  const full = inputProps2.full
+  const fullAt = inputProps2.fullAt
+  const warmUntil = inputProps2.warmUntil
+  const focusUntil = inputProps2.focusUntil
+
   const until = Math.max(full > 0 ? fullAt + full * DIGEST_MS : 0, warmUntil, focusUntil)
   const now = useDeadlineClock(until, 20_000)
   const f = fullNow({ full, fullAt }, now)

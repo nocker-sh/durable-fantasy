@@ -1,7 +1,10 @@
 // Fight with the actual starting equipment and persist the server-awarded experience.
 import { chromium } from "playwright-core"
 import { mkdir, writeFile } from "node:fs/promises"
-import { configureCpu, createCharacter, waitReady, walkToMap } from "./lib/game-browser.mjs"
+import { configureCpu } from "#resources/scripts/lib/configure-cpu"
+import { createCharacter } from "#resources/scripts/lib/create-character"
+import { waitReady } from "#resources/scripts/lib/wait-ready"
+import { walkToMap } from "#resources/scripts/lib/walk-to-map"
 const browser = await chromium.launch({ channel: "chrome", args: ["--disable-http2"] })
 let page
 const commands = []
@@ -43,7 +46,7 @@ try {
   const before = await page.evaluate(() => ({ exp: game.state.get().player.exp, weapon: game.state.get().player.equipment.weapon }))
   if (before.weapon !== "wooden-stick") throw Error("Unexpected starting equipment")
   const target = await page.evaluate(async () => {
-    const { SPAWNS, monsterAt } = await import("/world/core/monsters.ts")
+    const { SPAWNS, monsterAt } = await import("/world/core/monsters")
     const cell = game.scene.playerCell()
     const candidates = SPAWNS.filter((s) => s.map === game.state.get().map.id && s.kind === "slime" && game.session.wild[s.id]?.hp > 0 && game.session.wild[s.id].back <= Date.now())
     const distance = (s) => {
@@ -99,7 +102,7 @@ try {
   await page.keyboard.press("z")
   await page.waitForFunction(() => game.state.get().player.sitting === true)
   const needsRest = await page.evaluate(async () => {
-    const { derive } = await import("/world/core/stats.ts")
+    const { derive } = await import("/world/core/stats")
     return game.state.get().player.hp < derive(game.state.get().player).maxHp
   })
   if (needsRest) await page.waitForFunction((hp) => Number.parseFloat(document.querySelector('[data-slot="meter"][aria-label="HP"]')?.textContent ?? "") > hp, afterMeal.hp, { timeout: 45000 })

@@ -1,8 +1,9 @@
 import { expect, it } from "vitest"
 import { apply } from "./apply"
-import { derive } from "./stats"
-import { effectOf } from "./makers"
-import { player, bagWith } from "../test/helpers"
+import { derive } from "#/world/core/derive"
+import { effectOf } from "#/world/core/effect-of"
+import { player } from "#/world/test/player"
+import { bagWith } from "#/world/test/bag-with"
 
 const now = 1_000_000
 function rested() {

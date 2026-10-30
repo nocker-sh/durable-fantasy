@@ -1,11 +1,15 @@
-import type { GameSession } from "./session.ts"
-import type { ServerMessageContext } from "./server-context.ts"
+import { currentPublication } from "./player-publication"
+import type { GameSession } from "#/world/client/game-session"
+import type { ServerMessageContext } from "./server-context"
 import type { VoidSocket } from "void/ws"
-import type { Transition } from "../core/apply.ts"
-import { commandSchema, REASON_TEXT, type Command } from "../core/commands.ts"
-import { MAPS, cellDistance, isMapId, type MapId } from "../maps/index.ts"
-import type { Cell } from "../protocol.ts"
-import { lap } from "../diagnostics.ts"
+import type { Transition } from "#/world/core/transition"
+import { commandSchema, REASON_TEXT, type Command } from "../core/commands"
+import { MAPS } from "#/world/maps"
+import { cellDistance } from "#/world/maps/cell-distance"
+import { isMapId } from "#/world/maps/is-map-id"
+import { type MapId } from "#/world/maps/types"
+import type { Cell } from "#/world/protocol"
+import { lap } from "#/world/lap"
 
 const COMMAND_TIMEOUT = 8000
 
@@ -18,7 +22,7 @@ export class RoomClient {
   }
   constructor(
     private readonly target: Pick<ServerMessageContext, "update" | "getScene" | "onServer" | "preview" | "notify" | "setPlayer" | "report"> & {
-      readonly session: Pick<GameSession, "wantChannel" | "rooms" | "state" | "socket" | "arriveAt" | "others" | "playerId" | "waiting" | "engaged">
+      readonly session: Pick<GameSession, "wantChannel" | "rooms" | "state" | "socket" | "arriveAt" | "others" | "playerId" | "waiting" | "engaged" | "wild">
     },
   ) {}
   async connect(id: MapId) {
@@ -28,7 +32,9 @@ export class RoomClient {
     // a room got ready while walking up to the way in is taken as it is
     const ready = this.target.session.rooms.take(id, want)
     if (ready) {
-      const { channel, channels } = await ready.channel
+      const channelSource = await ready.channel,
+        channel = channelSource.channel,
+        channels = channelSource.channels
       const socket = ready.socket
       if (!socket) return
       if (generation !== this.generation || this.target.session.state.get().map.id !== id) {
@@ -45,7 +51,9 @@ export class RoomClient {
       }
       return
     }
-    const { channel, channels } = await this.target.session.rooms.askChannel(id, want)
+    const channelSource2 = await this.target.session.rooms.askChannel(id, want),
+      channel = channelSource2.channel,
+      channels = channelSource2.channels
     lap("room: channel chosen")
     if (generation !== this.generation || this.target.session.state.get().map.id !== id) return // moved on meanwhile
     this.target.update({ room: { world: this.target.session.rooms.world, channel, channels } })
@@ -68,6 +76,8 @@ export class RoomClient {
   }
 
   listen(socket: VoidSocket<"/map/:mapId">) {
+    // Counters belong to one channel's Wild DO, not to the player across rooms.
+    this.target.session.wild = {}
     socket.on("open", () => {
       if (this.target.session.socket !== socket) return
       lap("room: socket open")
@@ -158,6 +168,8 @@ export class RoomClient {
       this.target.notify(REASON_TEXT[result.reason], "bad")
       return false
     }
+    // The command succeeded even if a newer publication has already reached the session.
+    if (!currentPublication(this.target.session.state.get().player, result.state)) return true
     this.target.setPlayer(result.state)
     for (const event of result.events) this.target.report(event)
     return true

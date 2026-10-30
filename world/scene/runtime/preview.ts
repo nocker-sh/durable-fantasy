@@ -1,7 +1,7 @@
 import type * as THREE from "three"
-import { keyTurn } from "../turn"
+import { keyTurn } from "#/world/scene/key-turn"
 
-interface PreviewScene {
+type PreviewScene = {
   renderer: THREE.WebGLRenderer
   movement: { yaw: number; yawTarget: number }
   pan(dx: number, dy: number, yaw: number): void
@@ -13,7 +13,12 @@ interface PreviewScene {
  * along with the pointer, the wheel zooms, the arrow keys and WASD slide the view, Q and E (or a
  * right-button drag) turn it in the game's 45° steps.
  */
-export function createPreviewControls({ renderer, movement, pan, zoom }: PreviewScene) {
+export function createPreviewControls(inputProps: PreviewScene) {
+  const renderer = inputProps.renderer
+  const movement = inputProps.movement
+  const pan = inputProps.pan
+  const zoom = inputProps.zoom
+
   const el = renderer.domElement
   let drag: { id: number; x: number; y: number; turn: boolean } | null = null
   const held = new Set<string>()

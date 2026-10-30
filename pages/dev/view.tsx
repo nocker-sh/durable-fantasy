@@ -1,12 +1,15 @@
-import "#/dev/dev.css"
+import "#resources/dev/dev"
 import { useEffect, useRef, useState } from "react"
-import { MapScene, diorama } from "#/world/scene/index.ts"
-import { spritesPending } from "#/world/scene/sprite-pool.ts"
-import { MAP_SCENES } from "#/world/scene/runtime/definitions.ts"
-import { MAPS } from "#/world/maps/index.ts"
-import { formatTime, jstMinutes, parseTime } from "#/world/core/clock.ts"
-import { MAP_KIND } from "#/dev/sheets/shared.tsx"
-import { useNoCanvasMenu } from "#/hooks/use-no-canvas-menu.ts"
+import { MapScene } from "#/world/scene/runtime/scene"
+import { diorama } from "#/world/scene/runtime/settings"
+import { spritesPending } from "#/world/scene/sprites-pending"
+import { MAP_SCENES } from "#/world/scene/runtime/definitions"
+import { MAPS } from "#/world/maps/index"
+import { formatTime } from "#/world/core/format-time"
+import { jstMinutes } from "#/world/core/jst-minutes"
+import { parseTime } from "#/world/core/parse-time"
+import { MAP_KIND } from "#/dev/sheets/shared"
+import { useNoCanvasMenu } from "#/hooks/use-no-canvas-menu"
 
 /**
  * One map as the game draws it, with nobody playing: no player, no windows, no names, no server.
@@ -28,7 +31,9 @@ const choices = Object.keys(MAP_SCENES)
 export default function MapView() {
   useNoCanvasMenu()
   // drawn in the browser only: the query and the clock are not known on the server
-  const [mounted, setMounted] = useState(false)
+  const mountedState = useState(false),
+    mounted = mountedState[0],
+    setMounted = mountedState[1]
   useEffect(() => setMounted(true), [])
   return mounted ? <MapViewer /> : null
 }
@@ -36,10 +41,17 @@ export default function MapView() {
 function MapViewer() {
   const ref = useRef<HTMLDivElement>(null)
   const scene = useRef<MapScene | null>(null)
-  const [query] = useState(() => new URLSearchParams(location.search))
-  const [time, setTime] = useState(() => parseTime(query.get("time")) ?? jstMinutes(Date.now()))
-  const [panel, setPanel] = useState(query.get("ui") !== "0")
-  const [loading, setLoading] = useState<string | null>("読み込んでいます…")
+  const queryState = useState(() => new URLSearchParams(location.search)),
+    query = queryState[0]
+  const timeState = useState(() => parseTime(query.get("time")) ?? jstMinutes(Date.now())),
+    time = timeState[0],
+    setTime = timeState[1]
+  const panelState = useState(query.get("ui") !== "0"),
+    panel = panelState[0],
+    setPanel = panelState[1]
+  const loadingState = useState<string | null>("読み込んでいます…"),
+    loading = loadingState[0],
+    setLoading = loadingState[1]
   const map = query.get("map") ?? "phanthiet"
   const known = map in MAP_SCENES
 
@@ -50,9 +62,9 @@ function MapViewer() {
     diorama.enabled = query.get("blur") !== "0"
     const x = Number(query.get("x")),
       z = Number(query.get("z"))
-    const s = new MapScene(
-      ref.current,
-      {
+    const s = new MapScene({
+      element: ref.current,
+      events: {
         progress: setLoading,
         ready: () => setLoading(null),
         failed: (error) => {
@@ -66,9 +78,9 @@ function MapViewer() {
         swing: () => {},
         tick: () => {},
       },
-      map,
-      { preview: true, at: query.has("x") && query.has("z") ? [x, z] : undefined, zoom: query.has("zoom") ? Number(query.get("zoom")) : undefined, turn: Number(query.get("turn")) || 0 },
-    )
+      map: map,
+      options: { preview: true, at: query.has("x") && query.has("z") ? [x, z] : undefined, zoom: query.has("zoom") ? Number(query.get("zoom")) : undefined, turn: Number(query.get("turn")) || 0 },
+    })
     scene.current = s
     return () => {
       s.destroy()

@@ -1,6 +1,6 @@
 // Top middle (ui.md §3.15): one-line results and refusals that fade after 2.5 seconds.
 import { cn } from "cn"
-import { useGameState } from "#/components/game/context.tsx"
+import { useGameState } from "#/hooks/use-game-state"
 
 export function Notices() {
   const notices = useGameState((s) => s.notices)

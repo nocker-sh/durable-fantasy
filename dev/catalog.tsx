@@ -4,8 +4,14 @@
 import { useEffect, useState, type ReactNode } from "react"
 
 /** A page's body, drawn once in the browser; `ready` false holds off the screenshot. */
-export function DevPage({ children, ready = true }: { children: ReactNode | (() => ReactNode); ready?: boolean }) {
-  const [mounted, setMounted] = useState(false)
+export function DevPage(inputProps: { children: ReactNode | (() => ReactNode); ready?: boolean }) {
+  const children = inputProps.children
+  const readyValue = inputProps.ready
+  const ready = readyValue === undefined ? true : readyValue
+
+  const mountedState = useState(false),
+    mounted = mountedState[0],
+    setMounted = mountedState[1]
   useEffect(() => setMounted(true), [])
   useEffect(() => {
     if (!mounted) return

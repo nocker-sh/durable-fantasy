@@ -1,0 +1,103 @@
+import { z } from "zod"
+import { hotWaterAnimationSchema } from "./hot-water-animation-schema"
+const positive = z.number().positive(),
+  point = z.tuple([z.number().nonnegative(), z.number().nonnegative()])
+
+const tiltCandidate = z.object({
+  scope: z.literal("sampled_native_frames"),
+  status: z.literal("unresolved"),
+  start_degrees: z.literal(0),
+  grip_backset_m: positive,
+  clearance_mode: z.literal("whole_vessel_above_all_cups"),
+  upper_body: z.object({ scope: z.literal("fixed_pelvis_forward_lean"), start_lean_degrees: z.number().nonnegative().lt(90), release_after_degrees: z.number().nonnegative() }),
+  pending: z.array(z.string().min(1)).min(1),
+})
+const reachReview = z.object({
+  scope: z.literal("native_static_reach"),
+  status: z.literal("unverified"),
+  contact_review: z.literal("whole_wooden_bar_with_intact_cuff"),
+  body_review: z.literal("complete_vessel_and_native_body"),
+  body_from_lip_m: z.tuple([z.number(), z.number()]),
+  facing: z.literal("n"),
+  grip_offset_m: positive,
+  animations: z.array(hotWaterAnimationSchema).min(1),
+  poles: z.object({ l: z.tuple([z.number(), z.number(), z.number()]), r: z.tuple([z.number(), z.number(), z.number()]) }),
+})
+const poseReview = z
+  .object({
+    scope: z.literal("static_open_vessel"),
+    status: z.literal("unverified"),
+    tilt_candidate: tiltCandidate,
+    lip_facing: z.enum(["n", "s"]),
+    tilt_degrees: z.number().min(0).max(90),
+    lip_above_rim_m: positive,
+    reach_review: reachReview,
+    holding_review: z.object({
+      scope: z.literal("native_upright_hold"),
+      status: z.literal("unverified"),
+      space_review: z.literal("projected_room_occupancy_with_station_solids"),
+      body_m: point,
+      grip_m: z.tuple([z.number(), z.number(), z.number()]),
+      lean_degrees: z.number().nonnegative().lt(90),
+      pending: z.array(z.string().min(1)).min(1),
+    }),
+  })
+  .refine((review) => review.tilt_candidate.upper_body.release_after_degrees < review.tilt_degrees, { message: "Upper-body release must precede the final tilt" })
+
+export const hotWaterServiceSchema = z.object({
+  status: z.literal("proposed"),
+  scope: z.literal("single_heating_batch"),
+  id: z.string().min(1),
+  name: z.string().min(1),
+  owner: z.string().min(1),
+  maker: z.string().min(1),
+  operator: z.string().min(1),
+  stove: z.string().length(1),
+  filled_from: z.string().length(1),
+  empty_mass_kg: positive,
+  carry_mode: z.literal("two_hands"),
+  fill_ml: z.number().int().positive(),
+  pot: z.object({
+    diameter_m: positive,
+    height_m: positive,
+    base_diameter_m: positive,
+    radial_wall_m: positive,
+    bottom_m: positive,
+    fill_line_m: positive,
+    lip_start_m: positive,
+    lip_length_m: positive,
+    lip_half_angle_degrees: positive,
+    bail_height_m: positive,
+    bail_forward_m: z.number().nonnegative(),
+    bail_span_m: positive,
+    bail_radius_m: positive,
+    grip_length_m: positive,
+    grip_radius_m: positive,
+    lid_radius_m: positive,
+    lid_thickness_m: positive,
+    knob_height_m: positive,
+    knob_radius_m: positive,
+  }),
+  heating: z.object({ position_m: point, facing: z.literal("w") }),
+  rest: z.object({ rect_m: z.tuple([z.number().nonnegative(), z.number().nonnegative(), positive, positive]), position_m: point, facing: z.literal("w"), use_order: z.literal("lid_then_closed_pot") }),
+  serving: z.object({
+    table: z.string().length(1),
+    space_index: z.number().int().nonnegative(),
+    mode: z.literal("clear_clean_surface_before_cups"),
+    handle_facing: z.literal("e"),
+    pose_review: poseReview,
+    min_gap_m: positive,
+    edge_margin_m: positive,
+    cups: z.array(z.object({ cup: z.string().min(1), position_m: point })).min(1),
+    pot_rest: z.literal("stove_only"),
+  }),
+  portions: z.array(z.object({ cup: z.string().min(1), amount_ml: z.number().int().positive() })).min(1),
+  storage: z.object({
+    shelf: z.string().length(1),
+    box: z.string().min(1),
+    position_m: z.tuple([z.number().nonnegative(), z.literal(0), z.number().nonnegative()]),
+    required_state: z.literal("cold_clean_dry_empty_closed"),
+  }),
+  drying: z.literal("cold_open_on_plate_lid_at_rest"),
+  pending: z.array(z.string().min(1)).min(1),
+})

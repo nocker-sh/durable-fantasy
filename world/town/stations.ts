@@ -1,21 +1,21 @@
 // Where the town's shared work stations stand: the workshop's where its furniture is (interiors.ts),
 // the forge in the lane's yard (scene/districts.ts buildCraft). What a station is, what it costs
-// and what is made at it is in core/crafting.ts.
-import { STATION_RULES, type Station } from "../core/crafting.ts"
-import { INTERIORS } from "./interiors.ts"
+// and what is made at it is in core/recipes/catalog.ts.
+import { STATION_RULES } from "#/world/core/crafting-rules"
+import type { Station } from "#/world/core/crafting-types"
+import { CRAFT_FORGE_PLACE } from "./craft-yard"
+import { INTERIORS } from "#/world/town/interiors"
+import { equipmentPlace } from "#/world/town/equipment-place"
+import { locateStations } from "#/world/town/locate-stations"
+import type { StationPlace } from "#/world/town/station-places"
 
-const workshop = INTERIORS.find((i) => i.house.id === "h-c2")!
-const at = (kind: string): readonly [number, number] => {
-  const f = workshop.furniture.find((x) => x.kind === kind)!
-  return [Math.floor(f.x * 2), Math.floor(f.z * 2)]
-}
-const PLACES: Record<string, { map: string; cell: readonly [number, number] }> = {
-  "workshop-hearth": { map: workshop.id, cell: at("hearth") },
-  "workshop-bench": { map: workshop.id, cell: at("workbench") },
-  "workshop-loom": { map: workshop.id, cell: at("loom") },
-  "craft-forge": { map: "phanthiet-craft", cell: [33, 52] },
-}
+const PLACES = {
+  "workshop-hearth": equipmentPlace({ interiors: INTERIORS, house: "h-c2", kind: "hearth", name: "炉" }),
+  "workshop-bench": equipmentPlace({ interiors: INTERIORS, house: "h-c2", kind: "workbench", name: "木工台" }),
+  "workshop-loom": equipmentPlace({ interiors: INTERIORS, house: "h-c2", kind: "loom", name: "機織り機" }),
+  "craft-forge": CRAFT_FORGE_PLACE,
+} satisfies Record<string, StationPlace>
 
 /** The stations, each where it stands. */
-export const STATIONS: readonly Station[] = STATION_RULES.map((s) => ({ ...s, ...PLACES[s.id] }))
+export const STATIONS: readonly Station[] = locateStations(STATION_RULES, PLACES)
 export const stationAt = (id: string) => STATIONS.find((x) => x.id === id)

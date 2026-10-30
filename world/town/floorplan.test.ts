@@ -1,6 +1,12 @@
+import { getFurnitureKind } from "#/world/town/get-furniture-kind"
 import { describe, expect, it } from "vitest"
-import { HOUSES, enterable } from "./houses.ts"
-import { planOf, type FloorPlan, type Rect } from "./floorplan.ts"
+import { HOUSES } from "#/world/town/houses"
+import { enterable } from "#/world/town/enterable"
+import { floorPlan } from "#/world/town/floorplan/floor-plan"
+import { planOf } from "#/world/town/floorplan/plan-of"
+import type { FloorPlan, Rect } from "#/world/town/floorplan/types"
+
+const kind = (piece: FloorPlan["pieces"][number]) => piece.kind ?? getFurnitureKind(piece.name)
 
 const PLANS = HOUSES.map((h) => ({ h, p: planOf(h) }))
 const lived = PLANS.filter(({ h }) => h.plan.hearth && h.kind !== "vacant")
@@ -69,9 +75,9 @@ describe("every building can really be lived in (town.md「世帯と建物」)",
 
   it("a home turns round its hearth: a table stands out in the room, not along a wall, and close by the fire", () => {
     for (const { h, p } of lived) {
-      const fire = p.pieces.find((x) => x.floor === 0 && (x.name === "炉" || x.name === "暖炉"))!
+      const fire = p.pieces.find((x) => x.floor === 0 && kind(x) === "hearth")!
       expect(fire, `${h.name}: hearth`).toBeDefined()
-      const tables = p.pieces.filter((x) => x.floor === 0 && /^(食卓|大きな食卓|長卓|卓|作業台|木工台|調合台|地図の卓|書き物机|縫い物の台|搾り台)$/.test(x.name))
+      const tables = p.pieces.filter((x) => x.floor === 0 && (kind(x) === "table" || kind(x) === "workbench"))
       expect(
         tables.some((t) => !touchesWall(t, p)),
         `${h.name}: a table free of the walls`,
@@ -84,11 +90,8 @@ describe("every building can really be lived in (town.md「世帯と建物」)",
   it("the way through the house is clear: from the door to the fire, the table and the stair", () => {
     for (const { h, p } of lived) {
       const g = walkGrid(p, 0)
-      const door: [number, number] = [p.door, p.D - 0.3]
-      for (const name of ["炉", "暖炉", "食卓", "大きな食卓", "長卓", "卓", "階段"]) {
-        const x = p.pieces.find((q) => q.floor === 0 && q.name === name)
-        if (x) expect(g.reach(door, x), `${h.name}: door to ${name}`).toBe(true)
-      }
+      const door: [number, number] = p.entrance ? [p.entrance.point[0] - p.entrance.outward[0] * 0.3, p.entrance.point[1] - p.entrance.outward[1] * 0.3] : [p.door, p.D - 0.3]
+      for (const x of p.pieces.filter((q) => q.floor === 0 && ["hearth", "table", "stair"].includes(kind(q) ?? ""))) expect(g.reach(door, x), `${h.name}: door to ${x.name}`).toBe(true)
     }
   })
 
@@ -106,7 +109,7 @@ describe("every building can really be lived in (town.md「世帯と建物」)",
     for (const { h, p } of PLANS.filter((x) => enterable(x.h))) {
       expect(p.floors, h.name).toBeGreaterThanOrEqual(2)
       expect(
-        p.pieces.some((x) => x.floor === 0 && x.name === "階段"),
+        p.pieces.some((x) => x.floor === 0 && kind(x) === "stair"),
         `${h.name}: stair`,
       ).toBe(true)
       expect(
@@ -122,4 +125,19 @@ describe("every building can really be lived in (town.md「世帯と建物」)",
       if (h.household || enterable(h)) expect(p.pieces.filter((x) => x.on).length, h.name).toBeGreaterThanOrEqual(2)
     }
   })
+})
+
+it("reports an unknown building without caching a fabricated plan", () => {
+  for (let attempt = 0; attempt < 2; attempt++) expect(() => floorPlan("unknown-building")).toThrow("Unknown building: unknown-building")
+  const house = HOUSES[0]
+  expect(floorPlan(house.id).id).toBe(house.id)
+  expect(floorPlan(house.id)).toBe(floorPlan(house.id))
+})
+
+it("records a declared smoking room that the generated house has merged or omitted", () => {
+  const house = HOUSES.find((h) => h.id === "h-g4")!,
+    plan = planOf(house)
+  expect(house.plan.rooms.some((room) => room.name === "燻し部屋")).toBe(true)
+  expect(plan.rooms.some((room) => room.name === "燻し部屋")).toBe(false)
+  expect(plan.unrepresentedRooms).toContainEqual({ floor: 0, name: "燻し部屋" })
 })

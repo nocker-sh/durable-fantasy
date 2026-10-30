@@ -1,14 +1,15 @@
 import { afterEach, expect, it, vi } from "vitest"
-import type { Ctx } from "./context.ts"
-import type { Presence, TradeSide } from "./presence.ts"
-import type { ServerMessage } from "../../protocol.ts"
-import { emptyOffer } from "../../core/trade.ts"
-import { bagWith, player } from "../../test/helpers.ts"
-import { mapPlayer } from "./presence.ts"
+import type { Ctx } from "./context"
+import type { Presence, TradeSide } from "#/world/server/map-room/presence"
+import type { ServerMessage } from "#/world/protocol"
+import { emptyOffer } from "#/world/core/empty-offer"
+import { bagWith } from "#/world/test/bag-with"
+import { player } from "#/world/test/player"
+import { mapPlayer } from "#/world/server/map-room/map-player"
 
 const read = vi.hoisted(() => vi.fn())
-vi.mock("../../../durable-objects/player.ts", () => ({ Player: { get: () => ({ read, tradeStatus: async () => null, beginTrade: async () => ({ ok: false, reason: "NOT_READY" }) }) } }))
-import { HANDLERS } from "./trade.ts"
+vi.mock("../../../durable-objects/player", () => ({ Player: { get: () => ({ read, tradeStatus: async () => null, beginTrade: async () => ({ ok: false, reason: "NOT_READY" }) }) } }))
+import { HANDLERS } from "./trade"
 afterEach(() => read.mockReset())
 
 const side = (withId: string, session = "first"): TradeSide => ({ session, with: withId, open: true, offer: emptyOffer(), shown: [], locked: false, done: false })

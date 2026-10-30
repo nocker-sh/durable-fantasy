@@ -1,36 +1,5 @@
-// Skills (game-system.md §9) other than the life skills (core/life.ts): what anyone can do —
-// sit down to rest, see to a wound with a herb — and the arts that come with a weapon or a staff,
-// usable by whoever holds it and meets the art's needs. There are no jobs and no skill points.
-import type { Stat } from "./growth.ts"
-import type { ItemId, Skill as LifeSkill } from "./items.ts"
-import { lifeLevel, type LifeExp } from "./life.ts"
-import { weaponsOf } from "./items/weapons.ts"
-
-interface Base {
-  name: string
-  /** SP it takes */
-  sp: number
-  /** ms before it can be used again */
-  cooldown: number
-  text: string
-}
-
-/** Anyone, any time. */
-export interface Action extends Base {
-  kind: "action"
-}
-
-/** Weapon requirements are shared; each art kind carries only its own effect. */
-interface EquippedArt extends Base {
-  weapons: readonly ItemId[]
-  needs: Partial<Record<Stat | LifeSkill, number>>
-}
-
-type StatEffect = { base: number; per: number; stat: Stat }
-export type OffensiveEffect = { kind: "strike"; power: number; sure?: boolean } | { kind: "spell"; magic: StatEffect }
-export type Art = EquippedArt & (OffensiveEffect | { kind: "prayer"; heal: StatEffect })
-
-export type SkillDef = Action | Art
+import type { SkillDef } from "#/world/core/skill-types"
+import { weaponsOf } from "#/world/core/items/weapons-of"
 
 export const SKILLS = {
   sit: { kind: "action", name: "座る", sp: 0, cooldown: 0, text: "道ばたでも腰を下ろして休める。座っている間は HP と SP が倍の速さで戻る（Z キー）。" },
@@ -66,7 +35,17 @@ export const SKILLS = {
     power: 2.3,
     text: "剣を大きく構え、一体へ体重を乗せて斬り込む。踏み込み斬りより消耗が大きい。",
   },
-  pierce: { kind: "strike", name: "急所突き", sp: 3, cooldown: 5000, weapons: ["dagger", ...weaponsOf("dagger", "knife", "estoc")], needs: { dex: 9 }, power: 1, sure: true, text: "動きの止まった一瞬に、急所を突く。必ず会心になる。" },
+  pierce: {
+    kind: "strike",
+    name: "急所突き",
+    sp: 3,
+    cooldown: 5000,
+    weapons: ["dagger", ...weaponsOf("dagger", "knife", "estoc")],
+    needs: { dex: 9 },
+    power: 1,
+    sure: true,
+    text: "動きの止まった一瞬に、急所を突く。必ず会心になる。",
+  },
   cleave: {
     kind: "strike",
     name: "振り下ろし",
@@ -179,42 +158,3 @@ export const SKILLS = {
     text: "森の木に宿るものに呼びかける、木こりに伝わる祈り。傷がふさがる。",
   },
 } satisfies Record<string, SkillDef>
-
-export type SkillId = keyof typeof SKILLS
-export const SKILL_IDS = Object.keys(SKILLS) as SkillId[]
-export const isSkillId = (v: string): v is SkillId => Object.hasOwn(SKILLS, v)
-export const skillOf = (id: SkillId): SkillDef => SKILLS[id]
-export const isArt = (s: SkillDef): s is Art => s.kind !== "action"
-
-/** HP first aid gives back, for alchemy's level and VIT (a herb chewed as it is gives 15). */
-export const firstAid = (alchemy: number, vit: number) => 15 + alchemy * 3 + Math.floor(vit / 2)
-
-/** Why an art cannot be used with what is held and what has been raised; null when it can. */
-export function artBlocked(id: SkillId, p: { equipment: { weapon: ItemId | null }; stats: Readonly<Record<Stat, number>>; life: LifeExp }): "NO_WEAPON" | "STAT_TOO_LOW" | "SKILL_TOO_LOW" | null {
-  const s = skillOf(id)
-  if (!isArt(s)) return null
-  if (!p.equipment.weapon || !s.weapons.includes(p.equipment.weapon)) return "NO_WEAPON"
-  for (const [k, n] of Object.entries(s.needs) as [string, number][]) {
-    if (k in p.stats) {
-      if (p.stats[k as Stat] < n) return "STAT_TOO_LOW"
-    } else if (lifeLevel(p.life[k as LifeSkill] ?? 0) < n) return "SKILL_TOO_LOW"
-  }
-  return null
-}
-
-const weaponArts = new Map<ItemId, readonly SkillId[]>()
-const noArts: readonly SkillId[] = Object.freeze([])
-for (const id of SKILL_IDS) {
-  const skill = skillOf(id)
-  if (!isArt(skill)) continue
-  for (const weapon of skill.weapons) weaponArts.set(weapon, [...(weaponArts.get(weapon) ?? noArts), id])
-}
-for (const arts of weaponArts.values()) Object.freeze(arts)
-
-/** Stable, immutable lists in definition order, shared by skill windows and item descriptions. */
-export const artsOf = (weapon: ItemId | null): readonly SkillId[] => (weapon ? (weaponArts.get(weapon) ?? noArts) : noArts)
-
-/** A skill on the shortcut bar is written "skill:<id>"; anything else there is an item. */
-export type SkillKey = `skill:${SkillId}`
-export const skillKey = (id: SkillId): SkillKey => `skill:${id}`
-export const skillOfKey = (key: string): SkillId | null => (key.startsWith("skill:") && isSkillId(key.slice(6)) ? (key.slice(6) as SkillId) : null)

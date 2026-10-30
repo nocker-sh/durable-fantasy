@@ -1,8 +1,9 @@
 // The ground plans (world.ts Layout) of the districts beyond the square, the fields and the
 // rooms: data and landforms only, with nothing drawn, so the workers that paint the ground can
 // load them without the scene.
-import { OFF, OFF_LINE, OFF_POINT, catmull, smooth, type Layout } from "./layout.ts"
-import { fbm } from "../../lib/engine/noise.ts"
+import { OFF, OFF_LINE, OFF_POINT, catmull, type Layout } from "./layout"
+import { smooth } from "../../lib/engine/smooth"
+import { fbm } from "../../lib/engine/fbm"
 
 const N = 48
 
@@ -189,15 +190,24 @@ const dirt = (pts: V2[], w = 0.85) => ({ pts: catmull(pts), w, kind: "dirt" as c
 /** ground that falls into the sea east of `x0` over `width` tiles */
 const seaward =
   (x0: number, width: number, depth = 2.4) =>
-  (x: number, z: number, h: number) =>
-    h - smooth(x0, x0 + width, x + (fbm(x, z, 0.15, 7) - 0.5) * 3) * depth
+  (inputProps: Parameters<NonNullable<Layout["shape"]>>[0]) => {
+    const x = inputProps.x
+    const z = inputProps.z
+    const h = inputProps.h
+    return h - smooth(x0, x0 + width, x + (fbm({ x: x, y: z, scale: 0.15, seed: 7 }) - 0.5) * 3) * depth
+  }
 
 /** Hills rising along the map's edges (not on the open sides), so the land seems to go on. */
 function rimmed(l: Layout, open = ""): Layout {
   const inner = l.shape
   return {
     ...l,
-    shape: (x, z, h, roadD) => {
+    shape: (inputProps: { x: number; z: number; h: number; roadD: number }) => {
+      const x = inputProps.x
+      const z = inputProps.z
+      const h = inputProps.h
+      const roadD = inputProps.roadD
+
       const sides: [string, number][] = [
         ["w", x],
         ["n", z],
@@ -205,8 +215,12 @@ function rimmed(l: Layout, open = ""): Layout {
         ["s", N - z],
       ]
       let rim = 0
-      for (const [k, d] of sides) if (!open.includes(k)) rim = Math.max(rim, smooth(5, 0.5, d + (fbm(x, z, 0.2, 17) - 0.5) * 2))
-      return (inner ? inner(x, z, h, roadD) : h) + rim * 2.2
+      for (const entry of sides) {
+        const k = entry[0]
+        const d = entry[1]
+        if (!open.includes(k)) rim = Math.max(rim, smooth(5, 0.5, d + (fbm({ x: x, y: z, scale: 0.2, seed: 17 }) - 0.5) * 2))
+      }
+      return (inner ? inner({ x: x, z: z, h: h, roadD: roadD }) : h) + rim * 2.2
     },
   }
 }
@@ -283,7 +297,12 @@ export const LAYOUTS: Record<string, Layout> = {
         0.8,
       ),
     ],
-    shape: (x, z, h) => h + (Math.sin(x * 0.33 + z * 0.12 + fbm(x, z, 0.08, 9) * 4) * 0.5 + 0.5) ** 2 * 1.5,
+    shape: (inputProps: Parameters<NonNullable<Layout["shape"]>>[0]) => {
+      const x = inputProps.x
+      const z = inputProps.z
+      const h = inputProps.h
+      return h + (Math.sin(x * 0.33 + z * 0.12 + fbm({ x: x, y: z, scale: 0.08, seed: 9 }) * 4) * 0.5 + 0.5) ** 2 * 1.5
+    },
   },
   // the road along the sea cliffs, the sea to the east
   "sea-cliff": {
@@ -305,8 +324,12 @@ export const LAYOUTS: Record<string, Layout> = {
         0.85,
       ),
     ],
-    shape: (x, z, h) => {
-      const edge = 34 + Math.sin(z * 0.21) * 2 + (fbm(x, z, 0.2, 11) - 0.5) * 2
+    shape: (inputProps: Parameters<NonNullable<Layout["shape"]>>[0]) => {
+      const x = inputProps.x
+      const z = inputProps.z
+      const h = inputProps.h
+
+      const edge = 34 + Math.sin(z * 0.21) * 2 + (fbm({ x: x, y: z, scale: 0.2, seed: 11 }) - 0.5) * 2
       return x < edge ? h + smooth(4, 30, x) * 0.6 : h - 2.8 - smooth(edge, edge + 6, x) * 1.2
     },
   },
@@ -491,10 +514,15 @@ export const LAYOUTS: Record<string, Layout> = {
         0.8,
       ),
     ],
-    shape: (x, z, h, roadD) => {
+    shape: (inputProps: { x: number; z: number; h: number; roadD: number }) => {
+      const x = inputProps.x
+      const z = inputProps.z
+      const h = inputProps.h
+      const roadD = inputProps.roadD
+
       // the valley follows the road; the slopes rise steeply away from it
       const d = Math.max(0, roadD - 2)
-      return h + Math.min(5, d * d * 0.06) + (fbm(x, z, 0.3, 13) - 0.5) * Math.min(1, d * 0.2)
+      return h + Math.min(5, d * d * 0.06) + (fbm({ x: x, y: z, scale: 0.3, seed: 13 }) - 0.5) * Math.min(1, d * 0.2)
     },
   },
   // before the walls of Hue, chimneys smoking behind them
@@ -520,4 +548,10 @@ export const LAYOUTS: Record<string, Layout> = {
 }
 
 export const OPEN_SIDES: Record<string, string> = { "sea-cliff": "e", "net-sheds": "e", "quynhon-gate": "e" }
-export const FIELD_LAYOUTS: Record<string, Layout> = Object.fromEntries(Object.entries(LAYOUTS).map(([id, l]) => [id, rimmed(l, OPEN_SIDES[id])]))
+export const FIELD_LAYOUTS: Record<string, Layout> = Object.fromEntries(
+  Object.entries(LAYOUTS).map((entry2) => {
+    const id = entry2[0]
+    const l = entry2[1]
+    return [id, rimmed(l, OPEN_SIDES[id])]
+  }),
+)
