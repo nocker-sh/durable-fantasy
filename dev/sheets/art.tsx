@@ -14,6 +14,8 @@ import { stoneTex } from "#/world/scene/textures/stone-tex"
 import { roofTex } from "#/world/scene/textures/roof-tex"
 import { thatchTex } from "#/world/scene/textures/thatch-tex"
 import { woodTex } from "#/world/scene/textures/wood-tex"
+import { createSignTexture } from "#/world/scene/textures/create-sign-texture"
+import { SIGN_PAINTERS } from "#/world/scene/textures/signs/sign-painters"
 import { sheet } from "#/dev/sheets/schema"
 
 const uiIcons = sheet<SpriteName>({
@@ -46,6 +48,7 @@ const TEXTURES: Record<string, { name: string; make: () => { w: number; h: numbe
   thatch: { name: "藁屋根", make: () => thatchTex() },
   leaf: { name: "葉", make: () => leafTex() },
   leaf2: { name: "葉（濃い）", make: () => leafTex("leaf2") },
+  ...Object.fromEntries(Array.from(SIGN_PAINTERS.keys(), (kind) => [`sign-${kind}`, { name: `看板：${kind}`, make: () => createSignTexture(kind) }])),
 }
 
 const texCache = new Map<string, string>()
@@ -59,7 +62,7 @@ const textures = sheet<string>({
   key: (id) => id,
   name: (id) => TEXTURES[id].name,
   kind: () => "テクスチャ",
-  icon: (id) => <img src={texOf(id)} alt="" width={32} height={32} style={{ imageRendering: "pixelated" }} />,
+  icon: (id) => <img src={texOf(id)} alt="" width={32} height={32} style={{ imageRendering: "pixelated", objectFit: "contain" }} />,
   cols: [
     {
       label: "大きさ",
@@ -70,7 +73,7 @@ const textures = sheet<string>({
       w: "w-20",
     },
   ],
-  more: (id) => [{ title: "原寸の4倍", head: [], rows: [[<img key="t" src={texOf(id)} alt="" className="w-full max-w-lg" style={{ imageRendering: "pixelated" }} />]] }],
+  more: (id) => [{ title: "拡大", head: [], rows: [[<img key="t" src={texOf(id)} alt="" className="w-full max-w-lg" style={{ imageRendering: "pixelated" }} />]] }],
 })
 
 const ramps = sheet<string>({

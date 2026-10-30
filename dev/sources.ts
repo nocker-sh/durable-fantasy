@@ -22,7 +22,7 @@ export const SOURCES: Record<string, readonly string[]> = {
   world: ["WORLD", "GRID_SIZE", "WORLD_NODES", "LOCKED_CITIES"],
   icons: ["SPRITES"],
   "item-art": ["ITEM_SPRITES", "HIDE"],
-  textures: [],
+  textures: ["SIGN_PAINTERS"],
   ramps: ["RAMPS"],
   parts: ["SEX", "AGE", "SKIN", "HAIR", "STYLES", "CLOTH", "HATS", "NECKS", "NECK_KINDS", "NECK_RAMPS", "FRINGES"],
   presets: ["PRESETS", "LOOKS", "DEFAULT_LOOK"],
