@@ -28,7 +28,7 @@ A* 探索のコスト・前のセル・候補の展開は `lib/engine/grid-path-
 
 地面の形と配置の共有型は `world/maps/layout-types.ts`、地形の機能がないことを表す定数は `empty-layout-features.ts` に置く。中央の広場と周囲の地区の配置は `layout.ts` の `SQUARE_LAYOUT` が持つ。河川の座標列は一度だけ生成し、共同洗濯場の基準位置も同じ点列から求める。`lib/engine/get-nearest-polyline-x.ts` は行に最も近い標本の x 座標を返し、標本の間の補間とは区別する。
 
-`world/maps/layouts.ts` は地図の選択と町の踏み跡を加えた配置の保持を担当する。地図名は `Map` で照会し、継承したプロパティを地図として使わない。戸口の壁ごとの座標と外向きは `get-house-door-approach.ts`、描画用の踏み跡は `get-house-door-trail.ts`、道路上の最近点は `get-nearest-road-point.ts` が持つ。線分への射影は `lib/engine/get-nearest-segment-point.ts` を使う。踏み跡は通行判定を変えない。地面の保存識別子には地図選択・踏み跡の計算・家と戸口の定義も含め、参照の検査は地図選択からの依存も辿る。
+`world/maps/layouts.ts` は地図の選択と町の踏み跡を加えた配置の保持を担当する。地図名は `Map` で照会し、継承したプロパティを地図として使わない。戸口の壁ごとの座標と外向きは `get-house-door-approach.ts`、描画用の踏み跡は `get-house-door-trail.ts`、道路上の最近点は `get-nearest-road-point.ts` が持つ。線分への射影は `lib/engine/get-nearest-segment-point.ts` を使う。踏み跡は通行判定を変えない。地面の保存識別子には地図選択・踏み跡の計算・家と戸口の定義も含め、参照の検査は地図選択からの依存も辿る。識別子の組立ては `lib/engine/get-source-fingerprint.ts`、文字列のハッシュは `get-string-hash.ts` に分ける。既存の保存形式に合わせてパス順の内容を結合し、文字列は UTF-16 の各符号単位を順に処理する。
 
 経路の短縮は `lib/engine/get-shortened-path.ts` に分け、見通しの判定を探索側から渡す。見通しを単調と仮定せず遠い候補から調べ、短縮できない区間では元の隣接点を残す。
 

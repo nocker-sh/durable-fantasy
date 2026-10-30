@@ -1,3 +1,5 @@
+import { getSourceFingerprint } from "#/lib/engine/get-source-fingerprint"
+
 // Fingerprint the sources that paint terrain, including the houses and their worn approaches.
 const sources = import.meta.glob<string>(
   [
@@ -68,19 +70,5 @@ const sources = import.meta.glob<string>(
   { query: "?raw", import: "default", eager: true },
 )
 
-/** Source changes invalidate kept pixels; sorting makes the fingerprint independent of file enumeration order. */
-export const GROUND_VERSION = hash(
-  Object.keys(sources)
-    .sort()
-    .map((file) => sources[file])
-    .join(""),
-)
-
-function hash(s: string): string {
-  let h = 2166136261
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i)
-    h = Math.imul(h, 16777619)
-  }
-  return (h >>> 0).toString(36)
-}
+/** Source changes invalidate kept pixels independently of file enumeration order. */
+export const GROUND_VERSION = getSourceFingerprint(sources)
