@@ -1,5 +1,5 @@
 import { parseTime } from "#/world/core/parse-time"
-import type { Slot } from "#/world/town/routines"
+import type { Slot } from "#/world/town/routine-types"
 
 type Props = Omit<Slot, "from"> & Readonly<{ from: string }>
 

@@ -1,4 +1,4 @@
-import type { Slot } from "#/world/town/routines"
+import type { Slot } from "#/world/town/routine-types"
 import { schedules } from "#/world/town/routines"
 
 /** The slot someone is in at `min`; definitions are sorted once when loaded. */

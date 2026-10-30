@@ -1,6 +1,6 @@
 import { ROOM_SCALE } from "#/world/town/interior-rules"
 import type { Cell, Interior } from "#/world/town/interiors"
-import type { Slot } from "#/world/town/routines"
+import type { Slot } from "#/world/town/routine-types"
 
 type Props = Readonly<{ name: string; slot: Slot; rooms: readonly Interior[] }>
 

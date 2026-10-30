@@ -1,6 +1,6 @@
 import { INTERIORS } from "#/world/town/interiors"
 import { seatsOf } from "#/world/town/interior-seats-of"
-import type { Spot } from "#/world/town/routines"
+import type { Spot } from "#/world/town/routine-types"
 import { slotAt } from "#/world/town/slot-at"
 import { routinePatrons } from "#/world/town/routines"
 

@@ -1,5 +1,5 @@
 import type { Cell } from "#/world/maps/types"
-import type { Spot } from "#/world/town/routines"
+import type { Spot } from "#/world/town/routine-types"
 
 type Props = Readonly<{ spot: Spot; places: Readonly<Record<string, Cell>> | null }>
 

@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
 import { lessonRoster } from "./routine-activities"
-import type { Slot } from "#/world/town/routines"
+import type { Slot } from "#/world/town/routine-types"
 const slot = (role: "student" | "teacher", map = "hall"): Slot => ({ from: 0, where: { map, cell: [1, 1] }, doing: "表示文言", activity: { kind: "lesson", role } })
 it("uses explicit activity and map identities rather than interpreting action text", () => {
   const routines = {

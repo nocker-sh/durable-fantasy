@@ -1,4 +1,4 @@
-import type { Slot } from "#/world/town/routines"
+import type { Slot } from "#/world/town/routine-types"
 /** Activity identities are independent of the text shown for a resident's current action. */
 export function lessonRoster(routines: Readonly<Record<string, readonly Slot[]>>, map: string): { teachers: string[]; students: string[] } {
   const teachers = new Set<string>(),

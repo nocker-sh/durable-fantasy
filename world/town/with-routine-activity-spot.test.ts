@@ -1,7 +1,7 @@
 import { expect, it } from "vitest"
 import { INTERIORS } from "#/world/town/interiors"
 import { withRoutineActivitySpot } from "#/world/town/with-routine-activity-spot"
-import type { Slot } from "#/world/town/routines"
+import type { Slot } from "#/world/town/routine-types"
 
 const lesson: Slot = { from: 1230, where: "home", doing: "字を教える", activity: { kind: "lesson", role: "teacher" } }
 

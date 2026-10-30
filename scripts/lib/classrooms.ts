@@ -1,4 +1,4 @@
-import type { Slot } from "#/world/town/routines"
+import type { Slot } from "#/world/town/routine-types"
 import { lessonRoster } from "../../world/town/routine-activities"
 import { roomHasWorker } from "./room-worker"
 import { crowdedSeatCentres } from "./spatial-rules"

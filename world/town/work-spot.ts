@@ -1,5 +1,5 @@
 import { keeperPlace } from "#/world/town/keeper-place"
-import type { Spot } from "#/world/town/routines"
+import type { Spot } from "#/world/town/routine-types"
 
 /** A resident's work spot from their entry in residents.ts. */
 export function workSpot(r: { name: string; map?: string; at: string | readonly [number, number] }): Spot {

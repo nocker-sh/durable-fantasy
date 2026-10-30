@@ -1,6 +1,6 @@
 import { MAPS } from "#/world/maps"
 import type { Cell } from "#/world/maps/types"
-import type { Spot } from "#/world/town/routines"
+import type { Spot } from "#/world/town/routine-types"
 import { getSpotCell } from "#/world/maps/get-spot-cell"
 
 /** The cell a spot stands for, or null when the place is unknown. */
