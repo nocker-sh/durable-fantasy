@@ -3,6 +3,7 @@
 // street of fences instead of once per post. Whatever moves, fades or is hidden later keeps its
 // own transform: it is an anchor, and what stands under it merges under it, never above.
 import * as THREE from "three"
+import { concatBufferGeometries } from "#/lib/graphics/concat-buffer-geometries"
 
 export type MergeOptions = {
   /** objects whose transform or visibility changes later (what is under them merges under them) */
@@ -40,7 +41,7 @@ export function mergeStatic(root: THREE.Object3D, options: MergeOptions): { befo
       toAnchor.copy(inverse).multiply(mesh.matrixWorld)
       return mesh.geometry.clone().applyMatrix4(toAnchor)
     })
-    const m = new THREE.Mesh(concat(geometries), g.sample.material)
+    const m = new THREE.Mesh(concatBufferGeometries(geometries), g.sample.material)
     for (const geometry of geometries) geometry.dispose()
     m.castShadow = g.sample.castShadow
     m.receiveShadow = g.sample.receiveShadow
@@ -69,39 +70,6 @@ export function mergeStatic(root: THREE.Object3D, options: MergeOptions): { befo
     }
   })
   return { before, after }
-}
-
-/** One geometry holding all of these, which share their attribute names and sizes and are all indexed or none. */
-function concat(geometries: THREE.BufferGeometry[]): THREE.BufferGeometry {
-  const out = new THREE.BufferGeometry()
-  const first = geometries[0]
-  for (const name of Object.keys(first.attributes)) {
-    const size = first.attributes[name].itemSize
-    const total = geometries.reduce((n, g) => n + g.attributes[name].count, 0)
-    const ArrayType = first.attributes[name].array.constructor as typeof Float32Array
-    const data = new ArrayType(total * size)
-    let at = 0
-    for (const g of geometries) {
-      const a = g.attributes[name]
-      data.set(a.array, at)
-      at += a.count * size
-    }
-    out.setAttribute(name, new THREE.BufferAttribute(data, size, first.attributes[name].normalized))
-  }
-  if (first.index) {
-    const total = geometries.reduce((n, g) => n + g.index!.count, 0)
-    const index = new Uint32Array(total)
-    let at = 0,
-      base = 0
-    for (const g of geometries) {
-      const ix = g.index!
-      for (let i = 0; i < ix.count; i++) index[at + i] = ix.array[i] + base
-      at += ix.count
-      base += g.attributes.position.count
-    }
-    out.setIndex(new THREE.BufferAttribute(index, 1))
-  }
-  return out
 }
 
 function mergeable(m: THREE.Mesh): boolean {
