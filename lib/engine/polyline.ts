@@ -19,22 +19,15 @@ export class Polyline {
   }
 
   distance(px: number, pz: number): number {
-    let best = 1e9
-    for (const entry2 of this.#segments) {
-      const ax = entry2.ax
-      const az = entry2.az
-      const dx = entry2.dx
-      const dz = entry2.dz
-      const l2 = entry2.l2
-
-      const projection = ((px - ax) * dx + (pz - az) * dz) / l2
-      const t = projection < 0 ? 0 : projection > 1 ? 1 : projection
-      const ex = ax + dx * t - px
-      const ez = az + dz * t - pz
-      const d = ex * ex + ez * ez
-      if (d < best) best = d
-    }
-    return Math.sqrt(best)
+    const closestSquared = this.#segments.reduce((best, segment) => {
+      const projection = ((px - segment.ax) * segment.dx + (pz - segment.az) * segment.dz) / segment.l2
+      const fraction = projection < 0 ? 0 : projection > 1 ? 1 : projection
+      const x = segment.ax + segment.dx * fraction - px
+      const z = segment.az + segment.dz * fraction - pz
+      const squared = x * x + z * z
+      return squared < best ? squared : best
+    }, 1e9)
+    return Math.sqrt(closestSquared)
   }
 
   static catmull(pts: V2[], k = 8): V2[] {
