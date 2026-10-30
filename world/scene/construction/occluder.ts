@@ -8,7 +8,7 @@ import { glowMats, houseGlows, houseShutters, occluders } from "#/world/scene/co
  */
 export function occluder(obj: THREE.Object3D, min = 0.22, opaque = false) {
   // one copy per material, shared by every mesh of this object that had it: the fade is per
-  // object, and meshes that share a material can be merged into one draw (lib/graphics/batch.ts)
+  // object, and meshes that share a material can be merged into one draw (lib/graphics/merge-static.ts)
   const copies = new Map<THREE.Material, THREE.MeshLambertMaterial>()
   obj.traverse((o) => {
     const m = o as THREE.Mesh

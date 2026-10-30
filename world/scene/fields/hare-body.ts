@@ -1,5 +1,5 @@
 import { HARE_BODY_PARTS } from "#/world/core/monster-body-shapes"
-import { mergeStatic } from "#/lib/graphics/batch"
+import { mergeStatic } from "#/lib/graphics/merge-static"
 import * as THREE from "three"
 import { createColorMaterial as colorMat } from "#/lib/graphics/create-color-material"
 

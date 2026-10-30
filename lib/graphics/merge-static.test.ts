@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import * as THREE from "three"
-import { mergeStatic } from "#/lib/graphics/batch"
+import { mergeStatic } from "#/lib/graphics/merge-static"
 
 const material = new THREE.MeshBasicMaterial()
 function box(x: number) {
@@ -51,7 +51,7 @@ describe("static batching", () => {
     stall.visible = false
     const visible: THREE.Object3D[] = []
     root.traverseVisible((o) => {
-      if ((o as THREE.Mesh).isMesh) visible.push(o)
+      if ("isMesh" in o && o.isMesh) visible.push(o)
     })
     expect(visible).toHaveLength(1)
   })
