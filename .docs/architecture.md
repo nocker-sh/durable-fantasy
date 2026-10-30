@@ -271,7 +271,7 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 作業姿勢の候補は `world/scene/figure/native-work-pose.ts` が既存の足形を床へ接地し、固定長の腕へ握りを解く。`scripts/lib/native-work-pose.ts` は実際の身体形状の保守的な境界を室内へ照合する。炉・煙道と支持部・壁・開いた戸・ほかの家具は `scripts/lib/hearth-room-section.ts` が同じ部屋座標の断面へまとめ、持ち替えの検査と共有する。境界が重なる場合は未解決として残す。`lib/graphics/ray/primitive-bounds.ts` と `cylinder-bounds.ts` は描画形状の境界を扱い、ゲームの配置には依存しない。明示した骨格の描画は `renderSkeletonFrame` を既存の描画処理と共有する。 握りの軸は `hearthSpatialStrokes` が道具の傾きから求め、作業姿勢は身体の向きへ変換して手の取付軸を合わせる。ベクトルの回転は `lib/engine/qrot.ts`、回転の合成は `qmul.ts`、方向間の最小回転は `qfrom-to.ts` に置く。共通の型は `quaternion-types.ts` が持つ。手の表面は既存の形状のままであり、取付軸の一致を指や手首の可動域の照合済みとは扱わない。
 
-身体と室内部材の境界の距離は `lib/engine/segment-cuboid-distance.ts`、保守的な直方体の交差は `lib/engine/cuboid-translation-hits.ts` に置く。作業の支持を固定した候補の検査では、中央と両端を静止形状として照合する。連続した動作の囲いは静止した端の境界とは分けて扱う。
+身体と室内部材の境界の距離は `lib/engine/segment-cuboid-distance.ts` が面の交点で線分を区切り、`get-segment-cuboid-interval-minimum.ts` が各区間の端点と二次式の停留点を照合する。接触ぎりぎりの距離を点のサンプリングで代用しない。保守的な直方体の交差は `lib/engine/cuboid-translation-hits.ts` に置く。作業の支持を固定した候補の検査では、中央と両端を静止形状として照合する。連続した動作の囲いは静止した端の境界とは分けて扱う。
 
 左右の靴形状は `world/scene/figure/legs.ts` が描画と同じ端点と半径で返し、`buildBody` が明示して渡す。`world/scene/figure/footing.ts` はその形状から床へ置く高さと各靴の最下点・隙間を求める。作業姿勢は図形の並び順から足を選ばず、資料の接地指定もこの結果へ照合する。
 

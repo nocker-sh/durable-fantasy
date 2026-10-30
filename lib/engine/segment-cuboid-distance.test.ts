@@ -11,6 +11,15 @@ it("finds an interior closest point between disjoint endpoints", () => {
   expect(segmentCuboidDistance(box, [-2, 3, 2], [3, -2, 2])).toBeCloseTo(1, 12)
   expect(segmentCuboidDistance(box, [-2, 5, 2], [5, -2, 2])).toBeCloseTo(Math.sqrt(1.5), 12)
 })
+it("keeps a small positive clearance distinct from contact", () => {
+  const clearance = 2 ** -30
+  expect(segmentCuboidDistance(box, [-2, 1 + clearance, 0.5], [3, 1 + clearance, 0.5])).toBe(clearance)
+})
+it("supports translated boxes with a zero-width axis", () => {
+  const flat = { x0: 3, x1: 3, bottom: -4, top: -2, z0: 7, z1: 9 }
+  expect(segmentCuboidDistance(flat, [0, -3, 8], [6, -3, 8])).toBe(0)
+  expect(segmentCuboidDistance(flat, [4, -3, 6], [4, -3, 10])).toBe(1)
+})
 it("preserves reversal and agrees with an independently sampled upper bound", () => {
   for (let i = 0; i < 30; i++) {
     const a: [number, number, number] = [Math.sin(i) * 3, Math.cos(i * 2) * 3, Math.sin(i * 3) * 3],
