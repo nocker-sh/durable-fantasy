@@ -1,3 +1,4 @@
+import { roomWorkUseSchema } from "#/scripts/lib/room-work-use-schema"
 import { entryApproachSchema } from "#/scripts/lib/entry-approach-schema"
 import { entryStepsSchema } from "#/scripts/lib/entry-steps-schema"
 import { foundationSchema } from "#/scripts/lib/foundation-schema"
@@ -347,6 +348,7 @@ const structure = z.object({
   potable_water_supply: potableWaterSupplySchema.optional(),
   water_collection: potableWaterCollectionSchema.optional(),
   routine_source: z.object({ file: text, export: text, key: text }).optional(),
+  work_uses: z.array(roomWorkUseSchema).optional(),
   appearance_source: z.object({ file: text, export: text, key: text }).optional(),
   runtime_station: text.optional(),
   storage_ids: references.optional(),

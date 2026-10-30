@@ -1,3 +1,4 @@
+import { auditRoomWorkUses } from "#/scripts/lib/audit-room-work-uses"
 import { hasEntryApproachSections } from "#/scripts/lib/has-entry-approach-sections"
 import { auditEntryApproachSections } from "#/scripts/lib/audit-entry-approach-sections"
 import { getWindmillApproachSection } from "#/scripts/lib/get-windmill-approach-section"
@@ -618,6 +619,7 @@ failures.push(
   ...auditSettingReferenceTypes(documents),
   ...auditWorkerAssignments(documents),
   ...auditHouseholdMeals(documents),
+  ...auditRoomWorkUses(documents, ROUTINES),
   ...auditLaundryDrying(documents),
   ...auditGroundStorage(documents),
   ...auditHotWork(documents),
