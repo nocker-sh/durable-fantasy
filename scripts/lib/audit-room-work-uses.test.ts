@@ -27,12 +27,28 @@ function fixture() {
     furniture: [{ ...piece("T"), seat_symbols: ["B"] }, piece("B")],
     work_uses: [use],
   }
-  const storage: SettingDocument = { ...document("storage", "rooms"), building: "home", furniture: [{ ...piece("P"), role: "storage", compartments: ["kit"] }] }
+  const stored = {
+    id: "kit",
+    name: "Kit",
+    owner: "Berta",
+    source: "test",
+    kind: "box",
+    board: 0,
+    across_m: 0,
+    from_back_m: 0.01,
+    width_m: 0.3,
+    height_m: 0.1,
+    depth_m: 0.2,
+    wall_thickness_m: 0.01,
+    lid_thickness_m: 0.01,
+  }
+  const shelf = { height_m: 1, board_thickness_m: 0.025, board_tops_m: [0.12, 1], front: "s", contents: [stored] }
+  const storage: SettingDocument = { ...document("storage", "rooms"), building: "home", furniture: [{ ...piece("P"), role: "storage", compartments: ["kit"], shelf }] }
   const resident = document("resident-b", "residents", "Berta")
   const building: SettingDocument = { ...document("home", "buildings"), rooms: ["room", "storage"] }
   const documents = new Map([room, storage, resident, building, document("maker", "residents")].map((entry) => [entry.id, entry]))
   const routines: Record<string, readonly Slot[]> = { Berta: [{ from: 0, where: "home", doing: "repair" }] }
-  return { room, storage, documents, routines, use }
+  return { room, storage, documents, routines, use, stored }
 }
 
 it("checks the declared shared-table job without editing documents or treating it as designed", () => {
@@ -127,14 +143,11 @@ it("does not complete a work use without a dimensioned kit box", () => {
 it("includes closed-box packing in the room audit", () => {
   const f = fixture()
   const box = {
-    width_m: 0.01,
-    height_m: 0.01,
-    depth_m: 0.01,
-    wall_thickness_m: 0.01,
-    lid_thickness_m: 0.01,
+    storage_item: "kit",
     clearance_m: 0,
     contents: [{ id: "tool", name: "Tool", owner: "resident-b", makers: ["maker"], source: "test", origin_m: [0, 0, 0], size_m: [0.001, 0.001, 0.001] }],
   }
+  f.stored.wall_thickness_m = 0.16
   f.room.work_uses = [{ ...f.use, kit: { ...f.use.kit, box } }]
   expect(auditRoomWorkUses(f.documents, f.routines)).toContain("room: Invalid storage box wall or lid")
 })
@@ -143,11 +156,7 @@ it("requires dependency gates for additional parcel makers", () => {
   const f = fixture()
   f.documents.set("second-maker", document("second-maker", "residents"))
   const box = {
-    width_m: 0.3,
-    height_m: 0.1,
-    depth_m: 0.2,
-    wall_thickness_m: 0.01,
-    lid_thickness_m: 0.01,
+    storage_item: "kit",
     clearance_m: 0,
     contents: [{ id: "tool", name: "Tool", owner: "resident-b", makers: ["maker", "second-maker"], source: "test", origin_m: [0, 0, 0], size_m: [0.01, 0.01, 0.01] }],
   }

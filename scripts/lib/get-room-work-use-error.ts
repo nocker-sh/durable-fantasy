@@ -1,3 +1,4 @@
+import { getStoredWorkKitDimensions } from "#/scripts/lib/get-stored-work-kit-dimensions"
 import { getWorkKitBoxError } from "#/scripts/lib/get-work-kit-box-error"
 import type { z } from "zod"
 import type { roomWorkUseSchema } from "#/scripts/lib/room-work-use-schema"
@@ -36,7 +37,9 @@ export function getRoomWorkUseError(props: Props): Error | null {
     return new Error("Work use has no matching routine activity")
   if (use.status === "designed" && !use.kit.box) return new Error("Work kit has no dimensioned box")
   if (use.kit.box) {
-    const error = getWorkKitBoxError({ box: use.kit.box, owner: use.kit.owner, documents: props.documents })
+    const dimensions = getStoredWorkKitDimensions({ shelf: storage.shelf, id: use.kit.box.storage_item, owner: resident.title })
+    if (dimensions instanceof Error) return dimensions
+    const error = getWorkKitBoxError({ box: use.kit.box, dimensions, owner: use.kit.owner, documents: props.documents })
     if (error) return error
   }
   const dependencies = [use.resident, use.storage_room, use.kit.proposed_box_maker, use.kit.proposed_needle_maker, ...(use.kit.box?.contents.flatMap((piece) => piece.makers) ?? [])]
