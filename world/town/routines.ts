@@ -1,6 +1,6 @@
 import { CyclicSchedule } from "#/lib/engine/cyclic-schedule"
 import { INTERIORS } from "#/world/town/interiors"
-import { ROOM_SCALE } from "#/world/town/interior-rules"
+import { withRoutineActivitySpot } from "#/world/town/with-routine-activity-spot"
 import type { Cell } from "#/world/town/interiors"
 
 /** A spot: a named place on a map (scene `places`, exported to the map JSON), a tile position, or a cell. */
@@ -577,19 +577,7 @@ export const ROUTINES: Record<string, readonly Slot[]> = Object.fromEntries(
   Object.entries(baseRoutines).map((entry) => {
     const name = entry[0]
     const slots = entry[1]
-    return [
-      name,
-      slots.map((slot) => {
-        if (!slot.activity) return slot
-        for (const room of INTERIORS) {
-          const placed = room.house.authored?.activitySpots.find(
-            (p) => p.resident === name && p.kind === slot.activity!.kind && p.role === (slot.activity!.kind === "lesson" ? slot.activity!.role : undefined) && p.floor === room.floor,
-          )
-          if (placed) return { ...slot, where: { map: room.id, cell: [Math.floor((room.x0 + placed.x * ROOM_SCALE) * 2), Math.floor((room.z0 + placed.z * ROOM_SCALE) * 2)] as Cell } }
-        }
-        return slot
-      }),
-    ]
+    return [name, slots.map((slot) => withRoutineActivitySpot({ name, slot, rooms: INTERIORS }))]
   }),
 )
 
