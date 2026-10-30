@@ -1,3 +1,4 @@
+import { getWorkKitTableSetupError } from "#/scripts/lib/get-work-kit-table-setup-error"
 import { getStoredWorkKitDimensions } from "#/scripts/lib/get-stored-work-kit-dimensions"
 import { getWorkKitBoxError } from "#/scripts/lib/get-work-kit-box-error"
 import type { z } from "zod"
@@ -36,11 +37,18 @@ export function getRoomWorkUseError(props: Props): Error | null {
   if (use.routine_source.key !== resident.title || !Object.hasOwn(props.routines, resident.title) || !props.routines[resident.title]?.some((slot) => slot.doing === use.routine_source.doing))
     return new Error("Work use has no matching routine activity")
   if (use.status === "designed" && !use.kit.box) return new Error("Work kit has no dimensioned box")
+  if (use.table_setup && !use.kit.box) return new Error("Work tabletop setup has no referenced box")
+  if (use.status === "designed" && !use.table_setup) return new Error("Work use has no tabletop setup")
   if (use.kit.box) {
     const dimensions = getStoredWorkKitDimensions({ shelf: storage.shelf, id: use.kit.box.storage_item, owner: resident.title })
     if (dimensions instanceof Error) return dimensions
     const error = getWorkKitBoxError({ box: use.kit.box, dimensions, owner: use.kit.owner, documents: props.documents })
     if (error) return error
+    if (use.table_setup) {
+      if (!props.room.grid) return new Error("Work tabletop setup has no measured room")
+      const setupError = getWorkKitTableSetupError({ setup: use.table_setup, table, cell: props.room.grid.cell_m, dimensions })
+      if (setupError) return setupError
+    }
   }
   const dependencies = [use.resident, use.storage_room, use.kit.proposed_box_maker, use.kit.proposed_needle_maker, ...(use.kit.box?.contents.flatMap((piece) => piece.makers) ?? [])]
   const declared = props.room.design_dependencies

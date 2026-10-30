@@ -163,3 +163,54 @@ it("requires dependency gates for additional parcel makers", () => {
   f.room.work_uses = [{ ...f.use, kit: { ...f.use.kit, box } }]
   expect(auditRoomWorkUses(f.documents, f.routines)).toContain("room: Work use has missing design dependencies")
 })
+
+it("does not accept a tabletop setup without its referenced kit", () => {
+  const f = fixture()
+  f.room.work_uses = [{ ...f.use, table_setup: { box_origin_m: [0, 0], lid_origin_m: [0, 0.3], clearance_m: 0.01 } }]
+  expect(auditRoomWorkUses(f.documents, f.routines)).toContain("room: Work tabletop setup has no referenced box")
+})
+
+it("does not complete a kit job without tabletop placement", () => {
+  const f = fixture()
+  f.room.work_uses = [
+    {
+      ...f.use,
+      status: "designed",
+      pending: [],
+      kit: {
+        ...f.use.kit,
+        box: {
+          storage_item: "kit",
+          clearance_m: 0.01,
+          contents: [{ id: "tool", name: "Tool", owner: "resident-b", makers: ["maker"], source: "test", origin_m: [0, 0, 0], size_m: [0.01, 0.01, 0.01] }],
+        },
+      },
+    },
+  ]
+  expect(auditRoomWorkUses(f.documents, f.routines)).toContain("room: Work use has no tabletop setup")
+})
+
+it("includes tabletop containment in the room audit", () => {
+  const f = fixture()
+  f.room.grid = { cell_m: 0.5, rows: ["...."] }
+  const table = f.room.furniture?.find((piece) => piece.symbol === "T")
+  if (!table) throw new Error("Missing fixture table")
+  table.rect = [0, 0, 2, 3]
+  table.runtime_kind = "table"
+  table.work_surface = { height_m: 0.74, thickness_m: 0.035, leg_width_m: 0.06, leg_inset_m: 0.1, knee_clearance_m: 0.16 }
+  f.room.work_uses = [
+    {
+      ...f.use,
+      table_setup: { box_origin_m: [0.62, 0.7], lid_origin_m: [0.99, 0.98], clearance_m: 0.01 },
+      kit: {
+        ...f.use.kit,
+        box: {
+          storage_item: "kit",
+          clearance_m: 0.01,
+          contents: [{ id: "tool", name: "Tool", owner: "resident-b", makers: ["maker"], source: "test", origin_m: [0, 0, 0], size_m: [0.01, 0.01, 0.01] }],
+        },
+      },
+    },
+  ]
+  expect(auditRoomWorkUses(f.documents, f.routines)).toContain("room: Layout object lid leaves its container")
+})

@@ -1,3 +1,4 @@
+import { workKitTableSetupSchema } from "#/scripts/lib/work-kit-table-setup-schema"
 import { workKitBoxSchema } from "#/scripts/lib/work-kit-box-schema"
 import { z } from "zod"
 
@@ -9,6 +10,7 @@ export const roomWorkUseSchema = z
     furniture: text,
     seat_symbol: text,
     mode: text,
+    table_setup: workKitTableSetupSchema.optional(),
     storage_room: text,
     storage_symbol: text,
     status: z.enum(["proposed", "designed"]),
