@@ -148,6 +148,15 @@ export const SIZES: Readonly<Record<string, Omit<Piece, "name"> | "wall">> = {
   // the hearth in the middle of the room, the kitchen worktop beside it (floorplan.ts)
   炉: { w: 1.2, d: 1.0, front: 0.7 },
   台所の台: { w: 1.4, d: 0.6, front: 0.8 },
+  // the stores the town's day runs on, kept where they are made and burnt (ledger.ts)
+  粉袋の山: { w: 1.4, d: 0.7, front: 0.3 },
+  麦の袋: { w: 0.8, d: 0.6, front: 0.3 },
+  炭俵: { w: 1.0, d: 0.6, front: 0.3 },
+  チーズの棚: { w: 1.2, d: 0.45, front: 0.6 },
+  撹乳桶: { w: 0.45, d: 0.45, front: 0.4 },
+  乳の桶: { w: 0.6, d: 0.6, front: 0.3 },
+  塩漬けの樽: { w: 0.6, d: 0.6, front: 0.3 },
+  腸詰めの吊るし: "wall",
 }
 
 /** Every home has a hearth (the town is cold), and a kitchen has a worktop beside it. */

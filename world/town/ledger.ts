@@ -56,6 +56,21 @@ export const TRADE_FIRES: Readonly<Record<string, Partial<Record<"薪" | "炭", 
   "h-g2": { 炭: 3 },
 }
 
+/**
+ * What a day's goods are kept in, where they are made and where they are burnt: the furniture of
+ * the houses (houses/*.ts), so a room shows what its household makes and uses. Grain waits in sacks
+ * on the farms until it is milled; a dish a head is fish in a tub, meat smoked or salted, or milk
+ * churned and cheese ripening.
+ */
+export const STORES: Readonly<Record<Good, RegExp>> = {
+  パン: /^パン籠$/,
+  粉: /^(麦の袋|粉袋の山)$/,
+  野菜: /^野菜籠$/,
+  おかず: /^(魚桶|燻しの棚|腸詰めの吊るし|塩漬けの樽|チーズの棚|撹乳桶|乳の桶)$/,
+  薪: /^薪の山$/,
+  炭: /^炭俵$/,
+}
+
 /** Who turns the grain into flour: without a miller, no field feeds anyone. */
 export const MILLER = "ベルトラム"
 

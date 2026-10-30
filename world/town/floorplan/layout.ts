@@ -268,6 +268,18 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
     const r = /寝台/.test(name) ? (rooms.find((x) => x.floor === 0 && x.use === "寝間") ?? living) : /樽|甕|桶|籠|箱|袋|薪|木材/.test(name) ? entry : living
     place(name, r ?? undefined, "wall", undefined, ["w", "e", "n", "s"])
   }
+  // odds and ends: what a lived-in house gathers along its walls over the years, wherever there is
+  // still room for them and the way through stays open (a wash tub, a crate, a stool, a cask, a basket)
+  if (h.household && h.plan.hearth && h.kind !== "public") {
+    const odds = ["洗濯桶", "木箱", "腰掛け", "樽", "野菜籠", "木箱", "腰掛け"]
+    const want = Math.min(odds.length, Math.floor((W * D) / 8))
+    const spare = rooms.filter((r) => r.floor === 0 && r.use !== "寝間" && r.use !== "売り場" && r.name !== "廊下")
+    for (let i = 0; i < want; i++) {
+      const name = odds[(h.seed + i) % odds.length]
+      const s = sizeOf(name)!
+      for (const r of spare) if (f0.againstWall(name, s.w, s.d, 0.2, r, i % 2 ? ["e", "n", "w"] : ["w", "n", "e"], i % 3 === 0 ? 0 : 1)) break
+    }
+  }
   // a sleeping corner on one floor: curtained off where the beds went
   const sleep = rooms.find((r) => r.floor === 0 && r.use === "寝間")
   if (sleep && floors === 1) dividers.push(...across(0, "カーテン", sleep.x0, sleep.x1, sleep.z1 + DIV / 2, (sleep.x0 + sleep.x1) / 2, 0.8))

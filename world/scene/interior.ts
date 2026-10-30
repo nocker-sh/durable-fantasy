@@ -10,6 +10,7 @@ import { blocked, groundH, WN } from "./world"
 import { hash2 } from "./pix"
 import { INTERIORS, interiorRows, type Furniture, type Interior } from "../town/interiors.ts"
 import { HOUSEHOLDS } from "../town/houses.ts"
+import { DAILY_OUTPUT, type Good } from "../town/ledger.ts"
 import { Kit, furnish, paintOf, stockShelf, topOf, wood, woodOf, type Spot, type Stock, type Wood, type WoodId } from "./construction/furnishings.ts"
 import { fromBeams, hang as hangOn, hookOf, lying, ON_WALLS } from "./construction/belongings.ts"
 import { floorPlan } from "../town/floorplan.ts"
@@ -194,6 +195,53 @@ function fireLight(root: THREE.Group, s: Spot) {
   l.position.set(s.x + out[0] * (depth / 2 + 0.5), s.y + 0.6, s.z + out[1] * (depth / 2 + 0.5))
   root.add(l)
   fireLights.push({ light: l, base: 2.2, seed: s.x * 3 + s.z })
+}
+
+/** What a household makes, as it is left on its table: the ledger's goods of its makers (town/ledger.ts). */
+function goodsOf(it: Interior): string[] {
+  const hh = HOUSEHOLDS.find((h) => h.id === it.house.household)
+  if (!hh) return []
+  const goods = new Set(hh.members.flatMap((m) => Object.keys(DAILY_OUTPUT[m] ?? {}) as Good[]))
+  const dish = /魚|網/.test(hh.trade) ? "魚" : /乳|チーズ|羊/.test(hh.trade) ? "チーズ" : /腸詰め|豚/.test(hh.trade) ? "腸詰め" : "肉"
+  const look: Record<Good, string> = { パン: "パン", 粉: "袋", 野菜: "蕪の籠", おかず: dish, 薪: "木切れ", 炭: "炭" }
+  return [...goods].map((g) => look[g])
+}
+
+/** What clutters each top, by the piece: the day's plates and bread on a table, the cooking on the kitchen board, the trade's bits on a bench. */
+const TOPS: [RegExp, readonly string[]][] = [
+  [/^(食卓|大きな食卓|長卓|卓)$/, ["皿", "椀", "瓶", "パン", "蝋燭", "壺", "林檎", "布"]],
+  [/^台所の台$/, ["鍋", "包丁", "蕪の籠", "皿", "玉ねぎ", "壺", "パン", "椀"]],
+  [/^(作業台|木工台|修理台)$/, ["鑿", "板", "縄", "箱", "瓶", "布"]],
+]
+
+/**
+ * The tops of tables, kitchen boards and benches, cluttered: two or three things at the corners,
+ * clear of the middle where the plan's traces lie, the household's own goods among them. They
+ * stand on the furniture, so the walk grid is untouched.
+ */
+function onTops(gb: GB, it: Interior, y0: number, seed: number) {
+  const own = goodsOf(it)
+  it.furniture.forEach((f, k) => {
+    const name = f.name ?? ""
+    const kind = TOPS.find(([re]) => re.test(name))
+    if (!kind) return
+    const top = topOf(name) ?? 0.9
+    const s = spotOf(it, f, y0)
+    const frame = new Kit(gb, s)
+    const corners: [number, number][] = [
+      [-0.32, 0.12],
+      [0.32, -0.12],
+      [0.36, 0.16],
+    ]
+    const n = frame.W > 1.2 ? 3 : 2
+    for (let i = 0; i < n; i++) {
+      const [cu, cv] = corners[i]
+      const [x, z] = frame.at(cu * frame.W, cv * frame.D)
+      const pool = i === 0 && own.length ? own : kind[1]
+      const what = pool[Math.floor(hash2(seed + k, i, 97) * pool.length) % pool.length]
+      lying(new Kit(gb, { x, z, w: 0.3, d: 0.25, y: y0 + top, face: s.face }, 1.1), what, seed + k * 7 + i)
+    }
+  })
 }
 
 /** Tall pieces nothing is hung above. */
@@ -619,6 +667,7 @@ export function buildInterior(it: Interior) {
         trace(root, props, f, y0, seed + k * 11, (x, z) => (onWall ? y0 + 1.3 : heightAt(x, z)))
       })
     dress(root, props, it, y0, seed, wood(woodOfPiece("")))
+    onTops(props, it, y0, seed)
     root.add(props.build())
     if (it.drying) {
       const line = indoorLaundry(it.drying.z1 - it.drying.z0, seed)

@@ -31,6 +31,8 @@ const apple = colorMat(0xa83a3a)
 const fish = colorMat(0x8a9aa8)
 const meat = colorMat(0x8a4a3a)
 const hide = colorMat(0x8a6a4a)
+const sausage = colorMat(0x7a3a2a)
+const coal = colorMat(0x22222a)
 const glass = colorMat(0x8aa8b0)
 const steam = colorMat(0x5a5a62)
 
@@ -282,6 +284,17 @@ export const ON_WALLS: Record<string, OnWall> = {
       for (const du of [0.08, 0.42]) k.cyl(brass, null, u + du, 0.09, 0.08, 0.1, 0.07, 0.07, 8)
       return 0.6
     }),
+  腸詰めの吊るし: (k) => {
+    // a pole on two brackets, loops of sausage and a ham hung from it to smoke and dry
+    k.box(M.woodDark, null, -0.5, -0.04, 0.02, 0.5, 0, 0.12)
+    for (let i = 0; i < 7; i++) {
+      const u = -0.42 + i * 0.12
+      const l = 0.35 + (i % 3) * 0.08
+      k.box(sausage, null, u - 0.025, -l, 0.05, u + 0.025, -0.04, 0.1)
+      k.box(sausage, null, u + 0.025, -l + 0.02, 0.05, u + 0.06, -0.04, 0.1)
+    }
+    k.box(meat, null, 0.38, -0.55, 0.03, 0.5, -0.08, 0.14)
+  },
   // the pot hangs over the fire on its hook (drawn with the fire)
   大鍋: () => {},
 }
@@ -412,6 +425,8 @@ const LYING: [RegExp, Lying][] = [
   [/卵/, (k, s) => basket(k, 0, 0, s, garlic)],
   [/魚/, (k) => [-0.08, 0.06].forEach((u) => k.box(fish, null, u - 0.03, 0, -0.12, u + 0.03, 0.04, 0.12))],
   [/薬草|葡萄|玉ねぎ|花冠/, (k, s) => [-0.1, 0, 0.1].forEach((u, i) => k.box(pick(herb, s, i), null, u - 0.04, 0, -0.1, u + 0.04, 0.03, 0.1))],
+  [/腸詰め/, (k) => [-0.1, 0, 0.1].forEach((u) => k.box(sausage, null, u - 0.03, 0, -0.14, u + 0.03, 0.05, 0.14))],
+  [/炭/, (k, s) => [0, 1, 2, 3, 4].forEach((i) => k.box(coal, null, (r(s, i) - 0.5) * 0.24, 0, (r(s, i + 5) - 0.5) * 0.18, (r(s, i) - 0.5) * 0.24 + 0.07, 0.05, (r(s, i + 5) - 0.5) * 0.18 + 0.05))],
   [/肉/, (k) => k.box(meat, null, -0.1, 0, -0.12, 0.1, 0.12, 0.12)],
   [/結晶/, (k) => (k.box(linen, null, -0.12, 0, -0.08, 0.12, 0.01, 0.08), k.cyl(crystal, null, 0.03, 0, 0.01, 0.07, 0.025, 0.005, 5))],
   [/鍵/, (k) => k.box(M.iron, null, -0.06, 0, -0.03, 0.06, 0.02, 0.03)],

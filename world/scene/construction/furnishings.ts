@@ -90,6 +90,12 @@ const books = [0x6a2a2a, 0x2a3a5a, 0x3a4a2a, 0x6a5a3a, 0x4a2a4a, 0x7a6a5a].map(c
 const brass = colorMat(0xb89a4a)
 const wax = colorMat(0xe8dcb8)
 const ash = colorMat(0x8a8684)
+const charcoal = colorMat(0x22222a)
+const flourSack = colorMat(0xd8d0bc)
+const flourDust = colorMat(0xe8e2d4)
+const grainMat = colorMat(0xc8a858)
+const milk = colorMat(0xf0ece0)
+const cheese = [colorMat(0xe8d080), colorMat(0xd8b860), colorMat(0xc89a48)]
 const willow = mat(plainTex("thatch", 0.55, 0.3, 11, 16))
 
 // ---------------------------------------------------------------- where a piece stands
@@ -649,7 +655,7 @@ function cask(k: Kit, wd: Wood, seed: number, onCradle = false, tall = 0.95) {
   for (const t of [0.12, 0.5, 0.88]) k.cyl(M.iron, null, 0, 0, h * t - 0.025, h * t + 0.025, rr * (t === 0.5 ? 1 : 0.9) + 0.012, rr * (t === 0.5 ? 1 : 0.9) + 0.012, 10)
 }
 
-function tub(k: Kit, wd: Wood, seed: number, what: "fish" | "wash" | "lye" | "tan" | "water" | "glaze" | "tea" | "oil" | "wax") {
+function tub(k: Kit, wd: Wood, seed: number, what: "fish" | "wash" | "lye" | "tan" | "water" | "glaze" | "tea" | "oil" | "wax" | "milk") {
   const rr = Math.min(k.W, k.D) / 2 - 0.03
   if (what === "water" || what === "glaze" || what === "tea" || what === "oil") {
     // an earthen jar: wide in the middle, narrow at the mouth, a wooden lid or a cloth tied over
@@ -673,7 +679,7 @@ function tub(k: Kit, wd: Wood, seed: number, what: "fish" | "wash" | "lye" | "ta
   const h = what === "tan" ? 0.8 : what === "fish" ? 0.45 : 0.55
   k.cyl(wd.body, null, 0, 0, 0, h, rr * 0.9, rr, 12)
   for (const t of [0.2, 0.8]) k.cyl(M.iron, null, 0, 0, h * t - 0.02, h * t + 0.02, rr + 0.01, rr + 0.01, 12)
-  const liquid = what === "fish" ? M.water : what === "wash" ? colorMat(0x9aa8b0) : what === "lye" ? colorMat(0x6a6058) : colorMat(0x5a3a28)
+  const liquid = what === "milk" ? milk : what === "fish" ? M.water : what === "wash" ? colorMat(0x9aa8b0) : what === "lye" ? colorMat(0x6a6058) : colorMat(0x5a3a28)
   k.cyl(liquid, liquid, 0, 0, h - 0.12, h - 0.06, rr - 0.03, rr - 0.03, 12)
   if (what === "wash") k.box(wd.top, null, rr * 0.2, h - 0.2, -0.15, rr * 0.3, h + 0.25, 0.15) // the washboard leaned in it
   if (what === "fish") for (let t = 0; t < 3; t++) k.box(colorMat(0x8a9aa8), null, -0.12 + t * 0.08, h - 0.07, -0.04, -0.06 + t * 0.08, h - 0.05, 0.12)
@@ -780,17 +786,59 @@ function basketOf(k: Kit, seed: number, what: "veg" | "fruit" | "yarn" | "unfini
   }
 }
 
-function sacks(k: Kit, seed: number, what: "wool" | "ash") {
-  const n = Math.max(1, Math.round(k.W / 0.4))
-  for (let t = 0; t < n; t++) {
-    const u = -k.W / 2 + (t + 0.5) * (k.W / n)
-    const h = 0.45 + r(seed, t) * 0.15
-    const m = what === "wool" ? M.wool : M.sack
-    k.cyl(m, m, u, 0, 0, h * 0.75, 0.17, 0.19, 7)
-    k.cyl(m, m, u, 0, h * 0.75, h, 0.19, 0.07, 7)
-    k.cyl(M.rope, null, u, 0, h - 0.06, h - 0.02, 0.08, 0.08, 6)
-    if (what === "ash") k.cyl(ash, null, u + 0.2, 0.05, 0, 0.03, 0.08, 0.04, 6)
+function sacks(k: Kit, seed: number, what: "wool" | "ash" | "flour" | "grain" | "charcoal") {
+  if (what === "charcoal") {
+    // straw bales of charcoal, lumps showing at the open tops, black dust on the floor
+    const n = Math.max(1, Math.round(k.W / 0.34))
+    for (let t = 0; t < n; t++) {
+      const u = -k.W / 2 + (t + 0.5) * (k.W / n)
+      const h = 0.5 + r(seed, t) * 0.12
+      k.cyl(M.hay, M.hay, u, 0, 0, h, 0.15, 0.16, 7)
+      for (const y of [0.15, h - 0.12]) k.cyl(M.rope, null, u, 0, y, y + 0.04, 0.165, 0.165, 7)
+      for (let q = 0; q < 3; q++) k.box(charcoal, null, u - 0.08 + q * 0.05, h, -0.04 + (q % 2) * 0.05, u - 0.04 + q * 0.05, h + 0.05, 0.0 + (q % 2) * 0.05)
+    }
+    k.box(charcoal, null, -k.W / 2, 0, k.D / 2 - 0.12, k.W / 2 - 0.1, 0.005, k.D / 2)
+    return
   }
+  // flour and grain stacked two deep, a smaller layer laid across the top
+  const n = Math.max(1, Math.round(k.W / 0.4))
+  const layers = what === "flour" || what === "grain" ? 2 : 1
+  for (let l = 0; l < layers; l++)
+    for (let t = 0; t < n - l; t++) {
+      const u = -k.W / 2 + (t + 0.5 + l * 0.5) * (k.W / n)
+      const y = l * 0.42
+      const h = 0.45 + r(seed, t + l * 7) * 0.15
+      const m = what === "wool" ? M.wool : what === "flour" ? flourSack : M.sack
+      k.cyl(m, m, u, 0, y, y + h * 0.75, 0.17, 0.19, 7)
+      k.cyl(m, m, u, 0, y + h * 0.75, y + h, 0.19, 0.07, 7)
+      k.cyl(M.rope, null, u, 0, y + h - 0.06, y + h - 0.02, 0.08, 0.08, 6)
+      if (what === "ash") k.cyl(ash, null, u + 0.2, 0.05, 0, 0.03, 0.08, 0.04, 6)
+      if (what === "grain" && l === 0 && t === 0) k.cyl(grainMat, null, u + 0.22, 0.08, 0, 0.04, 0.1, 0.05, 6) // spilt from a seam
+    }
+  if (what === "flour") k.box(flourDust, null, -k.W / 2, 0, -k.D / 2, k.W / 2, 0.004, k.D / 2 + 0.1)
+}
+
+function cheeseShelf(k: Kit, wd: Wood, seed: number) {
+  // wheels of cheese turned on the boards to ripen, the youngest palest, a cloth over the top row
+  const { W } = k
+  const boards = [0.04, 0.45, 0.85, 1.25]
+  frame(k, wd, 1.6, boards, false)
+  boards.forEach((b, i) =>
+    row(k, b, -W / 2 + 0.08, W / 2 - 0.1, (u) => {
+      const rr = 0.11 + r(seed + i, Math.round(u * 10)) * 0.03
+      k.cyl(i === 3 ? linen : cheese[i % cheese.length], cheese[i % cheese.length], u + rr, 0, b + 0.035, b + 0.035 + 0.1, rr, rr, 10)
+      return rr * 2 + 0.05
+    }),
+  )
+}
+
+function churn(k: Kit, wd: Wood) {
+  // a tall staved churn, narrower at the top, the dasher standing up through its lid
+  k.cyl(wd.body, null, 0, 0, 0, 0.75, 0.17, 0.13, 10)
+  for (const y of [0.1, 0.4, 0.68]) k.cyl(M.iron, null, 0, 0, y, y + 0.03, 0.175 - y * 0.05, 0.175 - y * 0.05, 10)
+  k.cyl(wd.top, wd.top, 0, 0, 0.75, 0.78, 0.14, 0.14, 10)
+  k.box(wd.dark, null, -0.015, 0.78, -0.015, 0.015, 1.15, 0.015)
+  k.box(wd.dark, null, -0.08, 1.12, -0.015, 0.08, 1.15, 0.015)
 }
 
 function bundles(k: Kit, seed: number, what: "willow" | "timber" | "logs") {
@@ -1238,6 +1286,13 @@ export const FURNISHINGS: Record<string, Builder> = {
   毛糸の籠: B((k, _w, s) => basketOf(k, s, "yarn")),
   編みかけの籠: B((k, _w, s) => basketOf(k, s, "unfinished")),
   羊毛の袋: B((k, _w, s) => sacks(k, s, "wool")),
+  粉袋の山: B((k, _w, s) => sacks(k, s, "flour")),
+  麦の袋: B((k, _w, s) => sacks(k, s, "grain")),
+  炭俵: B((k, _w, s) => sacks(k, s, "charcoal")),
+  チーズの棚: cheeseShelf,
+  撹乳桶: B((k, w) => churn(k, w)),
+  乳の桶: B((k, w, s) => tub(k, w, s, "milk")),
+  塩漬けの樽: B((k, w, s) => cask(k, w, s, false, 0.7)),
   灰の袋: B((k, _w, s) => sacks(k, s, "ash")),
   柳の束: B((k, _w, s) => bundles(k, s, "willow")),
   木材: B((k, _w, s) => bundles(k, s, "timber")),

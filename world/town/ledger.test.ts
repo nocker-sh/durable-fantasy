@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 import { HOUSEHOLDS, HOUSES } from "./houses.ts"
 import { RESIDENTS } from "./residents.ts"
-import { DAILY_OUTPUT, MILLER, TRADE_FIRES, WATER_REACH, made, used, type Good } from "./ledger.ts"
+import { DAILY_OUTPUT, MILLER, STORES, TRADE_FIRES, WATER_REACH, made, used, type Good } from "./ledger.ts"
 import { MAPS } from "../maps/index.ts"
 import { layoutOf } from "../maps/layouts.ts"
 import { doorStep } from "../maps/siting.ts"
@@ -21,6 +21,23 @@ describe("the town's day in numbers (economy.md「町の帳簿」)", () => {
   it("every maker and the miller live in the town, and every fire is in a house that stands", () => {
     for (const name of [...Object.keys(DAILY_OUTPUT), MILLER]) expect(RESIDENTS.some((r) => r.name === name), name).toBe(true)
     for (const id of Object.keys(TRADE_FIRES)) expect(HOUSES.some((h) => h.id === id && h.kind !== "vacant"), id).toBe(true)
+  })
+
+  it("what is made is kept where it is made, and what is burnt where it burns (town.md「屋内マップ」)", () => {
+    const pieces = (ids: readonly string[]) => HOUSES.filter((h) => ids.includes(h.household ?? "")).flatMap((h) => h.plan.furniture.map((f) => f.replace(/（.+）$/, "").replace(/×\d+$/, "")))
+    const householdOf = (name: string) => HOUSEHOLDS.find((hh) => hh.members.includes(name))?.id ?? ""
+    for (const [maker, out] of Object.entries(DAILY_OUTPUT))
+      for (const g of Object.keys(out) as Good[]) {
+        // a maker who lodges works at another maker's: the store is theirs
+        const others = Object.entries(DAILY_OUTPUT).filter(([, o]) => o[g]).map(([n]) => householdOf(n))
+        expect(pieces([householdOf(maker)]).some((f) => STORES[g].test(f)) || pieces(others).some((f) => STORES[g].test(f)), `${maker}: ${g}`).toBe(true)
+      }
+    expect(pieces([householdOf(MILLER)]), MILLER).toContain("粉袋の山")
+    for (const [id, f] of Object.entries(TRADE_FIRES)) {
+      const here = HOUSES.find((h) => h.id === id)!.plan.furniture.map((x) => x.replace(/×\d+$/, ""))
+      if ((f.薪 ?? 0) >= 2) expect(here.some((x) => STORES.薪.test(x)), `${id}: 薪`).toBe(true)
+      if (f.炭) expect(here.some((x) => STORES.炭.test(x)), `${id}: 炭`).toBe(true)
+    }
   })
 
   it("every lived house has a well or the river within reach of its door", () => {

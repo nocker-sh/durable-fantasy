@@ -9,7 +9,7 @@ import { ALL_LINES } from "#/world/town/lines/index.ts"
 import { PEOPLE, RELATIONS } from "#/world/town/people.ts"
 import { ROUTINES } from "#/world/town/routines.ts"
 import { SHIFTS } from "#/world/town/shifts.ts"
-import { DAILY_OUTPUT, PER_HEAD, TRADE_FIRES, UNITS, made, used, type Good } from "#/world/town/ledger.ts"
+import { DAILY_OUTPUT, PER_HEAD, STORES, TRADE_FIRES, UNITS, made, used, type Good } from "#/world/town/ledger.ts"
 import { sheet } from "./schema.ts"
 import { AGE, residentIndex, homeOf, ref, mapName, HOUSE_KIND } from "./shared.tsx"
 
@@ -122,7 +122,10 @@ const ledger = sheet<{ good: Good }>({
   key: (r) => r.good,
   name: (r) => r.good,
   kind: (r) => `${made(r.good)}${UNITS[r.good]}作り、${used(r.good)}${UNITS[r.good]}使う`,
-  cols: [{ label: "ひとり一日", get: (r) => (PER_HEAD[r.good] ? `${PER_HEAD[r.good]}${UNITS[r.good]}` : "") }],
+  cols: [
+    { label: "ひとり一日", get: (r) => (PER_HEAD[r.good] ? `${PER_HEAD[r.good]}${UNITS[r.good]}` : "") },
+    { label: "置き場", get: (r) => STORES[r.good].source.replace(/^\^\(?|\)?\$$/g, "").replace(/\|/g, "・") },
+  ],
   refs: (r) => Object.entries(DAILY_OUTPUT).flatMap(([name, o]) => (o[r.good] ? ref("npcs", name, `${o[r.good]}${UNITS[r.good]}作る`) : [])),
   more: (r) => [
     {

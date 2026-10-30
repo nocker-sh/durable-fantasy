@@ -5,7 +5,7 @@ export const SOURCES: Record<string, readonly string[]> = {
   items: ["ITEMS", "ITEM_IDS", "ITEM_ICONS", "WEAPONS", "IRON_WEAPONS"],
   npcs: ["RESIDENTS", "RESIDENT_LOOKS", "PEOPLE", "ROUTINES", "SHIFTS"],
   households: ["HOUSEHOLDS"],
-  ledger: ["UNITS", "PER_HEAD", "DAILY_OUTPUT", "TRADE_FIRES"],
+  ledger: ["UNITS", "PER_HEAD", "DAILY_OUTPUT", "TRADE_FIRES", "STORES"],
   houses: ["HOUSES", "INTERIORS", "INDOOR_WORLDS", "OUT_FRONT", "TRACES"],
   maps: ["MAPS", "OPEN_FIELDS", "TOWN_SPAWN"],
   shops: ["SHOPS"],
