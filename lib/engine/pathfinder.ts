@@ -1,7 +1,6 @@
 import { getNearbyFreeGridCell } from "#/lib/engine/get-nearby-free-grid-cell"
-import { getGridWaypoints } from "#/lib/engine/get-grid-waypoints"
+import { GridPathSearch } from "#/lib/engine/grid-path-search"
 import { getShortenedPath } from "#/lib/engine/get-shortened-path"
-import { MinPriorityQueue } from "#/lib/engine/min-priority-queue"
 
 export type V2 = [number, number]
 
@@ -41,7 +40,7 @@ export class GridPathfinder {
     Object.freeze(this)
   }
 
-  private free(i: number, j: number) {
+  #isFree(i: number, j: number) {
     const props = this.#props
     return i >= 0 && j >= 0 && i < props.size && j < props.size && !props.blocked[j * props.size + i]
   }
@@ -49,55 +48,20 @@ export class GridPathfinder {
   /** A* on the walk grid; returns world-space waypoints, string-pulled unless `grid` asks for every cell center. */
   find(from: V2, to: V2, grid = false): V2[] | null {
     const props = this.#props
-    const s = getNearbyFreeGridCell({ cell: [Math.floor(from[0] * props.resolution), Math.floor(from[1] * props.resolution)], isFree: (x, y) => this.free(x, y) })
-    const g = getNearbyFreeGridCell({ cell: [Math.floor(to[0] * props.resolution), Math.floor(to[1] * props.resolution)], isFree: (x, y) => this.free(x, y) })
-    if (!s || !g) return null
-    const S = s[1] * props.size + s[0],
-      G = g[1] * props.size + g[0]
-    const cost = new Float32Array(props.size * props.size).fill(Infinity)
-    const prev = new Int32Array(props.size * props.size).fill(-1)
-    const closed = new Uint8Array(props.size * props.size)
-    const queue = new MinPriorityQueue<number>()
-    const h = (k: number) => {
-      const dx = Math.abs((k % props.size) - g[0]),
-        dy = Math.abs(((k / props.size) | 0) - g[1])
-      return Math.max(dx, dy) + 0.414 * Math.min(dx, dy)
-    }
-    cost[S] = 0
-    queue.push(h(S), S)
-    let iter = 0
-    while (queue.size && iter++ < 40000) {
-      const k = queue.pop()
-      if (k === null) break
-      if (closed[k]) continue
-      closed[k] = 1
-      if (k === G) break
-      const i = k % props.size,
-        j = (k / props.size) | 0
-      for (let dj = -1; dj <= 1; dj++)
-        for (let di = -1; di <= 1; di++) {
-          if (!di && !dj) continue
-          const ni = i + di,
-            nj = j + dj
-          if (!this.free(ni, nj)) continue
-          if (di && dj && (!this.free(i + di, j) || !this.free(i, j + dj))) continue
-          const nk = nj * props.size + ni,
-            c = cost[k] + (di && dj ? 1.414 : 1)
-          if (c < cost[nk]) {
-            cost[nk] = c
-            prev[nk] = k
-            queue.push(c + h(nk), nk)
-          }
-        }
-    }
-    const pts = getGridWaypoints({ previous: prev, start: S, goal: G, size: props.size, resolution: props.resolution })
-    if (!pts) return null
-    if (grid) return pts
-    pts[pts.length - 1] = this.free(Math.floor(to[0] * props.resolution), Math.floor(to[1] * props.resolution)) ? [to[0], to[1]] : pts[pts.length - 1]
-    return getShortenedPath({ points: pts, isVisible: (from, to) => this.los(from, to) })
+    const startCell = getNearbyFreeGridCell({ cell: [Math.floor(from[0] * props.resolution), Math.floor(from[1] * props.resolution)], isFree: (x, y) => this.#isFree(x, y) })
+    const goalCell = getNearbyFreeGridCell({ cell: [Math.floor(to[0] * props.resolution), Math.floor(to[1] * props.resolution)], isFree: (x, y) => this.#isFree(x, y) })
+    if (!startCell || !goalCell) return null
+    const start = startCell[1] * props.size + startCell[0]
+    const goal = goalCell[1] * props.size + goalCell[0]
+    const search = new GridPathSearch({ size: props.size, resolution: props.resolution, start, goal, blocked: props.blocked })
+    const points = search.find()
+    if (!points) return null
+    if (grid) return points
+    points[points.length - 1] = this.#isFree(Math.floor(to[0] * props.resolution), Math.floor(to[1] * props.resolution)) ? [to[0], to[1]] : points[points.length - 1]
+    return getShortenedPath({ points: points, isVisible: (from, to) => this.#hasLineOfSight(from, to) })
   }
 
-  private los(a: V2, b: V2): boolean {
+  #hasLineOfSight(a: V2, b: V2): boolean {
     const props = this.#props
     const offsets = this.#offsets
     const n = Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) * props.resolution * 3)
@@ -108,7 +72,7 @@ export class GridPathfinder {
       for (const entry of offsets) {
         const ox = entry[0]
         const oz = entry[1]
-        if (!this.free(Math.floor((x + ox) * props.resolution), Math.floor((z + oz) * props.resolution))) return false
+        if (!this.#isFree(Math.floor((x + ox) * props.resolution), Math.floor((z + oz) * props.resolution))) return false
       }
     }
     return true
