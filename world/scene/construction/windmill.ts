@@ -5,7 +5,8 @@ import { groundH, blockCircle } from "../world"
 import { M } from "./materials.ts"
 import { animateObject } from "./registry.ts"
 
-export function windmill(root: THREE.Group, x: number, z: number) {
+/** A windmill; `still` for one nobody works any more, its sails stopped and two of them gone to ribs. */
+export function windmill(root: THREE.Group, x: number, z: number, still = false) {
   const y0 = groundH(x, z)
   const gb = new GB()
   gb.cyl(M.ashlar, null, x, z, y0 - 0.3, y0 + 4.2, 1.35, 0.95, 10, 4)
@@ -23,14 +24,20 @@ export function windmill(root: THREE.Group, x: number, z: number) {
     arm.rotation.z = (i * Math.PI) / 2
     const beam = new THREE.Mesh(new THREE.BoxGeometry(0.08, 3.2, 0.06), M.woodDark)
     beam.position.y = 1.6
-    const sail = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 2.5), sailM)
-    sail.position.set(0.4, 1.9, 0.02)
-    beam.castShadow = sail.castShadow = true
-    arm.add(beam, sail)
+    beam.castShadow = true
+    arm.add(beam)
+    if (!still || i % 2 === 0) {
+      const sail = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 2.5), sailM)
+      sail.position.set(0.4, 1.9, 0.02)
+      sail.castShadow = true
+      arm.add(sail)
+    }
     hub.add(arm)
   }
   root.add(hub)
-  animateObject(hub, (_t, dt) => {
+  if (still) hub.rotation.z = 0.35
+  else
+    animateObject(hub, (_t, dt) => {
     hub.rotation.z -= dt * 0.5
   })
   blockCircle(x, z, 1.5)

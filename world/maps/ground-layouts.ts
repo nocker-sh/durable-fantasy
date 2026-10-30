@@ -272,6 +272,35 @@ const seaward =
   (x: number, z: number, h: number) =>
     h - smooth(x0, x0 + width, x + (fbm(x, z, 0.15, 7) - 0.5) * 3) * depth
 
+// ---------------------------------------------------------------- landforms (landscape.md「地形の作り方」)
+/** A rise of `top` over the ground, gentle out to `r`, flat on top inside `flat`. */
+const hill = (x: number, z: number, cx: number, cz: number, r: number, flat: number, top: number) => top * smooth(r, flat, Math.hypot(x - cx, z - cz))
+
+/** A hollow dug `depth` below the ground (or down to `floor`, under the water, for a pond), its rim wobbling. */
+const hollow = (x: number, z: number, h: number, cx: number, cz: number, r: number, floor: number, seed: number) => {
+  const d = Math.hypot(x - cx, z - cz) + (fbm(x, z, 0.35, seed) - 0.5) * 1.6
+  // a shelving bank down to the water, then the deep middle
+  return h + (floor - h) * smooth(r, r * 0.15, d)
+}
+
+/**
+ * Old fields cut into steps across a slope: each edge rises `step` over a short, rocky bank (too steep
+ * to walk, painted as stone), except where a ramp at `rampX` (± `rampW`) climbs it gently.
+ */
+const terraced = (x: number, z: number, edges: readonly number[], step: number, rampX: number, rampW: number, seed: number) => {
+  const ramp = smooth(rampW + 1, rampW, Math.abs(x - rampX))
+  let h = 0
+  edges.forEach((e, k) => {
+    const at = e + Math.sin(x * 0.45 + k * 1.7 + seed) * 0.6
+    const half = 0.16 + ramp * 1.6
+    h += step * smooth(at - half, at + half, z)
+  })
+  return h
+}
+
+/** Where the meadow's old terraces run (x from, x to), their edges (z) and the ramp up them: the scene walls their tops. */
+export const MEADOW_TERRACES = { x0: 3, x1: 19, edges: [34, 38, 42], step: 0.55, rampX: 11, rampW: 1.1 } as const
+
 /** Hills rising along the map's edges (not on the open sides), so the land seems to go on. */
 function rimmed(l: Layout, open = ""): Layout {
   const inner = l.shape
@@ -298,6 +327,20 @@ export const LAYOUTS: Record<string, Layout> = {
     seed: 201,
     relief: [1.4, 1.4],
     biome: "meadow",
+    // the lone tree's hill (gentle from the road, a rocky scarp to the north-east), the pond fed by the
+    // wet ground east of it, the old terraced fields climbing to the stopped windmill in the south-west,
+    // and the hollow where a war engine lies in the grass (landscape.md「マップごとのテーマ」)
+    shape: (x, z, h) => {
+      const dx = x - 34,
+        dz = z - 12.5
+      const ne = smooth(-0.2, 0.6, (dx - dz) / (Math.hypot(dx, dz) || 1) / Math.SQRT2)
+      const d = Math.hypot(dx, dz)
+      h += 1.8 * (smooth(7.5, 2.2, d) * (1 - ne) + smooth(4.3, 3.7, d) * ne)
+      const T = MEADOW_TERRACES
+      h += terraced(x, z, T.edges, T.step, T.rampX, T.rampW, 3) * smooth(T.x1 + 2, T.x1 - 3, x) * smooth(T.x0 - 3, T.x0, x)
+      h -= hill(x, z, 39.5, 37, 4.5, 1.2, 0.7)
+      return hollow(x, z, h, 40.5, 19.5, 4.2, -1.35, 31)
+    },
     // south from the gate, then east to the edge of the forest; a branch on south to the dunes
     roads: [
       dirt(

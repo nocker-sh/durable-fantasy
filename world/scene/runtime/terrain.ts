@@ -1,7 +1,7 @@
 import * as THREE from "three"
-import { N, WATER_Y } from "../world"
+import { N, WATER_Y, currentLayout } from "../world"
 import { meshHeights } from "../terrain"
-import { stoneTex } from "../textures"
+import { rockTex, stoneTex } from "../textures"
 import { toTex } from "../gfx"
 import { lap } from "../../diagnostics.ts"
 import type { PixBuf } from "../pix"
@@ -58,7 +58,8 @@ async function createTerrain(scene: THREE.Scene, world: SceneDefinition, ground:
   const gTex = toTex(ground, false)
   gTex.minFilter = THREE.NearestFilter
   gTex.generateMipmaps = false
-  const wallT = toTex(stoneTex("stone", 0.5, 21, 20, 11, 128))
+  // the town's banks are laid stone; out in the fields a steep face is the rock breaking through
+  const wallT = toTex(currentLayout().biome ? rockTex("stone", 0.5, 21, 128) : stoneTex("stone", 0.5, 21, 20, 11, 128))
   const tm = new THREE.MeshLambertMaterial({ map: gTex })
   tm.onBeforeCompile = (sh) => {
     sh.uniforms.wallMap = { value: wallT }

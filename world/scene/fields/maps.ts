@@ -2,54 +2,70 @@ import type * as THREE from "three"
 import { GB } from "../gfx"
 import { THINGS } from "../things"
 import { M, barrel, crate, sack, fence, woodpile, updaters, places, type V2 } from "../build"
-import { isFree, roadD } from "../world"
-import { LAYOUTS, OPEN_SIDES } from "../../maps/ground-layouts.ts"
+import { inRect, isFree, roadD } from "../world"
+import { LAYOUTS, MEADOW_TERRACES, OPEN_SIDES } from "../../maps/ground-layouts.ts"
 import { orchard, vineyard } from "./orchards.ts"
-import { signboard, cairn, rustedMachine, brokenTower, netShed, boat, dryingRack, charcoalKiln, ruinedWall, cityWall, emptyShrine } from "./landmarks.ts"
-import { broadleaves, rocks, pines, tufts, logs, stumps, mushrooms, shrubs, branches, deadTrees, trunkGeo } from "./vegetation.ts"
-import { scatter, edgeward, offRoad } from "./scatter.ts"
+import { signboard, cairn, rustedMachine, brokenTower, netShed, boat, dryingRack, charcoalKiln, ruinedWall, cityWall, emptyShrine, fieldWall, fireRing, warLitter } from "./landmarks.ts"
+import { windmill } from "../construction/windmill.ts"
+import { broadleaves, rocks, pines, tufts, logs, stumps, mushrooms, shrubs, branches, deadTrees, trunkGeo, flowers, reeds } from "./vegetation.ts"
+import { scatter, clusters, edgeward, offRoad, shore, verge } from "./scatter.ts"
 import { type Spot, instanced } from "./instancing.ts"
 import { BOARDS } from "../lettering.ts"
 
 // ---------------------------------------------------------------- builders
 function meadow(root: THREE.Group) {
+  // the meadow as landscape.md draws it: the lone tree's hill, the pond, the old terraces up to the
+  // stopped windmill, the hollow with the war engine; things gathered in groups with open grass between
   orchard(root, 6, 8, 4, 3)
   vineyard(root, 6, 16, 3, 7)
   signboard(root, 26.2, 6.4, BOARDS.orchard, 0.2)
-  // a lone old tree on the hill, the meadow's landmark
-  broadleaves(root, [{ x: 34, z: 13, s: 1.6, r: 0.4 }], M.leaf)
-  rocks(root, [
-    { x: 35.6, z: 14.2, s: 0.8, r: 1 },
-    { x: 32.8, z: 14.4, s: 0.5, r: 2 },
-  ])
-  // a shallow pond
-  broadleaves(
-    root,
-    scatter(2011, 26, 0.7, 1.1, (x, z) => edgeward(5)(x, z) && offRoad(2)(x, z)),
-    M.leaf2,
-  )
-  pines(
-    root,
-    scatter(2012, 14, 0.8, 1.1, (x, z) => edgeward(3)(x, z) && offRoad(2)(x, z)),
-  )
-  rocks(root, scatter(2013, 30, 0.3, 0.9, offRoad(1.2)))
-  tufts(root, scatter(2014, 160, 0.7, 1.2, offRoad(0.9)))
-  // the meadow left to itself: fallen trunks gone to moss, old stumps, toadstools at the wood's edge
-  logs(root, scatter(2015, 7, 0.8, 1.1, offRoad(1.6)), M.woodDark)
-  stumps(root, scatter(2016, 9, 0.7, 1.0, offRoad(1.4)))
-  mushrooms(
-    root,
-    scatter(2017, 12, 0.8, 1.1, (x, z) => edgeward(7)(x, z) && offRoad(1.2)(x, z)),
-  )
-  // shrubs along the field edges and round the pond, branches fallen from the old trees, loose stones
-  shrubs(
-    root,
-    scatter(2018, 34, 0.6, 1.1, (x, z) => edgeward(9)(x, z) && offRoad(1.5)(x, z)),
-  )
-  branches(root, scatter(2019, 18, 0.7, 1.2, offRoad(1.0)))
-  rocks(root, scatter(2020, 40, 0.15, 0.35, offRoad(0.8)))
-  // a cairn where the path to the dunes leaves the road
+  const free = offRoad(1.2)
+  // the lone old tree on top of its hill, rocks breaking out of the scarp below it to the north-east
+  broadleaves(root, [{ x: 34, z: 13, s: 1.7, r: 0.4 }], M.leaf)
+  rocks(root, clusters(2010, 0, 9, 1.8, 0.5, 1.3, free, [[38.4, 9.2], [36.2, 7.6], [39.6, 12.4]]))
+  rocks(root, clusters(2009, 0, 12, 2.2, 0.15, 0.4, offRoad(0.8), [[37.8, 9.6], [33, 15.8]]))
+  // groves at the edges and a few old trees standing alone in the grass
+  broadleaves(root, clusters(2011, 0, 6, 3, 0.7, 1.2, (x, z) => free(x, z) && !inRect(x, z, { x0: 4, z0: 6, x1: 14, z1: 24 }), [[3.5, 27], [45, 31], [17, 3.5], [44.5, 44.5], [30, 44.5]]), M.leaf2)
+  broadleaves(root, scatter(2021, 3, 0.9, 1.2, (x, z) => offRoad(3)(x, z) && Math.hypot(x - 34, z - 13) > 8), M.leaf)
+  pines(root, clusters(2012, 0, 7, 3.2, 0.8, 1.15, (x, z) => edgeward(5)(x, z) && free(x, z), [[3.5, 3.5], [44.5, 4], [3, 45]]))
+  // the pond: reeds round its edge, a ring of stones where someone sits by the water
+  reeds(root, clusters(2022, 0, 26, 3.4, 0.7, 1.1, shore, [[40.5, 19.5], [42, 21.5]]))
+  fireRing(root, 37.4, 22.2)
+  // the old terraces, walled along their tops, a field shrine nobody tends on the first step
+  const T = MEADOW_TERRACES
+  T.edges.forEach((e, k) => {
+    const line = (from: number, to: number) => {
+      const pts: V2[] = []
+      for (let x = from; x <= to + 1e-6; x += 0.5) pts.push([x, e + Math.sin(x * 0.45 + k * 1.7 + 3) * 0.6 + 0.4])
+      return pts
+    }
+    fieldWall(root, line(T.x0 + 0.5, T.rampX - T.rampW - 0.6), 2030 + k)
+    fieldWall(root, line(T.rampX + T.rampW + 0.6, T.x1 - 1), 2040 + k)
+  })
+  windmill(root, 6.5, 40, true)
+  emptyShrine(root, 15.5, 36)
+  // the hollow: the engine in the grass, its pieces strewn about
+  rustedMachine(root, 41.6, 39.6)
+  warLitter(root, 41, 38.6, 2050)
   cairn(root, 25.6, 30.6)
+  // the small things, thickest where the big ones stand: flowers in drifts, tufts, shrubs along the walls
+  flowers(root, clusters(2014, 16, 18, 2.4, 0.6, 1.1, offRoad(0.9)))
+  flowers(root, clusters(2015, 0, 14, 1.8, 0.6, 1.0, offRoad(0.9), [[34, 13], [15.5, 37.4], [38.5, 22.8], [12, 30]]))
+  tufts(root, scatter(2016, 120, 0.7, 1.2, offRoad(0.9)))
+  tufts(root, clusters(2017, 14, 12, 2, 0.8, 1.3, offRoad(0.9)))
+  shrubs(root, clusters(2018, 0, 5, 2.4, 0.6, 1.0, free, [[5, 33], [17, 37], [8, 37.6], [13, 41.5], [43.5, 17.5], [36.5, 18], [44, 36]]))
+  shrubs(root, scatter(2019, 14, 0.6, 1.0, (x, z) => edgeward(8)(x, z) && free(x, z)))
+  logs(root, scatter(2023, 5, 0.8, 1.1, offRoad(1.6)), M.woodDark)
+  stumps(root, clusters(2024, 0, 4, 1.5, 0.7, 1.0, offRoad(1.4), [[16, 5.5], [42, 29]]))
+  mushrooms(root, clusters(2025, 0, 5, 1.2, 0.8, 1.1, offRoad(1.2), [[3.8, 27.5], [44, 44], [17.5, 4]]))
+  branches(root, clusters(2026, 0, 5, 2, 0.7, 1.2, offRoad(1.0), [[34, 13.5], [3.5, 27], [45, 31]]))
+  rocks(root, scatter(2027, 50, 0.12, 0.3, offRoad(0.6)))
+  // the verges: long grass, flowers and stones along both sides of the road, a hedge where it bends
+  tufts(root, scatter(2028, 140, 0.8, 1.3, verge(0.7, 2.2)))
+  flowers(root, scatter(2029, 90, 0.6, 1.0, verge(0.6, 1.8)))
+  rocks(root, scatter(2031, 30, 0.12, 0.28, verge(0.5, 1.4)))
+  shrubs(root, clusters(2032, 0, 6, 1.6, 0.6, 1.0, verge(1.4, 3), [[28, 24], [35, 28.4], [21.2, 20], [26, 34]]))
+  cairn(root, 26.4, 23)
   const g = new GB()
   barrel(g, 25.6, 9.2)
   crate(g, 26.6, 9.6, 0.5)
@@ -57,7 +73,6 @@ function meadow(root: THREE.Group) {
   // ash swept off the road into heaps at its side, every few steps
   ashHeaps(g, "south-meadow", 3101)
   root.add(g.build())
-  // slimes in the open grass south of the orchard, hares near the woods
   // the slimes and hares here are the meadow's creatures (core/monsters.ts), drawn by the scene
 }
 

@@ -213,3 +213,67 @@ export function ruinedWall(root: THREE.Group, pts: V2[], seed: number) {
   }
   root.add(gb.build())
 }
+
+/** A dry-stone wall along an old field's edge: knee high, stones gone here and there, moss on the tops. */
+export function fieldWall(root: THREE.Group, pts: V2[], seed: number) {
+  const gb = new GB()
+  const r = new Rng(seed)
+  const moss = mat(leafTex("moss", seed))
+  for (let i = 0; i < pts.length - 1; i++) {
+    const [ax, az] = pts[i],
+      [bx, bz] = pts[i + 1]
+    const len = Math.hypot(bx - ax, bz - az)
+    const steps = Math.ceil(len / 0.45)
+    for (let k = 0; k < steps; k++) {
+      if (r.next() < 0.12) continue
+      const t = k / steps
+      const x = ax + (bx - ax) * t,
+        z = az + (bz - az) * t
+      const y = groundH(x, z)
+      const h = 0.3 + r.next() * 0.3
+      const w = 0.2 + r.next() * 0.06
+      gb.box(r.next() < 0.5 ? M.stone : M.stoneDark, r.next() < 0.45 ? moss : M.stone, x - w, y - 0.2, z - 0.22, x + w, y + h, z + 0.22, 2)
+      // a stone fallen off into the grass
+      if (r.next() < 0.1) gb.box(M.stone, M.stone, x + 0.3, y - 0.05, z + 0.35, x + 0.55, y + 0.12, z + 0.55, 1)
+      blockRect(x - 0.25, z - 0.25, x + 0.25, z + 0.25)
+    }
+  }
+  root.add(gb.build())
+}
+
+/** A ring of stones round a dead fire, charred sticks in it and stones to sit on: somebody rests here. */
+export function fireRing(root: THREE.Group, x: number, z: number) {
+  const ring: Spot[] = []
+  for (let k = 0; k < 9; k++) ring.push({ x: x + Math.cos((k / 9) * Math.PI * 2) * 0.45, z: z + Math.sin((k / 9) * Math.PI * 2) * 0.45, s: 0.22, r: k })
+  rocks(root, ring, M.rockDark)
+  rocks(root, [
+    { x: x + 1.3, z: z + 0.3, s: 0.5, r: 1 },
+    { x: x - 1.1, z: z + 0.8, s: 0.45, r: 2 },
+  ])
+  const gb = new GB()
+  const y = groundH(x, z)
+  gb.box(M.dark, null, x - 0.25, y, z - 0.05, x + 0.25, y + 0.08, z + 0.05, 1)
+  gb.box(M.dark, null, x - 0.05, y, z - 0.22, x + 0.05, y + 0.07, z + 0.22, 1)
+  gb.box(colorMat(0x6a6662), null, x - 0.3, y - 0.01, z - 0.3, x + 0.3, y + 0.015, z + 0.3, 1)
+  root.add(gb.build())
+  blockCircle(x, z, 0.6)
+}
+
+/** Rusted pieces of a war engine strewn about it: plates, a wheel half in the turf, a bent strut. */
+export function warLitter(root: THREE.Group, x: number, z: number, seed: number) {
+  const gb = new GB()
+  const r = new Rng(seed)
+  for (let k = 0; k < 9; k++) {
+    const a = r.next() * Math.PI * 2,
+      d = 2.4 + r.next() * 3
+    const px = x + Math.cos(a) * d,
+      pz = z + Math.sin(a) * d
+    const y = groundH(px, pz)
+    const kind = k % 3
+    if (kind === 0) gb.box(rust, rustDark, px - 0.35, y - 0.05, pz - 0.25, px + 0.35, y + 0.08, pz + 0.25, 2)
+    else if (kind === 1) gb.cyl(rustDark, rust, px, pz, y - 0.25, y + 0.35, 0.4, 0.4, 9, 2)
+    else gb.box(rust, null, px - 0.05, y - 0.1, pz - 0.05, px + 0.05, y + 0.9 + r.next() * 0.5, pz + 0.05, 1)
+    if (kind === 1) blockCircle(px, pz, 0.35)
+  }
+  root.add(gb.build())
+}

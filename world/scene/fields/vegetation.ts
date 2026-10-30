@@ -1,7 +1,7 @@
 import * as THREE from "three"
 import { colorMat, mat } from "../gfx"
 import { M } from "../build"
-import { PixBuf, Rng, RAMPS, hash2 } from "../pix"
+import { PixBuf, Rng, RAMPS, hash2, hex } from "../pix"
 import { leafTex } from "../textures"
 import { blockCircle, groundH } from "../world"
 import { type Spot, instanced } from "./instancing.ts"
@@ -239,6 +239,63 @@ export function branches(root: THREE.Group, spots: Spot[], material: THREE.Mater
     [b.x, groundH(b.x, b.z) + 0.04, b.z],
     [0, b.r, 0],
     [0.9 * b.s, 1, 1],
+  ])
+}
+
+/** A drift of small flowers in tones the cold allows: white, pale yellow, lilac, a little blue. */
+const flowerMats = [0xe8e4d8, 0xe0cc6a, 0xa890c0, 0x8aa0c8].map((c, k) => {
+  const b = new PixBuf(24, 18)
+  const r = new Rng(91 + k)
+  for (let t = 0; t < 9; t++) {
+    const x0 = 2 + r.int(20),
+      h = 5 + r.int(9)
+    for (let y = 0; y < h; y++) b.set(x0, 17 - y, RAMPS.moss[2 + (y % 2)])
+    const head = hex(`#${c.toString(16).padStart(6, "0")}`)
+    for (const [dx, dy] of [
+      [0, 0],
+      [-1, 0],
+      [1, 0],
+      [0, -1],
+    ])
+      b.set(Math.min(23, Math.max(0, x0 + dx)), 17 - h + dy, head)
+  }
+  return mat(b, { alpha: true, side: THREE.DoubleSide })
+})
+
+export function flowers(root: THREE.Group, spots: Spot[]) {
+  flowerMats.forEach((m, k) =>
+    instanced(
+      root,
+      tuftGeo,
+      m,
+      spots.filter((_, i) => i % flowerMats.length === k),
+      (s) => [
+        [s.x, s.z],
+        [0, s.r, 0],
+        [s.s * 0.8, s.s * 0.7, s.s * 0.8],
+      ],
+    ),
+  )
+}
+
+/** Reeds at the water's edge: tall, thin, gone brown at the tips. */
+const reedMat = (() => {
+  const b = new PixBuf(24, 32)
+  const r = new Rng(97)
+  for (let k = 0; k < 14; k++) {
+    const x0 = 1 + r.int(22),
+      h = 18 + r.int(13),
+      lean = r.next() < 0.5 ? -1 : 1
+    for (let t = 0; t < h; t++) b.set(Math.min(23, Math.max(0, x0 + Math.round((t / h) ** 3 * 2 * lean))), 31 - t, t > h - 5 && k % 3 === 0 ? RAMPS.wood[2] : RAMPS.moss[1 + Math.min(3, Math.floor((t / h) * 3))])
+  }
+  return mat(b, { alpha: true, side: THREE.DoubleSide })
+})()
+
+export function reeds(root: THREE.Group, spots: Spot[]) {
+  instanced(root, tuftGeo, reedMat, spots, (s) => [
+    [s.x, s.z],
+    [0, s.r, 0],
+    [s.s, s.s * 2.6, s.s],
   ])
 }
 

@@ -44,6 +44,8 @@ export const NOT_TABLES: readonly string[] = [
   "LETTERS",
   // Server command dispatch, not a world data table.
   "HANDLERS",
+  // where a map's landform runs, shared by its ground and its scene
+  "MEADOW_TERRACES",
   // names for codes, shown inside the sheets
   "GATHER_SKILL_NAME",
   "KIND_NAME",

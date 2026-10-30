@@ -370,8 +370,11 @@ function biomeColor(biome: string, x: number, z: number, sx: number, sy: number,
     if (td < 0.13 + worn * 0.08 && worn > 0.3 && hash2(sx, sy, 128) > 0.12) return hash2(sx, sy, 122) > 0.95 ? lvl("stone", 1) : dirt(x, z, sx, sy, biome === "forest" ? 0.32 : 0.42)
     if (hash2(sx >> 1, sy >> 1, 123) > 0.55) return biome === "forest" ? lvl("needles", 1) : lvl("grass", 1)
   }
-  // mud in the low wet places, a few small puddles in it skinned with ice
-  if ((biome === "meadow" || biome === "forest") && vnoise(x, z, 0.85, 124) > 0.78) {
+  // mud in the low wet places (the hollows the ground drains into, and the water's edge), a few small
+  // puddles in it skinned with ice: only where the land would hold water, so the wet follows the landform
+  const low = (groundH(x + 1.2, z) + groundH(x - 1.2, z) + groundH(x, z + 1.2) + groundH(x, z - 1.2)) / 4 - h
+  const damp = h < WATER_LINE + 0.5 ? 1 : smooth(0.02, 0.1, low)
+  if ((biome === "meadow" || biome === "forest") && damp > 0 && vnoise(x, z, 0.85, 124) > 0.78 - damp * 0.3) {
     const wet = vnoise(x, z, 2.6, 125)
     if (wet > 0.74) return hash2(sx, sy, 126) > 0.7 ? pick("frost", 0.55 + (wet - 0.74) * 1.5, sx, sy) : pick("water", 0.3, sx, sy)
     if (wet > 0.42) return dirt(x, z, sx, sy, 0.22 + (wet - 0.42) * 0.3, "mud")
