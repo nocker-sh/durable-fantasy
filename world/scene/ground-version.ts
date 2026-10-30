@@ -6,6 +6,8 @@ const sources = import.meta.glob<string>(
     "../../lib/engine/lerp.ts",
     "../../lib/engine/polyline.ts",
     "../../lib/engine/catmull-coordinate.ts",
+    "../../lib/engine/get-catmull-path.ts",
+    "../../lib/engine/get-integer-range.ts",
     "../../lib/engine/scalar-field.ts",
     "../../lib/engine/smooth.ts",
     "../../lib/engine/vnoise.ts",

@@ -1,3 +1,4 @@
+import { getCatmullPath } from "#/lib/engine/get-catmull-path"
 import type { Vector2Tuple } from "#/lib/engine/vector2-types"
 import { expect, it } from "vitest"
 import { Polyline } from "#/lib/engine/polyline"
@@ -12,7 +13,7 @@ it("matches direct distances for curved paths, endpoints and repeated points", (
       [4, 0],
       [4, 3],
     ],
-    Polyline.catmull([
+    getCatmullPath([
       [0, 0],
       [3, 8],
       [9, -2],

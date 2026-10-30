@@ -1,3 +1,4 @@
+import { getCatmullPath } from "#/lib/engine/get-catmull-path"
 import { describe, expect, it } from "vitest"
 import { GridPathfinder } from "#/lib/engine/grid-pathfinder"
 import { Polyline } from "#/lib/engine/polyline"
@@ -58,7 +59,7 @@ describe("map-independent engine", () => {
     ]
     expect(Polyline.distance(2, 3, line)).toBe(3)
     expect(Polyline.distance(7, 4, line)).toBe(5)
-    const curve = Polyline.catmull(line, 4)
+    const curve = getCatmullPath(line, 4)
     expect(curve[0]).toEqual([0, 0])
     expect(curve.at(-1)).toEqual([4, 0])
     expect(curve[2]).toEqual([2, 0])

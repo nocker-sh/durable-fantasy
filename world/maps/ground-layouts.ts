@@ -1,7 +1,8 @@
+import { getCatmullPath } from "#/lib/engine/get-catmull-path"
 // The ground plans (world.ts Layout) of the districts beyond the square, the fields and the
 // rooms: data and landforms only, with nothing drawn, so the workers that paint the ground can
 // load them without the scene.
-import { OFF, OFF_LINE, OFF_POINT, catmull, type Layout } from "#/world/maps/layout"
+import { OFF, OFF_LINE, OFF_POINT, type Layout } from "#/world/maps/layout"
 import { smooth } from "#/lib/engine/smooth"
 import { fbm } from "#/lib/engine/fbm"
 
@@ -33,7 +34,7 @@ export const MARKET: Layout = {
   ...base,
   roads: [
     {
-      pts: catmull([
+      pts: getCatmullPath([
         [-3, 24],
         [10, 24],
         [24, 24.2],
@@ -44,7 +45,7 @@ export const MARKET: Layout = {
       kind: "cobble",
     },
     {
-      pts: catmull([
+      pts: getCatmullPath([
         [24, 24],
         [24, 15],
         [24.5, 8],
@@ -54,7 +55,7 @@ export const MARKET: Layout = {
     },
     // the back alley behind the north row: washing, barrels, the kitchen doors
     {
-      pts: catmull([
+      pts: getCatmullPath([
         [2.5, 16.2],
         [12, 16.1],
         [24, 16.2],
@@ -76,7 +77,7 @@ export const CRAFT: Layout = {
   ...base,
   roads: [
     {
-      pts: catmull([
+      pts: getCatmullPath([
         [-3, 23],
         [8, 23.4],
         [20, 23],
@@ -87,7 +88,7 @@ export const CRAFT: Layout = {
       kind: "cobble",
     },
     {
-      pts: catmull([
+      pts: getCatmullPath([
         [20, 23],
         [19.6, 32],
         [20, 40],
@@ -112,7 +113,7 @@ export const GATE: Layout = {
   ...base,
   roads: [
     {
-      pts: catmull([
+      pts: getCatmullPath([
         [19.2, -3],
         [20.2, 6],
         [23.2, 14],
@@ -125,7 +126,7 @@ export const GATE: Layout = {
     },
     // the lane west between the hunter's and the teacher's houses
     {
-      pts: catmull([
+      pts: getCatmullPath([
         [23.6, 22.2],
         [16, 21.8],
         [9, 22.1],
@@ -186,7 +187,7 @@ const open: Omit<Layout, "roads" | "seed" | "relief" | "biome" | "shape" | "fog"
   dirtPatches: [],
   town: [24, 24, 2, 2],
 }
-const dirt = (pts: V2[], w = 0.85) => ({ pts: catmull(pts), w, kind: "dirt" as const })
+const dirt = (pts: V2[], w = 0.85) => ({ pts: getCatmullPath(pts), w, kind: "dirt" as const })
 /** ground that falls into the sea east of `x0` over `width` tiles */
 const seaward =
   (x0: number, width: number, depth = 2.4) =>
@@ -258,19 +259,19 @@ export const LAYOUTS: Record<string, Layout> = {
     ],
     // worn by feet: into the orchard, up to the lone tree on the hill, and the slimes' ground
     trails: [
-      catmull([
+      getCatmullPath([
         [23.6, 12],
         [18, 11],
         [12, 10.5],
         [8, 9.4],
       ]),
-      catmull([
+      getCatmullPath([
         [25.4, 18],
         [29, 16.5],
         [32.4, 14.6],
         [34, 13.4],
       ]),
-      catmull([
+      getCatmullPath([
         [26, 26.3],
         [30, 30],
         [36, 34],
@@ -405,18 +406,18 @@ export const LAYOUTS: Record<string, Layout> = {
     ],
     // Josef's way to his kiln, and the deer's runs between the trees
     trails: [
-      catmull([
+      getCatmullPath([
         [20, 22.6],
         [18.4, 25],
         [17, 26.5],
       ]),
-      catmull([
+      getCatmullPath([
         [28, 28],
         [34, 32],
         [40, 31],
         [46, 36],
       ]),
-      catmull([
+      getCatmullPath([
         [25, 12],
         [32, 10],
         [38, 6],
@@ -446,19 +447,19 @@ export const LAYOUTS: Record<string, Layout> = {
     ],
     // game trails into the deep wood, one to the old wall
     trails: [
-      catmull([
+      getCatmullPath([
         [22, 33],
         [16, 28],
         [12, 20],
         [14, 12],
       ]),
-      catmull([
+      getCatmullPath([
         [30, 28],
         [32, 20],
         [36, 14],
         [40, 10],
       ]),
-      catmull([
+      getCatmullPath([
         [25, 40],
         [32, 44],
         [40, 46],

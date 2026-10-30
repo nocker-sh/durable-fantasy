@@ -4,8 +4,7 @@
 
 export type V2 = [number, number]
 
-import { Polyline } from "#/lib/engine/polyline"
-export const catmull = Polyline.catmull
+import { getCatmullPath } from "#/lib/engine/get-catmull-path"
 
 // ------------------------------------------------------------------ layout
 // Each map describes its ground with a Layout (scene/world.ts swaps it in and recomputes the
@@ -64,7 +63,7 @@ export const OFF_LINE: V2[] = [
 
 const rx30 = riverX0(
   30,
-  catmull([
+  getCatmullPath([
     [33, -3],
     [32.6, 5],
     [33.6, 11],
@@ -92,7 +91,7 @@ export function riverX0(z: number, river: V2[]): number {
 
 /** The village around the market square (the first map). */
 export const VILLAGE: Layout = {
-  river: catmull([
+  river: getCatmullPath([
     [33, -3],
     [32.6, 5],
     [33.6, 11],
@@ -107,7 +106,7 @@ export const VILLAGE: Layout = {
   embanked: [5, 41],
   roads: [
     {
-      pts: catmull([
+      pts: getCatmullPath([
         [19, 41],
         [18.6, 36],
         [18.8, 31],
@@ -117,7 +116,7 @@ export const VILLAGE: Layout = {
       kind: "cobble",
     },
     {
-      pts: catmull([
+      pts: getCatmullPath([
         [19.2, 50],
         [19.4, 45],
         [19, 41],
@@ -126,7 +125,7 @@ export const VILLAGE: Layout = {
       kind: "dirt",
     },
     {
-      pts: catmull([
+      pts: getCatmullPath([
         [23.5, 23],
         [27, 22.2],
         [30, 22],
@@ -135,7 +134,7 @@ export const VILLAGE: Layout = {
       kind: "cobble",
     },
     {
-      pts: catmull([
+      pts: getCatmullPath([
         [34, 22],
         [37, 22.4],
         [40, 23.5],
@@ -146,7 +145,7 @@ export const VILLAGE: Layout = {
       kind: "dirt",
     },
     {
-      pts: catmull([
+      pts: getCatmullPath([
         [19, 19.5],
         [18.4, 16.6],
         [16.2, 14.8],
@@ -155,7 +154,7 @@ export const VILLAGE: Layout = {
       kind: "cobble",
     },
     {
-      pts: catmull([
+      pts: getCatmullPath([
         [14.5, 24.5],
         [11, 25.4],
         [7, 25.6],
@@ -165,7 +164,7 @@ export const VILLAGE: Layout = {
       kind: "cobble",
     },
     {
-      pts: catmull([
+      pts: getCatmullPath([
         [3.5, 25.3],
         [0, 25],
         [-3, 25],
@@ -174,7 +173,7 @@ export const VILLAGE: Layout = {
       kind: "dirt",
     },
     {
-      pts: catmull([
+      pts: getCatmullPath([
         [40, 23.5],
         [40.6, 20.5],
         [41.5, 18.6],
@@ -183,7 +182,7 @@ export const VILLAGE: Layout = {
       kind: "dirt",
     },
     {
-      pts: catmull([
+      pts: getCatmullPath([
         [37, 22.4],
         [37.2, 15],
         [37.8, 10],
@@ -192,7 +191,7 @@ export const VILLAGE: Layout = {
       kind: "dirt",
     },
     {
-      pts: catmull([
+      pts: getCatmullPath([
         [40.5, 23.6],
         [41.2, 28],
         [42, 30.5],
@@ -201,7 +200,7 @@ export const VILLAGE: Layout = {
       kind: "dirt",
     },
     {
-      pts: catmull([
+      pts: getCatmullPath([
         [19.2, 33.4],
         [24, 33.5],
         [28.7, 33.6],
@@ -210,7 +209,7 @@ export const VILLAGE: Layout = {
       kind: "cobble",
     },
     {
-      pts: catmull([
+      pts: getCatmullPath([
         [16, 11.6],
         [13.5, 9.6],
         [11.6, 7.6],
