@@ -4,11 +4,11 @@ import { ScalarField } from "#/lib/engine/scalar-field"
 import { readSetting } from "#/scripts/lib/read-setting"
 import { getWindmillYardSiteReview } from "#/scripts/lib/get-windmill-yard-site-review"
 import { getWindmillRoadSeam } from "#/scripts/lib/get-windmill-road-seam"
-import { VILLAGE } from "#/world/maps/layout"
+import { SQUARE_LAYOUT } from "#/world/maps/layout"
 import { TILE_M } from "#/world/town/fit"
 const fixture = () => {
   const document = readSetting(readFileSync(".docs/settings/facilities/facility-square-windmill.md", "utf8"))
-  const review = getWindmillYardSiteReview({ document, fields: VILLAGE.fields, roads: VILLAGE.roads, metresPerTile: TILE_M })
+  const review = getWindmillYardSiteReview({ document, fields: SQUARE_LAYOUT.fields, roads: SQUARE_LAYOUT.roads, metresPerTile: TILE_M })
   if (!review || review instanceof Error || !review.approach) throw new Error("Missing windmill approach")
   return {
     approach: {

@@ -6,14 +6,14 @@ import { getWindmillRoadApproach } from "#/scripts/lib/get-windmill-road-approac
 import { getWindmillYardSiteReview } from "#/scripts/lib/get-windmill-yard-site-review"
 import { getWindmillYardSiteErrors } from "#/scripts/lib/get-windmill-yard-site-errors"
 import { getWindmillFieldPartition } from "#/scripts/lib/get-windmill-field-partition"
-import { VILLAGE } from "#/world/maps/layout"
+import { SQUARE_LAYOUT } from "#/world/maps/layout"
 import { TILE_M } from "#/world/town/fit"
 const fixture = () => {
   const document = readSetting(readFileSync(".docs/settings/facilities/facility-square-windmill.md", "utf8"))
   const grid = document.grid,
     site = windmillYardSiteSchema.parse(document.windmill_yard_site)
   if (!grid || !site.approach) throw new Error("Missing approach study")
-  const review = getWindmillYardSiteReview({ document, fields: VILLAGE.fields, roads: VILLAGE.roads, metresPerTile: TILE_M })
+  const review = getWindmillYardSiteReview({ document, fields: SQUARE_LAYOUT.fields, roads: SQUARE_LAYOUT.roads, metresPerTile: TILE_M })
   if (!review || review instanceof Error || !review.approach) throw new Error("Missing approach review")
   return { document, grid, site, review }
 }
@@ -23,7 +23,7 @@ it("joins the complete south opening to the nominated existing road without copy
   if (!approach) throw new Error("Missing approach")
   expect(approach.points[0][1]).toBeCloseTo(study.review.footprint.rect[3], 12)
   expect(approach.points[0][0]).toBeCloseTo(study.site.origin_tiles[0] + (11 * study.grid.cell_m) / TILE_M, 12)
-  expect(approach.points[2]).toEqual(VILLAGE.roads[8].pts.at(-1))
+  expect(approach.points[2]).toEqual(SQUARE_LAYOUT.roads[8].pts.at(-1))
   expect(approach.points[1]).toEqual([approach.points[0][0], approach.points[2][1]])
   for (const bound of approach.bounds) expect(Math.min(bound[2] - bound[0], bound[3] - bound[1]) * TILE_M).toBeCloseTo(approach.widthM, 12)
 })
@@ -31,21 +31,21 @@ it("subtracts the yard and full approach together without double-counting their 
   const study = fixture(),
     approach = study.review.approach
   if (!approach) throw new Error("Missing approach")
-  const before = JSON.stringify([study.document, VILLAGE.fields])
-  const yardOnly = getWindmillFieldPartition({ field: VILLAGE.fields[0], bounds: study.review.footprint.rect, metresPerTile: TILE_M })
-  const repeated = getWindmillFieldPartition({ field: VILLAGE.fields[0], bounds: study.review.footprint.rect, additionalBounds: [...approach.bounds, ...approach.bounds], metresPerTile: TILE_M })
+  const before = JSON.stringify([study.document, SQUARE_LAYOUT.fields])
+  const yardOnly = getWindmillFieldPartition({ field: SQUARE_LAYOUT.fields[0], bounds: study.review.footprint.rect, metresPerTile: TILE_M })
+  const repeated = getWindmillFieldPartition({ field: SQUARE_LAYOUT.fields[0], bounds: study.review.footprint.rect, additionalBounds: [...approach.bounds, ...approach.bounds], metresPerTile: TILE_M })
   if (yardOnly instanceof Error || repeated instanceof Error) throw new Error("Missing partition")
   expect(study.review.partition.removedM2).toBeGreaterThan(yardOnly.removedM2)
   expect(repeated.removedM2).toBeCloseTo(study.review.partition.removedM2, 10)
   expect(study.review.partition.originalM2).toBeCloseTo(study.review.partition.removedM2 + study.review.partition.retainedM2, 10)
   for (const rect of study.review.partition.retained) for (const cut of approach.bounds) expect(rect.x0 < cut[2] && rect.x1 > cut[0] && rect.z0 < cut[3] && rect.z1 > cut[1]).toBe(false)
-  expect(JSON.stringify([study.document, VILLAGE.fields])).toBe(before)
+  expect(JSON.stringify([study.document, SQUARE_LAYOUT.fields])).toBe(before)
 })
 it("refuses a stale road anchor, a non-door, insufficient or excessive width and an unsupported rotated approach", () => {
   const study = fixture(),
     approach = study.site.approach
   if (!approach) throw new Error("Missing approach")
-  const base = { grid: study.grid, site: study.site, roads: VILLAGE.roads, metresPerTile: TILE_M }
+  const base = { grid: study.grid, site: study.site, roads: SQUARE_LAYOUT.roads, metresPerTile: TILE_M }
   for (const plan of [
     { ...approach, road_end_tiles: [37.81, 10] },
     { ...approach, door: [9, 19] },

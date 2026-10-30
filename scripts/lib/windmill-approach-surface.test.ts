@@ -6,11 +6,11 @@ import { getWindmillYardSiteReview } from "#/scripts/lib/get-windmill-yard-site-
 import { getWindmillApproachSection } from "#/scripts/lib/get-windmill-approach-section"
 import { getWindmillApproachSurface } from "#/scripts/lib/get-windmill-approach-surface"
 import { getWindmillApproachSurfaceHeight } from "#/scripts/lib/get-windmill-approach-surface-height"
-import { VILLAGE } from "#/world/maps/layout"
+import { SQUARE_LAYOUT } from "#/world/maps/layout"
 import { TILE_M } from "#/world/town/fit"
 const fixture = () => {
   const document = readSetting(readFileSync(".docs/settings/facilities/facility-square-windmill.md", "utf8"))
-  const review = getWindmillYardSiteReview({ document, fields: VILLAGE.fields, roads: VILLAGE.roads, metresPerTile: TILE_M })
+  const review = getWindmillYardSiteReview({ document, fields: SQUARE_LAYOUT.fields, roads: SQUARE_LAYOUT.roads, metresPerTile: TILE_M })
   if (!review || review instanceof Error || !review.approach) throw new Error("Missing windmill approach")
   const terrain = new ScalarField(new Float32Array(10000).fill(0.25), 100)
   for (const x of [37, 38]) {

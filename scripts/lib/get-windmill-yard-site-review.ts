@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { getWindmillRoadApproach } from "#/scripts/lib/get-windmill-road-approach"
-import type { Road } from "#/world/maps/layout"
+import type { Road } from "#/world/maps/layout-types"
 import { windmillYardSiteSchema } from "#/scripts/lib/windmill-yard-site-schema"
 import { auditWindmillYard } from "#/scripts/lib/audit-windmill-yard"
 import { getWindmillYardSiteGeometry } from "#/scripts/lib/get-windmill-yard-site-geometry"

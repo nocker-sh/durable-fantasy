@@ -9,7 +9,7 @@ import { getStockLockWaitingCircles } from "#/scripts/lib/get-stock-lock-waiting
 import { getStockLockWaitingError } from "#/scripts/lib/get-stock-lock-waiting-error"
 import { townAnimalSpawns } from "#/world/town/animals"
 import { getSheepBodyRadius } from "#/world/town/get-sheep-body-radius"
-import { VILLAGE } from "#/world/maps/layout"
+import { SQUARE_LAYOUT } from "#/world/maps/layout"
 import { TILE_M } from "#/world/town/fit"
 
 function fixture() {
@@ -18,7 +18,7 @@ function fixture() {
     site = stockLockSiteSchema.parse(document.stock_lock_site)
   const geometry = getStockLockSiteGeometry({ plan, site, metresPerTile: TILE_M })
   if (geometry instanceof Error) throw geometry
-  const native = VILLAGE.pasture,
+  const native = SQUARE_LAYOUT.pasture,
     pasture: readonly [number, number, number, number] = [native.x0, native.z0, native.x1, native.z1]
   const animals = townAnimalSpawns("phanthiet").filter((animal) => animal.kind === "sheep")
 

@@ -26,6 +26,8 @@
 
 A* 探索のコスト・前のセル・候補の展開は `lib/engine/grid-path-search.ts` に分ける。探索ごとに独立した作業配列を作り、障害物の更新を読み、同じ優先度の候補の順も維持する。`lib/engine/grid-pathfinder.ts` は端点の補正と探索・経路の短縮を組み立てる。設定の検査は `assert-pathfinder-grid.ts`、設定の共有型は `grid-pathfinder-types.ts` に置く。経路探索と曲線の平面座標は `vector2-types.ts` の `Vector2Tuple` を直接参照し、処理のクラスを型だけの依存元にしない。塞がれた端点の補正は `lib/engine/get-nearby-free-grid-cell.ts` が持ち、候補の範囲と周回・行の順を保つ。前のセルへの参照からの経路点の復元は `lib/engine/get-grid-waypoints.ts` が担い、開始点へ届かない参照や循環から部分的な経路を作らない。
 
+地面の形と配置の共有型は `world/maps/layout-types.ts`、地形の機能がないことを表す定数は `empty-layout-features.ts` に置く。中央の広場と周囲の地区の配置は `layout.ts` の `SQUARE_LAYOUT` が持つ。河川の座標列は一度だけ生成し、共同洗濯場の基準位置も同じ点列から求める。`lib/engine/get-nearest-polyline-x.ts` は行に最も近い標本の x 座標を返し、標本の間の補間とは区別する。
+
 経路の短縮は `lib/engine/get-shortened-path.ts` に分け、見通しの判定を探索側から渡す。見通しを単調と仮定せず遠い候補から調べ、短縮できない区間では元の隣接点を残す。
 
 キーを押し続けた移動では、既存の経路をそのフレームの経過時間だけ進めてから、次の経路を作って送信する。新しく送った経路に直前のフレームの待ち時間を使うと、サーバーが経路を受け取るより先に進みすぎるため、入力と移動更新の順序を保つ。

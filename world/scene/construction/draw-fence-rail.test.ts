@@ -4,7 +4,7 @@ import { M } from "#/world/scene/construction/materials"
 import { drawFenceRail } from "#/world/scene/construction/draw-fence-rail"
 import { fence } from "#/world/scene/construction/fence"
 import { getPastureFence } from "#/world/town/get-pasture-fence"
-import { VILLAGE } from "#/world/maps/layout"
+import { SQUARE_LAYOUT } from "#/world/maps/layout"
 import { groundH } from "#/world/scene/ground-h"
 import { Group, Raycaster, Vector3 } from "three"
 
@@ -34,7 +34,7 @@ it("keeps a rail without openings and its material, face thickness and full endp
 })
 
 it("leaves the real pasture opening clear at both rail heights while retaining the adjacent fence", () => {
-  const plan = getPastureFence(VILLAGE.pasture),
+  const plan = getPastureFence(SQUARE_LAYOUT.pasture),
     root = new Group()
   fence({ root: root, pts: plan.points, gaps: plan.gaps, h: plan.height })
   root.updateMatrixWorld(true)

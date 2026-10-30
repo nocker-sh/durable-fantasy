@@ -7,25 +7,25 @@ import { getWindmillYardSiteErrors } from "#/scripts/lib/get-windmill-yard-site-
 import { getWindmillFieldPartition } from "#/scripts/lib/get-windmill-field-partition"
 import { getWindmillYardSiteGeometry } from "#/scripts/lib/get-windmill-yard-site-geometry"
 import { windmillYardSiteSchema } from "#/scripts/lib/windmill-yard-site-schema"
-import { VILLAGE } from "#/world/maps/layout"
+import { SQUARE_LAYOUT } from "#/world/maps/layout"
 import { TILE_M } from "#/world/town/fit"
 const fixture = () => {
   const document = readSetting(readFileSync(".docs/settings/facilities/facility-square-windmill.md", "utf8"))
-  const review = getWindmillYardSiteReview({ document, fields: VILLAGE.fields, roads: VILLAGE.roads, metresPerTile: TILE_M })
+  const review = getWindmillYardSiteReview({ document, fields: SQUARE_LAYOUT.fields, roads: SQUARE_LAYOUT.roads, metresPerTile: TILE_M })
   if (!review || review instanceof Error) throw new Error("Missing mill site review")
   return { document, review }
 }
 it("accounts for every retained field piece and the removed area without modifying the source field or document", () => {
   const props = fixture(),
-    before = JSON.stringify([props.document, VILLAGE.fields])
-  const review = getWindmillYardSiteReview({ document: props.document, fields: VILLAGE.fields, roads: VILLAGE.roads, metresPerTile: TILE_M })
+    before = JSON.stringify([props.document, SQUARE_LAYOUT.fields])
+  const review = getWindmillYardSiteReview({ document: props.document, fields: SQUARE_LAYOUT.fields, roads: SQUARE_LAYOUT.roads, metresPerTile: TILE_M })
   if (!review || review instanceof Error) throw new Error("Missing site review")
   expect(review.partition.removedM2).toBeGreaterThan(0)
   expect(review.partition.retainedM2).toBeGreaterThan(0)
   expect(review.partition.removedM2 + review.partition.retainedM2).toBeCloseTo(review.partition.originalM2, 10)
   const bounds = review.footprint.rect
   for (const piece of review.partition.retained) expect(piece.x0 < bounds[2] && piece.x1 > bounds[0] && piece.z0 < bounds[3] && piece.z1 > bounds[1]).toBe(false)
-  expect(JSON.stringify([props.document, VILLAGE.fields])).toBe(before)
+  expect(JSON.stringify([props.document, SQUARE_LAYOUT.fields])).toBe(before)
 })
 it("replaces only the named field and refuses double allocation or a changed source rectangle", () => {
   const props = fixture(),
@@ -63,9 +63,9 @@ it("rejects a false field claim, loss of the whole field and invalid scale", () 
   const props = fixture()
   const site = windmillYardSiteSchema.parse(props.document.windmill_yard_site)
   props.document.windmill_yard_site = { ...site, field_index: 1 }
-  expect(getWindmillYardSiteReview({ document: props.document, fields: VILLAGE.fields, roads: VILLAGE.roads, metresPerTile: TILE_M })).toBeInstanceOf(Error)
+  expect(getWindmillYardSiteReview({ document: props.document, fields: SQUARE_LAYOUT.fields, roads: SQUARE_LAYOUT.roads, metresPerTile: TILE_M })).toBeInstanceOf(Error)
   props.document.design_gate = "通過"
-  expect(getWindmillYardSiteReview({ document: props.document, fields: VILLAGE.fields, roads: VILLAGE.roads, metresPerTile: TILE_M })).toEqual(new Error("Invalid proposed windmill site"))
+  expect(getWindmillYardSiteReview({ document: props.document, fields: SQUARE_LAYOUT.fields, roads: SQUARE_LAYOUT.roads, metresPerTile: TILE_M })).toEqual(new Error("Invalid proposed windmill site"))
 })
 it("uses the same grid metre scale and rotates the complete footprint", () => {
   const props = fixture(),

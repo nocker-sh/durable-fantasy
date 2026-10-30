@@ -1,6 +1,6 @@
 import { ScalarField } from "#/lib/engine/scalar-field"
-import { VILLAGE } from "#/world/maps/layout"
-import type { Layout } from "#/world/maps/layout"
+import { SQUARE_LAYOUT } from "#/world/maps/layout"
+import type { Layout } from "#/world/maps/layout-types"
 import { Polyline } from "#/lib/engine/polyline"
 import { baseH } from "#/world/scene/helpers/world/base-h"
 
@@ -14,7 +14,7 @@ export type RoadPath = { path: Polyline; width: number; kind: number }
 
 export const WATER_Y = -0.95
 
-export const layout = { value: VILLAGE }
+export const layout = { value: SQUARE_LAYOUT }
 
 export const F = {
   h: new Float32Array(GN * GN),

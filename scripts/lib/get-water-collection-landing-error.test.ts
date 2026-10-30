@@ -4,7 +4,7 @@ import { readSetting } from "#/scripts/lib/read-setting"
 import { potableWaterCollectionSchema } from "#/scripts/lib/potable-water-supply-schema"
 import { getWaterCollectionLandingError } from "#/scripts/lib/get-water-collection-landing-error"
 import { MAPS } from "#/world/maps/index"
-import { VILLAGE } from "#/world/maps/layout"
+import { SQUARE_LAYOUT } from "#/world/maps/layout"
 import { TILE_M } from "#/world/town/fit"
 const fixture = () => {
   const document = readSetting(readFileSync(new URL("../../.docs/settings/facilities/facility-square-well.md", import.meta.url), "utf8"))
@@ -16,7 +16,7 @@ const fixture = () => {
     [document.id, document],
     [resident.id, resident],
   ])
-  return { document, documents, landing: collection.landing, map: MAPS.phanthiet, anchorTiles: VILLAGE.plaza, metresPerTile: TILE_M }
+  return { document, documents, landing: collection.landing, map: MAPS.phanthiet, anchorTiles: SQUARE_LAYOUT.plaza, metresPerTile: TILE_M }
 }
 it("fits the whole authored south receiving floor onto native free cells outside the unchanged well", () => {
   expect(getWaterCollectionLandingError(fixture())).toBeNull()

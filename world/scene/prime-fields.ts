@@ -1,4 +1,4 @@
-import type { Layout } from "#/world/maps/layout"
+import type { Layout } from "#/world/maps/layout-types"
 import type { Fields } from "#/world/scene/world"
 import { FIELD_CACHE } from "#/world/scene/world"
 

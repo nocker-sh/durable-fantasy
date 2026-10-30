@@ -1,6 +1,6 @@
 import { mapRoadPlanSchema } from "#/scripts/lib/map-road-plan-schema"
 import { getRoadPlanAttachmentError } from "#/scripts/lib/get-road-plan-attachment-error"
-import type { Road } from "#/world/maps/layout"
+import type { Road } from "#/world/maps/layout-types"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 type Props = Readonly<{ map: SettingDocument; roads: readonly Road[]; documents: ReadonlyMap<string, SettingDocument> }>
 

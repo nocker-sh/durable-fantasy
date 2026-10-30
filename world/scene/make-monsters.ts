@@ -4,7 +4,7 @@ import { spawnsOn } from "#/world/core/spawns-on"
 import { MonsterMotion } from "#/world/core/monster-motion"
 import { createMonsterBody } from "#/world/scene/create-monster-body"
 import { isFree } from "#/world/scene/is-free"
-import type { V2 } from "#/world/maps/layout"
+import type { Vector2Tuple } from "#/lib/engine/vector2-types"
 import type { MonsterView } from "#/world/scene/monsters"
 
 export function makeMonsters(root: THREE.Group, map: string): MonsterView[] {
@@ -20,7 +20,7 @@ export function makeMonsters(root: THREE.Group, map: string): MonsterView[] {
       spawn,
       motion: new MonsterMotion({ spawn: spawn, free: isFree }),
       body,
-      pos: [0, 0] as V2,
+      pos: [0, 0] as Vector2Tuple,
       hp: kind.hp,
       back: 0,
       burst: null,

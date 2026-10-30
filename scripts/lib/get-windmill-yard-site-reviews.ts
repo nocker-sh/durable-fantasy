@@ -1,5 +1,5 @@
 import { z } from "zod"
-import type { Road } from "#/world/maps/layout"
+import type { Road } from "#/world/maps/layout-types"
 import { getWindmillYardSiteReview } from "#/scripts/lib/get-windmill-yard-site-review"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 import type { Rectangle } from "#/lib/engine/rectangle-subtraction"

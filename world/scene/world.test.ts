@@ -1,4 +1,4 @@
-import { VILLAGE } from "#/world/maps/layout"
+import { SQUARE_LAYOUT } from "#/world/maps/layout"
 import { deepStrictEqual } from "node:assert"
 import { afterEach, expect, it, vi } from "vitest"
 
@@ -33,7 +33,7 @@ it("defers default terrain calculation until its first sample", async () => {
   const height = world.groundH(12, 18)
   expect(world.F.h.some((value) => value !== 0)).toBe(true)
   const before = world.fieldsNow()
-  world.setLayout(VILLAGE)
+  world.setLayout(SQUARE_LAYOUT)
   expect(world.groundH(12, 18)).toBe(height)
   deepStrictEqual(world.fieldsNow(), before)
 })
@@ -66,7 +66,7 @@ it("uses primed fields without calculating the unused default or selected layout
   const shape = vi.fn(() => {
     throw Error("Should use primed fields")
   })
-  const layout = { ...VILLAGE, shape }
+  const layout = { ...SQUARE_LAYOUT, shape }
   const count = world.GRID_N ** 2
   const fields = {
     h: new Float32Array(count).fill(3),

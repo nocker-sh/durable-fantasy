@@ -78,7 +78,7 @@ export const NOT_TABLES: readonly string[] = [
   "CRAFT",
   "GATE",
   "MARKET",
-  "VILLAGE",
+  "SQUARE_LAYOUT",
   "INDOOR",
   "FIELD_LAYOUTS",
   "FIELD_BUILDERS",

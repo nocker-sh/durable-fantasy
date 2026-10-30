@@ -2,7 +2,7 @@ import { z } from "zod"
 import { segmentRectDistance } from "#/lib/engine/segment-rect-distance"
 import { getStockLockRoadAttachmentError } from "#/scripts/lib/get-stock-lock-road-attachment-error"
 import type { mapRoadPlanSchema } from "#/scripts/lib/map-road-plan-schema"
-import type { Road } from "#/world/maps/layout"
+import type { Road } from "#/world/maps/layout-types"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 type Attachment = z.infer<typeof mapRoadPlanSchema>["changes"][number]["start"]
 type Props = Readonly<{

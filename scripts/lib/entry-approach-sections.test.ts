@@ -5,7 +5,7 @@ import { ScalarField } from "#/lib/engine/scalar-field"
 import { entryStepGeometry } from "#/scripts/lib/entry-step-geometry"
 import { auditEntryApproachSections } from "#/scripts/lib/audit-entry-approach-sections"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
-import type { Road } from "#/world/maps/layout"
+import type { Road } from "#/world/maps/layout-types"
 
 function fixture() {
   const room: SettingDocument = {

@@ -4,7 +4,7 @@ import { MIN_PASSAGE_WIDTH_M } from "#/scripts/lib/spatial-rules"
 import type { z } from "zod"
 import type { windmillYardSiteSchema } from "#/scripts/lib/windmill-yard-site-schema"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
-import type { Road } from "#/world/maps/layout"
+import type { Road } from "#/world/maps/layout-types"
 type Props = Readonly<{ grid: NonNullable<SettingDocument["grid"]>; site: z.infer<typeof windmillYardSiteSchema>; roads: readonly Road[]; metresPerTile: number }>
 
 /** 開口と道路端を実寸で結び、幅全体を農地と障害物の照合へ渡す。 */

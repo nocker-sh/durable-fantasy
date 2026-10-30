@@ -12,7 +12,7 @@ import { getStockLockRoadAttachmentError } from "#/scripts/lib/get-stock-lock-ro
 import { getPlannedMapRoads } from "#/scripts/lib/get-planned-map-roads"
 import { plannedBuildingFootprints } from "#/scripts/lib/planned-building-footprints"
 import { MAPS } from "#/world/maps/index"
-import { VILLAGE } from "#/world/maps/layout"
+import { SQUARE_LAYOUT } from "#/world/maps/layout"
 import { HOUSES } from "#/world/town/houses"
 import { TILE_M } from "#/world/town/fit"
 import { getPastureFence } from "#/world/town/get-pasture-fence"
@@ -31,10 +31,10 @@ function fixture() {
   const plan = stockLockSchema.parse(document.stock_lock),
     site = stockLockSiteSchema.parse(document.stock_lock_site),
     geometry = getStockLockSiteGeometry({ plan, site, metresPerTile: TILE_M })
-  const roads = getPlannedMapRoads({ map, roads: VILLAGE.roads, documents }),
+  const roads = getPlannedMapRoads({ map, roads: SQUARE_LAYOUT.roads, documents }),
     footprint = getStockLockSiteFootprint(document, TILE_M)
   if (geometry instanceof Error || roads instanceof Error || footprint instanceof Error || !footprint) throw new Error("Invalid source pasture proposal")
-  const pasture = VILLAGE.pasture,
+  const pasture = SQUARE_LAYOUT.pasture,
     pastureBounds: readonly [number, number, number, number] = [pasture.x0, pasture.z0, pasture.x1, pasture.z1]
   const obstacles: Array<Readonly<{ id: string; rect: readonly [number, number, number, number] }>> = plannedBuildingFootprints({
     houses: HOUSES,
@@ -45,17 +45,19 @@ function fixture() {
     .filter((house) => house.map === "phanthiet")
     .map((house) => ({ id: `building-${house.id}`, rect: [house.x0, house.z0, house.x1, house.z1] satisfies readonly [number, number, number, number] }))
   obstacles.push(
-    ...[...VILLAGE.fields.map((rect, index) => ({ id: `field-${index + 1}`, rect })), { id: "pigpen", rect: VILLAGE.pigpen }, { id: "graveyard", rect: VILLAGE.graveyard }].map((land) => ({
-      id: land.id,
-      rect: [land.rect.x0, land.rect.z0, land.rect.x1, land.rect.z1] satisfies readonly [number, number, number, number],
-    })),
+    ...[...SQUARE_LAYOUT.fields.map((rect, index) => ({ id: `field-${index + 1}`, rect })), { id: "pigpen", rect: SQUARE_LAYOUT.pigpen }, { id: "graveyard", rect: SQUARE_LAYOUT.graveyard }].map(
+      (land) => ({
+        id: land.id,
+        rect: [land.rect.x0, land.rect.z0, land.rect.x1, land.rect.z1] satisfies readonly [number, number, number, number],
+      }),
+    ),
     { id: "pasture", rect: pastureBounds },
     footprint,
   )
   const ground = {
     mapTiles: MAPS.phanthiet.size / 2,
     obstacles,
-    corridors: [...roads.map((road, index) => ({ id: `road-${index + 1}`, points: road.pts, halfWidth: road.w })), { id: "river", points: VILLAGE.river, halfWidth: VILLAGE.riverHW }],
+    corridors: [...roads.map((road, index) => ({ id: `road-${index + 1}`, points: road.pts, halfWidth: road.w })), { id: "river", points: SQUARE_LAYOUT.river, halfWidth: SQUARE_LAYOUT.riverHW }],
   }
 
   return { document, plan, site, geometry, footprint, roads, props: { document, map: map.id, pasture: pastureBounds, metresPerTile: TILE_M, ground } }
@@ -63,17 +65,17 @@ function fixture() {
 
 it("fits the complete source proposal, including roof overhangs and the full terminal road width, without changing its inputs", () => {
   const source = fixture(),
-    before = JSON.stringify([source.document, source.roads, source.props.ground, VILLAGE])
+    before = JSON.stringify([source.document, source.roads, source.props.ground, SQUARE_LAYOUT])
   expect(getStockLockSiteError(source.props)).toBeNull()
   expect((source.geometry.enclosure[2] - source.geometry.enclosure[0]) * TILE_M).toBeCloseTo(source.plan.layout.rows[0].length * source.plan.layout.cell_m)
   expect(source.footprint.rect).toEqual(source.geometry.enclosure)
   expect(source.footprint.id).toBe(`${source.document.id}/stock-lock`)
-  expect(JSON.stringify([source.document, source.roads, source.props.ground, VILLAGE])).toBe(before)
+  expect(JSON.stringify([source.document, source.roads, source.props.ground, SQUARE_LAYOUT])).toBe(before)
 })
 
 it("does not squeeze the enclosure into the old west opening near the northern corner", () => {
   const source = fixture(),
-    fence = getPastureFence(VILLAGE.pasture),
+    fence = getPastureFence(SQUARE_LAYOUT.pasture),
     inner = source.plan.gates.find((gate) => gate.id === "inner")
   if (!inner) throw new Error("Missing inner gate")
   const origin: [number, number] = [

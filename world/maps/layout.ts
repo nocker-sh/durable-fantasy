@@ -1,107 +1,23 @@
-// The ground plan of a map, as data: its river, roads, yards and fields, and the landform of a
-// field map. The scene paints and builds from it (scene/world.ts); the server and the tests read it
-// too, so nothing here draws.
-
-export type V2 = [number, number]
-
 import { getCatmullPath } from "#/lib/engine/get-catmull-path"
+import { getNearestPolylineX } from "#/lib/engine/get-nearest-polyline-x"
+import type { Layout } from "#/world/maps/layout-types"
 
-// ------------------------------------------------------------------ layout
-// Each map describes its ground with a Layout (scene/world.ts swaps it in and recomputes the
-// fields). A feature a map does not have sits far outside it (OFF).
+const river = getCatmullPath([
+  [33, -3],
+  [32.6, 5],
+  [33.6, 11],
+  [33, 17],
+  [31.7, 23],
+  [31.4, 29],
+  [32.6, 35],
+  [34, 41],
+  [33.4, 51],
+])
+const laundryRiverX = getNearestPolylineX(30, river)
 
-export type Road = {
-  pts: V2[]
-  w: number
-  kind: "cobble" | "dirt" | "pave"
-}
-export type Rect = { x0: number; z0: number; x1: number; z1: number }
-
-export type Layout = {
-  /** river centre line and half width; OFF_LINE for none */
-  river: V2[]
-  riverHW: number
-  /** z range where the river runs between stone embankments */
-  embanked: [number, number]
-  roads: Road[]
-  /** round paved square and its radius; OFF_POINT for none */
-  plaza: V2
-  plazaR: number
-  terrace: Rect & { h: number }
-  stairs: Rect
-  lavoir: Rect & { h: number }
-  lavStairs: Rect
-  bridge: Rect
-  fields: (Rect & { axis: "x" | "z" })[]
-  pigpen: Rect
-  pasture: Rect
-  graveyard: Rect
-  gardens: Rect[]
-  dirtPatches: [number, number, number, number][]
-  /** the flatter, built-up part: centre and radii (wilder, hillier ground outside) */
-  town: [number, number, number, number]
-  /** seed for the rolling height noise */
-  seed: number
-  /** how rolling the ground is inside and outside the town */
-  relief: [number, number]
-  /** a field's own landform, applied over the rolling ground: dunes, a sea cliff, a pass */
-  shape?: (inputProps: { x: number; z: number; h: number; roadD: number }) => number
-  /** a field's ground: what grows or lies where no road or yard is (terrain.ts) */
-  biome?: "meadow" | "dune" | "coast" | "forest" | "pass"
-  /** fog colour and range (in tiles beyond the player), for haze over dunes or mist in the forest */
-  fog?: { color: number; near: number; far: number }
-  /** footpaths worn into the ground by people and animals: drawn only, they block and flatten nothing */
-  trails?: V2[][]
-}
-
-export const OFF: Rect & { h: number } = { x0: -99, z0: -99, x1: -98, z1: -98, h: 0 }
-export const OFF_POINT: V2 = [-99, -99]
-export const OFF_LINE: V2[] = [
-  [-99, -99],
-  [-98, -99],
-]
-
-const rx30 = riverX0(
-  30,
-  getCatmullPath([
-    [33, -3],
-    [32.6, 5],
-    [33.6, 11],
-    [33, 17],
-    [31.7, 23],
-    [31.4, 29],
-    [32.6, 35],
-    [34, 41],
-    [33.4, 51],
-  ]),
-)
-export function riverX0(z: number, river: V2[]): number {
-  let best = 1e9,
-    bx = 0
-  for (const entry of river) {
-    const x = entry[0]
-    const zz = entry[1]
-    if (Math.abs(zz - z) < best) {
-      best = Math.abs(zz - z)
-      bx = x
-    }
-  }
-  return bx
-}
-
-/** The village around the market square (the first map). */
-export const VILLAGE: Layout = {
-  river: getCatmullPath([
-    [33, -3],
-    [32.6, 5],
-    [33.6, 11],
-    [33, 17],
-    [31.7, 23],
-    [31.4, 29],
-    [32.6, 35],
-    [34, 41],
-    [33.4, 51],
-  ]),
+/** The central square and its surrounding town district (the first map). */
+export const SQUARE_LAYOUT: Layout = {
+  river,
   riverHW: 1.6,
   embanked: [5, 41],
   roads: [
@@ -222,8 +138,8 @@ export const VILLAGE: Layout = {
   plazaR: 4.6,
   terrace: { x0: 3, z0: 0.5, x1: 21, z1: 12, h: 1.9 },
   stairs: { x0: 15, x1: 17.2, z0: 12, z1: 14.6 },
-  lavoir: { x0: rx30 - 1.6 - 1.25, x1: rx30 - 1.6 + 0.02, z0: 28.4, z1: 32.0, h: -0.74 },
-  lavStairs: { x0: rx30 - 1.6 - 1.25, x1: rx30 - 1.6 + 0.02 - 0.1, z0: 32.0, z1: 33.3 },
+  lavoir: { x0: laundryRiverX - 1.6 - 1.25, x1: laundryRiverX - 1.6 + 0.02, z0: 28.4, z1: 32.0, h: -0.74 },
+  lavStairs: { x0: laundryRiverX - 1.6 - 1.25, x1: laundryRiverX - 1.6 + 0.02 - 0.1, z0: 32.0, z1: 33.3 },
   bridge: { x0: 29.0, x1: 34.6, z0: 21.15, z1: 22.85 },
   fields: [
     { x0: 38.6, z0: 1.5, x1: 44, z1: 9.5, axis: "x" },

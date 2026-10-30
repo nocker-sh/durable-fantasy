@@ -1,5 +1,5 @@
 import type * as THREE from "three"
-import type { Layout } from "#/world/maps/layout"
+import type { Layout } from "#/world/maps/layout-types"
 import { buildMarket } from "#/world/scene/build-market"
 import { buildCraft } from "#/world/scene/build-craft"
 import { buildGate } from "#/world/scene/build-gate"

@@ -10,7 +10,7 @@ import { auditDoorSwings } from "#/scripts/lib/audit-door-swings"
 import { roomDoorSwing } from "#/scripts/lib/room-door-swing"
 import { auditBuildingSite } from "#/scripts/lib/audit-building-site"
 import { auditSiteBounds } from "#/scripts/lib/audit-site-bounds"
-import { VILLAGE } from "#/world/maps/layout"
+import { SQUARE_LAYOUT } from "#/world/maps/layout"
 import { currentLayout } from "#/world/scene/current-layout"
 import { setLayout } from "#/world/scene/set-layout"
 import { groundH } from "#/world/scene/ground-h"
@@ -26,7 +26,7 @@ it("fits the monk home's foundation, west-facing entrance and landings to the ac
   const documents = new Map([[room.id, room]])
   const previous = currentLayout()
   try {
-    setLayout(VILLAGE)
+    setLayout(SQUARE_LAYOUT)
     groundH(0, 0)
     const terrain = new ScalarField(F.h.slice(), GRID_N, FR)
     expect(auditBuildingFoundation(building, terrain, TILE_M)).toEqual([])

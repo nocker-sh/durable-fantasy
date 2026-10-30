@@ -8,7 +8,7 @@ import { auditBuildingSite } from "#/scripts/lib/audit-building-site"
 import { auditRoofSite } from "#/scripts/lib/audit-roof-site"
 import { plannedBuildingFootprints } from "#/scripts/lib/planned-building-footprints"
 import { getCartApronSiteErrors } from "#/scripts/lib/get-cart-apron-site-errors"
-import { VILLAGE } from "#/world/maps/layout"
+import { SQUARE_LAYOUT } from "#/world/maps/layout"
 import { HOUSES } from "#/world/town/houses"
 import { TILE_M } from "#/world/town/fit"
 
@@ -25,7 +25,7 @@ function fixture() {
     room = documents.get("room-barn-2")
   if (!map || !building || !room) throw new Error("Missing farm proposal")
 
-  return { map, building, room, documents, roads: VILLAGE.roads, plan: mapRoadPlanSchema.parse(map.road_plan) }
+  return { map, building, room, documents, roads: SQUARE_LAYOUT.roads, plan: mapRoadPlanSchema.parse(map.road_plan) }
 }
 
 it("retains every road's width and material, leaves unchanged routes intact, and applies the whole plan without mutation", () => {
@@ -108,7 +108,7 @@ it("fits the actual barn walls, roof and apron only with the explicitly rerouted
     roads = getPlannedMapRoads(source),
     houses = plannedBuildingFootprints({ houses: HOUSES, documents: source.documents, metresPerTile: TILE_M })
   if (roads instanceof Error) throw roads
-  expect(auditBuildingSite({ building: source.building, houses: houses, metresPerTile: TILE_M, roads: VILLAGE.roads }).problems.length).toBeGreaterThan(0)
+  expect(auditBuildingSite({ building: source.building, houses: houses, metresPerTile: TILE_M, roads: SQUARE_LAYOUT.roads }).problems.length).toBeGreaterThan(0)
   expect(auditBuildingSite({ building: source.building, houses: houses, metresPerTile: TILE_M, roads: roads }).problems).toEqual([])
   expect(
     auditRoofSite({

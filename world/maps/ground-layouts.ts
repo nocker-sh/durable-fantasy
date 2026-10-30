@@ -2,7 +2,8 @@ import { getCatmullPath } from "#/lib/engine/get-catmull-path"
 // The ground plans (world.ts Layout) of the districts beyond the square, the fields and the
 // rooms: data and landforms only, with nothing drawn, so the workers that paint the ground can
 // load them without the scene.
-import { OFF, OFF_LINE, OFF_POINT, type Layout } from "#/world/maps/layout"
+import { OFF, OFF_LINE, OFF_POINT } from "#/world/maps/empty-layout-features"
+import type { Layout } from "#/world/maps/layout-types"
 import { smooth } from "#/lib/engine/smooth"
 import { fbm } from "#/lib/engine/fbm"
 

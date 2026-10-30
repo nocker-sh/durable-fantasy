@@ -1,4 +1,4 @@
-import type { Layout } from "#/world/maps/layout"
+import type { Layout } from "#/world/maps/layout-types"
 import { layout, F, PLAZA_H, fieldsReady, FIELD_CACHE, walkSurfaces, blocked, blockedBy } from "#/world/scene/world"
 import { ensureFields } from "#/world/scene/ensure-fields"
 import { fieldsNow } from "#/world/scene/fields-now"

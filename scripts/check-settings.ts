@@ -91,7 +91,7 @@ import { auditSiteApproaches } from "#/scripts/lib/audit-site-approaches"
 import { auditBuildingSite } from "#/scripts/lib/audit-building-site"
 import { auditSiteBounds } from "#/scripts/lib/audit-site-bounds"
 import { TILE_M } from "#/world/town/fit"
-import { VILLAGE } from "#/world/maps/layout"
+import { SQUARE_LAYOUT } from "#/world/maps/layout"
 import { MARKET, CRAFT, GATE } from "#/world/maps/ground-layouts"
 import { auditDesignDependencies } from "#/scripts/lib/design-dependencies"
 import { readSettingIndex } from "#/scripts/lib/read-setting-index"
@@ -243,7 +243,7 @@ for (const doc of documents.values())
   if (doc.kind === "buildings")
     for (const problem of [...auditBuildingLayout(doc, documents), ...auditStairSections(doc, documents), ...auditRoofSection(doc, documents), ...auditPrivateRoomAccess(doc, documents)])
       failures.push(`${doc.id}: ${problem}`)
-const outdoorLayouts = { phanthiet: VILLAGE, "phanthiet-market": MARKET, "phanthiet-craft": CRAFT, "phanthiet-gate": GATE }
+const outdoorLayouts = { phanthiet: SQUARE_LAYOUT, "phanthiet-market": MARKET, "phanthiet-craft": CRAFT, "phanthiet-gate": GATE }
 const outdoorLayoutKeys: ReadonlyArray<keyof typeof outdoorLayouts> = ["phanthiet", "phanthiet-market", "phanthiet-craft", "phanthiet-gate"]
 for (const key of outdoorLayoutKeys) {
   const map = documents.get(`map-${key}`),

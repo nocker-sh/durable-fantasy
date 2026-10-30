@@ -1,13 +1,14 @@
 // Which ground plan each map is laid out on (layout.ts): read by the scene and by the
 // workers that paint the ground, so both see the same map. Data only: nothing here draws.
-import { VILLAGE, type Layout } from "#/world/maps/layout"
+import { SQUARE_LAYOUT } from "#/world/maps/layout"
+import type { Layout } from "#/world/maps/layout-types"
 import { CRAFT, FIELD_LAYOUTS, GATE, INDOOR, MARKET } from "#/world/maps/ground-layouts"
 import { HOUSES } from "#/world/town/houses"
 import type { HouseDef } from "#/world/town/house-types"
 
 type V2 = [number, number]
 
-const STREETS: Record<string, Layout> = { phanthiet: VILLAGE, "phanthiet-market": MARKET, "phanthiet-craft": CRAFT, "phanthiet-gate": GATE }
+const STREETS: Record<string, Layout> = { phanthiet: SQUARE_LAYOUT, "phanthiet-market": MARKET, "phanthiet-craft": CRAFT, "phanthiet-gate": GATE }
 
 /** The nearest point on any of the roads to `p`. */
 function nearestOnRoads(layout: Layout, p: V2): V2 {
@@ -71,5 +72,5 @@ export function layoutOf(map: string): Layout {
     }
     return t
   }
-  return FIELD_LAYOUTS[map] ?? (map.includes("-in-") ? INDOOR : VILLAGE)
+  return FIELD_LAYOUTS[map] ?? (map.includes("-in-") ? INDOOR : SQUARE_LAYOUT)
 }

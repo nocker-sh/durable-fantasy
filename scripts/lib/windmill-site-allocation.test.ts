@@ -3,17 +3,17 @@ import { expect, it } from "vitest"
 import { readSetting } from "#/scripts/lib/read-setting"
 import { getWindmillYardSiteReviews } from "#/scripts/lib/get-windmill-yard-site-reviews"
 import { getWindmillSiteReservations } from "#/scripts/lib/get-windmill-site-reservations"
-import { VILLAGE } from "#/world/maps/layout"
+import { SQUARE_LAYOUT } from "#/world/maps/layout"
 import { TILE_M } from "#/world/town/fit"
 const fixture = () => {
   const document = readSetting(readFileSync(".docs/settings/facilities/facility-square-windmill.md", "utf8"))
-  return { document, fieldsByMap: new Map([["map-phanthiet", VILLAGE.fields]]) }
+  return { document, fieldsByMap: new Map([["map-phanthiet", SQUARE_LAYOUT.fields]]) }
 }
 it("collects a one-shot document iterator without modifying documents or source fields", () => {
   const source = fixture(),
     before = JSON.stringify([source.document, [...source.fieldsByMap]])
   const documents = new Map([[source.document.id, source.document]])
-  const result = getWindmillYardSiteReviews({ documents: documents.values(), fieldsByMap: source.fieldsByMap, roadsByMap: new Map([["map-phanthiet", VILLAGE.roads]]), metresPerTile: TILE_M })
+  const result = getWindmillYardSiteReviews({ documents: documents.values(), fieldsByMap: source.fieldsByMap, roadsByMap: new Map([["map-phanthiet", SQUARE_LAYOUT.roads]]), metresPerTile: TILE_M })
   expect(result.errors).toEqual([])
   expect(result.reviews).toHaveLength(1)
   expect(result.reviews[0].footprint.map).toBe("map-phanthiet")
@@ -27,7 +27,7 @@ it("refuses an unknown map and does not borrow another map's fields", () => {
     documents: [source.document],
     fieldsByMap: new Map([
       ["map-phanthiet", []],
-      ["map-other", VILLAGE.fields],
+      ["map-other", SQUARE_LAYOUT.fields],
     ]),
     metresPerTile: TILE_M,
   })
@@ -36,7 +36,7 @@ it("refuses an unknown map and does not borrow another map's fields", () => {
 })
 it("partitions a fresh reservation map and preserves unrelated land and the original map", () => {
   const source = fixture(),
-    collection = getWindmillYardSiteReviews({ documents: [source.document], fieldsByMap: source.fieldsByMap, roadsByMap: new Map([["map-phanthiet", VILLAGE.roads]]), metresPerTile: TILE_M })
+    collection = getWindmillYardSiteReviews({ documents: [source.document], fieldsByMap: source.fieldsByMap, roadsByMap: new Map([["map-phanthiet", SQUARE_LAYOUT.roads]]), metresPerTile: TILE_M })
   const review = collection.reviews[0]
   if (!review) throw new Error("Missing site review")
   const field = [{ id: review.sourceFieldId, rect: review.fieldRect }]
@@ -56,7 +56,7 @@ it("partitions a fresh reservation map and preserves unrelated land and the orig
 })
 it("keeps a rejected duplicate's footprint visible while refusing a second claim on the same field", () => {
   const source = fixture(),
-    collection = getWindmillYardSiteReviews({ documents: [source.document], fieldsByMap: source.fieldsByMap, roadsByMap: new Map([["map-phanthiet", VILLAGE.roads]]), metresPerTile: TILE_M })
+    collection = getWindmillYardSiteReviews({ documents: [source.document], fieldsByMap: source.fieldsByMap, roadsByMap: new Map([["map-phanthiet", SQUARE_LAYOUT.roads]]), metresPerTile: TILE_M })
   const review = collection.reviews[0]
   if (!review) throw new Error("Missing site review")
   const second = { ...review, footprint: { ...review.footprint, id: "facility-second-mill" } }
@@ -74,7 +74,7 @@ it("keeps a rejected duplicate's footprint visible while refusing a second claim
 })
 it("reports stale land without overwriting it or hiding the proposed site", () => {
   const source = fixture(),
-    collection = getWindmillYardSiteReviews({ documents: [source.document], fieldsByMap: source.fieldsByMap, roadsByMap: new Map([["map-phanthiet", VILLAGE.roads]]), metresPerTile: TILE_M })
+    collection = getWindmillYardSiteReviews({ documents: [source.document], fieldsByMap: source.fieldsByMap, roadsByMap: new Map([["map-phanthiet", SQUARE_LAYOUT.roads]]), metresPerTile: TILE_M })
   const review = collection.reviews[0]
   if (!review) throw new Error("Missing site review")
   const land = [{ id: review.sourceFieldId, rect: [0, 0, 1, 1] satisfies readonly [number, number, number, number] }]

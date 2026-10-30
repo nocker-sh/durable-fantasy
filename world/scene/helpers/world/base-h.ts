@@ -1,5 +1,5 @@
 import { fbm } from "#/lib/engine/fbm"
-import type { Layout } from "#/world/maps/layout"
+import type { Layout } from "#/world/maps/layout-types"
 import { smooth } from "#/lib/engine/smooth"
 import { lerp } from "#/lib/engine/lerp"
 
