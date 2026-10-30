@@ -1,4 +1,4 @@
-import { segmentRectDistance } from "./segment-rect-distance"
+import { segmentRectDistance } from "#/lib/engine/segment-rect-distance"
 
 type Props = Readonly<{ from: ReadonlyArray<number>; to: ReadonlyArray<number>; otherFrom: ReadonlyArray<number>; otherTo: ReadonlyArray<number> }>
 

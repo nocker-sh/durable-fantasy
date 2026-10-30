@@ -7,7 +7,7 @@ import { walkable } from "#/world/maps/walkable"
 import { emptyWild } from "#/world/core/wild/empty-wild"
 import { hit } from "#/world/core/wild/hit"
 import { hpOf } from "#/world/core/wild/hp-of"
-import { apply } from "./apply"
+import { apply } from "#/world/core/apply"
 import { countItem } from "#/world/core/count-item"
 import { player } from "#/world/test/player"
 

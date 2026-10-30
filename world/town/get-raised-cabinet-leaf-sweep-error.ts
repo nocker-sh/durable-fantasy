@@ -1,6 +1,6 @@
-import { cuboidTranslationHits } from "../../lib/engine/cuboid-translation-hits"
+import { cuboidTranslationHits } from "#/lib/engine/cuboid-translation-hits"
 import type { Cuboid } from "#/lib/engine/cuboid-subtraction"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 import type { SlidingCabinetPart } from "#/world/town/sliding-cabinet-types"
 type Props = Readonly<{ parts: readonly SlidingCabinetPart[]; obstacles: readonly Cuboid[]; offset: Point3 }>
 

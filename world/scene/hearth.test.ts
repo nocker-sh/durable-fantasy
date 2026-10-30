@@ -1,14 +1,14 @@
 import { expect, it } from "vitest"
 import * as THREE from "three"
 import { INTERIORS } from "#/world/town/interiors"
-import { rectangleFace } from "../../lib/engine/rectangle-face"
+import { rectangleFace } from "#/lib/engine/rectangle-face"
 import { buildInterior } from "#/world/scene/build-interior"
 import { INDOOR } from "#/world/maps/ground-layouts"
 import { cutaways } from "#/world/scene/interior"
 import { setLayout } from "#/world/scene/set-layout"
 import { groundH } from "#/world/scene/ground-h"
-import { M } from "./construction/materials"
-import { SceneResources } from "../../lib/graphics/scene-resources"
+import { M } from "#/world/scene/construction/materials"
+import { SceneResources } from "#/lib/graphics/scene-resources"
 it("faces the hearth mouth and firelight toward each authored operating side", () => {
   for (const front of ["n", "s", "w", "e"] as const) {
     setLayout(INDOOR)

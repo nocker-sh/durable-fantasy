@@ -1,7 +1,7 @@
 import { expect, it } from "vitest"
 import { readFileSync } from "node:fs"
 import { readSetting } from "#/scripts/lib/read-setting"
-import { auditHotWork } from "./hot-work"
+import { auditHotWork } from "#/scripts/lib/hot-work"
 function fixture() {
   const read = (path: string) => readSetting(readFileSync(new URL(`../../.docs/settings/${path}.md`, import.meta.url), "utf8"))
   const room = read("rooms/room-smithy-1"),

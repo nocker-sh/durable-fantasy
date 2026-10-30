@@ -1,4 +1,4 @@
-import type { SpriteBakePlan, SpriteBakeJob } from "./sprite-bake-types"
+import type { SpriteBakePlan, SpriteBakeJob } from "#/scripts/lib/sprite-bake-types"
 
 export function getSpriteBakeJobs(plan: SpriteBakePlan): readonly SpriteBakeJob[] {
   return plan.selected.flatMap((resident) => {

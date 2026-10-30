@@ -1,5 +1,5 @@
-import { subtractRectangles, type Rectangle } from "../../lib/engine/rectangle-subtraction"
-import type { FlueSection } from "./floorplan/types"
+import { subtractRectangles, type Rectangle } from "#/lib/engine/rectangle-subtraction"
+import type { FlueSection } from "#/world/town/floorplan/types"
 
 /** Replace timber around a penetrating shaft; stair openings remain open in both materials. */
 export function flueFloor(inputProps: { bounds: Rectangle; floor: number; flues: readonly FlueSection[]; openings: readonly Rectangle[] }) {

@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { auditClassrooms } from "./classrooms"
+import { auditClassrooms } from "#/scripts/lib/classrooms"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 import type { Slot } from "#/world/town/routine-types"
 const base = (id: string, kind: string): SettingDocument => ({ id, kind, title: id, status: "設計中", source: "test", design_gate: "未通過", issues: [] })

@@ -5,7 +5,7 @@ import { mkdirSync } from "node:fs"
 import { homedir } from "node:os"
 import { join } from "node:path"
 import { chromium } from "playwright-core"
-import { MAPS } from "../world/maps/index"
+import { MAPS } from "#/world/maps/index"
 
 const BASE = process.env.BASE ?? "https://durable-fantasy.localhost"
 const out = join(homedir(), "Pictures", "durable-fantasy-maps"),

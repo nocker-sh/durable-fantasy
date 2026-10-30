@@ -14,7 +14,7 @@ import { stoneTex } from "#/world/scene/textures/stone-tex"
 import { roofTex } from "#/world/scene/textures/roof-tex"
 import { thatchTex } from "#/world/scene/textures/thatch-tex"
 import { woodTex } from "#/world/scene/textures/wood-tex"
-import { sheet } from "./schema"
+import { sheet } from "#/dev/sheets/schema"
 
 const uiIcons = sheet<SpriteName>({
   id: "icons",

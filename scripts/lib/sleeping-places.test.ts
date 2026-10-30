@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { auditSleepingPlaces } from "./sleeping-places"
+import { auditSleepingPlaces } from "#/scripts/lib/sleeping-places"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 const doc = (id: string, kind: string): SettingDocument => ({ id, kind, title: id, source: "test", status: "設計中", design_gate: "未通過", issues: [] })
 function fixture() {

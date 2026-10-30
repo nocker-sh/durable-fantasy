@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { FrameLimiter } from "./frame-limiter"
+import { FrameLimiter } from "#/lib/engine/frame-limiter"
 
 it("renders each 60 Hz frame despite small timestamp rounding errors", () => {
   const limiter = new FrameLimiter(60)

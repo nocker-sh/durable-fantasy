@@ -1,6 +1,6 @@
 import { limbSd } from "#/lib/graphics/ray/limb-sd"
-import { subtractVector3 as sub } from "../../../lib/engine/subtract-vector3"
-import type { Vector3Tuple as V3 } from "../../../lib/engine/vector3-types"
+import { subtractVector3 as sub } from "#/lib/engine/subtract-vector3"
+import type { Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
 type Props = { points: V3[]; radii: number[]; supportY: number }
 
 /** A resting trouser thigh flattens at its support plane; the lower leg retains its complete round profile. */

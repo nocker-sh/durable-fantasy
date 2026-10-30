@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { rectangleFace } from "./rectangle-face"
+import { rectangleFace } from "#/lib/engine/rectangle-face"
 it("keeps face centres and tangent widths on all four rectangle edges", () => {
   for (const [side, point, normal, span] of [
     ["n", [10, 19], [0, -1], 4],

@@ -1,4 +1,4 @@
-import type { ConeLocalRay as Props } from "./cone-ray-types"
+import type { ConeLocalRay as Props } from "#/lib/graphics/ray/cone-ray-types"
 
 export function getConeTopIntersection(ray: Props): number {
   if (!(Math.abs(ray.directionZ) > 1e-6)) return -1

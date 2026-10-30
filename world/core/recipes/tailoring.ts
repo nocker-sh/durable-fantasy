@@ -1,4 +1,4 @@
-import { recipe as r, type Recipe } from "./definition"
+import { recipe as r, type Recipe } from "#/world/core/recipes/definition"
 
 export const TAILORING_RECIPES: readonly Recipe[] = [
   // the loom and spinning wheel: fleece spun to yarn, woven to a muffler

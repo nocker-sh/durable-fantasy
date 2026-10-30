@@ -7,7 +7,7 @@ import { todays } from "#/world/core/todays"
 import { friendDiscount } from "#/world/core/friend-discount"
 import { useGameState } from "#/hooks/use-game-state"
 import { Window } from "#/components/game/window"
-import { useWindow } from "./use-window"
+import { useWindow } from "#/components/hud/use-window"
 
 export function ErrandsWindow() {
   const win = useWindow("errands")

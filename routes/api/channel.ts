@@ -3,7 +3,7 @@ import { z } from "zod"
 import { defineHandler } from "void"
 import { WORLDS } from "#/world/channels"
 import { isMapId } from "#/world/maps/is-map-id"
-import { Directory } from "../../durable-objects/directory"
+import { Directory } from "#/durable-objects/directory"
 
 const whole = z.string().transform(Number).pipe(z.number().int().min(1))
 const query = z.object({

@@ -2,12 +2,12 @@ import { afterEach, expect, it, vi } from "vitest"
 import { player } from "#/world/test/player"
 import { mapPlayer } from "#/world/server/map-room/map-player"
 import type { Presence } from "#/world/server/map-room/presence"
-import type { Ctx } from "./context"
+import type { Ctx } from "#/world/server/map-room/context"
 import type { ServerMessage } from "#/world/protocol"
 const run = vi.hoisted(() => vi.fn())
 vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }))
 vi.mock("../../../durable-objects/player", () => ({ Player: { get: () => ({ run }) } }))
-import { HANDLERS } from "./work"
+import { HANDLERS } from "#/world/server/map-room/work"
 afterEach(() => {
   vi.restoreAllMocks()
   run.mockReset()

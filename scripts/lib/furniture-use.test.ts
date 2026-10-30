@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { auditFurnitureUse } from "./furniture-use"
+import { auditFurnitureUse } from "#/scripts/lib/furniture-use"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 function document(): SettingDocument {
   return {

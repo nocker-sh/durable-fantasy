@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
-import { solveTwoBone } from "./solve-two-bone"
-import { twoBoneJointSpeedBound } from "./two-bone-joint-speed-bound"
+import { solveTwoBone } from "#/lib/engine/solve-two-bone"
+import { twoBoneJointSpeedBound } from "#/lib/engine/two-bone-joint-speed-bound"
 type V3 = [number, number, number]
 it("bounds joint displacement along curved joint paths over a target segment", () => {
   const root: V3 = [0, 0, 0],

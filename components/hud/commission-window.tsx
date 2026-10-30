@@ -18,7 +18,7 @@ import { Button } from "#/components/game/button"
 import { Gold } from "#/components/game/gold"
 import { Slot } from "#/components/game/slot"
 import { Window } from "#/components/game/window"
-import { ItemTooltip } from "./item-tooltip"
+import { ItemTooltip } from "#/components/hud/item-tooltip"
 
 export function CommissionWindow() {
   const game = useGame()

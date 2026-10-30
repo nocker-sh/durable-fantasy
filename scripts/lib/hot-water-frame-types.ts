@@ -5,7 +5,7 @@ import type { getHotWaterServiceDefinition } from "#/scripts/lib/get-hot-water-s
 import type { getHotWaterPouringReview } from "#/scripts/lib/get-hot-water-pouring-review"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 import type { Look } from "#/world/scene/figure/look"
-import type { hotWaterAnimationSchema } from "./hot-water-animation-schema"
+import type { hotWaterAnimationSchema } from "#/scripts/lib/hot-water-animation-schema"
 import type { z } from "zod"
 export type HotWaterFrameContext = Readonly<{
   room: SettingDocument

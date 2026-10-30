@@ -1,5 +1,5 @@
 import { seatRect } from "#/world/town/seat-rect"
-import type { SeatSpec } from "./room-fixtures"
+import type { SeatSpec } from "#/world/town/room-fixtures"
 
 export type FootRestSection = {
   part: "board" | "bearer"

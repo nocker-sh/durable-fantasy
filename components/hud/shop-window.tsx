@@ -31,7 +31,7 @@ import { Tooltip } from "#/components/game/tooltip"
 import { TooltipContent } from "#/components/game/tooltip-content"
 import { TooltipTrigger } from "#/components/game/tooltip-trigger"
 import { Window } from "#/components/game/window"
-import { ItemTooltip } from "./item-tooltip"
+import { ItemTooltip } from "#/components/hud/item-tooltip"
 
 export function ShopWindow() {
   const game = useGame()

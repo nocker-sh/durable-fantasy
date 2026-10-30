@@ -1,4 +1,4 @@
-import { cuboidTranslationHits } from "../../lib/engine/cuboid-translation-hits"
+import { cuboidTranslationHits } from "#/lib/engine/cuboid-translation-hits"
 import type { getSlidingCabinetPlan } from "#/world/town/get-sliding-cabinet-plan"
 import type { Cuboid } from "#/lib/engine/cuboid-subtraction"
 import type { SlidingCabinetSpec } from "#/world/town/sliding-cabinet-types"

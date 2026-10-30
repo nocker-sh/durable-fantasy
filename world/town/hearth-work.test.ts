@@ -1,7 +1,7 @@
 import { expect, it } from "vitest"
 import { hearthSpatialStrokes } from "#/world/town/hearth-spatial-strokes"
 import { hearthWorkTilt } from "#/world/town/hearth-work-tilt"
-import { rectangleFace } from "../../lib/engine/rectangle-face"
+import { rectangleFace } from "#/lib/engine/rectangle-face"
 const spec = { height: 0.7, openingBottom: 0.06, openingTop: 0.48, openingWidth: 0.4, openingOffset: 0, chamberDepth: 0.9 },
   bounds = { x0: 0, z0: 0, x1: 1, z1: 1 }
 it("fits the tilted blade's outer corners to both the floor and rear contact planes", () => {

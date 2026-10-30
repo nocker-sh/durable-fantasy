@@ -1,7 +1,7 @@
 // Every baked clip with a Japanese label, the item it is shown with and the prop that
 // explains it (a tree to chop, a well to draw from, water to swim in...).
 import type { Item } from "#/world/scene/figure/look"
-import type { PropKind } from "./props"
+import type { PropKind } from "#/dev/studio/props"
 
 export type Motion = {
   clip: string

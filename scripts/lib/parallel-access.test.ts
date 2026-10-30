@@ -1,6 +1,6 @@
 import { readSetting } from "#/scripts/lib/read-setting"
 import { expect, it } from "vitest"
-import { auditParallelAccess } from "./parallel-access"
+import { auditParallelAccess } from "#/scripts/lib/parallel-access"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 function fixture(): SettingDocument {
   return {

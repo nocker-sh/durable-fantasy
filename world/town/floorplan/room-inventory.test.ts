@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { unrepresentedRooms } from "./room-inventory"
+import { unrepresentedRooms } from "#/world/town/floorplan/room-inventory"
 it("does not mistake a shared room for a separately declared smoking room", () => {
   expect(
     unrepresentedRooms(

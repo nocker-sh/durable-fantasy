@@ -1,7 +1,7 @@
 import { expect, it } from "vitest"
-import { rectangleTranslationBounds } from "./rectangle-translation-bounds"
-import { rectangleTranslationHits } from "./rectangle-translation-hits"
-import { rectangleTurnRadius } from "./rectangle-turn-radius"
+import { rectangleTranslationBounds } from "#/lib/engine/rectangle-translation-bounds"
+import { rectangleTranslationHits } from "#/lib/engine/rectangle-translation-hits"
+import { rectangleTurnRadius } from "#/lib/engine/rectangle-turn-radius"
 it("tests the whole translation and does not confuse a diagonal's bounding box with its sweep", () => {
   const load = [-0.1, -0.1, 0.1, 0.1] as const
   expect(rectangleTranslationHits({ relative: load, from: [0, 0], to: [4, 4], obstacle: [1.95, 1.95, 2.05, 2.05] })).toBe(true)

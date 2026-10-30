@@ -1,4 +1,4 @@
-import type { Point3 } from "./cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = Readonly<{ root: Point3; target: Point3; radius: number; upper: number; lower: number; pole: Point3 }>
 
 /** Enclose every target in a ball strictly inside the reach annulus and away from the solver's pole fallback; no sampled endpoints substitute for this domain. */

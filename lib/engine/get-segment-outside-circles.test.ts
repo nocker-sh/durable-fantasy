@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { getSegmentOutsideCircles } from "./get-segment-outside-circles"
+import { getSegmentOutsideCircles } from "#/lib/engine/get-segment-outside-circles"
 
 it("clips partial overlaps missed by a midpoint test, keeping both surviving sides", () => {
   const props = { from: [0, 0] satisfies readonly [number, number], to: [4, 0] satisfies readonly [number, number], centres: [[1, 0]] satisfies ReadonlyArray<readonly [number, number]>, radius: 0.5 }

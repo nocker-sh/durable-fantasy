@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs"
 import { expect, it } from "vitest"
 import { readSetting } from "#/scripts/lib/read-setting"
 import { auditRoomGrid } from "#/scripts/lib/audit-room-grid"
-import { shelfDimensions } from "./shelf-dimensions"
+import { shelfDimensions } from "#/scripts/lib/shelf-dimensions"
 const read = (id: string) => readSetting(readFileSync(new URL(`../../.docs/settings/rooms/${id}.md`, import.meta.url), "utf8"))
 it("reads every authored shelf and requires named owned sources for stored documents", () => {
   for (const id of ["room-h10-1", "room-h-m5-2"]) {

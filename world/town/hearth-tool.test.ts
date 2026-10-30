@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { hearthToolPaths } from "./hearth-tool"
+import { hearthToolPaths } from "#/world/town/hearth-tool"
 const bounds = { x0: 0, z0: 0, x1: 1, z1: 1 },
   spec = { height: 0.7, openingBottom: 0.06, openingTop: 0.48, openingWidth: 0.4, openingOffset: 0, chamberDepth: 0.9 }
 it("requires the held tool itself to reach both rear sides through the mouth", () => {

@@ -1,5 +1,5 @@
 import type { getPouringPotProfile } from "#/world/town/get-pouring-pot-profile"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { profile: Exclude<ReturnType<typeof getPouringPotProfile>, Error>; radius: number; height: number; angle: number }
 
 /** Shape only the upper open rim; water capacity is measured below the unchanged lip-start section. */

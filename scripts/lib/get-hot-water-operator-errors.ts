@@ -1,5 +1,5 @@
-import { waterHandlingPlanSchema } from "./potable-water-supply-schema"
-import type { hotWaterServiceSchema } from "./hot-water-service-schema"
+import { waterHandlingPlanSchema } from "#/scripts/lib/potable-water-supply-schema"
+import type { hotWaterServiceSchema } from "#/scripts/lib/hot-water-service-schema"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 import type { z } from "zod"
 

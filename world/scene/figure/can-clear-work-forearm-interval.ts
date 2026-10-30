@@ -1,5 +1,5 @@
 import { canSeparateSurfaceFromPrimitive } from "#/lib/graphics/ray/can-separate-surface-from-primitive"
-import { twoBoneJointSpeedBound } from "../../../lib/engine/two-bone-joint-speed-bound"
+import { twoBoneJointSpeedBound } from "#/lib/engine/two-bone-joint-speed-bound"
 import { nativeArmSurfaces } from "#/world/scene/figure/native-arm-surfaces"
 import { nativeArmMotionSpeed } from "#/world/scene/figure/native-arm-motion-speed"
 import { armGripLengths } from "#/world/scene/figure/arm-grip-lengths"
@@ -8,7 +8,7 @@ import { createBodyContext } from "#/world/scene/figure/context"
 import type { Look } from "#/world/scene/figure/look"
 import type { Skel } from "#/world/scene/rig"
 import type { Primitive } from "#/lib/graphics/ray/primitive-types"
-import type { Vector3Tuple as V3 } from "../../../lib/engine/vector3-types"
+import type { Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
 type Props = { look: Look; skeleton: Skel; hand: "l" | "r"; pole: V3; fixed: readonly Primitive[]; from: V3; to: V3 }
 
 /** The midpoint's inflated native surfaces cover every arm pose in this fixed-support interval. */

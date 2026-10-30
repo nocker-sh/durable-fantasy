@@ -1,4 +1,4 @@
-import type { ReadonlyMatrix3, Vector3, Vector3Tuple } from "./vector3-types"
+import type { ReadonlyMatrix3, Vector3, Vector3Tuple } from "#/lib/engine/vector3-types"
 
 /** The matrix stores columns, so each output component combines the corresponding row. */
 export function multiplyMatrix3Vector(matrix: ReadonlyMatrix3, vector: Vector3): Vector3Tuple {

@@ -1,6 +1,6 @@
 import { getFrontAccessHandlePlan } from "#/scripts/lib/get-front-access-handle-plan"
 import { getEasedSideStepOffsets } from "#/world/town/get-eased-side-step-offsets"
-import { smooth } from "../../lib/engine/smooth"
+import { smooth } from "#/lib/engine/smooth"
 type Props = Parameters<typeof getFrontAccessHandlePlan>[0] & Readonly<{ leaf: "north" | "south"; cycle: number; phase: number }>
 
 /** Each cycle follows its own actual leaf distance; both body and board stop smoothly at cycle boundaries. */

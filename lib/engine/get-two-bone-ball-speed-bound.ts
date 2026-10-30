@@ -1,4 +1,4 @@
-import { getTwoBoneBallRange } from "./get-two-bone-ball-range"
+import { getTwoBoneBallRange } from "#/lib/engine/get-two-bone-ball-range"
 type Props = Parameters<typeof getTwoBoneBallRange>[0] & Readonly<{ targetSpeed: number }>
 
 /** Differentiate the same two-sphere joint construction over a bounded target path with a fixed root and pole. */

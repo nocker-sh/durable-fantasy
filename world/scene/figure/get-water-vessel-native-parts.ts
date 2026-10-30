@@ -1,5 +1,5 @@
 import type { WaterVesselPart } from "#/world/town/get-water-vessel-parts"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { parts: readonly WaterVesselPart[]; position: Point3; scale: number; rootY: number }
 
 /** Physical vessel metres become native figure coordinates at the same grounded root used to solve the arms. */

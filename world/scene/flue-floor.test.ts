@@ -7,8 +7,8 @@ import { INDOOR } from "#/world/maps/ground-layouts"
 import { cutaways } from "#/world/scene/interior"
 import { setLayout } from "#/world/scene/set-layout"
 import { groundH } from "#/world/scene/ground-h"
-import { M } from "./construction/materials"
-import { SceneResources } from "../../lib/graphics/scene-resources"
+import { M } from "#/world/scene/construction/materials"
+import { SceneResources } from "#/lib/graphics/scene-resources"
 it("cuts the actual timber mesh and fills only the stone collar through the floor thickness", () => {
   setLayout(INDOOR)
   const room = INTERIORS.find((r) => r.id === "phanthiet-in-h-m5-floor-2")!,

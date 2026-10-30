@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { apply } from "./apply"
+import { apply } from "#/world/core/apply"
 import { countItem } from "#/world/core/count-item"
 import { emptyBag } from "#/world/core/empty-bag"
 import { checkTrade } from "#/world/core/check-trade"

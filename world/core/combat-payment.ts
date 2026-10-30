@@ -3,7 +3,7 @@ import { settle } from "#/world/core/settle"
 import { derive } from "#/world/core/derive"
 import { getStrikePayment } from "#/world/core/get-strike-payment"
 import type { PlayerState } from "#/world/core/player-types"
-import type { Reason } from "./commands"
+import type { Reason } from "#/world/core/commands"
 import type { SkillId } from "#/world/core/skill-types"
 import type { Transition } from "#/world/core/transition"
 

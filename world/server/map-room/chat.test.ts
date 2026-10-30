@@ -3,8 +3,8 @@ import { HEARING_CELLS } from "#/world/protocol"
 import { player } from "#/world/test/player"
 import { mapPlayer } from "#/world/server/map-room/map-player"
 import type { Presence } from "#/world/server/map-room/presence"
-import type { Ctx } from "./context"
-import { HANDLERS } from "./chat"
+import type { Ctx } from "#/world/server/map-room/context"
+import { HANDLERS } from "#/world/server/map-room/chat"
 
 afterEach(() => {
   vi.restoreAllMocks()

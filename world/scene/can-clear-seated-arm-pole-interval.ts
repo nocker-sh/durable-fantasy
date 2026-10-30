@@ -4,7 +4,7 @@ import { solveArmGripPose } from "#/world/scene/figure/solve-arm-grip-pose"
 import { nativeArmMotionSpeed } from "#/world/scene/figure/native-arm-motion-speed"
 import { createBodyContext } from "#/world/scene/figure/context"
 import { getSeatedArmClearanceError } from "#/world/scene/get-seated-arm-clearance-error"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = Omit<Parameters<typeof getSeatedArmClearanceError>[0], "margin" | "movingHand"> & { hand: "l" | "r"; target: Point3; from: Point3; to: Point3 }
 
 /** Hold the palm anchor fixed while a continuous pole line changes the elbow's bend plane. */

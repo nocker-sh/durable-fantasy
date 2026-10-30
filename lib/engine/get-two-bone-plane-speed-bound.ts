@@ -1,7 +1,7 @@
-import { qfromTo } from "./qfrom-to"
-import { qrot } from "./qrot"
-import { twoBoneJointSpeedBound } from "./two-bone-joint-speed-bound"
-import type { Point3 } from "./cuboid-motion-types"
+import { qfromTo } from "#/lib/engine/qfrom-to"
+import { qrot } from "#/lib/engine/qrot"
+import { twoBoneJointSpeedBound } from "#/lib/engine/two-bone-joint-speed-bound"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { root: Point3; from: Point3; to: Point3; upper: number; lower: number; pole: Point3; normal: Point3 }
 
 /** A fixed target plane reduces the moving chain to fixed-radius planar circles; drifting planes and singular branches remain unresolved. */

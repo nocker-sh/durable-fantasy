@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { getExpandedCuboid } from "./get-expanded-cuboid"
+import { getExpandedCuboid } from "#/lib/engine/get-expanded-cuboid"
 const box = { x0: 1, x1: 2, bottom: 0, top: 0.5, z0: 3, z1: 4 }
 
 it("encloses displaced faces without mutating or shrinking the original solid", () => {

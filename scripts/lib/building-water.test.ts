@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { auditBuildingWater } from "./building-water"
+import { auditBuildingWater } from "#/scripts/lib/building-water"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 const building = (): SettingDocument => ({
   id: "building-a",

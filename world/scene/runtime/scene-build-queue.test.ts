@@ -1,5 +1,5 @@
 import { expect, it, vi } from "vitest"
-import { SceneBuildQueue } from "./scene-build-queue"
+import { SceneBuildQueue } from "#/world/scene/runtime/scene-build-queue"
 function deferred<T>() {
   let resolve!: (value: T) => void, reject!: (error: Error) => void
   const promise = new Promise<T>((yes, no) => {

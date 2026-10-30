@@ -1,6 +1,6 @@
 import { getArmGripMotionBound } from "#/world/scene/figure/get-arm-grip-motion-bound"
 import type { WaterVesselPart } from "#/world/town/get-water-vessel-parts"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = Pick<Parameters<typeof getArmGripMotionBound>[0], "look" | "skeleton"> & { parts: readonly WaterVesselPart[]; delta: Point3; poles: Readonly<Record<"l" | "r", Point3>> }
 
 /** Resolve both translated handle centres so the enclosure uses the same grip targets as the pose solver. */

@@ -1,7 +1,7 @@
 import { expect, it } from "vitest"
 import { getSupportedThighField } from "#/world/scene/figure/get-supported-thigh-field"
 import { limbSd } from "#/lib/graphics/ray/limb-sd"
-import type { Vector3Tuple as V3 } from "../../../lib/engine/vector3-types"
+import type { Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
 
 const points: V3[] = [
   [0, 0.44, 0],

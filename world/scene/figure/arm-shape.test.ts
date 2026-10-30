@@ -2,10 +2,10 @@ import { expect, it } from "vitest"
 import { nativeArmSurfaces } from "#/world/scene/figure/native-arm-surfaces"
 import { armGripPoint } from "#/world/scene/figure/arm-grip-point"
 import { limbSd } from "#/lib/graphics/ray/limb-sd"
-import { lerpVector3 as lerp3 } from "../../../lib/engine/lerp-vector3"
-import { scaleVector3 as mul } from "../../../lib/engine/scale-vector3"
-import { addVector3 as add } from "../../../lib/engine/add-vector3"
-import { type Vector3Tuple as V3 } from "../../../lib/engine/vector3-types"
+import { lerpVector3 as lerp3 } from "#/lib/engine/lerp-vector3"
+import { scaleVector3 as mul } from "#/lib/engine/scale-vector3"
+import { addVector3 as add } from "#/lib/engine/add-vector3"
+import { type Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
 it("keeps the cuff behind the wrist instead of burying the palm grip in a rounded cap", () => {
   const shoulder: V3 = [0, 0.5, 0],
     elbow: V3 = [0, 0.3, 0],

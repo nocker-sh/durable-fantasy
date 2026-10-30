@@ -1,8 +1,8 @@
-import { addVector3 } from "./add-vector3"
-import { subtractVector3 } from "./subtract-vector3"
-import { scaleVector3 } from "./scale-vector3"
-import { getTwoBoneBend } from "./get-two-bone-bend"
-import type { TwoBoneTarget as Props, TwoBoneSolution } from "./two-bone-types"
+import { addVector3 } from "#/lib/engine/add-vector3"
+import { subtractVector3 } from "#/lib/engine/subtract-vector3"
+import { scaleVector3 } from "#/lib/engine/scale-vector3"
+import { getTwoBoneBend } from "#/lib/engine/get-two-bone-bend"
+import type { TwoBoneTarget as Props, TwoBoneSolution } from "#/lib/engine/two-bone-types"
 /** Intersection of the two fixed-length joint spheres; unreachable targets never stretch the links. */
 export function solveTwoBone(props: Props): TwoBoneSolution | undefined {
   if (![...props.root, ...props.target, ...props.pole, props.upper, props.lower].every(Number.isFinite) || props.upper <= 0 || props.lower <= 0) throw new Error("Invalid two-bone dimensions")

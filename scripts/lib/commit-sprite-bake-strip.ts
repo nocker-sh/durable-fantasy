@@ -1,5 +1,5 @@
 import { renameSync } from "node:fs"
-import { isCompleteSpriteStrip } from "./is-complete-sprite-strip"
+import { isCompleteSpriteStrip } from "#/scripts/lib/is-complete-sprite-strip"
 type Props = Readonly<{ pngPath: string; target: string; token: string; encode: (source: string, destination: string) => void | Promise<void> }>
 
 /** 符号化が完了した自分の一時ファイルだけを、読める名前へ移す。 */

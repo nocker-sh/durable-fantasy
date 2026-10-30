@@ -3,7 +3,7 @@ import { activityPose } from "#/world/town/activity-pose"
 import { projectActivityPose } from "#/world/town/project-activity-pose"
 import { INTERIORS } from "#/world/town/interiors"
 import { ROOM_SCALE } from "#/world/town/interior-rules"
-import hall from "./floorplan/authored/h-m5"
+import hall from "#/world/town/floorplan/authored/h-m5"
 import * as routines from "#/world/town/slot-at"
 
 afterEach(() => vi.restoreAllMocks())

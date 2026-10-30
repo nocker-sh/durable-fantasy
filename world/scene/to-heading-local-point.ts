@@ -1,5 +1,5 @@
 import { toHeadingWorldPoint } from "#/world/scene/to-heading-world-point"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 
 /** Invert the actor's translation and heading before solving native joints. */
 export function toHeadingLocalPoint(point: Point3, origin: Point3, heading: number): Point3 {

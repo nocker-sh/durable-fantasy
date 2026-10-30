@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { PendingAction } from "./action-target"
+import { PendingAction } from "#/world/scene/runtime/action-target"
 
 it("replaces earlier gathering, conversation and combat with the newest purpose", () => {
   const action = new PendingAction<string>()

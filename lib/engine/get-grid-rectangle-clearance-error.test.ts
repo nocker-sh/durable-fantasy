@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { getGridRectangleClearanceError } from "./get-grid-rectangle-clearance-error"
+import { getGridRectangleClearanceError } from "#/lib/engine/get-grid-rectangle-clearance-error"
 it("detects a blocked interior cell despite clear corners and permits a touching outside cell", () => {
   expect(getGridRectangleClearanceError({ rect: [0, 0, 3, 3], cellSize: 1, isCellFree: (cell) => cell[0] !== 1 || cell[1] !== 1 })).toBeInstanceOf(Error)
   expect(getGridRectangleClearanceError({ rect: [0, 0, 1, 1], cellSize: 1, isCellFree: (cell) => cell[0] === 0 && cell[1] === 0 })).toBeNull()

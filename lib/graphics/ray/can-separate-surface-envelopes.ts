@@ -1,7 +1,7 @@
-import { getPrimitiveCapsuleBounds } from "./get-primitive-capsule-bounds"
-import { segmentCuboidDistance } from "../../engine/segment-cuboid-distance"
+import { getPrimitiveCapsuleBounds } from "#/lib/graphics/ray/get-primitive-capsule-bounds"
+import { segmentCuboidDistance } from "#/lib/engine/segment-cuboid-distance"
 import { segmentSegmentDistance3D } from "#/lib/engine/segment-segment-distance-3d"
-import type { SurfaceSeparationContext as Props } from "./surface-separation-types"
+import type { SurfaceSeparationContext as Props } from "#/lib/graphics/ray/surface-separation-types"
 
 /** 妥当な余地について、囲いだけで詳細な表面同士の分離を証明する。 */
 export function canSeparateSurfaceEnvelopes(props: Props): boolean {

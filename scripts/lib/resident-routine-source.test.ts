@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { auditResidentRoutineSources } from "./resident-routine-source"
+import { auditResidentRoutineSources } from "#/scripts/lib/resident-routine-source"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 function fixture() {
   const doc: SettingDocument = {

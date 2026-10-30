@@ -1,4 +1,4 @@
-import type { SpriteBakePlan } from "./sprite-bake-types"
+import type { SpriteBakePlan } from "#/scripts/lib/sprite-bake-types"
 import type { SpriteManifest } from "#/world/scene/sprite-manifest-types"
 type Props = Readonly<{ source: SpriteBakePlan["source"]; previous: SpriteManifest | null; selected: readonly number[]; partial: boolean }>
 

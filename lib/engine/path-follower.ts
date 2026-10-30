@@ -1,4 +1,4 @@
-import type { V2 } from "./pathfinder"
+import type { V2 } from "#/lib/engine/pathfinder"
 
 /** Consumes a distance budget across waypoints, independent of render frequency. */
 export class PathFollower {

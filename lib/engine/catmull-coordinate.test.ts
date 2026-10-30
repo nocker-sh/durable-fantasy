@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { catmullCoordinate } from "./catmull-coordinate"
+import { catmullCoordinate } from "#/lib/engine/catmull-coordinate"
 
 it("interpolates the two middle control points and preserves a straight progression", () => {
   const points = { previous: -1, start: 1, end: 3, next: 5 }

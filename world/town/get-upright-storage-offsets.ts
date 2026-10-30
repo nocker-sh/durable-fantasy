@@ -1,4 +1,4 @@
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { bodyStart: readonly [number, number]; poses: ReadonlyArray<readonly [number, number]>; height: number }
 /** Lift at pickup, preserve the held offset throughout the walk, then lower at staging without a horizontal jump. */
 export function getUprightStorageOffsets(props: Props): ReadonlyArray<Point3> | Error {

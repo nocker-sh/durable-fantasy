@@ -1,6 +1,6 @@
 import { readdirSync, rmSync } from "node:fs"
 import { join } from "node:path"
-import { isSpriteBakeClaimBlocking } from "./is-sprite-bake-claim-blocking"
+import { isSpriteBakeClaimBlocking } from "#/scripts/lib/is-sprite-bake-claim-blocking"
 type Props = Readonly<{ directory: string; claim: string }>
 
 /** 参加を記録してから他の参加者を見る。停止した一意な記録だけを取り除く。 */

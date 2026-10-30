@@ -11,11 +11,11 @@ import { workSpot } from "#/world/town/work-spot"
 import type { Spot } from "#/world/town/routine-types"
 import { Actor } from "#/world/scene/actor"
 import { FIG } from "#/world/scene/figure/display-scale"
-import { getResidentBakedStrips } from "../get-resident-baked-strips"
+import { getResidentBakedStrips } from "#/world/scene/get-resident-baked-strips"
 import { lap } from "#/world/lap"
-import { RESIDENTS, RESIDENT_LOOKS } from "../../town/residents"
-import type { SceneDefinition } from "./definitions"
-import { spriteManifest, SPRITES } from "./assets"
+import { RESIDENTS, RESIDENT_LOOKS } from "#/world/town/residents"
+import type { SceneDefinition } from "#/world/scene/runtime/definitions"
+import { spriteManifest, SPRITES } from "#/world/scene/runtime/assets"
 
 async function createPopulation(inputProps: { scene: THREE.Scene; map: string; world: SceneDefinition; progress: (text: string) => void; tick: () => Promise<unknown>; own?: (actor: Actor) => void }) {
   const scene = inputProps.scene

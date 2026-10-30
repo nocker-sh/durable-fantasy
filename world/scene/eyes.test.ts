@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vite-plus/test"
-import { PixelBuffer as PixBuf } from "../../lib/graphics/pixel-buffer"
+import { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
 import { ANIMS } from "#/world/scene/figure/animation"
 import { EYE_DARK, FH, FW, eyesDrawn } from "#/world/scene/figure/render"
 import { renderFrame } from "#/world/scene/figure/render-frame"
 import type { Look } from "#/world/scene/figure/look"
-import { RESIDENTS, RESIDENT_LOOKS } from "../town/residents"
+import { RESIDENTS, RESIDENT_LOOKS } from "#/world/town/residents"
 
 const dark = (b: PixBuf, x: number, y: number) => {
   const k = (y * b.w + x) * 4

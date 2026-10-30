@@ -1,5 +1,5 @@
 import * as THREE from "three"
-import type { PixelBuffer } from "./pixel-buffer"
+import type { PixelBuffer } from "#/lib/graphics/pixel-buffer"
 export function toTexture(b: PixelBuffer, repeat = true): THREE.Texture {
   const t = new THREE.DataTexture(b.data, b.w, b.h, THREE.RGBAFormat)
   t.flipY = true

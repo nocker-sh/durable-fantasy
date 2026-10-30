@@ -1,4 +1,4 @@
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = {
   origin: readonly [number, number]
   width: number

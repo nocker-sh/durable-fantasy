@@ -1,11 +1,11 @@
 import { FW, FH } from "#/world/scene/figure/render"
 import { FRAMES } from "#/world/scene/figure/animation"
-import { lookKey } from "./sprite-key"
-import { getSpriteStripUrl } from "./get-sprite-strip-url"
-import { SPRITE_RENDER_VERSION } from "./sprite-render-version"
-import type { Item, Look } from "./figure/look"
+import { lookKey } from "#/world/scene/sprite-key"
+import { getSpriteStripUrl } from "#/world/scene/get-sprite-strip-url"
+import { SPRITE_RENDER_VERSION } from "#/world/scene/sprite-render-version"
+import type { Item, Look } from "#/world/scene/figure/look"
 import type { BakedStrips } from "#/world/scene/actors"
-import type { SpriteManifest } from "./sprite-manifest-types"
+import type { SpriteManifest } from "#/world/scene/sprite-manifest-types"
 
 type Props = Readonly<{ directory: string; index: number; name: string; look: Look; item: Item; manifest: SpriteManifest | null }>
 

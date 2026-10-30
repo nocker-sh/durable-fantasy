@@ -1,7 +1,7 @@
 import { expect, it } from "vitest"
 import * as THREE from "three"
-import { spinningWheel } from "./spinning-wheel"
-import { SceneResources } from "../../../lib/graphics/scene-resources"
+import { spinningWheel } from "#/world/scene/construction/spinning-wheel"
+import { SceneResources } from "#/lib/graphics/scene-resources"
 import type { Furniture } from "#/world/town/interiors"
 it.each([
   [0.9, 1.35],

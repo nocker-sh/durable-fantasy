@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest"
-import { BitmapCache } from "./bitmap-cache"
+import { BitmapCache } from "#/lib/graphics/bitmap-cache"
 
 const bitmap = (width = 2, height = 2) => ({ width, height, close: vi.fn() }) as unknown as ImageBitmap
 

@@ -1,9 +1,9 @@
 import { expect, it } from "vitest"
 import * as THREE from "three"
-import { workTable } from "./work-table"
+import { workTable } from "#/world/scene/construction/work-table"
 import { GeometryBuilder as GB } from "#/lib/graphics/geometry-builder"
 import { INTERIORS } from "#/world/town/interiors"
-import { SceneResources } from "../../../lib/graphics/scene-resources"
+import { SceneResources } from "#/lib/graphics/scene-resources"
 
 it("supports all six authored tables from the room floor at the designed work height", () => {
   const tables = INTERIORS.filter((room) => room.house.id === "h-m5").flatMap((room) => room.furniture.filter((f) => f.kind === "table"))

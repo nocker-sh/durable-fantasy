@@ -1,4 +1,4 @@
-import type { WorkSurfaceSpec } from "../../world/town/room-fixtures"
+import type { WorkSurfaceSpec } from "#/world/town/room-fixtures"
 
 export function workSurface(value: unknown, width: number, depth: number): WorkSurfaceSpec {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("Missing work surface dimensions")

@@ -1,8 +1,8 @@
 import { expect, it } from "vitest"
-import { groundFootwear } from "./footing"
-import { buildBody } from "./body"
+import { groundFootwear } from "#/world/scene/figure/footing"
+import { buildBody } from "#/world/scene/figure/body"
 import { skelFor } from "#/world/scene/figure/helpers/animation/skel-for"
-import { RESIDENTS, RESIDENT_LOOKS } from "../../town/residents"
+import { RESIDENTS, RESIDENT_LOOKS } from "#/world/town/residents"
 it("grounds the rendered shoe end at the lowest point and reports the other shoe's gap", () => {
   const result = groundFootwear({ l: { a: [1, 1, 2], b: [1, 0.7, 3], r: 0.1 }, r: { a: [-1, 0.4, 2], b: [-1, 0.8, 3], r: 0.2 } })
   expect(result.rootY).toBeCloseTo(-0.2, 12)

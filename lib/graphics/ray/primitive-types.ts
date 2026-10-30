@@ -1,6 +1,6 @@
-import type { PrimitiveBounds } from "./primitive-bounds-types"
-import type { Vector3Tuple as V3 } from "../../engine/vector3-types"
-import type { BoundedField } from "../../engine/field-separation"
+import type { PrimitiveBounds } from "#/lib/graphics/ray/primitive-bounds-types"
+import type { Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
+import type { BoundedField } from "#/lib/engine/field-separation"
 
 /** Shade source: which ramp and a brightness offset at a surface point. */
 /** ramp, brightness offset, optional hatch: +1 highlight strokes, -1 shadow strokes */

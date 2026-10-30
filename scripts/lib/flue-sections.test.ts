@@ -1,7 +1,7 @@
 import { expect, it } from "vitest"
 import { readFileSync } from "node:fs"
 import { readSetting } from "#/scripts/lib/read-setting"
-import { compileFlues } from "./flue-sections"
+import { compileFlues } from "#/scripts/lib/flue-sections"
 const read = (kind: string, id: string) => readSetting(readFileSync(new URL(`../../.docs/settings/${kind}/${id}.md`, import.meta.url), "utf8"))
 const building = read("buildings", "building-h-m5")
 const rooms = new Map((building.rooms as string[]).map((id) => [id, read("rooms", id)]))

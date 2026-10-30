@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest"
-import { Rooms, type Channel, type RoomSocket } from "./rooms"
+import { Rooms, type Channel, type RoomSocket } from "#/world/parts/rooms"
 
 function fixture() {
   const rooms = new Rooms()

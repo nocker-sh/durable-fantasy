@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { auditRoomClearance } from "./room-clearance"
+import { auditRoomClearance } from "#/scripts/lib/room-clearance"
 import { auditRoomGrid } from "#/scripts/lib/audit-room-grid"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 function room(opening = "####..####"): SettingDocument {

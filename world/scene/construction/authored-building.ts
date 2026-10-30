@@ -1,11 +1,11 @@
-import { gableRoofPanels } from "../../../lib/engine/gable-roof-panels"
-import { flueWalls } from "../../town/flue-walls"
+import { gableRoofPanels } from "#/lib/engine/gable-roof-panels"
+import { flueWalls } from "#/world/town/flue-walls"
 import { framedWindow } from "#/world/scene/construction/framed-window"
-import { subtractRectangles } from "../../../lib/engine/rectangle-subtraction"
+import { subtractRectangles } from "#/lib/engine/rectangle-subtraction"
 import * as THREE from "three"
-import type { BuildingEnvelope } from "../../town/building-envelope"
+import type { BuildingEnvelope } from "#/world/town/building-envelope"
 import { GeometryBuilder as GB } from "#/lib/graphics/geometry-builder"
-import { M } from "./materials"
+import { M } from "#/world/scene/construction/materials"
 
 type Point = [number, number, number]
 /** Dimensioned shell: no random bay windows, extra chimneys or guessed storey heights. */

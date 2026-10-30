@@ -1,4 +1,4 @@
-import { roomHasWorker } from "./room-worker"
+import { roomHasWorker } from "#/scripts/lib/room-worker"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 type HotWork = { process?: keyof typeof PROCESS_ROLES; handler: string; heat_sources: string[]; cooling: string[]; finished: string[]; fuel: string[] }
 const PROCESS_ROLES = {

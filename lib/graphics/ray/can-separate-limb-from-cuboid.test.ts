@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
 import { limbSd } from "#/lib/graphics/ray/limb-sd"
-import { canSeparateLimbFromCuboid } from "./can-separate-limb-from-cuboid"
+import { canSeparateLimbFromCuboid } from "#/lib/graphics/ray/can-separate-limb-from-cuboid"
 const surface = limbSd(
   [
     [-0.1, 0, 0],

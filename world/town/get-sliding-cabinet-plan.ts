@@ -1,7 +1,7 @@
 import { getSlidingCabinetSpecError } from "#/world/town/get-sliding-cabinet-spec-error"
 import { getSlidingCabinetFrameParts } from "#/world/town/get-sliding-cabinet-frame-parts"
 import { getSlidingCabinetPanelParts } from "#/world/town/get-sliding-cabinet-panel-parts"
-import { cuboidTranslationHits } from "../../lib/engine/cuboid-translation-hits"
+import { cuboidTranslationHits } from "#/lib/engine/cuboid-translation-hits"
 import type { Cuboid } from "#/lib/engine/cuboid-subtraction"
 import type { SlidingCabinetSpec } from "#/world/town/sliding-cabinet-types"
 type Props = Readonly<{ spec: SlidingCabinetSpec; contents: readonly Cuboid[] }>

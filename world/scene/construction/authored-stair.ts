@@ -1,7 +1,7 @@
 import * as THREE from "three"
 import { GeometryBuilder as GB } from "#/lib/graphics/geometry-builder"
-import { M } from "./materials"
-import { stairGeometry, type StairSection } from "../../town/floorplan/stair-geometry"
+import { M } from "#/world/scene/construction/materials"
+import { stairGeometry, type StairSection } from "#/world/town/floorplan/stair-geometry"
 
 /** On the upper floor the same flight descends below the opening, never rises again. */
 export function authoredStair(inputProps: { section: StairSection; floor: number; floorY: number; scale?: number }): THREE.Group {

@@ -1,4 +1,4 @@
-import type { Q, V3 } from "./quaternion-types"
+import type { Q, V3 } from "#/lib/engine/quaternion-types"
 export const qrot = (q: Readonly<Q>, v: Readonly<V3>): V3 => {
   const xState = q,
     x = xState[0],

@@ -1,11 +1,11 @@
 import { getSkirtDimensions } from "#/world/scene/figure/get-skirt-dimensions"
-import { addVector3 as add } from "../../../lib/engine/add-vector3"
-import { subtractVector3 as sub } from "../../../lib/engine/subtract-vector3"
-import { scaleVector3 as mul } from "../../../lib/engine/scale-vector3"
-import { normalizeVector3 as norm } from "../../../lib/engine/normalize-vector3"
-import { lerpVector3 as lerp3 } from "../../../lib/engine/lerp-vector3"
+import { addVector3 as add } from "#/lib/engine/add-vector3"
+import { subtractVector3 as sub } from "#/lib/engine/subtract-vector3"
+import { scaleVector3 as mul } from "#/lib/engine/scale-vector3"
+import { normalizeVector3 as norm } from "#/lib/engine/normalize-vector3"
+import { lerpVector3 as lerp3 } from "#/lib/engine/lerp-vector3"
 import type { BodyContext } from "#/world/scene/figure/context"
-import type { Vector3Tuple as V3 } from "../../../lib/engine/vector3-types"
+import type { Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
 export type SkirtLayer = "skirt" | "overskirt" | "frill"
 
 /** Preserve standing cloth length along waist, lap and hanging hem; short skirts end before the knee. */

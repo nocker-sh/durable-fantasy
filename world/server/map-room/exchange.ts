@@ -1,11 +1,11 @@
 // The map room's handlers for the exchange board (core/exchange.ts).
-import { Player } from "../../../durable-objects/player"
+import { Player } from "#/durable-objects/player"
 import { parseSymbol } from "#/world/core/parse-symbol"
-import { BOARD_REACH, EXCHANGE_BOARD } from "../../town/boards"
-import { Exchange } from "../../../durable-objects/exchange"
+import { BOARD_REACH, EXCHANGE_BOARD } from "#/world/town/boards"
+import { Exchange } from "#/durable-objects/exchange"
 import type { Transition } from "#/world/core/transition"
 import type { Cell } from "#/world/protocol"
-import type { Ctx, Handlers, Message } from "./context"
+import type { Ctx, Handlers, Message } from "#/world/server/map-room/context"
 import { near } from "#/world/server/map-room/near"
 
 async function exLookOrExPlaceExCancelExClaim(roomCtx: Ctx, message: Message<"ex-look" | "ex-place" | "ex-cancel" | "ex-claim">) {

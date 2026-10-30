@@ -1,8 +1,8 @@
-import { getHotWaterFrameContext } from "./get-hot-water-frame-context"
-import { getHotWaterHoldingFrame } from "./get-hot-water-holding-frame"
+import { getHotWaterFrameContext } from "#/scripts/lib/get-hot-water-frame-context"
+import { getHotWaterHoldingFrame } from "#/scripts/lib/get-hot-water-holding-frame"
 import { FRAMES } from "#/world/scene/figure/animation"
-import { hotWaterAnimationSchema } from "./hot-water-animation-schema"
-import type { HotWaterReviewInput as Props } from "./hot-water-frame-types"
+import { hotWaterAnimationSchema } from "#/scripts/lib/hot-water-animation-schema"
+import type { HotWaterReviewInput as Props } from "#/scripts/lib/hot-water-frame-types"
 
 /** 静止保持は待機・見回しの全コマを照合し、運搬や注湯の成立と区別する。 */
 export function getHotWaterHoldingReviewError(props: Props): Error | null {

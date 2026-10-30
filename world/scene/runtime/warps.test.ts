@@ -1,6 +1,6 @@
 import { expect, it, vi } from "vitest"
 import * as THREE from "three"
-import { WarpMarkers } from "./warps"
+import { WarpMarkers } from "#/world/scene/runtime/warps"
 
 vi.mock("#/world/scene/walk-h", () => ({ walkH: () => 2 }))
 

@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { getYawPitchBoxRadius } from "./get-yaw-pitch-box-radius"
+import { getYawPitchBoxRadius } from "#/lib/engine/get-yaw-pitch-box-radius"
 
 it("preserves all headings at zero pitch instead of using only the box's forward extent", () => {
   expect(getYawPitchBoxRadius({ bounds: [-3, 4, -4, 3, 4, 4], maxPitch: 0 })).toBe(5)

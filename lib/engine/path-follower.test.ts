@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
-import { PathFollower } from "./path-follower"
-import type { V2 } from "./pathfinder"
+import { PathFollower } from "#/lib/engine/path-follower"
+import type { V2 } from "#/lib/engine/pathfinder"
 
 const follower = new PathFollower(2.4)
 it.each([5, 10, 30, 60, 144])("preserves distance across cell boundaries at %s fps", (fps) => {

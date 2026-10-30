@@ -1,4 +1,4 @@
-import { MIN_PASSAGE_WIDTH_M } from "./spatial-rules"
+import { MIN_PASSAGE_WIDTH_M } from "#/scripts/lib/spatial-rules"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 /** Move a conservative, axis-aligned body footprint; point reachability cannot prove clearance. */
 export function auditRoomClearance(document: SettingDocument): string[] {

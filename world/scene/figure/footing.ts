@@ -1,4 +1,4 @@
-import type { Vector3Tuple as V3 } from "../../../lib/engine/vector3-types"
+import type { Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
 export type Footwear = Record<"l" | "r", { a: V3; b: V3; r: number }>
 /** Lowest points of the rendered shoe capsules; contact alone does not prove balance or load support. */
 export function groundFootwear(shoes: Footwear) {

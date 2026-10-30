@@ -2,7 +2,7 @@ import * as THREE from "three"
 import { M } from "#/world/scene/construction/materials"
 import { createCupHandle } from "#/world/scene/construction/create-cup-handle"
 import type { getCupProfile } from "#/world/town/get-cup-profile"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { profile: Exclude<ReturnType<typeof getCupProfile>, Error>; at: Point3; inverted: boolean }
 
 /** Keep the hollow, base and handle in the existing ceramic material; invert the same object rather than inventing a drying shape. */

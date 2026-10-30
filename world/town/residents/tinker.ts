@@ -1,4 +1,4 @@
-import type { Resident } from "../resident"
+import type { Resident } from "#/world/town/resident"
 
 const residents = {
   クルト: {

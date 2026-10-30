@@ -1,7 +1,7 @@
 import { expect, it } from "vitest"
-import { minimapTarget } from "./minimap-target"
-import { MAPS } from "../maps/index"
-import { shopMarkers } from "../maps/shop-markers"
+import { minimapTarget } from "#/world/client/minimap-target"
+import { MAPS } from "#/world/maps/index"
+import { shopMarkers } from "#/world/maps/shop-markers"
 it("keeps the fruit stall marker instead of entering the nearby bakery", () => {
   const marker = shopMarkers("phanthiet", 720).find((m) => m.shops.some((s) => s.id === "fruit"))!
   const x = (marker.cell[0] + 0.5) / 2,

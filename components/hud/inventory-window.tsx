@@ -9,11 +9,11 @@ import { useGameState } from "#/hooks/use-game-state"
 import { Gold } from "#/components/game/gold"
 import { Slot } from "#/components/game/slot"
 import { Window } from "#/components/game/window"
-import { ItemTooltip } from "./item-tooltip"
+import { ItemTooltip } from "#/components/hud/item-tooltip"
 import { carriesItem } from "#/components/hud/carries-item"
 import { readDrag } from "#/components/hud/read-drag"
 import { startDrag } from "#/components/hud/start-drag"
-import { useWindow } from "./use-window"
+import { useWindow } from "#/components/hud/use-window"
 
 export function InventoryWindow() {
   const game = useGame()

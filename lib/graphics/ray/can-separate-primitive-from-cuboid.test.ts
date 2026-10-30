@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
-import { canSeparatePrimitiveFromCuboid } from "./can-separate-primitive-from-cuboid"
-import type { Primitive } from "./primitive-types"
+import { canSeparatePrimitiveFromCuboid } from "#/lib/graphics/ray/can-separate-primitive-from-cuboid"
+import type { Primitive } from "#/lib/graphics/ray/primitive-types"
 const primitive: Primitive = { kind: "cone", a: [0, 0, 0], b: [0, 1, 0], r: 0.5, r2: 0.05, id: 0, m: () => ["test", 0] }
 
 it("refines the cone's broad envelope without accepting an occupied box", () => {

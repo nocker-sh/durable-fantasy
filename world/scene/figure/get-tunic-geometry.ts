@@ -1,9 +1,9 @@
 import { getFoldedGarmentGeometry } from "#/world/scene/figure/get-folded-garment-geometry"
 import { seatedSupportDepth } from "#/world/scene/figure/seated-support-depth"
-import { lerpVector3 as lerp3 } from "../../../lib/engine/lerp-vector3"
+import { lerpVector3 as lerp3 } from "#/lib/engine/lerp-vector3"
 import type { BodyContext } from "#/world/scene/figure/context"
 import type { PrimitiveShape } from "#/lib/graphics/ray/primitive-types"
-import type { Vector3Tuple as V3 } from "../../../lib/engine/vector3-types"
+import type { Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
 
 /** Standing and kneeling keep the native cone; a seated tunic folds its lower span forward instead of through the seat. */
 export function getTunicGeometry(context: BodyContext) {

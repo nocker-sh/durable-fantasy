@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
-import { getCapsuleRayIntersection } from "./get-capsule-ray-intersection"
-import type { Primitive } from "./primitive-types"
+import { getCapsuleRayIntersection } from "#/lib/graphics/ray/get-capsule-ray-intersection"
+import type { Primitive } from "#/lib/graphics/ray/primitive-types"
 const capsule: Primitive = { kind: "cap", a: [0, 0, 0], b: [0, 1, 0], r: 0.5, r2: 0.5, id: 0, m: () => ["test", 0] }
 
 it("hits the near rounded end from either axial direction regardless of endpoint order", () => {

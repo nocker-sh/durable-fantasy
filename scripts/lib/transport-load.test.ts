@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
-import { auditTransportLoads } from "./transport-load"
+import { auditTransportLoads } from "#/scripts/lib/transport-load"
 const base = (id: string, kind: string): SettingDocument => ({ id, kind, title: id, status: "設計中", design_gate: "未通過", source: "test", issues: [] })
 function fixture() {
   const carrier: SettingDocument = { ...base("resident-a", "residents"), handling_plan: { max_hand_load_kg: 12, status: "proposed", basis: "設計上限" } }

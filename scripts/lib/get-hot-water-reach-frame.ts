@@ -1,7 +1,7 @@
 import { getHotWaterPosedFrame } from "#/scripts/lib/get-hot-water-posed-frame"
 import { skelFor } from "#/world/scene/figure/helpers/animation/skel-for"
 import type { HotWaterAnimationContext } from "#/scripts/lib/hot-water-frame-types"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = HotWaterAnimationContext & Readonly<{ placed: HotWaterAnimationContext["review"]["poses"][number] }>
 
 /** Translate the pot and actor into the same room coordinates once before solving the grounded native frame. */

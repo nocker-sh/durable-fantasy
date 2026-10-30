@@ -1,5 +1,5 @@
 import { buildBody } from "#/world/scene/figure/body"
-import { primitiveBounds } from "../../../lib/graphics/ray/primitive-bounds"
+import { primitiveBounds } from "#/lib/graphics/ray/primitive-bounds"
 import type { Look } from "#/world/scene/figure/look"
 import type { Skel } from "#/world/scene/rig"
 type Props = Readonly<{ look: Look; skeleton: Skel; rootY: number }>

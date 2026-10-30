@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
-import { gatheringTool } from "./gathering-tool"
-import { apply } from "./apply"
+import { gatheringTool } from "#/world/core/gathering-tool"
+import { apply } from "#/world/core/apply"
 import { NODES } from "#/world/core/gather"
 import { player } from "#/world/test/player"
 import { bagWith } from "#/world/test/bag-with"

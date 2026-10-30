@@ -11,7 +11,7 @@ import { useGameState } from "#/hooks/use-game-state"
 import { Button } from "#/components/game/button"
 import { Meter } from "#/components/game/meter"
 import { Window } from "#/components/game/window"
-import { useWindow } from "./use-window"
+import { useWindow } from "#/components/hud/use-window"
 
 export function StatsWindow() {
   const game = useGame()

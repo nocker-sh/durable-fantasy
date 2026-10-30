@@ -7,7 +7,7 @@ import { INDOOR } from "#/world/maps/ground-layouts"
 import { cutaways } from "#/world/scene/interior"
 import { setLayout } from "#/world/scene/set-layout"
 import { groundH } from "#/world/scene/ground-h"
-import { SceneResources } from "../../lib/graphics/scene-resources"
+import { SceneResources } from "#/lib/graphics/scene-resources"
 it("joins the collar underside to the same masonry support from either floor", () => {
   const tops: number[] = []
   for (const floor of [0, 1]) {

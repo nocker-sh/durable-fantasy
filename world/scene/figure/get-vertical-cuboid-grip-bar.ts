@@ -1,5 +1,5 @@
 import { toHeadingLocalCuboid } from "#/world/scene/to-heading-local-cuboid"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 import type { Cuboid } from "#/lib/engine/cuboid-subtraction"
 import type { RoundGripBar } from "#/world/scene/figure/round-grip-bar-types"
 type Props = Readonly<{ box: Cuboid; root: Point3; heading: number }>

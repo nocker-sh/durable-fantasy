@@ -1,10 +1,10 @@
-import { lines as guards } from "./households/guards"
-import { lines as guide } from "./households/guide"
-import { lines as warehouse } from "./households/warehouse"
-import { lines as tinker } from "./households/tinker"
-import { lines as hunter } from "./households/hunter"
-import { lines as teacher } from "./households/teacher"
-import { lines as retired } from "./households/retired"
+import { lines as guards } from "#/world/town/lines/households/guards"
+import { lines as guide } from "#/world/town/lines/households/guide"
+import { lines as warehouse } from "#/world/town/lines/households/warehouse"
+import { lines as tinker } from "#/world/town/lines/households/tinker"
+import { lines as hunter } from "#/world/town/lines/households/hunter"
+import { lines as teacher } from "#/world/town/lines/households/teacher"
+import { lines as retired } from "#/world/town/lines/households/retired"
 import type { Line } from "#/world/town/lines/line"
 
 export const LINES: Record<string, readonly Line[]> = {

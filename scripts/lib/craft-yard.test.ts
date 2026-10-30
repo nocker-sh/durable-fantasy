@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { CRAFT_FORGE_PLACE, CRAFT_YARD, craftYardFootprints } from "../../world/town/craft-yard"
+import { CRAFT_FORGE_PLACE, CRAFT_YARD, craftYardFootprints } from "#/world/town/craft-yard"
 import { auditReservedLand } from "#/scripts/lib/audit-reserved-land"
 it("reserves each occupied piece without filling the open space between equipment", () => {
   const footprints = craftYardFootprints()

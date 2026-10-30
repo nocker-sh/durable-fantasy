@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest"
-import { RESIDENTS } from "./residents"
+import { RESIDENTS } from "#/world/town/residents"
 import { HOUSEHOLDS } from "#/world/town/houses"
 import { householdOf as household } from "#/world/town/household-of"
-import { APART, PEOPLE, RELATIONS } from "./people"
+import { APART, PEOPLE, RELATIONS } from "#/world/town/people"
 import { MAPS } from "#/world/maps"
 import { npcsAt } from "#/world/maps/npcs-at"
 

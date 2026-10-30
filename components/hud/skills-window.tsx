@@ -28,9 +28,9 @@ import { useGameState } from "#/hooks/use-game-state"
 import { Button } from "#/components/game/button"
 import { Meter } from "#/components/game/meter"
 import { Window } from "#/components/game/window"
-import { useWindow } from "./use-window"
+import { useWindow } from "#/components/hud/use-window"
 import { startDrag } from "#/components/hud/start-drag"
-import { skillIconUrl } from "./skill-icon"
+import { skillIconUrl } from "#/components/hud/skill-icon"
 
 const KIND = { action: "動作", strike: "戦技", spell: "術", prayer: "祈り" } as const
 const needName = (k: string) => (k in STAT_NAME ? STAT_NAME[k as Stat] : GATHER_SKILL_NAME[k as Skill])

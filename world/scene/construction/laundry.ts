@@ -1,11 +1,11 @@
 import * as THREE from "three"
 import { GeometryBuilder as GB } from "#/lib/graphics/geometry-builder"
-import { toTexture as toTex } from "../../../lib/graphics/to-texture"
+import { toTexture as toTex } from "#/lib/graphics/to-texture"
 import { laundry } from "#/world/scene/laundry"
 import { GPPU } from "#/world/scene/goods"
 import { groundH } from "#/world/scene/ground-h"
 import { blockCircle } from "#/world/scene/block-circle"
-import { M } from "./materials"
+import { M } from "#/world/scene/construction/materials"
 import { animateObject } from "#/world/scene/construction/animate-object"
 
 export function laundryLine(inputProps: { root: THREE.Group; ax: number; az: number; bx: number; bz: number; seed: number }) {

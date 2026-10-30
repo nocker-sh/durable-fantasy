@@ -1,10 +1,10 @@
 import { ashLidRestPlan } from "#/scripts/lib/ash-lid-rest-plan"
-import { shelfDimensions } from "./shelf-dimensions"
-import { storageRetrieval } from "../../world/town/storage-retrieval"
+import { shelfDimensions } from "#/scripts/lib/shelf-dimensions"
+import { storageRetrieval } from "#/world/town/storage-retrieval"
 import { readFileSync } from "node:fs"
 import { expect, it } from "vitest"
 import { readSetting } from "#/scripts/lib/read-setting"
-import { auditAshReceivers } from "./ash-receiver"
+import { auditAshReceivers } from "#/scripts/lib/ash-receiver"
 import { auditStorageRetrieval } from "#/scripts/lib/audit-storage-retrieval"
 function fixture() {
   const read = (kind: string, id: string) => readSetting(readFileSync(new URL(`../../.docs/settings/${kind}/${id}.md`, import.meta.url), "utf8")),

@@ -1,6 +1,6 @@
 import { expect, it, vi } from "vitest"
-import { currentPublication } from "./player-publication"
-import { ServerMessages } from "./server-messages"
+import { currentPublication } from "#/world/client/player-publication"
+import { ServerMessages } from "#/world/client/server-messages"
 import { GameSession } from "#/world/client/game-session"
 import { player } from "#/world/test/player"
 

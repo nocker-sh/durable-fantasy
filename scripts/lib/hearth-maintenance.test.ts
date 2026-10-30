@@ -1,7 +1,7 @@
 import { expect, it } from "vitest"
 import { readFileSync } from "node:fs"
 import { readSetting } from "#/scripts/lib/read-setting"
-import { auditHearthMaintenance } from "./hearth-maintenance"
+import { auditHearthMaintenance } from "#/scripts/lib/hearth-maintenance"
 const read = (id: string) => readSetting(readFileSync(new URL(`../../.docs/settings/rooms/room-${id}-1.md`, import.meta.url), "utf8"))
 it("fits the full maintenance body and reaches the firebox back in both rooms", () => {
   for (const id of ["h10", "h-m5"]) {

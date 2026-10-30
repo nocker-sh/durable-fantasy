@@ -1,6 +1,6 @@
 import { afterEach, expect, it, vi } from "vitest"
 import { Box3, Ray, Vector3 } from "three"
-import { OcclusionQuery } from "./occlusion-query"
+import { OcclusionQuery } from "#/lib/graphics/occlusion-query"
 
 afterEach(() => vi.restoreAllMocks())
 const box = (z: number) => new Box3(new Vector3(-1, -1, z), new Vector3(1, 1, z + 1))

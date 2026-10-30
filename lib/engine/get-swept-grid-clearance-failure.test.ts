@@ -1,5 +1,5 @@
 import { expect, it, vi } from "vitest"
-import { getSweptGridClearanceFailure } from "./get-swept-grid-clearance-failure"
+import { getSweptGridClearanceFailure } from "#/lib/engine/get-swept-grid-clearance-failure"
 
 it("returns ordinary blocked-candidate reasons while preserving the swept footprint between clear endpoints", () => {
   const isCellFree = (cell: readonly [number, number]) => cell[0] !== 3 || cell[1] !== 2

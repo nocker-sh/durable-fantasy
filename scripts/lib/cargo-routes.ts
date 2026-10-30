@@ -1,11 +1,11 @@
-import { rectangleTranslationBounds } from "../../lib/engine/rectangle-translation-bounds"
-import { rectangleTranslationHits } from "../../lib/engine/rectangle-translation-hits"
-import { rectangleTurnRadius } from "../../lib/engine/rectangle-turn-radius"
+import { rectangleTranslationBounds } from "#/lib/engine/rectangle-translation-bounds"
+import { rectangleTranslationHits } from "#/lib/engine/rectangle-translation-hits"
+import { rectangleTurnRadius } from "#/lib/engine/rectangle-turn-radius"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 import { pointRectDistance } from "#/lib/engine/point-rect-distance"
 import { doorPanelRect } from "#/scripts/lib/door-panel-rect"
 import { roomDoorSwings } from "#/scripts/lib/room-door-swings"
-import { MIN_PASSAGE_WIDTH_M } from "./spatial-rules"
+import { MIN_PASSAGE_WIDTH_M } from "#/scripts/lib/spatial-rules"
 import { getCargoDoorFrames } from "#/scripts/lib/get-cargo-door-frames"
 type CargoRoute = { activity: string; length_m: number; width_m: number; clearance_m: number; points_m: number[][] }
 type Rect = [number, number, number, number]

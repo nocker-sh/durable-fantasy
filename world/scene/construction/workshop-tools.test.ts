@@ -1,8 +1,8 @@
 import { expect, it } from "vitest"
 import * as THREE from "three"
-import { pottersWheel } from "./potters-wheel"
-import { whetstone } from "./whetstone"
-import { SceneResources } from "../../../lib/graphics/scene-resources"
+import { pottersWheel } from "#/world/scene/construction/potters-wheel"
+import { whetstone } from "#/world/scene/construction/whetstone"
+import { SceneResources } from "#/lib/graphics/scene-resources"
 import type { Furniture } from "#/world/town/interiors"
 it.each(["potter", "stone"] as const)("supports the %s tool inside its existing footprint", (kind) => {
   const f: Furniture = { kind: "whetstone", x: 12, z: 18, w: 1.35, d: 1.35, solid: true },

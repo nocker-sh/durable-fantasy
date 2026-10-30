@@ -1,6 +1,6 @@
 import { toHeadingLocalCuboid } from "#/world/scene/to-heading-local-cuboid"
 import type { Cuboid } from "#/lib/engine/cuboid-subtraction"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = Readonly<{ box: Cuboid; from: Point3; to: Point3; heading: number }>
 
 /** A fixed-heading straight root translation sweeps each obstacle between these local endpoints; their union encloses every intermediate position. */

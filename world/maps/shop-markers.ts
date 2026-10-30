@@ -1,7 +1,7 @@
 import { SHOPS } from "#/world/core/shops"
 import type { ShopId } from "#/world/core/shop-types"
 import type { ShopDefinition } from "#/world/core/shop-types"
-import { RESIDENTS } from "../town/residents"
+import { RESIDENTS } from "#/world/town/residents"
 import { workSpot } from "#/world/town/work-spot"
 import { INTERIORS } from "#/world/town/interiors"
 import { outsideDoor } from "#/world/town/outside-door"

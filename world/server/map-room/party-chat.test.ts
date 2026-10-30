@@ -4,7 +4,7 @@ vi.mock("../../../durable-objects/player", () => ({ Player: { get: () => calls }
 vi.mock("../../../durable-objects/party", () => ({ Party: { get: () => calls } }))
 import { HANDLERS } from "#/world/server/map-room/party-chat"
 import { deliverPartyChat } from "#/world/server/map-room/deliver-party-chat"
-import type { Ctx } from "./context"
+import type { Ctx } from "#/world/server/map-room/context"
 function fixture() {
   const send = vi.fn(async () => {})
   const context = { me: { owner: "self", party: "group", player: { name: "エルナ" } }, ctx: { connection: { state: {}, send } } } as unknown as Ctx

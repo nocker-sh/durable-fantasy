@@ -1,10 +1,10 @@
 import { getFoldedGarmentGeometry } from "#/world/scene/figure/get-folded-garment-geometry"
 import { seatedSupportDepth } from "#/world/scene/figure/seated-support-depth"
-import { lerpVector3 as lerp3 } from "../../../lib/engine/lerp-vector3"
-import { dotVector3 as dot } from "../../../lib/engine/dot-vector3"
-import { subtractVector3 as sub } from "../../../lib/engine/subtract-vector3"
+import { lerpVector3 as lerp3 } from "#/lib/engine/lerp-vector3"
+import { dotVector3 as dot } from "#/lib/engine/dot-vector3"
+import { subtractVector3 as sub } from "#/lib/engine/subtract-vector3"
 import type { BodyContext } from "#/world/scene/figure/context"
-import type { Vector3Tuple as V3 } from "../../../lib/engine/vector3-types"
+import type { Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
 
 /** Gather seated coat tails over the thighs; keep the native front opening, lining and trim. */
 export function buildCoatTails(context: BodyContext) {

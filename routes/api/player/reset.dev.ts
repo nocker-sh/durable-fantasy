@@ -1,7 +1,7 @@
 // Dev only: start a player over as a new traveller (the debug panel's reset button).
 import { z } from "zod"
 import { defineHandler } from "void"
-import { Player } from "../../../durable-objects/player"
+import { Player } from "#/durable-objects/player"
 import { playerId } from "#/world/core/identity"
 import { authenticatedPlayer } from "#/world/server/authenticated-player"
 import { sameOrigin } from "#/world/server/same-origin"

@@ -13,7 +13,7 @@ import { getPouringPotNativeParts } from "#/world/scene/figure/get-pouring-pot-n
 import { toHeadingLocalPoint } from "#/world/scene/to-heading-local-point"
 import { getRoundBarGripProfile } from "#/world/scene/figure/get-round-bar-grip-profile"
 import { getRoundBarContactError } from "#/world/scene/figure/get-round-bar-contact-error"
-import { lerpVector3 as lerp3 } from "../../lib/engine/lerp-vector3"
+import { lerpVector3 as lerp3 } from "#/lib/engine/lerp-vector3"
 import { nativeArmSurfaces } from "#/world/scene/figure/native-arm-surfaces"
 import { getHotWaterReachFrame } from "#/scripts/lib/get-hot-water-reach-frame"
 import { FRAMES } from "#/world/scene/figure/animation"

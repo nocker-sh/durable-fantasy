@@ -1,8 +1,8 @@
 import * as THREE from "three"
 import { GeometryBuilder } from "#/lib/graphics/geometry-builder"
-import { toTexture as toTex } from "./to-texture"
+import { toTexture as toTex } from "#/lib/graphics/to-texture"
 import { describe, expect, it } from "vitest"
-import { PixelBuffer } from "./pixel-buffer"
+import { PixelBuffer } from "#/lib/graphics/pixel-buffer"
 
 describe("graphics engine", () => {
   it("clips pixels and applies caller-supplied outline colors without filling corners", () => {

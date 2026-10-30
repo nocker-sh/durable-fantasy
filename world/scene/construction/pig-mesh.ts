@@ -1,5 +1,5 @@
 import * as THREE from "three"
-import { M } from "./materials"
+import { M } from "#/world/scene/construction/materials"
 
 /** Native pig construction; sheep uses the shared sheep-shape definition. */
 export function pigMesh(): THREE.Group {

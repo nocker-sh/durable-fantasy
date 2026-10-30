@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { siteTransform } from "./site-transform"
+import { siteTransform } from "#/scripts/lib/site-transform"
 it.each([
   { quarters: 0, point: [2, 1], direction: [1, 2], size: [6, 4] },
   { quarters: 1, point: [1, 4], direction: [2, -1], size: [4, 6] },

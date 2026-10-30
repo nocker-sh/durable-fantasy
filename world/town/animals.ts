@@ -1,4 +1,4 @@
-import { Rng } from "../../lib/engine/random"
+import { Rng } from "#/lib/engine/random"
 import type { TownAnimalSpawn } from "#/world/town/animal-types"
 /** Existing town population; definitions stay independent of meshes and sprite generation. */
 export function townAnimalSpawns(map?: string): TownAnimalSpawn[] {

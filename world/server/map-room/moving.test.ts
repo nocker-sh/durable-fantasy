@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from "vitest"
-import type { Ctx } from "./context"
+import type { Ctx } from "#/world/server/map-room/context"
 import { mapPlayer } from "#/world/server/map-room/map-player"
 import type { Presence } from "#/world/server/map-room/presence"
 import { player } from "#/world/test/player"
@@ -12,7 +12,7 @@ vi.mock("../../../durable-objects/player", () => ({ Player: { get: () => ({ walk
 vi.mock("#/world/maps/walkable", () => ({
   walkable: (_map: unknown, cell: Cell) => cell.every((n) => n >= 0 && n < 96),
 }))
-import { HANDLERS } from "./moving"
+import { HANDLERS } from "#/world/server/map-room/moving"
 afterEach(() => {
   vi.useRealTimers()
   walk.mockClear()

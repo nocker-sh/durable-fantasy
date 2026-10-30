@@ -1,8 +1,8 @@
-import { qfromTo } from "./qfrom-to"
-import { qrot } from "./qrot"
-import { solveTwoBoneAtHeight } from "./solve-two-bone-at-height"
-import type { Q } from "./quaternion-types"
-import type { Point3 } from "./cuboid-motion-types"
+import { qfromTo } from "#/lib/engine/qfrom-to"
+import { qrot } from "#/lib/engine/qrot"
+import { solveTwoBoneAtHeight } from "#/lib/engine/solve-two-bone-at-height"
+import type { Q } from "#/lib/engine/quaternion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { root: Point3; target: Point3; upper: number; lower: number; pole: Point3; normal: Point3 }
 
 /** Fix the joint to the target's plane by rotating the existing fixed-height solve, retaining both sphere radii. */

@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs"
 import { join } from "node:path"
 import { describe, expect, it } from "vite-plus/test"
-import { NOT_TABLES, SOURCES } from "./sources"
+import { NOT_TABLES, SOURCES } from "#/dev/sources"
 
 function files(dir: string): string[] {
   return readdirSync(dir).flatMap((f) => {

@@ -1,8 +1,8 @@
-import { subtractRectangles } from "./rectangle-subtraction"
-import { gableRoofHeight } from "./gable-roof-height"
-import { getGableRoofHalves } from "./get-gable-roof-halves"
-import type { Rectangle } from "./rectangle-subtraction"
-import type { GableRoof, RoofPanel, RoofPoint } from "./gable-roof-types"
+import { subtractRectangles } from "#/lib/engine/rectangle-subtraction"
+import { gableRoofHeight } from "#/lib/engine/gable-roof-height"
+import { getGableRoofHalves } from "#/lib/engine/get-gable-roof-halves"
+import type { Rectangle } from "#/lib/engine/rectangle-subtraction"
+import type { GableRoof, RoofPanel, RoofPoint } from "#/lib/engine/gable-roof-types"
 
 /** Upward quads, split at the ridge and around vertical penetrations. */
 export function gableRoofPanels(roof: GableRoof, cuts: readonly Rectangle[]) {

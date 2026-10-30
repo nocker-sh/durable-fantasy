@@ -4,7 +4,7 @@ import { FRAMES } from "#/world/scene/figure/animation"
 import { skelFor } from "#/world/scene/figure/helpers/animation/skel-for"
 import type { getWaterPickupProposal } from "#/scripts/lib/get-water-pickup-proposal"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { proposal: NonNullable<Exclude<ReturnType<typeof getWaterPickupProposal>, Error>>; room: SettingDocument }
 
 /** Each native frame stays fixed during the lift; this does not certify interpolation between clip frames or stepping. */

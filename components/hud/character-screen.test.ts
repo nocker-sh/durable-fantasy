@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server"
 import { afterEach, beforeEach, expect, it, vi } from "vitest"
 import { createGameState } from "#/world/client/initial-state"
 import { newPlayer } from "#/world/core/new-player"
-import { CharacterScreen } from "./character-screen"
+import { CharacterScreen } from "#/components/hud/character-screen"
 
 let state = createGameState().get()
 vi.mock("#/hooks/use-game", () => ({ useGame: () => ({}) }))

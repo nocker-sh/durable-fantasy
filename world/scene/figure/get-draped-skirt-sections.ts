@@ -1,7 +1,7 @@
 import { getEllipticalFrustumField } from "#/lib/graphics/ray/get-elliptical-frustum-field"
-import { lerpVector3 as lerp3 } from "../../../lib/engine/lerp-vector3"
+import { lerpVector3 as lerp3 } from "#/lib/engine/lerp-vector3"
 import type { getDrapedSkirtProfile } from "#/world/scene/figure/get-draped-skirt-profile"
-import type { Vector3Tuple as V3 } from "../../../lib/engine/vector3-types"
+import type { Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
 type Profile = Exclude<ReturnType<typeof getDrapedSkirtProfile>, Error>
 type Section = Exclude<ReturnType<typeof getEllipticalFrustumField>, Error> & { distance: number; length: number }
 type Props = { profile: Profile; supportDepth: number; shellThickness: number | null }

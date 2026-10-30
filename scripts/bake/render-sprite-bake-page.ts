@@ -1,7 +1,7 @@
 import { join } from "node:path"
 import { withScopedCleanup } from "#/lib/engine/with-scoped-cleanup"
-import { renderSpriteBakeJob } from "./render-sprite-bake-job"
-import type { SpriteBakePageContext as Props } from "./types"
+import { renderSpriteBakeJob } from "#/scripts/bake/render-sprite-bake-job"
+import type { SpriteBakePageContext as Props } from "#/scripts/bake/types"
 
 export async function renderSpriteBakePage(props: Props): Promise<void> {
   const context = await props.browser.newContext({ ignoreHTTPSErrors: true })

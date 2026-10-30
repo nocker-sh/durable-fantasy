@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { KeyedQueue } from "./keyed-queue"
+import { KeyedQueue } from "#/lib/engine/keyed-queue"
 
 it("orders one connection while other connections continue", async () => {
   const queue = new KeyedQueue()

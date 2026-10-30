@@ -1,4 +1,4 @@
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { phase: number; stride: number; lift: number; pelvisDrop: number; settlingDrop: number; leading: "l" | "r"; clearance: Readonly<Record<"l" | "r", number>> }
 
 /** Step the leading foot back, then collect the other foot; body-relative offsets cancel translation at each planted foot. */

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { HOUSES } from "#/world/town/houses"
-import { layoutOf } from "./layouts"
+import { layoutOf } from "#/world/maps/layouts"
 import { currentLayout } from "#/world/scene/current-layout"
 import { roadD } from "#/world/scene/road-d"
 import { setLayout } from "#/world/scene/set-layout"

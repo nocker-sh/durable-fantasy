@@ -1,5 +1,5 @@
 import * as THREE from "three"
-import { M } from "./materials"
+import { M } from "#/world/scene/construction/materials"
 import type { Furniture } from "#/world/town/interiors"
 
 type ContainerKind = "wax-pot" | "lye-tub" | "ash-sack" | "tinker-toolbox"

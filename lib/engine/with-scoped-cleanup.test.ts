@@ -1,5 +1,5 @@
 import { expect, it, vi } from "vitest"
-import { withScopedCleanup } from "./with-scoped-cleanup"
+import { withScopedCleanup } from "#/lib/engine/with-scoped-cleanup"
 
 it("waits for cleanup before returning the original result", async () => {
   const value = { pixels: 42 }

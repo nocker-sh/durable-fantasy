@@ -1,6 +1,6 @@
-import { spriteBakePlanSchema } from "./sprite-bake-plan-schema"
-import { areSpriteManifestsEqual } from "./are-sprite-manifests-equal"
-import type { SpriteBakePlan } from "./sprite-bake-types"
+import { spriteBakePlanSchema } from "#/scripts/lib/sprite-bake-plan-schema"
+import { areSpriteManifestsEqual } from "#/scripts/lib/are-sprite-manifests-equal"
+import type { SpriteBakePlan } from "#/scripts/lib/sprite-bake-types"
 
 export function getSpriteBakeResumeError(expected: SpriteBakePlan, stored: unknown): Error | null {
   const parsed = spriteBakePlanSchema.safeParse(stored)

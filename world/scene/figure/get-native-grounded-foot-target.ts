@@ -1,5 +1,5 @@
 import type { Skel } from "#/world/scene/rig"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = Readonly<{ skeleton: Skel; side: "l" | "r"; offset: Point3; clearance: number }>
 
 /** The reach certificate and actual leg solver share the same shoe target, including the native shoe's initial float. */

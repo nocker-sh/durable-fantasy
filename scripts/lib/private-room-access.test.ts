@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { auditPrivateRoomAccess } from "./private-room-access"
+import { auditPrivateRoomAccess } from "#/scripts/lib/private-room-access"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 const base = (id: string, kind: string): SettingDocument => ({ id, kind, title: id, status: "設計中", source: "test", design_gate: "未通過", issues: [] })
 function fixture() {

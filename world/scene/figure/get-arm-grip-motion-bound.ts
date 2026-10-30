@@ -1,10 +1,10 @@
-import { twoBoneJointSpeedBound } from "../../../lib/engine/two-bone-joint-speed-bound"
+import { twoBoneJointSpeedBound } from "#/lib/engine/two-bone-joint-speed-bound"
 import { armGripLengths } from "#/world/scene/figure/arm-grip-lengths"
 import { getNativeArmMotionBound } from "#/world/scene/figure/get-native-arm-motion-bound"
 import { createBodyContext } from "#/world/scene/figure/context"
 import type { Skel } from "#/world/scene/rig"
 import type { Look } from "#/world/scene/figure/look"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { look: Look; skeleton: Skel; hand: "l" | "r"; from: Point3; to: Point3; pole: Point3 }
 
 /** Bounds are speeds over normalized segment time; both native sleeves and uncut palms stay enclosed. */

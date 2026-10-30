@@ -1,10 +1,10 @@
-import { assertSpriteWebpEncoder } from "./assert-sprite-webp-encoder"
+import { assertSpriteWebpEncoder } from "#/scripts/bake/assert-sprite-webp-encoder"
 import { mkdtempSync, rmSync } from "node:fs"
 import { join } from "node:path"
 import { tmpdir } from "node:os"
 import { withScopedCleanup } from "#/lib/engine/with-scoped-cleanup"
-import { renderSpriteBakeBrowser } from "./render-sprite-bake-browser"
-import type { SpriteBakePageContext } from "./types"
+import { renderSpriteBakeBrowser } from "#/scripts/bake/render-sprite-bake-browser"
+import type { SpriteBakePageContext } from "#/scripts/bake/types"
 type Props = Omit<SpriteBakePageContext, "browser" | "pageIndex" | "temporaryDirectory" | "onDone"> & Readonly<{ prepare: () => void }>
 
 export async function renderSpriteBakePlan(props: Props): Promise<void> {

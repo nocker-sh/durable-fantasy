@@ -1,16 +1,16 @@
 import { afterEach, expect, it, vi } from "vitest"
-import { apply } from "../../core/apply"
-import type { ServerCommand } from "../../core/commands"
+import { apply } from "#/world/core/apply"
+import type { ServerCommand } from "#/world/core/commands"
 import type { Stack } from "#/world/core/bag-types"
 import type { PlayerState } from "#/world/core/player-types"
-import type { Ctx } from "./context"
+import type { Ctx } from "#/world/server/map-room/context"
 import { player } from "#/world/test/player"
 const rpc = vi.hoisted(() => ({ read: vi.fn(), run: vi.fn() }))
 vi.mock("../../../durable-objects/player", () => ({ Player: { get: () => rpc } }))
 vi.mock("../../../durable-objects/market", () => ({ Market: { get: vi.fn() } }))
 vi.mock("../../../durable-objects/nature", () => ({ Nature: { get: vi.fn() } }))
 vi.mock("#/world/maps/npc-cell", () => ({ npcCell: () => [10, 10] }))
-import { HANDLERS } from "./work"
+import { HANDLERS } from "#/world/server/map-room/work"
 afterEach(() => vi.resetAllMocks())
 function fixture() {
   const orders = [

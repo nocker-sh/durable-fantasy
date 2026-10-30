@@ -1,5 +1,5 @@
 import type { getEllipticalFrustumField } from "#/lib/graphics/ray/get-elliptical-frustum-field"
-import type { Vector3Tuple as V3 } from "../../../lib/engine/vector3-types"
+import type { Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
 type Section = Exclude<ReturnType<typeof getEllipticalFrustumField>, Error>
 type Props = { waist: Section; lap: Section; waistLength: number; lapLength: number }
 

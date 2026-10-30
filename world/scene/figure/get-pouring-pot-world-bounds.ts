@@ -1,4 +1,4 @@
-import { getPouringPotNativeParts } from "./get-pouring-pot-native-parts"
+import { getPouringPotNativeParts } from "#/world/scene/figure/get-pouring-pot-native-parts"
 
 type Props = Pick<Parameters<typeof getPouringPotNativeParts>[0], "profile" | "pose">
 

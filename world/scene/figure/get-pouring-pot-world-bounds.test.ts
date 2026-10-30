@@ -3,7 +3,7 @@ import * as THREE from "three"
 import { getPouringPotProfile } from "#/world/town/get-pouring-pot-profile"
 import { getPouringPotHeldPose } from "#/world/town/get-pouring-pot-held-pose"
 import { createPosedPouringPot } from "#/world/scene/construction/create-posed-pouring-pot"
-import { getPouringPotWorldBounds } from "./get-pouring-pot-world-bounds"
+import { getPouringPotWorldBounds } from "#/world/scene/figure/get-pouring-pot-world-bounds"
 const fixture = () => {
   const profile = getPouringPotProfile({
     diameter: 0.2,

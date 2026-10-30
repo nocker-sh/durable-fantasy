@@ -1,5 +1,5 @@
-import { renderSpriteBakePage } from "./render-sprite-bake-page"
-import type { SpriteBakePageContext } from "./types"
+import { renderSpriteBakePage } from "#/scripts/bake/render-sprite-bake-page"
+import type { SpriteBakePageContext } from "#/scripts/bake/types"
 type Props = Omit<SpriteBakePageContext, "pageIndex">
 
 /** 全てのページが片付くまで待ち、先頭の失敗で他のページの理由を捨てない。 */

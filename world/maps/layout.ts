@@ -4,7 +4,7 @@
 
 export type V2 = [number, number]
 
-import { Polyline } from "../../lib/engine/polyline"
+import { Polyline } from "#/lib/engine/polyline"
 export const catmull = Polyline.catmull
 
 // ------------------------------------------------------------------ layout

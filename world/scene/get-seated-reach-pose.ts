@@ -1,7 +1,7 @@
 import { getSeatedNativePose } from "#/world/scene/get-seated-native-pose"
 import { toHeadingLocalPoint } from "#/world/scene/to-heading-local-point"
 import { solveArmGripPose } from "#/world/scene/figure/solve-arm-grip-pose"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = Parameters<typeof getSeatedNativePose>[0] & { target: Point3; hand: "l" | "r"; pole: Point3 }
 
 /** Solve one arm at fixed native lengths, preserving the seated root, legs and other arm. */

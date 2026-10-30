@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { workTableSections } from "./work-table"
+import { workTableSections } from "#/world/town/work-table"
 
 it.each([0, 1.2, -2])("supports a complete tabletop on four separate legs from floor %s", (floor) => {
   const sections = workTableSections({ surface: { height: 0.74, thickness: 0.04, legWidth: 0.06, legInset: 0.3, kneeClearance: 0.18 }, x: 8, z: 12, width: 1.5, depth: 1, floor: floor })

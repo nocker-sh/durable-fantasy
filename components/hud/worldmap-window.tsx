@@ -8,7 +8,7 @@ import { GRID_SIZE, WORLD } from "#/world/maps/grid"
 import { LOCKED_CITIES, WORLD_NODES } from "#/world/maps/world-map"
 import { worldNodeOf } from "#/world/maps/world-node-of"
 import { worldRoads } from "#/world/maps/world-roads"
-import { useWindow } from "./use-window"
+import { useWindow } from "#/components/hud/use-window"
 
 const W = 360,
   H = 300

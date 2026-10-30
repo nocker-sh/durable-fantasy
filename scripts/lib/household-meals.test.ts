@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
-import { auditHouseholdMeals } from "./household-meals"
+import { auditHouseholdMeals } from "#/scripts/lib/household-meals"
 function fixture() {
   const base = { status: "設計中", source: "test", design_gate: "未通過", issues: [] }
   const documents = new Map<string, SettingDocument>([

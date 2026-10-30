@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { auditFacilitySite } from "./facility-site"
+import { auditFacilitySite } from "#/scripts/lib/facility-site"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 const maps = { square: { places: { well: [1, 2] } } }
 const document = (site: unknown): SettingDocument => ({ id: "facility-well", kind: "facilities", title: "井戸", source: "test", status: "設計中", design_gate: "未通過", issues: [], site })

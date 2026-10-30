@@ -1,4 +1,4 @@
-import type { SpriteBakePlan, SpriteBakeJob, SpriteBakeDrawInput } from "./sprite-bake-types"
+import type { SpriteBakePlan, SpriteBakeJob, SpriteBakeDrawInput } from "#/scripts/lib/sprite-bake-types"
 
 export function getSpriteBakeDrawInput(plan: SpriteBakePlan, job: SpriteBakeJob): SpriteBakeDrawInput | Error {
   const resident = plan.source.residents[job.resident]

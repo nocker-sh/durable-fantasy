@@ -1,10 +1,10 @@
 import { hearthParts } from "#/world/town/hearth-parts"
-import { hearthDimensions } from "./hearth-dimensions"
-import { flueWalls } from "../../world/town/flue-walls"
-import { flueCorbelParts } from "../../world/town/flue-corbel"
-import { MIN_STANDING_HEADROOM_M } from "./spatial-rules"
+import { hearthDimensions } from "#/scripts/lib/hearth-dimensions"
+import { flueWalls } from "#/world/town/flue-walls"
+import { flueCorbelParts } from "#/world/town/flue-corbel"
+import { MIN_STANDING_HEADROOM_M } from "#/scripts/lib/spatial-rules"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
-import type { FlueSection } from "../../world/town/floorplan/types"
+import type { FlueSection } from "#/world/town/floorplan/types"
 
 /** Reserve the vertical route before the roof chimney or its interior shaft is drawn. */
 export function compileFlues(building: SettingDocument, rooms: ReadonlyMap<string, SettingDocument>): FlueSection[] {

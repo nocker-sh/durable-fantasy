@@ -1,6 +1,6 @@
 import type { Primitive } from "#/lib/graphics/ray/primitive-types"
 import { getPaddedFrameLayout } from "#/lib/graphics/get-padded-frame-layout"
-import { PixelBuffer as PixBuf } from "../../../lib/graphics/pixel-buffer"
+import { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
 import { FW, FH, OX, OY } from "#/world/scene/figure/render"
 import { renderSkeletonFrame } from "#/world/scene/figure/render-skeleton-frame"
 import type { Look, Item } from "#/world/scene/figure/look"

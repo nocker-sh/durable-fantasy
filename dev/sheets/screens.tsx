@@ -1,4 +1,4 @@
-import { sheet } from "./schema"
+import { sheet } from "#/dev/sheets/schema"
 
 const SCREENS: { id: string; name: string; kind: string }[] = [
   { id: "loading", name: "読み込み", kind: "画面の間" },

@@ -1,8 +1,8 @@
 import { getDrapedSkirtGeometry } from "#/world/scene/figure/get-draped-skirt-geometry"
-import { dotVector3 as dot } from "../../../lib/engine/dot-vector3"
-import { subtractVector3 as sub } from "../../../lib/engine/subtract-vector3"
+import { dotVector3 as dot } from "#/lib/engine/dot-vector3"
+import { subtractVector3 as sub } from "#/lib/engine/subtract-vector3"
 import type { BodyContext } from "#/world/scene/figure/context"
-import type { Vector3Tuple as V3 } from "../../../lib/engine/vector3-types"
+import type { Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
 
 /** Keep the open front, lining and hem of the existing overskirt on the folded cloth path. */
 export function buildDrapedOverskirt(context: BodyContext) {

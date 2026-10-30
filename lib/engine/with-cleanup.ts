@@ -1,4 +1,4 @@
-import { CleanupStack } from "./cleanup-stack"
+import { CleanupStack } from "#/lib/engine/cleanup-stack"
 export async function withCleanup<T>(build: (resources: CleanupStack) => Promise<T>): Promise<T> {
   const resources = new CleanupStack()
   try {

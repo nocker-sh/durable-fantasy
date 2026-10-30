@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { getPouringPotObstacleError } from "./get-pouring-pot-obstacle-error"
+import { getPouringPotObstacleError } from "#/world/scene/figure/get-pouring-pot-obstacle-error"
 type Props = Parameters<typeof getPouringPotObstacleError>[0]
 const box = { x0: -1, x1: 1, bottom: -1, top: 1, z0: -1, z1: 1 }
 const fields: Props["fields"] = [{ min: [4, 4, 4], max: [5, 5, 5], value: () => 0, lipschitz: 1 }]

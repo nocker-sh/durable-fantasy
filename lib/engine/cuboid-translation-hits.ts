@@ -1,6 +1,6 @@
-import { cuboidStationaryHits } from "./cuboid-stationary-hits"
-import type { Cuboid } from "./cuboid-subtraction"
-import type { Point3 } from "./cuboid-motion-types"
+import { cuboidStationaryHits } from "#/lib/engine/cuboid-stationary-hits"
+import type { Cuboid } from "#/lib/engine/cuboid-subtraction"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = Readonly<{ relative: Cuboid; from: Point3; to: Point3; obstacle: Cuboid; tolerance?: number }>
 
 /** Positive-volume collision during translation; touching faces remain separate. */

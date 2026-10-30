@@ -1,7 +1,7 @@
 import { expect, it } from "vitest"
 import { emptyClaims } from "#/world/core/empty-claims"
 import { reserveInbox } from "#/world/core/reserve-inbox"
-import { apply } from "./apply"
+import { apply } from "#/world/core/apply"
 import { emptyBag } from "#/world/core/empty-bag"
 import { cancel } from "#/world/core/cancel"
 import { expire } from "#/world/core/expire"

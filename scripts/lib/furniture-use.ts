@@ -1,4 +1,4 @@
-import { MIN_OPERATING_SIDE_M } from "./spatial-rules"
+import { MIN_OPERATING_SIDE_M } from "#/scripts/lib/spatial-rules"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 /** The furniture footprint alone cannot prove that a person can use it. */
 export function auditFurnitureUse(document: SettingDocument): string[] {

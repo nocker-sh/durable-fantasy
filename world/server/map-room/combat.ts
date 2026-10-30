@@ -1,6 +1,6 @@
 // The map room's handlers for striking creatures (core/art-swing.ts).
-import { Player } from "../../../durable-objects/player"
-import { Wild } from "../../../durable-objects/wild"
+import { Player } from "#/durable-objects/player"
+import { Wild } from "#/durable-objects/wild"
 import { FIGHT_STAMINA, MELEE_REACH, MONSTER_KINDS } from "#/world/core/monsters"
 import { monsterAt } from "#/world/core/monster-at"
 import { spawnOf } from "#/world/core/spawn-of"
@@ -10,11 +10,11 @@ import { isArt } from "#/world/core/is-art"
 import { skillOf } from "#/world/core/skill-of"
 import { derive } from "#/world/core/derive"
 import { walkable } from "#/world/maps/walkable"
-import type { Ctx, Handlers, Message } from "./context"
+import type { Ctx, Handlers, Message } from "#/world/server/map-room/context"
 import { reachable } from "#/world/server/map-room/reachable"
 import { combatAudience } from "#/world/server/map-room/combat-audience"
 import { notifyCombat } from "#/world/server/map-room/notify-combat"
-import { notifyClient } from "./notifications"
+import { notifyClient } from "#/world/server/map-room/notifications"
 
 async function attack(roomCtx: Ctx, message: Message<"attack">) {
   const ctxSource = roomCtx,

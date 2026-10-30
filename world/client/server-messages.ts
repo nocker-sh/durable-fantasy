@@ -1,8 +1,8 @@
 import { currentCreature } from "#/world/client/current-creature"
 import { mergeWild } from "#/world/client/merge-wild"
-import { currentPublication } from "./player-publication"
+import { currentPublication } from "#/world/client/player-publication"
 import type { GameSession } from "#/world/client/game-session"
-import { REASON_TEXT, type Reason } from "../core/commands"
+import { REASON_TEXT, type Reason } from "#/world/core/commands"
 import { isShopId } from "#/world/core/is-shop-id"
 import { MAPS } from "#/world/maps"
 import { cellDistance } from "#/world/maps/cell-distance"
@@ -13,7 +13,7 @@ import { threadClosedText } from "#/world/parts/thread-closed-text"
 import { tradeClosedText } from "#/world/parts/trade-closed-text"
 import { lap } from "#/world/lap"
 import type { Offer } from "#/world/state"
-import type { ServerMessageContext } from "./server-context"
+import type { ServerMessageContext } from "#/world/client/server-context"
 
 export class ServerMessages {
   constructor(

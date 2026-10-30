@@ -1,8 +1,8 @@
 import { expect, it } from "vitest"
 import * as THREE from "three"
-import proposal from "../../town/floorplan/authored/h-m5"
-import { authoredBuilding } from "./authored-building"
-import { SceneResources } from "../../../lib/graphics/scene-resources"
+import proposal from "#/world/town/floorplan/authored/h-m5"
+import { authoredBuilding } from "#/world/scene/construction/authored-building"
+import { SceneResources } from "#/lib/graphics/scene-resources"
 import { TILE_M } from "#/world/town/fit"
 
 it("uses the site dimensions, roof elevation, supported flue and entry stair", () => {

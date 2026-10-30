@@ -5,7 +5,7 @@ import { createBodyContext } from "#/world/scene/figure/context"
 import type { Look } from "#/world/scene/figure/look"
 import type { Skel } from "#/world/scene/rig"
 import type { RoundGripBar } from "#/world/scene/figure/round-grip-bar-types"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { look: Look; skeleton: Skel; grips: Record<"l" | "r", Point3>; bar: RoundGripBar; poles: Record<"l" | "r", Point3> }
 
 /** Both forearms stay normal to the complete bar, keeping its envelope in front of the unchanged wrist and cuff planes. */

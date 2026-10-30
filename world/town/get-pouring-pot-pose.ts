@@ -1,7 +1,7 @@
-import { qmul } from "../../lib/engine/qmul"
-import { qrot } from "../../lib/engine/qrot"
-import type { Q } from "../../lib/engine/quaternion-types"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import { qmul } from "#/lib/engine/qmul"
+import { qrot } from "#/lib/engine/qrot"
+import type { Q } from "#/lib/engine/quaternion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 import type { getPouringPotProfile } from "#/world/town/get-pouring-pot-profile"
 import type { PouringPotPose } from "#/world/town/pouring-pot-pose-types"
 type Props = { profile: Exclude<ReturnType<typeof getPouringPotProfile>, Error>; lipAt: Point3; tilt: number; heading: number }

@@ -1,7 +1,7 @@
 import { seatForward } from "#/world/town/seat-forward"
-import { seatDimensions } from "./seat-dimensions"
+import { seatDimensions } from "#/scripts/lib/seat-dimensions"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
-import type { ActivitySpot } from "../../world/town/room-fixtures"
+import type { ActivitySpot } from "#/world/town/room-fixtures"
 
 export function compileActivitySpots(building: SettingDocument, rooms: readonly SettingDocument[]): ActivitySpot[] {
   const result: ActivitySpot[] = []

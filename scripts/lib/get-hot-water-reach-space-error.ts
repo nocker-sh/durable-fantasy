@@ -1,4 +1,4 @@
-import { getHotWaterStationSolids } from "./get-hot-water-station-solids"
+import { getHotWaterStationSolids } from "#/scripts/lib/get-hot-water-station-solids"
 import { buildBody } from "#/world/scene/figure/body"
 import { toHeadingLocalCuboid } from "#/world/scene/to-heading-local-cuboid"
 import { canSeparatePrimitiveFromCuboid } from "#/lib/graphics/ray/can-separate-primitive-from-cuboid"

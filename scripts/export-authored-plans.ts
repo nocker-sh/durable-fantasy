@@ -1,6 +1,6 @@
 import { readFile, mkdir, writeFile } from "node:fs/promises"
 import { readSetting } from "#/scripts/lib/read-setting"
-import { compileAuthoredPlan } from "./lib/authored-plan"
+import { compileAuthoredPlan } from "#/scripts/lib/authored-plan"
 
 const root = new URL("../", import.meta.url)
 const building = readSetting(await readFile(new URL(".docs/settings/buildings/building-h-m5.md", root), "utf8"))

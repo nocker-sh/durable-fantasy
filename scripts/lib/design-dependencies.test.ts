@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { auditDesignDependencies } from "./design-dependencies"
+import { auditDesignDependencies } from "#/scripts/lib/design-dependencies"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 const doc = (id: string, passed = false): SettingDocument => ({
   id,

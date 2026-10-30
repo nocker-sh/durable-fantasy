@@ -3,7 +3,7 @@ import { STATION_RULES } from "#/world/core/crafting-rules"
 import { INTERIORS } from "#/world/town/interiors"
 import { equipmentPlace } from "#/world/town/equipment-place"
 import { locateStations } from "#/world/town/locate-stations"
-import { STATIONS } from "./stations"
+import { STATIONS } from "#/world/town/stations"
 it("keeps every current crafting rule located at its current equipment or outdoor forge", () => {
   expect(STATIONS.map((station) => station.id)).toEqual(STATION_RULES.map((rule) => rule.id))
   const workshop = INTERIORS.find((room) => room.house.id === "h-c2" && room.floor === 0)!

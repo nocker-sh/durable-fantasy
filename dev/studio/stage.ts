@@ -6,8 +6,8 @@ import type { Look, Item } from "#/world/scene/figure/look"
 import { SpriteCache } from "#/world/scene/sprite-cache"
 import { frameAt } from "#/world/scene/frame-at"
 import { tickSprites } from "#/world/scene/tick-sprites"
-import { propSprite, PROP_PLACE, PROP_DIST } from "./props"
-import type { Motion } from "./motions"
+import { propSprite, PROP_PLACE, PROP_DIST } from "#/dev/studio/props"
+import type { Motion } from "#/dev/studio/motions"
 
 export type { Look, Item, Motion }
 

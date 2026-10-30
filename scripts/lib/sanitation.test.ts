@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
-import { auditSanitation } from "./sanitation"
+import { auditSanitation } from "#/scripts/lib/sanitation"
 const base = (id: string, kind = "facilities"): SettingDocument => ({ id, kind, title: id, source: "test", status: "設計中", design_gate: "未通過", issues: [] })
 const route = (stream: string, to: string, container_id: string) => ({ stream, to, container_id, container_symbol: null as string | null, status: "proposed" })
 function fixture() {

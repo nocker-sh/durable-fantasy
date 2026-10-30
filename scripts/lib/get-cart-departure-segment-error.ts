@@ -1,5 +1,5 @@
-import { rectangleTranslationBounds } from "../../lib/engine/rectangle-translation-bounds"
-import { rectangleTranslationHits } from "../../lib/engine/rectangle-translation-hits"
+import { rectangleTranslationBounds } from "#/lib/engine/rectangle-translation-bounds"
+import { rectangleTranslationHits } from "#/lib/engine/rectangle-translation-hits"
 import { segmentRectDistance } from "#/lib/engine/segment-rect-distance"
 import { getGridRectangleClearanceError } from "#/lib/engine/get-grid-rectangle-clearance-error"
 import { getSweptGridClearanceError } from "#/lib/engine/get-swept-grid-clearance-error"

@@ -3,7 +3,7 @@ import { armGripPoint } from "#/world/scene/figure/arm-grip-point"
 import { solveArmGrip } from "#/world/scene/figure/solve-arm-grip"
 import { toHeadingWorldPoint } from "#/world/scene/to-heading-world-point"
 import { toHeadingLocalPoint } from "#/world/scene/to-heading-local-point"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = Parameters<typeof getSeatedNativePose>[0] & { hand: "l" | "r"; seatTarget: Point3 }
 
 /** Withdrawal and swivel share one target and native pole so their common endpoint cannot drift. */

@@ -1,4 +1,4 @@
-import type { Rect } from "./types"
+import type { Rect } from "#/world/town/floorplan/types"
 
 export type StairSection = Rect & {
   id: string

@@ -2,9 +2,9 @@ import { expect, it } from "vitest"
 import { getGroundBoxLidPlan } from "#/world/town/get-ground-box-lid-plan"
 import { storageLidState } from "#/world/town/storage-lid-state"
 import { getStoragePathError } from "#/world/town/get-storage-path-error"
-import { cuboidTranslationHits } from "../../lib/engine/cuboid-translation-hits"
+import { cuboidTranslationHits } from "#/lib/engine/cuboid-translation-hits"
 import type { LayoutBox } from "#/lib/engine/get-box-layout-error"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 const box = { x0: 1.5, x1: 2.5, y0: 0, y1: 0.48, z0: 4, z1: 4.5 }
 const contents: readonly LayoutBox[] = [{ id: "clothing", origin: [0.015, 0, 0.015], size: [0.4, 0.16, 0.4] }]
 const rest: Point3 = [2, 0, 5.05]

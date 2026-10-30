@@ -1,8 +1,8 @@
 import { expect, it } from "vitest"
-import { getSpriteBakeDrawInput } from "./get-sprite-bake-draw-input"
-import { createSpriteBakePlan } from "./create-sprite-bake-plan"
-import { getCurrentSpriteManifest } from "../bake/get-current-sprite-manifest"
-import { renderSpriteBakePng } from "../bake/render-sprite-bake-png"
+import { getSpriteBakeDrawInput } from "#/scripts/lib/get-sprite-bake-draw-input"
+import { createSpriteBakePlan } from "#/scripts/lib/create-sprite-bake-plan"
+import { getCurrentSpriteManifest } from "#/scripts/bake/get-current-sprite-manifest"
+import { renderSpriteBakePng } from "#/scripts/bake/render-sprite-bake-png"
 
 it("binds each draw to the exact resident, look, frame shape and animation length", () => {
   const source = getCurrentSpriteManifest()

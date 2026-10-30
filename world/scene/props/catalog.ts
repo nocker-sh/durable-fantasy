@@ -1,9 +1,9 @@
-import type { Thing } from "./types"
-import { ashThings } from "./ash"
-import { waterThings } from "./water"
-import { eavesThings } from "./eaves"
-import { animalsThings } from "./animals"
-import { workThings } from "./work"
+import type { Thing } from "#/world/scene/props/types"
+import { ashThings } from "#/world/scene/props/ash"
+import { waterThings } from "#/world/scene/props/water"
+import { eavesThings } from "#/world/scene/props/eaves"
+import { animalsThings } from "#/world/scene/props/animals"
+import { workThings } from "#/world/scene/props/work"
 
 export const THINGS: Readonly<Record<string, Thing>> = {
   "ash-broom": ashThings["ash-broom"],

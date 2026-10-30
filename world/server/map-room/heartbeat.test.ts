@@ -7,13 +7,13 @@ import { player } from "#/world/test/player"
 import { mapPlayer } from "#/world/server/map-room/map-player"
 import type { Presence } from "#/world/server/map-room/presence"
 import type { ServerMessage } from "#/world/protocol"
-import type { Ctx } from "./context"
+import type { Ctx } from "#/world/server/map-room/context"
 
 const calls = vi.hoisted(() => ({ state: vi.fn(), deliveryUpdate: vi.fn(), left: vi.fn() }))
 vi.mock("../../../durable-objects/wild", () => ({ Wild: { get: () => ({ snapshot: async (map: string) => ({ revision: 1, monsters: await calls.state(map) }) }) } }))
 vi.mock("../../../durable-objects/nature", () => ({ Nature: { get: () => calls } }))
 vi.mock("../../../durable-objects/player", () => ({ Player: { get: () => calls } }))
-import { HANDLERS } from "./heartbeat"
+import { HANDLERS } from "#/world/server/map-room/heartbeat"
 
 afterEach(() => {
   vi.useRealTimers()

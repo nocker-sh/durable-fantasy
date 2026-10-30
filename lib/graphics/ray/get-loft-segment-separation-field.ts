@@ -1,7 +1,7 @@
 import type { Ring } from "#/lib/graphics/ray/distance-types"
-import type { PrimitiveBounds } from "./primitive-bounds-types"
-import type { Vector3Tuple as V3 } from "../../engine/vector3-types"
-import type { BoundedField } from "../../engine/field-separation"
+import type { PrimitiveBounds } from "#/lib/graphics/ray/primitive-bounds-types"
+import type { Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
+import type { BoundedField } from "#/lib/engine/field-separation"
 type Props = { from: Ring; to: Ring; axis: V3; x: V3; z: V3; lengthSquared: number; bounds: PrimitiveBounds | null; value: (point: V3) => number }
 
 /** Bound the actual clamped elliptical loft field's derivatives on its segment domain; no unit-distance assumption is made. */

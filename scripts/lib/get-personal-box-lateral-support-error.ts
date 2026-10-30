@@ -1,4 +1,4 @@
-import { smooth } from "../../lib/engine/smooth"
+import { smooth } from "#/lib/engine/smooth"
 import { getPersonalBoxLateralContext } from "#/scripts/lib/get-personal-box-lateral-context"
 import { getNativeLowSideStepPose } from "#/world/scene/figure/get-native-low-side-step-pose"
 import { getNativePlantedFootwearError } from "#/world/scene/figure/get-native-planted-footwear-error"

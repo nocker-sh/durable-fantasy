@@ -1,7 +1,7 @@
 vi.mock("../../town/activity-pose", () => ({ activityPose: vi.fn(() => null) }))
 import { beforeEach, expect, it, vi } from "vitest"
-import { withCleanup } from "../../../lib/engine/with-cleanup"
-import type { SceneDefinition } from "./definitions"
+import { withCleanup } from "#/lib/engine/with-cleanup"
+import type { SceneDefinition } from "#/world/scene/runtime/definitions"
 const actors = vi.hoisted(() => ({ create: vi.fn() }))
 vi.mock("../figure/render", () => ({ FW: 80, FH: 96, SPPU: 48 }))
 vi.mock("../figure/animation", () => ({ FRAMES: { idle: 8 } }))
@@ -32,10 +32,10 @@ vi.mock("../../town/residents", () => ({
 }))
 vi.mock("./assets", () => ({ spriteManifest: vi.fn(async () => null), SPRITES: "/sprites" }))
 import { activityPose } from "#/world/town/activity-pose"
-import { createPopulation } from "./population"
-import { spriteManifest } from "./assets"
-import type { SpriteManifest } from "../sprite-manifest-types"
-import { SPRITE_RENDER_VERSION } from "../sprite-render-version"
+import { createPopulation } from "#/world/scene/runtime/population"
+import { spriteManifest } from "#/world/scene/runtime/assets"
+import type { SpriteManifest } from "#/world/scene/sprite-manifest-types"
+import { SPRITE_RENDER_VERSION } from "#/world/scene/sprite-render-version"
 beforeEach(() => {
   vi.mocked(activityPose).mockReset().mockReturnValue(null)
   actors.create.mockReset().mockImplementation(() => ({ fig: { dispose: vi.fn() }, faceTo: vi.fn() }))

@@ -1,7 +1,7 @@
-import { getBoundedUnionDistance } from "./get-bounded-union-distance"
-import type { BoundedField } from "../../engine/field-separation"
-import type { Vector3Tuple as V3 } from "../../engine/vector3-types"
-import type { PrimitiveShape } from "./primitive-types"
+import { getBoundedUnionDistance } from "#/lib/graphics/ray/get-bounded-union-distance"
+import type { BoundedField } from "#/lib/engine/field-separation"
+import type { Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
+import type { PrimitiveShape } from "#/lib/graphics/ray/primitive-types"
 
 /** Retain every component's finite domain when converting bounded fields to one drawable surface. */
 export function getUnionFieldPrimitive(fields: readonly BoundedField[]) {

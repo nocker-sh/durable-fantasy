@@ -1,6 +1,6 @@
 import { getPersonalBoxGripFrame } from "#/scripts/lib/get-personal-box-grip-frame"
 import { getPlanarArmGripMotionBound } from "#/world/scene/figure/get-planar-arm-grip-motion-bound"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = Omit<Parameters<typeof getPersonalBoxGripFrame>[0], "state"> & { segment: number }
 
 /** Vertical phases hold body, shoulder and bar axis fixed, so both arm surfaces have a whole-interval displacement bound. */

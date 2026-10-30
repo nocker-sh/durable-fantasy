@@ -1,7 +1,7 @@
 // Dev only: put things in a player's bag (for checks: crafting, selling, eating).
 import { z } from "zod"
 import { defineHandler } from "void"
-import { Player } from "../../../durable-objects/player"
+import { Player } from "#/durable-objects/player"
 import { playerId } from "#/world/core/identity"
 import { itemId } from "#/world/core/player-schema"
 import { authenticatedPlayer } from "#/world/server/authenticated-player"

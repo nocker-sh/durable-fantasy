@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
-import { RESIDENTS, RESIDENT_LOOKS } from "../../town/residents"
-import { PixelBuffer as PixBuf } from "../../../lib/graphics/pixel-buffer"
+import { RESIDENTS, RESIDENT_LOOKS } from "#/world/town/residents"
+import { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
 import { skelFor } from "#/world/scene/figure/helpers/animation/skel-for"
 import { blinks } from "#/world/scene/figure/helpers/animation/blinks"
 import { FW, FH } from "#/world/scene/figure/render"

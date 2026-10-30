@@ -1,4 +1,4 @@
-import { primitiveBounds } from "../../../lib/graphics/ray/primitive-bounds"
+import { primitiveBounds } from "#/lib/graphics/ray/primitive-bounds"
 import { canSeparatePrimitiveFromCuboid } from "#/lib/graphics/ray/can-separate-primitive-from-cuboid"
 import { canSeparateSurfaceFromPrimitive } from "#/lib/graphics/ray/can-separate-surface-from-primitive"
 import { limbSd } from "#/lib/graphics/ray/limb-sd"

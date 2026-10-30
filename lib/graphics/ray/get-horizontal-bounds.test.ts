@@ -1,7 +1,7 @@
 import { expect, it } from "vitest"
-import { getHorizontalBounds } from "./get-horizontal-bounds"
-import { createSolidSurfaceMaterial } from "./create-solid-surface-material"
-import type { Primitive } from "./primitive-types"
+import { getHorizontalBounds } from "#/lib/graphics/ray/get-horizontal-bounds"
+import { createSolidSurfaceMaterial } from "#/lib/graphics/ray/create-solid-surface-material"
+import type { Primitive } from "#/lib/graphics/ray/primitive-types"
 const primitive: Primitive = { kind: "sdf", a: [0, 0, 0], b: [0, 0, 0], r: 4, r2: 0, m: createSolidSurfaceMaterial("redsand"), id: 0, bounds: { min: [-1, 0, -2], max: [1, 1, 2] } }
 it("rotates all four corners and unions separate parts at the physical scale", () => {
   const bounds = getHorizontalBounds({ primitives: [primitive], position: [10, 20], heading: Math.PI / 4, scale: 2 })

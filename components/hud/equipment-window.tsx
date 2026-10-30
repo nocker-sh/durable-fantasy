@@ -14,11 +14,11 @@ import type { SpriteName } from "#/world/art/pixel-art"
 import { equipmentAttack } from "#/world/core/equipment-attack"
 import { equipmentDefense } from "#/world/core/equipment-defense"
 import { displayName } from "#/world/core/display-name"
-import { ItemTooltip } from "./item-tooltip"
+import { ItemTooltip } from "#/components/hud/item-tooltip"
 import { carriesItem } from "#/components/hud/carries-item"
 import { readDrag } from "#/components/hud/read-drag"
 import { startDrag } from "#/components/hud/start-drag"
-import { useWindow } from "./use-window"
+import { useWindow } from "#/components/hud/use-window"
 
 const LEFT: SlotId[] = ["head", "neck", "body", "feet"]
 const RIGHT: SlotId[] = ["weapon", "shield"]

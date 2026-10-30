@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { ScalarField } from "../../lib/engine/scalar-field"
+import { ScalarField } from "#/lib/engine/scalar-field"
 import { auditBuildingFoundation } from "#/scripts/lib/audit-building-foundation"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 function fixture() {

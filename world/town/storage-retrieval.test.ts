@@ -3,7 +3,7 @@ import { expect, it } from "vitest"
 import { shelfItemParts } from "#/world/town/shelf-item-parts"
 import { scaleShelf } from "#/world/town/scale-shelf"
 import type { ShelfSpec } from "#/world/town/shelf"
-import { storageRetrieval } from "./storage-retrieval"
+import { storageRetrieval } from "#/world/town/storage-retrieval"
 const shelf: ShelfSpec = {
   height: 0.9,
   board: 0.025,

@@ -2,7 +2,7 @@ import { expect, it } from "vitest"
 import { storageLidPlan } from "#/world/town/storage-lid-plan"
 import { storageLidState } from "#/world/town/storage-lid-state"
 import { certifyStorageLid } from "#/world/town/certify-storage-lid"
-import { cuboidTranslationHits } from "../../lib/engine/cuboid-translation-hits"
+import { cuboidTranslationHits } from "#/lib/engine/cuboid-translation-hits"
 const box = { x0: 1, x1: 1.28, y0: 0.05, y1: 0.31, z0: 1, z1: 1.32 },
   handle = { axis: "z" as const, span: 0.08, depth: 0.018, height: 0.04, thickness: 0.003 },
   support = { x0: 1.6, x1: 2, z0: 0.9, z1: 1.5, bottom: 0, top: 0.36 }

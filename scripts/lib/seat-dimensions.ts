@@ -1,4 +1,4 @@
-import type { SeatSpec } from "../../world/town/room-fixtures"
+import type { SeatSpec } from "#/world/town/room-fixtures"
 
 /** Parse the physical dimensions once for both document audits and runtime exports. */
 export function seatDimensions(value: unknown, width: number, depth: number): SeatSpec {

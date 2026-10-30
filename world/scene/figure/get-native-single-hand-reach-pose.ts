@@ -4,7 +4,7 @@ import { groundFootwear } from "#/world/scene/figure/footing"
 import { toHeadingLocalPoint } from "#/world/scene/to-heading-local-point"
 import type { Look } from "#/world/scene/figure/look"
 import type { Skel } from "#/world/scene/rig"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = Readonly<{ look: Look; skeleton: Skel; target: Point3; body: readonly [number, number]; heading: number; hand: "l" | "r"; pole: Point3 }>
 
 /** Move only the selected elbow and wrist; reaching an anchor grants no palm contact, strength or cane-support certificate. */

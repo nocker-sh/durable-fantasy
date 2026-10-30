@@ -1,5 +1,5 @@
-import type { GableRoof } from "./gable-roof-types"
-import type { Rectangle } from "./rectangle-subtraction"
+import type { GableRoof } from "#/lib/engine/gable-roof-types"
+import type { Rectangle } from "#/lib/engine/rectangle-subtraction"
 
 /** Keep the eaves' overhang on both slopes and split exactly at the ridge. */
 export function getGableRoofHalves(roof: GableRoof): readonly Rectangle[] {

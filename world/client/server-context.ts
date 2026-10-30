@@ -1,7 +1,7 @@
-import type { GameContext } from "./context"
+import type { GameContext } from "#/world/client/context"
 import type { Cell, MapPlayer, ServerMessage } from "#/world/protocol"
 import type { MapId } from "#/world/maps/types"
-import type { GameEvent, Command, Reason } from "../core/commands"
+import type { GameEvent, Command, Reason } from "#/world/core/commands"
 import type { PlayerState } from "#/world/core/player-types"
 import type { Avatar } from "#/world/scene/runtime/types"
 

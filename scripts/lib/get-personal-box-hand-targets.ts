@@ -1,5 +1,5 @@
 import type { StorageBoxPart } from "#/world/town/storage-box-types"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 import { getStorageLidBridge } from "#/world/town/get-storage-lid-bridge"
 type Props = { parts: readonly StorageBoxPart[]; target: "west_edge" | "lid_handle"; halfSpan: number }
 

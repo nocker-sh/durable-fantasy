@@ -1,6 +1,6 @@
 import { afterEach, expect, it, vi } from "vitest"
-import { Market } from "../../../durable-objects/market"
-import { Player } from "../../../durable-objects/player"
+import { Market } from "#/durable-objects/market"
+import { Player } from "#/durable-objects/player"
 import { emptyMarket } from "#/world/core/empty-market"
 import { seedStock } from "#/world/core/seed-stock"
 import { SHOPS } from "#/world/core/shops"
@@ -9,10 +9,10 @@ import type { MarketRecord } from "#/world/server/market-record-types"
 import type { ShopCommand } from "#/world/core/shop-receipt-types"
 import { player } from "#/world/test/player"
 import { bagWith } from "#/world/test/bag-with"
-import { durableStorage } from "../../test/durable-storage"
+import { durableStorage } from "#/world/test/durable-storage"
 import { mapPlayer } from "#/world/server/map-room/map-player"
 import type { Presence } from "#/world/server/map-room/presence"
-import type { Ctx } from "./context"
+import type { Ctx } from "#/world/server/map-room/context"
 import type { ServerMessage } from "#/world/protocol"
 
 vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }))
@@ -20,7 +20,7 @@ const policy = vi.hoisted(() => ({ open: true }))
 vi.mock("#/world/maps/npc-cell", () => ({ npcCell: () => [0, 0] }))
 vi.mock("#/world/maps/shop-open", () => ({ shopOpen: () => policy.open }))
 vi.mock("#/world/maps/minutes-to-close", () => ({ minutesToClose: () => null }))
-import { HANDLERS } from "./work"
+import { HANDLERS } from "#/world/server/map-room/work"
 afterEach(() => {
   vi.useRealTimers()
   vi.restoreAllMocks()

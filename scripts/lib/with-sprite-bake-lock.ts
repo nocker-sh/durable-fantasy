@@ -1,4 +1,4 @@
-import { acquireSpriteBakeLock } from "./acquire-sprite-bake-lock"
+import { acquireSpriteBakeLock } from "#/scripts/lib/acquire-sprite-bake-lock"
 import { withScopedCleanup } from "#/lib/engine/with-scoped-cleanup"
 
 export async function withSpriteBakeLock<T>(directory: string, work: (token: string) => Promise<T>): Promise<T> {

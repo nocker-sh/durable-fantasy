@@ -1,5 +1,5 @@
 import { getRoomStorageSection } from "#/scripts/lib/get-room-storage-section"
-import { cuboidTranslationHits } from "../../lib/engine/cuboid-translation-hits"
+import { cuboidTranslationHits } from "#/lib/engine/cuboid-translation-hits"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 import type { getFrontAccessStorageReview } from "#/scripts/lib/get-front-access-storage-review"
 type Props = Readonly<{ room: SettingDocument; building: SettingDocument | undefined; review: Exclude<ReturnType<typeof getFrontAccessStorageReview>, Error> }>

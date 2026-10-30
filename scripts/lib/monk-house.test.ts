@@ -15,7 +15,7 @@ import { currentLayout } from "#/world/scene/current-layout"
 import { setLayout } from "#/world/scene/set-layout"
 import { groundH } from "#/world/scene/ground-h"
 import { F, FR, GRID_N } from "#/world/scene/world"
-import { ScalarField } from "../../lib/engine/scalar-field"
+import { ScalarField } from "#/lib/engine/scalar-field"
 import { TILE_M } from "#/world/town/fit"
 
 const read = (directory: string, id: string) => readSetting(readFileSync(new URL(`../../.docs/settings/${directory}/${id}.md`, import.meta.url), "utf8"))

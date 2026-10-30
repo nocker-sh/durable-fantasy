@@ -1,7 +1,7 @@
 import { ITEMS } from "#/world/core/items/catalog"
 import { ITEM_ICONS } from "#/world/core/items/icons"
 import { describe, expect, it } from "vitest"
-import { apply } from "./apply"
+import { apply } from "#/world/core/apply"
 import { countItem } from "#/world/core/count-item"
 import { MAX_LEVEL } from "#/world/core/growth-rules"
 import { expToNext } from "#/world/core/exp-to-next"

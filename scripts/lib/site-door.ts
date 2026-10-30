@@ -1,4 +1,4 @@
-import { siteTransform } from "./site-transform"
+import { siteTransform } from "#/scripts/lib/site-transform"
 type DoorSite = {
   grid: { rows: string[]; cell_m: number }
   room_origin: number[]

@@ -2,7 +2,7 @@ import { eventOf } from "#/world/town/event-of"
 import { REASON_TEXT } from "#/world/core/commands"
 import { FLAVOR } from "#/world/town/flavor"
 import { ALL_LINES } from "#/world/town/lines/index"
-import { sheet } from "./schema"
+import { sheet } from "#/dev/sheets/schema"
 import { ref } from "#/dev/sheets/ref"
 import { mapName } from "#/dev/sheets/map-name"
 

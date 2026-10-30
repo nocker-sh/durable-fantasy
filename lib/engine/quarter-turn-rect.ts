@@ -1,5 +1,5 @@
-import { quarterTurnPoint } from "./quarter-turn-point"
-import type { Rectangle } from "./rectangle-subtraction"
+import { quarterTurnPoint } from "#/lib/engine/quarter-turn-point"
+import type { Rectangle } from "#/lib/engine/rectangle-subtraction"
 type Props = Readonly<{ bounds: Readonly<Rectangle>; turn: 0 | 1 | 2 | 3; origin?: readonly [number, number] }>
 
 /** Rotate an axis-aligned rectangle about the origin by exact quarter turns. */

@@ -1,10 +1,10 @@
 // Public speech is limited by hearing distance, except for a map-wide shout.
 import { cellDistance } from "#/world/maps/cell-distance"
 import { HEARING_CELLS } from "#/world/protocol"
-import type { Ctx, Handlers, Message } from "./context"
+import type { Ctx, Handlers, Message } from "#/world/server/map-room/context"
 import { presence } from "#/world/server/map-room/presence"
 import { reachable } from "#/world/server/map-room/reachable"
-import { notifyClient } from "./notifications"
+import { notifyClient } from "#/world/server/map-room/notifications"
 
 async function say(roomCtx: Ctx, message: Message<"say">) {
   const ctxSource = roomCtx,

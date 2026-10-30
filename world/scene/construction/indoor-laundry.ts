@@ -1,8 +1,8 @@
 import * as THREE from "three"
-import { PixelBuffer as PixBuf } from "../../../lib/graphics/pixel-buffer"
+import { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
 import { laundry } from "#/world/scene/laundry"
 import { GPPU } from "#/world/scene/goods"
-import { toTexture as toTex } from "../../../lib/graphics/to-texture"
+import { toTexture as toTex } from "#/lib/graphics/to-texture"
 
 /** Still indoor laundry and its rope share one texture and one draw. */
 export function indoorLaundry(length: number, seed: number): THREE.Mesh {

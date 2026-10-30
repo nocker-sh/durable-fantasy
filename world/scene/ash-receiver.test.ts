@@ -7,8 +7,8 @@ import { INDOOR } from "#/world/maps/ground-layouts"
 import { cutaways } from "#/world/scene/interior"
 import { setLayout } from "#/world/scene/set-layout"
 import { groundH } from "#/world/scene/ground-h"
-import { M } from "./construction/materials"
-import { SceneResources } from "../../lib/graphics/scene-resources"
+import { M } from "#/world/scene/construction/materials"
+import { SceneResources } from "#/lib/graphics/scene-resources"
 it("renders the stored ash box at its authored shelf position with an iron lid and an open grip handle", () => {
   setLayout(INDOOR)
   const room = INTERIORS.find((r) => r.id === "phanthiet-in-h-m5")!,

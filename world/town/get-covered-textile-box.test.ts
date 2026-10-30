@@ -1,7 +1,7 @@
 import { expect, it } from "vitest"
 import { getCoveredTextileBox } from "#/world/town/get-covered-textile-box"
 import { getStorageBoxContentBounds } from "#/world/town/get-storage-box-content-bounds"
-import { cuboidTranslationHits } from "../../lib/engine/cuboid-translation-hits"
+import { cuboidTranslationHits } from "#/lib/engine/cuboid-translation-hits"
 const fixture = () => ({ size: [0.32, 0.08, 0.21], packageSize: [0.28, 0.04, 0.19], wall: 0.005, lid: 0.005, clearance: 0.005 }) satisfies Parameters<typeof getCoveredTextileBox>[0]
 
 it("builds bottom, four walls and a separate lid around the unchanged textile envelope", () => {

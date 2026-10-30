@@ -1,9 +1,9 @@
 import { expect, it } from "vitest"
 import * as THREE from "three"
-import { chair } from "./chair"
+import { chair } from "#/world/scene/construction/chair"
 import { GeometryBuilder as GB } from "#/lib/graphics/geometry-builder"
 import { INTERIORS } from "#/world/town/interiors"
-import { SceneResources } from "../../../lib/graphics/scene-resources"
+import { SceneResources } from "#/lib/graphics/scene-resources"
 
 it("keeps every classroom chair in its footprint and puts the seat at its projected height", () => {
   const room = INTERIORS.find((room) => room.id === "phanthiet-in-h-m5")!

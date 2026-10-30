@@ -1,4 +1,4 @@
-import type { LampFixture, WindowFixture } from "../../world/town/room-fixtures"
+import type { LampFixture, WindowFixture } from "#/world/town/room-fixtures"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 
 export function compileRoomFixtures(building: SettingDocument, rooms: readonly SettingDocument[]): { windows: WindowFixture[]; lamps: LampFixture[] } {

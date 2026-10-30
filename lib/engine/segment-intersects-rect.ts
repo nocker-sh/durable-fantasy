@@ -1,4 +1,4 @@
-import type { Rect } from "./segment-distance-types"
+import type { Rect } from "#/lib/engine/segment-distance-types"
 
 type Props = Readonly<{ rect: Rect; from: ReadonlyArray<number>; to: ReadonlyArray<number>; boundary?: "open" | "closed" }>
 

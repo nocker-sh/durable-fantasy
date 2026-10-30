@@ -1,5 +1,5 @@
 import { getPouringPotPose } from "#/world/town/get-pouring-pot-pose"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = Omit<Parameters<typeof getPouringPotPose>[0], "lipAt"> & { gripAt: Point3 }
 
 /** Rotate the whole vessel around its actual carrying grip instead of keeping the lip artificially pinned. */

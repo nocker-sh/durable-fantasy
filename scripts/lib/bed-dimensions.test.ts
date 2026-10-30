@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs"
 import { expect, it } from "vitest"
 import { readSetting } from "#/scripts/lib/read-setting"
 import { auditRoomGrid } from "#/scripts/lib/audit-room-grid"
-import { bedDimensions } from "./bed-dimensions"
+import { bedDimensions } from "#/scripts/lib/bed-dimensions"
 import { bedDimensionsSchema } from "#/scripts/lib/bed-dimensions-schema"
 import { bedParts } from "#/world/town/bed-parts"
 it("reads each monk's owned bed from the room document and rejects missing or impossible dimensions", () => {

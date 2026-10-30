@@ -1,5 +1,5 @@
 import { sameStack } from "#/world/core/same-stack"
-import type { Command, ServerCommand } from "./commands"
+import type { Command, ServerCommand } from "#/world/core/commands"
 import type { PlayerState } from "#/world/core/player-types"
 /** A delayed inventory operation must still refer to the goods grabbed, including wear and quantity. */
 export function inventorySelectionMatches(state: PlayerState, command: Command | ServerCommand): boolean {

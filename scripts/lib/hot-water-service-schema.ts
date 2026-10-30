@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { hotWaterAnimationSchema } from "./hot-water-animation-schema"
+import { hotWaterAnimationSchema } from "#/scripts/lib/hot-water-animation-schema"
 const positive = z.number().positive(),
   point = z.tuple([z.number().nonnegative(), z.number().nonnegative()])
 

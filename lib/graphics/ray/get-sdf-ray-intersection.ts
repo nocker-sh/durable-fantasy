@@ -1,7 +1,7 @@
-import type { Vector3Tuple as V3 } from "../../engine/vector3-types"
-import { subtractVector3 as sub } from "../../engine/subtract-vector3"
-import { dotVector3 as dot } from "../../engine/dot-vector3"
-import type { Primitive } from "./primitive-types"
+import type { Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
+import { subtractVector3 as sub } from "#/lib/engine/subtract-vector3"
+import { dotVector3 as dot } from "#/lib/engine/dot-vector3"
+import type { Primitive } from "#/lib/graphics/ray/primitive-types"
 
 export function getSdfRayIntersection(o: V3, d: V3, p: Primitive): number {
   const oc = sub(o, p.a),

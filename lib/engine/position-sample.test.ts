@@ -1,5 +1,5 @@
 import { expect, it, vi } from "vitest"
-import { PositionSample } from "./position-sample"
+import { PositionSample } from "#/lib/engine/position-sample"
 
 it("samples stationary positions once and updates either coordinate without rounding", () => {
   const terrain = vi.fn((x: number, z: number) => x * 2 - z)

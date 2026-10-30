@@ -1,7 +1,7 @@
 import { getWaterVesselNativeParts } from "#/world/scene/figure/get-water-vessel-native-parts"
 import { getWaterJarBodyError } from "#/world/scene/figure/get-water-jar-body-error"
 import { getWaterHandleBodyError } from "#/world/scene/figure/get-water-handle-body-error"
-import { subtractVector3 as sub } from "../../lib/engine/subtract-vector3"
+import { subtractVector3 as sub } from "#/lib/engine/subtract-vector3"
 import { getPaddedPoseFrame } from "#/world/scene/figure/get-padded-pose-frame"
 import { readFileSync } from "node:fs"
 import { expect, it } from "vitest"

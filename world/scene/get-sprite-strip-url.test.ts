@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { getSpriteStripUrl } from "./get-sprite-strip-url"
+import { getSpriteStripUrl } from "#/world/scene/get-sprite-strip-url"
 
 const identity = { directory: "/sprites", resident: 3, animation: "idle", view: 2, rendererVersion: 6, key: "look", frame: [80, 96] satisfies [number, number], frames: 25 }
 

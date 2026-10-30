@@ -1,5 +1,5 @@
-import { recipe as r, type Recipe } from "./definition"
-import { FORGED_WEAPON_RECIPES } from "./forged-weapons"
+import { recipe as r, type Recipe } from "#/world/core/recipes/definition"
+import { FORGED_WEAPON_RECIPES } from "#/world/core/recipes/forged-weapons"
 
 export const SMITHING_RECIPES: readonly Recipe[] = [
   // the forge: scrap to iron, iron and wood to tools

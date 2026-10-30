@@ -1,5 +1,5 @@
 import type { GameSession } from "#/world/client/game-session"
-import type { GameContext } from "./context"
+import type { GameContext } from "#/world/client/context"
 
 export class SocialActions {
   constructor(

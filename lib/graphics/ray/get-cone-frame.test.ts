@@ -1,8 +1,8 @@
 import { expect, it } from "vitest"
-import { getConeFrame } from "./get-cone-frame"
-import { getConeRayIntersection } from "./get-cone-ray-intersection"
-import { getConeSurfaceNormal } from "./get-cone-surface-normal"
-import type { Primitive } from "./primitive-types"
+import { getConeFrame } from "#/lib/graphics/ray/get-cone-frame"
+import { getConeRayIntersection } from "#/lib/graphics/ray/get-cone-ray-intersection"
+import { getConeSurfaceNormal } from "#/lib/graphics/ray/get-cone-surface-normal"
+import type { Primitive } from "#/lib/graphics/ray/primitive-types"
 
 const cone: Primitive = { kind: "cone", a: [0, 0, 0], b: [0, 1, 0], r: 0.5, r2: 0.2, id: 1, m: () => ["test", 0] }
 

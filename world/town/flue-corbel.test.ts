@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
-import { flueCorbelParts } from "./flue-corbel"
-import { flueFloor } from "./flue-floor"
+import { flueCorbelParts } from "#/world/town/flue-corbel"
+import { flueFloor } from "#/world/town/flue-floor"
 const shaft = { x0: 2, z0: 2, x1: 2.5, z1: 2.5, wallThickness: 0.1, lowerFloor: 0, upperFloor: 1, floorCollar: 0.15, floorSupport: { depth: 0.2, steps: 4 } },
   bounds = { x0: 0, z0: 0, x1: 6, z1: 6 }
 const area = (ps: readonly { x0: number; z0: number; x1: number; z1: number }[]) => ps.reduce((a, p) => a + (p.x1 - p.x0) * (p.z1 - p.z0), 0)

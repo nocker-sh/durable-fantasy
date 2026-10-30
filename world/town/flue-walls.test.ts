@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { flueWalls } from "./flue-walls"
+import { flueWalls } from "#/world/town/flue-walls"
 it("keeps the duct open and gives its four masonry walls the declared thickness", () => {
   const { duct, walls } = flueWalls({ x0: 2, z0: 3, x1: 2.5, z1: 3.5 }, 0.1)
   expect(duct).toEqual({ x0: 2.1, z0: 3.1, x1: 2.4, z1: 3.4 })

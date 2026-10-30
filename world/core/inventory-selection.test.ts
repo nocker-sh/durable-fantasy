@@ -1,8 +1,8 @@
 import { expect, it } from "vitest"
-import { apply } from "./apply"
+import { apply } from "#/world/core/apply"
 import { emptyBag } from "#/world/core/empty-bag"
 import type { Stack } from "#/world/core/bag-types"
-import { commandSchema } from "./commands"
+import { commandSchema } from "#/world/core/commands"
 import { lifeExpAt } from "#/world/core/life-exp-at"
 import { player } from "#/world/test/player"
 const grabbed: Stack = { item: "wood-axe", count: 1, q: 2, by: "ギュンター", dur: 3 }

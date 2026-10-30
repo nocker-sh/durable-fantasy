@@ -1,8 +1,8 @@
 import { availableParallelism } from "node:os"
 import { join } from "node:path"
-import { MAPS } from "../world/maps/index"
-import { withSpriteBakeLock } from "./lib/with-sprite-bake-lock"
-import { runSpriteBake } from "./bake/run-sprite-bake"
+import { MAPS } from "#/world/maps/index"
+import { withSpriteBakeLock } from "#/scripts/lib/with-sprite-bake-lock"
+import { runSpriteBake } from "#/scripts/bake/run-sprite-bake"
 
 const args = process.argv.slice(2)
 const outputDirectory = join(import.meta.dirname, "..", "public", MAPS.phanthiet.assets.sprites)

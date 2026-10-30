@@ -1,5 +1,5 @@
-import { cuboidTranslationHits } from "../../lib/engine/cuboid-translation-hits"
-import { type Point3 } from "../../lib/engine/cuboid-motion-types"
+import { cuboidTranslationHits } from "#/lib/engine/cuboid-translation-hits"
+import { type Point3 } from "#/lib/engine/cuboid-motion-types"
 import type { Cuboid } from "#/lib/engine/cuboid-subtraction"
 import type { Rectangle } from "#/lib/engine/rectangle-subtraction"
 import type { StorageBoxPart } from "#/world/town/storage-box-types"

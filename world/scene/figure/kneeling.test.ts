@@ -1,10 +1,10 @@
 import { expect, it } from "vitest"
-import { kneelingPose } from "./kneeling"
+import { kneelingPose } from "#/world/scene/figure/kneeling"
 import { skelFor } from "#/world/scene/figure/helpers/animation/skel-for"
-import { buildBody } from "./body"
-import { groundFootwear } from "./footing"
-import { primitiveBounds } from "../../../lib/graphics/ray/primitive-bounds"
-import { RESIDENTS, RESIDENT_LOOKS } from "../../town/residents"
+import { buildBody } from "#/world/scene/figure/body"
+import { groundFootwear } from "#/world/scene/figure/footing"
+import { primitiveBounds } from "#/lib/graphics/ray/primitive-bounds"
+import { RESIDENTS, RESIDENT_LOOKS } from "#/world/town/residents"
 const distance = (a: readonly number[], b: readonly number[]) => Math.hypot(...a.map((v, i) => v - b[i]))
 it("plants both original shoe orientations and the actual clothed knee at fixed leg lengths", () => {
   for (const name of ["エーリヒ", "クレメンス"]) {

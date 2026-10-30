@@ -1,10 +1,10 @@
-import { unrepresentedRooms } from "./room-inventory"
+import { unrepresentedRooms } from "#/world/town/floorplan/room-inventory"
 import { enterable } from "#/world/town/enterable"
 import { floorsOf } from "#/world/town/floors-of"
 import type { HouseDef } from "#/world/town/house-types"
 import { TILE_M } from "#/world/town/fit"
-import { TRACES } from "../traces"
-import type { FloorPlan, PRoom, Divider, Rect, DividerKind, Use, Placed } from "./types"
+import { TRACES } from "#/world/town/traces"
+import type { FloorPlan, PRoom, Divider, Rect, DividerKind, Use, Placed } from "#/world/town/floorplan/types"
 import { WALL, STAIR, DIV, DOORWAY } from "#/world/town/floorplan/geometry"
 import { centre } from "#/world/town/floorplan/centre"
 import { rect } from "#/world/town/floorplan/rect"
@@ -17,7 +17,7 @@ import { sizeOf } from "#/world/town/floorplan/size-of"
 import { split } from "#/world/town/floorplan/split"
 import { across } from "#/world/town/floorplan/across"
 import { along } from "#/world/town/floorplan/along"
-import { Floor } from "./placement"
+import { Floor } from "#/world/town/floorplan/placement"
 
 function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"): FloorPlan {
   const W = (h.x1 - h.x0) * TILE_M - 2 * WALL,

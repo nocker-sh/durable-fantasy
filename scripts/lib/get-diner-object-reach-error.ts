@@ -4,7 +4,7 @@ import { toHeadingWorldPoint } from "#/world/scene/to-heading-world-point"
 import type { tablePlaceSettingsSchema } from "#/scripts/lib/table-place-settings-schema"
 import type { Look } from "#/world/scene/figure/look"
 import type { SeatedPlace } from "#/world/scene/seated-pose"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 import type { Cuboid } from "#/lib/engine/cuboid-subtraction"
 import type { z } from "zod"
 type Review = NonNullable<z.infer<typeof tablePlaceSettingsSchema>["places"][number]["reach_review"]>

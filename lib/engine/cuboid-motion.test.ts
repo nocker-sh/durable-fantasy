@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
-import { cuboidTranslationHits } from "./cuboid-translation-hits"
-import { translatedCuboid } from "./translated-cuboid"
+import { cuboidTranslationHits } from "#/lib/engine/cuboid-translation-hits"
+import { translatedCuboid } from "#/lib/engine/translated-cuboid"
 const shape = { x0: -0.1, z0: -0.1, x1: 0.1, z1: 0.1, bottom: -0.1, top: 0.1 }
 it("detects a collision between endpoints and permits a clear diagonal past a box", () => {
   const obstacle = { x0: 1.9, z0: 1.9, x1: 2.1, z1: 2.1, bottom: 1.9, top: 2.1 }

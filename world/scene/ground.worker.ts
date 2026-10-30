@@ -2,10 +2,10 @@
 import { fieldsNow } from "#/world/scene/fields-now"
 import { setLayout } from "#/world/scene/set-layout"
 import type { Fields } from "#/world/scene/world"
-import { layoutOf } from "../maps/layouts"
+import { layoutOf } from "#/world/maps/layouts"
 import { GROUND_PX } from "#/world/scene/terrain"
 import { paintRows } from "#/world/scene/paint-rows"
-import { PixelBuffer as PixBuf } from "../../lib/graphics/pixel-buffer"
+import { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
 
 export type GroundJob = {
   map: string

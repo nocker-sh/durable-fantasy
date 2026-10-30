@@ -3,7 +3,7 @@ import { toHeadingWorldPoint } from "#/world/scene/to-heading-world-point"
 import { toHeadingLocalPoint } from "#/world/scene/to-heading-local-point"
 import type { Skel } from "#/world/scene/rig"
 import type { SeatedPlace } from "#/world/scene/seated-pose"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 export type SeatedArmRest = Readonly<Record<"l" | "r", { readonly seat_target_m: Point3; readonly pole: Point3 }>>
 type Props = { skeleton: Skel; root: Point3; place: SeatedPlace; rest: SeatedArmRest }
 const hands: readonly ("l" | "r")[] = ["l", "r"]

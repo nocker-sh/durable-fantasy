@@ -2,7 +2,7 @@ import { getCarrierTranslationError } from "#/world/scene/figure/get-carrier-tra
 import { certifyStorageTranslation, type StorageRoomSection } from "#/world/town/certify-storage-translation"
 import type { AshReceiving } from "#/scripts/lib/ash-receiving-schema"
 import type { StorageBoxPart } from "#/world/town/storage-box-types"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Carrier = Omit<Parameters<typeof getCarrierTranslationError>[0], "body" | "destination" | "section">
 type Props = { carrier: Carrier; parts: ReadonlyArray<StorageBoxPart>; height: number; receiving: AshReceiving; section: StorageRoomSection; carrierSection: StorageRoomSection }
 /** A fixed-pose spatial candidate only: translate box and body together without adopting the old width-only carrying route. */

@@ -1,4 +1,4 @@
-import type { WorkSurfaceSpec } from "./room-fixtures"
+import type { WorkSurfaceSpec } from "#/world/town/room-fixtures"
 
 export type WorkTableSection = {
   part: "top" | "leg"

@@ -1,9 +1,9 @@
-import { subtractVector3 } from "../../engine/subtract-vector3"
-import { dotVector3 } from "../../engine/dot-vector3"
-import { normalizeVector3 } from "../../engine/normalize-vector3"
-import { addVector3 } from "../../engine/add-vector3"
-import { scaleVector3 } from "../../engine/scale-vector3"
-import type { Vector3, Vector3Tuple } from "../../engine/vector3-types"
+import { subtractVector3 } from "#/lib/engine/subtract-vector3"
+import { dotVector3 } from "#/lib/engine/dot-vector3"
+import { normalizeVector3 } from "#/lib/engine/normalize-vector3"
+import { addVector3 } from "#/lib/engine/add-vector3"
+import { scaleVector3 } from "#/lib/engine/scale-vector3"
+import type { Vector3, Vector3Tuple } from "#/lib/engine/vector3-types"
 type Props = Readonly<{ a: Vector3; b: Vector3 }>
 
 export function getCapsuleSurfaceNormal(point: Vector3, primitive: Props): Vector3Tuple {

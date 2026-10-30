@@ -1,7 +1,7 @@
 import { home } from "#/world/town/home"
 import { bed } from "#/world/town/bed"
 import { room } from "#/world/town/room"
-import type { HouseDef } from "../house-types"
+import type { HouseDef } from "#/world/town/house-types"
 
 const houses: readonly HouseDef[] = [
   {

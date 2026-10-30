@@ -1,4 +1,4 @@
-import type { Placed, Rect, Divider } from "./types"
+import type { Placed, Rect, Divider } from "#/world/town/floorplan/types"
 import { overlap } from "#/world/town/floorplan/overlap"
 import { rect } from "#/world/town/floorplan/rect"
 import { inside } from "#/world/town/floorplan/inside"

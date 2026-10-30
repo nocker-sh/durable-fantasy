@@ -1,8 +1,8 @@
 import { armGripPoint } from "#/world/scene/figure/arm-grip-point"
-import { crossVector3 as cross } from "../../../lib/engine/cross-vector3"
-import { dotVector3 as dot } from "../../../lib/engine/dot-vector3"
-import { normalizeVector3 as norm } from "../../../lib/engine/normalize-vector3"
-import { subtractVector3 as sub } from "../../../lib/engine/subtract-vector3"
+import { crossVector3 as cross } from "#/lib/engine/cross-vector3"
+import { dotVector3 as dot } from "#/lib/engine/dot-vector3"
+import { normalizeVector3 as norm } from "#/lib/engine/normalize-vector3"
+import { subtractVector3 as sub } from "#/lib/engine/subtract-vector3"
 import type { Skel } from "#/world/scene/rig"
 import type { RoundGripBar } from "#/world/scene/figure/round-grip-bar-types"
 type Props = { skeleton: Skel; hand: "l" | "r"; bar: RoundGripBar }

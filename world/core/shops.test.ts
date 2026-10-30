@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { apply } from "./apply"
+import { apply } from "#/world/core/apply"
 import { BAG_SIZE } from "#/world/core/bag-rules"
 import { addItem } from "#/world/core/add-item"
 import { countItem } from "#/world/core/count-item"

@@ -7,7 +7,7 @@ import { updateCutaways } from "#/world/scene/update-cutaways"
 import { HOUSES } from "#/world/town/houses"
 import { interiorPlan } from "#/world/town/interior-plan"
 import { setLayout } from "#/world/scene/set-layout"
-import { SceneResources } from "../../lib/graphics/scene-resources"
+import { SceneResources } from "#/lib/graphics/scene-resources"
 afterEach(() => {
   cutaways.length = 0
 })

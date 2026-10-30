@@ -8,7 +8,7 @@ import { restoreNature } from "#/world/server/restore-nature"
 import { beginGather } from "#/world/server/begin-gather"
 import { finishGather } from "#/world/server/finish-gather"
 import { recoverGathering } from "#/world/server/recover-gathering"
-import { Player } from "./player"
+import { Player } from "#/durable-objects/player"
 
 const players = (owner: string) => Player.get(owner)
 export const Nature = defineDurableState({

@@ -1,7 +1,7 @@
 import { limbSd } from "#/lib/graphics/ray/limb-sd"
 import { loftSd } from "#/lib/graphics/ray/loft-sd"
 import { expect, it } from "vitest"
-import { cylinderBounds } from "./cylinder-bounds"
+import { cylinderBounds } from "#/lib/graphics/ray/cylinder-bounds"
 it("clips vertical cylinder bounds at the axial end planes", () => {
   expect(cylinderBounds([0, 1, 0], [0, 3, 0], 0.5)).toEqual({ min: [-0.5, 1, -0.5], max: [0.5, 3, 0.5] })
 })

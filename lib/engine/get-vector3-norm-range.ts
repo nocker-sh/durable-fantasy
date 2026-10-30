@@ -1,8 +1,8 @@
-import type { Vector3 as V3 } from "./vector3-types"
-import { addVector3 } from "./add-vector3"
-import { subtractVector3 } from "./subtract-vector3"
-import { scaleVector3 } from "./scale-vector3"
-import { dotVector3 } from "./dot-vector3"
+import type { Vector3 as V3 } from "#/lib/engine/vector3-types"
+import { addVector3 } from "#/lib/engine/add-vector3"
+import { subtractVector3 } from "#/lib/engine/subtract-vector3"
+import { scaleVector3 } from "#/lib/engine/scale-vector3"
+import { dotVector3 } from "#/lib/engine/dot-vector3"
 export function getVector3NormRange(a: V3, b: V3) {
   const v = subtractVector3(b, a),
     l2 = dotVector3(v, v),

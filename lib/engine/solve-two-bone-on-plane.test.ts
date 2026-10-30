@@ -1,9 +1,9 @@
 import { expect, it } from "vitest"
-import { solveTwoBoneOnPlane } from "./solve-two-bone-on-plane"
-import { solveTwoBone } from "./solve-two-bone"
-import { qfromTo } from "./qfrom-to"
-import { qrot } from "./qrot"
-import type { Point3 } from "./cuboid-motion-types"
+import { solveTwoBoneOnPlane } from "#/lib/engine/solve-two-bone-on-plane"
+import { solveTwoBone } from "#/lib/engine/solve-two-bone"
+import { qfromTo } from "#/lib/engine/qfrom-to"
+import { qrot } from "#/lib/engine/qrot"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 const distance = (first: Point3, second: Point3) => Math.hypot(...first.map((value, index) => value - second[index]))
 
 it("preserves link lengths and the target plane under arbitrary rotations and translations", () => {

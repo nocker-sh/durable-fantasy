@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { PathFollower } from "../../../lib/engine/path-follower"
+import { PathFollower } from "#/lib/engine/path-follower"
 import { cellsReached } from "#/world/cells-reached"
 import type { Cell } from "#/world/protocol"
 import { cellOf } from "#/world/scene/runtime/cell-of"

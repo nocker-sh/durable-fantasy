@@ -1,4 +1,4 @@
-import type { Bounds as Props } from "./bounds-types"
+import type { Bounds as Props } from "#/lib/engine/bounds-types"
 
 /** 厚みのない面や点も許し、非有限の座標と逆向きの範囲だけを拒否する。 */
 export function isFiniteOrderedBounds(bounds: Props): boolean {

@@ -1,7 +1,7 @@
 import { expect, it } from "vitest"
 import * as THREE from "three"
-import { ceramicVessel, type VesselPurpose } from "./ceramic-vessel"
-import { SceneResources } from "../../../lib/graphics/scene-resources"
+import { ceramicVessel, type VesselPurpose } from "#/world/scene/construction/ceramic-vessel"
+import { SceneResources } from "#/lib/graphics/scene-resources"
 import type { Furniture } from "#/world/town/interiors"
 it.each<VesselPurpose>(["tea", "oil", "glaze"])("keeps a closed %s vessel grounded within its planned footprint", (purpose) => {
   const furniture: Furniture = { kind: "tea-jar", x: 12, z: 18, w: 0.6, d: 0.9, solid: true },

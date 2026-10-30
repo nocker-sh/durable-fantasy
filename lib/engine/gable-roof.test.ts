@@ -1,7 +1,7 @@
 import { expect, it } from "vitest"
-import { gableRoofPanels } from "./gable-roof-panels"
-import { gableRoofHeight } from "./gable-roof-height"
-import { type GableRoof } from "./gable-roof-types"
+import { gableRoofPanels } from "#/lib/engine/gable-roof-panels"
+import { gableRoofHeight } from "#/lib/engine/gable-roof-height"
+import { type GableRoof } from "#/lib/engine/gable-roof-types"
 it("keeps both roof slopes planar and upward around a penetration crossing the ridge", () => {
   for (const ridgeAxis of ["x", "z"] as const) {
     const roof: GableRoof = { bounds: { x0: 1, z0: 2, x1: 7, z1: 10 }, eave: 4, ridge: 6, ridgeAxis, overhang: 0.25 }

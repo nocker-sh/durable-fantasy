@@ -5,8 +5,8 @@ import { personalStorageSchema } from "#/scripts/lib/personal-storage-schema"
 import { getFrontAccessStorageError } from "#/scripts/lib/get-front-access-storage-error"
 import { getFrontAccessStorageReview } from "#/scripts/lib/get-front-access-storage-review"
 import { getSlidingCabinetPlan } from "#/world/town/get-sliding-cabinet-plan"
-import { cuboidTranslationHits } from "../../lib/engine/cuboid-translation-hits"
-import { translatedCuboid } from "../../lib/engine/translated-cuboid"
+import { cuboidTranslationHits } from "#/lib/engine/cuboid-translation-hits"
+import { translatedCuboid } from "#/lib/engine/translated-cuboid"
 
 function fixture(number = 3) {
   const room = readSetting(readFileSync(`.docs/settings/rooms/room-h1-${number}.md`, "utf8")),

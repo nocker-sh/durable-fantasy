@@ -5,7 +5,7 @@ import { createBodyContext } from "#/world/scene/figure/context"
 import type { Look } from "#/world/scene/figure/look"
 import type { Skel } from "#/world/scene/rig"
 import type { RoundGripBar } from "#/world/scene/figure/round-grip-bar-types"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = Readonly<{ look: Look; skeleton: Skel; hand: "l" | "r"; target: Point3; pole: Point3; bar: RoundGripBar }>
 
 /** The selected forearm stays normal to the whole bar; the opposite arm and its contact profile are untouched. */

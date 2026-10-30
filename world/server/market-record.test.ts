@@ -1,7 +1,7 @@
 import { expect, it, vi } from "vitest"
-import { Market } from "../../durable-objects/market"
+import { Market } from "#/durable-objects/market"
 import { emptyMarket } from "#/world/core/empty-market"
-import { durableStorage } from "../test/durable-storage"
+import { durableStorage } from "#/world/test/durable-storage"
 import type { MarketRecord } from "#/world/server/market-record-types"
 
 vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }))

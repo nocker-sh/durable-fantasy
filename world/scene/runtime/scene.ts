@@ -3,9 +3,9 @@ import { places } from "#/world/scene/construction/registry"
 import type { Anim } from "#/world/scene/figure/animation"
 import { lap } from "#/world/lap"
 import { keyTurn } from "#/world/scene/key-turn"
-import { createSceneRuntime } from "./create"
-import type { SceneOptions } from "./scene-options"
-import type { SceneEvents, ResidentInfo, Cell, WalkerInfo, Avatar } from "./types"
+import { createSceneRuntime } from "#/world/scene/runtime/create"
+import type { SceneOptions } from "#/world/scene/runtime/scene-options"
+import type { SceneEvents, ResidentInfo, Cell, WalkerInfo, Avatar } from "#/world/scene/runtime/types"
 import { cellOf } from "#/world/scene/runtime/cell-of"
 
 type SceneRuntime = Awaited<ReturnType<typeof createSceneRuntime>>

@@ -1,6 +1,6 @@
 // Which windows are open and in what order (front-most last), remembered between visits, and the
 // modal screen over everything (ui.md §3).
-import type { Store } from "../../lib/engine/store"
+import type { Store } from "#/lib/engine/store"
 import { DEFAULT_WINDOWS } from "#/world/state"
 import type { GameState, ModalId, WindowId } from "#/world/state"
 

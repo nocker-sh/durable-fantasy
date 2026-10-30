@@ -1,4 +1,4 @@
-import type { RGB } from "./pixel-types"
+import type { RGB } from "#/lib/graphics/pixel-types"
 
 /** Fixed-size RGBA storage, shared with textures and transferable to rendering workers. */
 export class PixelBuffer {

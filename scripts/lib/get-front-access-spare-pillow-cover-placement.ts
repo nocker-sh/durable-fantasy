@@ -1,6 +1,6 @@
 import { getNorthHingedLidEnvelope } from "#/world/town/get-north-hinged-lid-envelope"
 import { getCabinetRoomBoundsError } from "#/world/town/get-cabinet-room-bounds-error"
-import { cuboidTranslationHits } from "../../lib/engine/cuboid-translation-hits"
+import { cuboidTranslationHits } from "#/lib/engine/cuboid-translation-hits"
 import { getStorageSparePillowCoverDefinition } from "#/scripts/lib/get-storage-spare-pillow-cover-definition"
 import { getCabinetTopPackagePlacement } from "#/world/town/get-cabinet-top-package-placement"
 import type { getFrontAccessSpareBlanketPlacement } from "#/scripts/lib/get-front-access-spare-blanket-placement"

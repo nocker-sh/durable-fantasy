@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { subtractCuboids, type Cuboid } from "./cuboid-subtraction"
+import { subtractCuboids, type Cuboid } from "#/lib/engine/cuboid-subtraction"
 const volume = (r: Cuboid) => (r.x1 - r.x0) * (r.z1 - r.z0) * (r.top - r.bottom)
 const contains = (r: Cuboid, x: number, y: number, z: number) => x > r.x0 && x < r.x1 && y > r.bottom && y < r.top && z > r.z0 && z < r.z1
 it("subtracts connected horizontal and vertical voids without filling their junction", () => {

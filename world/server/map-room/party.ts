@@ -1,10 +1,10 @@
 // The map room's handlers for parties (core/party.ts).
 import { sendPartyChat } from "#/world/server/map-room/send-party-chat"
-import { Party } from "../../../durable-objects/party"
+import { Party } from "#/durable-objects/party"
 import { PARTY_MAX } from "#/world/core/party/rules"
-import { Player } from "../../../durable-objects/player"
+import { Player } from "#/durable-objects/player"
 import { derive } from "#/world/core/derive"
-import type { Ctx, Handlers, Message } from "./context"
+import type { Ctx, Handlers, Message } from "#/world/server/map-room/context"
 import { presence } from "#/world/server/map-room/presence"
 import { setPresence } from "#/world/server/map-room/set-presence"
 import { partyView } from "#/world/server/map-room/party-view"

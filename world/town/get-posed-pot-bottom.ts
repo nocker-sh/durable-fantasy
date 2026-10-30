@@ -1,4 +1,4 @@
-import { qrot } from "../../lib/engine/qrot"
+import { qrot } from "#/lib/engine/qrot"
 import type { getPouringPotProfile } from "#/world/town/get-pouring-pot-profile"
 import type { getPouringPotPose } from "#/world/town/get-pouring-pot-pose"
 type Props = { profile: Exclude<ReturnType<typeof getPouringPotProfile>, Error>; pose: Exclude<ReturnType<typeof getPouringPotPose>, Error> }

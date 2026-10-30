@@ -1,4 +1,4 @@
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 
 /** Match the actor's heading rotation before adding its root translation. */
 export function toHeadingWorldPoint(point: Point3, origin: Point3, heading: number): Point3 {

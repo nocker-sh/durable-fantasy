@@ -1,6 +1,6 @@
 import * as THREE from "three"
-import type { PixelBuffer as PixBuf } from "../../lib/graphics/pixel-buffer"
-import { toTexture as toTex } from "../../lib/graphics/to-texture"
+import type { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
+import { toTexture as toTex } from "#/lib/graphics/to-texture"
 
 /**
  * Sprites are not lit by the scene's lights, so every pixel sprite (crops, goods, clutter) is

@@ -1,6 +1,6 @@
 import { strictEqual } from "node:assert"
 import { describe, expect, it } from "vitest"
-import { apply } from "./apply"
+import { apply } from "#/world/core/apply"
 import { CLAIM_MS, MONSTER_KINDS, SPAWNS } from "#/world/core/monsters"
 import { dropsOf } from "#/world/core/drops-of"
 import { monsterAt } from "#/world/core/monster-at"

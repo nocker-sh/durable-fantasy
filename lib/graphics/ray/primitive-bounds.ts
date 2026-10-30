@@ -1,6 +1,6 @@
-import type { PrimitiveShape } from "./primitive-types"
-import type { PrimitiveBounds } from "./primitive-bounds-types"
-import { cylinderBounds } from "./cylinder-bounds"
+import type { PrimitiveShape } from "#/lib/graphics/ray/primitive-types"
+import type { PrimitiveBounds } from "#/lib/graphics/ray/primitive-bounds-types"
+import { cylinderBounds } from "#/lib/graphics/ray/cylinder-bounds"
 
 export function primitiveBounds(primitive: PrimitiveShape): PrimitiveBounds {
   if (primitive.bounds) return primitive.bounds

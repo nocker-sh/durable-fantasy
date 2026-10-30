@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
-import { apply } from "./apply"
-import { commandSchema } from "./commands"
+import { apply } from "#/world/core/apply"
+import { commandSchema } from "#/world/core/commands"
 import { lifeExpAt } from "#/world/core/life-exp-at"
 import { emptyEquipment } from "#/world/core/empty-equipment"
 import { loadPlayer } from "#/world/core/load-player"

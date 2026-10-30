@@ -1,9 +1,9 @@
-import { certifyFieldSeparation } from "../../engine/field-separation"
-import { primitiveBounds } from "./primitive-bounds"
-import { getConeSeparationField } from "./get-cone-separation-field"
-import { getPrimitiveCapsuleField } from "./get-primitive-capsule-field"
-import type { BoundedField } from "../../engine/field-separation"
-import type { Primitive } from "./primitive-types"
+import { certifyFieldSeparation } from "#/lib/engine/field-separation"
+import { primitiveBounds } from "#/lib/graphics/ray/primitive-bounds"
+import { getConeSeparationField } from "#/lib/graphics/ray/get-cone-separation-field"
+import { getPrimitiveCapsuleField } from "#/lib/graphics/ray/get-primitive-capsule-field"
+import type { BoundedField } from "#/lib/engine/field-separation"
+import type { Primitive } from "#/lib/graphics/ray/primitive-types"
 type Props = { fields: readonly BoundedField[]; primitive: Primitive }
 
 /** Every filled component needs a proof; uncertain native surfaces remain collisions rather than being sampled away. */

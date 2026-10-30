@@ -1,11 +1,11 @@
 import { solveTwoBoneOnPlane } from "#/lib/engine/solve-two-bone-on-plane"
 import { armGripLengths } from "#/world/scene/figure/arm-grip-lengths"
 import { armGripPoint } from "#/world/scene/figure/arm-grip-point"
-import { addVector3 as add } from "../../../lib/engine/add-vector3"
-import { scaleVector3 as mul } from "../../../lib/engine/scale-vector3"
-import { subtractVector3 as sub } from "../../../lib/engine/subtract-vector3"
+import { addVector3 as add } from "#/lib/engine/add-vector3"
+import { scaleVector3 as mul } from "#/lib/engine/scale-vector3"
+import { subtractVector3 as sub } from "#/lib/engine/subtract-vector3"
 import type { Skel } from "#/world/scene/rig"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { skeleton: Skel; hand: "l" | "r"; target: Point3; pole: Point3; normal: Point3 }
 
 /** Place the elbow in the palm's bar-normal plane without changing shoulder, wrist offset or native link lengths. */

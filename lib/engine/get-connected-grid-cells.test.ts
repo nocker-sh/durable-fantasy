@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { getConnectedGridCells } from "./get-connected-grid-cells"
+import { getConnectedGridCells } from "#/lib/engine/get-connected-grid-cells"
 
 it("finds only the connected floor without crossing a wall or the grid boundary", () => {
   const floor = ["..#..", ".##..", "..#.."]

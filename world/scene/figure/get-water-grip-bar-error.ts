@@ -1,7 +1,7 @@
 import { armGripPoint } from "#/world/scene/figure/arm-grip-point"
-import { dotVector3 as dot } from "../../../lib/engine/dot-vector3"
-import { subtractVector3 as sub } from "../../../lib/engine/subtract-vector3"
-import { normalizeVector3 as norm } from "../../../lib/engine/normalize-vector3"
+import { dotVector3 as dot } from "#/lib/engine/dot-vector3"
+import { subtractVector3 as sub } from "#/lib/engine/subtract-vector3"
+import { normalizeVector3 as norm } from "#/lib/engine/normalize-vector3"
 import type { Skel } from "#/world/scene/rig"
 import type { WaterVesselPart } from "#/world/town/get-water-vessel-parts"
 type Props = { skeleton: Skel; bar: Extract<WaterVesselPart, { kind: "capsule" }> }

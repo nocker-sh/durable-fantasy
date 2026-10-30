@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { payStrike } from "./combat-payment"
+import { payStrike } from "#/world/core/combat-payment"
 import { player } from "#/world/test/player"
 
 function fighter() {

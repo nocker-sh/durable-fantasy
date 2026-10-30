@@ -1,6 +1,6 @@
 import type { SettingDocument } from "#/scripts/lib/setting-document"
-import { stairHeadroom } from "./stair-headroom"
-import { MAX_STAIR_RISER_M, MIN_STAIR_GOING_M, MIN_STAIR_HEADROOM_M, MIN_PASSAGE_WIDTH_M } from "./spatial-rules"
+import { stairHeadroom } from "#/scripts/lib/stair-headroom"
+import { MAX_STAIR_RISER_M, MIN_STAIR_GOING_M, MIN_STAIR_HEADROOM_M, MIN_PASSAGE_WIDTH_M } from "#/scripts/lib/spatial-rules"
 type Section = {
   lower_room: string
   upper_room: string

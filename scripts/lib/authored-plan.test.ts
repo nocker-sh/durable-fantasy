@@ -2,13 +2,13 @@ import { auditRoomGrid } from "#/scripts/lib/audit-room-grid"
 import { expect, it } from "vitest"
 import { readFileSync } from "node:fs"
 import { readSetting } from "#/scripts/lib/read-setting"
-import { compileAuthoredPlan } from "./authored-plan"
+import { compileAuthoredPlan } from "#/scripts/lib/authored-plan"
 import { authoredFloorPlan } from "#/world/town/floorplan/authored"
 import { interiorPlan } from "#/world/town/interior-plan"
 import { interiorRows } from "#/world/town/interior-rows"
 import { ROOM_SCALE } from "#/world/town/interior-rules"
 import { HOUSES } from "#/world/town/houses"
-import generated from "../../world/town/floorplan/authored/h-m5"
+import generated from "#/world/town/floorplan/authored/h-m5"
 
 const setting = (kind: string, id: string) => readSetting(readFileSync(new URL(`../../.docs/settings/${kind}/${id}.md`, import.meta.url), "utf8"))
 const building = setting("buildings", "building-h-m5")

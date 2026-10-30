@@ -1,6 +1,6 @@
 import { getPouringPotWorldBounds } from "#/world/scene/figure/get-pouring-pot-world-bounds"
 import { getGridRectangleClearanceError } from "#/lib/engine/get-grid-rectangle-clearance-error"
-import type { HotWaterPoseContext } from "./hot-water-frame-types"
+import type { HotWaterPoseContext } from "#/scripts/lib/hot-water-frame-types"
 
 type Props = Pick<HotWaterPoseContext, "room" | "definition" | "review" | "pose">
 

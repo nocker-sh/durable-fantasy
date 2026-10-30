@@ -1,8 +1,8 @@
-import { SPRITE_RENDER_VERSION } from "../sprite-render-version"
-import { OptionalCacheAccess } from "../../../lib/engine/optional-cache-access"
-import { isSpriteManifest } from "../is-sprite-manifest"
-import type { SpriteManifest } from "../sprite-manifest-types"
-import { MAPS } from "../../maps/index"
+import { SPRITE_RENDER_VERSION } from "#/world/scene/sprite-render-version"
+import { OptionalCacheAccess } from "#/lib/engine/optional-cache-access"
+import { isSpriteManifest } from "#/world/scene/is-sprite-manifest"
+import type { SpriteManifest } from "#/world/scene/sprite-manifest-types"
+import { MAPS } from "#/world/maps/index"
 
 const SPRITES = MAPS.phanthiet.assets.sprites
 const manifestAccess = new OptionalCacheAccess(5000)

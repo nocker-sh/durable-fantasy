@@ -1,12 +1,12 @@
 import { getEllipticalFrustumField } from "#/lib/graphics/ray/get-elliptical-frustum-field"
 import { getUnionFieldPrimitive } from "#/lib/graphics/ray/get-union-field-primitive"
 import { getFoldedGarmentMaterialCoordinates } from "#/world/scene/figure/get-folded-garment-material-coordinates"
-import { addVector3 as add } from "../../../lib/engine/add-vector3"
-import { subtractVector3 as sub } from "../../../lib/engine/subtract-vector3"
-import { scaleVector3 as mul } from "../../../lib/engine/scale-vector3"
-import { normalizeVector3 as norm } from "../../../lib/engine/normalize-vector3"
-import { lerpVector3 as lerp3 } from "../../../lib/engine/lerp-vector3"
-import type { Vector3Tuple as V3 } from "../../../lib/engine/vector3-types"
+import { addVector3 as add } from "#/lib/engine/add-vector3"
+import { subtractVector3 as sub } from "#/lib/engine/subtract-vector3"
+import { scaleVector3 as mul } from "#/lib/engine/scale-vector3"
+import { normalizeVector3 as norm } from "#/lib/engine/normalize-vector3"
+import { lerpVector3 as lerp3 } from "#/lib/engine/lerp-vector3"
+import type { Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
 type Props = {
   hem: V3
   waist: V3

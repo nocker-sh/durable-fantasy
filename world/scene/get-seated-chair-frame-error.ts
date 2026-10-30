@@ -4,7 +4,7 @@ import { toHeadingLocalCuboid } from "#/world/scene/to-heading-local-cuboid"
 import type { ChairSection } from "#/world/town/get-chair-sections"
 import type { Look } from "#/world/scene/figure/look"
 import type { Skel } from "#/world/scene/rig"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { look: Look; skeleton: Skel; root: Point3; heading: number; chair: readonly ChairSection[] }
 
 /** Chair back and four legs only; seat support, clothing at the board and foot-rest contact require separate proofs. */

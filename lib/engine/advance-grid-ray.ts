@@ -1,4 +1,4 @@
-import type { getGridRayAxis } from "./get-grid-ray-axis"
+import type { getGridRayAxis } from "#/lib/engine/get-grid-ray-axis"
 type Axis = ReturnType<typeof getGridRayAxis>
 type Props = { x: Axis; z: Axis }
 /** Advance both axes at a corner while retaining its two side cells in the supercover. */

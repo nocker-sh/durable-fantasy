@@ -1,4 +1,4 @@
-import { getSpriteStripFilename } from "./get-sprite-strip-filename"
+import { getSpriteStripFilename } from "#/world/scene/get-sprite-strip-filename"
 
 type Props = Readonly<{ directory: string; resident: number; animation: string; view: number; rendererVersion: number; key: string; frame: readonly [number, number]; frames: number }>
 

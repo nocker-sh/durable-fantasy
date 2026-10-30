@@ -1,7 +1,7 @@
 import { getHotWaterFrameContext } from "#/scripts/lib/get-hot-water-frame-context"
 import { getHotWaterReachFrame } from "#/scripts/lib/get-hot-water-reach-frame"
 import { FRAMES } from "#/world/scene/figure/animation"
-import type { HotWaterReviewInput as Props } from "./hot-water-frame-types"
+import type { HotWaterReviewInput as Props } from "#/scripts/lib/hot-water-frame-types"
 
 /** Static frames check reach, palm openings, cuff planes, the whole pot and table space; load, attachment and a moving pour remain separate. */
 export function getHotWaterReachReviewError(props: Props): Error | null {

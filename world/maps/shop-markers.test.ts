@@ -4,7 +4,7 @@ import { MAPS } from "#/world/maps"
 import { shopOpen } from "#/world/maps/shop-open"
 import { INTERIORS } from "#/world/town/interiors"
 import { outsideDoor } from "#/world/town/outside-door"
-import { shopMarkers } from "./shop-markers"
+import { shopMarkers } from "#/world/maps/shop-markers"
 
 describe("shop minimap markers", () => {
   it("keeps every shop on its district map even when closed", () => {

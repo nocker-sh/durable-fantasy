@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
-import { getTwoBonePoleSpeedBound } from "./get-two-bone-pole-speed-bound"
-import { solveTwoBone } from "./solve-two-bone"
+import { getTwoBonePoleSpeedBound } from "#/lib/engine/get-two-bone-pole-speed-bound"
+import { solveTwoBone } from "#/lib/engine/solve-two-bone"
 
 const root = [0, 0, 0] satisfies [number, number, number],
   target = [0, 0, 1] satisfies [number, number, number]

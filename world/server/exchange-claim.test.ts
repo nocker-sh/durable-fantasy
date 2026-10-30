@@ -1,13 +1,13 @@
 import { afterEach, expect, it, vi } from "vitest"
-import { Exchange } from "../../durable-objects/exchange"
-import { Player } from "../../durable-objects/player"
+import { Exchange } from "#/durable-objects/exchange"
+import { Player } from "#/durable-objects/player"
 import { emptyExchange } from "#/world/core/empty-exchange"
 import { place } from "#/world/core/place"
 import type { ExchangeState, Inbox } from "#/world/core/exchange-types"
 
 import { emptyBag } from "#/world/core/empty-bag"
 import type { InboxClaim } from "#/world/core/exchange-claim-types"
-import { durableStorage as storage } from "../test/durable-storage"
+import { durableStorage as storage } from "#/world/test/durable-storage"
 import { player } from "#/world/test/player"
 
 vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }))

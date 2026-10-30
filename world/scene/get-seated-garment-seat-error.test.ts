@@ -9,11 +9,11 @@ import { createBodyContext } from "#/world/scene/figure/context"
 import { buildBody } from "#/world/scene/figure/body"
 import { seatedSupportDepth } from "#/world/scene/figure/seated-support-depth"
 import { RESIDENTS, RESIDENT_LOOKS } from "#/world/town/residents"
-import { addVector3 as add } from "../../lib/engine/add-vector3"
-import { subtractVector3 as sub } from "../../lib/engine/subtract-vector3"
-import { scaleVector3 as mul } from "../../lib/engine/scale-vector3"
-import { normalizeVector3 as norm } from "../../lib/engine/normalize-vector3"
-import { lerpVector3 as lerp3 } from "../../lib/engine/lerp-vector3"
+import { addVector3 as add } from "#/lib/engine/add-vector3"
+import { subtractVector3 as sub } from "#/lib/engine/subtract-vector3"
+import { scaleVector3 as mul } from "#/lib/engine/scale-vector3"
+import { normalizeVector3 as norm } from "#/lib/engine/normalize-vector3"
+import { lerpVector3 as lerp3 } from "#/lib/engine/lerp-vector3"
 const fixture = (frame: number, name = "ヴィルヘルム") => {
   const room = readSetting(readFileSync(new URL("../../.docs/settings/rooms/room-h1-1.md", import.meta.url), "utf8"))
   const chair = room.furniture?.find((part) => part.symbol === "A"),

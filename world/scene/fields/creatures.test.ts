@@ -1,7 +1,7 @@
 import { expect, it, vi } from "vitest"
 import * as THREE from "three"
 import { hareBody } from "#/world/scene/fields/hare-body"
-import { outlineShape } from "../../../lib/graphics/outline-shape"
+import { outlineShape } from "#/lib/graphics/outline-shape"
 
 it("keeps all seven boxes and the body shadow in four draws", () => {
   const disposed = vi.spyOn(THREE.BufferGeometry.prototype, "dispose")

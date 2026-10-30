@@ -2,7 +2,7 @@ import { afterEach, expect, it } from "vitest"
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import { tmpdir } from "node:os"
-import { commitSpriteBakeStrip } from "./commit-sprite-bake-strip"
+import { commitSpriteBakeStrip } from "#/scripts/lib/commit-sprite-bake-strip"
 const directories: string[] = []
 afterEach(() => {
   for (const directory of directories.splice(0)) rmSync(directory, { recursive: true, force: true })

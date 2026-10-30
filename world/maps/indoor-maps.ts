@@ -3,7 +3,7 @@ import { INDOOR_SIZE } from "#/world/town/interior-rules"
 import { interiorRows } from "#/world/town/interior-rows"
 import { outsideDoor } from "#/world/town/outside-door"
 import type { Interior } from "#/world/town/interiors"
-import { interiorStairLinks } from "../town/interior-stairs"
+import { interiorStairLinks } from "#/world/town/interior-stairs"
 
 /** The same map definitions are consumed by server movement and the client scene. */
 export function indoorMaps(interiors: readonly Interior[], options: { sprites: string; name: (it: Interior) => string; npcs: (it: Interior) => MapDefinition["npcs"] }): Record<string, MapDefinition> {

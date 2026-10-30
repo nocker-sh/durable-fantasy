@@ -1,10 +1,10 @@
-import type { BodyContext } from "./context"
-import type { HeadContext } from "./head"
-import type { HairContext } from "./hair"
-import { dotVector3 as dot } from "../../../lib/engine/dot-vector3"
-import { subtractVector3 as sub } from "../../../lib/engine/subtract-vector3"
-import { createSolidSurfaceMaterial } from "../../../lib/graphics/ray/create-solid-surface-material"
-import { hashSurfacePoint } from "../../../lib/graphics/ray/hash-surface-point"
+import type { BodyContext } from "#/world/scene/figure/context"
+import type { HeadContext } from "#/world/scene/figure/head"
+import type { HairContext } from "#/world/scene/figure/hair"
+import { dotVector3 as dot } from "#/lib/engine/dot-vector3"
+import { subtractVector3 as sub } from "#/lib/engine/subtract-vector3"
+import { createSolidSurfaceMaterial } from "#/lib/graphics/ray/create-solid-surface-material"
+import { hashSurfacePoint } from "#/lib/graphics/ray/hash-surface-point"
 import { limbSd } from "#/lib/graphics/ray/limb-sd"
 
 function buildHats(context: BodyContext & HeadContext & HairContext) {

@@ -1,6 +1,6 @@
 import type { StorageLidPlan } from "#/world/town/storage-lid"
 import type { StorageBoxPart } from "#/world/town/storage-box-types"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { plan: StorageLidPlan; offset: Point3 }
 
 /** Only the existing cover moves; boards and handles retain their identities and the grounded body stays fixed. */

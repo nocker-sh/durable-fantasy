@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs"
 import { expect, it } from "vitest"
 import * as THREE from "three"
 import { readSetting } from "#/scripts/lib/read-setting"
-import { bedDimensions } from "../../scripts/lib/bed-dimensions"
+import { bedDimensions } from "#/scripts/lib/bed-dimensions"
 import { scaleBed } from "#/world/town/scale-bed"
 import { HOUSES } from "#/world/town/houses"
 import { interiorPlan } from "#/world/town/interior-plan"
@@ -12,7 +12,7 @@ import { INDOOR } from "#/world/maps/ground-layouts"
 import { cutaways } from "#/world/scene/interior"
 import { setLayout } from "#/world/scene/set-layout"
 import { groundH } from "#/world/scene/ground-h"
-import { SceneResources } from "../../lib/graphics/scene-resources"
+import { SceneResources } from "#/lib/graphics/scene-resources"
 it("draws a closed sleeping surface for existing and measured native beds", () => {
   const document = readSetting(readFileSync(new URL("../../.docs/settings/rooms/room-h10-2.md", import.meta.url), "utf8"))
   const source = document.furniture!.find((f) => f.runtime_kind === "bed")!,

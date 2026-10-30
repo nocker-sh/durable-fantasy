@@ -1,7 +1,7 @@
 import { certifyLinearInterval } from "#/lib/engine/certify-linear-interval"
 import { canClearWorkForearmInterval } from "#/world/scene/figure/can-clear-work-forearm-interval"
 import { nativeWorkStrokeEndpoints } from "#/world/scene/figure/work-stroke"
-import type { Vector3Tuple as V3 } from "../../../lib/engine/vector3-types"
+import type { Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
 import type { Look } from "#/world/scene/figure/look"
 import type { WorkPoseCandidate } from "#/world/scene/figure/work-pose"
 

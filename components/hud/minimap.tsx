@@ -9,7 +9,7 @@ import { useGame } from "#/hooks/use-game"
 import { useGameState } from "#/hooks/use-game-state"
 import { TitleButton } from "#/components/game/title-button"
 import { Window } from "#/components/game/window"
-import { useWindow } from "./use-window"
+import { useWindow } from "#/components/hud/use-window"
 
 const SIZES = [168, 256] as const
 

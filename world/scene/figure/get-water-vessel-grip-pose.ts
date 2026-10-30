@@ -7,7 +7,7 @@ import { getWaterHandleGripProfile } from "#/world/scene/figure/get-water-handle
 import type { WaterVesselPart } from "#/world/town/get-water-vessel-parts"
 import type { Look } from "#/world/scene/figure/look"
 import type { Skel } from "#/world/scene/rig"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { look: Look; skeleton: Skel; parts: readonly WaterVesselPart[]; position: Point3; scale: number; poles: Record<"l" | "r", Point3> }
 
 /** Solve the two physical handle centres while retaining shoulders, feet and bone lengths. */

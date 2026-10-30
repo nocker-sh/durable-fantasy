@@ -1,4 +1,4 @@
-import { acquireSpriteBakeLock } from "./acquire-sprite-bake-lock"
+import { acquireSpriteBakeLock } from "#/scripts/lib/acquire-sprite-bake-lock"
 const directory = process.argv[2]
 const mode = process.argv[3]
 if (!directory) throw new Error("Missing fixture directory")

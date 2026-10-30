@@ -1,8 +1,8 @@
 import { expect, it } from "vitest"
 import * as THREE from "three"
-import { basketry } from "./basketry"
+import { basketry } from "#/world/scene/construction/basketry"
 import { getInteriorPiece } from "#/world/town/get-interior-piece"
-import { SceneResources } from "../../../lib/graphics/scene-resources"
+import { SceneResources } from "#/lib/graphics/scene-resources"
 
 it.each([
   ["毛糸の籠", "yarn-basket", 0.75, 0.75],

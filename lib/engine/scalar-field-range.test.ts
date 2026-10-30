@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
-import { ScalarField } from "./scalar-field"
-import { scalarFieldRange } from "./scalar-field-range"
+import { ScalarField } from "#/lib/engine/scalar-field"
+import { scalarFieldRange } from "#/lib/engine/scalar-field-range"
 it("finds a peak and a hollow inside a rectangle whose corners miss both", () => {
   const field = new ScalarField(new Float32Array([0, 0, 0, 0, 0, 9, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0]), 4)
   expect(scalarFieldRange(field, [0.2, 0.2, 2.7, 2.7])).toEqual({ min: -4, max: 9 })

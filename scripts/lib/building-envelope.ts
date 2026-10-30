@@ -1,14 +1,14 @@
 import { doorLeafSection } from "#/world/town/door-leaf-section"
 import { doorMovingThickness } from "#/world/town/door-moving-thickness"
 import { doorHandleAlong } from "#/world/town/door-handle-along"
-import type { BuildingEnvelope } from "../../world/town/building-envelope"
+import type { BuildingEnvelope } from "#/world/town/building-envelope"
 import type { AuthoredPlan } from "#/world/town/floorplan/authored"
 import { TILE_M } from "#/world/town/fit"
 import { entryStepGeometry } from "#/scripts/lib/entry-step-geometry"
 import type { EntrySteps } from "#/scripts/lib/entry-steps-types"
 import { roomDoorSwing } from "#/scripts/lib/room-door-swing"
 import { doorAxes } from "#/scripts/lib/door-axes"
-import { siteTransform } from "./site-transform"
+import { siteTransform } from "#/scripts/lib/site-transform"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 
 /** Compile site and interior dimensions together; presentation magnification stays indoors. */

@@ -1,5 +1,5 @@
 import { segmentRectDistance } from "#/lib/engine/segment-rect-distance"
-import { MIN_PASSAGE_WIDTH_M } from "./spatial-rules"
+import { MIN_PASSAGE_WIDTH_M } from "#/scripts/lib/spatial-rules"
 type Rect = readonly [number, number, number, number]
 export type JourneyGround = {
   map_tiles: number

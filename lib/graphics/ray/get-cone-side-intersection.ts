@@ -1,4 +1,4 @@
-import type { ConeLocalRay as Props } from "./cone-ray-types"
+import type { ConeLocalRay as Props } from "#/lib/graphics/ray/cone-ray-types"
 
 /** 側面の二根を近い順に調べ、実際の高さと正の半径の範囲だけを描く。 */
 export function getConeSideIntersection(ray: Props): number {

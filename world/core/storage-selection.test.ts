@@ -1,8 +1,8 @@
 import { expect, it } from "vitest"
-import { apply } from "./apply"
+import { apply } from "#/world/core/apply"
 import { emptyBag } from "#/world/core/empty-bag"
 import type { Stack } from "#/world/core/bag-types"
-import type { ServerCommand } from "./commands"
+import type { ServerCommand } from "#/world/core/commands"
 import { player } from "#/world/test/player"
 const original: Stack = { item: "wood-axe", count: 1, q: 1, by: "ギュンター", dur: 3 }
 for (const action of ["store", "retrieve"] as const) {

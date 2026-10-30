@@ -1,7 +1,7 @@
 import { expect, it } from "vitest"
 import { Box3, BoxGeometry, Group, Mesh, PerspectiveCamera, Sprite, Vector3 } from "three"
-import { getCameraFacingBounds } from "./get-camera-facing-bounds"
-import { getPerspectiveBoxDistance } from "./get-perspective-box-distance"
+import { getCameraFacingBounds } from "#/lib/graphics/get-camera-facing-bounds"
+import { getPerspectiveBoxDistance } from "#/lib/graphics/get-perspective-box-distance"
 
 it("retains exact ordinary geometry bounds and does not mutate the scene", () => {
   const root = new Group(),

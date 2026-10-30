@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
 import { PerspectiveCamera, Vector3 } from "three"
-import { getPerspectiveBoxDistance } from "./get-perspective-box-distance"
+import { getPerspectiveBoxDistance } from "#/lib/graphics/get-perspective-box-distance"
 const frame = { size: [8.53, 3.62, 7.27] satisfies [number, number, number], outward: [0, 0.6, 0.8] satisfies [number, number, number], fovDegrees: 24, aspect: 2.73, padding: 1.1, near: 0.05 }
 
 it("fits every corner through the actual projection for wide, square and narrow viewports through a full turn", () => {

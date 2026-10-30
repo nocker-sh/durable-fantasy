@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { createMonsterNavigationFree } from "./create-monster-navigation-free"
+import { createMonsterNavigationFree } from "#/world/core/create-monster-navigation-free"
 
 it("keeps the caller's point predicate when no body footprint is requested", () => {
   const free = (x: number, z: number) => x > 0 && z > 0

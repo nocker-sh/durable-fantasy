@@ -1,4 +1,4 @@
-import type { Disposable } from "./cleanup-types"
+import type { Disposable } from "#/lib/engine/cleanup-types"
 
 /** Own resources as they are acquired, including resources created before an async failure. */
 export class CleanupStack {

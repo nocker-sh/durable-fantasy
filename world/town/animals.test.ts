@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
-import { townAnimalSpawns } from "./animals"
-import { Rng } from "../../lib/engine/random"
+import { townAnimalSpawns } from "#/world/town/animals"
+import { Rng } from "#/lib/engine/random"
 it("preserves the town's existing population, sprite variants and areas", () => {
   const animals = townAnimalSpawns()
   expect(animals).toHaveLength(23)

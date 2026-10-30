@@ -1,7 +1,7 @@
-import { qrot } from "../../../lib/engine/qrot"
+import { qrot } from "#/lib/engine/qrot"
 import { toHeadingLocalPoint } from "#/world/scene/to-heading-local-point"
 import type { getPouringPotPose } from "#/world/town/get-pouring-pot-pose"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { point: Point3; pose: Exclude<ReturnType<typeof getPouringPotPose>, Error>; body: readonly [number, number]; heading: number; rootY: number }
 
 /** Every pot section shares the same rigid rotation and grounded native figure origin. */

@@ -18,13 +18,13 @@ import { Slot } from "#/components/game/slot"
 import { Tooltip } from "#/components/game/tooltip"
 import { TooltipContent } from "#/components/game/tooltip-content"
 import { TooltipTrigger } from "#/components/game/tooltip-trigger"
-import { ItemTooltip } from "./item-tooltip"
+import { ItemTooltip } from "#/components/hud/item-tooltip"
 import type { ItemId } from "#/world/core/items/catalog"
 import { carriesItem } from "#/components/hud/carries-item"
 import { readDrag } from "#/components/hud/read-drag"
 
 import { useDeadlineClock } from "#/hooks/use-deadline-clock"
-import { skillIconUrl } from "./skill-icon"
+import { skillIconUrl } from "#/components/hud/skill-icon"
 
 const KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
 

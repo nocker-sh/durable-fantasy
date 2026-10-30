@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { apply } from "./apply"
+import { apply } from "#/world/core/apply"
 import type { Order } from "#/world/core/commission-types"
 import { player } from "#/world/test/player"
 const orders: Order[] = [

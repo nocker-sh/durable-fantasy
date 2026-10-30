@@ -1,5 +1,5 @@
-import { getSweptGridClearanceError } from "./get-swept-grid-clearance-error"
-import { segmentRectDistance } from "./segment-rect-distance"
+import { getSweptGridClearanceError } from "#/lib/engine/get-swept-grid-clearance-error"
+import { segmentRectDistance } from "#/lib/engine/segment-rect-distance"
 type Props = Readonly<{
   points: ReadonlyArray<readonly [number, number]>
   radius: number

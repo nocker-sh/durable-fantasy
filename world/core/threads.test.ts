@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { apply } from "./apply"
+import { apply } from "#/world/core/apply"
 import { hometownOf } from "#/world/hometown-of"
 import { MAX_THREADS } from "#/world/core/threads"
 import { keep } from "#/world/core/keep"

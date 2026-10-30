@@ -1,7 +1,7 @@
 import { interiorRows } from "#/world/town/interior-rows"
 import type { Cell, Interior } from "#/world/town/interiors"
-import { stairGeometry } from "./floorplan/stair-geometry"
-import type { Rect } from "./floorplan/types"
+import { stairGeometry } from "#/world/town/floorplan/stair-geometry"
+import type { Rect } from "#/world/town/floorplan/types"
 
 export type StairLink = { at: Cell; to: { map: string; at: Cell } }
 const distance = (a: Cell, b: Cell) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1]))

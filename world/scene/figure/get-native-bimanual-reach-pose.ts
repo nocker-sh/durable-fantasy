@@ -4,7 +4,7 @@ import { groundFootwear } from "#/world/scene/figure/footing"
 import { solveBimanualGrip } from "#/world/scene/figure/solve-bimanual-grip"
 import type { Look } from "#/world/scene/figure/look"
 import type { Skel } from "#/world/scene/rig"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { look: Look; skeleton: Skel; targets: readonly Point3[]; body: readonly [number, number]; heading: number; poles: Record<"l" | "r", Point3> }
 
 /** Ground native footwear once and solve both palms in the actor's frame; bone lengths and shoulders remain unchanged. */

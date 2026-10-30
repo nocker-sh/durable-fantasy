@@ -1,7 +1,7 @@
 import { chromium } from "playwright-core"
 import { withScopedCleanup } from "#/lib/engine/with-scoped-cleanup"
-import { renderSpriteBakePages } from "./render-sprite-bake-pages"
-import type { SpriteBakePageContext } from "./types"
+import { renderSpriteBakePages } from "#/scripts/bake/render-sprite-bake-pages"
+import type { SpriteBakePageContext } from "#/scripts/bake/types"
 
 type Props = Omit<SpriteBakePageContext, "browser" | "pageIndex"> & Readonly<{ prepare: () => void }>
 

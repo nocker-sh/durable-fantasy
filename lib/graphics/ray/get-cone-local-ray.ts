@@ -1,9 +1,9 @@
-import { getConeFrame } from "./get-cone-frame"
-import { subtractVector3 } from "../../engine/subtract-vector3"
-import { dotVector3 } from "../../engine/dot-vector3"
-import type { Vector3 } from "../../engine/vector3-types"
-import type { PrimitiveShape } from "./primitive-types"
-import type { ConeLocalRay } from "./cone-ray-types"
+import { getConeFrame } from "#/lib/graphics/ray/get-cone-frame"
+import { subtractVector3 } from "#/lib/engine/subtract-vector3"
+import { dotVector3 } from "#/lib/engine/dot-vector3"
+import type { Vector3 } from "#/lib/engine/vector3-types"
+import type { PrimitiveShape } from "#/lib/graphics/ray/primitive-types"
+import type { ConeLocalRay } from "#/lib/graphics/ray/cone-ray-types"
 
 export function getConeLocalRay(origin: Vector3, direction: Vector3, primitive: PrimitiveShape): ConeLocalRay {
   const frame = getConeFrame(primitive)

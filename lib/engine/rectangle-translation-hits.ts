@@ -1,5 +1,5 @@
-import { segmentIntersectsRect } from "./segment-intersects-rect"
-import type { Rect } from "./rectangle-motion-types"
+import { segmentIntersectsRect } from "#/lib/engine/segment-intersects-rect"
+import type { Rect } from "#/lib/engine/rectangle-motion-types"
 type Props = Readonly<{ relative: Rect; from: readonly number[]; to: readonly number[]; obstacle: Rect; tolerance?: number; boundary?: "open" | "closed" }>
 
 /** Exact continuous collision, including diagonal motion; tolerance and edge policy belong to the caller. */

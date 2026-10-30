@@ -7,7 +7,7 @@ import { getWaterMotionFloorError } from "#/scripts/lib/get-water-motion-floor-e
 import type { getWaterPickupProposal } from "#/scripts/lib/get-water-pickup-proposal"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 import type { Skel } from "#/world/scene/rig"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { proposal: NonNullable<Exclude<ReturnType<typeof getWaterPickupProposal>, Error>>; room: SettingDocument; skeleton: Skel; from: Point3; to: Point3 }
 
 /** Each accepted interval proves grip, body, shelf and floor enclosures for the same two-handed motion. */

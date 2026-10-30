@@ -1,7 +1,7 @@
 import { expect, it } from "vitest"
-import { getCapsuleSurfaceNormal } from "./get-capsule-surface-normal"
-import { getSphereSurfaceNormal } from "./get-sphere-surface-normal"
-import type { Primitive } from "./primitive-types"
+import { getCapsuleSurfaceNormal } from "#/lib/graphics/ray/get-capsule-surface-normal"
+import { getSphereSurfaceNormal } from "#/lib/graphics/ray/get-sphere-surface-normal"
+import type { Primitive } from "#/lib/graphics/ray/primitive-types"
 const capsule: Primitive = { kind: "cap", a: [1, 2, 3], b: [1, 2, 3], r: 0.5, r2: 0.5, id: 0, m: () => ["test", 0] }
 
 it("uses the sphere normal when the capsule axis has zero length", () => {

@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { ScalarField } from "../../lib/engine/scalar-field"
+import { ScalarField } from "#/lib/engine/scalar-field"
 import { auditEntrySteps } from "#/scripts/lib/audit-entry-steps"
 import { entryStepGeometry } from "#/scripts/lib/entry-step-geometry"
 import { entryOpeningHeight } from "#/scripts/lib/entry-opening-height"

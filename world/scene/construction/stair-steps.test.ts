@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { stairSteps } from "./stair-steps"
+import { stairSteps } from "#/world/scene/construction/stair-steps"
 const spec = { x0: 1, x1: 2.2, z0: 32, z1: 33.3, y0: -0.74, y1: 0.04, steps: 6 }
 it("keeps every washing-place step above its foundation when rising from the ledge", () => {
   const steps = stairSteps(spec)

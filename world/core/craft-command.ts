@@ -2,7 +2,7 @@
 // players before calling this pure transition; a rejected craft never consumes inputs.
 import { addItem } from "#/world/core/add-item"
 import { takeCraftInputs } from "#/world/core/take-craft-inputs"
-import type { ServerCommand } from "./commands"
+import type { ServerCommand } from "#/world/core/commands"
 import { STAMINA_PER_CRAFT } from "#/world/core/crafting-rules"
 import { craftedQuality } from "#/world/core/crafted-quality"
 import { failChance } from "#/world/core/fail-chance"

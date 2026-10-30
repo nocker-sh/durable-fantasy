@@ -1,9 +1,9 @@
 // Which ground plan each map is laid out on (layout.ts): read by the scene and by the
 // workers that paint the ground, so both see the same map. Data only: nothing here draws.
-import { VILLAGE, type Layout } from "./layout"
-import { CRAFT, FIELD_LAYOUTS, GATE, INDOOR, MARKET } from "./ground-layouts"
+import { VILLAGE, type Layout } from "#/world/maps/layout"
+import { CRAFT, FIELD_LAYOUTS, GATE, INDOOR, MARKET } from "#/world/maps/ground-layouts"
 import { HOUSES } from "#/world/town/houses"
-import type { HouseDef } from "../town/house-types"
+import type { HouseDef } from "#/world/town/house-types"
 
 type V2 = [number, number]
 

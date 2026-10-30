@@ -5,7 +5,7 @@ import { LIFE_CAP } from "#/world/core/life-rules"
 import { lifeExpAt } from "#/world/core/life-exp-at"
 import { MONSTER_KINDS, SPAWNS } from "#/world/core/monsters"
 import { SHOPS } from "#/world/core/shops"
-import { apply } from "./apply"
+import { apply } from "#/world/core/apply"
 import { countItem } from "#/world/core/count-item"
 import { player } from "#/world/test/player"
 

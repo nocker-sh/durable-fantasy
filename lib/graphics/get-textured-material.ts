@@ -1,7 +1,7 @@
-import { createTexturedMaterial } from "./create-textured-material"
+import { createTexturedMaterial } from "#/lib/graphics/create-textured-material"
 import type * as THREE from "three"
-import type { PixelBuffer } from "./pixel-buffer"
-import type { TexturedMaterialOptions } from "./material-types"
+import type { PixelBuffer } from "#/lib/graphics/pixel-buffer"
+import type { TexturedMaterialOptions } from "#/lib/graphics/material-types"
 
 // A cache must not keep procedural map images alive after their scene is gone.
 const variantsByPixels = new WeakMap<PixelBuffer, Map<string, THREE.MeshLambertMaterial>>()

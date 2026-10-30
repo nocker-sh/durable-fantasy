@@ -5,11 +5,11 @@ import { nativeArmSurfaces } from "#/world/scene/figure/native-arm-surfaces"
 import { armGripPoint } from "#/world/scene/figure/arm-grip-point"
 import { skelFor } from "#/world/scene/figure/helpers/animation/skel-for"
 import { RESIDENTS, RESIDENT_LOOKS } from "#/world/town/residents"
-import { addVector3 as add } from "../../../lib/engine/add-vector3"
-import { crossVector3 as cross } from "../../../lib/engine/cross-vector3"
-import { scaleVector3 as mul } from "../../../lib/engine/scale-vector3"
-import { normalizeVector3 as norm } from "../../../lib/engine/normalize-vector3"
-import { subtractVector3 as sub } from "../../../lib/engine/subtract-vector3"
+import { addVector3 as add } from "#/lib/engine/add-vector3"
+import { crossVector3 as cross } from "#/lib/engine/cross-vector3"
+import { scaleVector3 as mul } from "#/lib/engine/scale-vector3"
+import { normalizeVector3 as norm } from "#/lib/engine/normalize-vector3"
+import { subtractVector3 as sub } from "#/lib/engine/subtract-vector3"
 const fixture = () => {
   const look = RESIDENT_LOOKS[RESIDENTS.findIndex((resident) => resident.name === "ゾフィー")],
     skeleton = skelFor(look, "idle", 0)

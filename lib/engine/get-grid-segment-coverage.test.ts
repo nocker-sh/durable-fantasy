@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { getGridSegmentCoverage } from "./get-grid-segment-coverage"
+import { getGridSegmentCoverage } from "#/lib/engine/get-grid-segment-coverage"
 
 it("returns full corner coverage without treating rejected input as an empty clear segment", () => {
   expect(getGridSegmentCoverage({ from: [0.25, 0.25], to: [0.75, 0.75], cellSize: 0.5 })).toEqual([

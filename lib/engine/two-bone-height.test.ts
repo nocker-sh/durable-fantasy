@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { solveTwoBoneAtHeight } from "./solve-two-bone-at-height"
+import { solveTwoBoneAtHeight } from "#/lib/engine/solve-two-bone-at-height"
 const distance = (a: readonly number[], b: readonly number[]) => Math.hypot(...a.map((v, i) => v - b[i]))
 it("meets the requested height and both fixed lengths, choosing the pole's side", () => {
   for (const sign of [-1, 1]) {

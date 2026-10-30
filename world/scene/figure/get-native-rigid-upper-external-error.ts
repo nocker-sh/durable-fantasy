@@ -1,5 +1,5 @@
 import { buildBody } from "#/world/scene/figure/body"
-import { primitiveBounds } from "../../../lib/graphics/ray/primitive-bounds"
+import { primitiveBounds } from "#/lib/graphics/ray/primitive-bounds"
 import { canSeparatePrimitiveFromCuboid } from "#/lib/graphics/ray/can-separate-primitive-from-cuboid"
 import { getCertifiedSingleBarBodyError } from "#/world/scene/figure/get-certified-single-bar-body-error"
 import { createBodyContext } from "#/world/scene/figure/context"

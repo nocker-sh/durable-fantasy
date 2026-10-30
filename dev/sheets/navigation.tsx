@@ -1,4 +1,4 @@
-import type { Ref } from "./schema"
+import type { Ref } from "#/dev/sheets/schema"
 import { sheetOf } from "#/dev/sheets/sheet-of"
 import { rowOf } from "#/dev/sheets/row-of"
 

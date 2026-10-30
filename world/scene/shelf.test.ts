@@ -7,7 +7,7 @@ import { INDOOR } from "#/world/maps/ground-layouts"
 import { cutaways } from "#/world/scene/interior"
 import { setLayout } from "#/world/scene/set-layout"
 import { groundH } from "#/world/scene/ground-h"
-import { SceneResources } from "../../lib/graphics/scene-resources"
+import { SceneResources } from "#/lib/graphics/scene-resources"
 it("draws each owned paper bundle on its assigned board rather than inventing stock", () => {
   setLayout(INDOOR)
   const room = INTERIORS.find((r) => r.id === "phanthiet-in-h-m5-floor-2")!,

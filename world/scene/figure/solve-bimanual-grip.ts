@@ -1,6 +1,6 @@
 import { solveArmGrip } from "#/world/scene/figure/solve-arm-grip"
 import type { Skel } from "#/world/scene/rig"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { skeleton: Skel; grips: Record<"l" | "r", Point3>; poles: Record<"l" | "r", Point3> }
 /** Both shoulders and bone lengths stay fixed; wrist rotation and contact surfaces require separate checks. */
 export function solveBimanualGrip(props: Props) {

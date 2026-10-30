@@ -1,5 +1,5 @@
-import { hash2 } from "./hash2"
-import type { NoiseInput as Props } from "./noise-types"
+import { hash2 } from "#/lib/engine/hash2"
+import type { NoiseInput as Props } from "#/lib/engine/noise-types"
 
 export function vnoise(props: Props): number {
   const u = props.x * props.scale

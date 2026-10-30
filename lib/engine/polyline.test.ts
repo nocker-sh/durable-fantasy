@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { Polyline, type V2 } from "./polyline"
+import { Polyline, type V2 } from "#/lib/engine/polyline"
 
 it("matches direct distances for curved paths, endpoints and repeated points", () => {
   const paths: V2[][] = [

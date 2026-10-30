@@ -1,6 +1,6 @@
-import { createConeFrame } from "./create-cone-frame"
-import type { ConeFrame, ConeEndpoints as Props } from "./cone-frame-types"
-import type { Vector3 } from "../../engine/vector3-types"
+import { createConeFrame } from "#/lib/graphics/ray/create-cone-frame"
+import type { ConeFrame, ConeEndpoints as Props } from "#/lib/graphics/ray/cone-frame-types"
+import type { Vector3 } from "#/lib/engine/vector3-types"
 
 type CachedFrame = Readonly<{ start: Vector3; end: Vector3; frame: ConeFrame }>
 const frames = new WeakMap<Props, CachedFrame>()

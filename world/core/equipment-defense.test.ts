@@ -3,7 +3,7 @@ import { equipmentDefense } from "#/world/core/equipment-defense"
 import { derive } from "#/world/core/derive"
 import { ITEMS } from "#/world/core/items/catalog"
 import { ITEM_IDS } from "#/world/core/items/item-ids"
-import { apply } from "./apply"
+import { apply } from "#/world/core/apply"
 import { player } from "#/world/test/player"
 
 it.each([

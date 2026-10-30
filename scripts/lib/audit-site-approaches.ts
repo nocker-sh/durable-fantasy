@@ -1,9 +1,9 @@
-import { MIN_PASSAGE_WIDTH_M } from "./spatial-rules"
+import { MIN_PASSAGE_WIDTH_M } from "#/scripts/lib/spatial-rules"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 import { segmentRectDistance } from "#/lib/engine/segment-rect-distance"
 import { segmentSegmentDistance } from "#/lib/engine/segment-segment-distance"
 import { auditBuildingSite } from "#/scripts/lib/audit-building-site"
-import { siteDoorPose } from "./site-door"
+import { siteDoorPose } from "#/scripts/lib/site-door"
 type House = { id: string; map: string; x0: number; z0: number; x1: number; z1: number }
 type Approach = { room: string; door: number[]; width_m: number; points_tiles: number[][] }
 type ApproachGround = { map_tiles: number; watercourses: readonly { name: string; points: readonly (readonly number[])[]; half_width: number }[] }

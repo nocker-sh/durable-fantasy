@@ -7,7 +7,7 @@ import { buildBody } from "#/world/scene/figure/body"
 import { groundFootwear } from "#/world/scene/figure/footing"
 import { toHeadingWorldPoint } from "#/world/scene/to-heading-world-point"
 import { getNativeBimanualReachPose } from "#/world/scene/figure/get-native-bimanual-reach-pose"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 const poles = { l: [1, -0.3, -0.2] satisfies Point3, r: [-1, -0.3, -0.2] satisfies Point3 }
 const distance = (first: readonly number[], second: readonly number[]) => Math.hypot(...first.map((value, index) => value - second[index]))
 

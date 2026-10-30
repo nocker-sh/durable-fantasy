@@ -1,4 +1,4 @@
-import { smooth } from "../../lib/engine/smooth"
+import { smooth } from "#/lib/engine/smooth"
 import { getSideStepOffsets } from "#/world/town/get-side-step-offsets"
 type Props = Parameters<typeof getSideStepOffsets>[0]
 

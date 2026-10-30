@@ -1,5 +1,5 @@
 import type { Page } from "playwright-core"
-import type { SpriteBakeDrawInput } from "../lib/sprite-bake-types"
+import type { SpriteBakeDrawInput } from "#/scripts/lib/sprite-bake-types"
 
 export async function drawSpriteBakePng(page: Page, input: SpriteBakeDrawInput): Promise<number[]> {
   return page.evaluate(async (measured) => {

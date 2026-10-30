@@ -1,5 +1,5 @@
-import { getLoftSegmentSeparationField } from "./get-loft-segment-separation-field"
-import type { BoundedField } from "../../engine/field-separation"
+import { getLoftSegmentSeparationField } from "#/lib/graphics/ray/get-loft-segment-separation-field"
+import type { BoundedField } from "#/lib/engine/field-separation"
 
 /** Every segment must provide a finite enclosing domain and bound; partial loft certificates are never exposed. */
 export function getLoftSeparationFields(segments: readonly Parameters<typeof getLoftSegmentSeparationField>[0][]): readonly BoundedField[] | undefined {

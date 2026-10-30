@@ -1,12 +1,12 @@
 import { WINDMILL_ROTOR_SHAPE } from "#/world/scene/construction/windmill-rotor-shape"
 import * as THREE from "three"
 import { GeometryBuilder as GB } from "#/lib/graphics/geometry-builder"
-import { getTexturedMaterial as mat } from "../../../lib/graphics/get-textured-material"
-import { PixelBuffer as PixBuf } from "../../../lib/graphics/pixel-buffer"
+import { getTexturedMaterial as mat } from "#/lib/graphics/get-textured-material"
+import { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
 import { pick } from "#/world/scene/pick"
 import { groundH } from "#/world/scene/ground-h"
 import { blockCircle } from "#/world/scene/block-circle"
-import { M } from "./materials"
+import { M } from "#/world/scene/construction/materials"
 import { animateObject } from "#/world/scene/construction/animate-object"
 
 export function windmill(root: THREE.Group, x: number, z: number) {

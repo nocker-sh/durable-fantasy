@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { plannedBuildingFootprints } from "./planned-building-footprints"
+import { plannedBuildingFootprints } from "#/scripts/lib/planned-building-footprints"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 const house = { id: "a", map: "town", x0: 1, z0: 1, x1: 3, z1: 3, name: "家" }
 function fixture(): SettingDocument {

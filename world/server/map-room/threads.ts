@@ -1,8 +1,8 @@
 // The map room's handlers for swapping muffler threads (core/threads.ts).
 import { threadOf } from "#/world/core/thread-of"
 import { TRADE_CELLS } from "#/world/core/trade-rules"
-import { Player } from "../../../durable-objects/player"
-import type { Ctx, Handlers, Message } from "./context"
+import { Player } from "#/durable-objects/player"
+import type { Ctx, Handlers, Message } from "#/world/server/map-room/context"
 import { presence } from "#/world/server/map-room/presence"
 import { setPresence } from "#/world/server/map-room/set-presence"
 import { reachable } from "#/world/server/map-room/reachable"

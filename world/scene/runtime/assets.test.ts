@@ -1,4 +1,4 @@
-import { SPRITE_RENDER_VERSION } from "../sprite-render-version"
+import { SPRITE_RENDER_VERSION } from "#/world/scene/sprite-render-version"
 import { afterEach, expect, it, vi } from "vitest"
 vi.mock("../../maps/index", () => ({ MAPS: { phanthiet: { assets: { sprites: "/sprites" } } } }))
 afterEach(() => {

@@ -1,7 +1,7 @@
 import { emptyEquipment } from "#/world/core/empty-equipment"
 import { loadPlayer } from "#/world/core/load-player"
 import { describe, expect, it } from "vitest"
-import { apply } from "./apply"
+import { apply } from "#/world/core/apply"
 import { addItem } from "#/world/core/add-item"
 import { countItem } from "#/world/core/count-item"
 import { emptyBag } from "#/world/core/empty-bag"
@@ -9,7 +9,7 @@ import { STORAGE_KEEPER, STORAGE_SIZE, STORE_FEE } from "#/world/core/storage/ru
 import { ITEMS } from "#/world/core/items/catalog"
 import { FRIEND } from "#/world/core/friendship-rules"
 import { derive } from "#/world/core/derive"
-import { storageOpen } from "../town/warehouse"
+import { storageOpen } from "#/world/town/warehouse"
 import { bagWith } from "#/world/test/bag-with"
 import { player } from "#/world/test/player"
 

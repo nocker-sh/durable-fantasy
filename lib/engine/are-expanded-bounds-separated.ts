@@ -1,5 +1,5 @@
-import type { Bounds } from "./bounds-types"
-import { isFiniteOrderedBounds } from "./is-finite-ordered-bounds"
+import type { Bounds } from "#/lib/engine/bounds-types"
+import { isFiniteOrderedBounds } from "#/lib/engine/is-finite-ordered-bounds"
 
 type Props = Readonly<{ moving: Bounds; fixed: Bounds; margin: number }>
 

@@ -25,7 +25,7 @@ import { shelfLidHandle } from "#/world/town/shelf-lid-handle"
 import { getNativeBoxGripCandidate } from "#/scripts/lib/get-native-box-grip-candidate"
 import { RESIDENTS, RESIDENT_LOOKS } from "#/world/town/residents"
 import { armGripLengths } from "#/world/scene/figure/arm-grip-lengths"
-import { quarterTurnPoint } from "../../lib/engine/quarter-turn-point"
+import { quarterTurnPoint } from "#/lib/engine/quarter-turn-point"
 function fixture() {
   const room = readSetting(readFileSync(new URL("../../.docs/settings/rooms/room-h-m5-1.md", import.meta.url), "utf8"))
   const operation = room.furniture!.find((furniture) => furniture.hearth_maintenance)!.hearth_maintenance!,

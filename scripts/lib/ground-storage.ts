@@ -1,5 +1,5 @@
-import { roomHasWorker } from "./room-worker"
-import { auditRoomClearance } from "./room-clearance"
+import { roomHasWorker } from "#/scripts/lib/room-worker"
+import { auditRoomClearance } from "#/scripts/lib/room-clearance"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 type GroundStorage = { furniture: string; contents: string; handler: string }
 /** A ground-delivered load must reach the outside without stairs or private bedrooms. */

@@ -1,5 +1,5 @@
-import { solveCoincidentTwoBoneAtHeight } from "./solve-coincident-two-bone-at-height"
-import type { Vector3 } from "./vector3-types"
+import { solveCoincidentTwoBoneAtHeight } from "#/lib/engine/solve-coincident-two-bone-at-height"
+import type { Vector3 } from "#/lib/engine/vector3-types"
 type Props = Readonly<{ root: Vector3; target: Vector3; pole: Vector3; height: number; upperRadiusSquared: number; lowerRadiusSquared: number }>
 
 /** Intersect the two horizontal circles and choose the pole's side without changing the joint height. */

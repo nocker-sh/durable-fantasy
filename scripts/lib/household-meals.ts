@@ -1,7 +1,7 @@
 import type { householdMealSchema } from "#/scripts/lib/household-meal-schema"
 import type { z } from "zod"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
-import { crowdedSeatCentres } from "./spatial-rules"
+import { crowdedSeatCentres } from "#/scripts/lib/spatial-rules"
 type Meal = z.infer<typeof householdMealSchema>
 /** A household's dining plan assigns a physical seat to every member, without using an employee's home. */
 export function auditHouseholdMeals(documents: ReadonlyMap<string, SettingDocument>): string[] {

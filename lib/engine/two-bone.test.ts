@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { solveTwoBone } from "./solve-two-bone"
+import { solveTwoBone } from "#/lib/engine/solve-two-bone"
 const distance = (a: readonly number[], b: readonly number[]) => Math.hypot(...a.map((v, i) => v - b[i]))
 it("preserves both link lengths and reaches the endpoint with the bend toward its pole", () => {
   const root = [0, 0, 0] as const,

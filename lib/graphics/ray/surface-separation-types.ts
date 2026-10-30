@@ -1,5 +1,5 @@
-import type { PrimitiveBounds } from "./primitive-bounds-types"
-import type { PrimitiveShape } from "./primitive-types"
+import type { PrimitiveBounds } from "#/lib/graphics/ray/primitive-bounds-types"
+import type { PrimitiveShape } from "#/lib/graphics/ray/primitive-types"
 import type { limbSd } from "#/lib/graphics/ray/limb-sd"
 
 export type SurfaceSeparationInput = Readonly<{ surface: ReturnType<typeof limbSd>; primitive: PrimitiveShape; margin: number }>

@@ -1,8 +1,8 @@
 import { expect, it } from "vitest"
-import { qfromTo } from "./qfrom-to"
-import { qmul } from "./qmul"
-import { qrot } from "./qrot"
-import { type Q } from "./quaternion-types"
+import { qfromTo } from "#/lib/engine/qfrom-to"
+import { qmul } from "#/lib/engine/qmul"
+import { qrot } from "#/lib/engine/qrot"
+import { type Q } from "#/lib/engine/quaternion-types"
 type V3 = [number, number, number]
 const unit = (v: V3) => {
   const n = Math.hypot(...v)

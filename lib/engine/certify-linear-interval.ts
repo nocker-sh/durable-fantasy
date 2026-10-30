@@ -1,4 +1,4 @@
-import type { Point3 } from "./cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { from: Point3; to: Point3; canClear: (from: Point3, to: Point3) => boolean }
 type Interval = { readonly from: Point3; readonly to: Point3 }
 const MAX_DEPTH = 12

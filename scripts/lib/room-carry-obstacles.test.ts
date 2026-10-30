@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs"
 import { expect, it } from "vitest"
 import { readSetting } from "#/scripts/lib/read-setting"
 import { roomCarryObstacles } from "#/scripts/lib/room-carry-obstacles"
-import { certifyStorageCarry } from "../../world/town/storage-carry"
+import { certifyStorageCarry } from "#/world/town/storage-carry"
 const fixture = () => readSetting(readFileSync(new URL("../../.docs/settings/rooms/room-h-m5-1.md", import.meta.url), "utf8"))
 it("rejects crossing the fully open door even where the grid shows empty floor", () => {
   const room = fixture(),

@@ -1,4 +1,4 @@
-import { roomHasWorker } from "./room-worker"
+import { roomHasWorker } from "#/scripts/lib/room-worker"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 type AnimalCare = {
   kind: string

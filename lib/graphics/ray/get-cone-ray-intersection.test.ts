@@ -1,7 +1,7 @@
 import { expect, it } from "vitest"
-import { getConeRayIntersection } from "./get-cone-ray-intersection"
-import type { PrimitiveShape } from "./primitive-types"
-import type { Vector3 } from "../../engine/vector3-types"
+import { getConeRayIntersection } from "#/lib/graphics/ray/get-cone-ray-intersection"
+import type { PrimitiveShape } from "#/lib/graphics/ray/primitive-types"
+import type { Vector3 } from "#/lib/engine/vector3-types"
 const cone: PrimitiveShape = { kind: "cone", a: [0, 0, 0], b: [0, 0, 1], r: 1, r2: 0.5 }
 
 it("selects the forward side root, including a ray starting inside the surface", () => {

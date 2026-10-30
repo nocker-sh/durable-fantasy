@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { certifyStorageCarry } from "./storage-carry"
+import { certifyStorageCarry } from "#/world/town/storage-carry"
 it("keeps the full carried rectangle clear even when only its corner hits", () => {
   const rect = [-0.2, 0.5, 0.2, 0.9] as const,
     poses = [

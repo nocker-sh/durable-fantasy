@@ -1,5 +1,5 @@
-import type { Cuboid } from "./cuboid-subtraction"
-import type { Point3 } from "./cuboid-motion-types"
+import type { Cuboid } from "#/lib/engine/cuboid-subtraction"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 /** Exact distance: between box-plane crossings, squared distance is one quadratic. */
 export function segmentCuboidDistance(box: Cuboid, a: Point3, b: Point3): number {
   const low = [box.x0, box.bottom, box.z0],

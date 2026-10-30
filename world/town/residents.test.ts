@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
-import { RELATIONS } from "./people"
-import { RESIDENTS, RESIDENT_LOOKS } from "./residents"
+import { RELATIONS } from "#/world/town/people"
+import { RESIDENTS, RESIDENT_LOOKS } from "#/world/town/residents"
 
 const look = (name: string) => RESIDENT_LOOKS[RESIDENTS.findIndex((r) => r.name === name)]
 /** how many of hair, eyes and skin two people have in common */

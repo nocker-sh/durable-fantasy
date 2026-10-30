@@ -1,10 +1,10 @@
-import { solveTwoBone } from "../../../lib/engine/solve-two-bone"
-import { qfromTo } from "../../../lib/engine/qfrom-to"
-import { qmul } from "../../../lib/engine/qmul"
-import { addVector3 as add } from "../../../lib/engine/add-vector3"
-import { subtractVector3 as sub } from "../../../lib/engine/subtract-vector3"
-import { type Vector3Tuple as V3 } from "../../../lib/engine/vector3-types"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import { solveTwoBone } from "#/lib/engine/solve-two-bone"
+import { qfromTo } from "#/lib/engine/qfrom-to"
+import { qmul } from "#/lib/engine/qmul"
+import { addVector3 as add } from "#/lib/engine/add-vector3"
+import { subtractVector3 as sub } from "#/lib/engine/subtract-vector3"
+import { type Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 import type { Bone, Skel } from "#/world/scene/rig"
 type Props = { skeleton: Skel; side: "l" | "r"; target: Point3 }
 /** Preserve both native leg lengths and the existing heel-to-toe orientation; unreachable foot placements fail instead of stretching. */

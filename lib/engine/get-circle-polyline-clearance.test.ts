@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { getCirclePolylineClearance } from "./get-circle-polyline-clearance"
+import { getCirclePolylineClearance } from "#/lib/engine/get-circle-polyline-clearance"
 
 it("detects an explicit obstacle between clear endpoints and identifies it without changing the caller's labels", () => {
   const props = {

@@ -2,11 +2,11 @@
 // paths against the map's walk grid, checks distances for shops and warps, and runs commands on
 // each player's data through their Player Durable Object. Who is where lives on the connections,
 // so the room keeps nothing once the last player leaves.
-import { standUp } from "../../world/server/map-room/posture"
+import { standUp } from "#/world/server/map-room/posture"
 import { defineRoom } from "void/ws"
 import { KeyedQueue } from "#/lib/engine/keyed-queue"
-import { Player } from "../../durable-objects/player"
-import { Directory } from "../../durable-objects/directory"
+import { Player } from "#/durable-objects/player"
+import { Directory } from "#/durable-objects/directory"
 import { parseRoom } from "#/world/parse-room"
 import { MAPS } from "#/world/maps"
 import { isMapId } from "#/world/maps/is-map-id"

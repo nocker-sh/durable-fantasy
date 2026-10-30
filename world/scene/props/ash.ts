@@ -1,7 +1,7 @@
 import { M } from "#/world/scene/construction/materials"
 import { crate } from "#/world/scene/construction/crate"
 import { blockCircle } from "#/world/scene/block-circle"
-import type { Thing } from "./types"
+import type { Thing } from "#/world/scene/props/types"
 import { y0 } from "#/world/scene/props/helpers/materials/y0"
 import { straw, ash, ashDark, wicker } from "#/world/scene/props/materials"
 

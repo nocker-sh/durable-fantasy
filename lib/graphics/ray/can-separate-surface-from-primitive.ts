@@ -1,9 +1,9 @@
-import { isFiniteOrderedBounds } from "../../engine/is-finite-ordered-bounds"
-import { primitiveBounds } from "./primitive-bounds"
-import { canSeparateSurfaceEnvelopes } from "./can-separate-surface-envelopes"
-import { canSeparateSurfaceFields } from "./can-separate-surface-fields"
-import { areExpandedBoundsSeparated } from "../../engine/are-expanded-bounds-separated"
-import type { SurfaceSeparationInput as Props } from "./surface-separation-types"
+import { isFiniteOrderedBounds } from "#/lib/engine/is-finite-ordered-bounds"
+import { primitiveBounds } from "#/lib/graphics/ray/primitive-bounds"
+import { canSeparateSurfaceEnvelopes } from "#/lib/graphics/ray/can-separate-surface-envelopes"
+import { canSeparateSurfaceFields } from "#/lib/graphics/ray/can-separate-surface-fields"
+import { areExpandedBoundsSeparated } from "#/lib/engine/are-expanded-bounds-separated"
+import type { SurfaceSeparationInput as Props } from "#/lib/graphics/ray/surface-separation-types"
 
 /** 必要な余地を含めて外形が離れる組を先に確定し、近い組だけを詳細に証明する。 */
 export function canSeparateSurfaceFromPrimitive(props: Props): boolean {

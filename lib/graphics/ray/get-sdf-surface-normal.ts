@@ -1,8 +1,8 @@
-import type { Vector3Tuple as V3 } from "../../engine/vector3-types"
-import { normalizeVector3 as norm } from "../../engine/normalize-vector3"
-import { addVector3 as add } from "../../engine/add-vector3"
-import { subtractVector3 as sub } from "../../engine/subtract-vector3"
-import type { Primitive } from "./primitive-types"
+import type { Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
+import { normalizeVector3 as norm } from "#/lib/engine/normalize-vector3"
+import { addVector3 as add } from "#/lib/engine/add-vector3"
+import { subtractVector3 as sub } from "#/lib/engine/subtract-vector3"
+import type { Primitive } from "#/lib/graphics/ray/primitive-types"
 
 export function getSdfSurfaceNormal(q: V3, p: Primitive): V3 {
   const e = 1e-3,

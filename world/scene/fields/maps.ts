@@ -11,7 +11,7 @@ import { updaters, places } from "#/world/scene/construction/registry"
 import type { V2 } from "#/world/scene/construction/registry"
 import { isFree } from "#/world/scene/is-free"
 import { roadD } from "#/world/scene/road-d"
-import { LAYOUTS, OPEN_SIDES } from "../../maps/ground-layouts"
+import { LAYOUTS, OPEN_SIDES } from "#/world/maps/ground-layouts"
 import { orchard } from "#/world/scene/fields/orchard"
 import { vineyard } from "#/world/scene/fields/vineyard"
 import { signboard } from "#/world/scene/fields/signboard"
@@ -39,7 +39,7 @@ import { trunkGeo } from "#/world/scene/fields/vegetation"
 import { scatter } from "#/world/scene/fields/helpers/scatter/scatter"
 import { edgeward } from "#/world/scene/fields/helpers/scatter/edgeward"
 import { offRoad } from "#/world/scene/fields/helpers/scatter/off-road"
-import { type Spot, instanced } from "./instancing"
+import { type Spot, instanced } from "#/world/scene/fields/instancing"
 
 // ---------------------------------------------------------------- builders
 function meadow(root: THREE.Group) {

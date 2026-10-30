@@ -1,6 +1,6 @@
-import { segmentIntersectsRect } from "./segment-intersects-rect"
-import { pointRectDistance } from "./point-rect-distance"
-import type { Rect } from "./segment-distance-types"
+import { segmentIntersectsRect } from "#/lib/engine/segment-intersects-rect"
+import { pointRectDistance } from "#/lib/engine/point-rect-distance"
+import type { Rect } from "#/lib/engine/segment-distance-types"
 
 /** 交差を含み、両端と矩形の全ての角から連続する線分への最短距離を求める。 */
 export function segmentRectDistance(rect: Rect, from: ReadonlyArray<number>, to: ReadonlyArray<number>): number {

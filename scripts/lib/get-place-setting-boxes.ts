@@ -1,4 +1,4 @@
-import { quarterTurnRect } from "../../lib/engine/quarter-turn-rect"
+import { quarterTurnRect } from "#/lib/engine/quarter-turn-rect"
 import type { LayoutBox } from "#/lib/engine/get-box-layout-error"
 import type { getTablewareInventory } from "#/scripts/lib/get-tableware-inventory"
 import type { tablePlaceSettingsSchema } from "#/scripts/lib/table-place-settings-schema"

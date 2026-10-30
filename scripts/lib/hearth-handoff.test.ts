@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs"
 import { expect, it } from "vitest"
 import { readSetting } from "#/scripts/lib/read-setting"
-import { auditHearthHandoff } from "./hearth-handoff"
+import { auditHearthHandoff } from "#/scripts/lib/hearth-handoff"
 function fixture(id: string) {
   const read = (kind: string, name: string) => readSetting(readFileSync(new URL(`../../.docs/settings/${kind}/${name}.md`, import.meta.url), "utf8"))
   const building = read("buildings", `building-${id}`),

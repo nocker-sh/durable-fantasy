@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { getBoxLayoutError } from "./get-box-layout-error"
+import { getBoxLayoutError } from "#/lib/engine/get-box-layout-error"
 
 const box = { id: "first", origin: [0, 0, 0] satisfies [number, number, number], size: [0.2, 0.06, 0.2] satisfies [number, number, number] }
 it("allows outer bounds to touch in a stack without assuming hollow nesting", () => {

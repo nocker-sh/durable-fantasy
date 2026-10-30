@@ -1,5 +1,5 @@
-import { getTwoBoneHeightJoint } from "./get-two-bone-height-joint"
-import type { TwoBoneTarget, TwoBoneSolution } from "./two-bone-types"
+import { getTwoBoneHeightJoint } from "#/lib/engine/get-two-bone-height-joint"
+import type { TwoBoneTarget, TwoBoneSolution } from "#/lib/engine/two-bone-types"
 type Props = TwoBoneTarget & Readonly<{ height: number }>
 /** Fixed joint height reduces the two joint spheres to intersecting circles in the horizontal plane. */
 export function solveTwoBoneAtHeight(props: Props): TwoBoneSolution | undefined {

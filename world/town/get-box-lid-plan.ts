@@ -7,7 +7,7 @@ import type { StorageLidPlan } from "#/world/town/storage-lid"
 import type { StorageBoxBounds } from "#/world/town/storage-box-types"
 import type { StorageBoxHandle } from "#/world/town/storage-box-types"
 import type { StorageRoomSection } from "#/world/town/certify-storage-translation"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 import type { LayoutBox } from "#/lib/engine/get-box-layout-error"
 import type { Cuboid } from "#/lib/engine/cuboid-subtraction"
 type Props = {

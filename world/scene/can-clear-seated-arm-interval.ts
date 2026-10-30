@@ -1,10 +1,10 @@
 import { solveArmGripPose } from "#/world/scene/figure/solve-arm-grip-pose"
-import { twoBoneJointSpeedBound } from "../../lib/engine/two-bone-joint-speed-bound"
+import { twoBoneJointSpeedBound } from "#/lib/engine/two-bone-joint-speed-bound"
 import { armGripLengths } from "#/world/scene/figure/arm-grip-lengths"
 import { nativeArmMotionSpeed } from "#/world/scene/figure/native-arm-motion-speed"
 import { createBodyContext } from "#/world/scene/figure/context"
 import { getSeatedArmClearanceError } from "#/world/scene/get-seated-arm-clearance-error"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = Omit<Parameters<typeof getSeatedArmClearanceError>[0], "margin" | "movingHand"> & { hand: "l" | "r"; from: Point3; to: Point3; pole: Point3 }
 
 /** A midpoint enclosure inflated by the joint-speed bound covers the entire straight-target interval. */

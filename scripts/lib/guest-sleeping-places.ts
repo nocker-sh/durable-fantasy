@@ -1,5 +1,5 @@
 import type { SettingDocument } from "#/scripts/lib/setting-document"
-import { MIN_BED_LENGTH_M, MIN_BED_WIDTH_M } from "./spatial-rules"
+import { MIN_BED_LENGTH_M, MIN_BED_WIDTH_M } from "#/scripts/lib/spatial-rules"
 type GuestPlace = { id: string; label: string; grid_symbol: string | null; luggage_id: string; luggage_symbol: string | null }
 /** Guest slots belong to the inn, never to a resident's permanent bed assignment. */
 export function auditGuestSleepingPlaces(documents: ReadonlyMap<string, SettingDocument>): string[] {

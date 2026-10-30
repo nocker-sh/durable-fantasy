@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { RESIDENTS } from "./residents"
+import { RESIDENTS } from "#/world/town/residents"
 import { SHOPS } from "#/world/core/shops"
 import { ITEMS } from "#/world/core/items/catalog"
 import { HOUSEHOLDS, HOUSES } from "#/world/town/houses"

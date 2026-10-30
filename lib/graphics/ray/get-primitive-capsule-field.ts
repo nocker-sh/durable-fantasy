@@ -1,8 +1,8 @@
-import { getPrimitiveCapsuleBounds } from "./get-primitive-capsule-bounds"
-import { primitiveBounds } from "./primitive-bounds"
+import { getPrimitiveCapsuleBounds } from "#/lib/graphics/ray/get-primitive-capsule-bounds"
+import { primitiveBounds } from "#/lib/graphics/ray/primitive-bounds"
 import { segmentSegmentDistance3D } from "#/lib/engine/segment-segment-distance-3d"
-import type { BoundedField } from "../../engine/field-separation"
-import type { PrimitiveShape } from "./primitive-types"
+import type { BoundedField } from "#/lib/engine/field-separation"
+import type { PrimitiveShape } from "#/lib/graphics/ray/primitive-types"
 
 /** Refine the moving surface against a conservative capsule union, never against an uncertified native field. */
 export function getPrimitiveCapsuleField(primitive: PrimitiveShape): BoundedField {

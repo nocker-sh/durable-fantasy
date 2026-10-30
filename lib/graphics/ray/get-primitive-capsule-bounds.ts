@@ -1,5 +1,5 @@
-import type { PrimitiveShape } from "./primitive-types"
-import type { Vector3Tuple as V3 } from "../../engine/vector3-types"
+import type { PrimitiveShape } from "#/lib/graphics/ray/primitive-types"
+import type { Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
 type Capsule = { readonly a: Readonly<V3>; readonly b: Readonly<V3>; readonly r: number }
 
 /** The renderer clips SDF rays to its enclosing sphere; use that tighter envelope before its box corners. */

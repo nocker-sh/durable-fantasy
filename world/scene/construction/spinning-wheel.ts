@@ -1,6 +1,6 @@
 import * as THREE from "three"
 import { GeometryBuilder as GB } from "#/lib/graphics/geometry-builder"
-import { M } from "./materials"
+import { M } from "#/world/scene/construction/materials"
 import type { Furniture } from "#/world/town/interiors"
 
 /** A treadle wheel with a driven bobbin, kept inside its existing floor footprint. */

@@ -1,7 +1,7 @@
 import { expect, it } from "vitest"
-import { getTwoBonePlaneSpeedBound } from "./get-two-bone-plane-speed-bound"
-import { solveTwoBoneOnPlane } from "./solve-two-bone-on-plane"
-import type { Point3 } from "./cuboid-motion-types"
+import { getTwoBonePlaneSpeedBound } from "#/lib/engine/get-two-bone-plane-speed-bound"
+import { solveTwoBoneOnPlane } from "#/lib/engine/solve-two-bone-on-plane"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 const distance = (first: Point3, second: Point3) => Math.hypot(...first.map((value, index) => value - second[index]))
 
 it("bounds the actual planar elbow curve for cardinal and oblique fixed planes", () => {

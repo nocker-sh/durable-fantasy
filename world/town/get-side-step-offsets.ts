@@ -1,4 +1,4 @@
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { phase: number; stride: number; lift: number; direction: "left" | "right" }
 /** The leading foot steps out before the trailing foot collects; offsets compensate the body's translation to retain a planted foot. */
 export function getSideStepOffsets(props: Props): { body: number; l: Point3; r: Point3 } | Error {

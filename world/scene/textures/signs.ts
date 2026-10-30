@@ -1,8 +1,8 @@
-import { PixelBuffer as PixBuf } from "../../../lib/graphics/pixel-buffer"
+import { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
 import { pick } from "#/world/scene/pick"
 import { RAMPS } from "#/world/scene/pix"
-import { type RGB } from "../../../lib/graphics/pixel-types"
-import { hexToRgb as hex } from "../../../lib/graphics/hex-to-rgb"
+import { type RGB } from "#/lib/graphics/pixel-types"
+import { hexToRgb as hex } from "#/lib/graphics/hex-to-rgb"
 
 // ---------------------------------------------------------------- small icons
 export function signTex(kind: string): PixBuf {

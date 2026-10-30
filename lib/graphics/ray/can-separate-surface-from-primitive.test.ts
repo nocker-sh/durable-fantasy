@@ -1,8 +1,8 @@
 import { expect, it, vi } from "vitest"
-import { canSeparateSurfaceFromPrimitive } from "./can-separate-surface-from-primitive"
-import { getConeSeparationField } from "./get-cone-separation-field"
+import { canSeparateSurfaceFromPrimitive } from "#/lib/graphics/ray/can-separate-surface-from-primitive"
+import { getConeSeparationField } from "#/lib/graphics/ray/get-cone-separation-field"
 import { limbSd } from "#/lib/graphics/ray/limb-sd"
-import type { Primitive } from "./primitive-types"
+import type { Primitive } from "#/lib/graphics/ray/primitive-types"
 const cone: Primitive = { kind: "cone", a: [0, 0, 0], b: [0, 1, 0], r: 0.5, r2: 0.05, id: 0, m: () => ["test", 0] }
 
 it("refines overlapping capsule envelopes using the actual tapered cone field", () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { apply } from "./apply"
+import { apply } from "#/world/core/apply"
 import { countItem } from "#/world/core/count-item"
 import { startingStats } from "#/world/core/starting-stats"
 import { lifeExpAt } from "#/world/core/life-exp-at"
@@ -13,7 +13,7 @@ import { isArt } from "#/world/core/is-art"
 import { skillOf } from "#/world/core/skill-of"
 import { bagWith } from "#/world/test/bag-with"
 import { player } from "#/world/test/player"
-import { commandSchema } from "./commands"
+import { commandSchema } from "#/world/core/commands"
 
 const holding = (weapon: "wood-axe" | "oak-staff" | "dagger", patch: Parameters<typeof player>[0] = {}) => player({ equipment: { ...emptyEquipment(), weapon }, ...patch })
 

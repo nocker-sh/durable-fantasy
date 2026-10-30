@@ -1,7 +1,7 @@
-import { getPrimitiveCapsuleField } from "./get-primitive-capsule-field"
-import { getConeSeparationField } from "./get-cone-separation-field"
-import { certifyFieldSeparation, type BoundedField } from "../../engine/field-separation"
-import type { SurfaceSeparationContext as Props } from "./surface-separation-types"
+import { getPrimitiveCapsuleField } from "#/lib/graphics/ray/get-primitive-capsule-field"
+import { getConeSeparationField } from "#/lib/graphics/ray/get-cone-separation-field"
+import { certifyFieldSeparation, type BoundedField } from "#/lib/engine/field-separation"
+import type { SurfaceSeparationContext as Props } from "#/lib/graphics/ray/surface-separation-types"
 
 /** 囲いで未確定の組だけを、既存の表面・円錐・距離場の順序で細分して照合する。 */
 export function canSeparateSurfaceFields(props: Props): boolean {

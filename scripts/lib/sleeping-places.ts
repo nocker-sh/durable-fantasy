@@ -1,5 +1,5 @@
 import type { SettingDocument } from "#/scripts/lib/setting-document"
-import { MIN_BED_LENGTH_M, MIN_BED_WIDTH_M } from "./spatial-rules"
+import { MIN_BED_LENGTH_M, MIN_BED_WIDTH_M } from "#/scripts/lib/spatial-rules"
 type SleepingPlace = { id: string; resident: string; kind: string; grid_symbol?: string | null }
 /** Every resident owns one ordinary bed; guest capacity cannot satisfy a household's bed count. */
 export function auditSleepingPlaces(documents: ReadonlyMap<string, SettingDocument>): string[] {

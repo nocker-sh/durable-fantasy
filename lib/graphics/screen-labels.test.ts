@@ -1,5 +1,5 @@
 import { expect, it, vi } from "vitest"
-import { ScreenLabels } from "./screen-labels"
+import { ScreenLabels } from "#/lib/graphics/screen-labels"
 
 function label() {
   let currentDisplay = ""

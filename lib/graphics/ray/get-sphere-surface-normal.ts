@@ -1,5 +1,5 @@
-import { normalizeVector3 } from "../../engine/normalize-vector3"
-import type { Vector3, Vector3Tuple } from "../../engine/vector3-types"
+import { normalizeVector3 } from "#/lib/engine/normalize-vector3"
+import type { Vector3, Vector3Tuple } from "#/lib/engine/vector3-types"
 type Props = Readonly<{ a: Vector3; sx?: number; sy?: number; sz?: number }>
 
 export function getSphereSurfaceNormal(point: Vector3, primitive: Props): Vector3Tuple {

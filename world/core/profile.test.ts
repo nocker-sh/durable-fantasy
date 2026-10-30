@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
-import { commandSchema } from "./commands"
-import { apply } from "./apply"
+import { commandSchema } from "#/world/core/commands"
+import { apply } from "#/world/core/apply"
 import { loadPlayer } from "#/world/core/load-player"
 import { newPlayer } from "#/world/core/new-player"
 import { profileNameSchema } from "#/world/core/player-schema"

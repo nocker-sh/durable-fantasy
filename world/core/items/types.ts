@@ -1,6 +1,6 @@
 import type { Stat } from "#/world/core/growth-types"
-import type { Skill, Grade, ItemKind, Rarity, GatherSkill } from "./kinds"
-import type { ItemIcon } from "./icons"
+import type { Skill, Grade, ItemKind, Rarity, GatherSkill } from "#/world/core/items/kinds"
+import type { ItemIcon } from "#/world/core/items/icons"
 
 /** Where an equipment item goes; accessories fit either accessory slot. */
 /** neck is for looks: a worn neck wrap replaces the one chosen in the character screen */

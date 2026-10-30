@@ -3,7 +3,7 @@ import { PositionSample } from "#/lib/engine/position-sample"
 import { walkH } from "#/world/scene/walk-h"
 import type { V2 } from "#/world/scene/construction/registry"
 import type { Critter } from "#/world/scene/animal-types"
-import { outlineShape } from "../../lib/graphics/outline-shape"
+import { outlineShape } from "#/lib/graphics/outline-shape"
 import { LIVESTOCK_GRAZE_PITCH } from "#/world/town/livestock-graze-pitch"
 
 type Props = Readonly<{ scene: THREE.Object3D; obj: THREE.Object3D; area: readonly [number, number, number, number]; speed: number }>

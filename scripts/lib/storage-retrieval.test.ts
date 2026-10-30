@@ -2,10 +2,10 @@ import { readFileSync } from "node:fs"
 import { expect, it } from "vitest"
 import { readSetting } from "#/scripts/lib/read-setting"
 import { auditRoomGrid } from "#/scripts/lib/audit-room-grid"
-import { auditFurnitureUse } from "./furniture-use"
+import { auditFurnitureUse } from "#/scripts/lib/furniture-use"
 import { auditStorageRetrieval } from "#/scripts/lib/audit-storage-retrieval"
 import { auditStorageRetrievals } from "#/scripts/lib/audit-storage-retrievals"
-import { shelfDimensions } from "./shelf-dimensions"
+import { shelfDimensions } from "#/scripts/lib/shelf-dimensions"
 import { storageBoxInterior } from "#/world/town/storage-box-interior"
 const read = () => readSetting(readFileSync(new URL("../../.docs/settings/rooms/room-h10-2.md", import.meta.url), "utf8"))
 function item(room: ReturnType<typeof read>) {

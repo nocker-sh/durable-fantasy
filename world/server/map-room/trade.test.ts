@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest"
 import type { WebSocketConnection } from "void/ws"
 import type { ServerMessage } from "#/world/protocol"
-import type { Ctx } from "./context"
+import type { Ctx } from "#/world/server/map-room/context"
 import { emptyOffer } from "#/world/core/empty-offer"
 import { mapPlayer } from "#/world/server/map-room/map-player"
 import { setPresence } from "#/world/server/map-room/set-presence"
@@ -15,7 +15,7 @@ vi.mock("../../../durable-objects/player", () => ({
     }),
   },
 }))
-import { HANDLERS } from "./trade"
+import { HANDLERS } from "#/world/server/map-room/trade"
 
 function connection(id: string, patch: Partial<Presence> = {}) {
   const state: Presence = {

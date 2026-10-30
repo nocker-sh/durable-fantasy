@@ -1,12 +1,12 @@
 import { expect, it, vi } from "vitest"
-import { Exchange } from "../../durable-objects/exchange"
+import { Exchange } from "#/durable-objects/exchange"
 import { emptyExchange } from "#/world/core/empty-exchange"
 import { place } from "#/world/core/place"
 import { emptyClaims } from "#/world/core/empty-claims"
 import type { ExchangeClaims } from "#/world/core/exchange-claim-types"
 import { emptyRequests } from "#/world/core/empty-requests"
 import type { OrderRequests } from "#/world/core/exchange-order-types"
-import { durableStorage } from "../test/durable-storage"
+import { durableStorage } from "#/world/test/durable-storage"
 
 vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }))
 

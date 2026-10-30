@@ -1,11 +1,11 @@
 import { expect, it } from "vitest"
 import * as THREE from "three"
-import { workshopContainer } from "./workshop-container"
+import { workshopContainer } from "#/world/scene/construction/workshop-container"
 import { HOUSES } from "#/world/town/houses"
 import { getInteriorPiece } from "#/world/town/get-interior-piece"
 import { interiorPlan } from "#/world/town/interior-plan"
 import { floorPlan } from "#/world/town/floorplan/floor-plan"
-import { SceneResources } from "../../../lib/graphics/scene-resources"
+import { SceneResources } from "#/lib/graphics/scene-resources"
 
 it.each([
   ["ろうの鍋", "wax-pot", 1.2, 1.2, "pot-lid"],

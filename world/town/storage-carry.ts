@@ -1,6 +1,6 @@
-import { rectangleTranslationHits } from "../../lib/engine/rectangle-translation-hits"
-import { rectangleTurnRadius } from "../../lib/engine/rectangle-turn-radius"
-import { quarterTurnRect } from "../../lib/engine/quarter-turn-rect"
+import { rectangleTranslationHits } from "#/lib/engine/rectangle-translation-hits"
+import { rectangleTurnRadius } from "#/lib/engine/rectangle-turn-radius"
+import { quarterTurnRect } from "#/lib/engine/quarter-turn-rect"
 import { pointRectDistance } from "#/lib/engine/point-rect-distance"
 import { segmentRectDistance } from "#/lib/engine/segment-rect-distance"
 export type StorageCarryPose = {

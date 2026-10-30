@@ -1,5 +1,5 @@
 import { getScalarGridAxisSamples } from "#/lib/engine/get-scalar-grid-axis-samples"
-import type { ScalarField } from "./scalar-field"
+import type { ScalarField } from "#/lib/engine/scalar-field"
 /** Exact extrema of the bilinear field over an axis-aligned rectangle, including clipped cell edges. */
 export function scalarFieldRange(field: ScalarField, bounds: readonly [number, number, number, number]): { min: number; max: number } {
   if (

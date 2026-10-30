@@ -1,4 +1,4 @@
-import { roomHasWorker } from "./room-worker"
+import { roomHasWorker } from "#/scripts/lib/room-worker"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 /** A connected building can still force someone through another person's private room. */
 export function auditPrivateRoomAccess(building: SettingDocument, documents: ReadonlyMap<string, SettingDocument>): string[] {

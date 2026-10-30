@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
-import { apply } from "./apply"
-import { commandSchema } from "./commands"
+import { apply } from "#/world/core/apply"
+import { commandSchema } from "#/world/core/commands"
 import { forgottenLifeExp } from "#/world/core/forgotten-life-exp"
 import { gainLife } from "#/world/core/gain-life"
 import { lifeExpAt } from "#/world/core/life-exp-at"

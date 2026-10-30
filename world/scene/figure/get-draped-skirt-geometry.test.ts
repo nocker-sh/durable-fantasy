@@ -4,7 +4,7 @@ import { getDrapedSkirtGeometry } from "#/world/scene/figure/get-draped-skirt-ge
 import { createBodyContext } from "#/world/scene/figure/context"
 import { skelFor } from "#/world/scene/figure/helpers/animation/skel-for"
 import { RESIDENTS, RESIDENT_LOOKS } from "#/world/town/residents"
-import { subtractVector3 as sub } from "../../../lib/engine/subtract-vector3"
+import { subtractVector3 as sub } from "#/lib/engine/subtract-vector3"
 const look = RESIDENT_LOOKS[RESIDENTS.findIndex((resident) => resident.name === "ゾフィー")]
 it("conserves each layer's cloth length and keeps the frill to its hem band", () => {
   const context = createBodyContext(look, skelFor(look, "sit", 0), null)

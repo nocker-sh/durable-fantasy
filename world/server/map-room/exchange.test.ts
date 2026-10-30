@@ -1,8 +1,8 @@
 import { newPlayer } from "#/world/core/new-player"
 import { afterEach, expect, it, vi } from "vitest"
-import { HANDLERS } from "./exchange"
-import type { Ctx } from "./context"
-import { EXCHANGE_BOARD } from "../../town/boards"
+import { HANDLERS } from "#/world/server/map-room/exchange"
+import type { Ctx } from "#/world/server/map-room/context"
+import { EXCHANGE_BOARD } from "#/world/town/boards"
 
 const calls = vi.hoisted(() => ({ player: vi.fn(), exchange: vi.fn() }))
 vi.mock("../../../durable-objects/player", () => ({ Player: { get: calls.player } }))

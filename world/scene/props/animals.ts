@@ -1,7 +1,7 @@
-import { createColorMaterial as colorMat } from "../../../lib/graphics/create-color-material"
+import { createColorMaterial as colorMat } from "#/lib/graphics/create-color-material"
 import { M } from "#/world/scene/construction/materials"
 import { blockCircle } from "#/world/scene/block-circle"
-import type { Thing } from "./types"
+import type { Thing } from "#/world/scene/props/types"
 import { y0 } from "#/world/scene/props/helpers/materials/y0"
 import { tin, ash, furGrey, furGinger, furBlack } from "#/world/scene/props/materials"
 

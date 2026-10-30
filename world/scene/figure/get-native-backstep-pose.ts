@@ -5,7 +5,7 @@ import { lowerNativePose } from "#/world/scene/figure/lower-native-pose"
 import { solveFootTarget } from "#/world/scene/figure/solve-foot-target"
 import type { Look } from "#/world/scene/figure/look"
 import type { Skel } from "#/world/scene/rig"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = Omit<Parameters<typeof getBackstepOffsets>[0], "clearance"> & { look: Look; skeleton: Skel }
 
 /** Preserve the starting pose exactly; grounded shoe targets and native leg lengths constrain the following backward step. */

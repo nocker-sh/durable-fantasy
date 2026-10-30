@@ -1,6 +1,6 @@
 import { afterEach, expect, it, vi } from "vitest"
-import { Keys, type KeyTarget } from "./keys"
-import { createGameState } from "../client/initial-state"
+import { Keys, type KeyTarget } from "#/world/parts/keys"
+import { createGameState } from "#/world/client/initial-state"
 
 const cleanups: (() => void)[] = []
 afterEach(() => {

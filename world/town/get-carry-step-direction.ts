@@ -1,4 +1,4 @@
-import { quarterTurnPoint } from "../../lib/engine/quarter-turn-point"
+import { quarterTurnPoint } from "#/lib/engine/quarter-turn-point"
 type Props = { from: readonly [number, number]; to: readonly [number, number]; turn: number }
 export type CarryStepDirection = "forward" | "backward" | "side_left" | "side_right"
 /** Left and right belong to the carrier, not the screen; diagonal steps need their own authored gait. */

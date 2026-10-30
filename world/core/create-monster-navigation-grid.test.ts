@@ -1,5 +1,5 @@
 import { expect, it, vi } from "vitest"
-import { createMonsterNavigationGrid } from "./create-monster-navigation-grid"
+import { createMonsterNavigationGrid } from "#/world/core/create-monster-navigation-grid"
 
 it("queries only real cells in row order, retaining negative and clipped coordinates", () => {
   const queries: number[][] = []

@@ -1,4 +1,4 @@
-import type { GridSweepInput as Props, GridSweepWindow, GridSweepWindowFailure } from "./grid-sweep-types"
+import type { GridSweepInput as Props, GridSweepWindow, GridSweepWindowFailure } from "#/lib/engine/grid-sweep-types"
 
 /** 実際に走査する格子の全範囲を先に検証し、上限を超える照会で地形へ触れない。 */
 export function getSweptGridWindow(props: Props): GridSweepWindow | GridSweepWindowFailure {

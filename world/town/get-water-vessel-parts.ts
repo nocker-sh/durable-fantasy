@@ -1,5 +1,5 @@
 import type { getWaterVesselProfile } from "#/world/town/get-water-vessel-profile"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Profile = Exclude<ReturnType<typeof getWaterVesselProfile>, Error>
 export type WaterVesselPart =
   | { kind: "tube"; part: "wall"; centre: readonly [number, number]; radius: number; innerRadius: number; bottom: number; top: number }

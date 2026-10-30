@@ -1,9 +1,9 @@
-import { certifyStorageCarry } from "../../world/town/storage-carry"
+import { certifyStorageCarry } from "#/world/town/storage-carry"
 import { roomCarryObstacles } from "#/scripts/lib/room-carry-obstacles"
-import { MIN_PASSAGE_WIDTH_M, MIN_STANDING_HEADROOM_M } from "./spatial-rules"
+import { MIN_PASSAGE_WIDTH_M, MIN_STANDING_HEADROOM_M } from "#/scripts/lib/spatial-rules"
 import { pointRectDistance } from "#/lib/engine/point-rect-distance"
-import { storageRetrieval } from "../../world/town/storage-retrieval"
-import { shelfDimensions } from "./shelf-dimensions"
+import { storageRetrieval } from "#/world/town/storage-retrieval"
+import { shelfDimensions } from "#/scripts/lib/shelf-dimensions"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 const EPS = 1e-9
 const near = (a: readonly number[], b: readonly number[]) => Math.hypot(a[0] - b[0], a[1] - b[1]) < EPS

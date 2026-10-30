@@ -11,7 +11,7 @@ import { getBoxSideGrips } from "#/world/town/get-box-side-grips"
 import type { Look } from "#/world/scene/figure/look"
 import type { StorageBoxPart } from "#/world/town/storage-box-types"
 import type { Skel } from "#/world/scene/rig"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = {
   look: Look
   skeleton: Skel

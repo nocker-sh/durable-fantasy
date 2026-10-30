@@ -3,7 +3,7 @@ import { createPouringPotBody } from "#/world/scene/construction/create-pouring-
 import { createPouringPotHandle } from "#/world/scene/construction/create-pouring-pot-handle"
 import { createPouringPotLid } from "#/world/scene/construction/create-pouring-pot-lid"
 import type { getPouringPotProfile } from "#/world/town/get-pouring-pot-profile"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { profile: Exclude<ReturnType<typeof getPouringPotProfile>, Error>; at: Point3; heading: number; lid: "seated" | "absent" }
 
 /** Use one measured vessel in heating, cooling and storage; a parked lid is never also drawn on this pot. */

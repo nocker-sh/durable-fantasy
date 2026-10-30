@@ -1,4 +1,4 @@
-import type { Cuboid } from "./cuboid-subtraction"
+import type { Cuboid } from "#/lib/engine/cuboid-subtraction"
 
 /** Axis-aligned expansion encloses every displacement of at most the given Euclidean distance. */
 export function getExpandedCuboid(box: Cuboid, margin: number): Cuboid | Error {

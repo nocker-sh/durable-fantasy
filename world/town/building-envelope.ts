@@ -1,4 +1,4 @@
-import type { FramedWindow } from "./room-fixtures"
+import type { FramedWindow } from "#/world/town/room-fixtures"
 export type BuildingEnvelope = {
   windows: readonly FramedWindow[]
   id: string

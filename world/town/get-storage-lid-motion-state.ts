@@ -1,6 +1,6 @@
 import { storageLidPartsAtOffset } from "#/world/town/storage-lid-parts-at-offset"
 import type { StorageLidPlan } from "#/world/town/storage-lid"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { plan: StorageLidPlan; segment: number; progress: number }
 
 /** Interpolate one certified board segment with exact endpoint weights; this says nothing about the actor's support or gait. */

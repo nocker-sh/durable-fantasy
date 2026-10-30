@@ -2,13 +2,13 @@ import { readFileSync } from "node:fs"
 import { expect, it } from "vitest"
 import * as THREE from "three"
 import { readSetting } from "#/scripts/lib/read-setting"
-import { shelfDimensions } from "../../../scripts/lib/shelf-dimensions"
+import { shelfDimensions } from "#/scripts/lib/shelf-dimensions"
 import { ashLidRestPlan } from "#/scripts/lib/ash-lid-rest-plan"
-import { storageRetrieval } from "../../town/storage-retrieval"
+import { storageRetrieval } from "#/world/town/storage-retrieval"
 import { storageLidState } from "#/world/town/storage-lid-state"
 import { drawStorageBoxParts } from "#/world/scene/construction/draw-storage-box-parts"
 import { GeometryBuilder as GB } from "#/lib/graphics/geometry-builder"
-import { SceneResources } from "../../../lib/graphics/scene-resources"
+import { SceneResources } from "#/lib/graphics/scene-resources"
 it("draws the same receiver hollow on the floor with its own lid resting separately on the shelf", () => {
   const read = (kind: string, id: string) => readSetting(readFileSync(new URL(`../../../.docs/settings/${kind}/${id}.md`, import.meta.url), "utf8")),
     building = read("buildings", "building-h-m5"),

@@ -1,7 +1,7 @@
 import { FRAMES } from "#/world/scene/figure/animation"
 import { getSeatedWithdrawalFrame } from "#/world/scene/get-seated-withdrawal-frame"
 import { certifySeatedElbowSwivel } from "#/world/scene/certify-seated-elbow-swivel"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 import type { Cuboid } from "#/lib/engine/cuboid-subtraction"
 type Props = Omit<Parameters<typeof getSeatedWithdrawalFrame>[0], "frame"> & { poleTarget: Point3; obstacles: readonly Cuboid[] }
 

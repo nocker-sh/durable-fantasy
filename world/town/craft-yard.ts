@@ -1,4 +1,4 @@
-import { ANVIL_GROUND_RADIUS, FORGE_GROUND_HALF_SIZE, WOODPILE_GROUND_HALF_DEPTH, groundRect } from "./workshop-footprints"
+import { ANVIL_GROUND_RADIUS, FORGE_GROUND_HALF_SIZE, WOODPILE_GROUND_HALF_DEPTH, groundRect } from "#/world/town/workshop-footprints"
 /** The existing shared forge yard. Rendering and crafting must refer to the same equipment. */
 export const CRAFT_YARD = {
   map: "phanthiet-craft",

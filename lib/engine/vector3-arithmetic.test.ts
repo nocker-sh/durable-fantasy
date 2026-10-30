@@ -1,9 +1,9 @@
 import { expect, it } from "vitest"
-import { multiplyMatrix3Vector } from "./multiply-matrix3-vector"
-import { multiplyTransposedMatrix3Vector } from "./multiply-transposed-matrix3-vector"
-import { normalizeVector3 } from "./normalize-vector3"
-import { addVector3 } from "./add-vector3"
-import type { ReadonlyMatrix3, Vector3 } from "./vector3-types"
+import { multiplyMatrix3Vector } from "#/lib/engine/multiply-matrix3-vector"
+import { multiplyTransposedMatrix3Vector } from "#/lib/engine/multiply-transposed-matrix3-vector"
+import { normalizeVector3 } from "#/lib/engine/normalize-vector3"
+import { addVector3 } from "#/lib/engine/add-vector3"
+import type { ReadonlyMatrix3, Vector3 } from "#/lib/engine/vector3-types"
 
 it("distinguishes stored frame columns from their transpose without assuming orthogonality", () => {
   const matrix: ReadonlyMatrix3 = [

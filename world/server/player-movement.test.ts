@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from "vitest"
-import { Player } from "../../durable-objects/player"
+import { Player } from "#/durable-objects/player"
 import { player } from "#/world/test/player"
 import type { Cell } from "#/world/protocol"
 

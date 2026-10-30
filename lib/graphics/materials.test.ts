@@ -1,7 +1,7 @@
 import { expect, it } from "vitest"
 import * as THREE from "three"
-import { PixelBuffer } from "./pixel-buffer"
-import { getTexturedMaterial as mat } from "./get-textured-material"
+import { PixelBuffer } from "#/lib/graphics/pixel-buffer"
+import { getTexturedMaterial as mat } from "#/lib/graphics/get-textured-material"
 
 it("shares equivalent materials while keeping distinct rendering options separate", () => {
   const pixels = new PixelBuffer(2, 2)

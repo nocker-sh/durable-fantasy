@@ -1,8 +1,8 @@
-import { workTableSections } from "../../world/town/work-table"
-import { footRestSections, type FootRestSection } from "../../world/town/foot-rest"
-import type { SeatSpec } from "../../world/town/room-fixtures"
+import { workTableSections } from "#/world/town/work-table"
+import { footRestSections, type FootRestSection } from "#/world/town/foot-rest"
+import type { SeatSpec } from "#/world/town/room-fixtures"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
-import { workSurface } from "./work-surface"
+import { workSurface } from "#/scripts/lib/work-surface"
 
 type Furniture = NonNullable<SettingDocument["furniture"]>[number]
 const overlaps = (a: FootRestSection, b: Omit<FootRestSection, "part">) => a.x0 < b.x1 && a.x1 > b.x0 && a.y0 < b.y1 && a.y1 > b.y0 && a.z0 < b.z1 && a.z1 > b.z0

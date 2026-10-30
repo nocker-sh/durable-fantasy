@@ -1,6 +1,6 @@
 import { certifyLinearInterval } from "#/lib/engine/certify-linear-interval"
 import { canClearSeatedArmInterval } from "#/world/scene/can-clear-seated-arm-interval"
-import { twoBoneSegmentReach } from "../../lib/engine/two-bone-segment-reach"
+import { twoBoneSegmentReach } from "#/lib/engine/two-bone-segment-reach"
 import { armGripLengths } from "#/world/scene/figure/arm-grip-lengths"
 type Props = Parameters<typeof canClearSeatedArmInterval>[0]
 

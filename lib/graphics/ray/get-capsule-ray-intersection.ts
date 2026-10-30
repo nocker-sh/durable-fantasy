@@ -1,9 +1,9 @@
-import { subtractVector3 } from "../../engine/subtract-vector3"
-import { getCapsuleRayCoefficients } from "./get-capsule-ray-coefficients"
-import { getCapsuleEndEntry } from "./get-capsule-end-entry"
-import { getCapsuleParallelIntersection } from "./get-capsule-parallel-intersection"
-import type { Vector3 } from "../../engine/vector3-types"
-import type { PrimitiveShape } from "./primitive-types"
+import { subtractVector3 } from "#/lib/engine/subtract-vector3"
+import { getCapsuleRayCoefficients } from "#/lib/graphics/ray/get-capsule-ray-coefficients"
+import { getCapsuleEndEntry } from "#/lib/graphics/ray/get-capsule-end-entry"
+import { getCapsuleParallelIntersection } from "#/lib/graphics/ray/get-capsule-parallel-intersection"
+import type { Vector3 } from "#/lib/engine/vector3-types"
+import type { PrimitiveShape } from "#/lib/graphics/ray/primitive-types"
 
 export function getCapsuleRayIntersection(origin: Vector3, direction: Vector3, primitive: PrimitiveShape): number {
   const ray = getCapsuleRayCoefficients(origin, direction, primitive)

@@ -1,7 +1,7 @@
 import type { Slot } from "#/world/town/routine-types"
-import { lessonRoster } from "../../world/town/routine-activities"
-import { roomHasWorker } from "./room-worker"
-import { crowdedSeatCentres } from "./spatial-rules"
+import { lessonRoster } from "#/world/town/routine-activities"
+import { roomHasWorker } from "#/scripts/lib/room-worker"
+import { crowdedSeatCentres } from "#/scripts/lib/spatial-rules"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 type Classroom = { teachers: string[]; routine_map: string; places: { resident: string; chair: string; table: string }[] }
 /** Match named learners to real seats and the code's lesson roster, without inventing a timetable. */

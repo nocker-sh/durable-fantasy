@@ -10,7 +10,7 @@ import { shopBuying } from "#/world/server/shop-buying"
 import { beginShopTrade } from "#/world/server/begin-shop-trade"
 import { finishShopTrade } from "#/world/server/finish-shop-trade"
 import { recoverShopTrades } from "#/world/server/recover-shop-trades"
-import { Player } from "./player"
+import { Player } from "#/durable-objects/player"
 
 const players = (owner: string) => Player.get(owner)
 export const Market = defineDurableState({

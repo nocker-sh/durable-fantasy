@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { solidLeafHitsBox } from "./solid-door"
+import { solidLeafHitsBox } from "#/scripts/lib/solid-door"
 it("detects thickness on the opposite side of the closed centreline", () => {
   expect(solidLeafHitsBox(1, 0.04, [0.5, -0.015, 0.6, -0.01])).toBe(true)
 })

@@ -1,6 +1,6 @@
 import { solveArmGrip } from "#/world/scene/figure/solve-arm-grip"
 import type { Skel } from "#/world/scene/rig"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { skeleton: Skel; hand: "l" | "r"; target: Point3; pole: Point3 }
 
 /** Change only the solved elbow and wrist; the native shoulders, other arm, root and rest lengths stay intact. */

@@ -5,7 +5,7 @@ import { FH, FW } from "#/world/scene/figure/render"
 import { renderFrame } from "#/world/scene/figure/render-frame"
 import type { AnimSpec, Anim } from "#/world/scene/figure/animation"
 import type { Item, Look } from "#/world/scene/figure/look"
-import { PixelBuffer as PixBuf } from "../../lib/graphics/pixel-buffer"
+import { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
 
 export type FrameJob = {
   key: string

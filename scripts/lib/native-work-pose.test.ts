@@ -1,8 +1,8 @@
-import { assertSettingShape } from "./setting-shape"
+import { assertSettingShape } from "#/scripts/lib/setting-shape"
 import { readFileSync } from "node:fs"
 import { expect, it } from "vitest"
 import { readSetting } from "#/scripts/lib/read-setting"
-import { auditNativeWorkPose } from "./native-work-pose"
+import { auditNativeWorkPose } from "#/scripts/lib/native-work-pose"
 function fixture(id: string) {
   const read = (kind: string, name: string) => readSetting(readFileSync(new URL(`../../.docs/settings/${kind}/${name}.md`, import.meta.url), "utf8"))
   const building = read("buildings", `building-${id}`),

@@ -10,7 +10,7 @@ import { iconUrl } from "#/world/art/icon-url"
 import { mapName } from "#/dev/sheets/map-name"
 import { NODE_KIND, STATION_KIND } from "#/dev/sheets/shared"
 import { ref } from "#/dev/sheets/ref"
-import { sheet } from "./schema"
+import { sheet } from "#/dev/sheets/schema"
 
 const nodeName = (n: (typeof NODES)[number]) => `${mapName(n.map)}の${NODE_KIND[n.kind]} ${n.id.split("-").pop()}`
 

@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs"
 import { expect, it } from "vitest"
 import { readSetting } from "#/scripts/lib/read-setting"
-import { auditHearthCarry } from "./hearth-carry"
+import { auditHearthCarry } from "#/scripts/lib/hearth-carry"
 const read = (kind: string, id: string) => readSetting(readFileSync(new URL(`../../.docs/settings/${kind}/${id}.md`, import.meta.url), "utf8"))
 function fixture(id: string) {
   const room = read("rooms", `room-${id}-1`),

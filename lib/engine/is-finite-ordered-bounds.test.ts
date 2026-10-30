@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { isFiniteOrderedBounds } from "./is-finite-ordered-bounds"
+import { isFiniteOrderedBounds } from "#/lib/engine/is-finite-ordered-bounds"
 
 it("accepts closed degenerate bounds and rejects every nonfinite or reversed coordinate", () => {
   expect(isFiniteOrderedBounds({ min: [-0, 0, 0], max: [0, 0, 0] })).toBe(true)

@@ -1,5 +1,5 @@
-import type { Vector3Tuple as V3 } from "../../engine/vector3-types"
-import type { PrimitiveBounds } from "./primitive-bounds-types"
+import type { Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
+import type { PrimitiveBounds } from "#/lib/graphics/ray/primitive-bounds-types"
 
 /** The two axial end planes clip the radial cylinder; no spherical end caps. */
 export function cylinderBounds(a: V3, b: V3, radius: number): PrimitiveBounds {

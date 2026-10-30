@@ -1,10 +1,10 @@
-import { lines as armorer } from "./households/armorer"
-import { lines as woodworker } from "./households/woodworker"
-import { lines as leather } from "./households/leather"
-import { lines as potter } from "./households/potter"
-import { lines as baskets } from "./households/baskets"
-import { lines as mason } from "./households/mason"
-import { lines as sweep } from "./households/sweep"
+import { lines as armorer } from "#/world/town/lines/households/armorer"
+import { lines as woodworker } from "#/world/town/lines/households/woodworker"
+import { lines as leather } from "#/world/town/lines/households/leather"
+import { lines as potter } from "#/world/town/lines/households/potter"
+import { lines as baskets } from "#/world/town/lines/households/baskets"
+import { lines as mason } from "#/world/town/lines/households/mason"
+import { lines as sweep } from "#/world/town/lines/households/sweep"
 import type { Line } from "#/world/town/lines/line"
 
 export const LINES: Record<string, readonly Line[]> = {

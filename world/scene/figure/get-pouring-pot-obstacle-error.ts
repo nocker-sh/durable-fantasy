@@ -2,7 +2,7 @@ import { certifyFieldSeparation } from "#/lib/engine/field-separation"
 import { segmentCuboidDistance } from "#/lib/engine/segment-cuboid-distance"
 import type { Cuboid } from "#/lib/engine/cuboid-subtraction"
 import type { BoundedField } from "#/lib/engine/field-separation"
-import type { getPouringPotNativeParts } from "./get-pouring-pot-native-parts"
+import type { getPouringPotNativeParts } from "#/world/scene/figure/get-pouring-pot-native-parts"
 type Props = { parts: Exclude<ReturnType<typeof getPouringPotNativeParts>, Error>; fields: readonly BoundedField[]; box: Cuboid }
 
 /** 杯の空洞へ胴を入れず、握りを含む全ての柄も家具から離す。 */

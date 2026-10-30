@@ -1,8 +1,8 @@
 import { afterEach, expect, it } from "vitest"
 import * as THREE from "three"
-import proposal from "../../town/floorplan/authored/h-m5"
+import proposal from "#/world/town/floorplan/authored/h-m5"
 import { authoredFloorPlan } from "#/world/town/floorplan/authored"
-import { stairGeometry } from "../../town/floorplan/stair-geometry"
+import { stairGeometry } from "#/world/town/floorplan/stair-geometry"
 import { HOUSES } from "#/world/town/houses"
 import { interiorPlan } from "#/world/town/interior-plan"
 import { interiorRows } from "#/world/town/interior-rows"
@@ -12,7 +12,7 @@ import { INDOOR } from "#/world/maps/ground-layouts"
 import { cutaways } from "#/world/scene/interior"
 import { updateCutaways } from "#/world/scene/update-cutaways"
 import { setLayout } from "#/world/scene/set-layout"
-import { SceneResources } from "../../../lib/graphics/scene-resources"
+import { SceneResources } from "#/lib/graphics/scene-resources"
 
 afterEach(() => {
   cutaways.length = 0

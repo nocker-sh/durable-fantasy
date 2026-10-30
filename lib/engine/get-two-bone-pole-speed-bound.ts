@@ -1,5 +1,5 @@
-import { twoBoneSegmentReach } from "./two-bone-segment-reach"
-import type { Point3 } from "./cuboid-motion-types"
+import { twoBoneSegmentReach } from "#/lib/engine/two-bone-segment-reach"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { root: Point3; target: Point3; upper: number; lower: number; from: Point3; to: Point3 }
 
 /** A fixed grip makes the elbow rotate in one plane; refuse pole paths crossing the solver's singular projection. */

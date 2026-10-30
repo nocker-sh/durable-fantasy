@@ -1,9 +1,9 @@
 import { spriteManifestSchema } from "#/world/scene/sprite-manifest-schema"
-import { spriteBakePlanSchema } from "./sprite-bake-plan-schema"
-import { getSpriteBakeSelection } from "./get-sprite-bake-selection"
-import { getSpriteBakeOutput } from "./get-sprite-bake-output"
+import { spriteBakePlanSchema } from "#/scripts/lib/sprite-bake-plan-schema"
+import { getSpriteBakeSelection } from "#/scripts/lib/get-sprite-bake-selection"
+import { getSpriteBakeOutput } from "#/scripts/lib/get-sprite-bake-output"
 import type { SpriteManifest } from "#/world/scene/sprite-manifest-types"
-import type { SpriteBakePlan } from "./sprite-bake-types"
+import type { SpriteBakePlan } from "#/scripts/lib/sprite-bake-types"
 type Props = Readonly<{ source: SpriteManifest; previous: SpriteManifest | null; only: readonly string[] | null }>
 
 export function createSpriteBakePlan(props: Props): SpriteBakePlan | Error {

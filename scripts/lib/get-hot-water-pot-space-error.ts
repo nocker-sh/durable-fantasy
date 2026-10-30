@@ -1,7 +1,7 @@
 import { getPosedPotBottom } from "#/world/town/get-posed-pot-bottom"
-import { getHotWaterPotGridError } from "./get-hot-water-pot-grid-error"
-import { getHotWaterPotStationError } from "./get-hot-water-pot-station-error"
-import type { HotWaterPosedContext as Props } from "./hot-water-frame-types"
+import { getHotWaterPotGridError } from "#/scripts/lib/get-hot-water-pot-grid-error"
+import { getHotWaterPotStationError } from "#/scripts/lib/get-hot-water-pot-station-error"
+import type { HotWaterPosedContext as Props } from "#/scripts/lib/hot-water-frame-types"
 
 /** 器の床・部屋の占有・台と杯の立体を、それぞれ省かずに照合する。 */
 export function getHotWaterPotSpaceError(props: Props): Error | null {

@@ -3,7 +3,7 @@ import { getHotWaterReachReviewError } from "#/scripts/lib/get-hot-water-reach-r
 import { getHotWaterHoldingReviewError } from "#/scripts/lib/get-hot-water-holding-review-error"
 import { getHotWaterBatch } from "#/scripts/lib/get-hot-water-batch"
 import { getPotStorageError } from "#/scripts/lib/get-pot-storage-error"
-import { getHotWaterOperatorErrors } from "./get-hot-water-operator-errors"
+import { getHotWaterOperatorErrors } from "#/scripts/lib/get-hot-water-operator-errors"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 
 /** Batch capacity and placement are not boiling, grasp, drying or daily-operation approval. */

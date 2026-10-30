@@ -1,5 +1,5 @@
 import { getBoxLayoutError } from "#/lib/engine/get-box-layout-error"
-import { cuboidTranslationHits } from "../../lib/engine/cuboid-translation-hits"
+import { cuboidTranslationHits } from "#/lib/engine/cuboid-translation-hits"
 import type { StorageRoomSection } from "#/world/town/certify-storage-translation"
 type Props = Readonly<{
   id: string

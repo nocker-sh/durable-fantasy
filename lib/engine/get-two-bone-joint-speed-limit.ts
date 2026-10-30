@@ -1,4 +1,4 @@
-import type { Vector3 } from "./vector3-types"
+import type { Vector3 } from "#/lib/engine/vector3-types"
 type Props = Readonly<{ upper: number; lower: number; velocity: number; poleOffset: Vector3; distance: Readonly<{ min: number; max: number }>; bendMinimum: number }>
 
 /** Preserve the conservative speed allowance and leave a fully extended joint unresolved. */

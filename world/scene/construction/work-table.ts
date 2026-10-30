@@ -1,6 +1,6 @@
-import { workTableSections } from "../../town/work-table"
+import { workTableSections } from "#/world/town/work-table"
 import { GeometryBuilder as GB } from "#/lib/graphics/geometry-builder"
-import { M } from "./materials"
+import { M } from "#/world/scene/construction/materials"
 import type { Furniture } from "#/world/town/interiors"
 
 /** An authored table uses the room's floor and already projected physical dimensions. */

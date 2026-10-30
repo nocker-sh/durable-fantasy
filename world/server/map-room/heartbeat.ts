@@ -1,12 +1,12 @@
-import { Nature } from "../../../durable-objects/nature"
+import { Nature } from "#/durable-objects/nature"
 import { NODES } from "#/world/core/gather"
-import { Wild } from "../../../durable-objects/wild"
-import { Player } from "../../../durable-objects/player"
+import { Wild } from "#/durable-objects/wild"
+import { Player } from "#/durable-objects/player"
 import { spawnsOn } from "#/world/core/spawns-on"
-import type { Handlers } from "./context"
+import type { Handlers } from "#/world/server/map-room/context"
 import { presence } from "#/world/server/map-room/presence"
 import { reachable } from "#/world/server/map-room/reachable"
-import { notifyClient } from "./notifications"
+import { notifyClient } from "#/world/server/map-room/notifications"
 
 export const HANDLERS: Handlers = {
   async heartbeat(inputProps) {

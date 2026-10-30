@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { segmentCuboidDistance } from "./segment-cuboid-distance"
+import { segmentCuboidDistance } from "#/lib/engine/segment-cuboid-distance"
 const box = { x0: 0, x1: 1, bottom: 0, top: 1, z0: 0, z1: 1 }
 it("finds interior crossings, touching faces and stationary distances", () => {
   expect(segmentCuboidDistance(box, [-2, 0.5, 0.5], [3, 0.5, 0.5])).toBe(0)

@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { stairHeadroom, type StairHeadroom } from "./stair-headroom"
+import { stairHeadroom, type StairHeadroom } from "#/scripts/lib/stair-headroom"
 const section = (): StairHeadroom => ({ bottom_m: 0, top_m: 2.52, lower_ceiling_m: 2.32, upper_ceiling_m: 4.72, risers: 14, going_m: 0.28, opening_length_m: 3.64 })
 it("derives headroom from the steps, ceilings and floor opening", () => {
   expect(stairHeadroom(section()).minimum_m).toBeCloseTo(2.2)

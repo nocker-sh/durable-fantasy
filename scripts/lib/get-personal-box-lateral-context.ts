@@ -1,4 +1,4 @@
-import { smooth } from "../../lib/engine/smooth"
+import { smooth } from "#/lib/engine/smooth"
 import { getPersonalBoxLidReview } from "#/scripts/lib/get-personal-box-lid-review"
 import { getPersonalBoxReachPose } from "#/scripts/lib/get-personal-box-reach-pose"
 import { getStorageLidMotionState } from "#/world/town/get-storage-lid-motion-state"

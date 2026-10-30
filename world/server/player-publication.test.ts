@@ -1,8 +1,8 @@
 import { afterEach, expect, it, vi } from "vitest"
-import { Player } from "../../durable-objects/player"
+import { Player } from "#/durable-objects/player"
 import { player } from "#/world/test/player"
 import { bagWith } from "#/world/test/bag-with"
-import { durableStorage } from "../test/durable-storage"
+import { durableStorage } from "#/world/test/durable-storage"
 import { initialPlayerRecord } from "#/world/server/initial-player-record"
 import type { PlayerState } from "#/world/core/player-types"
 

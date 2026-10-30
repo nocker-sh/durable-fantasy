@@ -1,4 +1,4 @@
-import { subtractRectangles, type Rectangle } from "../../lib/engine/rectangle-subtraction"
+import { subtractRectangles, type Rectangle } from "#/lib/engine/rectangle-subtraction"
 
 /** The duct remains empty through every masonry course. */
 export function flueWalls(outer: Rectangle, thickness: number) {

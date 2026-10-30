@@ -1,12 +1,12 @@
-import { getSpriteBakeDrawInput } from "../lib/get-sprite-bake-draw-input"
+import { getSpriteBakeDrawInput } from "#/scripts/lib/get-sprite-bake-draw-input"
 import { join } from "node:path"
 import { writeFileSync } from "node:fs"
 import { getSpriteStripFilename } from "#/world/scene/get-sprite-strip-filename"
-import { isCompleteSpriteStrip } from "../lib/is-complete-sprite-strip"
-import { commitSpriteBakeStrip } from "../lib/commit-sprite-bake-strip"
-import { drawSpriteBakePng } from "./draw-sprite-bake-png"
-import { encodeSpriteWebp } from "./encode-sprite-webp"
-import type { SpriteBakeJobContext as Props } from "./types"
+import { isCompleteSpriteStrip } from "#/scripts/lib/is-complete-sprite-strip"
+import { commitSpriteBakeStrip } from "#/scripts/lib/commit-sprite-bake-strip"
+import { drawSpriteBakePng } from "#/scripts/bake/draw-sprite-bake-png"
+import { encodeSpriteWebp } from "#/scripts/bake/encode-sprite-webp"
+import type { SpriteBakeJobContext as Props } from "#/scripts/bake/types"
 
 export async function renderSpriteBakeJob(props: Props): Promise<void> {
   const input = getSpriteBakeDrawInput(props.plan, props.job)

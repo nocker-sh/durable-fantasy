@@ -1,13 +1,13 @@
-import { isFiniteOrderedBounds } from "../../engine/is-finite-ordered-bounds"
-import { primitiveBounds } from "./primitive-bounds"
-import { getPrimitiveCapsuleBounds } from "./get-primitive-capsule-bounds"
-import { getPrimitiveCapsuleField } from "./get-primitive-capsule-field"
-import { getConeSeparationField } from "./get-cone-separation-field"
-import { segmentCuboidDistance } from "../../engine/segment-cuboid-distance"
-import { certifyFieldSeparation } from "../../engine/field-separation"
-import type { Cuboid } from "../../engine/cuboid-subtraction"
-import type { BoundedField } from "../../engine/field-separation"
-import type { Primitive } from "./primitive-types"
+import { isFiniteOrderedBounds } from "#/lib/engine/is-finite-ordered-bounds"
+import { primitiveBounds } from "#/lib/graphics/ray/primitive-bounds"
+import { getPrimitiveCapsuleBounds } from "#/lib/graphics/ray/get-primitive-capsule-bounds"
+import { getPrimitiveCapsuleField } from "#/lib/graphics/ray/get-primitive-capsule-field"
+import { getConeSeparationField } from "#/lib/graphics/ray/get-cone-separation-field"
+import { segmentCuboidDistance } from "#/lib/engine/segment-cuboid-distance"
+import { certifyFieldSeparation } from "#/lib/engine/field-separation"
+import type { Cuboid } from "#/lib/engine/cuboid-subtraction"
+import type { BoundedField } from "#/lib/engine/field-separation"
+import type { Primitive } from "#/lib/graphics/ray/primitive-types"
 type Props = { primitive: Primitive; box: Cuboid }
 
 /** Refine conservative envelopes without assigning an invented Lipschitz constant to a native surface. */

@@ -3,7 +3,7 @@
 // and what is made at it is in core/recipes/catalog.ts.
 import { STATION_RULES } from "#/world/core/crafting-rules"
 import type { Station } from "#/world/core/crafting-types"
-import { CRAFT_FORGE_PLACE } from "./craft-yard"
+import { CRAFT_FORGE_PLACE } from "#/world/town/craft-yard"
 import { INTERIORS } from "#/world/town/interiors"
 import { equipmentPlace } from "#/world/town/equipment-place"
 import { locateStations } from "#/world/town/locate-stations"

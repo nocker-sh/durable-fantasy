@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { PhaseOscillator } from "./phase-oscillator"
+import { PhaseOscillator } from "#/lib/engine/phase-oscillator"
 
 it("matches independent waves across all ash phases and clock jumps", () => {
   for (const step of [1, 1.7]) {

@@ -1,4 +1,4 @@
-import { recipe as r, type Recipe } from "./definition"
+import { recipe as r, type Recipe } from "#/world/core/recipes/definition"
 
 export const MILESTONES_RECIPES: readonly Recipe[] = [
   // past level 8 (economy.md §2.1): not to be made in v0.1, where life skills stop at 8

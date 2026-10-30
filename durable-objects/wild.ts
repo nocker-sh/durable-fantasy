@@ -9,9 +9,9 @@ import { beginStrike } from "#/world/server/begin-strike"
 import { advanceStrike } from "#/world/server/advance-strike"
 import { deliverStrike } from "#/world/server/deliver-strike"
 import { recoverStrikes } from "#/world/server/recover-strikes"
-import type { CombatAudience } from "../world/server/combat-plan"
-import { Party } from "./party"
-import { Player } from "./player"
+import type { CombatAudience } from "#/world/server/combat-plan"
+import { Party } from "#/durable-objects/party"
+import { Player } from "#/durable-objects/player"
 
 const players = (owner: string) => Player.get(owner)
 const parties = (party: string) => Party.get(party)

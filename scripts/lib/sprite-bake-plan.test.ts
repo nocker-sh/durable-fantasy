@@ -1,7 +1,7 @@
 import { expect, it } from "vitest"
-import { createSpriteBakePlan } from "./create-sprite-bake-plan"
-import { getSpriteBakeResumeError } from "./get-sprite-bake-resume-error"
-import { getSpriteBakeJobs } from "./get-sprite-bake-jobs"
+import { createSpriteBakePlan } from "#/scripts/lib/create-sprite-bake-plan"
+import { getSpriteBakeResumeError } from "#/scripts/lib/get-sprite-bake-resume-error"
+import { getSpriteBakeJobs } from "#/scripts/lib/get-sprite-bake-jobs"
 import type { SpriteManifest } from "#/world/scene/sprite-manifest-types"
 
 const manifest = () =>

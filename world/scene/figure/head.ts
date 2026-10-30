@@ -1,10 +1,10 @@
-import { qrot } from "../../../lib/engine/qrot"
-import type { BodyContext } from "./context"
-import { type Matrix3 as M3, type Vector3Tuple as V3 } from "../../../lib/engine/vector3-types"
-import { addVector3 as add } from "../../../lib/engine/add-vector3"
-import { multiplyMatrix3Vector as mv } from "../../../lib/engine/multiply-matrix3-vector"
-import { multiplyTransposedMatrix3Vector as mtv } from "../../../lib/engine/multiply-transposed-matrix3-vector"
-import { subtractVector3 as sub } from "../../../lib/engine/subtract-vector3"
+import { qrot } from "#/lib/engine/qrot"
+import type { BodyContext } from "#/world/scene/figure/context"
+import { type Matrix3 as M3, type Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
+import { addVector3 as add } from "#/lib/engine/add-vector3"
+import { multiplyMatrix3Vector as mv } from "#/lib/engine/multiply-matrix3-vector"
+import { multiplyTransposedMatrix3Vector as mtv } from "#/lib/engine/multiply-transposed-matrix3-vector"
+import { subtractVector3 as sub } from "#/lib/engine/subtract-vector3"
 
 function buildHead(context: BodyContext) {
   const childSource = context,

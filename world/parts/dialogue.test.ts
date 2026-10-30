@@ -1,12 +1,12 @@
 import { afterEach, expect, it, vi } from "vitest"
 import { choicesFor } from "#/world/parts/choices-for"
 import { linesFor } from "#/world/parts/lines-for"
-import { createGameState } from "../client/initial-state"
+import { createGameState } from "#/world/client/initial-state"
 import { player } from "#/world/test/player"
 import { bagWith } from "#/world/test/bag-with"
 import { errandProgress } from "#/world/core/errand-progress"
 import { dayOf } from "#/world/core/day-of"
-import { ALL_LINES } from "../town/lines"
+import { ALL_LINES } from "#/world/town/lines"
 import { errandOf } from "#/world/core/errand-of"
 
 const now = Date.UTC(2026, 9, 26, 12)

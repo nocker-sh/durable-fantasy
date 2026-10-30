@@ -1,10 +1,10 @@
 import { existsSync, mkdirSync, readFileSync, rmSync } from "node:fs"
 import { join } from "node:path"
-import { getSpriteBakeResumeError } from "./get-sprite-bake-resume-error"
-import { getSpriteBakeJobs } from "./get-sprite-bake-jobs"
-import { writeSpriteBakeJson } from "./write-sprite-bake-json"
+import { getSpriteBakeResumeError } from "#/scripts/lib/get-sprite-bake-resume-error"
+import { getSpriteBakeJobs } from "#/scripts/lib/get-sprite-bake-jobs"
+import { writeSpriteBakeJson } from "#/scripts/lib/write-sprite-bake-json"
 import { getSpriteStripFilename } from "#/world/scene/get-sprite-strip-filename"
-import type { SpriteBakePlan } from "./sprite-bake-types"
+import type { SpriteBakePlan } from "#/scripts/lib/sprite-bake-types"
 type Props = Readonly<{ directory: string; plan: SpriteBakePlan; resume: boolean }>
 
 export function prepareSpriteBake(props: Props): void {

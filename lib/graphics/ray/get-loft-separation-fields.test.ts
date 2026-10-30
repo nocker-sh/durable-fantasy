@@ -1,12 +1,12 @@
 import { expect, it } from "vitest"
 import { loftSd } from "#/lib/graphics/ray/loft-sd"
 import { limbSd } from "#/lib/graphics/ray/limb-sd"
-import { canSeparateSurfaceFromPrimitive } from "./can-separate-surface-from-primitive"
-import { canSeparatePrimitiveFromCuboid } from "./can-separate-primitive-from-cuboid"
-import { qfromTo } from "../../engine/qfrom-to"
+import { canSeparateSurfaceFromPrimitive } from "#/lib/graphics/ray/can-separate-surface-from-primitive"
+import { canSeparatePrimitiveFromCuboid } from "#/lib/graphics/ray/can-separate-primitive-from-cuboid"
+import { qfromTo } from "#/lib/engine/qfrom-to"
 import type { Ring } from "#/lib/graphics/ray/distance-types"
-import type { Primitive } from "./primitive-types"
-import type { Vector3Tuple as V3 } from "../../engine/vector3-types"
+import type { Primitive } from "#/lib/graphics/ray/primitive-types"
+import type { Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
 const distance = (a: V3, b: V3) => Math.hypot(...a.map((value, axis) => value - b[axis]))
 
 it("retains the rendered loft's zero set and finite derivative bounds on tilted tapering segments", () => {

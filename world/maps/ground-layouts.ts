@@ -1,9 +1,9 @@
 // The ground plans (world.ts Layout) of the districts beyond the square, the fields and the
 // rooms: data and landforms only, with nothing drawn, so the workers that paint the ground can
 // load them without the scene.
-import { OFF, OFF_LINE, OFF_POINT, catmull, type Layout } from "./layout"
-import { smooth } from "../../lib/engine/smooth"
-import { fbm } from "../../lib/engine/fbm"
+import { OFF, OFF_LINE, OFF_POINT, catmull, type Layout } from "#/world/maps/layout"
+import { smooth } from "#/lib/engine/smooth"
+import { fbm } from "#/lib/engine/fbm"
 
 const N = 48
 

@@ -11,10 +11,10 @@ import { shopBuys } from "#/world/core/shop-buys"
 import type { ShopId } from "#/world/core/shop-types"
 import { iconUrl } from "#/world/art/icon-url"
 import { ITEM_SPRITES } from "#/world/art/items/catalog"
-import { sheet } from "./schema"
+import { sheet } from "#/dev/sheets/schema"
 import { effects } from "#/dev/sheets/effects"
 import { needsText } from "#/dev/sheets/needs-text"
-import { texUrl } from "./art"
+import { texUrl } from "#/dev/sheets/art"
 
 // ---------------------------------------------------------------- the sheets
 

@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { areExpandedBoundsSeparated } from "./are-expanded-bounds-separated"
+import { areExpandedBoundsSeparated } from "#/lib/engine/are-expanded-bounds-separated"
 
 const moving = { min: [0, 0, 0], max: [1, 1, 1] } as const
 

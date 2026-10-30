@@ -1,4 +1,4 @@
-import { getSweptGridClearanceFailure } from "./get-swept-grid-clearance-failure"
+import { getSweptGridClearanceFailure } from "#/lib/engine/get-swept-grid-clearance-failure"
 type Props = Parameters<typeof getSweptGridClearanceFailure>[0]
 
 /** Preserve the diagnostic Error contract while sharing the exact footprint proof with ordinary candidate rejection. */

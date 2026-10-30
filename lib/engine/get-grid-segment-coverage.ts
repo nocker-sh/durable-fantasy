@@ -1,5 +1,5 @@
-import { advanceGridRay } from "./advance-grid-ray"
-import { getGridRayAxis } from "./get-grid-ray-axis"
+import { advanceGridRay } from "#/lib/engine/advance-grid-ray"
+import { getGridRayAxis } from "#/lib/engine/get-grid-ray-axis"
 type Props = Readonly<{ from: readonly [number, number]; to: readonly [number, number]; cellSize: number }>
 /** Supercover traversal includes both side cells at corners; it never relies on point samples along the segment. */
 export function getGridSegmentCoverage(props: Props): ReadonlyArray<readonly [number, number]> | Error {

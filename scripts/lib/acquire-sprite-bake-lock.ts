@@ -1,10 +1,10 @@
-import { getSpriteBakeHostKey } from "./get-sprite-bake-host-key"
+import { getSpriteBakeHostKey } from "#/scripts/lib/get-sprite-bake-host-key"
 import { mkdirSync, rmSync, writeFileSync } from "node:fs"
 import { randomUUID } from "node:crypto"
 import { join } from "node:path"
-import { getSpriteBakeLockDirectory } from "./get-sprite-bake-lock-directory"
-import { assertSpriteBakeLockAvailable } from "./assert-sprite-bake-lock-available"
-import type { SpriteBakeLease } from "./sprite-bake-types"
+import { getSpriteBakeLockDirectory } from "#/scripts/lib/get-sprite-bake-lock-directory"
+import { assertSpriteBakeLockAvailable } from "#/scripts/lib/assert-sprite-bake-lock-available"
+import type { SpriteBakeLease } from "#/scripts/lib/sprite-bake-types"
 
 export function acquireSpriteBakeLock(output: string): SpriteBakeLease {
   const directory = getSpriteBakeLockDirectory(output)

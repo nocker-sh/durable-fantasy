@@ -1,5 +1,5 @@
 import type { limbSd } from "#/lib/graphics/ray/limb-sd"
-import type { PrimitiveShape } from "./primitive-types"
+import type { PrimitiveShape } from "#/lib/graphics/ray/primitive-types"
 
 /** A real uncut rounded-cone union carries its own distance field and capsule envelope without rendering-only identity or material. */
 export function getLimbPrimitiveShape(surface: ReturnType<typeof limbSd>): PrimitiveShape {

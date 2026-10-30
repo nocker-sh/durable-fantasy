@@ -1,6 +1,6 @@
 import { segmentCuboidDistance } from "#/lib/engine/segment-cuboid-distance"
 import type { Cuboid } from "#/lib/engine/cuboid-subtraction"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = Readonly<{ capsules: readonly Readonly<{ a: Point3; b: Point3; r: number }>[]; margin: number; rootY: number; ceiling: number; boxes: readonly Cuboid[] }>
 
 /** A whole moving segment stays in its midpoint capsule enlarged by the maximum endpoint displacement. */

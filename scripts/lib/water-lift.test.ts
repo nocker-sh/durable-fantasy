@@ -12,11 +12,11 @@ import { getArmGripMotionBound } from "#/world/scene/figure/get-arm-grip-motion-
 import { solveArmGripPose } from "#/world/scene/figure/solve-arm-grip-pose"
 import { nativeArmSurfaces } from "#/world/scene/figure/native-arm-surfaces"
 import { skelFor } from "#/world/scene/figure/helpers/animation/skel-for"
-import { subtractVector3 as sub } from "../../lib/engine/subtract-vector3"
-import { normalizeVector3 as norm } from "../../lib/engine/normalize-vector3"
+import { subtractVector3 as sub } from "#/lib/engine/subtract-vector3"
+import { normalizeVector3 as norm } from "#/lib/engine/normalize-vector3"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 import type { WaterSupportPart } from "#/world/town/get-water-vessel-support-parts"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 const fixture = () => {
   const room = readSetting(readFileSync(new URL("../../.docs/settings/rooms/room-h1-2.md", import.meta.url), "utf8")),
     documents = new Map<string, SettingDocument>()

@@ -1,5 +1,5 @@
-import { vnoise } from "./vnoise"
-import type { NoiseInput as Props } from "./noise-types"
+import { vnoise } from "#/lib/engine/vnoise"
+import type { NoiseInput as Props } from "#/lib/engine/noise-types"
 
 export function fbm(props: Props): number {
   return (

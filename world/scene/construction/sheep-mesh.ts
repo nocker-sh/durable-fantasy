@@ -1,6 +1,6 @@
 import { Group, Mesh, BoxGeometry, IcosahedronGeometry } from "three"
 import { SHEEP_SHAPE } from "#/world/town/sheep-shape"
-import { createColorMaterial as colorMat } from "../../../lib/graphics/create-color-material"
+import { createColorMaterial as colorMat } from "#/lib/graphics/create-color-material"
 import { M } from "#/world/scene/construction/materials"
 
 /** Keep the native geometry and child order while sharing its dimensions with the pasture occupancy check. */

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import * as THREE from "three"
-import { BillboardBatch } from "./billboards"
+import { BillboardBatch } from "#/lib/graphics/billboards"
 
 describe("billboard batching", () => {
   it("sorts transparent particles back to front with their size and opacity", () => {

@@ -1,4 +1,4 @@
-import { getSpriteBakeHostKey } from "./get-sprite-bake-host-key"
+import { getSpriteBakeHostKey } from "#/scripts/lib/get-sprite-bake-host-key"
 
 /** 経過時間で所有者の停止を推測せず、判別不能な所有者も使用中として扱う。 */
 export function isSpriteBakeClaimBlocking(name: string): boolean {

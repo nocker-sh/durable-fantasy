@@ -1,7 +1,7 @@
 // Confirm standing before movement or combat; connection state follows the saved player state.
-import { Player } from "../../../durable-objects/player"
-import type { Ctx } from "./context"
-import { notifyClient } from "./notifications"
+import { Player } from "#/durable-objects/player"
+import type { Ctx } from "#/world/server/map-room/context"
+import { notifyClient } from "#/world/server/map-room/notifications"
 
 export async function standUp(inputProps: Pick<Ctx, "ctx" | "me" | "save">): Promise<boolean> {
   const ctx = inputProps.ctx

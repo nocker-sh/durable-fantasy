@@ -1,10 +1,10 @@
 // Small pixel props that explain a motion: a tree to chop, a well to draw from, water to
 // swim in. Each is drawn once into a PixBuf with the village ramps and a dark outline.
-import { PixelBuffer as PixBuf } from "../../lib/graphics/pixel-buffer"
+import { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
 import { pick } from "#/world/scene/pick"
 import { RAMPS, OUTLINE } from "#/world/scene/pix"
-import { type RGB } from "../../lib/graphics/pixel-types"
-import { hash2 } from "../../lib/engine/hash2"
+import { type RGB } from "#/lib/graphics/pixel-types"
+import { hash2 } from "#/lib/engine/hash2"
 
 export type PropKind =
   | "tree"

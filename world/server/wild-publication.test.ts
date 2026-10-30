@@ -1,12 +1,12 @@
 import { afterEach, expect, it, vi } from "vitest"
-import { Wild } from "../../durable-objects/wild"
-import { Player } from "../../durable-objects/player"
+import { Wild } from "#/durable-objects/wild"
+import { Player } from "#/durable-objects/player"
 import { initialPlayerRecord } from "#/world/server/initial-player-record"
 import { initialWildRecord } from "#/world/server/initial-wild-record"
 import type { WildRecord } from "#/world/server/wild-record"
 import { emptyWild } from "#/world/core/wild/empty-wild"
 import { SPAWNS, MONSTER_KINDS } from "#/world/core/monsters"
-import { durableStorage } from "../test/durable-storage"
+import { durableStorage } from "#/world/test/durable-storage"
 
 vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }))
 afterEach(() => {

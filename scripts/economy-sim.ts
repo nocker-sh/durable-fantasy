@@ -6,7 +6,7 @@ import { RECIPES } from "#/world/core/recipes/catalog"
 import { STAMINA_PER_CRAFT } from "#/world/core/crafting-rules"
 import { craftedQuality } from "#/world/core/crafted-quality"
 import { failChance } from "#/world/core/fail-chance"
-import { STATIONS } from "../world/town/stations"
+import { STATIONS } from "#/world/town/stations"
 import { GATHER_STAMINA } from "#/world/core/gather-rules"
 import { NODES } from "#/world/core/gather"
 import { yieldOf } from "#/world/core/yield-of"
@@ -21,7 +21,7 @@ import { effectOf } from "#/world/core/effect-of"
 import { priceOf } from "#/world/core/price-of"
 import { LISTING_FEE, TRADE_FEE } from "#/world/core/exchange-rules"
 
-import { OPEN_FIELDS } from "../world/maps/index"
+import { OPEN_FIELDS } from "#/world/maps/index"
 import { SHOPS } from "#/world/core/shops"
 
 // ---------------------------------------------------------------- assumptions (one evening of play)

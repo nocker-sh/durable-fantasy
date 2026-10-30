@@ -1,4 +1,4 @@
-import type { Q } from "./quaternion-types"
+import type { Q } from "#/lib/engine/quaternion-types"
 /** Composition: apply b, then a. */
 export function qmul(a: Q, b: Q): Q {
   const axState = a,

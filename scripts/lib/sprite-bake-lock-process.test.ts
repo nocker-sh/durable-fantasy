@@ -6,7 +6,7 @@ import { stripTypeScriptTypes } from "node:module"
 import { mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import { tmpdir } from "node:os"
-import { getSpriteBakeLockDirectory } from "./get-sprite-bake-lock-directory"
+import { getSpriteBakeLockDirectory } from "#/scripts/lib/get-sprite-bake-lock-directory"
 import type { ChildProcess } from "node:child_process"
 
 const directories: string[] = []
@@ -28,6 +28,7 @@ const fixture = () => {
   const compiled = join(root, "compiled")
   mkdirSync(compiled)
   writeFileSync(join(compiled, "package.json"), JSON.stringify({ type: "module" }))
+  // The isolated Node fixture has no Vite/Bun alias resolver; link its copied modules locally.
   for (const name of [
     "acquire-sprite-bake-lock",
     "assert-sprite-bake-lock-available",
@@ -37,7 +38,7 @@ const fixture = () => {
     "sprite-bake-lock-process.fixture",
   ]) {
     const source = readFileSync(new URL(`./${name}.ts`, import.meta.url), "utf8")
-    writeFileSync(join(compiled, name.endsWith(".fixture") ? "process.mjs" : name), stripTypeScriptTypes(source))
+    writeFileSync(join(compiled, name.endsWith(".fixture") ? "process.mjs" : name), stripTypeScriptTypes(source).replaceAll('"#/scripts/lib/', '"./'))
   }
   const output = join(root, "sprites")
   mkdirSync(output)

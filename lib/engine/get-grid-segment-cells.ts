@@ -1,4 +1,4 @@
-import { getGridSegmentCoverage } from "./get-grid-segment-coverage"
+import { getGridSegmentCoverage } from "#/lib/engine/get-grid-segment-coverage"
 type Props = Parameters<typeof getGridSegmentCoverage>[0]
 
 /** Preserve the throwing cell-list contract while coverage consumers may handle bounded rejection explicitly. */

@@ -3,7 +3,7 @@ import { getBoxLidPlan } from "#/world/town/get-box-lid-plan"
 import { workTableSections } from "#/world/town/work-table"
 import { storageLidState } from "#/world/town/storage-lid-state"
 import { getStoragePathError } from "#/world/town/get-storage-path-error"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 const parts = workTableSections({ surface: { height: 0.455, thickness: 0.025, legWidth: 0.04, legInset: 0.06, kneeClearance: 0.1 }, x: 2, z: 4.75, width: 1, depth: 0.5 })
 const obstacles = parts.map((part) => ({ x0: part.x0, x1: part.x1, z0: part.z0, z1: part.z1, bottom: part.y0, top: part.y1 }))
 const proposal = {

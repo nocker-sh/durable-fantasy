@@ -1,11 +1,11 @@
-import { subtractVector3 } from "../../engine/subtract-vector3"
-import { dotVector3 } from "../../engine/dot-vector3"
-import { normalizeVector3 } from "../../engine/normalize-vector3"
-import { addVector3 } from "../../engine/add-vector3"
-import { scaleVector3 } from "../../engine/scale-vector3"
-import { getConeFrame } from "./get-cone-frame"
-import type { Vector3, Vector3Tuple } from "../../engine/vector3-types"
-import type { ConeEndpoints } from "./cone-frame-types"
+import { subtractVector3 } from "#/lib/engine/subtract-vector3"
+import { dotVector3 } from "#/lib/engine/dot-vector3"
+import { normalizeVector3 } from "#/lib/engine/normalize-vector3"
+import { addVector3 } from "#/lib/engine/add-vector3"
+import { scaleVector3 } from "#/lib/engine/scale-vector3"
+import { getConeFrame } from "#/lib/graphics/ray/get-cone-frame"
+import type { Vector3, Vector3Tuple } from "#/lib/engine/vector3-types"
+import type { ConeEndpoints } from "#/lib/graphics/ray/cone-frame-types"
 type Props = ConeEndpoints & Readonly<{ r: number; r2: number }>
 
 export function getConeSurfaceNormal(point: Vector3, primitive: Props): Vector3Tuple {

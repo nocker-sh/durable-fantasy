@@ -1,12 +1,12 @@
 import { afterEach, expect, it, vi } from "vitest"
-import { Wild } from "../../durable-objects/wild"
-import { Player } from "../../durable-objects/player"
+import { Wild } from "#/durable-objects/wild"
+import { Player } from "#/durable-objects/player"
 import { emptyWild } from "#/world/core/wild/empty-wild"
 import { hit } from "#/world/core/wild/hit"
 import { MONSTER_KINDS, SPAWNS } from "#/world/core/monsters"
 import type { SkillId } from "#/world/core/skill-types"
 import { player } from "#/world/test/player"
-import { durableStorage } from "../test/durable-storage"
+import { durableStorage } from "#/world/test/durable-storage"
 
 vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }))
 const spawn = SPAWNS.find((s) => s.kind === "slime")!

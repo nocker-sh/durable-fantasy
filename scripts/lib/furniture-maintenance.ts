@@ -1,5 +1,5 @@
 import type { SettingDocument } from "#/scripts/lib/setting-document"
-import { roomHasWorker } from "./room-worker"
+import { roomHasWorker } from "#/scripts/lib/room-worker"
 /** A maintenance assignment belongs to a real member of the home or a worker of this room. */
 export function auditFurnitureMaintenance(documents: ReadonlyMap<string, SettingDocument>): string[] {
   const errors: string[] = []

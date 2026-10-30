@@ -2,9 +2,9 @@ import { beforeEach, expect, it, vi } from "vitest"
 const calls = vi.hoisted(() => ({ read: vi.fn(), poll: vi.fn(), chat: vi.fn(), run: vi.fn() }))
 vi.mock("../../../durable-objects/player", () => ({ Player: { get: () => calls } }))
 vi.mock("../../../durable-objects/party", () => ({ Party: { get: () => calls } }))
-import { HANDLERS } from "./party"
+import { HANDLERS } from "#/world/server/map-room/party"
 import { player } from "#/world/test/player"
-import type { Ctx } from "./context"
+import type { Ctx } from "#/world/server/map-room/context"
 
 beforeEach(() => vi.resetAllMocks())
 it.each(["group", "previous-group"])("polls status and private speech once with a cursor for %s", async (cursorParty) => {

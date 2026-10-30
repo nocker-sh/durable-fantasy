@@ -1,10 +1,10 @@
-import { qrot } from "../../../lib/engine/qrot"
+import { qrot } from "#/lib/engine/qrot"
 import { getNativeBimanualReachPose } from "#/world/scene/figure/get-native-bimanual-reach-pose"
 import type { getPouringPotProfile } from "#/world/town/get-pouring-pot-profile"
 import type { getPouringPotPose } from "#/world/town/get-pouring-pot-pose"
 import type { Look } from "#/world/scene/figure/look"
 import type { Skel } from "#/world/scene/rig"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = {
   look: Look
   skeleton: Skel

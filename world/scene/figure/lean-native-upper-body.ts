@@ -1,8 +1,8 @@
-import { qmul } from "../../../lib/engine/qmul"
-import { qrot } from "../../../lib/engine/qrot"
-import { addVector3 as add } from "../../../lib/engine/add-vector3"
-import { subtractVector3 as sub } from "../../../lib/engine/subtract-vector3"
-import type { Q } from "../../../lib/engine/quaternion-types"
+import { qmul } from "#/lib/engine/qmul"
+import { qrot } from "#/lib/engine/qrot"
+import { addVector3 as add } from "#/lib/engine/add-vector3"
+import { subtractVector3 as sub } from "#/lib/engine/subtract-vector3"
+import type { Q } from "#/lib/engine/quaternion-types"
 import type { Bone, Skel } from "#/world/scene/rig"
 type Props = { skeleton: Skel; angle: number }
 

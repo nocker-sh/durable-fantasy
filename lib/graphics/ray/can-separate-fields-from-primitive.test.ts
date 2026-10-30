@@ -1,8 +1,8 @@
 import { expect, it } from "vitest"
-import { canSeparateFieldsFromPrimitive } from "./can-separate-fields-from-primitive"
-import { createSolidSurfaceMaterial } from "./create-solid-surface-material"
-import type { Primitive } from "./primitive-types"
-import type { BoundedField } from "../../engine/field-separation"
+import { canSeparateFieldsFromPrimitive } from "#/lib/graphics/ray/can-separate-fields-from-primitive"
+import { createSolidSurfaceMaterial } from "#/lib/graphics/ray/create-solid-surface-material"
+import type { Primitive } from "#/lib/graphics/ray/primitive-types"
+import type { BoundedField } from "#/lib/engine/field-separation"
 const filled: BoundedField = { min: [0, 0, 0], max: [1, 1, 1], value: () => -1, lipschitz: 1 }
 const sphere: Primitive = { id: 0, kind: "sph", a: [2, 0.5, 0.5], b: [2, 0.5, 0.5], r: 0.2, r2: 0, m: createSolidSurfaceMaterial("wood") }
 

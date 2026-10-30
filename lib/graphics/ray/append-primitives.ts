@@ -1,4 +1,4 @@
-import type { Primitive } from "./primitive-types"
+import type { Primitive } from "#/lib/graphics/ray/primitive-types"
 
 /** Extra pose geometry shares the native depth and outline passes without reusing body-part identifiers. */
 export function appendPrimitives(base: readonly Primitive[], extra: readonly Omit<Primitive, "id">[]): readonly Primitive[] | Error {

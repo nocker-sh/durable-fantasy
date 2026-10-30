@@ -1,10 +1,10 @@
 import { afterEach, expect, it, vi } from "vitest"
-import { Player } from "../../durable-objects/player"
+import { Player } from "#/durable-objects/player"
 import { prepareTrade } from "#/world/core/prepare-trade"
 import { emptyBag } from "#/world/core/empty-bag"
 import { player } from "#/world/test/player"
 import { bagWith } from "#/world/test/bag-with"
-import { durableStorage } from "../test/durable-storage"
+import { durableStorage } from "#/world/test/durable-storage"
 
 vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }))
 afterEach(() => vi.restoreAllMocks())

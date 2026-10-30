@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { getSweptGridClearanceError } from "./get-swept-grid-clearance-error"
+import { getSweptGridClearanceError } from "#/lib/engine/get-swept-grid-clearance-error"
 const isCellFree = (cell: readonly [number, number]) => cell[0] !== 3 || cell[1] !== 2
 it("finds an obstacle beside the centre line, between two clear endpoint footprints", () => {
   expect(getSweptGridClearanceError({ from: [0.75, 0.75], to: [0.75, 0.75], radius: 0.27, cellSize: 0.5, isCellFree })).toBeNull()

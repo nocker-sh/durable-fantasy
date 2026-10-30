@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { apply } from "./apply"
+import { apply } from "#/world/core/apply"
 import { RECIPES } from "#/world/core/recipes/catalog"
 import { ITEMS } from "#/world/core/items/catalog"
 import { QUALITY_EFFECT } from "#/world/core/items/kinds"

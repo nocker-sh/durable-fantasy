@@ -1,7 +1,7 @@
 import { getNativeBody } from "#/world/scene/figure/get-native-body"
 import type { NativeBodyFrame } from "#/world/scene/figure/native-body-frame-types"
 import { canSeparatePrimitiveFromCuboid } from "#/lib/graphics/ray/can-separate-primitive-from-cuboid"
-import { primitiveBounds } from "../../../lib/graphics/ray/primitive-bounds"
+import { primitiveBounds } from "#/lib/graphics/ray/primitive-bounds"
 import { getWaterVesselPrimitive } from "#/world/scene/figure/get-water-vessel-primitive"
 import type { Look } from "#/world/scene/figure/look"
 import type { Skel } from "#/world/scene/rig"

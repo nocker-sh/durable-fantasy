@@ -1,6 +1,6 @@
 import { afterEach, expect, it, vi } from "vitest"
 import * as THREE from "three"
-import { createPointer } from "./pointer"
+import { createPointer } from "#/world/scene/runtime/pointer"
 
 vi.mock("../world", async (original) => ({ ...(await original<typeof import("../world")>()), walkH: () => 0, isFree: () => true }))
 vi.mock("../animals", () => ({ critters: [] }))

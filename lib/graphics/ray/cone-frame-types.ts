@@ -1,4 +1,4 @@
-import type { Vector3 } from "../../engine/vector3-types"
+import type { Vector3 } from "#/lib/engine/vector3-types"
 
 export type ConeFrame = Readonly<{ u: Vector3; v: Vector3; w: Vector3; h: number }>
 

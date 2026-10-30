@@ -1,7 +1,7 @@
 import { expect, it, vi } from "vitest"
 import { currentCreature } from "#/world/client/current-creature"
 import { mergeWild } from "#/world/client/merge-wild"
-import { ServerMessages } from "./server-messages"
+import { ServerMessages } from "#/world/client/server-messages"
 import { GameSession } from "#/world/client/game-session"
 import type { CreatureHealth } from "#/world/core/wild/types"
 import { serverMessage } from "#/world/protocol"

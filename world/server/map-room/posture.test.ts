@@ -1,9 +1,9 @@
 import { afterEach, expect, it, vi } from "vitest"
 import { player } from "#/world/test/player"
-import type { Ctx } from "./context"
+import type { Ctx } from "#/world/server/map-room/context"
 const run = vi.hoisted(() => vi.fn())
 vi.mock("../../../durable-objects/player", () => ({ Player: { get: () => ({ run }) } }))
-import { standUp } from "./posture"
+import { standUp } from "#/world/server/map-room/posture"
 afterEach(() => {
   vi.restoreAllMocks()
   run.mockReset()

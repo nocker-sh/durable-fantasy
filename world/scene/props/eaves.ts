@@ -1,10 +1,10 @@
-import { createColorMaterial as colorMat } from "../../../lib/graphics/create-color-material"
+import { createColorMaterial as colorMat } from "#/lib/graphics/create-color-material"
 import { M } from "#/world/scene/construction/materials"
 import { crate } from "#/world/scene/construction/crate"
 import { sack } from "#/world/scene/construction/sack"
 import { blockCircle } from "#/world/scene/block-circle"
 import { blockRect } from "#/world/scene/block-rect"
-import type { Thing } from "./types"
+import type { Thing } from "#/world/scene/props/types"
 import { y0 } from "#/world/scene/props/helpers/materials/y0"
 import { furBlack, ash, wicker, clay, clayDark, straw } from "#/world/scene/props/materials"
 

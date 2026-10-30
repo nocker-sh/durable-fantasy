@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { certifyLinearInterval } from "./certify-linear-interval"
+import { certifyLinearInterval } from "#/lib/engine/certify-linear-interval"
 
 it("returns a complete ordered sequence when the checker needs subdivision", () => {
   const from = [0, 0, 0] satisfies [number, number, number],

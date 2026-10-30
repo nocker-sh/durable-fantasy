@@ -1,13 +1,13 @@
-import type { CleanupStack } from "../../../lib/engine/cleanup-stack"
+import type { CleanupStack } from "#/lib/engine/cleanup-stack"
 import * as THREE from "three"
 import { N, WATER_Y } from "#/world/scene/world"
 import { INTERIORS } from "#/world/town/interiors"
 import { meshHeights } from "#/world/scene/mesh-heights"
 import { stoneTex } from "#/world/scene/textures/stone-tex"
-import { toTexture as toTex } from "../../../lib/graphics/to-texture"
+import { toTexture as toTex } from "#/lib/graphics/to-texture"
 import { lap } from "#/world/lap"
-import type { PixelBuffer as PixBuf } from "../../../lib/graphics/pixel-buffer"
-import { type SceneDefinition, MAP_SCENES } from "./definitions"
+import type { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
+import { type SceneDefinition, MAP_SCENES } from "#/world/scene/runtime/definitions"
 
 async function createTerrain(inputProps: { scene: THREE.Scene; world: SceneDefinition; ground: PixBuf; progress: (text: string) => void; tick: () => Promise<unknown>; resources: CleanupStack }) {
   const scene = inputProps.scene

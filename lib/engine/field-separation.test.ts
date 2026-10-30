@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { certifyFieldSeparation as separate, type BoundedField } from "./field-separation"
+import { certifyFieldSeparation as separate, type BoundedField } from "#/lib/engine/field-separation"
 function ball(x: number, r: number): BoundedField {
   return { min: [x - r, -r, -r], max: [x + r, r, r], value: (p) => Math.hypot(p[0] - x, p[1], p[2]) - r, lipschitz: 1 }
 }

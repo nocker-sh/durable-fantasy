@@ -1,4 +1,4 @@
-import { cuboidTranslationHits } from "../../../lib/engine/cuboid-translation-hits"
+import { cuboidTranslationHits } from "#/lib/engine/cuboid-translation-hits"
 import type { Cuboid } from "#/lib/engine/cuboid-subtraction"
 import type { getNativeEasedShoeEnvelopes } from "#/world/scene/figure/get-native-eased-shoe-envelopes"
 type Props = Readonly<{ shoes: Exclude<ReturnType<typeof getNativeEasedShoeEnvelopes>, Error>; boxes: readonly Cuboid[]; ceiling: number }>

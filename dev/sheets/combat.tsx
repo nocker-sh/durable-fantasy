@@ -9,7 +9,7 @@ import { SKILLS } from "#/world/core/skills"
 import { skillOf } from "#/world/core/skill-of"
 import { createMonsterBody } from "#/world/scene/create-monster-body"
 import type { Build } from "#/dev/three-view"
-import { sheet } from "./schema"
+import { sheet } from "#/dev/sheets/schema"
 import { needsText } from "#/dev/sheets/needs-text"
 
 const monsterBuilds = new Map<string, Build>()

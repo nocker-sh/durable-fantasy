@@ -1,12 +1,12 @@
 import { expect, it } from "vitest"
-import proposal from "../town/floorplan/authored/h-m5"
+import proposal from "#/world/town/floorplan/authored/h-m5"
 import { authoredFloorPlan } from "#/world/town/floorplan/authored"
 import { HOUSES } from "#/world/town/houses"
 import { interiorPlan } from "#/world/town/interior-plan"
-import { indoorMaps } from "./indoor-maps"
+import { indoorMaps } from "#/world/maps/indoor-maps"
 import { cellDistance } from "#/world/maps/cell-distance"
 import { walkable } from "#/world/maps/walkable"
-import { findPathCells } from "../test/path"
+import { findPathCells } from "#/world/test/path"
 const house = HOUSES.find((h) => h.id === "h-m5")!,
   plan = authoredFloorPlan(proposal)
 const interiors = [0, 1].map((floor) => interiorPlan(house, floor, plan))

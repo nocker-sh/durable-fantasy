@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { apply } from "./apply"
+import { apply } from "#/world/core/apply"
 import { dropsOf } from "#/world/core/drops-of"
 import { MONSTER_KINDS, SPAWNS } from "#/world/core/monsters"
 import { derive } from "#/world/core/derive"

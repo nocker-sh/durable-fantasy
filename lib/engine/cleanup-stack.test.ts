@@ -1,6 +1,6 @@
 import { expect, it, vi } from "vitest"
-import { CleanupStack } from "./cleanup-stack"
-import { withCleanup } from "./with-cleanup"
+import { CleanupStack } from "#/lib/engine/cleanup-stack"
+import { withCleanup } from "#/lib/engine/with-cleanup"
 it("releases partial async construction in reverse acquisition order", async () => {
   const order: string[] = [],
     error = new Error("population failed")

@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { subtractRectangles } from "./rectangle-subtraction"
+import { subtractRectangles } from "#/lib/engine/rectangle-subtraction"
 it("removes intersecting openings without overlapping or losing the remaining floor", () => {
   const source = { x0: 0, z0: 0, x1: 10, z1: 8 },
     cuts = [

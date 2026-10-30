@@ -1,17 +1,17 @@
 import { afterEach, expect, it, vi } from "vitest"
-import { Nature } from "../../../durable-objects/nature"
-import { Player } from "../../../durable-objects/player"
+import { Nature } from "#/durable-objects/nature"
+import { Player } from "#/durable-objects/player"
 import { NODES } from "#/world/core/gather"
 import { initialNatureRecord } from "#/world/server/initial-nature-record"
 import type { NatureRecord } from "#/world/server/nature-record-types"
 import { initialPlayerRecord } from "#/world/server/initial-player-record"
 import { player } from "#/world/test/player"
-import { durableStorage } from "../../test/durable-storage"
+import { durableStorage } from "#/world/test/durable-storage"
 import { mapPlayer } from "#/world/server/map-room/map-player"
 import type { Presence } from "#/world/server/map-room/presence"
-import type { Ctx } from "./context"
+import type { Ctx } from "#/world/server/map-room/context"
 import type { ServerMessage } from "#/world/protocol"
-import { HANDLERS } from "./work"
+import { HANDLERS } from "#/world/server/map-room/work"
 vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }))
 afterEach(() => {
   vi.useRealTimers()

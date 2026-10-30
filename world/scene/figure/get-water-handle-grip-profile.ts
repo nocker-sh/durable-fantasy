@@ -1,6 +1,6 @@
 import { armGripPoint } from "#/world/scene/figure/arm-grip-point"
 import { nativeArmSurfaces } from "#/world/scene/figure/native-arm-surfaces"
-import { subtractVector3 as sub } from "../../../lib/engine/subtract-vector3"
+import { subtractVector3 as sub } from "#/lib/engine/subtract-vector3"
 import type { Skel, HandGrip } from "#/world/scene/rig"
 import type { WaterVesselPart } from "#/world/town/get-water-vessel-parts"
 type Props = { skeleton: Skel; hand: "l" | "r"; bar: Extract<WaterVesselPart, { kind: "capsule" }>; bodyScale: number }

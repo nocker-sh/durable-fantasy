@@ -4,7 +4,7 @@ import { getUnionFieldPrimitive } from "#/lib/graphics/ray/get-union-field-primi
 import { seatedSupportDepth } from "#/world/scene/figure/seated-support-depth"
 import type { BodyContext } from "#/world/scene/figure/context"
 import type { SkirtLayer } from "#/world/scene/figure/get-draped-skirt-profile"
-import type { Vector3Tuple as V3 } from "../../../lib/engine/vector3-types"
+import type { Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
 
 /** Geometry and colour follow the same cloth path; its material classification is not a separation bound. */
 export function getDrapedSkirtGeometry(context: BodyContext, layer: SkirtLayer) {

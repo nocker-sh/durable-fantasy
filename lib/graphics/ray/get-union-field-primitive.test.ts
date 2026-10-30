@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
-import { getUnionFieldPrimitive } from "./get-union-field-primitive"
-import type { BoundedField } from "../../engine/field-separation"
+import { getUnionFieldPrimitive } from "#/lib/graphics/ray/get-union-field-primitive"
+import type { BoundedField } from "#/lib/engine/field-separation"
 const left: BoundedField = { min: [-1, -0.2, -0.2], max: [-0.5, 0.2, 0.2], lipschitz: 1, value: () => 0 }
 const right: BoundedField = { min: [0.5, -0.2, -0.2], max: [1, 0.2, 0.2], lipschitz: 1, value: () => 0 }
 it("keeps bounded component domains instead of filling their gap", () => {

@@ -1,6 +1,6 @@
 import { getPouringPotNativePoint } from "#/world/scene/figure/get-pouring-pot-native-point"
 import { getEllipticalFrustumField } from "#/lib/graphics/ray/get-elliptical-frustum-field"
-import { subtractVector3 as sub } from "../../../lib/engine/subtract-vector3"
+import { subtractVector3 as sub } from "#/lib/engine/subtract-vector3"
 import type { getPouringPotNativeParts } from "#/world/scene/figure/get-pouring-pot-native-parts"
 import type { BoundedField } from "#/lib/engine/field-separation"
 type Props = Parameters<typeof getPouringPotNativeParts>[0]

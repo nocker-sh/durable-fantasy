@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { getEllipticalFrustumField } from "./get-elliptical-frustum-field"
+import { getEllipticalFrustumField } from "#/lib/graphics/ray/get-elliptical-frustum-field"
 const props = {
   from: [0, 0, 0] satisfies [number, number, number],
   to: [0, 0, 1] satisfies [number, number, number],

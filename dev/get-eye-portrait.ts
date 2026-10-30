@@ -1,4 +1,4 @@
-import { PixelBuffer as PixBuf } from "../lib/graphics/pixel-buffer"
+import { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
 import { FW, FH } from "#/world/scene/figure/render"
 import { renderFrame } from "#/world/scene/figure/render-frame"
 import type { Look, Item } from "#/world/scene/figure/look"

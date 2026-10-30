@@ -1,5 +1,5 @@
-import { rectangleFace, type RectangleSide } from "../../lib/engine/rectangle-face"
-import type { Rectangle } from "../../lib/engine/rectangle-subtraction"
+import { rectangleFace, type RectangleSide } from "#/lib/engine/rectangle-face"
+import type { Rectangle } from "#/lib/engine/rectangle-subtraction"
 import type { HearthSpec } from "#/world/town/hearth-types"
 
 /** Necessary planar insertion paths to both rear sides, with blade clearance at the mouth. */

@@ -1,13 +1,13 @@
 import { existsSync, readFileSync } from "node:fs"
 import { join } from "node:path"
 import { isSpriteManifest } from "#/world/scene/is-sprite-manifest"
-import { createSpriteBakePlan } from "../lib/create-sprite-bake-plan"
-import { getSpriteBakeJobs } from "../lib/get-sprite-bake-jobs"
-import { prepareSpriteBake } from "../lib/prepare-sprite-bake"
-import { completeSpriteBake } from "../lib/complete-sprite-bake"
-import { getCurrentSpriteManifest } from "./get-current-sprite-manifest"
-import { renderSpriteBakePlan } from "./render-sprite-bake-plan"
-import type { SpriteBakeRunInput as Props } from "./types"
+import { createSpriteBakePlan } from "#/scripts/lib/create-sprite-bake-plan"
+import { getSpriteBakeJobs } from "#/scripts/lib/get-sprite-bake-jobs"
+import { prepareSpriteBake } from "#/scripts/lib/prepare-sprite-bake"
+import { completeSpriteBake } from "#/scripts/lib/complete-sprite-bake"
+import { getCurrentSpriteManifest } from "#/scripts/bake/get-current-sprite-manifest"
+import { renderSpriteBakePlan } from "#/scripts/bake/render-sprite-bake-plan"
+import type { SpriteBakeRunInput as Props } from "#/scripts/bake/types"
 
 export async function runSpriteBake(props: Props): Promise<void> {
   const previousPath = join(props.outputDirectory, "sprites.json")

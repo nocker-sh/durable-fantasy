@@ -7,7 +7,7 @@ import { INDOOR } from "#/world/maps/ground-layouts"
 import { cutaways } from "#/world/scene/interior"
 import { setLayout } from "#/world/scene/set-layout"
 import { groundH } from "#/world/scene/ground-h"
-import { SceneResources } from "../../lib/graphics/scene-resources"
+import { SceneResources } from "#/lib/graphics/scene-resources"
 it("preserves the authored duct through the upper shaft and the hearth's vertical stack", () => {
   for (const floor of [0, 1]) {
     setLayout(INDOOR)

@@ -1,6 +1,6 @@
 import { toHeadingLocalPoint } from "#/world/scene/to-heading-local-point"
 import type { Cuboid } from "#/lib/engine/cuboid-subtraction"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { box: Cuboid; root: Point3; heading: number }
 
 /** All eight corners enclose the rotated solid; cardinal chair headings retain their exact rectangular shape. */

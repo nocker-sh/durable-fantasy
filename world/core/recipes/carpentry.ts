@@ -1,4 +1,4 @@
-import { recipe as r, type Recipe } from "./definition"
+import { recipe as r, type Recipe } from "#/world/core/recipes/definition"
 
 export const CARPENTRY_RECIPES: readonly Recipe[] = [
   // the workbench: wood

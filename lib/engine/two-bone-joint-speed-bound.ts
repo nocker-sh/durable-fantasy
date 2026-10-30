@@ -1,10 +1,10 @@
-import { getTwoBoneJointSpeedLimit } from "./get-two-bone-joint-speed-limit"
-import type { Vector3 as V3 } from "./vector3-types"
-import { subtractVector3 } from "./subtract-vector3"
-import { crossVector3 } from "./cross-vector3"
-import { getVector3NormRange } from "./get-vector3-norm-range"
-import { twoBoneSegmentReach } from "./two-bone-segment-reach"
-import type { TwoBoneSegment } from "./two-bone-types"
+import { getTwoBoneJointSpeedLimit } from "#/lib/engine/get-two-bone-joint-speed-limit"
+import type { Vector3 as V3 } from "#/lib/engine/vector3-types"
+import { subtractVector3 } from "#/lib/engine/subtract-vector3"
+import { crossVector3 } from "#/lib/engine/cross-vector3"
+import { getVector3NormRange } from "#/lib/engine/get-vector3-norm-range"
+import { twoBoneSegmentReach } from "#/lib/engine/two-bone-segment-reach"
+import type { TwoBoneSegment } from "#/lib/engine/two-bone-types"
 type Props = TwoBoneSegment & Readonly<{ pole: V3 }>
 /** Upper bound on joint speed over a normalized straight target segment. Singular bend planes remain unresolved. */
 export function twoBoneJointSpeedBound(props: Props): number | undefined {

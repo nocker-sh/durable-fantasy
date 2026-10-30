@@ -1,14 +1,14 @@
-import { M } from "./materials"
+import { M } from "#/world/scene/construction/materials"
 import { readFileSync } from "node:fs"
 import { expect, it } from "vitest"
 import * as THREE from "three"
 import { readSetting } from "#/scripts/lib/read-setting"
-import { shelfDimensions } from "../../../scripts/lib/shelf-dimensions"
+import { shelfDimensions } from "#/scripts/lib/shelf-dimensions"
 import { shelfItemParts } from "#/world/town/shelf-item-parts"
 import { shelfLidHandle } from "#/world/town/shelf-lid-handle"
 import { storageBox } from "#/world/scene/construction/storage-box"
 import { GeometryBuilder as GB } from "#/lib/graphics/geometry-builder"
-import { SceneResources } from "../../../lib/graphics/scene-resources"
+import { SceneResources } from "#/lib/graphics/scene-resources"
 it("draws the owned box's interior and lid underside from the actual board dimensions", () => {
   const room = readSetting(readFileSync(new URL("../../../.docs/settings/rooms/room-h10-2.md", import.meta.url), "utf8")),
     f = room.furniture!.find((f) => f.symbol === "C")!,

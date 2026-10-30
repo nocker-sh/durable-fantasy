@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { auditGuestSleepingPlaces } from "./guest-sleeping-places"
+import { auditGuestSleepingPlaces } from "#/scripts/lib/guest-sleeping-places"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 function fixture() {
   const room: SettingDocument = {

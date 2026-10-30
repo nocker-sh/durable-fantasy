@@ -1,6 +1,6 @@
 import { getHotWaterPouringReview } from "#/scripts/lib/get-hot-water-pouring-review"
 import { RESIDENTS, RESIDENT_LOOKS } from "#/world/town/residents"
-import type { HotWaterReviewInput as Props, HotWaterFrameContext } from "./hot-water-frame-types"
+import type { HotWaterReviewInput as Props, HotWaterFrameContext } from "#/scripts/lib/hot-water-frame-types"
 
 /** 保持と注湯が同じ部屋・器・杯・身体の定義を使う。 */
 export function getHotWaterFrameContext(props: Props): HotWaterFrameContext | Error {

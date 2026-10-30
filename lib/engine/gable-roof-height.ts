@@ -1,4 +1,4 @@
-import type { GableRoof } from "./gable-roof-types"
+import type { GableRoof } from "#/lib/engine/gable-roof-types"
 export function gableRoofHeight(roof: GableRoof, x: number, z: number) {
   const b = roof.bounds,
     alongX = roof.ridgeAxis === "x",

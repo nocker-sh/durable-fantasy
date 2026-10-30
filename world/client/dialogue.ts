@@ -1,4 +1,4 @@
-import { parseChatInput } from "./chat-input"
+import { parseChatInput } from "#/world/client/chat-input"
 import type { GameSession } from "#/world/client/game-session"
 import { STORAGE } from "#/world/client/identity"
 import { STORAGE_KEEPER } from "#/world/core/storage/rules"
@@ -13,12 +13,12 @@ import { SHOPS } from "#/world/core/shops"
 import { shopOfKeeper } from "#/world/core/shop-of-keeper"
 import type { ShopId } from "#/world/core/shop-types"
 import { keeperPresent } from "#/world/maps/keeper-present"
-import { RESIDENTS } from "../town/residents"
+import { RESIDENTS } from "#/world/town/residents"
 import { choicesFor } from "#/world/parts/choices-for"
 import { keepingShop } from "#/world/parts/keeping-shop"
 import { linesFor } from "#/world/parts/lines-for"
 import { fullyShown } from "#/world/fully-shown"
-import type { GameContext } from "./context"
+import type { GameContext } from "#/world/client/context"
 
 export class DialogueActions {
   constructor(

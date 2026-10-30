@@ -1,5 +1,5 @@
 import type { StorageBoxBounds } from "#/world/town/storage-box-types"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 import type { Cuboid } from "#/lib/engine/cuboid-subtraction"
 type Props = { box: StorageBoxBounds; rest: Point3; support: Cuboid | null }
 

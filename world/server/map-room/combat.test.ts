@@ -4,7 +4,7 @@ import { hit } from "#/world/core/wild/hit"
 import { MONSTER_KINDS, SPAWNS } from "#/world/core/monsters"
 import { monsterAt } from "#/world/core/monster-at"
 import { mapPlayer } from "#/world/server/map-room/map-player"
-import type { Ctx } from "./context"
+import type { Ctx } from "#/world/server/map-room/context"
 import { player } from "#/world/test/player"
 
 vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }))
@@ -13,7 +13,7 @@ vi.mock("../../../durable-objects/player", () => ({ Player: { get: () => calls }
 vi.mock("../../../durable-objects/wild", () => ({ Wild: { get: () => calls } }))
 vi.mock("../../../durable-objects/party", () => ({ Party: { get: vi.fn() } }))
 vi.mock("#/world/maps/walkable", () => ({ walkable: () => true }))
-import { HANDLERS } from "./combat"
+import { HANDLERS } from "#/world/server/map-room/combat"
 
 beforeEach(() => {
   calls.beginStrike.mockResolvedValue({ ok: true, id: 1 })

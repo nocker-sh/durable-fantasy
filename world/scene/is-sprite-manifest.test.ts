@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { isSpriteManifest } from "./is-sprite-manifest"
+import { isSpriteManifest } from "#/world/scene/is-sprite-manifest"
 it("accepts known manifest fields with additional authoring metadata", () => {
   expect(isSpriteManifest({ frame: [80, 96], residents: [{ name: "アントン", key: "look", anims: { idle: 8 }, notes: "extra" }], version: 2 })).toBe(true)
 })

@@ -1,8 +1,8 @@
 import { afterEach, expect, it, vi } from "vitest"
-import { Player } from "../../durable-objects/player"
+import { Player } from "#/durable-objects/player"
 import { initialPlayerRecord } from "#/world/server/initial-player-record"
 import type { PlayerRecord } from "#/world/server/player-record"
-import { durableStorage } from "../test/durable-storage"
+import { durableStorage } from "#/world/test/durable-storage"
 import { player } from "#/world/test/player"
 vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }))
 afterEach(() => {

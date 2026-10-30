@@ -3,7 +3,7 @@ import { leanNativeUpperBody } from "#/world/scene/figure/lean-native-upper-body
 import { getPouringPotHeldPose } from "#/world/town/get-pouring-pot-held-pose"
 import { seatHeading } from "#/world/town/seat-heading"
 import { getHotWaterPosedFrame } from "#/scripts/lib/get-hot-water-posed-frame"
-import type { HotWaterAnimationContext as Props } from "./hot-water-frame-types"
+import type { HotWaterAnimationContext as Props } from "#/scripts/lib/hot-water-frame-types"
 
 /** 台の外の静止保持にも、握り・身体・器と家具・床の全検査を適用する。 */
 export function getHotWaterHoldingFrame(props: Props) {

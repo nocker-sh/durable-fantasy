@@ -1,12 +1,12 @@
 import { expect, it } from "vitest"
 import { nativeWorkPose } from "#/world/scene/figure/native-work-pose"
 import type { WorkPoseCandidate } from "#/world/scene/figure/work-pose"
-import { createBodyContext } from "./context"
-import { buildClothes } from "./clothes"
-import { buildArms } from "./arms"
-import { RESIDENTS, RESIDENT_LOOKS } from "../../town/residents"
-import { quarterTurnPoint } from "../../../lib/engine/quarter-turn-point"
-import { qrot } from "../../../lib/engine/qrot"
+import { createBodyContext } from "#/world/scene/figure/context"
+import { buildClothes } from "#/world/scene/figure/clothes"
+import { buildArms } from "#/world/scene/figure/arms"
+import { RESIDENTS, RESIDENT_LOOKS } from "#/world/town/residents"
+import { quarterTurnPoint } from "#/lib/engine/quarter-turn-point"
+import { qrot } from "#/lib/engine/qrot"
 import { armGripLengths } from "#/world/scene/figure/arm-grip-lengths"
 const distance = (a: readonly number[], b: readonly number[]) => Math.hypot(...a.map((v, i) => v - b[i]))
 it("aligns the actual native hand attachment to the grip and tool axis in every facing", () => {

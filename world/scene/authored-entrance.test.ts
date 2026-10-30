@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
 import * as THREE from "three"
-import template from "../town/floorplan/authored/h-m5"
+import template from "#/world/town/floorplan/authored/h-m5"
 import { authoredFloorPlan } from "#/world/town/floorplan/authored"
 import type { AuthoredPlan } from "#/world/town/floorplan/authored"
 import { interiorPlan } from "#/world/town/interior-plan"
@@ -11,7 +11,7 @@ import { cutaways } from "#/world/scene/interior"
 import { INDOOR } from "#/world/maps/ground-layouts"
 import { setLayout } from "#/world/scene/set-layout"
 import { groundH } from "#/world/scene/ground-h"
-import { SceneResources } from "../../lib/graphics/scene-resources"
+import { SceneResources } from "#/lib/graphics/scene-resources"
 
 it("projects each entrance direction into a matching wall opening, walk grid and inward arrival", () => {
   for (const side of ["n", "s", "w", "e"] as const) {

@@ -1,6 +1,6 @@
 import { getHeldWaterVesselPose } from "#/world/scene/figure/get-held-water-vessel-pose"
 import { getWaterGripMotionBounds } from "#/world/scene/figure/get-water-grip-motion-bounds"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = Omit<Parameters<typeof getHeldWaterVesselPose>[0], "position"> & { from: Point3; to: Point3 }
 
 /** Freeze the native clip frame while both grips follow one rigid translation, then enclose the complete interval. */

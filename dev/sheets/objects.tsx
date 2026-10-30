@@ -8,7 +8,7 @@ import { SIZES } from "#/world/town/fit"
 import { HOUSES } from "#/world/town/houses"
 import { INTERIORS } from "#/world/town/interiors"
 import { ROOM_FURNITURE } from "#/dev/sheets/shared"
-import { sheet } from "./schema"
+import { sheet } from "#/dev/sheets/schema"
 
 /** Furniture in the house plans, the furniture drawn in rooms you walk into, and the things the maps are dressed with. */
 type ObjectRow = { id: string; name: string; group: string }

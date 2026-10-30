@@ -1,5 +1,5 @@
 import { getBowlProfile } from "#/world/town/get-bowl-profile"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { diameter: number; height: number; baseDiameter: number; wall: number; bottom: number; handleGap: number; handleRadius: number; handleBottom: number; handleTop: number }
 
 /** A hollow tapered cup and one ear handle share a single measured envelope; roots embed in the wall, outside the cavity. */

@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { auditRuntimeStations } from "./runtime-stations"
+import { auditRuntimeStations } from "#/scripts/lib/runtime-stations"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 import type { Station } from "#/world/core/crafting-types"
 const station: Station = { id: "forge", kind: "forge", name: "共同の炉", fee: 1, map: "craft", cell: [2, 3] }

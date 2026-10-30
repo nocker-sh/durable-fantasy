@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { getGridSegmentCells } from "./get-grid-segment-cells"
+import { getGridSegmentCells } from "#/lib/engine/get-grid-segment-cells"
 it("covers corner neighbours rather than sampling only the diagonal cells", () => {
   const cells = getGridSegmentCells({ from: [0.25, 0.25], to: [1.25, 1.25], cellSize: 0.5 })
   expect(cells).toEqual(

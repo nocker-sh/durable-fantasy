@@ -1,5 +1,5 @@
 import type { SettingDocument } from "#/scripts/lib/setting-document"
-import { auditRoomClearance } from "./room-clearance"
+import { auditRoomClearance } from "#/scripts/lib/room-clearance"
 /** Hold other declared operating areas occupied while one user enters or leaves their own. */
 export function auditParallelAccess(document: SettingDocument): string[] {
   if (!document.grid) return []

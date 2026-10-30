@@ -1,5 +1,5 @@
-import { subtractRectangles, type Rectangle } from "../../lib/engine/rectangle-subtraction"
-import type { FlueSection } from "./floorplan/types"
+import { subtractRectangles, type Rectangle } from "#/lib/engine/rectangle-subtraction"
+import type { FlueSection } from "#/world/town/floorplan/types"
 
 /** Stepped masonry transfers the collar back into the shaft rather than onto timber. */
 export function flueCorbelParts(shaft: FlueSection, top: number, bounds: Rectangle) {

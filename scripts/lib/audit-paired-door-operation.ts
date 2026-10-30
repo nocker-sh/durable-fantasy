@@ -4,7 +4,7 @@ import { operatorRectDistance } from "#/scripts/lib/operator-rect-distance"
 import type { DoorOperation } from "#/scripts/lib/door-operation"
 import { doorPanelRect } from "#/scripts/lib/door-panel-rect"
 import { rectInDoorFrame } from "#/scripts/lib/rect-in-door-frame"
-import { solidLeafHitsBox } from "./solid-door"
+import { solidLeafHitsBox } from "#/scripts/lib/solid-door"
 import { segmentRectDistance } from "#/lib/engine/segment-rect-distance"
 export type PairedDoorSequence = { first: "start" | "end"; start: DoorOperation; end: DoorOperation; transfer_points_m: number[][] }
 function operatorPoint(swing: DoorSwing, operation: DoorOperation, end: boolean): number[] {

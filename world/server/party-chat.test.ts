@@ -1,6 +1,6 @@
 import { expect, it, vi } from "vitest"
 vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }))
-import { Party } from "../../durable-objects/party"
+import { Party } from "#/durable-objects/party"
 const member = (owner: string) => ({ owner, name: owner, level: 1, hp: 10, maxHp: 10, map: owner, at: 0 })
 it("persists member boundaries and chat cursors across real Void state reloads", async () => {
   const saved = new Map<string, unknown>()

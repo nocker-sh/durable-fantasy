@@ -1,6 +1,6 @@
 import { jstMinutes } from "#/world/core/jst-minutes"
-import { MAPS } from "../maps/index"
-import { Store } from "../../lib/engine/store"
+import { MAPS } from "#/world/maps/index"
+import { Store } from "#/lib/engine/store"
 import { DEFAULT_WINDOWS } from "#/world/state"
 import type { GameState } from "#/world/state"
 

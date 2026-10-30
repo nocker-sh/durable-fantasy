@@ -1,5 +1,5 @@
-import type { BoundedField } from "../../engine/field-separation"
-import type { Vector3Tuple as V3 } from "../../engine/vector3-types"
+import type { BoundedField } from "#/lib/engine/field-separation"
+import type { Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
 type Props = Readonly<{ fields: readonly BoundedField[]; point: V3 }>
 
 /** Evaluate every bounded component in order without allocating arrays for each sampled point. */

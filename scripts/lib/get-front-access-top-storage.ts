@@ -1,4 +1,4 @@
-import { cuboidTranslationHits } from "../../lib/engine/cuboid-translation-hits"
+import { cuboidTranslationHits } from "#/lib/engine/cuboid-translation-hits"
 import { getFrontAccessSpareBlanketPlacement } from "#/scripts/lib/get-front-access-spare-blanket-placement"
 import { getFrontAccessSparePillowCoverPlacement } from "#/scripts/lib/get-front-access-spare-pillow-cover-placement"
 import { getBoxLayoutError } from "#/lib/engine/get-box-layout-error"

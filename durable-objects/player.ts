@@ -34,7 +34,7 @@ import { publishPlayer } from "#/world/server/publish-player"
 import type { PlayerRecord } from "#/world/server/player-record"
 import { receiveCombat } from "#/world/core/receive-combat"
 import type { CombatDelivery } from "#/world/core/combat-delivery-types"
-import { payStrike } from "../world/core/combat-payment"
+import { payStrike } from "#/world/core/combat-payment"
 import type { SkillId } from "#/world/core/skill-types"
 import type { ItemId } from "#/world/core/items/catalog"
 

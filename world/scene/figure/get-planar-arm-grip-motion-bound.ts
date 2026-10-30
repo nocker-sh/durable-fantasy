@@ -3,7 +3,7 @@ import { armGripLengths } from "#/world/scene/figure/arm-grip-lengths"
 import { createBodyContext } from "#/world/scene/figure/context"
 import { getNativeArmMotionBound } from "#/world/scene/figure/get-native-arm-motion-bound"
 import type { getArmGripMotionBound } from "#/world/scene/figure/get-arm-grip-motion-bound"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = Parameters<typeof getArmGripMotionBound>[0] & { normal: Point3 }
 
 /** Apply the plane-constrained elbow bound before enclosing the same wrist, sleeve and uncut palm surfaces. */

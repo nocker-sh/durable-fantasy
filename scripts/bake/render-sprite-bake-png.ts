@@ -4,7 +4,7 @@ import { buildSheetStrip } from "#/world/scene/figure/build-sheet-strip"
 import { RESIDENTS, RESIDENT_LOOKS, RESIDENT_ANIMS } from "#/world/town/residents"
 import { lookKey } from "#/world/scene/sprite-key"
 import { SPRITE_RENDER_VERSION } from "#/world/scene/sprite-render-version"
-import type { SpriteBakeDrawInput } from "../lib/sprite-bake-types"
+import type { SpriteBakeDrawInput } from "#/scripts/lib/sprite-bake-types"
 
 /** ブラウザーの定義が計画と同じ時だけ、元の画素を PNG へ変換する。 */
 export async function renderSpriteBakePng(input: SpriteBakeDrawInput): Promise<number[]> {

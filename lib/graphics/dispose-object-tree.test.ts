@@ -1,8 +1,8 @@
 import { expect, it, vi } from "vitest"
 import * as THREE from "three"
-import { disposeObjectTree } from "./dispose-object-tree"
-import { CleanupStack } from "../engine/cleanup-stack"
-import { withCleanup } from "../engine/with-cleanup"
+import { disposeObjectTree } from "#/lib/graphics/dispose-object-tree"
+import { CleanupStack } from "#/lib/engine/cleanup-stack"
+import { withCleanup } from "#/lib/engine/with-cleanup"
 it("releases shared geometry, material and shader-only textures once", () => {
   const scene = new THREE.Scene(),
     geometry = new THREE.BoxGeometry(),

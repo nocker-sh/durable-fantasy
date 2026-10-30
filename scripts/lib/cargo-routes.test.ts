@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
-import { auditCargoRoutes } from "./cargo-routes"
+import { auditCargoRoutes } from "#/scripts/lib/cargo-routes"
 function fixture(): SettingDocument {
   return {
     id: "room-workshop",

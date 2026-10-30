@@ -1,6 +1,6 @@
 import * as THREE from "three"
 import { expect, it, vi } from "vitest"
-import { PixelCamera } from "./pixel-camera"
+import { PixelCamera } from "#/lib/graphics/pixel-camera"
 
 it("keeps the pixel scale and projection consistent when resizing and zooming", () => {
   const resize = vi.fn()

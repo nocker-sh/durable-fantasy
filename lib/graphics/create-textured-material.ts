@@ -1,7 +1,7 @@
 import * as THREE from "three"
-import { toTexture } from "./to-texture"
-import type { PixelBuffer } from "./pixel-buffer"
-import type { TexturedMaterialOptions } from "./material-types"
+import { toTexture } from "#/lib/graphics/to-texture"
+import type { PixelBuffer } from "#/lib/graphics/pixel-buffer"
+import type { TexturedMaterialOptions } from "#/lib/graphics/material-types"
 type Props = Readonly<{ pixels: PixelBuffer; options: TexturedMaterialOptions }>
 
 /** Create one owned material and texture without joining the shared variants. */

@@ -5,7 +5,7 @@ import type { V2 } from "#/world/scene/construction/registry"
 import type { Actor } from "#/world/scene/actor"
 import { critters } from "#/world/scene/critters"
 import { dragTurn } from "#/world/scene/drag-turn"
-import type { Walker } from "./walker"
+import type { Walker } from "#/world/scene/runtime/walker"
 import { snap } from "#/world/scene/runtime/snap"
 type PointerScene = {
   renderer: THREE.WebGLRenderer

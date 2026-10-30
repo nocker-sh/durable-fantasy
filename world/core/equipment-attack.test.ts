@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { apply } from "./apply"
+import { apply } from "#/world/core/apply"
 import { artSwing } from "#/world/core/art-swing"
 import { swing } from "#/world/core/swing"
 import { emptyEquipment } from "#/world/core/empty-equipment"

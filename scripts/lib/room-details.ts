@@ -1,5 +1,5 @@
 import type { SettingDocument } from "#/scripts/lib/setting-document"
-import type { Placed } from "../../world/town/floorplan/types"
+import type { Placed } from "#/world/town/floorplan/types"
 
 export function compileRoomDetails(building: SettingDocument, rooms: readonly SettingDocument[]): Placed[] {
   const result: Placed[] = []

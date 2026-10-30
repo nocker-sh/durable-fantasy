@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
 import { handoffRotationEnvelope } from "#/world/town/handoff-rotation-envelope"
-import { rectangleFace } from "../../lib/engine/rectangle-face"
+import { rectangleFace } from "#/lib/engine/rectangle-face"
 it("contains the complete pitch of all tool corners, including the intermediate extremum", () => {
   for (const front of ["n", "s", "e", "w"] as const) {
     const box = handoffRotationEnvelope({ front: front, width: 0.18, thickness: 0.2, length: 1.1, gripFromBlade: 1, from: "work_vertical", to: "work_horizontal" }),

@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { storedToolParts } from "./stored-tool"
+import { storedToolParts } from "#/world/town/stored-tool"
 import { scaleShelf } from "#/world/town/scale-shelf"
 it("rests the blade on its board and joins its narrow handle without filling the envelope", () => {
   const bounds = { part: "contents" as const, x0: 0, x1: 0.18, z0: 0, z1: 0.04, y0: 0.05, y1: 1.15 },

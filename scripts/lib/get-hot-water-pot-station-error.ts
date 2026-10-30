@@ -1,9 +1,9 @@
-import { getHotWaterStationSolids } from "./get-hot-water-station-solids"
+import { getHotWaterStationSolids } from "#/scripts/lib/get-hot-water-station-solids"
 import { getPouringPotNativeParts } from "#/world/scene/figure/get-pouring-pot-native-parts"
 import { getPouringPotBodyFields } from "#/world/scene/figure/get-pouring-pot-body-fields"
 import { getPouringPotObstacleError } from "#/world/scene/figure/get-pouring-pot-obstacle-error"
 import { toHeadingLocalCuboid } from "#/world/scene/to-heading-local-cuboid"
-import type { HotWaterPosedContext as Props } from "./hot-water-frame-types"
+import type { HotWaterPosedContext as Props } from "#/scripts/lib/hot-water-frame-types"
 
 /** 台と杯には身体と同じ座標変換で器全体を照合する。 */
 export function getHotWaterPotStationError(props: Props): Error | null {

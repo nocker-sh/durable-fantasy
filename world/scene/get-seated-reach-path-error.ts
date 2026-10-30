@@ -2,7 +2,7 @@ import { FRAMES } from "#/world/scene/figure/animation"
 import { getSeatedNativePose } from "#/world/scene/get-seated-native-pose"
 import { toHeadingLocalPoint } from "#/world/scene/to-heading-local-point"
 import { certifySeatedArmSegment } from "#/world/scene/certify-seated-arm-segment"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 import type { Cuboid } from "#/lib/engine/cuboid-subtraction"
 type Props = Omit<Parameters<typeof getSeatedNativePose>[0], "frame"> & { hand: "l" | "r"; from: Point3; to: Point3; pole: Point3; obstacles: readonly Cuboid[] }
 

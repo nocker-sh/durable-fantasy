@@ -10,7 +10,7 @@ import { buildBody } from "#/world/scene/figure/body"
 import { skelFor } from "#/world/scene/figure/helpers/animation/skel-for"
 import { toHeadingWorldPoint } from "#/world/scene/to-heading-world-point"
 import { lowerNativePose } from "#/world/scene/figure/lower-native-pose"
-import { subtractVector3 as sub } from "../../lib/engine/subtract-vector3"
+import { subtractVector3 as sub } from "#/lib/engine/subtract-vector3"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 const fixture = () => {
   const room = readSetting(readFileSync(new URL("../../.docs/settings/rooms/room-h1-2.md", import.meta.url), "utf8")),

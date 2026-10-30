@@ -1,6 +1,6 @@
 import { afterEach, expect, it, vi } from "vitest"
-import { Market } from "../../durable-objects/market"
-import { Player } from "../../durable-objects/player"
+import { Market } from "#/durable-objects/market"
+import { Player } from "#/durable-objects/player"
 import { emptyMarket } from "#/world/core/empty-market"
 import { stockOf } from "#/world/core/stock-of"
 import { seedStock } from "#/world/core/seed-stock"
@@ -13,7 +13,7 @@ import type { MarketRecord } from "#/world/server/market-record-types"
 import { shopMaker } from "#/world/server/shop-maker"
 import { player } from "#/world/test/player"
 import { bagWith } from "#/world/test/bag-with"
-import { durableStorage } from "../test/durable-storage"
+import { durableStorage } from "#/world/test/durable-storage"
 
 vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }))
 afterEach(() => {

@@ -1,4 +1,4 @@
-import { quarterTurnPoint } from "../../lib/engine/quarter-turn-point"
+import { quarterTurnPoint } from "#/lib/engine/quarter-turn-point"
 import { shelfItemParts } from "#/world/town/shelf-item-parts"
 import { shelfTurn } from "#/world/town/shelf-turn"
 import type { ShelfSpec } from "#/world/town/shelf"

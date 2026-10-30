@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { auditStairSections } from "./stair-sections"
+import { auditStairSections } from "#/scripts/lib/stair-sections"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 function fixture() {
   const common = {

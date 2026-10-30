@@ -1,7 +1,7 @@
-import { segmentCuboidDistance } from "../../engine/segment-cuboid-distance"
-import { certifyFieldSeparation } from "../../engine/field-separation"
-import { getExpandedCuboid } from "../../engine/get-expanded-cuboid"
-import type { Cuboid } from "../../engine/cuboid-subtraction"
+import { segmentCuboidDistance } from "#/lib/engine/segment-cuboid-distance"
+import { certifyFieldSeparation } from "#/lib/engine/field-separation"
+import { getExpandedCuboid } from "#/lib/engine/get-expanded-cuboid"
+import type { Cuboid } from "#/lib/engine/cuboid-subtraction"
 import type { limbSd } from "#/lib/graphics/ray/limb-sd"
 type Props = { surface: ReturnType<typeof limbSd>; box: Cuboid; margin: number }
 

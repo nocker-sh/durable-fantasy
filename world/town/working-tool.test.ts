@@ -3,7 +3,7 @@ import { workingToolGeometry } from "#/world/town/working-tool-geometry"
 import { projectToolFrame } from "#/world/town/project-tool-frame"
 import { workingToolGripProfile } from "#/world/town/working-tool-grip-profile"
 import { hearthSpatialStrokes } from "#/world/town/hearth-spatial-strokes"
-import { rectangleFace } from "../../lib/engine/rectangle-face"
+import { rectangleFace } from "#/lib/engine/rectangle-face"
 const spec = { width: 0.18, thickness: 0.008, length: 1.1, gripFromBlade: 1.05, handleWidth: 0.006, bladeLength: 0.12 }
 it("keeps the blade and narrow handle in an orthonormal frame for every hearth front", () => {
   for (const front of ["n", "e", "s", "w"] as const) {

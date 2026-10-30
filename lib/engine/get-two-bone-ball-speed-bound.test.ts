@@ -1,8 +1,8 @@
 import { expect, it } from "vitest"
-import { getTwoBoneBallRange } from "./get-two-bone-ball-range"
-import { getTwoBoneBallSpeedBound } from "./get-two-bone-ball-speed-bound"
-import { solveTwoBone } from "./solve-two-bone"
-import type { Point3 } from "./cuboid-motion-types"
+import { getTwoBoneBallRange } from "#/lib/engine/get-two-bone-ball-range"
+import { getTwoBoneBallSpeedBound } from "#/lib/engine/get-two-bone-ball-speed-bound"
+import { solveTwoBone } from "#/lib/engine/solve-two-bone"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 
 it("bounds a regular curved target's actual knee speed over the entire enclosing ball", () => {
   const props = { root: [0, 0, 0], target: [0.8, 0.1, 0.1], radius: 0.04, upper: 0.7, lower: 0.6, pole: [0, 1, 0], targetSpeed: 0.3 } satisfies Parameters<typeof getTwoBoneBallSpeedBound>[0]

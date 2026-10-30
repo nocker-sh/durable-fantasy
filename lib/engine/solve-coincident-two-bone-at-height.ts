@@ -1,4 +1,4 @@
-import type { Vector3 } from "./vector3-types"
+import type { Vector3 } from "#/lib/engine/vector3-types"
 type Props = Readonly<{ root: Vector3; pole: Vector3; height: number; upperRadiusSquared: number; lowerRadiusSquared: number }>
 
 /** Coaxial target spheres share a horizontal circle only when its squared radii agree. */

@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { CHAPEL, chapelFootprints } from "./chapel"
+import { CHAPEL, chapelFootprints } from "#/world/town/chapel"
 it("preserves the existing exterior and entrance while sharing its definition", () => {
   expect(CHAPEL.body).toEqual({ x0: 8, x1: 15, z0: 3, z1: 7, height: 3.4 })
   expect([CHAPEL.body.x0 + CHAPEL.doorOffset, CHAPEL.body.z1 + CHAPEL.approachOffset]).toEqual([11.6, 7.8])

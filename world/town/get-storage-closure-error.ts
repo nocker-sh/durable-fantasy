@@ -1,4 +1,4 @@
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 import type { StorageBoxPart } from "#/world/town/storage-box-types"
 type Props = { original: ReadonlyArray<StorageBoxPart>; closed: ReadonlyArray<StorageBoxPart>; lowering: Point3 }
 /** Closing must restore every physical piece at the lowered position, without adding a teleport between phases. */

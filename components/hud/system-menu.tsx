@@ -7,8 +7,8 @@ import { Kbd } from "#/components/game/kbd"
 import { Modal } from "#/components/game/modal"
 import { CHANNEL_CAP } from "#/world/channels"
 
-import { CharacterScreen } from "./character-screen"
-import { Welcome } from "./welcome"
+import { CharacterScreen } from "#/components/hud/character-screen"
+import { Welcome } from "#/components/hud/welcome"
 
 export function SystemModals() {
   const modal = useGameState((s) => s.modal)

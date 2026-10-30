@@ -1,10 +1,10 @@
 import { afterEach, expect, it, vi } from "vitest"
-import { PlayerActions } from "./player-actions"
+import { PlayerActions } from "#/world/client/player-actions"
 import { GameSession } from "#/world/client/game-session"
 import { emptyEquipment } from "#/world/core/empty-equipment"
 import { player } from "#/world/test/player"
 import { NODES } from "#/world/core/gather"
-import { REASON_TEXT } from "../core/commands"
+import { REASON_TEXT } from "#/world/core/commands"
 import type { VoidSocket } from "void/ws"
 
 afterEach(() => vi.useRealTimers())

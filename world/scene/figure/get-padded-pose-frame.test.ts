@@ -4,7 +4,7 @@ import { getNativeSideStepPose } from "#/world/scene/figure/get-native-side-step
 import { skelFor } from "#/world/scene/figure/helpers/animation/skel-for"
 import { FW, FH, OX, OY } from "#/world/scene/figure/render"
 import { renderSkeletonFrame } from "#/world/scene/figure/render-skeleton-frame"
-import { PixelBuffer as PixBuf } from "../../../lib/graphics/pixel-buffer"
+import { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
 import { RESIDENTS, RESIDENT_LOOKS } from "#/world/town/residents"
 const look = RESIDENT_LOOKS[RESIDENTS.findIndex((resident) => resident.name === "エーリヒ")]
 it.each([0, 1, 2, 3, 4, 5, 6, 7])("preserves native interior pixels and anchor alignment at view %s", (view) => {

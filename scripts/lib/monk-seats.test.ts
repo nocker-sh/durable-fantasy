@@ -2,8 +2,8 @@ import { readFileSync } from "node:fs"
 import { expect, it } from "vitest"
 import { readSetting } from "#/scripts/lib/read-setting"
 import { auditRoomGrid } from "#/scripts/lib/audit-room-grid"
-import { seatDimensions } from "./seat-dimensions"
-import { footRestSections } from "../../world/town/foot-rest"
+import { seatDimensions } from "#/scripts/lib/seat-dimensions"
+import { footRestSections } from "#/world/town/foot-rest"
 const read = () => readSetting(readFileSync(new URL("../../.docs/settings/rooms/room-h10-1.md", import.meta.url), "utf8"))
 it("keeps each monk's seat facing its assigned work surface with knee clearance", () => {
   const room = read()

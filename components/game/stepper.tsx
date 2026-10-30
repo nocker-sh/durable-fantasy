@@ -1,6 +1,6 @@
 // A small − n + quantity picker.
 import { cn } from "cn"
-import { Button } from "./button"
+import { Button } from "#/components/game/button"
 
 function Stepper(inputProps: { value: number; min?: number; max: number; onChange: (value: number) => void; className?: string }) {
   const value = inputProps.value

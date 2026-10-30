@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { flueFloor } from "./flue-floor"
+import { flueFloor } from "#/world/town/flue-floor"
 const bounds = { x0: 0, z0: 0, x1: 8, z1: 9 },
   shaft = { x0: 5.5, z0: 8, x1: 6, z1: 8.5, wallThickness: 0.1, lowerFloor: 0, upperFloor: 1, floorCollar: 0.15, floorSupport: { depth: 0.2, steps: 4 } }
 const area = (rs: readonly (typeof bounds)[]) => rs.reduce((a, r) => a + (r.x1 - r.x0) * (r.z1 - r.z0), 0)

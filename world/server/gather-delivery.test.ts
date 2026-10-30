@@ -1,6 +1,6 @@
 import { afterEach, expect, it, vi } from "vitest"
-import { Nature } from "../../durable-objects/nature"
-import { Player } from "../../durable-objects/player"
+import { Nature } from "#/durable-objects/nature"
+import { Player } from "#/durable-objects/player"
 import { NODES } from "#/world/core/gather"
 import { emptyNature } from "#/world/core/nature/empty-nature"
 import { leftAt } from "#/world/core/nature/left-at"
@@ -8,7 +8,7 @@ import type { GatherRequest } from "#/world/core/gather-receipt-types"
 import { initialPlayerRecord } from "#/world/server/initial-player-record"
 import type { NatureRecord } from "#/world/server/nature-record-types"
 import { player } from "#/world/test/player"
-import { durableStorage } from "../test/durable-storage"
+import { durableStorage } from "#/world/test/durable-storage"
 
 vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }))
 afterEach(() => {

@@ -1,9 +1,9 @@
-import { compileFlues } from "./flue-sections"
+import { compileFlues } from "#/scripts/lib/flue-sections"
 import { readFileSync } from "node:fs"
 import { expect, it } from "vitest"
 import { readSetting } from "#/scripts/lib/read-setting"
-import { compileEnvelope } from "./building-envelope"
-import plan from "../../world/town/floorplan/authored/h-m5"
+import { compileEnvelope } from "#/scripts/lib/building-envelope"
+import plan from "#/world/town/floorplan/authored/h-m5"
 import { TILE_M } from "#/world/town/fit"
 
 const read = (directory: string, id: string) => readSetting(readFileSync(new URL(`../../.docs/settings/${directory}/${id}.md`, import.meta.url), "utf8"))

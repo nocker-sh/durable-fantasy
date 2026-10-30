@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
 import type { SettingDocument, TransportContainer } from "#/scripts/lib/setting-document"
-import { auditTransportContainers } from "./transport-containers"
+import { auditTransportContainers } from "#/scripts/lib/transport-containers"
 function fixture() {
   const vessel: TransportContainer = {
     id: "container-night",

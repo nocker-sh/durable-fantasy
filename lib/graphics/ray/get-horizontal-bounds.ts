@@ -1,5 +1,5 @@
-import { primitiveBounds } from "./primitive-bounds"
-import type { Primitive } from "./primitive-types"
+import { primitiveBounds } from "#/lib/graphics/ray/primitive-bounds"
+import type { Primitive } from "#/lib/graphics/ray/primitive-types"
 type Props = { primitives: readonly Primitive[]; position: readonly [number, number]; heading: number; scale: number }
 
 /** Rotate the complete conservative native bounds, rather than only their centres or two opposite corners. */

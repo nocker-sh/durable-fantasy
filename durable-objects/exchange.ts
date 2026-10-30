@@ -1,8 +1,8 @@
 // One exchange for all towns. Void persists each operation; the server coordinator sequences RPCs.
 import { defineDurableState } from "void/durable"
-import { Player } from "./player"
+import { Player } from "#/durable-objects/player"
 import type { OrderIntent } from "#/world/core/exchange-types"
-import { initialExchangeRecord, exchangeMigrations } from "../world/server/exchange-record"
+import { initialExchangeRecord, exchangeMigrations } from "#/world/server/exchange-record"
 import { beginExchangeOrder } from "#/world/server/begin-exchange-order"
 import { advanceExchangeOrder } from "#/world/server/advance-exchange-order"
 import { cancelExchangeOrder } from "#/world/server/cancel-exchange-order"

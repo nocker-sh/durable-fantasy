@@ -1,11 +1,11 @@
 import { getWaterVesselNativeParts } from "#/world/scene/figure/get-water-vessel-native-parts"
 import { getWaterVesselPrimitive } from "#/world/scene/figure/get-water-vessel-primitive"
-import { primitiveBounds } from "../../../lib/graphics/ray/primitive-bounds"
-import { cuboidTranslationHits } from "../../../lib/engine/cuboid-translation-hits"
+import { primitiveBounds } from "#/lib/graphics/ray/primitive-bounds"
+import { cuboidTranslationHits } from "#/lib/engine/cuboid-translation-hits"
 import { toHeadingLocalCuboid } from "#/world/scene/to-heading-local-cuboid"
 import type { getWaterMotionSupportError } from "#/world/scene/figure/get-water-motion-support-error"
 import type { WaterVesselPart } from "#/world/town/get-water-vessel-parts"
-import type { Point3 } from "../../../lib/engine/cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = Pick<Parameters<typeof getWaterMotionSupportError>[0], "body" | "heading" | "parts"> & { vessel: readonly WaterVesselPart[]; from: Point3; to: Point3; rootY: number }
 
 /** Exact box translation permits the initial supporting face contact, but refuses penetration at any intermediate time. */

@@ -1,4 +1,4 @@
-import type { Q, V3 } from "./quaternion-types"
+import type { Q, V3 } from "#/lib/engine/quaternion-types"
 /** Shortest rotation between nonzero directions; opposite directions use a deterministic perpendicular axis. */
 export function qfromTo(from: V3, to: V3): Q {
   const f = Math.hypot(...from),

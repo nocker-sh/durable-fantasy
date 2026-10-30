@@ -4,10 +4,10 @@ import { walkH } from "#/world/scene/walk-h"
 import { isFree } from "#/world/scene/is-free"
 import type { V2 } from "#/world/scene/construction/registry"
 import type { Critter } from "#/world/scene/animal-types"
-import type { PixelBuffer as PixBuf } from "../../lib/graphics/pixel-buffer"
+import type { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
 import { addSprite } from "#/world/scene/construction/add-sprite"
-import { toTexture as toTex } from "../../lib/graphics/to-texture"
-import { outlineSprite } from "../../lib/graphics/outline-sprite"
+import { toTexture as toTex } from "#/lib/graphics/to-texture"
+import { outlineSprite } from "#/lib/graphics/outline-sprite"
 
 type Props = Readonly<{ scene: THREE.Object3D; frames: readonly PixBuf[]; ppu: number; area: readonly [number, number, number, number]; speed: number; kind: "hen" | "cat" }>
 

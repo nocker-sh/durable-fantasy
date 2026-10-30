@@ -1,6 +1,6 @@
 import { expect, it, vi } from "vitest"
 import * as THREE from "three"
-import { SceneResources } from "./scene-resources"
+import { SceneResources } from "#/lib/graphics/scene-resources"
 
 it("releases shared resources once, including detached objects and shadow targets", () => {
   const scene = new THREE.Scene()

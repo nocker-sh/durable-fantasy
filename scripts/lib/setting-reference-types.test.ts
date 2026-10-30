@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { auditSettingReferenceTypes } from "./setting-reference-types"
+import { auditSettingReferenceTypes } from "#/scripts/lib/setting-reference-types"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 const doc = (id: string, kind: string): SettingDocument => ({ id, kind, title: id, status: "設計中", source: "test", design_gate: "未通過", issues: [] })
 function fixture() {

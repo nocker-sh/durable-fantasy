@@ -1,5 +1,5 @@
-import { quarterTurnPoint } from "../../lib/engine/quarter-turn-point"
-import type { Point3 } from "../../lib/engine/cuboid-motion-types"
+import { quarterTurnPoint } from "#/lib/engine/quarter-turn-point"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 import type { StorageBoxPart } from "#/world/town/storage-box-types"
 type Props = { parts: ReadonlyArray<StorageBoxPart>; height: number; turn: 0 | 1 | 2 | 3; palmRadius: number }
 /** Palms approach the near rim corners from outside; their centres stay one native palm radius beyond the side faces. */

@@ -1,4 +1,4 @@
-import type { Point3 } from "./cuboid-motion-types"
+import type { Point3 } from "#/lib/engine/cuboid-motion-types"
 type Props = { firstStart: Point3; firstEnd: Point3; secondStart: Point3; secondEnd: Point3 }
 /** Closest points of two closed segments, including degenerate and parallel segments. */
 export function segmentSegmentDistance3D(props: Props): number {
