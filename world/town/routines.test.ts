@@ -198,3 +198,12 @@ it("keeps the carter's loom quiet while anyone in its shared bedroom sleeps", ()
   expect(slotAt("ベルタ", 16 * 60)?.doing).toBe("機を織る")
   expect(slotAt("ベルタ", 23 * 60)).toMatchObject({ where: "home", doing: "古着を繕う" })
 })
+
+it("brings Emil home with an awake parent for bedtime", () => {
+  expect(slotAt("エミール", 22 * 60 + 29)?.where).not.toBe("home")
+  for (const minute of Array.from({ length: 30 }, (_, index) => 22 * 60 + 30 + index)) {
+    expect(slotAt("エミール", minute)).toMatchObject({ where: "home", doing: "眠る" })
+    expect(slotAt("ベルタ", minute)).toMatchObject({ where: "home", doing: "子を寝かせる" })
+  }
+  expect(slotAt("ベルタ", 23 * 60)?.doing).toBe("古着を繕う")
+})

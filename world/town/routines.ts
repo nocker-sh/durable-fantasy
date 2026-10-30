@@ -186,6 +186,7 @@ const baseRoutines: Record<string, readonly Slot[]> = {
     at({ from: "17:30", where: "work", doing: "夜市で買い物" }),
     at({ from: "19:30", where: "home", doing: "古着を背負う" }),
     at({ from: "20:00", where: P("phanthiet-market", "nm1"), doing: "夜市で古着を売る" }),
+    at({ from: "22:30", where: "home", doing: "子を寝かせる" }),
     at({ from: "23:00", where: "home", doing: "古着を繕う" }),
   ],
   ルカス: [
