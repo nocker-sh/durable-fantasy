@@ -1,3 +1,4 @@
+import { createResidentLooks } from "#/world/town/create-resident-looks"
 import { residents as smith } from "./residents/smith"
 import { residents as bakers } from "./residents/bakers"
 import { residents as well } from "./residents/well"
@@ -38,7 +39,7 @@ import { residents as retired } from "./residents/retired"
 
 // Residents of the town: who they are, how they look and where they stand. What they say is in
 // lines/, who they are as people in people.ts, their day in routines.ts.
-import type { Look, Fringe } from "#/world/scene/figure/look"
+import type { Look } from "#/world/scene/figure/look"
 import type { Anim } from "#/world/scene/figure/animation"
 import { keeperPlace } from "#/world/town/keeper-place"
 
@@ -151,32 +152,8 @@ export const RESIDENTS: Resident[] = LISTED.map((r) => {
   return p ? { ...r, map: p.map, at: [(p.cell[0] + 0.5) / 2, (p.cell[1] + 0.5) / 2] as V2 } : r
 })
 
-/** Hats off until hair and face shapes are settled; armour stays on. */
-export function wearable(look: Look): Look {
-  return look.hat !== "helm" && look.hat !== "greathelm" ? { ...look, hat: undefined } : look
-}
-
-const F_FRINGES: Fringe[] = ["swept", "curtain", "blunt", "flicked", "dangle", "natural", "slant", "zigzag"]
-const M_FRINGES: Fringe[] = ["spiky", "blunt", "swept", "flicked", "curtain", "natural", "slant", "zigzag"]
-
-/** Wraps residents wear when their look names none: everyone wraps something round the neck. */
-const NECKS: Look["neck"][] = ["muffler", "scarf", "muffler", "stole", "muffler", "scarf"]
-const NECK_RAMPS = ["cRed", "cMustard", "cGreen", "cBlue", "cWine", "cCream", "cPlum", "cHoney", "cSky", "cBrown"]
-const NECK_STRIPES = [undefined, "cCream", undefined, "cLinen", undefined, undefined, "cWine"]
-
-/** The looks residents are drawn with: hats off, a fringe and a neck wrap picked in turn where none is set. */
-export const RESIDENT_LOOKS: Look[] = (() => {
-  const n = { f: 0, m: 0 }
-  return RESIDENTS.map((r, i) => {
-    let look = wearable(r.look)
-    if (!look.fringe) look = { ...look, fringe: (look.sex === "f" ? F_FRINGES : M_FRINGES)[n[look.sex]++ % 8] }
-    if (!look.neck) {
-      const stripe = NECK_STRIPES[(i * 5) % NECK_STRIPES.length]
-      look = { ...look, neck: NECKS[(i * 7) % NECKS.length], neckRamp: NECK_RAMPS[(i * 3) % NECK_RAMPS.length], ...(stripe ? { neckStripe: stripe } : {}) }
-    }
-    return look
-  })
-})()
+/** The looks residents are drawn with; their index remains the sprite bake index. */
+export const RESIDENT_LOOKS: Look[] = createResidentLooks(RESIDENTS.map((resident) => resident.look))
 
 /** Anims residents play (they stand and look around), baked ahead of time. */
 export const RESIDENT_ANIMS: Anim[] = ["idle", "look"]
