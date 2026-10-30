@@ -12,12 +12,12 @@ import { groundH, isFree } from "../world"
  * ordinary creatures now). Where it goes is decided in the browser for now; the server will own
  * monsters once there is combat.
  */
-/** A slime's body: a dome of jelly, a shine, two eyes. */
+/** A slime's body: a dome of jelly and a shine, with no face. */
 /**
  * A slime's skin, drawn as pixels (wrapped round the dome: x is the way round, the front at a
  * quarter; y from the crown down to the rim): a few tones of its own colour, a bright gleam up on
- * the left, little bubbles inside, and two eyes with a catchlight. Eyes only: creatures have no
- * mouth or nose drawn (ui.md §6.4.2).
+ * the left, little bubbles inside. No face at all: a slime is a lump of living jelly, and reads
+ * stranger and gentler without eyes (the owner's call, 2026-10-30).
  */
 const SLIME_W = 64,
   SLIME_H = 16
@@ -31,8 +31,6 @@ function slimeTex(color: number): THREE.Texture {
   const mix = (k: number, to: number): [number, number, number] => base.map((c) => Math.round(c + (to - c) * k)) as [number, number, number]
   // tones: rim shadow, shade, body, lit, gleam
   const tone = [mix(0.55, 20), mix(0.28, 30), base, mix(0.28, 255), mix(0.88, 255)]
-  const eye: [number, number, number] = [30, 22, 38],
-    white: [number, number, number] = [250, 250, 244]
   const b = new PixBuf(SLIME_W, SLIME_H)
   const front = SLIME_W / 4
   b.fill((x, y) => {
@@ -47,8 +45,6 @@ function slimeTex(color: number): THREE.Texture {
     // the gleam, up and to the left of the face
     if ((y === 3 && dx >= -7 && dx <= -4) || (y === 4 && dx >= -8 && dx <= -6) || (y === 5 && dx === -8)) t = 4
     if (y === 3 && dx === -3) t = 3
-    // eyes: two pixels wide, three tall, a catchlight at the top
-    for (const ex of [-4, 3]) if (dx >= ex && dx <= ex + 1 && y >= 6 && y <= 8) return y === 6 && dx === ex ? white : eye
     return tone[Math.max(0, Math.min(4, t))]
   })
   const tex = toTex(b, false)
