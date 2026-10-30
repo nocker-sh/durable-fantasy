@@ -1,3 +1,4 @@
+import { getNearbyFreeGridCell } from "#/lib/engine/get-nearby-free-grid-cell"
 import { getGridWaypoints } from "#/lib/engine/get-grid-waypoints"
 import { getShortenedPath } from "#/lib/engine/get-shortened-path"
 import { MinPriorityQueue } from "#/lib/engine/min-priority-queue"
@@ -45,17 +46,11 @@ export class GridPathfinder {
     return i >= 0 && j >= 0 && i < props.size && j < props.size && !props.blocked[j * props.size + i]
   }
 
-  private nearestFree(i: number, j: number): [number, number] | null {
-    if (this.free(i, j)) return [i, j]
-    for (let r = 1; r < 8; r++) for (let dj = -r; dj <= r; dj++) for (let di = -r; di <= r; di++) if (Math.max(Math.abs(di), Math.abs(dj)) === r && this.free(i + di, j + dj)) return [i + di, j + dj]
-    return null
-  }
-
   /** A* on the walk grid; returns world-space waypoints, string-pulled unless `grid` asks for every cell center. */
   find(from: V2, to: V2, grid = false): V2[] | null {
     const props = this.#props
-    const s = this.nearestFree(Math.floor(from[0] * props.resolution), Math.floor(from[1] * props.resolution))
-    const g = this.nearestFree(Math.floor(to[0] * props.resolution), Math.floor(to[1] * props.resolution))
+    const s = getNearbyFreeGridCell({ cell: [Math.floor(from[0] * props.resolution), Math.floor(from[1] * props.resolution)], isFree: (x, y) => this.free(x, y) })
+    const g = getNearbyFreeGridCell({ cell: [Math.floor(to[0] * props.resolution), Math.floor(to[1] * props.resolution)], isFree: (x, y) => this.free(x, y) })
     if (!s || !g) return null
     const S = s[1] * props.size + s[0],
       G = g[1] * props.size + g[0]
