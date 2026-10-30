@@ -1,3 +1,4 @@
+import { createRoutineSlot as at } from "#/world/town/create-routine-slot"
 import { CyclicSchedule } from "#/lib/engine/cyclic-schedule"
 import { INTERIORS } from "#/world/town/interiors"
 import { withRoutineActivitySpot } from "#/world/town/with-routine-activity-spot"
@@ -16,21 +17,6 @@ export type Slot = {
   where: Where
   doing: string
   activity?: RoutineActivity
-}
-
-const t = (s: string) => {
-  const timeParts = s.split(":").map(Number),
-    h = timeParts[0],
-    m = timeParts[1]
-  return h * 60 + m
-}
-
-const at = (inputProps: { from: string; where: Where; doing: string; activity?: RoutineActivity }): Slot => {
-  const from = inputProps.from
-  const where = inputProps.where
-  const doing = inputProps.doing
-  const activity = inputProps.activity
-  return { from: t(from), where, doing, ...(activity ? { activity } : {}) }
 }
 
 const P = (map: string, place: string): Spot => ({ map, place })
