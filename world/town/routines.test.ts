@@ -189,3 +189,12 @@ it("keeps every resident's schedule identical at all minutes and slot boundaries
   }
   expect(slotAt("unknown", 0)).toBeNull()
 })
+
+it("keeps the carter's loom quiet while anyone in its shared bedroom sleeps", () => {
+  for (const minute of Array.from({ length: 24 * 60 }, (_, minute) => minute)) {
+    const hasSleepingFamilyMember = ["ルカス", "エミール"].some((name) => slotAt(name, minute)?.doing.includes("眠"))
+    if (hasSleepingFamilyMember) expect(slotAt("ベルタ", minute)?.doing, `shared bedroom at minute ${minute}`).not.toBe("機を織る")
+  }
+  expect(slotAt("ベルタ", 16 * 60)?.doing).toBe("機を織る")
+  expect(slotAt("ベルタ", 23 * 60)).toMatchObject({ where: "home", doing: "古着を繕う" })
+})

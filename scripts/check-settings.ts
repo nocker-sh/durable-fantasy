@@ -1,3 +1,5 @@
+import { hasEntryApproachSections } from "#/scripts/lib/has-entry-approach-sections"
+import { auditEntryApproachSections } from "#/scripts/lib/audit-entry-approach-sections"
 import { getWindmillApproachSection } from "#/scripts/lib/get-windmill-approach-section"
 import { getWindmillSiteTerrain } from "#/scripts/lib/get-windmill-site-terrain"
 import type { Rectangle } from "#/lib/engine/rectangle-subtraction"
@@ -289,11 +291,15 @@ const entryFootprints = [...documents.values()]
   )
 for (const footprint of entryFootprints) reservedLand.get(footprint.map)?.push(footprint)
 for (const doc of documents.values())
-  if (doc.foundation || doc.entry_steps) {
+  if (doc.foundation || doc.entry_steps || hasEntryApproachSections(doc)) {
     const terrain = terrainFor(String(doc.map))
     if (!terrain) failures.push(`${doc.id}: foundation terrain is unavailable`)
     else
-      for (const problem of [...auditBuildingFoundation(doc, terrain, TILE_M), ...auditEntrySteps({ building: doc, documents: documents, terrain: terrain, metres: TILE_M })])
+      for (const problem of [
+        ...auditBuildingFoundation(doc, terrain, TILE_M),
+        ...auditEntrySteps({ building: doc, documents: documents, terrain: terrain, metres: TILE_M }),
+        ...auditEntryApproachSections({ building: doc, documents, terrain, metres: TILE_M, roads: Object.entries(outdoorLayouts).find((entry) => `map-${entry[0]}` === doc.map)?.[1].roads ?? [] }),
+      ])
         failures.push(`${doc.id}: ${problem}`)
   }
 const proposedHouses = plannedBuildingFootprints({ houses: HOUSES, documents: documents, metresPerTile: TILE_M })

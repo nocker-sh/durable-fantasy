@@ -1,3 +1,4 @@
+import { getScalarGridAxisSamples } from "#/lib/engine/get-scalar-grid-axis-samples"
 import type { ScalarField } from "./scalar-field"
 /** Exact extrema of the bilinear field over an axis-aligned rectangle, including clipped cell edges. */
 export function scalarFieldRange(field: ScalarField, bounds: readonly [number, number, number, number]): { min: number; max: number } {
@@ -12,15 +13,8 @@ export function scalarFieldRange(field: ScalarField, bounds: readonly [number, n
     bounds[1] > bounds[3]
   )
     throw new RangeError("Invalid scalar field range")
-  const axis = (start: number, end: number): number[] => {
-    const low = field.gridCoordinate(start) / field.resolution,
-      high = field.gridCoordinate(end) / field.resolution
-    const values = [low, high]
-    for (let i = Math.ceil(low * field.resolution); i <= Math.floor(high * field.resolution); i++) values.push(i / field.resolution)
-    return values
-  }
-  const xs = axis(bounds[0], bounds[2]),
-    zs = axis(bounds[1], bounds[3])
+  const xs = getScalarGridAxisSamples(field, bounds[0], bounds[2])
+  const zs = getScalarGridAxisSamples(field, bounds[1], bounds[3])
   let min = Infinity,
     max = -Infinity
   for (const x of xs)
