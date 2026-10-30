@@ -1,8 +1,8 @@
+import type { Vector2Tuple } from "#/lib/engine/vector2-types"
 import { getSweptGridClearanceError } from "#/lib/engine/get-swept-grid-clearance-error"
 import { getGridSegmentCoverage } from "#/lib/engine/get-grid-segment-coverage"
 import { MONSTER_CELLS_PER_TILE } from "#/world/core/monster-motion-rules"
-import type { V2 } from "#/lib/engine/pathfinder"
-type Props = { from: V2; to: V2; radius: number; free: (x: number, z: number) => boolean }
+type Props = { from: Vector2Tuple; to: Vector2Tuple; radius: number; free: (x: number, z: number) => boolean }
 /** The original terrain cells remain authoritative even when body-aware route searches use finer waypoints. */
 export function getMonsterSegmentError(props: Props): Error | null {
   const scale = MONSTER_CELLS_PER_TILE

@@ -1,11 +1,12 @@
+import type { Vector2Tuple } from "#/lib/engine/vector2-types"
 import { getMonsterRouteInputError } from "#/world/core/get-monster-route-input-error"
 import { createMonsterNavigationGrid } from "#/world/core/create-monster-navigation-grid"
 import { createMonsterNavigationFree } from "#/world/core/create-monster-navigation-free"
 import { MONSTER_CELLS_PER_TILE, MONSTER_NAV_CELLS_PER_TILE } from "#/world/core/monster-motion-rules"
-import { GridPathfinder, type V2 } from "#/lib/engine/pathfinder"
-type Props = { from: V2; to: V2; area: readonly [number, number, number, number]; radius: number; free: (x: number, z: number) => boolean }
+import { GridPathfinder } from "#/lib/engine/grid-pathfinder"
+type Props = { from: Vector2Tuple; to: Vector2Tuple; area: readonly [number, number, number, number]; radius: number; free: (x: number, z: number) => boolean }
 /** Do not string-pull around obstacles: adjacent clear grid cells preserve corner clearance. */
-export function getMonsterGridRoute(props: Props): V2[] | Error {
+export function getMonsterGridRoute(props: Props): Vector2Tuple[] | Error {
   const invalid = getMonsterRouteInputError(props)
   if (invalid) return invalid
   const scale = props.radius === 0 ? MONSTER_CELLS_PER_TILE : MONSTER_NAV_CELLS_PER_TILE
@@ -13,7 +14,7 @@ export function getMonsterGridRoute(props: Props): V2[] | Error {
   const navigation = createMonsterNavigationGrid({ area: props.area, cellsPerTile: scale, free: navigationFree })
   if (navigation instanceof Error) return navigation
   const grid = navigation.layout
-  const clamp = (x: number, z: number): V2 => [Math.min(props.area[2], Math.max(props.area[0], x)), Math.min(props.area[3], Math.max(props.area[1], z))]
+  const clamp = (x: number, z: number): Vector2Tuple => [Math.min(props.area[2], Math.max(props.area[0], x)), Math.min(props.area[3], Math.max(props.area[1], z))]
   const path = new GridPathfinder({ blocked: navigation.blocked, size: grid.size, resolution: 1, clearance: 0 }).find(
     [props.from[0] * scale - grid.ox, props.from[1] * scale - grid.oz],
     [props.to[0] * scale - grid.ox, props.to[1] * scale - grid.oz],

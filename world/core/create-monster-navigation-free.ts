@@ -1,6 +1,6 @@
+import type { Vector2Tuple } from "#/lib/engine/vector2-types"
 import { getSweptGridClearanceFailure } from "#/lib/engine/get-swept-grid-clearance-failure"
 import { MONSTER_CELLS_PER_TILE, MONSTER_NAV_CELLS_PER_TILE } from "#/world/core/monster-motion-rules"
-import type { V2 } from "#/lib/engine/pathfinder"
 type Props = { area: readonly [number, number, number, number]; radius: number; free: (x: number, z: number) => boolean }
 /** Each accepted resting point has a clear footprint and a clear connection to its route-grid node. */
 export function createMonsterNavigationFree(props: Props) {
@@ -9,7 +9,7 @@ export function createMonsterNavigationFree(props: Props) {
   return (x: number, z: number): boolean => {
     if (!props.free(x, z)) return false
     const scale = MONSTER_NAV_CELLS_PER_TILE
-    const centre: V2 = [
+    const centre: Vector2Tuple = [
       Math.min(props.area[2], Math.max(props.area[0], (Math.floor(x * scale) + 0.5) / scale)),
       Math.min(props.area[3], Math.max(props.area[1], (Math.floor(z * scale) + 0.5) / scale)),
     ]

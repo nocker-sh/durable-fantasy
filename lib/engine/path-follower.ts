@@ -1,10 +1,10 @@
-import type { V2 } from "#/lib/engine/pathfinder"
+import type { Vector2Tuple } from "#/lib/engine/vector2-types"
 
 /** Consumes a distance budget across waypoints, independent of render frequency. */
 export class PathFollower {
   constructor(private readonly speed: number) {}
 
-  advance(state: { pos: V2; path: V2[] }, seconds: number): number | null {
+  advance(state: { pos: Vector2Tuple; path: Vector2Tuple[] }, seconds: number): number | null {
     if (!Number.isFinite(seconds) || seconds <= 0) return null
     let remaining = this.speed * seconds
     let consumed = 0

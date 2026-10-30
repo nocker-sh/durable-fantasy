@@ -1,12 +1,12 @@
+import type { Vector2Tuple } from "#/lib/engine/vector2-types"
 import { catmullCoordinate } from "#/lib/engine/catmull-coordinate"
-export type V2 = [number, number]
 
 /** Curve and distance operations on planar polylines. */
 export class Polyline {
   readonly #segments: ReadonlyArray<Readonly<{ ax: number; az: number; dx: number; dz: number; l2: number }>>
 
   /** Snapshot a path for repeated queries; later edits to its points do not alter it. */
-  constructor(pts: readonly V2[]) {
+  constructor(pts: readonly Vector2Tuple[]) {
     this.#segments = pts.slice(0, -1).map((entry, i) => {
       const ax = entry[0]
       const az = entry[1]
@@ -30,8 +30,8 @@ export class Polyline {
     return Math.sqrt(closestSquared)
   }
 
-  static catmull(pts: V2[], k = 8): V2[] {
-    const out: V2[] = []
+  static catmull(pts: Vector2Tuple[], k = 8): Vector2Tuple[] {
+    const out: Vector2Tuple[] = []
     const p = [pts[0], ...pts, pts[pts.length - 1]]
     for (let i = 1; i < p.length - 2; i++) {
       const p0State = [p[i - 1], p[i], p[i + 1], p[i + 2]],
@@ -48,7 +48,7 @@ export class Polyline {
     return out
   }
 
-  static distance(px: number, pz: number, pts: V2[]): number {
+  static distance(px: number, pz: number, pts: Vector2Tuple[]): number {
     return new Polyline(pts).distance(px, pz)
   }
 }

@@ -1,9 +1,9 @@
+import type { Vector2Tuple } from "#/lib/engine/vector2-types"
 import { getMonsterGridRoute } from "#/world/core/get-monster-grid-route"
 import { getMonsterRouteInputError } from "#/world/core/get-monster-route-input-error"
-import type { V2 } from "#/lib/engine/pathfinder"
 import { getMonsterSegmentError } from "#/world/core/get-monster-segment-error"
-type Props = { from: V2; to: V2; area: readonly [number, number, number, number]; radius: number; free: (x: number, z: number) => boolean }
-export type MonsterRoute = { points: ReadonlyArray<V2>; lengths: ReadonlyArray<number>; distance: number }
+type Props = { from: Vector2Tuple; to: Vector2Tuple; area: readonly [number, number, number, number]; radius: number; free: (x: number, z: number) => boolean }
+export type MonsterRoute = { points: ReadonlyArray<Vector2Tuple>; lengths: ReadonlyArray<number>; distance: number }
 /** One swept-footprint proof includes both endpoints; a blocked direct route still needs separately checked rests and a verified detour. */
 export function getMonsterRoute(props: Props): MonsterRoute | Error {
   const invalid = getMonsterRouteInputError(props)

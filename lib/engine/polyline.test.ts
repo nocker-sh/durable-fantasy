@@ -1,8 +1,9 @@
+import type { Vector2Tuple } from "#/lib/engine/vector2-types"
 import { expect, it } from "vitest"
-import { Polyline, type V2 } from "#/lib/engine/polyline"
+import { Polyline } from "#/lib/engine/polyline"
 
 it("matches direct distances for curved paths, endpoints and repeated points", () => {
-  const paths: V2[][] = [
+  const paths: Vector2Tuple[][] = [
     [],
     [[2, 3]],
     [
@@ -25,7 +26,7 @@ it("matches direct distances for curved paths, endpoints and repeated points", (
 })
 
 it("keeps a stable snapshot when the source path changes", () => {
-  const points: V2[] = [
+  const points: Vector2Tuple[] = [
     [0, 0],
     [4, 0],
   ]

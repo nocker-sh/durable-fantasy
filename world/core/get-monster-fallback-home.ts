@@ -1,8 +1,8 @@
-import type { V2 } from "#/lib/engine/pathfinder"
+import type { Vector2Tuple } from "#/lib/engine/vector2-types"
 import { getMonsterGridLayout } from "#/world/core/get-monster-grid-layout"
 type Props = { area: readonly [number, number, number, number]; cellsPerTile: number; free: (x: number, z: number) => boolean }
 /** Exhaust the territory's cells rather than falling back to an unchecked, possibly blocked centre. */
-export function getMonsterFallbackHome(props: Props): V2 | Error {
+export function getMonsterFallbackHome(props: Props): Vector2Tuple | Error {
   const scale = props.cellsPerTile,
     grid = getMonsterGridLayout({ area: props.area, cellsPerTile: scale, storage: "rectangle" })
   if (grid instanceof Error) return grid

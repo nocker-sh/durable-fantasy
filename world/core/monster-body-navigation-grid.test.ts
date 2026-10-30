@@ -1,3 +1,4 @@
+import type { Vector2Tuple } from "#/lib/engine/vector2-types"
 import { expect, it } from "vitest"
 import { SPAWNS, MONSTER_KINDS } from "#/world/core/monsters"
 import { MAPS } from "#/world/maps"
@@ -6,7 +7,6 @@ import { getMonsterBodyRadius } from "#/world/core/get-monster-body-radius"
 import { createMonsterNavigationFree } from "#/world/core/create-monster-navigation-free"
 import { getMonsterSegmentError } from "#/world/core/get-monster-segment-error"
 import { MONSTER_NAV_CELLS_PER_TILE } from "#/world/core/monster-motion-rules"
-import type { V2 } from "#/lib/engine/pathfinder"
 const territories = [...new Map(SPAWNS.map((spawn) => [`${spawn.map}:${spawn.kind}:${spawn.area}`, spawn])).values()]
 it.each(territories)("keeps $id's body-aware grid connected with every allowed edge clear", (spawn) => {
   const radius = getMonsterBodyRadius({ kind: MONSTER_KINDS[spawn.kind] })
@@ -16,11 +16,11 @@ it.each(territories)("keeps $id's body-aware grid connected with every allowed e
     scale = MONSTER_NAV_CELLS_PER_TILE
   const width = Math.floor(spawn.area[2] * scale) - Math.floor(spawn.area[0] * scale) + 1,
     depth = Math.floor(spawn.area[3] * scale) - Math.floor(spawn.area[1] * scale) + 1
-  const nodes = new Map<string, V2>()
+  const nodes = new Map<string, Vector2Tuple>()
   for (const index of Array.from({ length: width * depth }).keys()) {
     const x = index % width,
       z = Math.floor(index / width)
-    const point: V2 = [Math.min(spawn.area[2], spawn.area[0] + (x + 0.5) / scale), Math.min(spawn.area[3], spawn.area[1] + (z + 0.5) / scale)]
+    const point: Vector2Tuple = [Math.min(spawn.area[2], spawn.area[0] + (x + 0.5) / scale), Math.min(spawn.area[3], spawn.area[1] + (z + 0.5) / scale)]
     if (navigationFree(...point)) nodes.set(`${x},${z}`, point)
   }
   expect(nodes.size).toBeGreaterThan(0)

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { GridPathfinder } from "#/lib/engine/pathfinder"
+import { GridPathfinder } from "#/lib/engine/grid-pathfinder"
 import { Polyline } from "#/lib/engine/polyline"
 import { ScalarField } from "#/lib/engine/scalar-field"
 import { LoadTimer } from "#/lib/engine/laps"
