@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
 import proposal from "#/world/town/floorplan/authored/h-m5"
-import { authoredFloorPlan } from "#/world/town/floorplan/authored"
+import { authoredFloorPlan } from "#/world/town/floorplan/authored-floor-plan"
 import { HOUSES } from "#/world/town/houses"
 import { interiorPlan } from "#/world/town/interior-plan"
 import { indoorMaps } from "#/world/maps/indoor-maps"

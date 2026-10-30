@@ -181,11 +181,11 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 ## 資料の平面と描画への投影
 
-`world/town/floorplan/authored.ts` は個別の部屋のグリッドと配置を実寸の `FloorPlan` へ変換する純粋な処理である。部屋の原点と家具の矩形を同じ倍率で移し、壁の連続したセルをまとめ、戸のセルを埋めない。部屋の境界どうしが同じ壁または戸を共有することだけを許し、内部の重複、未被覆の床、範囲外の家具は拒否する。家具の名前から似た形を推測せず、資料の `runtime_kind` と `runtime_solid` を使う。種類の定義は `world/town/furniture-kinds.ts`、明示した種類の検査は `parse-furniture-kind.ts` に分ける。既存の名前の判定は `get-furniture-kind.ts` に順序を持つ規則として残し、資料の明示した種類の代わりにはしない。
+`world/town/floorplan/authored-floor-plan.ts` は個別の部屋のグリッドと配置を実寸の `FloorPlan` へ変換する純粋な処理である。入力の共有型は `authored-types.ts` に置き、全体の寸法の検査は `assert-authored-plan-dimensions.ts`、外壁に収まる開口の検査と外壁面への投影は `get-authored-entrance.ts` と `get-authored-entrance-opening.ts` に分ける。部屋の原点と家具の矩形を同じ倍率で移し、壁の連続したセルをまとめ、戸のセルを埋めない。部屋の境界どうしが同じ壁または戸を共有することだけを許し、内部の重複、未被覆の床、範囲外の家具は拒否する。家具の名前から似た形を推測せず、資料の `runtime_kind` と `runtime_solid` を使う。種類の定義は `world/town/furniture-kinds.ts`、明示した種類の検査は `parse-furniture-kind.ts` に分ける。既存の名前の判定は `get-furniture-kind.ts` に順序を持つ規則として残し、資料の明示した種類の代わりにはしない。
 
 `scale-room-piece-dimensions.ts` は配置の座標変換と分けて、家具の実寸の付属情報を室内の倍率へ一度だけ変換する。椅子と足掛けは `scale-seat.ts`、卓の天板・脚と膝の空間は `scale-work-surface.ts` を使う。炉・棚・寝台も各部品の変換を使い、向き・階・グリッドの矩形は元の配置に保つ。描画の位置を決める変換で実寸を重ねて掛けない。
 
-`scripts/export-authored-plans.ts` は選んだ建物と各室の資料を読み、`world/town/floorplan/authored/` へ型検査可能な配置データを書き出す。現在の対象は寄り合い所で、資料の用途は共用として保持する。書き出しただけでは町へ登録されない。寄り合い所は `HOUSES` の `authored` から外観・上下階の室内・通行判定へ同じ配置を渡す。ほかの建物への採用は個別に行う。投影した平面は `interiorPlan` の引数へ渡せるため、採用時の描画と通行判定で別の配置を作らない。
+`scripts/export-authored-plans.ts` は選んだ建物と各室の資料を読み、`world/town/floorplan/authored/` へ型検査可能な配置データを書き出す。`scripts/lib/get-authored-plan-source.ts` が共有型への直接の参照とプロジェクトの整形を含むソースを作る。整形後の内容を比較し、変化のない再出力でファイルの更新時刻や開発画面の読込みを変えない。現在の対象は寄り合い所で、資料の用途は共用として保持する。書き出しただけでは町へ登録されない。寄り合い所は `HOUSES` の `authored` から外観・上下階の室内・通行判定へ同じ配置を渡す。ほかの建物への採用は個別に行う。投影した平面は `interiorPlan` の引数へ渡せるため、採用時の描画と通行判定で別の配置を作らない。
 
 資料案の階段は `world/town/floorplan/stair-geometry.ts` が段数・床高・踏面・踊り場から一つの階段を計算し、上下階の描画と通行判定で共有する。`world/scene/construction/authored-stair.ts` は上階では同じ階段を下へ降ろし、上向きに複製しない。上階の床は `lib/engine/rectangle-subtraction.ts` で開口を除いた矩形へ分解して描き、上の踊り場の床板を二重に描かない。資料案の縦横は同じ室内倍率で投影し、階高と床厚も資料の差から得る。既存の自動間取りの描画寸法は維持する。
 

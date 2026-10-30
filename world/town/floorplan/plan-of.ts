@@ -1,4 +1,4 @@
-import { authoredFloorPlan } from "#/world/town/floorplan/authored"
+import { authoredFloorPlan } from "#/world/town/floorplan/authored-floor-plan"
 import type { HouseDef } from "#/world/town/house-types"
 import type { Rect, FloorPlan } from "#/world/town/floorplan/types"
 import { layout } from "#/world/town/floorplan/layout"

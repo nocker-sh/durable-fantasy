@@ -1,4 +1,4 @@
-import type { AuthoredPlan } from "#/world/town/floorplan/authored"
+import type { AuthoredPlan } from "#/world/town/floorplan/authored-types"
 
 /** Shared structural validation runs before authoring geometry and before runtime projection. */
 export function assertAuthoredFloorLevels(levels: AuthoredPlan["floorLevels"], floors: number) {

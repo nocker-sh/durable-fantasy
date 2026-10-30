@@ -1,4 +1,4 @@
-import type { AuthoredPlan } from "#/world/town/floorplan/authored"
+import type { AuthoredPlan } from "#/world/town/floorplan/authored-types"
 export type HouseKind = "home" | "shop" | "public" | "workshop" | "farm" | "vacant"
 
 export type Room = {

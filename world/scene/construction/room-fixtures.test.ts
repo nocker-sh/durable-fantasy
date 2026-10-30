@@ -1,7 +1,7 @@
 import { afterEach, expect, it } from "vitest"
 import * as THREE from "three"
 import proposal from "#/world/town/floorplan/authored/h-m5"
-import { authoredFloorPlan } from "#/world/town/floorplan/authored"
+import { authoredFloorPlan } from "#/world/town/floorplan/authored-floor-plan"
 import { HOUSES } from "#/world/town/houses"
 import { interiorPlan } from "#/world/town/interior-plan"
 import { interiorRows } from "#/world/town/interior-rows"
