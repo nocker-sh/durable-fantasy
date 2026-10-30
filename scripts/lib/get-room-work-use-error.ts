@@ -1,34 +1,17 @@
-import { getWorkKitTableSetupError } from "#/scripts/lib/get-work-kit-table-setup-error"
-import { getStoredWorkKitDimensions } from "#/scripts/lib/get-stored-work-kit-dimensions"
-import { getWorkKitBoxError } from "#/scripts/lib/get-work-kit-box-error"
-import type { z } from "zod"
-import type { roomWorkUseSchema } from "#/scripts/lib/room-work-use-schema"
+import { getRoomWorkUseContext } from "#/scripts/lib/get-room-work-use-context"
+import { getRoomWorkKitLayoutError } from "#/scripts/lib/get-room-work-kit-layout-error"
+import type { RoomWorkUse } from "#/scripts/lib/room-work-use-types"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 import type { Slot } from "#/world/town/routine-types"
 
-type Props = Readonly<{ room: SettingDocument; use: z.infer<typeof roomWorkUseSchema>; documents: ReadonlyMap<string, SettingDocument>; routines: Readonly<Record<string, readonly Slot[]>> }>
+type Props = Readonly<{ room: SettingDocument; use: RoomWorkUse; documents: ReadonlyMap<string, SettingDocument>; routines: Readonly<Record<string, readonly Slot[]>> }>
 
-/** Validate references only; storage capacity, lighting and concurrent use remain separate design work. */
+/** Keep references, kit layout and completion gates distinct; handling, lighting and concurrent use remain separate design work. */
 export function getRoomWorkUseError(props: Props): Error | null {
   const use = props.use
-  const resident = props.documents.get(use.resident)
-  if (props.room.kind !== "rooms" || resident?.kind !== "residents" || !Array.isArray(props.room.occupants) || !props.room.occupants.includes(resident.title))
-    return new Error("Work use has no resident occupant")
-  const building = props.documents.get(String(props.room.building))
-  if (building?.kind !== "buildings" || !Array.isArray(building.rooms) || !building.rooms.includes(props.room.id)) return new Error("Work use has no containing building")
-  const table = props.room.furniture?.find((piece) => piece.symbol === use.furniture)
-  if (!table?.seat_symbols?.includes(use.seat_symbol) || !props.room.furniture?.some((piece) => piece.symbol === use.seat_symbol)) return new Error("Work use has no matching furniture and seat")
-  const storageRoom = props.documents.get(use.storage_room)
-  const storage = storageRoom?.furniture?.find((piece) => piece.symbol === use.storage_symbol)
-  if (
-    storageRoom?.kind !== "rooms" ||
-    storageRoom.building !== props.room.building ||
-    !building.rooms.includes(storageRoom.id) ||
-    storage?.role !== "storage" ||
-    !storage.compartments?.includes(use.kit.storage_compartment)
-  )
-    return new Error("Work use has no matching household storage compartment")
-  if (storage.owner !== resident.title && storage.owner !== resident.household && !storage.owners?.includes(resident.title)) return new Error("Work kit storage belongs to another resident")
+  const context = getRoomWorkUseContext(props)
+  if (context instanceof Error) return context
+  const resident = context.resident
   if (
     use.kit.owner !== use.resident ||
     [use.kit.proposed_box_maker, use.kit.proposed_needle_maker, ...(use.kit.box?.contents.flatMap((piece) => piece.makers) ?? [])].some((id) => props.documents.get(id)?.kind !== "residents")
@@ -36,20 +19,8 @@ export function getRoomWorkUseError(props: Props): Error | null {
     return new Error("Work kit has invalid ownership or makers")
   if (use.routine_source.key !== resident.title || !Object.hasOwn(props.routines, resident.title) || !props.routines[resident.title]?.some((slot) => slot.doing === use.routine_source.doing))
     return new Error("Work use has no matching routine activity")
-  if (use.status === "designed" && !use.kit.box) return new Error("Work kit has no dimensioned box")
-  if (use.table_setup && !use.kit.box) return new Error("Work tabletop setup has no referenced box")
-  if (use.status === "designed" && !use.table_setup) return new Error("Work use has no tabletop setup")
-  if (use.kit.box) {
-    const dimensions = getStoredWorkKitDimensions({ shelf: storage.shelf, id: use.kit.box.storage_item, owner: resident.title })
-    if (dimensions instanceof Error) return dimensions
-    const error = getWorkKitBoxError({ box: use.kit.box, dimensions, owner: use.kit.owner, documents: props.documents })
-    if (error) return error
-    if (use.table_setup) {
-      if (!props.room.grid) return new Error("Work tabletop setup has no measured room")
-      const setupError = getWorkKitTableSetupError({ setup: use.table_setup, table, cell: props.room.grid.cell_m, dimensions })
-      if (setupError) return setupError
-    }
-  }
+  const layoutError = getRoomWorkKitLayoutError({ room: props.room, use, context, documents: props.documents })
+  if (layoutError) return layoutError
   const dependencies = [use.resident, use.storage_room, use.kit.proposed_box_maker, use.kit.proposed_needle_maker, ...(use.kit.box?.contents.flatMap((piece) => piece.makers) ?? [])]
   const declared = props.room.design_dependencies
   if (!Array.isArray(declared) || dependencies.some((id) => !declared.includes(id))) return new Error("Work use has missing design dependencies")
