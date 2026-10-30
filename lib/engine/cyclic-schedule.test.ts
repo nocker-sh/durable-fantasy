@@ -30,3 +30,18 @@ it("rejects non-finite queries instead of selecting an arbitrary entry", () => {
   const schedule = new CyclicSchedule([{ from: 7 }, { from: 18 }])
   for (const time of [NaN, Infinity, -Infinity]) expect(() => schedule.at(time)).toThrow(RangeError)
 })
+
+it("keeps its captured boundaries when callers edit the input or a returned entry", () => {
+  const morning = { from: 7, name: "morning" }
+  const night = { from: 18, name: "night" }
+  const entries = [night, morning]
+  const schedule = new CyclicSchedule(entries)
+  morning.from = 22
+  const selected = schedule.at(19)
+  if (selected) selected.from = NaN
+  entries.splice(0, entries.length)
+  expect(schedule.at(6)).toBe(night)
+  expect(schedule.at(7)).toBe(morning)
+  expect(schedule.at(17.99)).toBe(morning)
+  expect(schedule.at(18)).toBe(night)
+})
