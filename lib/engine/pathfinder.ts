@@ -1,3 +1,4 @@
+import { getGridWaypoints } from "#/lib/engine/get-grid-waypoints"
 import { getShortenedPath } from "#/lib/engine/get-shortened-path"
 import { MinPriorityQueue } from "#/lib/engine/min-priority-queue"
 
@@ -63,14 +64,8 @@ export class GridPathfinder {
           }
         }
     }
-    if (prev[G] < 0 && G !== S) return null
-    const cells: number[] = []
-    for (let k = G; k !== -1; k = prev[k]) {
-      cells.push(k)
-      if (k === S) break
-    }
-    cells.reverse()
-    const pts: V2[] = cells.map((k) => [((k % this.size) + 0.5) / this.resolution, (((k / this.size) | 0) + 0.5) / this.resolution])
+    const pts = getGridWaypoints({ previous: prev, start: S, goal: G, size: this.size, resolution: this.resolution })
+    if (!pts) return null
     if (grid) return pts
     pts[pts.length - 1] = this.free(Math.floor(to[0] * this.resolution), Math.floor(to[1] * this.resolution)) ? [to[0], to[1]] : pts[pts.length - 1]
     return getShortenedPath({ points: pts, isVisible: (from, to) => this.los(from, to) })
