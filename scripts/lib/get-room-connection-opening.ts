@@ -1,6 +1,5 @@
 import { roomGridSchema } from "#/scripts/lib/room-layout-schema"
-import { getGridBoundaryOpening } from "#/scripts/lib/get-grid-boundary-opening"
-import { MIN_PASSAGE_WIDTH_M } from "#/scripts/lib/spatial-rules"
+import { getRoomDoorwayReview } from "#/scripts/lib/get-room-doorway-review"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 import type { Connection } from "#/scripts/lib/building-layout"
 
@@ -13,7 +12,8 @@ export function getRoomConnectionOpening(props: Props) {
     span = props.connection.width_cells ?? 1
 
   if (!["door", "opening"].includes(kind) || !props.connection.door || !grid.success || grid.data.cell_m !== props.cellMetres) return null
-  if (!Number.isFinite(span * props.cellMetres) || span * props.cellMetres < MIN_PASSAGE_WIDTH_M) return null
+  const review = getRoomDoorwayReview({ rows: grid.data.rows, door: props.connection.door, span, cellMetres: props.cellMetres })
+  if (review.errors.length) return null
 
-  return getGridBoundaryOpening({ rows: grid.data.rows, door: props.connection.door, span }) ?? null
+  return review.opening
 }
