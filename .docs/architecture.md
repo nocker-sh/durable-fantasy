@@ -1235,7 +1235,7 @@ React との共有の定義は `components/game/game-context.ts` に一つだけ
 
 ## 復帰位置と糸の訪問権限
 
-保存する経路と接続の型は `world/core/location-types.ts` に置く。`location-at.ts` は歩き終えた経路区間だけを経過時間から求め、`town-location.ts` は世界を移ったときの新しい町の経路を作る。接続の所有権の確認と保存は Player DO の入口に残す。
+保存する経路と接続の型は `world/core/location-types.ts` に置く。`location-at.ts` は歩き終えた経路区間だけを経過時間から求め、`town-location.ts` は世界を移ったときの新しい町の経路を作る。入室・歩行・マップ移動・切断・復活の位置更新は `world/server/arrive-player.ts`・`walk-player.ts`・`travel-player.ts`・`leave-player.ts`・`revive-player-at-home.ts` に分け、入力の型を `player-location-types.ts` に置く。各処理は受け取った時刻と保存中の接続・生存状態を使い、Player DO の入口が同じ RPC と保存単位で呼ぶ。切断の進捗と保存時刻には同じ時刻を使う。復活先の経路は戻る場所の読み取り専用のセルと参照を共有しない。
 
 糸の型と保持上限は `world/core/threads.ts`、保存済みの公開識別子の計算は `thread-key.ts`、相手の糸の生成は `thread-of.ts` に置く。`keep.ts` が同じ相手の置換と古い糸の除外を行い、`may-visit.ts` が自分の町と保持した糸の町への訪問を判定する。識別子の計算順序を分離で変えず、保存済みの糸を別の相手として扱わない。
 

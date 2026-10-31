@@ -1,3 +1,9 @@
+import { arrivePlayer } from "#/world/server/arrive-player"
+import { walkPlayer } from "#/world/server/walk-player"
+import { travelPlayer } from "#/world/server/travel-player"
+import { leavePlayer } from "#/world/server/leave-player"
+import { revivePlayerAtHome } from "#/world/server/revive-player-at-home"
+import type { PlayerArrivalInput, PlayerWalkInput, PlayerTravelInput } from "#/world/server/player-location-types"
 import { receiveGather } from "#/world/core/receive-gather"
 import type { GatherRequest } from "#/world/core/gather-receipt-types"
 import { receiveShop } from "#/world/core/receive-shop"
@@ -6,8 +12,6 @@ import type { ShopQuote } from "#/world/core/shop-receipt-types"
 // purchases sent at once can never both spend the same gold.
 import { defineDurableState } from "void/durable"
 import { locationAt } from "#/world/core/location-at"
-import { townLocation } from "#/world/core/town-location"
-import type { Cell } from "#/world/protocol"
 import { apply } from "#/world/core/apply"
 import type { Context } from "#/world/core/apply"
 import type { Transition } from "#/world/core/transition"
@@ -43,56 +47,23 @@ export const Player = defineDurableState({
   version: 8,
   migrations: playerMigrations,
   methods: {
-    arrive(context, input: { world: number; map: string; connection: string }) {
-      const world = input.world
-      const map = input.map
-      const connection = input.connection
-
-      const now = Date.now()
-      const location = context.state.location?.world === world ? context.state.location : townLocation(world, now)
-      const at = locationAt(location, now)
-      if (location.map !== map) return { map: location.map, at, accepted: false }
-      context.state.location = { ...location, route: [at], since: now, connection }
-      return { map, at, accepted: true }
+    arrive(context, input: PlayerArrivalInput) {
+      return arrivePlayer(context.state, input, Date.now())
     },
     ownsConnection(context, connection: string): boolean {
       return context.state.location?.connection === connection
     },
-    walk(context, input: { connection: string; route: Cell[]; since?: number }): boolean {
-      const connection = input.connection
-      const route = input.route
-      const since = input.since === undefined ? Date.now() : input.since
-
-      const location = context.state.location
-      if (!location || location.connection !== connection || context.state.player.hp <= 0) return false
-      context.state.location = { ...location, route, since }
-      return true
+    walk(context, input: PlayerWalkInput): boolean {
+      return walkPlayer(context.state, input, Date.now())
     },
-    travel(context, input: { connection: string; map: string; at: Cell }): boolean {
-      const connection = input.connection
-      const map = input.map
-      const at = input.at
-
-      const location = context.state.location
-      if (!location || location.connection !== connection || context.state.player.hp <= 0) return false
-      context.state.location = { ...location, map, route: [at], since: Date.now(), connection: null }
-      return true
+    travel(context, input: PlayerTravelInput): boolean {
+      return travelPlayer(context.state, input, Date.now())
     },
     reviveAtHome(context, connection: string): Transition {
-      const location = context.state.location
-      if (!location || location.connection !== connection || context.state.trade?.status === "prepared") return { ok: false, reason: "NOT_READY" }
-      const now = Date.now()
-      const result = apply(restoreSavedPlayer(context.state.player), { type: "revive" }, { now })
-      if (!result.ok) return result
-      publishPlayer(context.state, result.state)
-      advanceCombatLife(context.state)
-      const home = result.state.savePoint
-      context.state.location = { ...location, map: home.map, route: [home.cell as Cell], since: now, connection: null }
-      return { ...result, state: context.state.player }
+      return revivePlayerAtHome(context.state, connection, Date.now())
     },
     leave(context, connection: string) {
-      const location = context.state.location
-      if (location?.connection === connection) context.state.location = { ...location, route: [locationAt(location, Date.now())], since: Date.now(), connection: null }
+      leavePlayer(context.state, connection, Date.now())
     },
     claim(context, credential: string): boolean {
       if (context.state.credential) return context.state.credential === credential
