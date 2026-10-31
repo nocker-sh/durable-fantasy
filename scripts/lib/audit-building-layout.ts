@@ -1,13 +1,12 @@
+import { auditRoomConnection } from "#/scripts/lib/audit-room-connection"
+import { roomConnectionsSchema } from "#/scripts/lib/room-connection-schema"
 import { FloorOccupancy } from "#/scripts/lib/floor-occupancy"
 import { roomOriginSchema, roomGridSchema } from "#/scripts/lib/room-layout-schema"
 import { buildingLayoutSchema, buildingRoomIdsSchema } from "#/scripts/lib/building-layout-schema"
 import { getGridBoundaryOpening } from "#/scripts/lib/get-grid-boundary-opening"
-import { getRoomConnectionScopeError } from "#/scripts/lib/get-room-connection-scope-error"
 import { MIN_PASSAGE_WIDTH_M } from "#/scripts/lib/spatial-rules"
 import { auditBuildingDoorInventory } from "#/scripts/lib/audit-building-door-inventory"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
-import type { Connection } from "#/scripts/lib/building-layout"
-import { same } from "#/scripts/lib/building-layout/same"
 import { auditBuildingAccess } from "#/scripts/lib/building-layout/audit-building-access"
 
 /** Check the assembled building, without substituting its projection for the room's own design. */
@@ -54,48 +53,15 @@ export function auditBuildingLayout(building: SettingDocument, documents: Readon
         grid = parsedGrid.data
       if (grid.cell_m !== layout.cell_m) errors.push(`${id}: inconsistent cell scale`)
       errors.push(...cells.addRoom({ id, origin, rows: grid.rows }))
-      for (const connection of (room.connections ?? []) as Connection[]) {
-        const target = documents.get(connection.target)
-        const scopeError = getRoomConnectionScopeError({ building, roomId: id, targetId: connection.target, kind: connection.kind ?? "door", target })
-        if (scopeError) {
-          errors.push(scopeError)
-          continue
-        }
-        if (target?.kind !== "rooms") continue
-        if (!target.grid || !Array.isArray(target.origin)) {
-          errors.push(`${id}: connected room has no grid/origin`)
-          continue
-        }
-        const reciprocal = ((target.connections ?? []) as Connection[]).find(
-          (other) =>
-            other.target === id &&
-            (connection.kind === "stair"
-              ? other.kind === "stair" && other.furniture === connection.target_furniture && other.target_furniture === connection.furniture
-              : same(other.door, connection.target_door) && same(other.target_door, connection.door)),
-        )
-        if (reciprocal && (reciprocal.kind ?? "door") !== (connection.kind ?? "door")) errors.push(`${id}: connection kinds disagree`)
-        if (!reciprocal) errors.push(`${id}: connection to ${target.id} is not reciprocal`)
-        if (connection.kind === "stair") {
-          const a = room.furniture?.find((f) => f.symbol === connection.furniture),
-            b = target.furniture?.find((f) => f.symbol === connection.target_furniture)
-          if (
-            !a ||
-            !b ||
-            Math.abs(Number(target.floor) - Number(room.floor)) !== 1 ||
-            !same([origin[0] + a.rect[0], origin[1] + a.rect[1], ...a.rect.slice(2)], [Number(target.origin[0]) + b.rect[0], Number(target.origin[1]) + b.rect[1], ...b.rect.slice(2)])
-          )
-            errors.push(`${id}: stairs do not align between adjacent floors`)
-          if (!a?.access.some((p) => same(p, connection.access)) || !b?.access.some((p) => same(p, connection.target_access))) errors.push(`${id}: stair endpoints are not furniture use positions`)
-        } else {
-          const a = connection.door,
-            b = connection.target_door
-          if (!a || !b || room.floor !== target.floor || !same([origin[0] + a[0], origin[1] + a[1]], [Number(target.origin[0]) + b[0], Number(target.origin[1]) + b[1]]))
-            errors.push(`${id}: connected doors do not meet`)
-          if (connection.width_cells !== reciprocal?.width_cells) errors.push(`${id}: door widths disagree`)
-        }
+      const parsedConnections = roomConnectionsSchema.safeParse(room.connections)
+      if (!parsedConnections.success) {
+        errors.push(`${id}: invalid room connections`)
+        continue
       }
+      const connections = parsedConnections.data
+      for (const connection of connections) errors.push(...auditRoomConnection({ building, room, origin, connection, documents }))
       const declaredDoors = new Set<string>()
-      for (const connection of (room.connections ?? []) as Connection[])
+      for (const connection of connections)
         if (connection.door) {
           const xState = connection.door,
             x = xState[0],

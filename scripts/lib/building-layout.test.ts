@@ -306,3 +306,17 @@ it("does not accept another document kind as an interior room", () => {
   request.a.kind = "residents"
   expect(auditBuildingLayout(request.building, request.documents)).toContain("room-a: missing grid or wrong building/floor")
 })
+
+it.each([{}, "invalid", [null], [{ target: null }], [{ target: "room-b", door: "invalid" }]])("rejects malformed connections without crashing: %j", (connections) => {
+  const request = fixture()
+  Object.assign(request.a, { connections })
+  expect(auditBuildingLayout(request.building, request.documents)).toContain("room-a: invalid room connections")
+})
+
+it.each([null, undefined])("reports orphaned doors when the connection list is absent: %j", (connections) => {
+  const request = fixture()
+  Object.assign(request.a, { connections })
+  const errors = auditBuildingLayout(request.building, request.documents)
+  expect(errors).not.toContain("room-a: invalid room connections")
+  expect(errors).toContain("room-a: doorway cell has no connection at 0,1")
+})

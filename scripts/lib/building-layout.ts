@@ -1,16 +1,7 @@
 import type { z } from "zod"
+import type { roomConnectionSchema } from "#/scripts/lib/room-connection-schema"
 import type { buildingLayoutSchema } from "#/scripts/lib/building-layout-schema"
 
-export type Connection = {
-  kind?: string
-  door?: number[]
-  target: string
-  target_door?: number[]
-  width_cells?: number
-  furniture?: string
-  target_furniture?: string
-  access?: number[]
-  target_access?: number[]
-}
+export type Connection = z.infer<typeof roomConnectionSchema>
 
 export type Layout = z.infer<typeof buildingLayoutSchema>

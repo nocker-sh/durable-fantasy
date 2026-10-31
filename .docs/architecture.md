@@ -900,6 +900,8 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 部屋の原点と矩形グリッドは `room-layout-schema.ts` で検証する。`floor-occupancy.ts` の `FloorOccupancy` は一階分の平面の占有を保持し、境界外と共有を許さない重なりを報告する。部屋の接続や扉の操作はこの集計とは分けて照合し、平面の占有が通ったことを立体の整合とは扱わない。
 
+接続の読み取りと `Connection` の型は `room-connection-schema.ts` に置く。`audit-room-connection.ts` は接続先の所属、検証した原点、逆向きの宣言を解決する。`get-reciprocal-room-connection.ts` は両端を照合し、戸口は `audit-connected-room-door.ts`、階段の平面位置と使用面は `audit-connected-room-stair.ts` が調べる。外へ出られるかの探索も同じ接続スキーマを使い、不正な一覧を未検証の型変換で通さない。
+
 `get-room-door-portals.ts` が室の出入口を一棟の座標と階へ移し、`get-building-door-portals.ts` が所属する全室を解決する。`audit-building-door-inventory.ts` は同じ戸口の両側を一つにまとめ、板の定義と所有室が過不足なく一致することを検査する。`audit-building-layout.ts` から呼び、既存の各室の板の回転検査と併用する。ルードヴィヒの戸口の所有と、身体と立体・日課の残りは [[building-hue-ludwig#戸口と扉を持つ室]] にある。
 
 
