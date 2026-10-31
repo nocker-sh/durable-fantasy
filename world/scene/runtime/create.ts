@@ -1,6 +1,9 @@
+import { createSceneRenderer } from "#/world/scene/runtime/create-scene-renderer"
+import { createSceneRoot } from "#/world/scene/runtime/create-scene-root"
+import { createSceneCamera } from "#/world/scene/runtime/create-scene-camera"
+import { createWalkMarkers } from "#/world/scene/runtime/create-walk-markers"
 import { withCleanup } from "#/lib/engine/with-cleanup"
 import { type CleanupStack } from "#/lib/engine/cleanup-stack"
-import { disposeObjectTree } from "#/lib/graphics/dispose-object-tree"
 import type { SceneOptions } from "#/world/scene/runtime/scene-options"
 import { SceneBuildQueue } from "#/world/scene/runtime/scene-build-queue"
 import type { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
@@ -14,7 +17,6 @@ import { walkDirection } from "#/world/scene/walk-direction"
 import { createGatheringSpots } from "#/world/scene/runtime/gathering"
 import { createPointer } from "#/world/scene/runtime/pointer"
 import { createPreviewControls } from "#/world/scene/runtime/preview"
-import { PixelCamera } from "#/lib/graphics/pixel-camera"
 import { createWalkers } from "#/world/scene/runtime/walkers"
 import { DioramaPostProcessing } from "#/lib/graphics/post-processing"
 import { mergeStatic } from "#/lib/graphics/merge-static"
@@ -40,11 +42,10 @@ import type { Anim } from "#/world/scene/figure/animation"
 import { outlineShape } from "#/lib/graphics/outline-shape"
 import type { Actor } from "#/world/scene/actor"
 import { view } from "#/world/scene/actors"
-import { FIG_PPU, FIG } from "#/world/scene/figure/display-scale"
+import { FIG } from "#/world/scene/figure/display-scale"
 import { critters } from "#/world/scene/critters"
 import { spawnAnimals } from "#/world/scene/spawn-animals"
 import { tickSprites } from "#/world/scene/tick-sprites"
-import { exposeScene } from "#/world/expose-scene"
 import { lap } from "#/world/lap"
 import { Ashfall } from "#/world/scene/ashfall"
 import { dustAll } from "#/world/scene/dust-all"
@@ -58,7 +59,7 @@ import { createPopulation } from "#/world/scene/runtime/population"
 import type { Cell, SceneEvents } from "#/world/scene/runtime/types"
 import type { Walker } from "#/world/scene/runtime/walker"
 import { center } from "#/world/scene/runtime/center"
-import { CELL, NAME_RANGE } from "#/world/scene/runtime/grid"
+import { NAME_RANGE } from "#/world/scene/runtime/grid"
 import { cellOf } from "#/world/scene/runtime/cell-of"
 
 const builds = new SceneBuildQueue()
@@ -94,19 +95,9 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
   await tick()
   lap("scene: start")
   initWalk()
-  const renderer = new THREE.WebGLRenderer({ antialias: false })
-  resources.defer(() => renderer.forceContextLoss())
-  resources.use(renderer)
-  renderer.shadowMap.enabled = true
-  renderer.shadowMap.type = THREE.BasicShadowMap
-  // shadows are redrawn a few times a second and when the sun moves (frame()), not every frame
-  renderer.shadowMap.autoUpdate = false
+  const renderer = createSceneRenderer(resources)
   let shadowDirty = true
-  renderer.outputColorSpace = THREE.SRGBColorSpace
-  Object.assign(renderer.domElement.style, { display: "block", imageRendering: "pixelated", touchAction: "none" })
-  const scene = new THREE.Scene()
-  resources.defer(() => disposeObjectTree(scene, (asset) => resources.release(asset)))
-  exposeScene(scene)
+  const scene = createSceneRoot(resources)
 
   const post = resources.use(new DioramaPostProcessing(renderer))
   const render = () => post.render({ scene: scene, cam: cam, diorama: diorama, renderScale: camera.scale })
@@ -154,15 +145,9 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
   const warps = resources.use(new WarpMarkers(scene))
 
   // destination marker and a cursor on the cell under the pointer
-  const marker = new THREE.Mesh(new THREE.RingGeometry(0.16, 0.24, 16), new THREE.MeshBasicMaterial({ color: 0xffe080, transparent: true, opacity: 0.85, depthTest: false }))
-  marker.rotation.x = -Math.PI / 2
-  marker.visible = false
-  const cursorGeo = new THREE.EdgesGeometry(new THREE.PlaneGeometry(CELL * 0.92, CELL * 0.92).rotateX(-Math.PI / 2))
-  const cursor = new THREE.LineSegments(cursorGeo, new THREE.LineBasicMaterial({ color: 0xfff4d0, transparent: true, opacity: 0.7, depthTest: false }))
-  cursor.visible = false
-  // drawn last, over the houses, so they show where the street behind a house is clicked
-  marker.renderOrder = cursor.renderOrder = 999
-  scene.add(marker, cursor)
+  const markers = createWalkMarkers(scene)
+  const marker = markers.marker
+  const cursor = markers.cursor
 
   // the view looks at the player; the preview looks wherever it is sent, and can pull further back
   if (preview) {
@@ -171,21 +156,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
   }
   const lookAt = options.at ?? world.middle ?? world.centre
   const start = preview ? new THREE.Vector3(lookAt[0], walkH(lookAt[0], lookAt[1]), lookAt[1]) : new THREE.Vector3(me.pos[0], walkH(me.pos[0], me.pos[1]), me.pos[1])
-  const camera = new PixelCamera({
-    position: start,
-    pixelsPerUnit: FIG_PPU,
-    onResize: (width, height, scale) => {
-      const renderWidth = Math.ceil(width / scale),
-        renderHeight = Math.ceil(height / scale)
-      renderer.setPixelRatio(1)
-      renderer.setSize(renderWidth, renderHeight, false)
-      post.resize(renderWidth, renderHeight)
-      renderer.domElement.style.width = width + "px"
-      renderer.domElement.style.height = height + "px"
-    },
-    zooms: preview ? [0.5, 1, 2] : undefined,
-    level: preview ? (options.zoom ?? 1) : 0,
-  })
+  const camera = createSceneCamera({ viewport: { renderer, post }, position: start, preview, zoom: options.zoom })
   const cam = camera.camera,
     camFocus = camera.focus
   const resize = camera.resize,
