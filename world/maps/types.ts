@@ -1,3 +1,5 @@
+import type { MapSpace } from "#/world/maps/map-space-types"
+
 export type Cell = readonly [number, number]
 
 export type Warp = {
@@ -8,6 +10,8 @@ export type Warp = {
 }
 
 export type MapDefinition = {
+  /** Known metric placement in a parent map; absence means unverified placement. */
+  space?: MapSpace
   id: string
   name: string
   kind: "town" | "indoor" | "field" | "dungeon"

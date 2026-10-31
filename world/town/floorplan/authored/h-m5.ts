@@ -2,6 +2,7 @@
 import type { AuthoredPlan } from "#/world/town/floorplan/authored-types"
 const plan = {
   id: "h-m5",
+  parentMap: "phanthiet-market",
   cellM: 0.5,
   width: 18,
   depth: 20,

@@ -30,6 +30,8 @@ export type AuthoredRoom = {
 
 export type AuthoredPlan = {
   id: string
+  /** Known outdoor parent; absent for an unplaced layout preview. */
+  parentMap?: string
   exterior?: BuildingEnvelope
   cellM: number
   width: number

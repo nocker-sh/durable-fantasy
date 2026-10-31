@@ -2,7 +2,7 @@ import { auditRoomGrid } from "#/scripts/lib/audit-room-grid"
 import { expect, it } from "vitest"
 import { readFileSync } from "node:fs"
 import { readSetting } from "#/scripts/lib/read-setting"
-import { compileAuthoredPlan } from "#/scripts/lib/compile-authored-plan"
+import { compileAuthoredPlan as compilePlan } from "#/scripts/lib/compile-authored-plan"
 import { authoredFloorPlan } from "#/world/town/floorplan/authored-floor-plan"
 import { interiorPlan } from "#/world/town/interior-plan"
 import { interiorRows } from "#/world/town/interior-rows"
@@ -12,6 +12,8 @@ import generated from "#/world/town/floorplan/authored/h-m5"
 
 const setting = (kind: string, id: string) => readSetting(readFileSync(new URL(`../../.docs/settings/${kind}/${id}.md`, import.meta.url), "utf8"))
 const building = setting("buildings", "building-h-m5")
+const parentMap = setting("maps", "map-phanthiet-market")
+const compileAuthoredPlan = (building: Parameters<typeof compilePlan>[0], documents: Parameters<typeof compilePlan>[1]) => compilePlan(building, documents, parentMap)
 const documents = (building.rooms as string[]).map((id) => setting("rooms", id))
 it("keeps the shipped proposal identical to the authored room metadata", () => {
   expect(compileAuthoredPlan(building, documents)).toEqual(generated)

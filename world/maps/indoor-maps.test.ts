@@ -1,3 +1,7 @@
+import { MAPS } from "#/world/maps"
+import { SpatialFrame } from "#/lib/engine/spatial-frame"
+import { ROOM_SCALE } from "#/world/town/interior-rules"
+import { TILE_M } from "#/world/town/fit"
 import { expect, it } from "vitest"
 import proposal from "#/world/town/floorplan/authored/h-m5"
 import { authoredFloorPlan } from "#/world/town/floorplan/authored-floor-plan"
@@ -44,4 +48,48 @@ it("blocks authored exterior wall cells and never opens an upstairs street door"
     expect(walkable(map, cell(it.x1 - it.x0 - 0.3, 5))).toBe(false)
     expect(walkable(map, it.door)).toBe(it.floor === 0)
   }
+})
+
+it("anchors both authored floors to their outdoor map with metric floor elevations", () => {
+  const maps = make()
+  const site = house.authored?.exterior
+  if (!site) throw new Error("Missing authored site fixture")
+  for (const interior of interiors) {
+    const space = maps[interior.id].space
+    expect(space).toBeDefined()
+    if (!space) throw new Error("Missing authored map space")
+    const level = proposal.floorLevels.find((level) => level.floor === interior.floor)
+    if (!level) throw new Error("Missing floor fixture")
+    expect(MAPS[interior.id].space).toEqual(space)
+    expect(space.parentMap).toBe(house.map)
+    expect(space.frame.origin[0]).toBeCloseTo(site.bounds[0] * TILE_M)
+    expect(space.frame.origin[1]).toBeCloseTo(site.floorY * TILE_M + level.elevation)
+    expect(space.frame.origin[2]).toBeCloseTo(site.bounds[1] * TILE_M)
+    expect(space.frame.quarterTurns).toBe(site.quarterTurns)
+    expect(space.planarOrigin).toEqual([interior.x0, interior.z0])
+    expect(space.metresPerPlanarUnit).toBe(1 / ROOM_SCALE)
+  }
+})
+
+it("places indoor windows at their measured outdoor positions in the parent space", () => {
+  const maps = make()
+  const site = house.authored?.exterior
+  if (!site) throw new Error("Missing authored site fixture")
+  const checked: string[] = []
+  for (const interior of interiors) {
+    const space = maps[interior.id].space
+    if (!space) throw new Error("Missing authored map space")
+    const frame = new SpatialFrame(space.frame)
+    for (const window of interior.windows ?? []) {
+      const source = proposal.windows.find((candidate) => candidate.id === window.id)
+      const outside = site.windows.find((candidate) => candidate.id === window.id)
+      if (!source || !outside) throw new Error("Missing matched window fixture")
+      const point = frame.toWorld([(window.point[0] - space.planarOrigin[0]) * space.metresPerPlanarUnit, source.sill, (window.point[1] - space.planarOrigin[1]) * space.metresPerPlanarUnit])
+      expect(point[0]).toBeCloseTo(outside.point[0] * TILE_M)
+      expect(point[1]).toBeCloseTo((site.floorY + outside.sill) * TILE_M)
+      expect(point[2]).toBeCloseTo(outside.point[1] * TILE_M)
+      checked.push(window.id)
+    }
+  }
+  expect(checked).toHaveLength(proposal.windows.length)
 })

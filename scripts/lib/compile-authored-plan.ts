@@ -1,3 +1,4 @@
+import { getAuthoredParentMap } from "#/scripts/lib/get-authored-parent-map"
 import { assertAuthoredSiteFrame } from "#/world/town/floorplan/assert-authored-site-frame"
 import { getAuthoredBuildingSource } from "#/scripts/lib/get-authored-building-source"
 import { compileAuthoredRooms } from "#/scripts/lib/compile-authored-rooms"
@@ -13,12 +14,14 @@ import type { AuthoredPlan } from "#/world/town/floorplan/authored-types"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 
 /** Compile one building from its setting documents; runtime adoption is explicit in HOUSES. */
-export function compileAuthoredPlan(building: SettingDocument, documents: readonly SettingDocument[]): AuthoredPlan {
+export function compileAuthoredPlan(building: SettingDocument, documents: readonly SettingDocument[], parentMapDocument: SettingDocument): AuthoredPlan {
   const source = getAuthoredBuildingSource(building, documents)
+  const parentMap = getAuthoredParentMap(building, parentMapDocument)
   const compiled = compileAuthoredRooms({ building, documents: source.byId, layout: source.layout })
   const entrance = compiled.entrance
   const plan: AuthoredPlan = {
     id: building.id.replace(/^building-/, ""),
+    parentMap,
     cellM: source.layout.cell_m,
     width: source.layout.width,
     depth: source.layout.depth,

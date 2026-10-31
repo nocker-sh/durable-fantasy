@@ -1,3 +1,4 @@
+import { getInteriorMapSpace } from "#/world/town/get-interior-map-space"
 import { INDOOR_SIZE } from "#/world/town/interior-rules"
 import { outsideDoor } from "#/world/town/outside-door"
 import type { MapDefinition } from "#/world/maps/types"
@@ -13,7 +14,9 @@ export function createIndoorMap(props: Props): MapDefinition {
   const warps = [...(interior.floor === 0 ? [{ at: interior.door, to: { map: interior.house.map, at: outsideDoor(interior.house).arrive } }] : []), ...props.stairs]
   const spawn = interior.floor === 0 ? interior.arrive : props.incoming
   if (!spawn) throw new Error(`Indoor upper floor has no stair arrival: ${interior.id}`)
+  const space = getInteriorMapSpace(interior)
   return {
+    ...(space ? { space } : {}),
     id: interior.id,
     name: props.options.name(interior),
     kind: "indoor",
