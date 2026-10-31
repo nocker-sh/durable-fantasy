@@ -11,7 +11,7 @@ import type { SceneOptions } from "#/world/scene/runtime/scene-options"
 import { SceneBuildQueue } from "#/world/scene/runtime/scene-build-queue"
 import type { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
 import { OcclusionQuery } from "#/lib/graphics/occlusion-query"
-import { ScreenLabels } from "#/lib/graphics/screen-labels"
+import { SceneLabelProjection } from "#/world/scene/runtime/scene-label-projection"
 import { PendingAction } from "#/world/scene/runtime/action-target"
 import { WarpMarkers } from "#/world/scene/runtime/warps"
 import { FrameLimiter } from "#/lib/engine/frame-limiter"
@@ -252,8 +252,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     el.className = `gx-hit gx-hit--${kind}`
     el.textContent = kind === "miss" ? "ミス" : String(damage)
     walkers.layer?.appendChild(el)
-    const v = new THREE.Vector3()
-    place({ el: el, vis: toScreen({ pos: m.pos, h: 0.5, out: v }), p: v, dy: 0 })
+    labelProjection.place({ element: el, pos: m.pos, height: 0.5 })
     setTimeout(() => el.remove(), 900)
   }
 
@@ -264,8 +263,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     el.className = `gx-hit gx-hit--${kind === "miss" ? "miss" : "taken"}`
     el.textContent = kind === "miss" ? "かわした" : String(damage)
     walkers.layer?.appendChild(el)
-    const v = new THREE.Vector3()
-    place({ el: el, vis: toScreen({ pos: w.pos, h: w.fig.height * 0.9, out: v }), p: v, dy: 0 })
+    labelProjection.place({ element: el, pos: w.pos, height: w.fig.height * 0.9 })
     setTimeout(() => el.remove(), 900)
   }
   let down = false
@@ -340,32 +338,14 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     me,
     remotes,
     create: (text) => plate("gx-bubble", text),
-    place: (walker, element) => place({ el: element, vis: toScreen({ pos: walker.pos, h: walker.fig.height, out: v, ground: walker.fig.root.position.y }), p: v, dy: 20 }),
+    place: (walker, element) => labelProjection.place({ element, pos: walker.pos, height: walker.fig.height, ground: walker.fig.root.position.y, offset: 20 }),
   })
   const bubble = speech.bubble
   function setLayer(el: HTMLElement) {
     walkers.layer = el
     for (const node of [me.label, ...residentLabels, ...monsters.map((m) => m.label), ...[...remotes.values()].map((w) => w.label), ...speech.elements]) el.appendChild(node)
   }
-  const toScreen = (inputProps: { pos: V2; h: number; out: THREE.Vector3; ground?: number }) => {
-    const pos = inputProps.pos
-    const h = inputProps.h
-    const out = inputProps.out
-    const ground = inputProps.ground === undefined ? walkH(pos[0], pos[1]) : inputProps.ground
-
-    out.set(pos[0], ground + h, pos[1]).project(cam)
-    return out.z < 1 && Math.abs(out.x) < 1.1 && Math.abs(out.y) < 1.1
-  }
-  const labels = new ScreenLabels()
-  const place = (inputProps: { el: HTMLElement; vis: boolean; p: THREE.Vector3; dy?: number }) => {
-    const el = inputProps.el
-    const vis = inputProps.vis
-    const p = inputProps.p
-    const dy = inputProps.dy === undefined ? 0 : inputProps.dy
-
-    if (!vis) labels.place({ element: el, visible: false })
-    else labels.place({ element: el, visible: true, x: Math.round(((p.x + 1) / 2) * camera.width), y: Math.round(((1 - p.y) / 2) * camera.height) - dy })
-  }
+  const labelProjection = new SceneLabelProjection({ camera: cam, viewport: camera })
   let hoveredLabel: HTMLElement | null = null
 
   const clock = new THREE.Clock()
@@ -485,7 +465,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     render()
 
     // names over heads: players always, residents when near or under the pointer
-    for (const w of [me, ...remotes.values()]) place({ el: w.label, vis: toScreen({ pos: w.pos, h: w.fig.height, out: v, ground: w.fig.root.position.y }), p: v, dy: 2 })
+    for (const w of [me, ...remotes.values()]) labelProjection.place({ element: w.label, pos: w.pos, height: w.fig.height, ground: w.fig.root.position.y, offset: 2 })
     // creatures: where the clock puts them; the one we fight, followed and struck when in reach
     const wall = Date.now()
     updateMonsters({ list: monsters, root: town, now: wall, yaw: movement.yaw, dt: dt })
@@ -493,7 +473,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
       const kind = MONSTER_KINDS[m.spawn.kind]
       const show = m.body.visible && (m.spawn.id === action.fighting || m.hp < kind.hp || Math.hypot(m.pos[0] - me.pos[0], m.pos[1] - me.pos[1]) < 4)
       updateMonsterHealth(m)
-      place({ el: m.label, vis: show && toScreen({ pos: m.pos, h: 0.55, out: v, ground: m.groundHeight }), p: v, dy: 2 })
+      labelProjection.place({ element: m.label, visible: show, pos: m.pos, height: 0.55, ground: m.groundHeight, offset: 2 })
     }
     combat.update(wall)
     const nextHoveredLabel = pointer.hovered ? (residentLabels[people.indexOf(pointer.hovered)] ?? null) : null
@@ -504,11 +484,13 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     }
     people.forEach((a, i) => {
       const near = Math.hypot(a.pos[0] - me.pos[0], a.pos[1] - me.pos[1]) < NAME_RANGE || a === pointer.hovered
-      place({
-        el: residentLabels[i],
-        vis: a.fig.root.visible && near && toScreen({ pos: [a.fig.root.position.x, a.fig.root.position.z], h: a.fig.height, out: v, ground: a.fig.root.position.y }),
-        p: v,
-        dy: 2,
+      labelProjection.place({
+        element: residentLabels[i],
+        visible: a.fig.root.visible && near,
+        pos: [a.fig.root.position.x, a.fig.root.position.z],
+        height: a.fig.height,
+        ground: a.fig.root.position.y,
+        offset: 2,
       })
     })
     const now = performance.now()

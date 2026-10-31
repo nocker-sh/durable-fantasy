@@ -102,6 +102,8 @@ Durable Object の入口は `durable-objects/` にあり、どれも Void の規
 
 頭上の吹き出しは `scene-speech.ts` の SceneSpeech が人物ごとに保持する。同じ人物の次の発言で前の要素を外し、表示期限と退出をフレームで確認する。描画のレイヤーを付け直すときは保持中の要素を渡し、位置と見た目の計算はランタイムの共通の文字配置を使う。
 
+名前・吹き出し・ダメージ数字の投影と画素への配置は `scene-label-projection.ts` の SceneLabelProjection に集める。地面の高さが渡された場合はその値を使い、省略時だけ歩行面を読む。画面外の判定、画素への丸めと縦のずらしを共通化し、表示条件や人物ごとの高さは呼び出し側が渡す。
+
 マップの描画の入口は `world/scene/runtime/scene.ts` の MapScene で、地形・住民配置・照明・歩行者・入力は `world/scene/runtime/` に分ける。建物・野外・小物・テクスチャはそれぞれ `construction/`・`fields/`・`props/`・`textures/` に、人物の体・服・髪・装備・描画は `figure/` に分ける。描画は `world/scene/` が受け持ち、ゲームに依存しない部品は `lib/graphics/` と `lib/engine/` にある。
 
 地形の高さ・道・川の計算は、選んだマップのデータが必要になった時点で行う。Worker の読み込み時に未使用の初期マップを計算せず、保存済みの地形があればそれを使う。道・川・踏み跡までの距離は、地形生成の開始時に線分を `lib/engine/polyline.ts` のインスタンスへ写し、線分の方向と長さを各地点で計算し直さない。
