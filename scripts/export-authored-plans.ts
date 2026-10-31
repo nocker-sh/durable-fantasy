@@ -1,27 +1,18 @@
-import { readFile, mkdir, writeFile } from "node:fs/promises"
+import { readFile } from "node:fs/promises"
+import { resolve } from "node:path"
 import { fileURLToPath } from "node:url"
-import { z } from "zod"
-import { getAuthoredPlanSource } from "#/scripts/lib/get-authored-plan-source"
-import { readSetting } from "#/scripts/lib/read-setting"
-import { compileAuthoredPlan } from "#/scripts/lib/compile-authored-plan"
+import { readSettingIndex } from "#/scripts/lib/read-setting-index"
+import { getAuthoredExportTargets } from "#/scripts/lib/get-authored-export-targets"
+import { prepareAuthoredPlanExport } from "#/scripts/lib/prepare-authored-plan-export"
+import { writeAuthoredPlanExport } from "#/scripts/lib/write-authored-plan-export"
 
-const root = new URL("../", import.meta.url)
-const building = readSetting(await readFile(new URL(".docs/settings/buildings/building-h-m5.md", root), "utf8"))
-const roomIds = z.array(z.string()).parse(building.rooms)
-const rooms = await Promise.all(roomIds.map(async (id) => readSetting(await readFile(new URL(`.docs/settings/rooms/${id}.md`, root), "utf8"))))
-const mapId = z.string().min(1).parse(building.map)
-const map = readSetting(await readFile(new URL(`.docs/settings/maps/${mapId}.md`, root), "utf8"))
-const plan = compileAuthoredPlan(building, rooms, map)
-const directory = new URL("world/town/floorplan/authored/", root)
-const destination = new URL(`${plan.id}.ts`, directory)
-const source = getAuthoredPlanSource({ plan, filePath: fileURLToPath(destination) })
-const previous = await readFile(destination, "utf8").catch((error: unknown) => {
-  if (typeof error === "object" && error !== null && "code" in error && error.code === "ENOENT") return null
-  throw error
-})
-// An unchanged export must not reload an active game during an inspection.
-if (source !== previous) {
-  await mkdir(directory, { recursive: true })
-  await writeFile(destination, source)
+const root = fileURLToPath(new URL("../", import.meta.url)),
+  base = resolve(root, ".docs/settings"),
+  directory = resolve(root, "world/town/floorplan/authored")
+const entries = readSettingIndex(JSON.parse(await readFile(resolve(base, "index.json"), "utf8")))
+const targets = getAuthoredExportTargets(process.argv.slice(2), entries)
+const prepared = await Promise.all(targets.map((buildingId) => prepareAuthoredPlanExport({ base, directory, entries, buildingId })))
+for (const source of prepared) {
+  const written = await writeAuthoredPlanExport(source)
+  console.log(`${written.changed ? "Exported" : "Unchanged"} ${written.id}: ${written.roomCount} rooms`)
 }
-console.log(`${source === previous ? "Unchanged" : "Exported"} ${plan.id}: ${plan.rooms.length} rooms`)

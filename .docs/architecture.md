@@ -309,7 +309,11 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 `scale-room-piece-dimensions.ts` は配置の座標変換と分けて、家具の実寸の付属情報を室内の倍率へ一度だけ変換する。椅子と足掛けは `scale-seat.ts`、卓の天板・脚と膝の空間は `scale-work-surface.ts` を使う。炉・棚・寝台も各部品の変換を使い、向き・階・グリッドの矩形は元の配置に保つ。描画の位置を決める変換で実寸を重ねて掛けない。
 
-`scripts/export-authored-plans.ts` は選んだ建物・各室と参照先の屋外マップの資料を読み、`world/town/floorplan/authored/` へ型検査可能な配置データを書き出す。`scripts/lib/get-authored-plan-source.ts` が共有型への直接の参照とプロジェクトの整形を含むソースを作る。整形後の内容を比較し、変化のない再出力でファイルの更新時刻や開発画面の読込みを変えない。現在の対象は寄り合い所で、資料の用途は共用として保持する。書き出しただけでは町へ登録されない。寄り合い所は `HOUSES` の `authored` から外観・上下階の室内・通行判定へ同じ配置を渡す。ほかの建物への採用は個別に行う。投影した平面は `interiorPlan` の引数へ渡せるため、採用時の描画と通行判定で別の配置を作らない。
+`scripts/export-authored-plans.ts` は建物資料の ID を選び、`world/town/floorplan/authored/` へ型検査可能な配置データを書き出す。`get-authored-export-targets.ts` は索引の建物と出力のファイル名に使える ID だけを選び、対象と索引の重複を拒否する。`read-authored-plan-documents.ts` は建物の全室と参照先の屋外マップを解決し、`read-indexed-setting.ts` が索引の正規のパスと読取り後の ID・種別を照合する。参照の接頭辞からファイルを推測しない。
+
+`prepare-authored-plan-export.ts` は各対象を検証してから、`get-authored-plan-source.ts` で直接の型参照とプロジェクトの整形を含むソースを作る。全対象の準備が完了した後で `write-authored-plan-export.ts` が書き出し、変化のない再出力ではファイルの更新時刻や開発画面の読込みを変えない。入力に不備がある一棟を、別の棟の資料や既定の寸法へ読み替えない。
+
+書き出しただけでは町へ登録されない。寄り合い所は `HOUSES` の `authored` から外観・上下階の室内・通行判定へ同じ配置を渡し、資料の用途も共用として保持する。ほかの建物への採用は個別に行う。投影した平面は `interiorPlan` の引数へ渡せるため、採用時の描画と通行判定で別の配置を作らない。
 
 外観の生成は `scripts/lib/assert-envelope-plan-dimensions.ts` で内装の幅・奥行・セル寸法と建物資料の寸法の一致を先に確認する。外形の実寸の積が同じでも、元のグリッドや尺度が異なる入力を混ぜない。戸の開閉に使う接続の読み取りは `scripts/lib/get-door-swing-source.ts` が一意性と幅・座標を検証し、`get-door-swing-frame.ts` が厚い壁の通路と蝶番の位置を求める。移動先や部屋全体の被覆の検査とは分け、既存の床セルを使った局所の衝突診断を保つ。外観の戸は `get-envelope-door-source.ts` で実寸と金具・開閉を検証し、`get-envelope-door-projection.ts` で内側の戸板と外の開口を照合する。室のセル原点と戸の実寸の点の換算は `project-envelope-door-point.ts` が一度だけ行う。`compile-envelope-door.ts` は検証と照合の結果を描画用の単位へ組み立て、外観全体の入口から金具の判定を分離する。
 
