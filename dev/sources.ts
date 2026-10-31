@@ -129,6 +129,7 @@ export const NOT_TABLES: readonly string[] = [
   "LYING",
   "SIDE",
   // Drawing basis vectors, palette choices and procedural pixel stamps.
+  "SCENE_LIGHT_PALETTES", // Rendering keyframes blended by the clock, not placed world records.
   "OUT",
   "FR",
   "PARENT",

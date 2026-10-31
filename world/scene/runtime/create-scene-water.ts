@@ -21,7 +21,8 @@ const shaders = {
 
 /** 水面の材質と平面を取得順に所有し、時刻と空の色の一様変数を照明へ渡す。 */
 export function createSceneWater(resources: CleanupStack) {
-  const material = resources.use(new ShaderMaterial({ transparent: true, uniforms: { t: { value: 0 }, sky: { value: new Color(0xa6c2c2) } }, ...shaders }))
+  const uniforms = { t: { value: 0 }, sky: { value: new Color(0xa6c2c2) } }
+  const material = resources.use(Object.assign(new ShaderMaterial({ transparent: true, uniforms, ...shaders }), { uniforms }))
   const water = new Mesh(resources.use(new PlaneGeometry(N, N)), material)
   water.rotation.x = -Math.PI / 2
   water.position.set(N / 2, WATER_Y, N / 2)

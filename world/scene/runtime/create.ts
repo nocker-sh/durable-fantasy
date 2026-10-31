@@ -55,7 +55,7 @@ import { MAP_SCENES } from "#/world/scene/runtime/definitions"
 import { diorama } from "#/world/scene/runtime/settings"
 import { createSceneTerrain } from "#/world/scene/runtime/create-scene-terrain"
 import { createEnvironment } from "#/world/scene/runtime/helpers/lighting/create-environment"
-import { createLighting } from "#/world/scene/runtime/helpers/lighting/create-lighting"
+import { SceneLighting } from "#/world/scene/runtime/scene-lighting"
 import { createScenePopulation } from "#/world/scene/runtime/create-scene-population"
 import type { SceneEvents } from "#/world/scene/runtime/types"
 
@@ -155,7 +155,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     camFocus = camera.focus
   const resize = camera.resize,
     zoom = camera.zoom
-  const lighting = createLighting({ scene: scene, world: world, wm: wm, applySchedule: applySchedule, environment: environment })
+  const lighting = new SceneLighting({ scene: scene, world: world, wm: wm, applySchedule: applySchedule, environment: environment })
   const setClock = (min: number) => {
     lighting.setClock(min)
     shadows.invalidate()

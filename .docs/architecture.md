@@ -104,6 +104,10 @@ Durable Object の入口は `durable-objects/` にあり、どれも Void の規
 
 日課の場所の規則は引き続き `world/town/spot-at.ts`、活動の姿勢は `activity-pose.ts` が持つ。ScenePopulation は各人物の場所を一度引き、店先と人物をその対応から同期する。描画する地点への変換は `get-scene-spot-position.ts`、席・位置と向きの更新は `update-scheduled-resident.ts`、店の札と屋台の品・覆いは `update-scheduled-shop-fronts.ts` に置く。店の営業判定と、そのマップの名前付き地点にいる売り手の判定は混ぜない。
 
+時刻と照明の接続は `scene-lighting.ts` の SceneLighting が持ち、空と環境光、日課、家の灯り、人物と板絵の色・太陽と水面の順に同期する。日課を反映してから部屋の使用を判定する。三つの色の定義は `scene-light-palettes.ts`、色空間を保つ混合は `mix-scene-light.ts`、一日の曲線との接続は `get-scene-light.ts` に置く。空と霧は `update-scene-sky.ts`、屋内外の環境光と窓の明るさは `update-scene-ambient-light.ts`、色と太陽・水面の同期は `update-scene-light-tint.ts` が担う。
+
+`scene-house-lights.ts` の SceneHouseLights は各階の使用中の灯りを保持し、窓と鎧戸を家の生活時間に合わせる。同じ階と家の判定は一回の時刻更新の中で共有し、次の更新へ使い回さない。炎・街灯・煙のフレーム更新は `update-scene-flames.ts`・`update-scene-lamps.ts`・`update-scene-smoke.ts` に分ける。街灯の順は生成時の位置から一度並べ、時刻による点灯の番号を保つ。煙の粒の取得は環境の組み立て、描画は一括描画が持ち、照明の更新は粒の位相と位置を渡す。水面の時刻と空の色の一様変数は、生成時から具体的な型を持って照明へ渡す。
+
 移動入力と経路、停止と凍結は `scene-movement.ts` の SceneMovement が描画ごとに保持する。押し続けたキーから格子の候補を作る処理は純粋な `get-held-walk-candidates.ts` に分け、角が塞がれた場合の候補の順と、最初の空き候補での経路の照会を維持する。停止の通知より先に行動予約を外し、追跡で明示した場合だけ予約を保持する。住民・採集・作業場への接近と到着時の通知は `scene-interactions.ts` の SceneInteractions が受け持つ。周囲の候補は `get-approach-candidates.ts` が来た側から近い半径と左右の順で作る。予約を消費してから到着を通知し、通知中に選ばれた次の行動を前の到着で実行しない。
 
 敵の追跡と攻撃間隔は `scene-combat.ts` の SceneCombat が描画ごとに保持する。範囲内では行動予約を保持したまま経路を短くし、向きを合わせてから攻撃の演出と通知を行う。対象を選び直しても前の攻撃からの待機は保持する。命中・消費・報酬はサーバーの判定を使う。
