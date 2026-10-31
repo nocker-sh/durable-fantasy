@@ -7,7 +7,10 @@ type Props = Readonly<{ roomId: string; connection: Connection; candidates: read
 export function getReciprocalRoomConnection(props: Props): Connection | undefined {
   return props.candidates.find((candidate) => {
     if (candidate.target !== props.roomId) return false
-    if (props.connection.kind === "stair") return candidate.kind === "stair" && candidate.furniture === props.connection.target_furniture && candidate.target_furniture === props.connection.furniture
+    if (props.connection.kind === "stair") {
+      if (candidate.kind !== "stair" || candidate.furniture !== props.connection.target_furniture || candidate.target_furniture !== props.connection.furniture) return false
+      return same(candidate.access, props.connection.target_access) && same(candidate.target_access, props.connection.access)
+    }
     return same(candidate.door, props.connection.target_door) && same(candidate.target_door, props.connection.door)
   })
 }

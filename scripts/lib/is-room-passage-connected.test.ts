@@ -1,3 +1,4 @@
+import { auditRoomConnection } from "#/scripts/lib/audit-room-connection"
 import { expect, it } from "vitest"
 import { isRoomPassageConnected } from "#/scripts/lib/is-room-passage-connected"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
@@ -44,5 +45,15 @@ it("accepts stairs whose two declarations have valid furniture endpoints", () =>
 it("rejects a stair when only the returning declaration names an invalid use position", () => {
   const request = fixture()
   request.reverse.access = [99, 99]
+  expect(isRoomPassageConnected(request)).toBe(false)
+})
+
+it("rejects mismatched reciprocal endpoints even when both are valid furniture use positions", () => {
+  const request = fixture()
+  const upper = request.documents.get("upper")
+  if (!upper?.furniture) throw new Error("Missing test staircase")
+  upper.furniture[0].access.push([2, 2])
+  request.reverse.access = [2, 2]
+  expect(auditRoomConnection({ ...request, origin: [0, 0] })).toContain("lower: connection to upper is not reciprocal")
   expect(isRoomPassageConnected(request)).toBe(false)
 })

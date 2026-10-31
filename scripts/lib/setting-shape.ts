@@ -1,3 +1,4 @@
+import { stairSectionsSchema } from "#/scripts/lib/stair-sections-schema"
 import { roomWorkUseSchema } from "#/scripts/lib/room-work-use-schema"
 import { entryApproachSchema } from "#/scripts/lib/entry-approach-schema"
 import { entryStepsSchema } from "#/scripts/lib/entry-steps-schema"
@@ -132,23 +133,7 @@ const structure = z.object({
     .optional(),
   floor_levels: floorLevelsSchema.optional(),
   roof_section: z.object({ ridge_axis: z.enum(["x", "y"]), eave_underside_m: z.number(), ridge_underside_m: z.number(), overhang_m: z.number().nonnegative(), material: text }).optional(),
-  stair_sections: z
-    .array(
-      z.object({
-        lower_room: text,
-        upper_room: text,
-        furniture: z.string().length(1),
-        risers: z.number().int().min(2),
-        going_m: positive,
-        axis: z.enum(["x", "y"]),
-        lower_end: z.enum(["start", "end"]),
-        landing_depth_m: positive,
-        clear_width_m: positive,
-        rail_inset_m: z.number().nonnegative().optional(),
-        opening_length_m: z.number().nonnegative().nullable(),
-      }),
-    )
-    .optional(),
+  stair_sections: stairSectionsSchema.optional(),
   parallel_use: z.array(z.object({ activity: text, operations: z.array(z.object({ resident: text, furniture: z.string().length(1), space_index: integer })).min(2) })).optional(),
   guest_sleeping_places: z.array(z.object({ id: text, label: text, grid_symbol: z.string().length(1).nullable(), luggage_id: text, luggage_symbol: z.string().length(1).nullable() })).optional(),
   furniture: z

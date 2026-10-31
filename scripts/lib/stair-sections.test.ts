@@ -120,3 +120,14 @@ it("reserves the rail thickness instead of counting the entire stair width as us
   f.section.clear_width_m = 1
   expect(auditStairSections(f.building, f.documents)).toContain("Stair clear width does not fit its footprint")
 })
+
+it.each([{}, [null], "invalid"])("reports malformed stair section metadata without throwing: %j", (stair_sections) => {
+  const request = fixture()
+  Object.assign(request.building, { stair_sections })
+  expect(auditStairSections(request.building, request.documents)).toContain("Invalid stair sections")
+})
+it.each([{}, [null], [{ floor: "0", elevation_m: 0 }]])("reports malformed floor levels without throwing: %j", (floor_levels) => {
+  const request = fixture()
+  Object.assign(request.building, { floor_levels })
+  expect(auditStairSections(request.building, request.documents)).toContain("Invalid stair floor levels")
+})

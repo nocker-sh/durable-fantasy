@@ -1,24 +1,19 @@
+import { stairSectionsSchema } from "#/scripts/lib/stair-sections-schema"
+import { floorLevelsSchema } from "#/scripts/lib/floor-levels-schema"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 import { stairHeadroom } from "#/scripts/lib/stair-headroom"
 import { MAX_STAIR_RISER_M, MIN_STAIR_GOING_M, MIN_STAIR_HEADROOM_M, MIN_PASSAGE_WIDTH_M } from "#/scripts/lib/spatial-rules"
-type Section = {
-  lower_room: string
-  upper_room: string
-  furniture: string
-  risers: number
-  going_m: number
-  axis: "x" | "y"
-  lower_end: "start" | "end"
-  landing_depth_m: number
-  clear_width_m: number
-  rail_inset_m?: number
-  opening_length_m: number | null
-}
 type Connection = { kind?: string; target: string; furniture?: string; target_furniture?: string; access?: number[]; target_access?: number[] }
 /** A matching rectangle on two floors is insufficient to design the stair between them. */
 export function auditStairSections(building: SettingDocument, documents: ReadonlyMap<string, SettingDocument>): string[] {
-  const sections = (building.stair_sections ?? []) as Section[],
-    levels = building.floor_levels as { floor: number; elevation_m: number; ceiling_elevation_m?: number | null }[] | undefined
+  const parsedSections = stairSectionsSchema.safeParse(building.stair_sections ?? [])
+  if (!parsedSections.success) return ["Invalid stair sections"]
+
+  const parsedLevels = floorLevelsSchema.safeParse(building.floor_levels ?? [])
+  if (!parsedLevels.success) return ["Invalid stair floor levels"]
+
+  const sections = parsedSections.data,
+    levels = parsedLevels.data
   const errors: string[] = [],
     seen = new Set<string>()
   if (levels && new Set(levels.map((level) => level.floor)).size !== levels.length) errors.push("Duplicate floor elevation")
