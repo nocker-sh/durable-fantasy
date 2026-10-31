@@ -42,6 +42,8 @@ A* 探索のコスト・前のセル・候補の展開は `lib/engine/grid-path-
 
 歩行面の高さは `world/maps/ground/get-walk-height.ts` が地面・橋・登録した床面から求める。橋の上でも床面の候補を打ち切らない。橋の両岸と弧の高さは `get-bridge-deck-height.ts` に揃え、その橋の中央を通る線で地形を読む。`world/scene/walk-h.ts` と `bridge-deck-h.ts` は選択中の描画の地形と面を渡す入口にする。屋外の入口の段は `world/town/get-outdoor-walk-surfaces.ts`、室内の床と開口は `get-interior-walk-surfaces.ts` から取得し、メッシュを作らずに同じ面を読める。これらの矩形と高さは従来のマップの表示単位であり、実寸への換算とは分ける。
 
+`create-map-walk-sampler.ts` は実在するマップの地形と床面を所有し、選択中の描画に触れず高さを読む。室内の表示用の床の基準は `world/town/get-interior-floor-height.ts` を描画と共有する。配列や面の可変な参照は返さず、別の地図の生成や元の段の後からの変更に依存しない。`get-map-cell-world-point.ts` が歩けるセルの中心とこの高さを共通座標へ接続する。表示の床の除去、実寸への換算と未配置の扱いは [[spatial-model#階層を通した実寸の変換]] に従う。
+
 経路の短縮は `lib/engine/get-shortened-path.ts` に分け、見通しの判定を探索側から渡す。見通しを単調と仮定せず遠い候補から調べ、短縮できない区間では元の隣接点を残す。
 
 キーを押し続けた移動では、既存の経路をそのフレームの経過時間だけ進めてから、次の経路を作って送信する。新しく送った経路に直前のフレームの待ち時間を使うと、サーバーが経路を受け取るより先に進みすぎるため、入力と移動更新の順序を保つ。

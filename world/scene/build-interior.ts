@@ -56,6 +56,7 @@ import { WN } from "#/world/maps/ground/rules"
 import { groundH } from "#/world/scene/ground-h"
 import { setWalkSurfaces } from "#/world/scene/set-walk-surfaces"
 import { getInteriorWalkSurfaces } from "#/world/town/get-interior-walk-surfaces"
+import { getInteriorFloorHeight } from "#/world/town/get-interior-floor-height"
 import { interiorRows } from "#/world/town/interior-rows"
 import type { Interior } from "#/world/town/interiors"
 import { Kit } from "#/world/scene/construction/kit"
@@ -91,7 +92,7 @@ import { floorboards } from "#/world/scene/helpers/interior/floorboards"
 /** The builder for one room. */
 export function buildInterior(it: Interior) {
   return (root: THREE.Group) => {
-    const y0 = groundH(it.x0 + 1, it.z0 + 1) + 0.02
+    const y0 = getInteriorFloorHeight(it, groundH)
     const shop = it.house.shop
     const seed = it.house.seed
     cutaways.length = 0

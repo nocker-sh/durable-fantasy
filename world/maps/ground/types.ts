@@ -6,6 +6,9 @@ export type RoadPath = { path: Polyline; width: number; kind: number }
 export type WalkSurface = Readonly<{ rect: readonly [number, number, number, number]; height: number }>
 export type HeightSampler = (x: number, z: number) => number
 
+/** Snapshot of one map's display surface heights and presentation floor reference. */
+export type MapWalkSampler = Readonly<{ mapId: string; displayFloorHeight: number; sample: HeightSampler }>
+
 /** Ground samples shared by generation, rendering, workers and persisted caches. */
 export type Fields = {
   h: Float32Array
