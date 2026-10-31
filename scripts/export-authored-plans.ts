@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url"
 import { z } from "zod"
 import { getAuthoredPlanSource } from "#/scripts/lib/get-authored-plan-source"
 import { readSetting } from "#/scripts/lib/read-setting"
-import { compileAuthoredPlan } from "#/scripts/lib/authored-plan"
+import { compileAuthoredPlan } from "#/scripts/lib/compile-authored-plan"
 
 const root = new URL("../", import.meta.url)
 const building = readSetting(await readFile(new URL(".docs/settings/buildings/building-h-m5.md", root), "utf8"))

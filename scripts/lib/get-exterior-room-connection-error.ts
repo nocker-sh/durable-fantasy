@@ -1,3 +1,4 @@
+import { getGridBoundarySide } from "#/scripts/lib/get-grid-boundary-side"
 import { roomOriginSchema } from "#/scripts/lib/room-layout-schema"
 import { getRoomConnectionOpening } from "#/scripts/lib/get-room-connection-opening"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
@@ -16,11 +17,7 @@ export function getExteriorRoomConnectionError(props: Props): string | null {
     span = props.connection.width_cells ?? 1
   const endX = x + (opening.outward[0] === 0 ? span - 1 : 0),
     endZ = z + (opening.outward[0] === 0 ? 0 : span - 1)
-  const onOutline =
-    (opening.outward[0] === -1 && x === 0) ||
-    (opening.outward[0] === 1 && x === props.layout.width - 1) ||
-    (opening.outward[1] === -1 && z === 0) ||
-    (opening.outward[1] === 1 && z === props.layout.depth - 1)
+  const onOutline = getGridBoundarySide({ point: [x, z], outward: opening.outward, width: props.layout.width, depth: props.layout.depth })
   if (
     x < 0 ||
     z < 0 ||

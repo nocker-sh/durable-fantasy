@@ -2,7 +2,7 @@ import { auditRoomGrid } from "#/scripts/lib/audit-room-grid"
 import { expect, it } from "vitest"
 import { readFileSync } from "node:fs"
 import { readSetting } from "#/scripts/lib/read-setting"
-import { compileAuthoredPlan } from "#/scripts/lib/authored-plan"
+import { compileAuthoredPlan } from "#/scripts/lib/compile-authored-plan"
 import { authoredFloorPlan } from "#/world/town/floorplan/authored-floor-plan"
 import { interiorPlan } from "#/world/town/interior-plan"
 import { interiorRows } from "#/world/town/interior-rows"
@@ -131,4 +131,41 @@ it("rejects entrances that cross a corner or disagree with the authored door cel
   expect(() => authoredFloorPlan(source)).toThrow("must fit one exterior wall")
   source.entry = [8.5, source.depth - 1]
   expect(() => authoredFloorPlan(source)).toThrow("disagrees with doorway cells")
+})
+
+it.each([undefined, 123])("requires an explicit authored room name instead of coercing %j", (room_name) => {
+  const rooms = structuredClone(documents)
+  rooms[0].room_name = room_name
+  expect(() => compileAuthoredPlan(building, rooms)).toThrow("Missing authored room name")
+})
+it("rejects duplicate source documents rather than keeping the last one", () => {
+  expect(() => compileAuthoredPlan(building, [...documents, documents[0]])).toThrow("Duplicate authored document")
+})
+
+it("does not export an upstairs connection without a designed stair section", () => {
+  const incomplete = structuredClone(building)
+  incomplete.stair_sections = []
+  expect(() => compileAuthoredPlan(incomplete, documents)).toThrow("Stair has no designed section")
+})
+it("does not infer an absent stair inventory as an explicit empty inventory", () => {
+  const incomplete = structuredClone(building)
+  delete incomplete.stair_sections
+  expect(() => compileAuthoredPlan(incomplete, documents)).toThrow("Runtime stair section dimensions are incomplete")
+})
+it("owns exported room coordinates, rows and furniture footprints", () => {
+  const rooms = structuredClone(documents)
+  const plan = compileAuthoredPlan(building, rooms),
+    original = structuredClone(plan)
+  const origin = rooms[0].origin
+  if (!Array.isArray(origin) || !rooms[0].grid || !rooms[0].furniture) throw new Error("Missing test room geometry")
+  origin[0]++
+  rooms[0].grid.rows[0] = "changed"
+  rooms[0].furniture[0].rect[0]++
+  expect(plan).toEqual(original)
+})
+it("checks stairs in exported rooms even when the separate room inventory is empty", () => {
+  const incomplete = structuredClone(building)
+  incomplete.rooms = []
+  incomplete.stair_sections = []
+  expect(() => compileAuthoredPlan(incomplete, documents)).toThrow("Stair has no designed section")
 })

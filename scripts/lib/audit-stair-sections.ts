@@ -19,6 +19,6 @@ export function auditStairSections(building: SettingDocument, documents: Readonl
     seen.add(key)
     errors.push(...auditStairSection({ building, documents, section, levels: levels.data }))
   }
-  errors.push(...auditMissingStairSections({ building, documents, seen }))
+  if (building.design_gate === "通過") errors.push(...auditMissingStairSections({ roomIds: building.rooms, documents, seen }))
   return [...new Set(errors)]
 }
