@@ -1,3 +1,6 @@
+import { ScenePosture } from "#/world/scene/runtime/scene-posture"
+import { SceneCombatFeedback } from "#/world/scene/runtime/scene-combat-feedback"
+import { SceneHitLabels } from "#/world/scene/runtime/scene-hit-labels"
 import { SceneCameraFollow } from "#/world/scene/runtime/scene-camera-follow"
 import { SceneWorldAnimation } from "#/world/scene/runtime/scene-world-animation"
 import { updateSceneWalkers } from "#/world/scene/runtime/update-scene-walkers"
@@ -44,7 +47,6 @@ import { occluders, houseGlows, lamps, stalls, movingObjects } from "#/world/sce
 import { resetRegistries } from "#/world/scene/construction/reset-registries"
 import type { V2 } from "#/world/scene/construction/registry"
 import { daylight } from "#/world/core/daylight"
-import type { Anim } from "#/world/scene/figure/animation"
 import { outlineShape } from "#/lib/graphics/outline-shape"
 import type { Actor } from "#/world/scene/actor"
 import { FIG } from "#/world/scene/figure/display-scale"
@@ -194,13 +196,10 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
   })
   const approachSpot = interactions.approachSpot
   const approach = interactions.approach
-  /** Play an action for a moment, facing the spot. */
-  function playAction(anim: Anim, cell: readonly [number, number]) {
-    const at: V2 = [(cell[0] + 0.5) / 2, (cell[1] + 0.5) / 2]
-    me.head = Math.atan2(at[0] - me.pos[0], at[1] - me.pos[1])
-    me.fig.face(me.head)
-    walkers.action = { anim, until: performance.now() + 1400 }
-  }
+  const posture = new ScenePosture({ walkers, freeze, endFight: () => action.endFight() })
+  const playAction = posture.playAction
+  const setDown = posture.setDown
+  const setSitting = posture.setSitting
 
   // ---------------------------------------------------------------- creatures (core/monsters.ts)
   const monsters = makeMonsters(town, map)
@@ -225,66 +224,21 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     while (o && !o.userData.monster) o = o.parent
     return (o?.userData.monster as string | undefined) ?? null
   }
-  function setWild(states: Readonly<Record<string, { hp: number; back: number }>>) {
-    for (const m of monsters) {
-      const s = states[m.spawn.id]
-      if (s) {
-        m.hp = s.hp
-        m.back = s.back
-      }
-    }
-  }
-  function struck(inputProps: { id: string; kind: "miss" | "hit" | "critical"; damage: number; hp: number; back: number }) {
-    const id = inputProps.id
-    const kind = inputProps.kind
-    const damage = inputProps.damage
-    const hp = inputProps.hp
-    const back = inputProps.back
-
-    const m = monsters.find((x) => x.spawn.id === id)
-    if (!m) return
-    if (hp >= 0) m.hp = hp
-    if (back) m.back = back
-    if (hp === 0) {
-      burst(m, town, Date.now())
-      action.endFight(id)
-    }
-    // the number floats up from where it was struck
-    const el = document.createElement("div")
-    el.className = `gx-hit gx-hit--${kind}`
-    el.textContent = kind === "miss" ? "ミス" : String(damage)
-    walkers.layer?.appendChild(el)
-    labelProjection.place({ element: el, pos: m.pos, height: 0.5 })
-    setTimeout(() => el.remove(), 900)
-  }
-
-  function hurt(who: string, kind: "miss" | "hit" | "critical", damage: number) {
-    const w = who === "me" ? me : remotes.get(who)
-    if (!w) return
-    const el = document.createElement("div")
-    el.className = `gx-hit gx-hit--${kind === "miss" ? "miss" : "taken"}`
-    el.textContent = kind === "miss" ? "かわした" : String(damage)
-    walkers.layer?.appendChild(el)
-    labelProjection.place({ element: el, pos: w.pos, height: w.fig.height * 0.9 })
-    setTimeout(() => el.remove(), 900)
-  }
-  let down = false
-  function setDown(on: boolean) {
-    if (on === down) return
-    down = on
-    freeze(on)
-    if (on) {
-      action.endFight()
-      walkers.action = { anim: "sit", until: Infinity }
-    } else walkers.action = null
-  }
-
-  let sitting = false
-  function setSitting(on: boolean) {
-    if (on === sitting || down) return
-    sitting = on
-    walkers.action = on ? { anim: "sit", until: Infinity } : null
-  }
+  const labelProjection = new SceneLabelProjection({ camera: cam, viewport: camera })
+  const hitLabels = resources.use(new SceneHitLabels({ plate, place: labelProjection.place }))
+  const feedback = new SceneCombatFeedback({
+    monsters,
+    me,
+    remotes,
+    labels: hitLabels,
+    defeated: (monster) => {
+      burst(monster, town, Date.now())
+      action.endFight(monster.spawn.id)
+    },
+  })
+  const setWild = feedback.setWild
+  const struck = feedback.struck
+  const hurt = feedback.hurt
 
   function reach(a: Actor) {
     marker.visible = false
@@ -355,8 +309,6 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     walkers.layer = el
     for (const node of [me.label, ...residentNames.elements, ...monsters.map((m) => m.label), ...[...remotes.values()].map((w) => w.label), ...speech.elements]) el.appendChild(node)
   }
-  const labelProjection = new SceneLabelProjection({ camera: cam, viewport: camera })
-
   const clock = new THREE.Clock()
   const worldAnimation = new SceneWorldAnimation({ camera: cam, movement, people, animate: lighting.animate })
   const cameraFollow = new SceneCameraFollow({ camera, movement, me, preview: previewControls, heightAt: walkH })

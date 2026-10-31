@@ -1,3 +1,4 @@
+import type { HitKind, MonsterStrike } from "#/world/scene/runtime/combat-feedback-types"
 import { N, blocked } from "#/world/scene/world"
 import { places } from "#/world/scene/construction/registry"
 import type { Anim } from "#/world/scene/figure/animation"
@@ -177,17 +178,11 @@ export class MapScene {
   setWild(states: Readonly<Record<string, { hp: number; back: number }>>) {
     this.runtime?.setWild(states)
   }
-  struck(inputProps: { id: string; kind: "miss" | "hit" | "critical"; damage: number; hp: number; back: number }) {
-    const id = inputProps.id
-    const kind = inputProps.kind
-    const damage = inputProps.damage
-    const hp = inputProps.hp
-    const back = inputProps.back
-
-    this.runtime?.struck({ id: id, kind: kind, damage: damage, hp: hp, back: back })
+  struck(input: MonsterStrike) {
+    this.runtime?.struck(input)
   }
   /** A blow taken by the player ('me') or someone else on the map: the number floats up from them. */
-  hurt(who: string, kind: "miss" | "hit" | "critical", damage: number) {
+  hurt(who: string, kind: HitKind, damage: number) {
     this.runtime?.hurt(who, kind, damage)
   }
   /** Fallen: the player slumps where they are and cannot move until they come to. */
