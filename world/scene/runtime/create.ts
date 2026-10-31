@@ -1,3 +1,4 @@
+import { SceneMovement } from "#/world/scene/runtime/scene-movement"
 import { createSceneRenderer } from "#/world/scene/runtime/create-scene-renderer"
 import { createSceneRoot } from "#/world/scene/runtime/create-scene-root"
 import { createSceneCamera } from "#/world/scene/runtime/create-scene-camera"
@@ -13,7 +14,6 @@ import { PendingAction } from "#/world/scene/runtime/action-target"
 import { WarpMarkers } from "#/world/scene/runtime/warps"
 import { FrameLimiter } from "#/lib/engine/frame-limiter"
 import { keyTurn } from "#/world/scene/key-turn"
-import { walkDirection } from "#/world/scene/walk-direction"
 import { createGatheringSpots } from "#/world/scene/runtime/gathering"
 import { createPointer } from "#/world/scene/runtime/pointer"
 import { createPreviewControls } from "#/world/scene/runtime/preview"
@@ -49,16 +49,14 @@ import { tickSprites } from "#/world/scene/tick-sprites"
 import { lap } from "#/world/lap"
 import { Ashfall } from "#/world/scene/ashfall"
 import { dustAll } from "#/world/scene/dust-all"
-import { findPath } from "#/world/scene/path"
 import { MAP_SCENES } from "#/world/scene/runtime/definitions"
 import { diorama } from "#/world/scene/runtime/settings"
 import { createTerrain } from "#/world/scene/runtime/terrain"
 import { createEnvironment } from "#/world/scene/runtime/helpers/lighting/create-environment"
 import { createLighting } from "#/world/scene/runtime/helpers/lighting/create-lighting"
 import { createPopulation } from "#/world/scene/runtime/population"
-import type { Cell, SceneEvents } from "#/world/scene/runtime/types"
+import type { SceneEvents } from "#/world/scene/runtime/types"
 import type { Walker } from "#/world/scene/runtime/walker"
-import { center } from "#/world/scene/runtime/center"
 import { NAME_RANGE } from "#/world/scene/runtime/grid"
 import { cellOf } from "#/world/scene/runtime/cell-of"
 
@@ -171,81 +169,14 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     shadowDirty = true
   }
   // ---------------------------------------------------------------- movement
-  let frozen = false
   const action = new PendingAction<Actor>()
-  function freeze(on: boolean) {
-    frozen = on
-    if (on) {
-      action.clear()
-      if (me.path.length > 1) {
-        me.path = [me.path[0]]
-        runtime.events?.walk([cellOf(me.path[0])])
-      }
-      marker.visible = false
-    }
-  }
-  function walkTo(t: V2, keepAction = false) {
-    if (frozen) return false
-    if (!keepAction) action.clear()
-    const from = me.path.length ? me.path[0] : me.pos
-    const p = findPath(from, t, true)
-    if (!p) return false
-    me.path = me.path.length ? [me.path[0], ...p.slice(1)] : p.slice(1)
-    const end = p[p.length - 1]
-    marker.position.set(end[0], walkH(end[0], end[1]) + 0.04, end[1])
-    marker.visible = me.path.length > 0
-    if (me.path.length) runtime.events?.walk([cellOf(from), ...p.slice(1).map(cellOf)])
-    return true
-  }
-  function placePlayer(at: Cell) {
-    const p = center(at)
-    if (!isFree(p[0], p[1])) return
-    action.clear()
-    me.pos = p
-    me.path = []
-    camFocus.set(p[0], walkH(p[0], p[1]) + 0.6, p[1])
-  }
-  /** a direction held on the keys, on screen: right +x, up +y */
-  let held: [number, number] | null = null
-  function hold(dir: [number, number] | null) {
-    held = dir && (dir[0] || dir[1]) ? dir : null
-  }
-  /** One cell on along the held keys, turned by the camera: up on screen is away from the camera. */
-  function stepHeld() {
-    if (!held || frozen || me.path.length > 1) return
-    const diState = walkDirection(held, movement.yaw),
-      di = diState[0],
-      dj = diState[1]
-    const ciState = cellOf(me.path.length ? me.path[0] : me.pos),
-      ci = ciState[0],
-      cj = ciState[1]
-    // straight on if it is free; on a slant blocked by a corner, slide along whichever side is open
-    const tries: [number, number][] =
-      di && dj
-        ? [
-            [di, dj],
-            [di, 0],
-            [0, dj],
-          ]
-        : [[di, dj]]
-    for (const entry of tries) {
-      const a = entry[0]
-      const b = entry[1]
-
-      const next = center([ci + a, cj + b])
-      if (!isFree(next[0], next[1])) continue
-      walkTo(next)
-      return
-    }
-  }
-  function stop() {
-    action.clear()
-    if (me.path.length > 1) {
-      me.path = [me.path[0]]
-      runtime.events?.walk([cellOf(me.path[0])])
-    }
-    marker.visible = false
-  }
+  const movementControl = new SceneMovement({ me, action, marker, focus: camFocus, movement, onWalk: (path) => runtime.events?.walk(path) })
+  const freeze = movementControl.freeze
+  const walkTo = movementControl.walkTo
+  const placePlayer = movementControl.placePlayer
+  const hold = movementControl.hold
+  const stepHeld = movementControl.stepHeld
+  const stop = movementControl.stop
   // ---------------------------------------------------------------- gathering spots (core/gather.ts)
   const spotsSource = createGatheringSpots(town, map),
     spots = spotsSource.spots,
@@ -254,7 +185,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
   /** Walk up to a gathering spot, then have a go at it. */
   function approachSpot(id: string) {
     const s = spots.get(id)
-    if (!s || frozen) return
+    if (!s || movementControl.frozen) return
     action.clear()
     const within = (p: V2) => Math.hypot(p[0] - s.at[0], p[1] - s.at[1]) <= (REACH - 0.6) / 2
     const arrive = (x: string) => (x.startsWith("station:") ? runtime.events?.stationAt(x.slice(8)) : runtime.events?.gatherAt(x))
@@ -299,7 +230,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     return (o?.userData.monster as string | undefined) ?? null
   }
   function fight(id: string) {
-    if (!frozen) {
+    if (!movementControl.frozen) {
       action.clear()
       action.select({ kind: "fight", id })
       lastRepath = 0
@@ -369,7 +300,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
   }
 
   function approach(id: number) {
-    if (frozen) return
+    if (movementControl.frozen) return
     const a = personOf(id)
     if (!a) return
     action.clear()
