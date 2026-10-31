@@ -1,3 +1,4 @@
+import { assertMapFloorSeparation } from "#/world/maps/assert-map-floor-separation"
 import { assertMapRoomVolumeSeparation } from "#/world/maps/assert-map-room-volume-separation"
 import { assertMapRoomSeparation } from "#/world/maps/assert-map-room-separation"
 import { assertMapSpaceContainment } from "#/world/maps/assert-map-space-containment"
@@ -20,5 +21,6 @@ export function assertMapSpaceRegistry(maps: MapSpaceRegistry): void {
   }
   assertMapRoomSeparation(maps)
   assertMapRoomVolumeSeparation(maps)
+  assertMapFloorSeparation(maps)
   assertMapSpaceContainment(maps)
 }

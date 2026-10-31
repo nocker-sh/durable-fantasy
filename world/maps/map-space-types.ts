@@ -1,3 +1,4 @@
+import type { MapFloorSpace } from "#/world/maps/floor-space-types"
 import type { SpatialFrameChain } from "#/lib/engine/spatial-frame-chain"
 import type { MapRoomSpace } from "#/world/maps/room-space-types"
 import type { SpatialFrame } from "#/lib/engine/spatial-frame"
@@ -8,6 +9,8 @@ import type { Vector3 } from "#/lib/engine/vector3-types"
 export type MapSpace = Readonly<{
   /** Known room interiors in local metres; absence means room geometry is unverified. */
   rooms?: readonly MapRoomSpace[]
+  /** Known floor material only; absence does not mean an empty slab. */
+  floor?: MapFloorSpace
   parentMap: string
   frame: ConstructorParameters<typeof SpatialFrame>[0]
   planarOrigin: readonly [number, number]

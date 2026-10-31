@@ -1,3 +1,4 @@
+import { getInteriorFloorSpace } from "#/world/town/get-interior-floor-space"
 import { getAuthoredRoomSpace } from "#/world/town/floorplan/get-authored-room-space"
 import { assertAuthoredSiteFrame } from "#/world/town/floorplan/assert-authored-site-frame"
 import { assertAuthoredFloorLevels } from "#/world/town/floorplan/assert-authored-floor-levels"
@@ -29,6 +30,7 @@ export function getInteriorMapSpace(interior: Interior): MapSpace | undefined {
   if (!origin.every(Number.isFinite)) throw new Error(`Unbounded interior map space: ${interior.id}`)
   return {
     rooms: source.rooms.filter((room) => room.floor === interior.floor).map((room) => ({ ...getAuthoredRoomSpace(room, source), heightMetres: level.ceiling - level.elevation })),
+    floor: getInteriorFloorSpace(interior, level.thickness),
     parentMap: source.parentMap,
     frame: { origin, width, depth, quarterTurns: site.quarterTurns },
     planarOrigin: [interior.x0, interior.z0],
