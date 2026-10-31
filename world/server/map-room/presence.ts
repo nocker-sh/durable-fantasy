@@ -63,5 +63,5 @@ export type TradeSide = {
   settling?: boolean
 }
 
-export const presence = (connection: WebSocketConnection<ServerMessage>): Presence =>
+export const presence = (connection: Pick<WebSocketConnection<ServerMessage>, "state">): Presence =>
   (connection.state as Presence | undefined) ?? { player: null, owner: null, route: [], since: 0, said: [], engaged: null }
