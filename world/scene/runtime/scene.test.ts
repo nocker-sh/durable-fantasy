@@ -1,7 +1,7 @@
 import { afterEach, expect, it, vi } from "vitest"
 import type { SceneEvents } from "#/world/scene/runtime/types"
 const factory = vi.hoisted(() => ({ create: vi.fn() }))
-vi.mock("./create", () => ({ createSceneRuntime: factory.create }))
+vi.mock("#/world/scene/runtime/create-scene-runtime", () => ({ createSceneRuntime: factory.create }))
 vi.mock("../world", () => ({ N: 96, WR: 2, WN: 96, blocked: vi.fn() }))
 vi.mock("#/world/scene/construction/registry", () => ({ places: {} }))
 vi.mock("#/world/lap", () => ({ lap: vi.fn() }))

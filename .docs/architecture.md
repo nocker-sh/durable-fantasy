@@ -94,6 +94,8 @@ Durable Object の入口は `durable-objects/` にあり、どれも Void の規
 
 破棄したマップの描画から届く進捗や失敗は現在の画面へ送らず、遅れて完成した描画は解放する。地面の画像は並行で準備できるが、共有の地形と灯り・描画物の登録を変更する組み立ては `world/scene/runtime/scene-build-queue.ts` で直列化する。待機中に離れたマップは組み立てず、作成中に離れたマップは完成後に解放してから次へ進む。描画資源は作成の都度 `lib/engine/cleanup-stack.ts` へ登録する。非同期の組み立ては `with-cleanup.ts` が囲み、途中の失敗でも取得と逆順に解放する。住民も一人ずつ登録する。共有する資源は一度だけ解放し、シェーダーだけが参照するテクスチャや影の描画先は `lib/graphics/dispose-object-tree.ts` で回収する。解放に失敗した資源があっても残りを処理し、元の作成エラーを失わない。収集は `collect-object-assets.ts`・`collect-material-assets.ts`・`collect-texture-assets.ts` に分け、幾何・材質・影の資源は実際に解放可能かを確認する。共有参照の重複排除と解放順、失敗の集約はツリー全体で維持する。
 
+`create-scene-runtime.ts` は地面の並行準備と共有状態を触る構築の直列化を組み立て、`assemble-scene-runtime.ts` がマップの描画と操作を接続する。`create-scene-town.ts` は町の構築と静的メッシュの統合を扱い、動く物や遮蔽の単位を統合から保護する。
+
 描画器とシーンの根の生成は `world/scene/runtime/create-scene-renderer.ts`・`create-scene-root.ts` に置き、取得時の解放登録と逆順の回収を維持する。カメラの生成は `create-scene-camera.ts`、表示寸法と描画面・後処理の画素数の同期は `resize-scene-viewport.ts`、移動先の輪とカーソルの生成は `create-walk-markers.ts` が担う。
 
 環境は `create-scene-environment.ts` が環境光・太陽と照準・煙の順に根へ追加する。`create-scene-sun.ts` は影を先に所有へ登録してからカメラと解像度を設定する。`create-scene-smoke.ts` は元の画素のテクスチャ、幾何、材質を順に取得し、全てを所有してから根へ追加する。煙突がない場合も資源の回収手順は同じにする。煙の二色と透明な縁は `create-smoke-pixels.ts`、煙突の順と寿命の位相・横流れの初期値は `create-smoke-puffs.ts` に置く。粒は煙突の元の位置を共有し、更新中に位置を複製し直さない。

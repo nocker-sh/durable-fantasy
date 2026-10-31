@@ -16,11 +16,7 @@ import { createSceneRenderer } from "#/world/scene/runtime/create-scene-renderer
 import { createSceneRoot } from "#/world/scene/runtime/create-scene-root"
 import { createSceneCamera } from "#/world/scene/runtime/create-scene-camera"
 import { createWalkMarkers } from "#/world/scene/runtime/create-walk-markers"
-import { withCleanup } from "#/lib/engine/with-cleanup"
 import { type CleanupStack } from "#/lib/engine/cleanup-stack"
-import type { SceneOptions } from "#/world/scene/runtime/scene-options"
-import { SceneBuildQueue } from "#/world/scene/runtime/scene-build-queue"
-import type { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
 import { SceneOcclusion } from "#/world/scene/runtime/scene-occlusion"
 import { SceneLabelProjection } from "#/world/scene/runtime/scene-label-projection"
 import { PendingAction } from "#/world/scene/runtime/action-target"
@@ -32,7 +28,7 @@ import { ScenePointer } from "#/world/scene/runtime/scene-pointer"
 import { createPreviewControls } from "#/world/scene/runtime/preview"
 import { SceneWalkers } from "#/world/scene/runtime/scene-walkers"
 import { DioramaPostProcessing } from "#/lib/graphics/post-processing"
-import { mergeStatic } from "#/lib/graphics/merge-static"
+import { createSceneTown } from "#/world/scene/runtime/create-scene-town"
 import * as THREE from "three"
 import { initWalk } from "#/world/scene/init-walk"
 import { walkH } from "#/world/scene/walk-h"
@@ -40,8 +36,7 @@ import { setLayout } from "#/world/scene/set-layout"
 import { burst } from "#/world/scene/burst"
 import { makeMonsters } from "#/world/scene/make-monsters"
 import { SceneCombat } from "#/world/scene/runtime/scene-combat"
-import { groundOf } from "#/world/scene/ground-of"
-import { occluders, houseGlows, lamps, stalls, movingObjects } from "#/world/scene/construction/registry"
+import { occluders, houseGlows, lamps } from "#/world/scene/construction/registry"
 import { resetRegistries } from "#/world/scene/construction/reset-registries"
 import type { V2 } from "#/world/scene/construction/registry"
 import type { Actor } from "#/world/scene/actor"
@@ -59,24 +54,9 @@ import { SceneLighting } from "#/world/scene/runtime/scene-lighting"
 import { createScenePopulation } from "#/world/scene/runtime/create-scene-population"
 import type { SceneEvents } from "#/world/scene/runtime/types"
 
-const builds = new SceneBuildQueue()
+import type { SceneBuildProps } from "#/world/scene/runtime/scene-build-types"
 
-async function createSceneRuntime(map: string, progress: (t: string) => void, input: { signal?: AbortSignal; options?: SceneOptions } = {}) {
-  input.signal?.throwIfAborted()
-  progress("地面を描いています…")
-  // Painting can overlap; only construction touches shared layout and scene registries.
-  const ground = await groundOf(map)
-  lap("scene: ground painted")
-  return builds.run(() => buildSceneRuntime({ map, progress, ground, options: input.options ?? {} }), input.signal)
-}
-
-type BuildProps = { map: string; progress: (text: string) => void; ground: PixBuf; options: SceneOptions }
-
-async function buildSceneRuntime(props: BuildProps) {
-  return withCleanup((resources) => assembleSceneRuntime({ ...props, resources }))
-}
-
-async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStack }) {
+export async function assembleSceneRuntime(props: SceneBuildProps & { resources: CleanupStack }) {
   const map = props.map,
     progress = props.progress,
     ground = props.ground,
@@ -103,17 +83,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     groundCanvas = groundCanvasSource.groundCanvas,
     wm = groundCanvasSource.wm,
     terrain = groundCanvasSource.terrain
-  const town = new THREE.Group()
-  scene.add(town)
-  world.build(town)
-  lap("scene: town built")
-  // still things that share a material become one draw each; a house, a stall or a swaying crown
-  // keeps its own transform so it can still fade, hide or move as one
-  if (!world.indoor) {
-    const anchors = [...occluders.map((o) => o.obj), ...Object.values(stalls).flatMap((s) => [s.wares, s.cover, s.group ?? s.wares])]
-    const merged = mergeStatic(town, { anchors, moving: movingObjects })
-    lap(`scene: merged ${merged.before} meshes into ${merged.after}`)
-  }
+  const town = createSceneTown({ scene, world })
   spawnAnimals(scene, map)
 
   const environment = createSceneEnvironment(scene, resources)
@@ -390,5 +360,3 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
   }
   return runtime
 }
-
-export { createSceneRuntime }
