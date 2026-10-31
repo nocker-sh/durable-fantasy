@@ -59,10 +59,19 @@ it("swaps depleted nodes, defaults omitted counts to present and leaves stations
   expect(f.town.children.map((child) => child.visible)).toEqual([true, false, true, false, true, true, true, true])
 })
 
-it("resolves the first intersected child's tag through its parents and ignores spent nodes", () => {
+it("resolves the first intersected child's registered owner and ignores spent nodes", () => {
   const f = fixture()
   const ray = new Raycaster(new Vector3(2.25, 10, 4.25), new Vector3(0, -1, 0))
   expect(f.gathering.spotHit(ray)).toBe("herbs")
   f.gathering.setNodes({ herbs: 0 })
   expect(f.gathering.spotHit(ray)).toBeNull()
+})
+
+it("keeps the registered resource ID when child metadata is missing or inconsistent", () => {
+  const f = fixture()
+  const root = f.town.children[0]
+  delete root.userData.node
+  root.children[0].userData.node = "wrong-resource"
+  const ray = new Raycaster(new Vector3(2.25, 10, 4.25), new Vector3(0, -1, 0))
+  expect(f.gathering.spotHit(ray)).toBe("herbs")
 })

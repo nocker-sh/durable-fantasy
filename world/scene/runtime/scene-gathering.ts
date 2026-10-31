@@ -1,9 +1,10 @@
+import { pickVisibleOwner } from "#/lib/graphics/pick-visible-owner"
 import { NODES } from "#/world/core/gather"
 import { STATIONS } from "#/world/town/stations"
 import { EXCHANGE_BOARD } from "#/world/town/boards"
 import { createGatheringNode } from "#/world/scene/runtime/create-gathering-node"
 import { createStationSpot } from "#/world/scene/runtime/create-station-spot"
-import type { Group, Object3D, Raycaster } from "three"
+import type { Group, Raycaster } from "three"
 import type { GatheringSpot } from "#/world/scene/runtime/gathering-types"
 
 type Props = Readonly<{ town: Group; map: string }>
@@ -35,17 +36,5 @@ export class SceneGathering {
     }
   }
 
-  readonly spotHit = (ray: Pick<Raycaster, "intersectObjects">): string | null => {
-    const hits = ray.intersectObjects(
-      [...this.entries.values()].filter((spot) => spot.full.visible).map((spot) => spot.full),
-      true,
-    )
-    const cursor: { object: Object3D | null } = { object: hits[0]?.object ?? null }
-    while (cursor.object) {
-      const tag: unknown = cursor.object.userData.node
-      if (typeof tag === "string" && tag) return tag
-      cursor.object = cursor.object.parent
-    }
-    return null
-  }
+  readonly spotHit = (ray: Pick<Raycaster, "intersectObjects">): string | null => pickVisibleOwner({ ray, owners: [...this.entries], root: (entry) => entry[1].full })?.[0] ?? null
 }

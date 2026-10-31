@@ -1,3 +1,4 @@
+import { pickVisibleOwner } from "#/lib/graphics/pick-visible-owner"
 import { ScenePosture } from "#/world/scene/runtime/scene-posture"
 import { SceneCombatFeedback } from "#/world/scene/runtime/scene-combat-feedback"
 import { SceneHitLabels } from "#/world/scene/runtime/scene-hit-labels"
@@ -215,15 +216,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     onSwing: (id) => runtime.events?.swing(id),
   })
   const fight = combat.fight
-  const monsterHit = (ray: THREE.Raycaster): string | null => {
-    const hits = ray.intersectObjects(
-      monsters.filter((m) => m.body.visible).map((m) => m.body),
-      true,
-    )
-    let o: THREE.Object3D | null = hits[0]?.object ?? null
-    while (o && !o.userData.monster) o = o.parent
-    return (o?.userData.monster as string | undefined) ?? null
-  }
+  const monsterHit = (ray: THREE.Raycaster): string | null => pickVisibleOwner({ ray, owners: monsters, root: (monster) => monster.body })?.spawn.id ?? null
   const labelProjection = new SceneLabelProjection({ camera: cam, viewport: camera })
   const hitLabels = resources.use(new SceneHitLabels({ plate, place: labelProjection.place }))
   const feedback = new SceneCombatFeedback({

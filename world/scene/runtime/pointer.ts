@@ -1,3 +1,4 @@
+import { pickVisibleOwner } from "#/lib/graphics/pick-visible-owner"
 import * as THREE from "three"
 import { walkH } from "#/world/scene/walk-h"
 import { isFree } from "#/world/scene/is-free"
@@ -8,7 +9,13 @@ import { dragTurn } from "#/world/scene/drag-turn"
 import type { Walker } from "#/world/scene/runtime/walker"
 import { snap } from "#/world/scene/runtime/snap"
 type PointerScene = {
-  renderer: THREE.WebGLRenderer
+  renderer: {
+    domElement: EventTarget &
+      Pick<HTMLCanvasElement, "addEventListener" | "removeEventListener"> & {
+        style: { cursor: string }
+        getBoundingClientRect(): Pick<DOMRect, "left" | "top" | "width" | "height">
+      }
+  }
   cam: THREE.Camera
   terrain: THREE.Object3D
   town: THREE.Group
@@ -65,39 +72,14 @@ export function createPointer(inputProps: PointerScene) {
     const hit = bh ?? th
     return hit ? [hit.point.x, hit.point.z] : null
   }
-  const residentHit = (): Actor | null => {
-    const hits = ray.intersectObjects(
-      people.filter((p) => p.fig.root.visible).map((p) => p.fig.root),
-      true,
-    )
-    let o: THREE.Object3D | null = hits[0]?.object ?? null
-    while (o && !o.userData.actor) o = o.parent
-    return (o?.userData.actor as Actor | undefined) ?? null
-  }
+  const residentHit = (): Actor | null => pickVisibleOwner({ ray, owners: people, root: (person) => person.fig.root })
   let hovered: Actor | null = null
   // what else the pointer is on, for the white outline: another player, a creature, an animal
   let hoveredWalker: Walker | null = null,
     hoveredMonster: string | null = null,
     hoveredCritter: (typeof critters)[number] | null = null
-  const walkerHit = (): Walker | null => {
-    const ws = [...remotes.values()].filter((w) => w.fig.root.visible)
-    const hits = ray.intersectObjects(
-      ws.map((w) => w.fig.root),
-      true,
-    )
-    let o: THREE.Object3D | null = hits[0]?.object ?? null
-    while (o && !ws.some((w) => w.fig.root === o)) o = o.parent
-    return ws.find((w) => w.fig.root === o) ?? null
-  }
-  const critterHit = () => {
-    const hits = ray.intersectObjects(
-      critters.map((c) => c.obj).filter((o) => o.visible),
-      true,
-    )
-    let o: THREE.Object3D | null = hits[0]?.object ?? null
-    while (o && !critters.some((c) => c.obj === o)) o = o.parent
-    return critters.find((c) => c.obj === o) ?? null
-  }
+  const walkerHit = (): Walker | null => pickVisibleOwner({ ray, owners: [...remotes.values()], root: (walker) => walker.fig.root })
+  const critterHit = () => pickVisibleOwner({ ray, owners: critters, root: (critter) => critter.obj })
   let drag: { id: number; x: number; moved: boolean } | null = null
   const onDown = (e: PointerEvent) => {
     if (e.button === 0 && !drag) drag = { id: e.pointerId, x: e.clientX, moved: false }
