@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { siteTransform } from "#/scripts/lib/site-transform"
+import { SpatialFrame } from "#/lib/engine/spatial-frame"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 type Props = Readonly<{ building: SettingDocument; room: SettingDocument; rect: readonly [number, number, number, number]; metresPerTile: number }>
 const buildingSchema = z.object({
@@ -31,15 +31,15 @@ export function getRoomSiteRectangle(props: Props): readonly [number, number, nu
   const width = (house.layout.width * house.layout.cell_m) / metres
   const depth = (house.layout.depth * house.layout.cell_m) / metres
   if (![width, depth].every(Number.isFinite) || width <= 0 || depth <= 0) return new Error("Unbounded room site rectangle")
-  const transform = siteTransform(width, depth, house.site_plan.rotation_quarters)
+  const frame = new SpatialFrame({ origin: [house.site_plan.origin[0], 0, house.site_plan.origin[1]], width, depth, quarterTurns: house.site_plan.rotation_quarters })
   const corners = [rect[0], rect[0] + rect[2]].flatMap((x) =>
-    [rect[1], rect[1] + rect[3]].map((y) => transform.point((source.origin[0] * source.grid.cell_m + x) / metres, (source.origin[1] * source.grid.cell_m + y) / metres)),
+    [rect[1], rect[1] + rect[3]].map((y) => frame.toWorld([(source.origin[0] * source.grid.cell_m + x) / metres, 0, (source.origin[1] * source.grid.cell_m + y) / metres])),
   )
   const bounds: readonly [number, number, number, number] = [
-    house.site_plan.origin[0] + Math.min(...corners.map((point) => point[0])),
-    house.site_plan.origin[1] + Math.min(...corners.map((point) => point[1])),
-    house.site_plan.origin[0] + Math.max(...corners.map((point) => point[0])),
-    house.site_plan.origin[1] + Math.max(...corners.map((point) => point[1])),
+    Math.min(...corners.map((point) => point[0])),
+    Math.min(...corners.map((point) => point[2])),
+    Math.max(...corners.map((point) => point[0])),
+    Math.max(...corners.map((point) => point[2])),
   ]
   if (!bounds.every(Number.isFinite) || bounds[0] >= bounds[2] || bounds[1] >= bounds[3]) return new Error("Unbounded room site rectangle")
 

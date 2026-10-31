@@ -1,5 +1,5 @@
 import { roomDoorSwing } from "#/scripts/lib/room-door-swing"
-import { siteDoorPose } from "#/scripts/lib/site-door"
+import { getSiteDoorPose } from "#/scripts/lib/get-site-door-pose"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 import type { EntrySteps } from "#/scripts/lib/entry-steps-types"
 import { auditDoorPushMotion } from "#/scripts/lib/audit-door-push-motion"
@@ -39,7 +39,7 @@ export function auditDoorPushes(documents: ReadonlyMap<string, SettingDocument>)
         fail("push has no exterior doorway")
         continue
       }
-      const pose = siteDoorPose({
+      const pose = getSiteDoorPose({
         grid: room.grid,
         room_origin: [0, 0],
         door: leaf.door,

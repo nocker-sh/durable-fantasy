@@ -1,7 +1,7 @@
 import type { EntryStepSiteInput } from "#/scripts/lib/entry-step-geometry-types"
-import { siteDoorPose } from "#/scripts/lib/site-door"
+import { getSiteDoorPose } from "#/scripts/lib/get-site-door-pose"
 export function getEntryStepDoorPose(site: EntryStepSiteInput, span: number, metres: number) {
-  return siteDoorPose({
+  return getSiteDoorPose({
     grid: site.room.grid,
     room_origin: site.room.origin,
     door: site.steps.door,

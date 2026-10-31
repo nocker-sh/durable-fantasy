@@ -1,5 +1,5 @@
 import { getWindmillYardSiteGeometry } from "#/scripts/lib/get-windmill-yard-site-geometry"
-import { siteDoorPose } from "#/scripts/lib/site-door"
+import { getSiteDoorPose } from "#/scripts/lib/get-site-door-pose"
 import { MIN_PASSAGE_WIDTH_M } from "#/scripts/lib/spatial-rules"
 import type { z } from "zod"
 import type { windmillYardSiteSchema } from "#/scripts/lib/windmill-yard-site-schema"
@@ -19,7 +19,7 @@ export function getWindmillRoadApproach(props: Props) {
     scale = props.metresPerTile
   if (props.site.rotation_quarters !== 0 || !end || end.some((value, axis) => value !== plan.road_end_tiles[axis]) || !Number.isFinite(road.w) || road.w <= 0)
     return new Error("Invalid mill approach road anchor")
-  const door = siteDoorPose({
+  const door = getSiteDoorPose({
     grid,
     room_origin: [0, 0],
     door: plan.door,

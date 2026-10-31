@@ -1,6 +1,6 @@
 import { outdoorSite } from "#/scripts/lib/outdoor-site"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
-import { siteDoorPose } from "#/scripts/lib/site-door"
+import { getSiteDoorPose } from "#/scripts/lib/get-site-door-pose"
 import type { Endpoint } from "#/scripts/lib/outdoor-access"
 
 export function outdoorEntrance(endpoint: Endpoint, documents: ReadonlyMap<string, SettingDocument>, metres: number) {
@@ -15,7 +15,7 @@ export function outdoorEntrance(endpoint: Endpoint, documents: ReadonlyMap<strin
     (c) => (c.kind ?? "door") !== "stair" && c.target === map && c.door?.[0] === endpoint.door[0] && c.door?.[1] === endpoint.door[1],
   )
   if (!connection) return undefined
-  const pose = siteDoorPose({
+  const pose = getSiteDoorPose({
     grid: room.grid,
     room_origin: room.origin as number[],
     door: endpoint.door,
