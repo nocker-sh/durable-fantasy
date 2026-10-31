@@ -7,13 +7,13 @@ import { player } from "#/world/test/player"
 import { mapPlayer } from "#/world/server/map-room/map-player"
 import type { Presence } from "#/world/server/map-room/presence"
 import type { ServerMessage } from "#/world/protocol"
-import type { Ctx } from "#/world/server/map-room/context"
+import type { HeartbeatContext } from "#/world/server/map-room/heartbeat-types"
 
 const calls = vi.hoisted(() => ({ state: vi.fn(), deliveryUpdate: vi.fn(), left: vi.fn() }))
-vi.mock("../../../durable-objects/wild", () => ({ Wild: { get: () => ({ snapshot: async (map: string) => ({ revision: 1, monsters: await calls.state(map) }) }) } }))
-vi.mock("../../../durable-objects/nature", () => ({ Nature: { get: () => calls } }))
-vi.mock("../../../durable-objects/player", () => ({ Player: { get: () => calls } }))
-import { HANDLERS } from "#/world/server/map-room/heartbeat"
+vi.mock("#/durable-objects/wild", () => ({ Wild: { get: () => ({ snapshot: async (map: string) => ({ revision: 1, monsters: await calls.state(map) }) }) } }))
+vi.mock("#/durable-objects/nature", () => ({ Nature: { get: () => calls } }))
+vi.mock("#/durable-objects/player", () => ({ Player: { get: () => calls } }))
+import { handleHeartbeat } from "#/world/server/map-room/handle-heartbeat"
 
 afterEach(() => {
   vi.useRealTimers()
@@ -26,13 +26,13 @@ function fixture(map = "south-meadow") {
   calls.left.mockResolvedValue({})
   const me: Presence = { player: mapPlayer("self", player(), [0, 0]), owner: "self", route: [[0, 0]], since: 0, said: [], engaged: null, ready: true }
   const send = vi.fn(async (_message: ServerMessage) => {})
-  const context = {
+  const context: HeartbeatContext = {
     ctx: { connection: { state: me, send }, params: { mapId: `1~${map}~1` } },
-    key: { map },
+    key: { world: 1, map },
     me,
     save: (patch: Partial<Presence>) => Object.assign(me, patch),
-  } as unknown as Ctx
-  return { context, me, send, beat: () => HANDLERS.heartbeat!(context, { type: "heartbeat" }) }
+  }
+  return { context, me, send, beat: () => handleHeartbeat(context) }
 }
 
 it("refreshes a defeated creature before and after its authoritative recovery without rejoining", async () => {
