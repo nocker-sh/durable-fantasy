@@ -320,3 +320,44 @@ it.each([null, undefined])("reports orphaned doors when the connection list is a
   expect(errors).not.toContain("room-a: invalid room connections")
   expect(errors).toContain("room-a: doorway cell has no connection at 0,1")
 })
+
+it("does not count displaced reciprocal doors as a route outside", () => {
+  const request = fixture()
+  request.b.origin = [3, 0]
+  expect(auditBuildingLayout(request.building, request.documents)).toContain("room-b: no route to the building's exterior")
+})
+
+it("does not count mismatched connection kinds as a route outside", () => {
+  const request = fixture()
+  Object.assign(request.b.connections[0], { kind: "opening" })
+  expect(auditBuildingLayout(request.building, request.documents)).toContain("room-b: no route to the building's exterior")
+})
+
+it("requires a real doorway on both ends of an exterior route", () => {
+  const request = fixture()
+  request.b.grid.rows[1] = "#.#"
+  expect(auditBuildingLayout(request.building, request.documents)).toContain("room-b: no route to the building's exterior")
+})
+
+it("does not seed an exterior route from a connection drawn through a solid wall", () => {
+  const request = fixture()
+  request.a.grid.rows[1] = "#.D"
+  const errors = auditBuildingLayout(request.building, request.documents)
+  expect(errors).toContain("room-a: no route to the building's exterior")
+  expect(errors).toContain("room-b: no route to the building's exterior")
+})
+
+it("does not seed an exterior route from a stair targeting an outdoor map", () => {
+  const request = fixture()
+  Object.assign(request.a.connections[1], { kind: "stair" })
+  expect(auditBuildingLayout(request.building, request.documents)).toContain("room-a: no route to the building's exterior")
+})
+
+it("does not count coincident doorways facing the same direction as a passage", () => {
+  const request = fixture()
+  request.b.origin = [0, 0]
+  request.b.grid.rows[1] = "#.D"
+  request.a.connections[0].target_door = [2, 1]
+  request.b.connections[0].door = [2, 1]
+  expect(auditBuildingLayout(request.building, request.documents)).toContain("room-b: no route to the building's exterior")
+})

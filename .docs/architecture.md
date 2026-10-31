@@ -902,6 +902,8 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 接続の読み取りと `Connection` の型は `room-connection-schema.ts` に置く。`audit-room-connection.ts` は接続先の所属、検証した原点、逆向きの宣言を解決する。`get-reciprocal-room-connection.ts` は両端を照合し、戸口は `audit-connected-room-door.ts`、階段の平面位置と使用面は `audit-connected-room-stair.ts` が調べる。外へ出られるかの探索も同じ接続スキーマを使い、不正な一覧を未検証の型変換で通さない。
 
+`audit-building-access.ts` は `is-room-passage-connected.ts` で両方向の幾何が成立する室間の接続だけを探索する。`get-room-connection-opening.ts` は実際の境界の開口と幅・縮尺を照合し、`get-exterior-room-connection-error.ts` は外へ出る探索の起点を判定する。通行の規則と検査の限界は `.docs/settings/README.md` の「一棟の共通座標」に従う。
+
 `get-room-door-portals.ts` が室の出入口を一棟の座標と階へ移し、`get-building-door-portals.ts` が所属する全室を解決する。`audit-building-door-inventory.ts` は同じ戸口の両側を一つにまとめ、板の定義と所有室が過不足なく一致することを検査する。`audit-building-layout.ts` から呼び、既存の各室の板の回転検査と併用する。ルードヴィヒの戸口の所有と、身体と立体・日課の残りは [[building-hue-ludwig#戸口と扉を持つ室]] にある。
 
 
