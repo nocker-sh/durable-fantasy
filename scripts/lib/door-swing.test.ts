@@ -149,3 +149,17 @@ it("recesses top and side doors along their own inward normal", () => {
   f.document.connections = [{ door: [7, 3], width_cells: 2, target: "map-town" }]
   expect(roomDoorSwing(f.document, { ...f.leaf, door: [7, 3], wall_depth_cells: 3 })!.hinge).toEqual([2.5, 2.5])
 })
+
+it("rejects ambiguous connection widths rather than taking the first declaration", () => {
+  const f = fixture()
+  f.document.connections = [
+    { kind: "door", door: [3, 7], width_cells: 2, target: "map-town" },
+    { kind: "door", door: [3, 7], width_cells: 1, target: "map-town" },
+  ]
+  expect(roomDoorSwing(f.document, f.leaf)).toBeUndefined()
+})
+it.each([{}, "door", [null]])("rejects malformed connection inventories without throwing: %j", (connections) => {
+  const f = fixture()
+  f.document.connections = connections
+  expect(roomDoorSwing(f.document, f.leaf)).toBeUndefined()
+})
