@@ -25,9 +25,12 @@ it("reviews the authored two-gate floor and caretaker cycle against the real tow
   expect(JSON.stringify([...source.documents])).toBe(before)
 })
 
-it("keeps the prose grid identical to metadata rather than accepting a separate flattering diagram", () => {
-  const source = fixture()
-  expect(() => readSetting(source.text.replace("```stock-lock-grid\n#", "```stock-lock-grid\n."))).toThrow("Stock lock diagram disagrees")
+it.each(["\n", "\r\n"])("keeps the prose grid identical to metadata with %j line endings", (newline) => {
+  const source = fixture().text.replace(/\r?\n/g, newline)
+  const changed = source.replace(/(```stock-lock-grid\r?\n)#/, "$1.")
+  expect(changed).not.toBe(source)
+  expect(() => readSetting(source)).not.toThrow()
+  expect(() => readSetting(changed)).toThrow("Stock lock diagram disagrees")
 })
 
 it("rejects undeclared openings, a gate facing the wrong side and an undersized waiting floor", () => {

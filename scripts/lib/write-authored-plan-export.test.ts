@@ -24,3 +24,20 @@ it("propagates read failures that are not a missing file", async () => {
   roots.push(base)
   await expect(writeAuthoredPlanExport({ id: "test", roomCount: 1, filePath: base, source: "" })).rejects.toThrow()
 })
+
+it.each(["\n", "\r\n"])("preserves existing bytes and timestamps with %j line endings but still writes changed content", async (newline) => {
+  const base = await mkdtemp(join(tmpdir(), "authored-line-endings-"))
+  roots.push(base)
+  const filePath = join(base, "test.ts")
+  const prepared = { id: "test", roomCount: 1, filePath, source: "export default {}\n" }
+  const previous = prepared.source.replace(/\n/g, newline)
+  await writeAuthoredPlanExport({ ...prepared, source: previous })
+  await utimes(filePath, 1000000000, 1000000000)
+  const before = (await stat(filePath)).mtimeMs
+  expect(await writeAuthoredPlanExport(prepared)).toMatchObject({ changed: false })
+  expect(await readFile(filePath, "utf8")).toBe(previous)
+  expect((await stat(filePath)).mtimeMs).toBe(before)
+  const changed = { ...prepared, source: "export default { rooms: [] }\n" }
+  expect(await writeAuthoredPlanExport(changed)).toMatchObject({ changed: true })
+  expect(await readFile(filePath, "utf8")).toBe(changed.source)
+})

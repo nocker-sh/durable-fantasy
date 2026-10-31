@@ -4,6 +4,8 @@
 
 ## 操作が流れる順
 
+複数の品の収納は `world/core/put-stacks.ts` が提示順に組み立て、全品が入る場合だけ新しい袋を返す。取引所からの受領と対面取引はこの処理を共有する。重量の制限、所持金の反映、操作ごとの通知は `receive-items.ts` と `trade-in.ts` に残し、袋の操作にプレイヤーの状態や通信を持ち込まない。
+
 店での売買は `world/core/buy.ts` と `sell.ts`、頼まれごとの受注と完了は `world/core/take-errand.ts` と `hand-errand.ts` が扱う。`apply.ts` は共通の回復・行動不能の確認を済ませてから各操作へ振り分ける。頼まれごとは種類に応じて材料、または届け先と荷物を必須とする型にし、処理側で欠落を補わない。購入前の品揃え・品質と価格の確認は `get-shop-purchase.ts` が受け持ち、所持金・重量・収納を確認してから品と代金・一日ごとの親しさを一緒に確定する。
 
 倉庫の預け入れ・引き取りは `world/core/storage/store.ts` と `retrieve.ts` が扱い、共通の回復・行動不能の判定後に呼ぶ。料金、品質を保った移し替え、空き枠・重量の判定をここにまとめる。店と倉庫の一日一回の親しさ更新は `commerce-friendship.ts` を共用する。親しさの定数は `friendship-rules.ts`、増加は `befriend.ts`、値引き率と価格への適用は `friend-discount.ts` と `friend-price.ts`、頼まれごとと親しさ更新の日付は `day-of.ts` が定義し、売買や製作から頼まれごとの定義表を参照しない。
@@ -310,6 +312,8 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 `scale-room-piece-dimensions.ts` は配置の座標変換と分けて、家具の実寸の付属情報を室内の倍率へ一度だけ変換する。椅子と足掛けは `scale-seat.ts`、卓の天板・脚と膝の空間は `scale-work-surface.ts` を使う。炉・棚・寝台も各部品の変換を使い、向き・階・グリッドの矩形は元の配置に保つ。描画の位置を決める変換で実寸を重ねて掛けない。
 
 `scripts/export-authored-plans.ts` は建物資料の ID を選び、`world/town/floorplan/authored/` へ型検査可能な配置データを書き出す。`get-authored-export-targets.ts` は索引の建物と出力のファイル名に使える ID だけを選び、対象と索引の重複を拒否する。`read-authored-plan-documents.ts` は建物の全室と参照先の屋外マップを解決し、`read-indexed-setting.ts` が索引の正規のパスと読取り後の ID・種別を照合する。参照の接頭辞からファイルを推測しない。
+
+書出しの整形は `run-local-vp.ts` を通してプロジェクトの Vite+ を起動し、PATH 上のグローバル CLI に依存しない。`write-authored-plan-export.ts` は LF と CRLF だけの差では保存し直さず、既存の内容と更新時刻を保つ。実際の内容変更は保存する。資料検査のパス境界は `get-setting-document-path.ts` が OS のパス規則で確認し、基点そのものや配下から外れるパスを拒否する。実ファイルのリンクは引き続き一覧の走査で拒否する。
 
 `prepare-authored-plan-export.ts` は各対象を検証してから、`get-authored-plan-source.ts` で直接の型参照とプロジェクトの整形を含むソースを作る。全対象の準備が完了した後で `write-authored-plan-export.ts` が書き出し、変化のない再出力ではファイルの更新時刻や開発画面の読込みを変えない。入力に不備がある一棟を、別の棟の資料や既定の寸法へ読み替えない。
 

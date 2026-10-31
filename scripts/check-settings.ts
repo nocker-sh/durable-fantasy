@@ -96,6 +96,7 @@ import { CRAFT } from "#/world/maps/layouts/craft"
 import { GATE } from "#/world/maps/layouts/gate"
 import { auditDesignDependencies } from "#/scripts/lib/design-dependencies"
 import { readSettingIndex } from "#/scripts/lib/read-setting-index"
+import { getSettingDocumentPath } from "#/scripts/lib/get-setting-document-path"
 import { auditSettingInventory } from "#/scripts/lib/audit-setting-inventory"
 import { SETTING_PREFIXES } from "#/scripts/lib/setting-index"
 import { auditMonsterEcology } from "#/scripts/lib/audit-monster-ecology"
@@ -152,8 +153,7 @@ const documents = new Map<string, SettingDocument>(),
 for (const entry of entries) {
   try {
     if (documents.has(entry.id)) throw Error("Duplicate document ID")
-    const path = resolve(base, entry.file)
-    if (!path.startsWith(`${base}/`)) throw Error("Document path outside settings")
+    const path = getSettingDocumentPath(base, entry.file)
     const doc = readSetting(await readFile(path, "utf8"))
     if (doc.id !== entry.id || doc.kind !== entry.kind || entry.file !== `${entry.kind}/${entry.id}.md`) throw Error("Index and document identity disagree")
     documents.set(doc.id, doc)

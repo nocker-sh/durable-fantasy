@@ -116,6 +116,8 @@ Vite+ のグローバル CLI を公式手順で導入し、シェルを開き直
 
 Windows で `better-sqlite3` のソースビルドに失敗する場合は、Void の同梱する SQLite バイナリを使う。`vp install --frozen-lockfile --ignore-scripts` の後に `vp exec node node_modules/esbuild/install.js` と `vp exec node node_modules/workerd/install.js` を実行する。インストール時の全スクリプトを止めたまま完了にしない。
 
+依存導入後にグローバル `vp` が使えない Windows 環境では、`.\node_modules\.bin\vp.cmd` を入口に同じコマンドを実行できる。スクリプトの子プロセスは `scripts/lib/run-local-vp.ts` でプロジェクトの CLI を解決する。画像生成ロックのテストには一時フォルダ内の junction 作成が必要であり、制限された実行環境で拒否された場合は通常の実行権限で検証する。テストから権限を変更したり、リンクの検査を省略したりしない。ビルドの既定ログ保存先に書き込めない場合は、その実行の `WRANGLER_LOG_PATH` を書込み可能な一時フォルダへ向ける。
+
 `vp run dev` は Portless 経由で起動し、`portless.json` の名前でアクセスする。共有プロキシがある環境では `PORTLESS_STATE_DIR`・`PORTLESS_PORT`・`PORTLESS_HTTPS` を同じシェルへ設定する。他のアプリの経路と既存の方式を保つ。HTTP の場合の URL は `http://durable-fantasy.localhost/` で、Vite の待受ポートは Portless が割り当てる。
 
 Vite とテストの設定は `vite.config.ts` で管理し、`vitest.config.ts` へ分散しない。単体テストではアプリ用プラグインを起動せず、Node の環境・ファイルごとの分離・既存の制限時間を保つ。

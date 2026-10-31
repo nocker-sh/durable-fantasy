@@ -74,9 +74,12 @@ it("rejects malformed or prematurely adopted metadata at the loading boundary", 
   expect(auditTownDistrictPlan(source)).toContain("town-hue: Invalid district grid or entrance")
 })
 
-it("checks the district diagram against its own metadata without relaxing room-grid checks", () => {
-  const source = readFileSync(".docs/settings/towns/town-hue.md", "utf8")
-  expect(() => readSetting(source.replace("```district-grid\n#", "```district-grid\n."))).toThrow("District diagram disagrees with settings metadata")
+it.each(["\n", "\r\n"])("checks the district diagram against its metadata with %j line endings", (newline) => {
+  const source = readFileSync(".docs/settings/towns/town-hue.md", "utf8").replace(/\r?\n/g, newline)
+  const changed = source.replace(/(```district-grid\r?\n)#/, "$1.")
+  expect(changed).not.toBe(source)
+  expect(() => readSetting(source)).not.toThrow()
+  expect(() => readSetting(changed)).toThrow("District diagram disagrees with settings metadata")
 })
 
 it("does not accept an undeclared second entrance", () => {

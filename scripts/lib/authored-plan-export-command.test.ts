@@ -1,8 +1,8 @@
-import { spawnSync } from "node:child_process"
+import { runLocalVp } from "#/scripts/lib/run-local-vp"
 import { existsSync, statSync } from "node:fs"
 import { expect, it } from "vitest"
 
-const run = (args: readonly string[]) => spawnSync("vp", ["exec", "bun", "scripts/export-authored-plans.ts", ...args], { encoding: "utf8" })
+const run = (args: readonly string[]) => runLocalVp({ args: ["exec", "bun", "scripts/export-authored-plans.ts", ...args] })
 it("rejects an unknown requested building instead of silently exporting the hall", () => {
   const before = statSync("world/town/floorplan/authored/h-m5.ts").mtimeMs,
     command = run(["building-not-indexed"])
