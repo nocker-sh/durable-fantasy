@@ -1,9 +1,11 @@
 import { scaleRoomPieceDimensions } from "#/world/town/scale-room-piece-dimensions"
 import { getInteriorPiece } from "#/world/town/get-interior-piece"
-import { stairGeometry } from "#/world/town/floorplan/stair-geometry"
+import { getInteriorStairProjection } from "#/world/town/get-interior-stair-projection"
+import { getInteriorEntrance } from "#/world/town/get-interior-entrance"
+import { projectInteriorRectangle } from "#/world/town/project-interior-rectangle"
 import type { HouseDef } from "#/world/town/house-types"
 import { floorPlan } from "#/world/town/floorplan/floor-plan"
-import type { Cell, Furniture, UnrenderedFurniture, Interior } from "#/world/town/interiors"
+import type { Furniture, UnrenderedFurniture, Interior } from "#/world/town/interiors"
 import { ROOM_SCALE } from "#/world/town/interior-rules"
 import { interiorId } from "#/world/town/interior-id"
 import { interiorCellOf } from "#/world/town/interior-cell-of"
@@ -31,40 +33,14 @@ export function interiorPlan(h: HouseDef, floor = 0, plan = floorPlan(h.id)): In
     else unrenderedFurniture.push(piece)
   }
   for (const dv of plan.dividers) if (dv.floor === floor) furniture.push({ kind: DIVIDER_KIND[dv.kind], ...at(dv), solid: true, name: dv.kind })
-  const entranceGeometry = plan.entrance ? { point: [x0 + plan.entrance.point[0] * K, z0 + plan.entrance.point[1] * K] as const, outward: plan.entrance.outward } : undefined
-  const doorCoordinate = (axis: 0 | 1) => {
-    const doorGeometry = entranceGeometry!,
-      point = doorGeometry.point,
-      outward = doorGeometry.outward,
-      normal = outward[axis],
-      at = point[axis] * 2 - 0.5
-    // Choose the closest cell centre strictly inside the wall, including half-cell boundaries.
-    return normal > 0 ? Math.ceil(at) - 1 : normal < 0 ? Math.floor(at) + 1 : Math.floor(point[axis] * 2)
-  }
-  const door: Cell = entranceGeometry ? [doorCoordinate(0), doorCoordinate(1)] : interiorCellOf(x0 + plan.door * K, z1 - 0.25)
-  const outward = entranceGeometry?.outward ?? [0, 1]
+  const entry = getInteriorEntrance({ entrance: plan.entrance, door: plan.door, x0, z0, z1, scale: K })
   // the keeper stands behind the counter (between it and the back partition), else at the back of the room
   const counter = furniture.find((f) => f.kind === "counter")
   const keeper = counter ? interiorCellOf(counter.x, counter.z - counter.d / 2 - 0.35) : interiorCellOf(CENTRE + 0.25, z0 + 1.0)
   const entrance = plan.rooms.find((room) => room.floor === floor && room.name === "土間")
   const drying =
     floor === 0 && ["fisher", "greengrocer", "fruit"].includes(h.household ?? "") && entrance ? { x: x0 + 0.12, z0: z0 + entrance.z0 * K + 0.2, z1: z0 + entrance.z1 * K - 0.2 } : undefined
-  const projectRect = (r: { x0: number; z0: number; x1: number; z1: number }) => ({ x0: x0 + r.x0 * K, z0: z0 + r.z0 * K, x1: x0 + r.x1 * K, z1: z0 + r.z1 * K })
-  const stairSections = plan.stairSections
-    ?.filter((s) => s.lowerFloor === floor || s.upperFloor === floor)
-    .map((s) => ({
-      ...s,
-      ...projectRect(s),
-      height: s.height * K,
-      slabThickness: s.slabThickness * K,
-      going: s.going * K,
-      landing: s.landing * K,
-      clearWidth: s.clearWidth * K,
-      railInset: s.railInset * K,
-      openingLength: s.openingLength * K,
-    }))
-  const floorOpenings = stairSections?.filter((s) => s.upperFloor === floor).map((s) => stairGeometry(s).opening)
-  const stairBlocks = stairSections?.map((s) => (s.upperFloor === floor ? stairGeometry(s).opening : stairGeometry(s).flight))
+  const stairs = getInteriorStairProjection({ sections: plan.stairSections, floor, x0, z0, scale: K })
   const level = plan.floorLevels?.find((level) => level.floor === floor)
   const below = plan.floorLevels?.find((level) => level.floor === floor - 1)
   const windows = plan.windows
@@ -85,18 +61,18 @@ export function interiorPlan(h: HouseDef, floor = 0, plan = floorPlan(h.id)): In
       wallThickness: s.wallThickness * K,
       floorCollar: s.floorCollar * K,
       floorSupport: { depth: s.floorSupport.depth * K, steps: s.floorSupport.steps },
-      ...projectRect(s),
+      ...projectInteriorRectangle({ rect: s, x0, z0, scale: K }),
     })),
     below: plan.authored && level && below ? { drop: (level.elevation - below.elevation) * K, interior: interiorPlan(h, floor - 1, plan) } : undefined,
     doorHeight: plan.doorHeight ? plan.doorHeight * K : undefined,
     shellInset: plan.cellSize ? plan.cellSize * K : undefined,
     doorWidth: plan.doorWidth ? plan.doorWidth * K : undefined,
-    entrance: entranceGeometry,
+    entrance: entry.entrance,
     floorThickness: level ? level.thickness * K : undefined,
     wallHeight: level ? (level.ceiling - level.elevation) * K : undefined,
-    stairSections,
-    floorOpenings,
-    stairBlocks,
+    stairSections: stairs.stairSections,
+    floorOpenings: stairs.floorOpenings,
+    stairBlocks: stairs.stairBlocks,
     authored: plan.authored,
     drying,
     house: h,
@@ -106,8 +82,8 @@ export function interiorPlan(h: HouseDef, floor = 0, plan = floorPlan(h.id)): In
     z0,
     x1,
     z1,
-    door,
-    arrive: [door[0] - outward[0] * 2, door[1] - outward[1] * 2],
+    door: entry.door,
+    arrive: entry.arrive,
     keeper,
     furniture,
     unrenderedFurniture,
