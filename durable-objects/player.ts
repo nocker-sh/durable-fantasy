@@ -1,47 +1,43 @@
+import { defineDurableState } from "void/durable"
 import { arrivePlayer } from "#/world/server/arrive-player"
 import { walkPlayer } from "#/world/server/walk-player"
 import { travelPlayer } from "#/world/server/travel-player"
 import { leavePlayer } from "#/world/server/leave-player"
 import { revivePlayerAtHome } from "#/world/server/revive-player-at-home"
-import type { PlayerArrivalInput, PlayerWalkInput, PlayerTravelInput } from "#/world/server/player-location-types"
-import { receiveGather } from "#/world/core/receive-gather"
-import type { GatherRequest } from "#/world/core/gather-receipt-types"
-import { receiveShop } from "#/world/core/receive-shop"
-import type { ShopQuote } from "#/world/core/shop-receipt-types"
-// One Durable Object per player holds their data (game-system.md §13). Commands run one at a time here, so two
-// purchases sent at once can never both spend the same gold.
-import { defineDurableState } from "void/durable"
-import { locationAt } from "#/world/core/location-at"
-import { apply } from "#/world/core/apply"
-import type { Context } from "#/world/core/apply"
-import type { Transition } from "#/world/core/transition"
-import type { Command, ServerCommand } from "#/world/core/commands"
-import { newPlayer } from "#/world/core/new-player"
-import type { PlayerState } from "#/world/core/player-types"
-import { addItem } from "#/world/core/add-item"
-import { prepareTrade } from "#/world/core/prepare-trade"
-import { finishTrade } from "#/world/core/finish-trade"
-import type { TradeProposal, TradeRecord } from "#/world/core/trade-transaction-types"
-import { beginTrade } from "#/world/server/begin-trade"
-import { advanceTrade } from "#/world/server/advance-trade"
-import type { TradeJob, TradePeer } from "#/world/server/trade-coordinator"
-import type { OrderIntent } from "#/world/core/exchange-types"
-import { holdOrder } from "#/world/core/hold-order"
-import { receiveInbox } from "#/world/core/receive-inbox"
-import type { InboxClaim } from "#/world/core/exchange-claim-types"
+import { beginPlayerTrade } from "#/world/server/begin-player-trade"
+import { advancePlayerTrade } from "#/world/server/advance-player-trade"
+import { preparePlayerTrade } from "#/world/server/prepare-player-trade"
+import { finishPlayerTrade } from "#/world/server/finish-player-trade"
+import { holdPlayerOrder } from "#/world/server/hold-player-order"
+import { readPlayerDelivery } from "#/world/server/read-player-delivery"
+import { receivePlayerGather } from "#/world/server/receive-player-gather"
+import { receivePlayerShop } from "#/world/server/receive-player-shop"
+import { receivePlayerCombat } from "#/world/server/receive-player-combat"
+import { payPlayerStrike } from "#/world/server/pay-player-strike"
+import { readPlayerInboxReceipt } from "#/world/server/read-player-inbox-receipt"
+import { receivePlayerInbox } from "#/world/server/receive-player-inbox"
+import { runPlayerCommand } from "#/world/server/run-player-command"
+import { givePlayerItem } from "#/world/server/give-player-item"
+import { resetPlayerRecord } from "#/world/server/reset-player-record"
 import { initialPlayerRecord } from "#/world/server/initial-player-record"
-import { playerMigrations } from "#/world/server/player-record"
-import { restoreSavedPlayer } from "#/world/server/restore-saved-player"
 import { readPlayerRecord } from "#/world/server/read-player-record"
-import { advanceCombatLife } from "#/world/server/advance-combat-life"
-import { publishPlayer } from "#/world/server/publish-player"
-import type { PlayerRecord } from "#/world/server/player-record"
-import { receiveCombat } from "#/world/core/receive-combat"
+import { playerMigrations } from "#/world/server/player-record"
+import type { PlayerArrivalInput, PlayerWalkInput, PlayerTravelInput } from "#/world/server/player-location-types"
+import type { PlayerTradeInput, PlayerTradeDecision, PlayerStrikeInput } from "#/world/server/player-operation-types"
+import type { GatherRequest } from "#/world/core/gather-receipt-types"
+import type { ShopQuote } from "#/world/core/shop-receipt-types"
 import type { CombatDelivery } from "#/world/core/combat-delivery-types"
-import { payStrike } from "#/world/core/combat-payment"
-import type { SkillId } from "#/world/core/skill-types"
+import type { InboxClaim } from "#/world/core/exchange-claim-types"
+import type { Context } from "#/world/core/apply"
+import type { Command, ServerCommand } from "#/world/core/commands"
+import type { Transition } from "#/world/core/transition"
+import type { PlayerState } from "#/world/core/player-types"
+import type { TradeProposal, TradeRecord } from "#/world/core/trade-transaction-types"
+import type { TradeJob } from "#/world/server/trade-coordinator"
+import type { OrderIntent } from "#/world/core/exchange-types"
 import type { ItemId } from "#/world/core/items/catalog"
 
+/** One player per durable instance; each operation publishes its state and receipts in one save (game-system.md §13). */
 export const Player = defineDurableState({
   initialState: initialPlayerRecord,
   version: 8,
@@ -76,179 +72,68 @@ export const Player = defineDurableState({
     read(context): PlayerState {
       return readPlayerRecord(context.state, Date.now())
     },
-    async beginTrade(context, input: { peer: string; local: TradeProposal; remote: TradeProposal }): Promise<ReturnType<typeof beginTrade>> {
-      const peer = input.peer
-      const local = input.local
-      const remote = input.remote
-
-      context.state.player = restoreSavedPlayer(context.state.player)
-      const result = beginTrade({ state: context.state, peer: peer, local: local, remote: remote, now: Date.now() })
-      if (result.ok && !result.job.finished) await context.setAlarm(Date.now() + 100)
-      return result
+    async beginTrade(context, input: PlayerTradeInput) {
+      return beginPlayerTrade(context, input, Date.now())
     },
     tradeJob(context): TradeJob | null {
       return context.state.tradeJob
     },
     async advanceTrade(context): Promise<TradeJob | null> {
-      await advancePlayerTrade(context, (id) => Player.get(id))
+      await advancePlayerTrade(context, (id) => Player.get(id), Date.now())
       return context.state.tradeJob
     },
     tradeStatus(context): TradeRecord | null {
       return context.state.trade
     },
-    prepareTrade(context, proposal: TradeProposal): ReturnType<typeof prepareTrade> {
-      const result = prepareTrade({ player: restoreSavedPlayer(context.state.player), previous: context.state.trade, proposal, now: Date.now() })
-      if (result.ok) context.state.trade = result.record
-      return result
+    prepareTrade(context, proposal: TradeProposal): ReturnType<typeof preparePlayerTrade> {
+      return preparePlayerTrade(context.state, proposal, Date.now())
     },
-    finishTrade(context, input: { id: string; revision: number; decision: "committed" | "aborted" }): Transition {
-      const id = input.id
-      const revision = input.revision
-      const decision = input.decision
-
-      const result = finishTrade({ player: restoreSavedPlayer(context.state.player), record: context.state.trade, id, revision, decision })
-      if (!result.ok) return result
-      // Both fields are persisted together by Void, including when a retry finds a final record.
-      publishPlayer(context.state, result.player)
-      context.state.trade = result.record
-      return { ok: true, state: context.state.player, events: [] }
+    finishTrade(context, input: PlayerTradeDecision): Transition {
+      return finishPlayerTrade(context.state, input)
     },
     holdOrder(context, id: number, intent: OrderIntent): Transition & { by?: string } {
-      if (context.state.trade?.status === "prepared" && context.state.orderEscrow?.id !== id) return { ok: false, reason: "NOT_READY" }
-      const result = holdOrder({ player: restoreSavedPlayer(context.state.player), previous: context.state.orderEscrow, id, intent, now: Date.now() })
-      if (!result.ok) return result
-      publishPlayer(context.state, result.state, context.state.orderEscrow?.id !== result.receipt.id)
-      context.state.orderEscrow = result.receipt
-      return { ok: true, state: context.state.player, events: result.events, ...(result.receipt.by !== undefined ? { by: result.receipt.by } : {}) }
+      return holdPlayerOrder(context.state, { id, intent }, Date.now())
     },
     readCombat(context) {
       return { player: readPlayerRecord(context.state, Date.now()), life: context.state.combatLife }
     },
     deliveryUpdate(context, after: number | null) {
-      const player = restoreSavedPlayer(context.state.player)
-      return { revision: context.state.deliveryRevision, player: after === context.state.deliveryRevision ? null : player }
+      return readPlayerDelivery(context.state, after)
     },
     receiveGather(context, source: string, request: GatherRequest): Transition {
-      if (!source) return { ok: false, reason: "NOT_READY" }
-      const received = receiveGather({
-        player: restoreSavedPlayer(context.state.player),
-        previous: context.state.gatherReceipts[source],
-        request,
-        now: Date.now(),
-        reserved: context.state.trade?.status === "prepared",
-      })
-      if (received.receipt) context.state.gatherReceipts[source] = received.receipt
-      if (received.result.ok) publishPlayer(context.state, received.result.state, !!received.receipt)
-      return received.result.ok ? { ...received.result, state: context.state.player } : received.result
+      return receivePlayerGather({ record: context.state, source, request, now: Date.now() })
     },
     receiveShop(context, source: string, quote: ShopQuote): Transition {
-      if (!source) return { ok: false, reason: "NOT_READY" }
-      const received = receiveShop({
-        player: restoreSavedPlayer(context.state.player),
-        previous: context.state.shopReceipts[source],
-        quote,
-        now: Date.now(),
-        reserved: context.state.trade?.status === "prepared",
-      })
-      if (received.receipt) context.state.shopReceipts[source] = received.receipt
-      if (received.result.ok) publishPlayer(context.state, received.result.state, !!received.receipt)
-      return received.result.ok ? { ...received.result, state: context.state.player } : received.result
+      return receivePlayerShop({ record: context.state, source, quote, now: Date.now() })
     },
     receiveCombat(context, source: string, delivery: CombatDelivery): Transition {
-      if (!source) return { ok: false, reason: "NOT_READY" }
-      const now = Date.now()
-      const received = receiveCombat({
-        player: restoreSavedPlayer(context.state.player),
-        previous: context.state.combatReceipts[source],
-        delivery,
-        now,
-        reserved: context.state.trade?.status === "prepared",
-        life: context.state.combatLife,
-      })
-      if (received.receipt) context.state.combatReceipts[source] = received.receipt
-      if (received.result.ok) {
-        publishPlayer(context.state, received.result.state, !!received.receipt)
-        const location = context.state.location
-        if (received.result.state.hp <= 0 && location) context.state.location = { ...location, route: [locationAt(location, now)], since: now }
-      }
-      return received.result.ok ? { ...received.result, state: context.state.player } : received.result
+      return receivePlayerCombat({ record: context.state, source, delivery, now: Date.now() })
     },
-    payStrike(context, input: { source: string; id: number; art?: SkillId; life?: number }): Transition {
-      const source = input.source
-      const id = input.id
-      const art = input.art
-      const life = input.life
-
-      if (!source) return { ok: false, reason: "NOT_READY" }
-      const resultSource = payStrike({
-          player: restoreSavedPlayer(context.state.player),
-          previous: context.state.combatPayments[source],
-          request: { id, art, life },
-          context: { now: Date.now(), reserved: context.state.trade?.status === "prepared", life: context.state.combatLife },
-        }),
-        result = resultSource.result,
-        receipt = resultSource.receipt
-      if (receipt) context.state.combatPayments[source] = receipt
-      if (result.ok) publishPlayer(context.state, result.state, !!art && !!receipt)
-      return result.ok ? { ...result, state: context.state.player } : result
+    payStrike(context, input: PlayerStrikeInput): Transition {
+      return payPlayerStrike(context.state, input, Date.now())
     },
     inboxReceipt(context, id: number): Transition | null {
-      return context.state.exchangeReceipt?.id === id ? { ok: true, state: restoreSavedPlayer(context.state.player), events: [] } : null
+      return readPlayerInboxReceipt(context.state, id)
     },
     receiveInbox(context, claim: InboxClaim): Transition {
-      if (context.state.trade?.status === "prepared" && context.state.exchangeReceipt?.id !== claim.id) return { ok: false, reason: "NOT_READY" }
-      const result = receiveInbox({ player: restoreSavedPlayer(context.state.player), previous: context.state.exchangeReceipt, claim: claim, now: Date.now() })
-      if (!result.ok) return result
-      publishPlayer(context.state, result.state, context.state.exchangeReceipt?.id !== result.receipt.id)
-      context.state.exchangeReceipt = result.receipt
-      return { ok: true, state: context.state.player, events: result.events }
+      return receivePlayerInbox(context.state, claim, Date.now())
     },
-    /** Run a command; the room passes the price the shop asks today, the time is the server's. */
+    /** The room supplies shop context; the player's operation uses the server timestamp. */
     run(context, command: Command | ServerCommand, ctx: Omit<Context, "now"> = {}): Transition {
-      if (context.state.trade?.status === "prepared") return { ok: false, reason: "NOT_READY" }
-      const now = Date.now()
-      const result = apply(restoreSavedPlayer(context.state.player), command, { ...ctx, now })
-      if (result.ok) {
-        publishPlayer(context.state, result.state)
-        if (command.type === "revive") advanceCombatLife(context.state)
-        const location = context.state.location
-        if (result.state.hp <= 0 && location) {
-          context.state.location = { ...location, route: [locationAt(location, now)], since: now }
-        }
-      }
-      return result.ok ? { ...result, state: context.state.player } : result
+      return runPlayerCommand(context.state, { command, context: ctx }, Date.now())
     },
-    /** Dev only: put things in the bag (checks and the debug panel). */
+    /** Dev-only bag changes. */
     give(context, item: ItemId, count: number): PlayerState {
-      if (context.state.trade?.status === "prepared") throw new Error("Trade is pending")
-      const p = restoreSavedPlayer(context.state.player)
-      const bag = addItem({ bag: p.bag, item: item, count: count })
-      publishPlayer(context.state, bag ? { ...p, bag } : p)
-      return context.state.player
+      return givePlayerItem(context.state, { item, count })
     },
-    /** Start over as a new traveller (the dev debug panel). */
+    /** Dev-only reset. */
     reset(context): PlayerState {
-      if (context.state.trade?.status === "prepared") throw new Error("Trade is pending")
-      advanceCombatLife(context.state)
-      publishPlayer(context.state, newPlayer())
-      context.state.location = null
-      return context.state.player
+      return resetPlayerRecord(context.state)
     },
   },
   async alarm(context) {
-    await advancePlayerTrade(context, (id) => Player.get(id))
+    await advancePlayerTrade(context, (id) => Player.get(id), Date.now())
   },
 })
-
-async function advancePlayerTrade(context: { state: PlayerRecord; setAlarm(at: number): Promise<void> }, peer: (id: string) => TradePeer): Promise<void> {
-  const job = context.state.tradeJob
-  if (!job || job.finished) return
-  context.state.player = restoreSavedPlayer(context.state.player)
-  // Schedule recovery before crossing the RPC boundary. A failed state save leaves this retry armed.
-  await context.setAlarm(Date.now() + 5000)
-  const before = context.state.player
-  await advanceTrade(context.state, peer(job.peer))
-  if (context.state.player !== before) publishPlayer(context.state, restoreSavedPlayer(context.state.player))
-}
 
 export default Player
