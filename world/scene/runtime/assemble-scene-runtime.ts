@@ -1,3 +1,4 @@
+import { SceneRuntimeLifecycle } from "#/world/scene/runtime/scene-runtime-lifecycle"
 import { SceneResidentConversation } from "#/world/scene/runtime/scene-resident-conversation"
 import { SceneFrameRenderer } from "#/world/scene/runtime/scene-frame-renderer"
 import { SceneShadowUpdates } from "#/world/scene/runtime/scene-shadow-updates"
@@ -64,6 +65,7 @@ export async function assembleSceneRuntime(props: SceneBuildProps & { resources:
     resources = props.resources,
     options = props.options,
     preview = !!options.preview
+  const lifecycle = resources.use(new SceneRuntimeLifecycle())
   const world = MAP_SCENES[map] ?? MAP_SCENES.phanthiet
   setLayout(world.layout)
   resetRegistries()
@@ -93,7 +95,7 @@ export async function assembleSceneRuntime(props: SceneBuildProps & { resources:
     ids = peopleSource.ids,
     personOf = peopleSource.personOf,
     applySchedule = peopleSource.applySchedule
-  const walkers = new SceneWalkers({ scene, onPickPlayer: (id) => runtime.events?.pickPlayer?.(id), figureScale: world.figureMetres === undefined ? 1 : world.figureMetres / FIG })
+  const walkers = new SceneWalkers({ scene, onPickPlayer: (id) => lifecycle.events?.pickPlayer?.(id), figureScale: world.figureMetres === undefined ? 1 : world.figureMetres / FIG })
   resources.use(walkers)
   const meSource = walkers,
     me = meSource.me,
@@ -137,7 +139,7 @@ export async function assembleSceneRuntime(props: SceneBuildProps & { resources:
   }
   // ---------------------------------------------------------------- movement
   const action = new PendingAction<Actor>()
-  const movementControl = new SceneMovement({ me, action, marker, focus: camFocus, movement, onWalk: (path) => runtime.events?.walk(path) })
+  const movementControl = new SceneMovement({ me, action, marker, focus: camFocus, movement, onWalk: (path) => lifecycle.events?.walk(path) })
   const freeze = movementControl.freeze
   const walkTo = movementControl.walkTo
   const placePlayer = movementControl.placePlayer
@@ -147,7 +149,7 @@ export async function assembleSceneRuntime(props: SceneBuildProps & { resources:
   const spotsSource = new SceneGathering({ town, map }),
     setNodes = spotsSource.setNodes,
     spotHit = spotsSource.spotHit
-  const conversation = new SceneResidentConversation({ me, marker, personOf, idOf: peopleSource.idOf, onReach: (id) => runtime.events?.reach(id) })
+  const conversation = new SceneResidentConversation({ me, marker, personOf, idOf: peopleSource.idOf, onReach: (id) => lifecycle.events?.reach(id) })
   const faceResident = conversation.faceResident
   const interactions = new SceneInteractions({
     me,
@@ -157,8 +159,8 @@ export async function assembleSceneRuntime(props: SceneBuildProps & { resources:
     personOf,
     reach: conversation.reach,
     marker,
-    stationAt: (id) => runtime.events?.stationAt(id),
-    gatherAt: (id) => runtime.events?.gatherAt(id),
+    stationAt: (id) => lifecycle.events?.stationAt(id),
+    gatherAt: (id) => lifecycle.events?.gatherAt(id),
   })
   const approachSpot = interactions.approachSpot
   const approach = interactions.approach
@@ -174,11 +176,11 @@ export async function assembleSceneRuntime(props: SceneBuildProps & { resources:
     me,
     action,
     movement: movementControl,
-    onWalk: (path) => runtime.events?.walk(path),
+    onWalk: (path) => lifecycle.events?.walk(path),
     playSwing: (until) => {
       walkers.action = { anim: "sword", until }
     },
-    onSwing: (id) => runtime.events?.swing(id),
+    onSwing: (id) => lifecycle.events?.swing(id),
   })
   const fight = combat.fight
   const monsterHit = (ray: THREE.Raycaster): string | null => pickVisibleOwner({ ray, owners: monsters, root: (monster) => monster.body })?.spawn.id ?? null
@@ -226,6 +228,7 @@ export async function assembleSceneRuntime(props: SceneBuildProps & { resources:
   if (previewControls) resources.use(previewControls)
   /** Release all construction resources together when the map is left. */
   function dispose() {
+    resources.release(lifecycle)
     resources.dispose()
   }
 
@@ -259,7 +262,7 @@ export async function assembleSceneRuntime(props: SceneBuildProps & { resources:
   const worldAnimation = new SceneWorldAnimation({ camera: cam, movement, people, animate: lighting.animate })
   const cameraFollow = new SceneCameraFollow({ camera, movement, me, preview: previewControls, heightAt: walkH })
   const occlusion = new SceneOcclusion({ occluders, camera: cam, me, preview })
-  const frameLoop = new SceneFrameLoop({ clock, running: () => runtime.running, render: (frame) => frameRenderer.render(frame), tick: () => runtime.events?.tick() })
+  const frameLoop = new SceneFrameLoop({ clock, running: () => lifecycle.running, render: (frame) => frameRenderer.render(frame), tick: () => lifecycle.events?.tick() })
   const outlines = new SceneOutlines({ me, people, remotes, monsters, critters, pointer, preview })
 
   // ash: settled on everything that faces the sky outdoors, and falling round the player
@@ -307,8 +310,18 @@ export async function assembleSceneRuntime(props: SceneBuildProps & { resources:
     groundCanvas,
     remotes,
     dispose,
-    running: false,
-    events: null as SceneEvents | null,
+    get running() {
+      return lifecycle.running
+    },
+    set running(running: boolean) {
+      lifecycle.running = running
+    },
+    get events(): SceneEvents | null {
+      return lifecycle.events
+    },
+    set events(events: SceneEvents | null) {
+      lifecycle.events = events
+    },
     heading: () => me.head,
     fps: () => frameLoop.fps,
     lights: () => ({ windows: houseGlows.length, lit: houseGlows.filter((g) => g.mat.emissiveIntensity > 0).length, lamps: lamps.length, lampsOn: lamps.filter((l) => l.light.intensity > 0).length }),
