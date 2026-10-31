@@ -1,12 +1,10 @@
-import { getInteriorStairRegistry } from "#/world/town/get-interior-stair-registry"
+import type { getInteriorStairRegistry } from "#/world/town/get-interior-stair-registry"
 import { getInteriorStairEndpoints } from "#/world/town/get-interior-stair-endpoints"
 import { getInteriorStairArrival } from "#/world/town/get-interior-stair-arrival"
-import type { Interior } from "#/world/town/interiors"
 import type { StairLink } from "#/world/town/interior-stair-types"
 
 /** Stair travel starts on a landing and arrives clear of every return trigger. */
-export function interiorStairLinks(interiors: readonly Interior[]): ReadonlyMap<string, readonly StairLink[]> {
-  const registry = getInteriorStairRegistry(interiors)
+export function interiorStairLinks(registry: ReturnType<typeof getInteriorStairRegistry>): ReadonlyMap<string, readonly StairLink[]> {
   const endpoints = getInteriorStairEndpoints(registry)
   const links = new Map<string, StairLink[]>()
   for (const endpoint of endpoints) {
