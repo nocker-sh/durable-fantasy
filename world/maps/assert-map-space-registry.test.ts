@@ -82,3 +82,16 @@ it("rejects a duplicate of an actual placed indoor map", () => {
   const duplicate = { ...original, id: "duplicate-physical-room" }
   expect(() => assertMapSpaceRegistry({ ...MAPS, [duplicate.id]: duplicate })).toThrow("Map room planes overlap")
 })
+it("rejects coincident room planes reached through different parent depths", () => {
+  const base = space("root")
+  const maps: Maps = {
+    root: { id: "root" },
+    wing: { id: "wing", space: { ...base, frame: { origin: [100, 5, 200], width: 8, depth: 6, quarterTurns: 1 } } },
+    nested: {
+      id: "nested",
+      space: { ...base, parentMap: "wing", frame: { origin: [1, 2, 1], width: 2, depth: 2, quarterTurns: 0 }, rooms: [{ id: "nested-room", footprint: [{ x0: 0, z0: 0, x1: 2, z1: 2 }] }] },
+    },
+    direct: { id: "direct", space: { ...base, frame: { origin: [101, 7, 205], width: 2, depth: 2, quarterTurns: 0 }, rooms: [{ id: "direct-room", footprint: [{ x0: 0, z0: 0, x1: 2, z1: 2 }] }] } },
+  }
+  expect(() => assertMapSpaceRegistry(maps)).toThrow("Map room planes overlap")
+})

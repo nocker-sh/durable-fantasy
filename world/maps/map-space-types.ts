@@ -1,3 +1,4 @@
+import type { SpatialFrameChain } from "#/lib/engine/spatial-frame-chain"
 import type { MapRoomSpace } from "#/world/maps/room-space-types"
 import type { SpatialFrame } from "#/lib/engine/spatial-frame"
 
@@ -13,3 +14,6 @@ export type MapSpace = Readonly<{
 
 /** Map identity and known placement used by spatial registration, independent of rendering or movement fields. */
 export type MapSpaceRegistry = Readonly<Record<string, Readonly<{ id: string; space?: MapSpace }>>>
+
+/** A query transform to a named root; this does not assign an absolute world position to that root. */
+export type MapSpaceTransform = Readonly<{ rootMap: string; transform: SpatialFrameChain }>

@@ -10,7 +10,7 @@ const space = (): MapSpace => ({
   metresPerPlanarUnit: 1,
   rooms: [{ id: "room", footprint: [a] }],
 })
-const registry = (other: MapSpace): MapSpaceRegistry => ({ outside: { id: "outside" }, first: { id: "first", space: space() }, second: { id: "second", space: other } })
+const registry = (other: MapSpace): MapSpaceRegistry => ({ outside: { id: "outside" }, elsewhere: { id: "elsewhere" }, first: { id: "first", space: space() }, second: { id: "second", space: other } })
 const rotations = [
   { turn: 0, bounds: a },
   { turn: 1, bounds: { x0: 2, z0: 1, x1: 3, z1: 3 } },
@@ -33,9 +33,9 @@ it("allows boundary contact between different maps without moving either room", 
 it("compares actual strips rather than the outer bounds of a concave room", () => {
   const first = { ...space(), rooms: [{ id: "concave", footprint: [a, { x0: 1, z0: 2, x1: 2, z1: 4 }] }] }
   const second = { ...space(), rooms: [{ id: "in-gap", footprint: [{ x0: 2, z0: 2, x1: 3, z1: 4 }] }] }
-  expect(() => assertMapRoomSeparation({ first: { id: "first", space: first }, second: { id: "second", space: second } })).not.toThrow()
+  expect(() => assertMapRoomSeparation({ outside: { id: "outside" }, first: { id: "first", space: first }, second: { id: "second", space: second } })).not.toThrow()
 })
-it("does not compare coordinates belonging to different direct parents", () => {
+it("does not compare coordinates belonging to different roots", () => {
   expect(() => assertMapRoomSeparation(registry({ ...space(), parentMap: "elsewhere" }))).not.toThrow()
 })
 it("leaves different floor elevations to the separate volume design", () => {
