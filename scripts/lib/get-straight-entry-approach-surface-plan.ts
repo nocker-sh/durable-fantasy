@@ -4,7 +4,13 @@ type Props = Readonly<{ points: readonly (readonly [number, number])[]; widthM: 
 
 /** The blend begins at the lower landing's outer edge; the preceding half-cap stays at landing height. */
 export function getStraightEntryApproachSurfacePlan(props: Props): EntryApproachSurface | Error {
-  if (props.points.length !== 2 || ![props.widthM, props.elevationM, props.metresPerTile].every(Number.isFinite) || props.widthM <= 0 || props.metresPerTile <= 0 || props.points.some((point) => !point.every(Number.isFinite)))
+  if (
+    props.points.length !== 2 ||
+    ![props.widthM, props.elevationM, props.metresPerTile].every(Number.isFinite) ||
+    props.widthM <= 0 ||
+    props.metresPerTile <= 0 ||
+    props.points.some((point) => !point.every(Number.isFinite))
+  )
     return new Error("Invalid straight entry surface dimensions")
 
   const first = props.points[0]

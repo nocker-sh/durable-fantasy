@@ -6,10 +6,30 @@ import { getEntryApproachEarthworks } from "#/scripts/lib/get-entry-approach-ear
 
 type Case = Readonly<{ points: readonly (readonly [number, number])[] }>
 const cases = [
-  { points: [[4, 4], [4, 10]] },
-  { points: [[4, 10], [4, 4]] },
-  { points: [[4, 4], [10, 4]] },
-  { points: [[10, 4], [4, 4]] },
+  {
+    points: [
+      [4, 4],
+      [4, 10],
+    ],
+  },
+  {
+    points: [
+      [4, 10],
+      [4, 4],
+    ],
+  },
+  {
+    points: [
+      [4, 4],
+      [10, 4],
+    ],
+  },
+  {
+    points: [
+      [10, 4],
+      [4, 4],
+    ],
+  },
 ] satisfies readonly Case[]
 const terrain = new ScalarField({ samples: Float32Array.from({ length: 16 ** 2 }, (_, index) => (index % 16) / 8 + Math.floor(index / 16) / 16), size: 16 })
 
@@ -39,7 +59,15 @@ it("measures interior cut and fill across the corridor without changing terrain"
   samples[7 * 16 + 4] = 2
   const field = new ScalarField({ samples, size: 16 })
   const before = samples.slice()
-  const surface = getStraightEntryApproachSurfacePlan({ points: [[4, 4], [4, 10]], widthM: 2, elevationM: 0, metresPerTile: 1 })
+  const surface = getStraightEntryApproachSurfacePlan({
+    points: [
+      [4, 4],
+      [4, 10],
+    ],
+    widthM: 2,
+    elevationM: 0,
+    metresPerTile: 1,
+  })
   if (surface instanceof Error) throw surface
 
   expect(getEntryApproachEarthworks({ surface, terrain: field })).toEqual({ cutM: 2, fillM: 0 })
@@ -49,17 +77,46 @@ it("measures interior cut and fill across the corridor without changing terrain"
 
 it.each([
   { points: [] },
-  { points: [[4, 4], [4, 4]] },
-  { points: [[4, 4], [6, 8]] },
-  { points: [[4, 4], [4, 8], [6, 8]] },
-  { points: [[NaN, 4], [4, 8]] },
+  {
+    points: [
+      [4, 4],
+      [4, 4],
+    ],
+  },
+  {
+    points: [
+      [4, 4],
+      [6, 8],
+    ],
+  },
+  {
+    points: [
+      [4, 4],
+      [4, 8],
+      [6, 8],
+    ],
+  },
+  {
+    points: [
+      [NaN, 4],
+      [4, 8],
+    ],
+  },
 ] satisfies readonly Case[])("rejects malformed straight paths: $points", (input) => {
   expect(getStraightEntryApproachSurfacePlan({ points: input.points, widthM: 1, elevationM: 0, metresPerTile: 1 })).toBeInstanceOf(Error)
 })
 
 it("converts corridor width and terrain height to the same metric scale", () => {
   const field = new ScalarField({ samples: new Float32Array(16 ** 2).fill(0.5), size: 16 })
-  const surface = getStraightEntryApproachSurfacePlan({ points: [[4, 4], [4, 10]], widthM: 2, elevationM: 3, metresPerTile: 2 })
+  const surface = getStraightEntryApproachSurfacePlan({
+    points: [
+      [4, 4],
+      [4, 10],
+    ],
+    widthM: 2,
+    elevationM: 3,
+    metresPerTile: 2,
+  })
   if (surface instanceof Error) throw surface
 
   expect(surface.blendBounds[2] - surface.blendBounds[0]).toBe(1)
@@ -74,5 +131,13 @@ it.each([
   { widthM: Infinity, elevationM: 0, metresPerTile: 1 },
   { widthM: Number.MIN_VALUE, elevationM: 0, metresPerTile: Number.MAX_VALUE },
 ])("rejects invalid or collapsed metric dimensions: %j", (dimensions) => {
-  expect(getStraightEntryApproachSurfacePlan({ points: [[4, 4], [4, 10]], ...dimensions })).toBeInstanceOf(Error)
+  expect(
+    getStraightEntryApproachSurfacePlan({
+      points: [
+        [4, 4],
+        [4, 10],
+      ],
+      ...dimensions,
+    }),
+  ).toBeInstanceOf(Error)
 })

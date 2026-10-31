@@ -10,7 +10,13 @@ type Props = EntryApproachContext & Readonly<{ approach: EntryApproachPlan }>
 export function getEntryApproachSection(props: Props) {
   const source = getEntryApproachSurfaceSource(props)
   if (source instanceof Error) return source
-  const surface = getEntryApproachSurfacePlan({ points: source.points, widthM: props.approach.width_m, elevationM: source.elevationM, metresPerTile: props.metres, scope: props.approach.section.scope })
+  const surface = getEntryApproachSurfacePlan({
+    points: source.points,
+    widthM: props.approach.width_m,
+    elevationM: source.elevationM,
+    metresPerTile: props.metres,
+    scope: props.approach.section.scope,
+  })
   if (surface instanceof Error) return surface
   const earthworks = getEntryApproachEarthworks({ surface, terrain: props.terrain })
   if (earthworks instanceof Error) return earthworks
