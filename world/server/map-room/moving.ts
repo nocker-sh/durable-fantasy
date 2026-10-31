@@ -8,13 +8,11 @@ import { spawnsOn } from "#/world/core/spawns-on"
 import { Nature } from "#/durable-objects/nature"
 import { Directory } from "#/durable-objects/directory"
 import { walkable } from "#/world/maps/walkable"
-import { validPath } from "#/world/valid-path"
-import { cellsReached } from "#/world/cells-reached"
 import type { Cell, MapPlayer } from "#/world/protocol"
 import type { Ctx, Handlers, Message } from "#/world/server/map-room/context"
 import { presence } from "#/world/server/map-room/presence"
 import { mapPlayer } from "#/world/server/map-room/map-player"
-import { reachable } from "#/world/server/map-room/reachable"
+import { handleMove } from "#/world/server/map-room/handle-move"
 import { handleWarp } from "#/world/server/map-room/handle-warp"
 import { handleRevive } from "#/world/server/map-room/handle-revive"
 
@@ -85,39 +83,9 @@ async function join(roomCtx: Ctx, message: Message<"join">) {
   }
 }
 
-async function move(roomCtx: Ctx, message: Message<"move">) {
-  const ctxSource2 = roomCtx,
-    ctx = ctxSource2.ctx,
-    map = ctxSource2.map,
-    me = ctxSource2.me,
-    save = ctxSource2.save,
-    standUp = ctxSource2.standUp
-  if (!me.player) return
-  const since = roomCtx.receivedAt ?? Date.now()
-  const reached = cellsReached(me.route, Math.max(0, since - me.since) / 1000)
-  if (me.engaged || me.down || me.trade?.open || !validPath(reached, message.path, (c) => walkable(map, c))) {
-    const at = reachable(me)[0]
-    if (me.owner && (await Player.get(me.owner).walk({ connection: ctx.connection.id, route: [at] }))) {
-      save({ player: { ...me.player, at }, route: [at], since: Date.now() })
-      await ctx.room.broadcast({ type: "moved", id: me.player.id, path: [at] }, [ctx.connection.id])
-    }
-    await ctx.connection.send({ type: "refused", what: "move", at })
-    return
-  }
-  if (!(await standUp())) {
-    await ctx.connection.send({ type: "refused", what: "move", at: reachable(me)[0] })
-    return
-  }
-  if (!me.owner || !(await Player.get(me.owner).walk({ connection: ctx.connection.id, route: message.path, since: since }))) return
-  const at = message.path[message.path.length - 1]
-  save({ player: { ...me.player, at }, route: message.path, since })
-  await ctx.room.broadcast({ type: "moved", id: me.player.id, path: message.path }, [ctx.connection.id])
-  return
-}
-
 export const HANDLERS: Handlers = {
   join: join,
-  move: move,
+  move: handleMove,
   engage: handleEngage,
   revive: handleRevive,
   look: handleShopLook,
