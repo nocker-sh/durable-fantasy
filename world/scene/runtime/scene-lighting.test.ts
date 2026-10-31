@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest"
 import { Scene } from "three"
 import { SceneLighting } from "#/world/scene/runtime/scene-lighting"
-import { createEnvironment } from "#/world/scene/runtime/helpers/lighting/create-environment"
+import { createSceneEnvironment } from "#/world/scene/runtime/create-scene-environment"
 import { createSceneWater } from "#/world/scene/runtime/create-scene-water"
 import { CleanupStack } from "#/lib/engine/cleanup-stack"
 import { SQUARE_LAYOUT } from "#/world/maps/layout"
@@ -41,7 +41,7 @@ function fixture() {
   const owned = new CleanupStack()
   resources.push(owned)
   const scene = new Scene()
-  const environment = createEnvironment(scene, owned)
+  const environment = createSceneEnvironment(scene, owned)
   const wm = createSceneWater(owned).material
   const applySchedule = vi.fn(() => effects.events.push("schedule"))
   const lighting = new SceneLighting({ scene, environment, wm, world: { layout: SQUARE_LAYOUT, centre: [0, 0], build() {} }, applySchedule })

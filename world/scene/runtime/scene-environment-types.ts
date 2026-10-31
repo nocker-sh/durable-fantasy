@@ -1,3 +1,3 @@
-import type { createEnvironment } from "#/world/scene/runtime/helpers/lighting/create-environment"
+import type { createSceneEnvironment } from "#/world/scene/runtime/create-scene-environment"
 
-export type SceneEnvironment = ReturnType<typeof createEnvironment>
+export type SceneEnvironment = ReturnType<typeof createSceneEnvironment>

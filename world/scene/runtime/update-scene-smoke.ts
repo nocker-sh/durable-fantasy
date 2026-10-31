@@ -10,9 +10,9 @@ export function updateSceneSmoke(props: Props): void {
     const phase = puff.age / puff.life
     props.environment.smoke.set({
       index,
-      x: puff.o.x + phase * phase * 1.6 * puff.vx * 6 + Math.sin(puff.age * 2 + puff.o.x) * 0.08,
-      y: puff.o.y + phase * 2.6,
-      z: puff.o.z - phase * phase * 0.6,
+      x: puff.origin.x + phase * phase * 1.6 * puff.driftX * 6 + Math.sin(puff.age * 2 + puff.origin.x) * 0.08,
+      y: puff.origin.y + phase * 2.6,
+      z: puff.origin.z - phase * phase * 0.6,
       size: 0.18 + phase * 0.5,
       opacity: (1 - phase) * 0.5 * Math.min(1, phase * 8),
     })

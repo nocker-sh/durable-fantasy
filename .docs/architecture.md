@@ -96,6 +96,8 @@ Durable Object の入口は `durable-objects/` にあり、どれも Void の規
 
 描画器とシーンの根の生成は `world/scene/runtime/create-scene-renderer.ts`・`create-scene-root.ts` に置き、取得時の解放登録と逆順の回収を維持する。カメラの生成は `create-scene-camera.ts`、表示寸法と描画面・後処理の画素数の同期は `resize-scene-viewport.ts`、移動先の輪とカーソルの生成は `create-walk-markers.ts` が担う。
 
+環境は `create-scene-environment.ts` が環境光・太陽と照準・煙の順に根へ追加する。`create-scene-sun.ts` は影を先に所有へ登録してからカメラと解像度を設定する。`create-scene-smoke.ts` は元の画素のテクスチャ、幾何、材質を順に取得し、全てを所有してから根へ追加する。煙突がない場合も資源の回収手順は同じにする。煙の二色と透明な縁は `create-smoke-pixels.ts`、煙突の順と寿命の位相・横流れの初期値は `create-smoke-puffs.ts` に置く。粒は煙突の元の位置を共有し、更新中に位置を複製し直さない。
+
 地面と水面は `create-scene-terrain.ts` が建物より先に組み立てる。ミニマップの地面の画素は `create-ground-canvas.ts` が渡し、屋内の床と占有する家具の図は `paint-interior-minimap.ts` が描く。部屋は登録した描画定義との対応で引き、別の部屋の図で代用しない。読み込みの進捗を通知して処理を譲った後に、地形と水面の幾何・材質を取得する。
 
 地形の頂点とテクスチャ座標は `lib/graphics/create-heightfield-vertices.ts`、各セルの三角形は `create-grid-indices.ts` が入力の大きさと高さから作る。`create-ground-surface.ts` がこれらを幾何へ渡し、法線を計算してから `create-ground-material.ts` の地面と斜面の石の材質を使う。`apply-ground-shader.ts` は上向きと斜面、水際の材質の使い分けを保つ。`create-scene-water.ts` は水面の材質と平面を作り、時刻と空の色を照明へ渡す。幾何・地面と石のテクスチャ・材質・水面を取得の都度所有へ登録し、石のテクスチャがシェーダーだけから参照される場合や、水面を根へ追加する途中の失敗でも回収する。屋内でもミニマップは残し、屋外用の地面と水面は隠す。

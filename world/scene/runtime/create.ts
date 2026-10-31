@@ -54,7 +54,7 @@ import { dustAll } from "#/world/scene/dust-all"
 import { MAP_SCENES } from "#/world/scene/runtime/definitions"
 import { diorama } from "#/world/scene/runtime/settings"
 import { createSceneTerrain } from "#/world/scene/runtime/create-scene-terrain"
-import { createEnvironment } from "#/world/scene/runtime/helpers/lighting/create-environment"
+import { createSceneEnvironment } from "#/world/scene/runtime/create-scene-environment"
 import { SceneLighting } from "#/world/scene/runtime/scene-lighting"
 import { createScenePopulation } from "#/world/scene/runtime/create-scene-population"
 import type { SceneEvents } from "#/world/scene/runtime/types"
@@ -116,7 +116,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
   }
   spawnAnimals(scene, map)
 
-  const environment = createEnvironment(scene, resources)
+  const environment = createSceneEnvironment(scene, resources)
   const peopleSource = await createScenePopulation({ scene: scene, map: map, world: world, progress: progress, tick: tick, own: (person) => resources.use(person.fig) }),
     people = peopleSource.people,
     ids = peopleSource.ids,
