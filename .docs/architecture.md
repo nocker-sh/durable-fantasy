@@ -52,6 +52,8 @@ A* 探索のコスト・前のセル・候補の展開は `lib/engine/grid-path-
 
 取引所の DO は RPC とアラームの入口だけを持つ。受付・預かり・登録・受け取り・回復の手順は `world/server/begin-exchange-order.ts`・`advance-exchange-order.ts`・`deliver-exchange-inbox.ts`・`recover-exchange.ts`、保存全体の型と版の移行は `world/server/exchange-record.ts` に置く。コーディネーターは Void や Player DO の実装を参照せず、必要な RPC だけを持つ相手を引数で受け取る。各処理の成功後の保存と、例外時の状態の巻き戻しは Void が受け持つ。
 
+部屋の取引所の対応は `world/server/map-room/exchange.ts` に置き、`handle-exchange-request.ts` が参加状態、掲示板との距離、銘柄を確認してから保存先の参照を得る。注文は `place-exchange-order.ts`、取消は `cancel-exchange-order.ts`、受取りは `claim-exchange-inbox.ts` が受け持つ。注文は予約、登録、本人への結果、板の読取りと通知の順に進め、拒否や結果送信の失敗後に板を読まない。取消は成立後にプレイヤーを読み、受取りは予約の ID を配送へ渡す。板の送信は `send-exchange-board.ts` に共通化し、各処理へは必要な RPC と送信だけを持つ文脈を渡す。
+
 取引所の注文は `world/core/hold-order.ts` で受領済みの要求を先に照合し、新しい内容の検証と引落しの組立てを `get-order-escrow-command.ts` へ渡す。要求の内容比較は `same-intent.ts`、要求と預かり記録の型は `exchange-order-types.ts`、要求領域の初期化は `empty-requests.ts` が持つ。部屋は接続と操作番号で要求を識別し、取引所へ受付を頼む。取引所は接続の所有権を再確認し、要求を保存してから Player DO の預かりを呼ぶ。プレイヤーは預かり記録と持ち物・代金を同時に保存し、取引所は登録と完了記録を同時に保存する。接続ごとの古い要求を拒否し、未完了の要求を新しい要求で上書きしない。履歴全件ではなく、取引所とプレイヤーそれぞれで一人につき最後の要求を保持する。受取箱の配送も含め、DO 間の呼び出しは取引所からプレイヤーへ向け、相互に待つ経路を作らない。
 
 取引所の受取箱は `world/core/reserve-inbox.ts` と `finish-inbox.ts` で予約と完了を分け、`receive-inbox.ts` がプレイヤーへの受領を扱う。予約・受領の型は `exchange-claim-types.ts`、初期化は `empty-claims.ts` に置く。取引所は予約を保存してから Player DO の受け取りを呼び、Player DO は品物と受領記録を同じ保存単位へ反映する。取引所の保存や応答が失われた場合も同じ予約を再送する。受領済みの再送は、後から対面取引が保留された場合も重ねて品物を戻さない。未受領の品物は対面取引の保留中に持ち物へ加えない。取引所のアラームは一度の処理量を制限し、失敗した受取人を後ろへ回す。プレイヤーと取引所の状態移行は、それぞれの既存データを保って受領記録と予約領域を追加する。
