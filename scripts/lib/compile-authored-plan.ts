@@ -1,3 +1,4 @@
+import { assertAuthoredSiteFrame } from "#/world/town/floorplan/assert-authored-site-frame"
 import { getAuthoredBuildingSource } from "#/scripts/lib/get-authored-building-source"
 import { compileAuthoredRooms } from "#/scripts/lib/compile-authored-rooms"
 import { compileAuthoredStairSections } from "#/scripts/lib/compile-authored-stair-sections"
@@ -36,5 +37,7 @@ export function compileAuthoredPlan(building: SettingDocument, documents: readon
   }
   const assembled: AuthoredPlan = { ...plan, stairSections: compileAuthoredStairSections(building, plan, source.byId) }
   authoredFloorPlan(assembled)
-  return { ...assembled, exterior: compileEnvelope(building, source.byId, assembled) }
+  const result = { ...assembled, exterior: compileEnvelope(building, source.byId, assembled) }
+  assertAuthoredSiteFrame(result)
+  return result
 }

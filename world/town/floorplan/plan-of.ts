@@ -1,3 +1,4 @@
+import { assertAuthoredSiteFrame } from "#/world/town/floorplan/assert-authored-site-frame"
 import { authoredFloorPlan } from "#/world/town/floorplan/authored-floor-plan"
 import type { HouseDef } from "#/world/town/house-types"
 import type { Rect, FloorPlan } from "#/world/town/floorplan/types"
@@ -8,7 +9,11 @@ import { layout } from "#/world/town/floorplan/layout"
  * everything, with a table standing free near the fire, is kept.
  */
 export function planOf(h: HouseDef): FloorPlan {
-  if (h.authored) return authoredFloorPlan(h.authored)
+  if (h.authored) {
+    const plan = authoredFloorPlan(h.authored)
+    assertAuthoredSiteFrame(h.authored)
+    return plan
+  }
   const best: { value: { p: FloorPlan; score: number } | null } = { value: null }
   for (const fire of ["auto", "wall", "centre"] as const)
     for (const depth of [0.48, 0.42, 0.38, 0.55, 0.62]) {
