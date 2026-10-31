@@ -16,13 +16,13 @@ export const fieldsReady = { value: false }
 
 export const FIELD_CACHE = new Map<Layout, Fields>()
 
-export const heightField = new ScalarField(F.h, GN, FR)
+export const heightField = new ScalarField({ samples: F.h, size: GN, resolution: FR })
 
-export const riverField = new ScalarField(F.river, GN, FR)
+export const riverField = new ScalarField({ samples: F.river, size: GN, resolution: FR })
 
-export const roadField = new ScalarField(F.road, GN, FR)
+export const roadField = new ScalarField({ samples: F.road, size: GN, resolution: FR })
 
-export const trailField = new ScalarField(F.trail, GN, FR)
+export const trailField = new ScalarField({ samples: F.trail, size: GN, resolution: FR })
 
 export const walkSurfaces: WalkSurface[] = []
 

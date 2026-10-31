@@ -10,11 +10,12 @@ const fixture = () => {
   const document = readSetting(readFileSync(".docs/settings/facilities/facility-square-windmill.md", "utf8"))
   const review = getWindmillYardSiteReview({ document, fields: SQUARE_LAYOUT.fields, roads: SQUARE_LAYOUT.roads, metresPerTile: TILE_M })
   if (!review || review instanceof Error || !review.approach?.section) throw new Error("Missing windmill section study")
-  return { document, review, terrain: new ScalarField(new Float32Array(10000).fill(0.25), 100) }
+  const samples = new Float32Array(10000).fill(0.25)
+  return { document, review, samples, terrain: new ScalarField({ samples, size: 100 }) }
 }
 it("joins the reserved yard and turn to the road's measured datum without modifying the plan or terrain", () => {
   const source = fixture()
-  const before = JSON.stringify([source.document, source.review, [...source.terrain.data]])
+  const before = JSON.stringify([source.document, source.review, [...source.samples]])
   const section = getWindmillApproachSection({ ...source, metresPerTile: TILE_M })
   if (!section || section instanceof Error) throw section ?? new Error("Missing section")
   expect(section.anchors.map((point) => point.elevation_m)).toEqual([0.6, 0.6, 0.25 * TILE_M])
@@ -25,19 +26,19 @@ it("joins the reserved yard and turn to the road's measured datum without modify
   expect(final.grade).toBeCloseTo(0.25 / final.length_m, 12)
   expect(section.scope).toBe("centreline_level_reservation")
   section.anchors[0].point[0] = 0
-  expect(JSON.stringify([source.document, source.review, [...source.terrain.data]])).toBe(before)
+  expect(JSON.stringify([source.document, source.review, [...source.samples]])).toBe(before)
   expect(source.document.design_gate).toBe("未通過")
 })
 it("rejects a yard below the full terrain peak and a section steeper than its declared reservation", () => {
   const source = fixture()
-  source.terrain.data[343] = 1
+  source.samples[343] = 1
   expect(getWindmillApproachSection({ ...source, metresPerTile: TILE_M })).toEqual(new Error("Windmill section yard is below existing terrain"))
-  source.terrain.data.fill(0)
+  source.samples.fill(0)
   expect(getWindmillApproachSection({ ...source, metresPerTile: TILE_M })).toEqual(new Error("Windmill approach exceeds its reserved centreline grade"))
 })
 it("refuses a field that cannot cover the approach and leaves old plans without a section unasserted", () => {
   const source = fixture()
-  expect(() => getWindmillApproachSection({ ...source, terrain: new ScalarField(new Float32Array(9), 3), metresPerTile: TILE_M })).toThrow("exceeds sampled field")
+  expect(() => getWindmillApproachSection({ ...source, terrain: new ScalarField({ samples: new Float32Array(9), size: 3 }), metresPerTile: TILE_M })).toThrow("exceeds sampled field")
   const approach = source.review.approach
   if (!approach) throw new Error("Missing approach")
   expect(getWindmillApproachSection({ ...source, review: { ...source.review, approach: { ...approach, section: null } }, metresPerTile: TILE_M })).toBeNull()

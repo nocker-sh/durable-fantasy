@@ -17,7 +17,7 @@ export function createMapWalkSampler(mapId: string): MapWalkSampler {
   const interior = INTERIORS.find((room) => room.id === mapId)
   if (map.kind === "indoor" && !interior) throw new Error(`Walk sampler interior is missing: ${mapId}`)
   const source = layoutOf(mapId),
-    field = new ScalarField(createGroundFields(source).h, GN, FR),
+    field = new ScalarField({ samples: createGroundFields(source).h, size: GN, resolution: FR }),
     groundHeight = (x: number, z: number) => field.sample(x, z),
     displayFloorHeight = interior ? getInteriorFloorHeight(interior, groundHeight) : 0
   const definitions = interior ? getInteriorWalkSurfaces(interior, displayFloorHeight) : getOutdoorWalkSurfaces(mapId)

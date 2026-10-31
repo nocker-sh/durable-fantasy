@@ -43,7 +43,8 @@ function fixture() {
     foundation: { floor_elevation_m: 0.95, floor_thickness_m: 0.2, minimum_ground_gap_m: 0.1 },
     entry_steps: [steps],
   }
-  return { building, room, steps, documents: new Map([[room.id, room]]), terrain: new ScalarField(new Float32Array(16 ** 2), 16) }
+  const samples = new Float32Array(16 ** 2)
+  return { building, room, steps, documents: new Map([[room.id, room]]), samples, terrain: new ScalarField({ samples, size: 16 }) }
 }
 it("derives both landings, treads and the occupied rectangle from the rotated real doorway", () => {
   const f = fixture(),
@@ -59,7 +60,7 @@ it("derives both landings, treads and the occupied rectangle from the rotated re
 })
 it("rejects a stair whose ground pierces a tread or landing even when the building is clear", () => {
   const f = fixture()
-  f.terrain.data[11 * 16 + 6] = 0.2
+  f.samples[11 * 16 + 6] = 0.2
   expect(auditEntrySteps({ building: f.building, documents: f.documents, terrain: f.terrain, metres: 1 })).toContain("Entry stair tread or landing intersects terrain")
 })
 it("does not gain room by shrinking landings, rails or treads or making risers too high", () => {
@@ -140,7 +141,7 @@ it.each([undefined, 1.8, "2", Infinity, 2.5])("rejects an entrance without usabl
 
 it("rejects a stair outside the sampled terrain instead of accepting a clamped flat boundary", () => {
   const source = fixture()
-  const terrain = new ScalarField(new Float32Array(9), 3)
+  const terrain = new ScalarField({ samples: new Float32Array(9), size: 3 })
   expect(auditEntrySteps({ building: source.building, documents: source.documents, terrain: terrain, metres: 1 })).toContain("Entry stair footprint exceeds sampled terrain")
 })
 

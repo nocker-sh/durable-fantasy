@@ -5,7 +5,7 @@ export function scalarFieldRange(field: ScalarField, bounds: readonly [number, n
   if (
     !Number.isSafeInteger(field.size) ||
     field.size < 2 ||
-    field.data.length < field.size ** 2 ||
+    field.sampleCount < field.size ** 2 ||
     !Number.isFinite(field.resolution) ||
     field.resolution <= 0 ||
     bounds.some((value) => !Number.isFinite(value)) ||
@@ -15,14 +15,13 @@ export function scalarFieldRange(field: ScalarField, bounds: readonly [number, n
     throw new RangeError("Invalid scalar field range")
   const xs = getScalarGridAxisSamples(field, bounds[0], bounds[2])
   const zs = getScalarGridAxisSamples(field, bounds[1], bounds[3])
-  let min = Infinity,
-    max = -Infinity
+  const extrema = { min: Infinity, max: -Infinity }
   for (const x of xs)
     for (const z of zs) {
       const value = field.sample(x, z)
       if (!Number.isFinite(value)) throw new RangeError("Non-finite scalar field value")
-      min = Math.min(min, value)
-      max = Math.max(max, value)
+      extrema.min = Math.min(extrema.min, value)
+      extrema.max = Math.max(extrema.max, value)
     }
-  return { min, max }
+  return extrema
 }

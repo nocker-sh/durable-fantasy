@@ -53,7 +53,7 @@ function fixture() {
       kind: "dirt",
     },
   ]
-  return { building, documents, approach, section, roads, terrain: new ScalarField(new Float32Array(24 ** 2), 24), metres: 1 }
+  return { building, documents, approach, section, roads, terrain: new ScalarField({ samples: new Float32Array(24 ** 2), size: 24 }), metres: 1 }
 }
 
 it("audits the declared profile, catches tighter limits and preserves the proposed design gate", () => {

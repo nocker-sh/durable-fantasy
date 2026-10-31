@@ -44,7 +44,7 @@ describe("map-independent engine", () => {
 
   it("interpolates a field at fractional coordinates, clamps edges, and reads live samples", () => {
     const data = new Float32Array([0, 2, 4, 6])
-    const field = new ScalarField(data, 2, 2)
+    const field = new ScalarField({ samples: data, size: 2, resolution: 2 })
     expect(field.sample(0.25, 0.25)).toBe(3)
     expect(field.sample(-2, -3)).toBe(0)
     expect(field.sample(100, 100)).toBeCloseTo(5.994, 10)

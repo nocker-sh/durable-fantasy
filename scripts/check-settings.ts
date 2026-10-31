@@ -278,7 +278,7 @@ function terrainFor(map: string) {
   if (!layout) return undefined
   const known = terrainFields.get(id)
   if (known) return known
-  const terrain = new ScalarField(createGroundFields(layout).h, GRID_N, FR)
+  const terrain = new ScalarField({ samples: createGroundFields(layout).h, size: GRID_N, resolution: FR })
   terrainFields.set(id, terrain)
   return terrain
 }

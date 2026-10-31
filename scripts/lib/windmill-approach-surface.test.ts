@@ -12,19 +12,20 @@ const fixture = () => {
   const document = readSetting(readFileSync(".docs/settings/facilities/facility-square-windmill.md", "utf8"))
   const review = getWindmillYardSiteReview({ document, fields: SQUARE_LAYOUT.fields, roads: SQUARE_LAYOUT.roads, metresPerTile: TILE_M })
   if (!review || review instanceof Error || !review.approach) throw new Error("Missing windmill approach")
-  const terrain = new ScalarField(new Float32Array(10000).fill(0.25), 100)
+  const samples = new Float32Array(10000).fill(0.25),
+    terrain = new ScalarField({ samples, size: 100 })
   for (const x of [37, 38]) {
-    terrain.data[900 + x] = 0.22
-    terrain.data[1100 + x] = 0.28
+    samples[900 + x] = 0.22
+    samples[1100 + x] = 0.28
   }
   const section = getWindmillApproachSection({ review, terrain, metresPerTile: TILE_M })
   if (!section || section instanceof Error || !section.surface) throw section ?? new Error("Missing surface")
-  return { document, review, terrain, surface: section.surface }
+  return { document, review, terrain, samples, surface: section.surface }
 }
 it("matches the full road cross-section and level turn, including their overlap and the unchanged road-side cap", () => {
   const source = fixture()
   const surface = source.surface
-  const before = JSON.stringify([source.document, source.review, [...source.terrain.data]])
+  const before = JSON.stringify([source.document, source.review, [...source.samples]])
   for (const index of Array.from({ length: 1001 }, (_, index) => index)) {
     const z = surface.blend_bounds[1] + ((surface.blend_bounds[3] - surface.blend_bounds[1]) * index) / 1000
     expect(getWindmillApproachSurfaceHeight({ ...source, point: [surface.road_x, z] })).toBe(source.terrain.sample(surface.road_x, z) * TILE_M)
@@ -34,7 +35,7 @@ it("matches the full road cross-section and level turn, including their overlap 
     expect(getWindmillApproachSurfaceHeight({ ...source, point: [x, z] })).toBe(surface.elevation_m)
   }
   expect(surface.start_x).toBe(source.review.approach?.bounds[0][0])
-  expect(JSON.stringify([source.document, source.review, [...source.terrain.data]])).toBe(before)
+  expect(JSON.stringify([source.document, source.review, [...source.samples]])).toBe(before)
   expect(source.document.design_gate).toBe("未通過")
 })
 it("blends the transverse profile continuously and measures the shorter length beyond the whole turn", () => {

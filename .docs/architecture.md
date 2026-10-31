@@ -283,7 +283,7 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 職人通りの共同炉と金床・薪の既存の配置は `world/town/craft-yard.ts` で共有し、描画と加工判定が別々の座標を持たない。屋内の加工設備は描画の種類だけでなく元の家具名で結び、同じ種類の台を並べ替えても別の作業面を参照しない。設備資料の runtime_station は `scripts/lib/runtime-stations.ts` が実行時の設備とマップへ照合する。
 
-`lib/engine/scalar-field-range.ts` は双線形の補間の格子線と照会矩形の端から最小・最大を求める。補間と同じ座標の切詰めを `ScalarField.gridCoordinate` で使い、四隅だけでは見落とす内部の起伏も含める。設定検査は `create-ground-fields.ts` で現行の地形を地区ごとに直接生成し、独立した配列を床の基礎と入口の外階段へ渡す。描画の地区を切り替えたり共有配列を初期化したりしない。実行時の地面や建物をこの検査で変更しない。
+`lib/engine/scalar-field-range.ts` は双線形の補間の格子線と照会矩形の端から最小・最大を求める。補間と同じ座標の切詰めを `ScalarField.gridCoordinate` で使い、四隅だけでは見落とす内部の起伏も含める。`ScalarField` は所有側が管理する標本の読取りビューであり、名前付きの入力から寸法と解像度を固定する。配列そのものは公開せず、範囲の検査は `sampleCount` で標本数を確認する。描画が所有する配列の内容の更新はビューへ反映し、入力の設定オブジェクトの後からの変更は反映しない。設定検査は `create-ground-fields.ts` で現行の地形を地区ごとに直接生成し、独立した配列を床の基礎と入口の外階段へ渡す。描画の地区を切り替えたり共有配列を初期化したりしない。実行時の地面や建物をこの検査で変更しない。
 
 `scripts/lib/audit-building-foundation.ts` は共有の `foundation-schema.ts` で寸法を読み、地形の保持範囲と地面・床下面の隔たりを照合する。`scripts/lib/entry-step-geometry.ts` は戸から階段と踊り場・踏面を求める。入力の敷地・部屋・基礎は `entry-step-site-schema.ts` と `get-entry-step-site.ts` が照合し、戸口への変換は `get-entry-step-door-pose.ts`、断面の長さ・幅・蹴上げは `get-entry-step-section.ts`、踏面と踊り場は `get-entry-step-surfaces.ts` が担当する。各面の位置と矩形は `get-entry-step-point.ts`・`get-entry-step-rectangle.ts` で同じ回転と縮尺を使う。強制変換で未検証の値を渡さず、有限な入力でも計算が表現範囲を超える形状は拒否する。`audit-entry-steps.ts` は階段の配列と重複を検査し、`get-entry-step-errors.ts` から戸・寸法・接近路・地形の個別検査を元の順序で呼ぶ。接近路は `entry-approach-schema.ts` を資料の読取りと共用し、非有限な座標を経路の接続として受け入れない。`entry-opening-height.ts` は戸口の頭上高を確認する。外階段の寸法と型は `entry-steps-schema.ts` と `entry-steps-types.ts` で共用し、保持範囲外の地形を丸めて踏面の支持に使わない。外階段の占有は敷地と屋外の経路へ渡し、別の建物の案で消えないようにする。
 

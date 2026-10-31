@@ -4,10 +4,7 @@ import { getEntryApproachSurfacePlan } from "#/scripts/lib/get-entry-approach-su
 import { getEntryApproachSurfaceHeight } from "#/scripts/lib/get-entry-approach-surface-height"
 import { getEntryApproachEarthworks } from "#/scripts/lib/get-entry-approach-earthworks"
 
-const terrain = new ScalarField(
-  Float32Array.from({ length: 16 ** 2 }, (_, index) => (index % 16) / 8 + Math.floor(index / 16) / 16),
-  16,
-)
+const terrain = new ScalarField({ samples: Float32Array.from({ length: 16 ** 2 }, (_, index) => (index % 16) / 8 + Math.floor(index / 16) / 16), size: 16 })
 
 it.each([
   [
@@ -56,9 +53,10 @@ it.each([
 })
 
 it("measures an interior terrain peak and never rewrites its field", () => {
-  const field = new ScalarField(new Float32Array(12 ** 2), 12)
-  field.data[4 * 12 + 5] = 2
-  const before = field.data.slice()
+  const samples = new Float32Array(12 ** 2),
+    field = new ScalarField({ samples, size: 12 })
+  samples[4 * 12 + 5] = 2
+  const before = samples.slice()
   const surface = getEntryApproachSurfacePlan({
     points: [
       [3, 4],
@@ -72,7 +70,7 @@ it("measures an interior terrain peak and never rewrites its field", () => {
   if (surface instanceof Error) throw surface
 
   expect(getEntryApproachEarthworks({ surface, terrain: field })).toEqual({ cutM: 2, fillM: 0 })
-  expect(field.data).toEqual(before)
+  expect(samples).toEqual(before)
   expect(getEntryApproachSurfaceHeight({ surface, terrain: field, point: [0, 0] })).toBeInstanceOf(Error)
 })
 

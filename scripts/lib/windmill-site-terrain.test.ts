@@ -14,11 +14,12 @@ const fixture = () => {
 }
 it("includes interior terrain extrema and the full approach without changing the study or terrain", () => {
   const source = fixture()
-  const terrain = new ScalarField(new Float32Array(10000), 100)
-  terrain.data[343] = 9
-  terrain.data[1040] = -4
+  const samples = new Float32Array(10000),
+    terrain = new ScalarField({ samples, size: 100 })
+  samples[343] = 9
+  samples[1040] = -4
   const before = JSON.stringify(source)
-  const heights = [...terrain.data]
+  const heights = [...samples]
   const regions = getWindmillSiteTerrain({ review: source.review, terrain, metresPerTile: TILE_M })
   expect(regions).toHaveLength(3)
   expect(regions[0].maximum_m).toBe(9 * TILE_M)
@@ -28,12 +29,12 @@ it("includes interior terrain extrema and the full approach without changing the
   expect(regions.map((region) => region.id)).toEqual([source.document.id, `${source.document.id}/approach-1`, `${source.document.id}/approach-2`])
   regions[0].bounds[0] = 0
   expect(JSON.stringify(source)).toBe(before)
-  expect([...terrain.data]).toEqual(heights)
+  expect([...samples]).toEqual(heights)
   expect(source.document.design_gate).toBe("未通過")
 })
 it("rejects missing field coverage and invalid scale instead of clamping a site into apparently flat ground", () => {
   const source = fixture()
-  const terrain = new ScalarField(new Float32Array(9), 3)
+  const terrain = new ScalarField({ samples: new Float32Array(9), size: 3 })
   expect(() => getWindmillSiteTerrain({ review: source.review, terrain, metresPerTile: TILE_M })).toThrow("exceeds sampled field")
   for (const metresPerTile of [0, -1, NaN, Infinity]) expect(() => getWindmillSiteTerrain({ review: source.review, terrain, metresPerTile })).toThrow("Invalid terrain scale")
 })

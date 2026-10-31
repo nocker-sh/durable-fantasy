@@ -13,7 +13,7 @@ import type { Layout } from "#/world/maps/layout-types"
 /** Generate row-first against owned buffers; no selected scene, renderer or global cache is read. */
 export function createGroundFields(layout: Layout): GeneratedGroundFields {
   const fields = createGroundFieldBuffers(),
-    roadField = new ScalarField(fields.road, GN, FR),
+    roadField = new ScalarField({ samples: fields.road, size: GN, resolution: FR }),
     plazaH = baseH(layout.plaza[0], layout.plaza[1], layout)
   const context: GroundFieldContext = {
     river: new Polyline(layout.river),

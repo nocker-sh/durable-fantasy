@@ -13,7 +13,7 @@ export function getEntryApproachEarthworks(props: Props): { cutM: number; fillM:
     props.terrain.size < 2 ||
     !Number.isFinite(props.terrain.resolution) ||
     props.terrain.resolution <= 0 ||
-    props.terrain.data.length < props.terrain.size ** 2
+    props.terrain.sampleCount < props.terrain.size ** 2
   )
     return new Error("Invalid entry surface terrain")
   const limit = (props.terrain.size - 1.001) / props.terrain.resolution

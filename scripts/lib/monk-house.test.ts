@@ -29,7 +29,7 @@ it("fits the monk home's foundation, west-facing entrance and landings to the ac
   try {
     setLayout(SQUARE_LAYOUT)
     groundH(0, 0)
-    const terrain = new ScalarField(F.h.slice(), GRID_N, FR)
+    const terrain = new ScalarField({ samples: F.h.slice(), size: GRID_N, resolution: FR })
     expect(auditBuildingFoundation(building, terrain, TILE_M)).toEqual([])
     expect(auditEntrySteps({ building: building, documents: documents, terrain: terrain, metres: TILE_M })).toEqual([])
     expect(auditDoorSwings(room)).toEqual([])
