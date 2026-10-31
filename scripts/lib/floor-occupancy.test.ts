@@ -38,3 +38,18 @@ it("keeps different floors independent and does not borrow mutable dimensions", 
   expect(room).toEqual(original)
   expect(Object.isFrozen(lower)).toBe(true)
 })
+
+it.each([
+  { tile: "#", reverse: false },
+  { tile: "#", reverse: true },
+  { tile: "D", reverse: false },
+  { tile: "D", reverse: true },
+])("rejects sharing an internal cell with another room boundary: %j", (input) => {
+  const floor = new FloorOccupancy({ width: 5, depth: 5 })
+  const outer = { id: "outer", origin: [0, 0] satisfies [number, number], rows: ["#####", "#...#", `#.${input.tile}.#`, "#...#", "#####"] }
+  const inner = { id: "inner", origin: [2, 2] satisfies [number, number], rows: [input.tile] }
+  const first = input.reverse ? inner : outer
+  const second = input.reverse ? outer : inner
+  expect(floor.addRoom(first)).toEqual([])
+  expect(floor.addRoom(second)).toEqual([`${second.id}: conflicting room overlap at 2,2`])
+})
