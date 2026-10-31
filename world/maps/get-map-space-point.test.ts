@@ -26,3 +26,17 @@ it("rejects nonfinite planar or height inputs", () => {
   expect(() => getMapSpacePoint({ space: fixture(0), point: [Infinity, 24], heightMetres: 2 })).toThrow(RangeError)
   expect(() => getMapSpacePoint({ space: fixture(0), point: [12, 24], heightMetres: Infinity })).toThrow(RangeError)
 })
+it("rejects extra coordinate components instead of silently dropping them", () => {
+  const point: [number, number] = [12, 24]
+  Reflect.set(point, 2, 99)
+  expect(() => getMapSpacePoint({ space: fixture(0), point, heightMetres: 2 })).toThrow(RangeError)
+})
+it("rejects coercible coordinates and heights", () => {
+  const point: [number, number] = [12, 24],
+    input = { space: fixture(0), point, heightMetres: 2 }
+  Reflect.set(point, 0, "12")
+  expect(() => getMapSpacePoint(input)).toThrow(RangeError)
+  Reflect.set(point, 0, 12)
+  Reflect.set(input, "heightMetres", null)
+  expect(() => getMapSpacePoint(input)).toThrow(RangeError)
+})

@@ -2,6 +2,7 @@ import type { SpatialFrameChain } from "#/lib/engine/spatial-frame-chain"
 import type { MapRoomSpace } from "#/world/maps/room-space-types"
 import type { SpatialFrame } from "#/lib/engine/spatial-frame"
 import type { Rect } from "#/world/town/floorplan/types"
+import type { Vector3 } from "#/lib/engine/vector3-types"
 
 /** Frame coordinates are metres; the planar origin and scale describe the existing two-dimensional map units. */
 export type MapSpace = Readonly<{
@@ -21,3 +22,6 @@ export type MapSpaceRegistry = Readonly<Record<string, MapSpaceEntry>>
 
 /** A query transform to a named spatial root, which need not be a playable map. */
 export type MapSpaceTransform = Readonly<{ rootSpace: string; transform: SpatialFrameChain }>
+
+/** Metric position in the registered world layout; world-instance identity belongs to the caller. */
+export type MapWorldPoint = Readonly<{ rootSpace: string; point: Vector3 }>
