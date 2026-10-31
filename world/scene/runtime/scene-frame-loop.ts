@@ -10,7 +10,7 @@ type Props = Readonly<{
 
 /** 描画の周期と計測を保持し、世界の更新順は呼び出し側へ渡す。 */
 export class SceneFrameLoop {
-  private readonly state = { frames: 0, fpsAt: performance.now(), fps: 0, lastReport: 0 }
+  private readonly state = { frames: 0, fpsAt: performance.now(), fps: 0, lastReport: 0, isScheduled: false, isRendering: false }
   private readonly limiter = new FrameLimiter(60)
 
   constructor(private readonly props: Props) {
@@ -22,8 +22,9 @@ export class SceneFrameLoop {
   }
 
   readonly start = (): void => {
+    if (this.state.isScheduled || this.state.isRendering) return
     this.props.clock.getDelta()
-    requestAnimationFrame(this.frame)
+    this.schedule()
   }
 
   readonly record = (now: number): void => {
@@ -39,12 +40,29 @@ export class SceneFrameLoop {
     }
   }
 
-  private readonly frame = (at: number): void => {
-    if (!this.props.running()) return
-    if (this.limiter.ready(at)) {
-      const elapsed = this.props.clock.getDelta()
-      this.props.render({ at, elapsed, dt: Math.min(0.05, elapsed), time: this.props.clock.elapsedTime })
+  private schedule(): void {
+    if (this.state.isScheduled) return
+    this.state.isScheduled = true
+    try {
+      requestAnimationFrame(this.frame)
+    } catch (error) {
+      this.state.isScheduled = false
+      throw error
     }
-    if (this.props.running()) requestAnimationFrame(this.frame)
+  }
+
+  private readonly frame = (at: number): void => {
+    this.state.isScheduled = false
+    if (!this.props.running()) return
+    this.state.isRendering = true
+    try {
+      if (this.limiter.ready(at)) {
+        const elapsed = this.props.clock.getDelta()
+        this.props.render({ at, elapsed, dt: Math.min(0.05, elapsed), time: this.props.clock.elapsedTime })
+      }
+    } finally {
+      this.state.isRendering = false
+    }
+    if (this.props.running()) this.schedule()
   }
 }

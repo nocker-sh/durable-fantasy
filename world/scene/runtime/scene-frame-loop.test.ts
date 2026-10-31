@@ -101,3 +101,50 @@ it("does not queue another frame when a completed frame's tick stops the runtime
   expect(f.tick).toHaveBeenCalledOnce()
   expect(f.callbacks).toEqual([])
 })
+
+it("keeps one scheduled frame when start is called repeatedly", () => {
+  const request = fixture()
+  request.loop.start()
+  request.loop.start()
+  request.loop.start()
+  expect(request.callbacks).toHaveLength(1)
+  expect(request.clock.getDelta).toHaveBeenCalledOnce()
+  request.step(0)
+  expect(request.render).toHaveBeenCalledOnce()
+  expect(request.callbacks).toHaveLength(1)
+})
+
+it("does not create a second loop when render calls start again", () => {
+  const request = fixture()
+  request.render.mockImplementation(() => request.loop.start())
+  request.loop.start()
+  request.step(0)
+  expect(request.callbacks).toHaveLength(1)
+  expect(request.clock.getDelta).toHaveBeenCalledTimes(2)
+})
+
+it("can retry scheduling after the animation frame request throws", () => {
+  const request = fixture()
+  const failure = new Error("schedule failed")
+  vi.mocked(requestAnimationFrame).mockImplementationOnce(() => {
+    throw failure
+  })
+  expect(() => request.loop.start()).toThrow(failure)
+  request.loop.start()
+  expect(request.callbacks).toHaveLength(1)
+  request.step(0)
+  expect(request.render).toHaveBeenCalledOnce()
+})
+
+it("can start again after a stopped frame has consumed its reservation", () => {
+  const request = fixture()
+  request.loop.start()
+  request.state.running = false
+  request.step(0)
+  expect(request.callbacks).toEqual([])
+  request.state.running = true
+  request.loop.start()
+  request.step(1000)
+  expect(request.render).toHaveBeenCalledOnce()
+  expect(request.callbacks).toHaveLength(1)
+})
