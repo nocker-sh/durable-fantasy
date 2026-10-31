@@ -1,27 +1,20 @@
+import { handleEngage } from "#/world/server/map-room/handle-engage"
+import { handleShopLook } from "#/world/server/map-room/handle-shop-look"
 // The map room's handlers for joining, walking, looking about, warping, coming to and engaging a resident.
 import { mayVisit } from "#/world/core/may-visit"
 import { Player } from "#/durable-objects/player"
-import { SHOPS } from "#/world/core/shops"
-import { isShopId } from "#/world/core/is-shop-id"
-import { sellable } from "#/world/core/items/sellable"
-import { Market } from "#/durable-objects/market"
 import { Wild } from "#/durable-objects/wild"
 import { spawnsOn } from "#/world/core/spawns-on"
 import { Nature } from "#/durable-objects/nature"
 import { Directory } from "#/durable-objects/directory"
-import { TALK_CELLS } from "#/world/maps"
-import { minutesToClose } from "#/world/maps/minutes-to-close"
-import { npcCell } from "#/world/maps/npc-cell"
 import { walkable } from "#/world/maps/walkable"
 import { validPath } from "#/world/valid-path"
 import { cellsReached } from "#/world/cells-reached"
 import type { Cell, MapPlayer } from "#/world/protocol"
 import type { Ctx, Handlers, Message } from "#/world/server/map-room/context"
-import { TOWN, presence } from "#/world/server/map-room/presence"
-import { timeFor } from "#/world/server/map-room/time-for"
+import { presence } from "#/world/server/map-room/presence"
 import { mapPlayer } from "#/world/server/map-room/map-player"
 import { reachable } from "#/world/server/map-room/reachable"
-import { near } from "#/world/server/map-room/near"
 import { handleWarp } from "#/world/server/map-room/handle-warp"
 import { handleRevive } from "#/world/server/map-room/handle-revive"
 
@@ -122,44 +115,11 @@ async function move(roomCtx: Ctx, message: Message<"move">) {
   return
 }
 
-async function engage(roomCtx: Ctx, message: Message<"engage">) {
-  const ctxSource3 = roomCtx,
-    ctx = ctxSource3.ctx,
-    map = ctxSource3.map,
-    me = ctxSource3.me,
-    save = ctxSource3.save
-  if (!me.player) return
-  const cell = message.npc ? npcCell(map, message.npc, timeFor(me)) : null
-  if (message.npc && (!cell || !near(me, cell as Cell, TALK_CELLS + 1))) {
-    await ctx.connection.send({ type: "refused", what: "engage" })
-    return
-  }
-  // stop where the player stands now
-  const here = [...reachable(me).at(-1)!] as Cell
-  save({ engaged: message.npc, ...(message.npc ? { route: [here], since: Date.now(), player: { ...me.player, at: here } } : {}) })
-  return
-}
-
-async function look(roomCtx: Ctx, message: Message<"look">) {
-  const ctxSource5 = roomCtx,
-    ctx = ctxSource5.ctx,
-    map = ctxSource5.map,
-    me = ctxSource5.me
-  if (!me.player || !isShopId(message.shop)) return
-  const shop = message.shop
-  const open = SHOPS[shop].keepers.map((name) => npcCell(map, name, timeFor(me))).filter((c): c is Cell => !!c)
-  if (!open.some((c) => near(me, c, TALK_CELLS + 1))) return
-  const offers = await Market.get(TOWN).look(shop, minutesToClose(shop, timeFor(me)))
-  const carried = me.owner ? [...new Set((await Player.get(me.owner).read()).bag.flatMap((s) => (s && sellable(s.item) ? [s.item] : [])))] : []
-  await ctx.connection.send({ type: "stock", shop, offers, buys: await Market.get(TOWN).buying(shop, carried) })
-  return
-}
-
 export const HANDLERS: Handlers = {
   join: join,
   move: move,
-  engage: engage,
+  engage: handleEngage,
   revive: handleRevive,
-  look: look,
+  look: handleShopLook,
   warp: handleWarp,
 }
