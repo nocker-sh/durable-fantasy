@@ -205,3 +205,29 @@ it("reconciles saved posture before sending a recovered state, even if the notif
   expect(f.me.sitting).toBe(true)
   expect(f.me.deliveryRevision).toBeUndefined()
 })
+
+it("does not save an undefined route cell while reconciling a fallen player without a position", async () => {
+  const f = fixture("phanthiet")
+  f.me.route = []
+  calls.deliveryUpdate.mockResolvedValue({ revision: 1, player: player({ hp: 0 }) })
+  await f.beat()
+  expect(f.me.down).toBe(true)
+  expect(f.me.route).toEqual([])
+  expect(f.me.deliveryRevision).toBe(1)
+})
+
+it("records the actual stopping time after a delayed fallen-state read while retaining the attempt time", async () => {
+  vi.useFakeTimers()
+  vi.setSystemTime(1000)
+  const f = fixture("phanthiet")
+  f.me.route = [
+    [0, 0],
+    [1, 0],
+  ]
+  calls.deliveryUpdate.mockImplementation(async () => {
+    vi.setSystemTime(7000)
+    return { revision: 1, player: player({ hp: 0 }) }
+  })
+  await f.beat()
+  expect(f.me).toMatchObject({ down: true, route: [[1, 0]], since: 7000, deliveryCheckedAt: 1000, deliveryRevision: 1 })
+})

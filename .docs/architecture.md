@@ -54,7 +54,7 @@ A* 探索のコスト・前のセル・候補の展開は `lib/engine/grid-path-
 
 戦闘の受付は接続と対象のマップを確認し、`prepare-map-attack.ts` が保存済みの能力、到達範囲、立ち上がりを確認する。純粋な `world/core/get-attack-readiness.ts` は生存・技の種類・通常攻撃の間隔・スタミナの順を保持し、技固有の待ち時間と支払は保存先へ任せる。受付と配送の入力は `attack-types.ts` に置き、マップの地形、接続の読取りと送信、周囲への通知など実際に使う範囲だけを型で受け取る。到達範囲は `can-reach-monster.ts`、通常攻撃と技の命中計算の組立ては `world/core/get-attack-blow.ts` が受け持つ。乱数は立ち上がりの受入れ後だけ消費する。
 
-命中の予約と実行は `execute-map-attack.ts`、支払結果と命中の公開は `publish-map-strike.ts`・`notify-map-strike.ts` に分ける。`deliver-map-strike.ts` は保存済みの配送を進めてから反撃を通知し、`reconcile-strike-notices.ts` は本人への最後の配送結果を使う。アラームが討伐や反撃を先に配送していた場合だけ現在の保存状態を読み、イベントなしで補う。本人への結果・命中・反撃の通知の失敗は保存処理を止めず、保存先の読取りや配送の失敗は呼出し元へ返す。
+命中の予約と実行は `execute-map-attack.ts`、支払結果と命中の公開は `publish-map-strike.ts`・`notify-map-strike.ts` に分ける。`deliver-map-strike.ts` は保存済みの配送を進めてから反撃を通知し、`reconcile-strike-notices.ts` は本人への最後の配送結果を使う。アラームが討伐や反撃を先に配送していた場合だけ現在の保存状態を読み、イベントなしで補う。本人への結果・命中・反撃の通知の失敗は保存処理を止めず、保存先の読取りや配送の失敗は呼出し元へ返す。反撃と定期同期で反映する戦闘不能の停止状態は純粋な `get-fallen-presence.ts` で共有する。反映時点の到達範囲から停止地点を写し、位置が欠けている場合は戦闘不能だけを保存して座標を作らない。
 
 経路移動の受付は `world/server/map-room/handle-move.ts`、拒否した経路の補正は `refuse-movement.ts` に置く。受信した時刻で到達範囲と次の経路を検査し、立ち上がりや保存を待った時間を開始時刻へ加えない。保存先が現在の到達地点への補正を受け付けた場合だけ、接続の経路と姿を更新し、周囲へ通知する。最後に本人へ拒否を返す。位置がなければ座標を仮定せず、補正の保存・周囲への通知をせずに拒否する。`world/valid-path.ts` は空の経路を先に断り、開始地点、隣接と地形の検査を行う。受付の型は `movement-request-types.ts` に置き、地形検査の `walkable.ts` は大きさと歩行面だけを受け取る。
 

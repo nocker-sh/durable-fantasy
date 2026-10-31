@@ -5,7 +5,7 @@ import { Player } from "#/durable-objects/player"
 import { spawnsOn } from "#/world/core/spawns-on"
 import type { Handlers } from "#/world/server/map-room/context"
 import { presence } from "#/world/server/map-room/presence"
-import { reachable } from "#/world/server/map-room/reachable"
+import { getFallenPresence } from "#/world/server/map-room/get-fallen-presence"
 import { notifyClient } from "#/world/server/map-room/notifications"
 
 export const HANDLERS: Handlers = {
@@ -30,7 +30,7 @@ export const HANDLERS: Handlers = {
       let delivered = true
       if (delivery.player) {
         save({ sitting: delivery.player.sitting })
-        if (delivery.player.hp <= 0) save({ down: true, route: [reachable(me).at(-1)!], since: now })
+        if (delivery.player.hp <= 0) save(getFallenPresence(me, Date.now()))
         delivered = await notifyClient(ctx.connection.send({ type: "result", seq: -1, result: { ok: true, state: delivery.player, events: [] } }))
       }
       if (delivered) save({ deliveryRevision: delivery.revision })
