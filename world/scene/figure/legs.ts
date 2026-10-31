@@ -1,3 +1,4 @@
+import { getShoeCapsule } from "#/world/scene/figure/get-shoe-capsule"
 import { getSupportedThighField } from "#/world/scene/figure/get-supported-thigh-field"
 import { STANDING_LEG_FOLD_LIMIT } from "#/world/scene/figure/standing-leg-fold-limit"
 import { seatedSupportDepth } from "#/world/scene/figure/seated-support-depth"
@@ -9,8 +10,6 @@ import { lerpVector3 as lerp3 } from "#/lib/engine/lerp-vector3"
 import { type Vector3Tuple as V3 } from "#/lib/engine/vector3-types"
 import { addVector3 as add } from "#/lib/engine/add-vector3"
 import { subtractVector3 as sub } from "#/lib/engine/subtract-vector3"
-import { normalizeVector3 as norm } from "#/lib/engine/normalize-vector3"
-import { scaleVector3 as mul } from "#/lib/engine/scale-vector3"
 import { createSolidSurfaceMaterial } from "#/lib/graphics/ray/create-solid-surface-material"
 import type { SurfaceMaterial } from "#/lib/graphics/ray/primitive-types"
 import { limbSd } from "#/lib/graphics/ray/limb-sd"
@@ -94,11 +93,7 @@ function buildLegs(context: BodyContext) {
       })
     }
     // shoe: a flattened capsule from heel to toe (clogs: a rounder wooden block)
-    const fw = norm(sub(ball, foot))
-    const heel = add(foot, mul(fw, -0.02 * S)),
-      toe = add(ball, mul(fw, (foot_ === "clogs" ? 0.075 : 0.065) * S))
-    const sr = foot_ === "shoes" || foot_ === "wraps" ? 0.068 : 0.078
-    const shoe = { a: [heel[0], heel[1] - 0.004, heel[2]] as V3, b: toe, r: sr * S }
+    const shoe = getShoeCapsule({ foot, ball, kind: foot_, scale: S })
     footwear[s] = shoe
     knees[s] = kneeRadius ? { c: knee, r: kneeRadius } : undefined
     shoeParts[s] = push({ kind: "cap", ...shoe, r2: 0, m: foot_ === "clogs" ? (p, n) => ["wood", n[1] > 0.5 ? 0.15 : 0] : createSolidSurfaceMaterial(shoes, -0.1) })

@@ -1,6 +1,6 @@
 import { getBackstepOffsets } from "#/world/town/get-backstep-offsets"
 import { groundFootwear } from "#/world/scene/figure/footing"
-import { buildBody } from "#/world/scene/figure/body"
+import { getNativeFootwear } from "#/world/scene/figure/get-native-footwear"
 import { lowerNativePose } from "#/world/scene/figure/lower-native-pose"
 import { solveFootTarget } from "#/world/scene/figure/solve-foot-target"
 import type { Look } from "#/world/scene/figure/look"
@@ -10,7 +10,7 @@ type Props = Omit<Parameters<typeof getBackstepOffsets>[0], "clearance"> & { loo
 
 /** Preserve the starting pose exactly; grounded shoe targets and native leg lengths constrain the following backward step. */
 export function getNativeBackstepPose(props: Props) {
-  const ground = groundFootwear(buildBody(props.look, props.skeleton, null).footwear),
+  const ground = groundFootwear(getNativeFootwear(props.look, props.skeleton)),
     l = ground.feet.find((foot) => foot.side === "l"),
     r = ground.feet.find((foot) => foot.side === "r")
   if (!l || !r) return new Error("Missing backward step footwear")

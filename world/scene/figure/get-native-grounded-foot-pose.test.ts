@@ -1,7 +1,7 @@
-import { expect, it } from "vitest"
+import { afterEach, expect, it, vi } from "vitest"
 import { RESIDENTS, RESIDENT_LOOKS } from "#/world/town/residents"
 import { skelFor } from "#/world/scene/figure/helpers/animation/skel-for"
-import { buildBody } from "#/world/scene/figure/body"
+import * as bodyModule from "#/world/scene/figure/body"
 import { groundFootwear } from "#/world/scene/figure/footing"
 import { getNativeGroundedFootPose } from "#/world/scene/figure/get-native-grounded-foot-pose"
 import { getNativeFootClearanceError } from "#/world/scene/figure/get-native-foot-clearance-error"
@@ -11,7 +11,7 @@ it("distinguishes grounding one native shoe from preparing both shoes for suppor
     const look = RESIDENT_LOOKS[RESIDENTS.findIndex((resident) => resident.name === name)],
       skeleton = skelFor(look, "idle", 0),
       offsets = { body: 0, l: [0, 0, 0], r: [0, 0, 0] } satisfies Parameters<typeof getNativeGroundedFootPose>[0]["offsets"]
-    const rootY = groundFootwear(buildBody(look, skeleton, null).footwear).rootY
+    const rootY = groundFootwear(bodyModule.buildBody(look, skeleton, null).footwear).rootY
     expect(getNativeFootClearanceError({ look, skeleton, rootY, offsets })).toBeInstanceOf(Error)
     const pose = getNativeGroundedFootPose({ look, skeleton, offsets, pelvisDrop: 0.02 })
     if (pose instanceof Error) throw pose
@@ -33,4 +33,15 @@ it("rejects below-floor targets, invalid offsets and already certified hand cons
   expect(getNativeGroundedFootPose({ ...props, pelvisDrop: -1 })).toBeInstanceOf(Error)
   const constrained = { ...skeleton, handGrips: { r: { axis: [1, 0, 0] satisfies [number, number, number], across: [0, 0, 1] satisfies [number, number, number], halfWidth: 0.01, halfDepth: 0.01 } } }
   expect(getNativeGroundedFootPose({ ...props, skeleton: constrained })).toEqual(new Error("Native foot placement must precede hand contact constraints"))
+})
+
+afterEach(() => vi.restoreAllMocks())
+
+it("solves native foot targets without constructing the full body", () => {
+  const look = RESIDENT_LOOKS[RESIDENTS.findIndex((resident) => resident.name === "ゾフィー")]
+  const skeleton = skelFor(look, "idle", 0)
+  const build = vi.spyOn(bodyModule, "buildBody")
+  const pose = getNativeGroundedFootPose({ look, skeleton, offsets: { body: 0, l: [0, 0, 0], r: [0, 0, 0] }, pelvisDrop: 0.02 })
+  expect(pose).not.toBeInstanceOf(Error)
+  expect(build).not.toHaveBeenCalled()
 })

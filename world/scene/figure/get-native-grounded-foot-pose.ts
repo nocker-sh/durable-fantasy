@@ -1,5 +1,5 @@
 import { lowerNativePose } from "#/world/scene/figure/lower-native-pose"
-import { buildBody } from "#/world/scene/figure/body"
+import { getNativeFootwear } from "#/world/scene/figure/get-native-footwear"
 import { groundFootwear } from "#/world/scene/figure/footing"
 import { solveFootTarget } from "#/world/scene/figure/solve-foot-target"
 import { getNativeGroundedFootTarget } from "#/world/scene/figure/get-native-grounded-foot-target"
@@ -12,7 +12,7 @@ type Props = Readonly<{ look: Look; skeleton: Skel; pelvisDrop: number; offsets:
 export function getNativeGroundedFootPose(props: Props) {
   if (![props.offsets.body, ...props.offsets.l, ...props.offsets.r].every(Number.isFinite) || props.offsets.l[1] < 0 || props.offsets.r[1] < 0) return new Error("Invalid native foot offsets")
   if (Object.keys(props.skeleton.handGrips ?? {}).length) return new Error("Native foot placement must precede hand contact constraints")
-  const ground = groundFootwear(buildBody(props.look, props.skeleton, null).footwear),
+  const ground = groundFootwear(getNativeFootwear(props.look, props.skeleton)),
     lowered = lowerNativePose({ skeleton: props.skeleton, drop: props.pelvisDrop })
   if (lowered instanceof Error) return lowered
   const pose = { skeleton: lowered }

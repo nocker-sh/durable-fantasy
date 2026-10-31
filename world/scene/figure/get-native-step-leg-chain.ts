@@ -1,5 +1,5 @@
 import { lowerNativePose } from "#/world/scene/figure/lower-native-pose"
-import { buildBody } from "#/world/scene/figure/body"
+import { getNativeFootwear } from "#/world/scene/figure/get-native-footwear"
 import { groundFootwear } from "#/world/scene/figure/footing"
 import type { Look } from "#/world/scene/figure/look"
 import type { Skel } from "#/world/scene/rig"
@@ -9,7 +9,7 @@ type Props = Readonly<{ look: Look; native: Skel; pelvisDrop: number; side: "l" 
 export function getNativeStepLegChain(props: Props) {
   const lowered = lowerNativePose({ skeleton: props.native, drop: props.pelvisDrop })
   if (lowered instanceof Error) return lowered
-  const ground = groundFootwear(buildBody(props.look, props.native, null).footwear),
+  const ground = groundFootwear(getNativeFootwear(props.look, props.native)),
     foot = ground.feet.find((entry) => entry.side === props.side)
   if (!foot) return new Error("Native step chain has no shoe clearance")
   const rest = props.native.rest,
