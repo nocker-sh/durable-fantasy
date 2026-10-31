@@ -1,5 +1,6 @@
+import { connectOutdoorMaps } from "#/world/maps/connect-outdoor-maps"
 import { assertMapSpaceRegistry } from "#/world/maps/assert-map-space-registry"
-import type { Cell, MapDefinition, Warp } from "#/world/maps/types"
+import type { Cell, MapDefinition } from "#/world/maps/types"
 import { indoorMaps } from "#/world/maps/indoor-maps"
 import { RESIDENTS } from "#/world/town/residents"
 import { workSpot } from "#/world/town/work-spot"
@@ -17,11 +18,6 @@ import deep_forest from "#resources/world/maps/deep-forest"
 import quynhon_gate from "#resources/world/maps/quynhon-gate"
 import mountain_pass from "#resources/world/maps/mountain-pass"
 import hue_gate from "#resources/world/maps/hue-gate"
-import { OPPOSITE } from "#/world/maps/grid"
-import { across } from "#/world/maps/across"
-import { squareOf } from "#/world/maps/square-of"
-import { type Side } from "#/world/maps/grid-types"
-import { layoutOf } from "#/world/maps/layouts"
 import { INTERIORS } from "#/world/town/interiors"
 import { keeperPlace } from "#/world/town/keeper-place"
 import { keepersOf } from "#/world/town/keepers-of"
@@ -93,122 +89,6 @@ const FIELDS: MapDefinition[] = [
   field("hue-gate", "フエの門前", hue_gate),
 ]
 
-/** Where a map's roads run off one of its sides, along that side, in cells (scene/ground-layouts.ts). */
-function roadEnds(id: string, side: Side): number[] {
-  const out: number[] = []
-  for (const r of layoutOf(id).roads)
-    for (const entry of [r.pts[0], r.pts[r.pts.length - 1]]) {
-      const x = entry[0]
-      const z = entry[1]
-
-      const off = side === "w" ? x < 0.5 : side === "e" ? x > 47.5 : side === "n" ? z < 0.5 : z > 47.5
-      if (off) out.push(Math.round((side === "w" || side === "e" ? z : x) * 2))
-    }
-  return out
-}
-
-/** A crossing sits this many cells in from the edge, and you come in five further in. */
-const EDGE = 3,
-  IN = 5
-
-/** Where a side's crossing stands and where you come in by it, at `j` along the side. */
-function crossingCells(size: number, side: Side, j: number): { at: Cell; arrive: Cell } {
-  const lo = EDGE,
-    hi = size - 1 - EDGE + 1
-  switch (side) {
-    case "w":
-      return { at: [lo, j], arrive: [lo + IN, j] }
-    case "e":
-      return { at: [hi, j], arrive: [hi - IN, j] }
-    case "n":
-      return { at: [j, lo], arrive: [j, lo + IN] }
-    case "s":
-      return { at: [j, hi], arrive: [j, hi - IN] }
-  }
-}
-
-const lands = new Map<string, Set<number>>()
-/** The largest stretch of free ground on a map that can all be walked across (cells as j * size + i). */
-function mainland(def: MapDefinition): Set<number> {
-  const known = lands.get(def.id)
-  if (known) return known
-  const n = def.size,
-    seen = new Uint8Array(n * n)
-  let best = new Set<number>()
-  for (let k = 0; k < n * n; k++) {
-    if (seen[k] || def.rows[Math.floor(k / n)][k % n] !== ".") continue
-    const part = new Set<number>([k]),
-      todo = [k]
-    seen[k] = 1
-    while (todo.length) {
-      const c = todo.pop()!,
-        i = c % n,
-        j = Math.floor(c / n)
-      for (const entry2 of [
-        [1, 0],
-        [-1, 0],
-        [0, 1],
-        [0, -1],
-      ]) {
-        const di = entry2[0]
-        const dj = entry2[1]
-
-        const ii = i + di,
-          jj = j + dj,
-          q = jj * n + ii
-        if (ii < 0 || jj < 0 || ii >= n || jj >= n || seen[q] || def.rows[jj][ii] !== ".") continue
-        seen[q] = 1
-        part.add(q)
-        todo.push(q)
-      }
-    }
-    if (part.size > best.size) best = part
-  }
-  lands.set(def.id, best)
-  return best
-}
-
-/**
- * The ways out of an outdoor map: one for each open side with a map across it, at the same place
- * along the side on both maps — free ground on both, as near the road as it can be.
- */
-function crossings(def: MapDefinition, all: Record<string, MapDefinition>): Warp[] {
-  const sq = squareOf(def.id)
-  if (!sq) return []
-  const out: Warp[] = []
-  for (const side of ["n", "e", "s", "w"] as Side[]) {
-    const o = across(sq, side)
-    const there = o?.map ? all[o.map] : undefined
-    if (!o || !there) continue
-    const back = OPPOSITE[side]
-    // where the drawn roads meet this side and the facing side: the crossing goes on the road
-    const hints = [...roadEnds(def.id, side), ...roadEnds(there.id, back)]
-    const hint = hints.length ? hints.reduce((a, b) => a + b, 0) / hints.length : def.size / 2
-    const a = mainland(def),
-      b = mainland(there)
-    const fits = (j: number) => {
-      const here = crossingCells(def.size, side, j),
-        far = crossingCells(there.size, back, j)
-      return [
-        [a, here.at],
-        [a, here.arrive],
-        [b, far.at],
-        [b, far.arrive],
-      ].every((entry3) => {
-        const land = entry3[0]
-        const c = entry3[1]
-        return (land as Set<number>).has((c as Cell)[1] * def.size + (c as Cell)[0])
-      })
-    }
-    const js = Array.from({ length: def.size - 2 * (EDGE + IN) }, (_, k) => k + EDGE + IN)
-      .filter(fits)
-      .sort((a, b) => Math.abs(a - hint) - Math.abs(b - hint) || a - b)
-    if (!js.length) continue
-    out.push({ at: crossingCells(def.size, side, js[0]).at, to: { map: there.id, at: crossingCells(there.size, back, js[0]).arrive } })
-  }
-  return out
-}
-
 /** Playable outdoor maps (game-system.md §1); new maps stay closed until checked. */
 export const OPEN_FIELDS: readonly string[] = ["south-meadow", "forest-edge", "deep-forest", "red-dunes", "sea-cliff", "net-sheds", "quynhon-gate", "mountain-pass", "hue-gate"]
 
@@ -234,24 +114,7 @@ function withDoors(def: MapDefinition): MapDefinition {
   return { ...def, warps: [...def.warps, ...doors] }
 }
 
-const OUTDOORS: Record<string, MapDefinition> = Object.fromEntries([...Object.values(STREETS), ...FIELDS].map((d) => [d.id, d]))
-for (const d of Object.values(OUTDOORS)) d.warps = crossings(d, OUTDOORS)
-// out in the fields you appear where the way from the town side brings you in
-const steps = new Map<string, number>([["phanthiet", 0]])
-for (const queue = ["phanthiet"]; queue.length;) {
-  const id = queue.shift()!
-  for (const w of OUTDOORS[id].warps)
-    if (!steps.has(w.to.map)) {
-      steps.set(w.to.map, steps.get(id)! + 1)
-      queue.push(w.to.map)
-    }
-}
-const fromTown = (id: string) => steps.get(id) ?? 99
-for (const d of Object.values(OUTDOORS)) {
-  if (d.kind !== "field" || !d.warps.length) continue
-  const near = [...d.warps].sort((a, b) => fromTown(a.to.map) - fromTown(b.to.map))[0]
-  d.spawn = OUTDOORS[near.to.map].warps.find((x) => x.to.map === d.id)!.to.at
-}
+const OUTDOORS = connectOutdoorMaps(Object.fromEntries([...Object.values(STREETS), ...FIELDS].map((map) => [map.id, map])))
 
 export const MAPS: Record<string, MapDefinition> = {
   ...Object.fromEntries(Object.values(OUTDOORS).map((d) => [d.id, d.kind === "town" ? withDoors(d) : d])),
