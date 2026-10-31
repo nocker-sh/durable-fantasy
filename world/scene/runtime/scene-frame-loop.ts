@@ -45,6 +45,6 @@ export class SceneFrameLoop {
       const elapsed = this.props.clock.getDelta()
       this.props.render({ at, elapsed, dt: Math.min(0.05, elapsed), time: this.props.clock.elapsedTime })
     }
-    requestAnimationFrame(this.frame)
+    if (this.props.running()) requestAnimationFrame(this.frame)
   }
 }

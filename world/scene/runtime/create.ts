@@ -1,15 +1,12 @@
+import { SceneFrameRenderer } from "#/world/scene/runtime/scene-frame-renderer"
 import { SceneShadowUpdates } from "#/world/scene/runtime/scene-shadow-updates"
 import { SceneOutlines } from "#/world/scene/runtime/scene-outlines"
-import { updateSceneFog } from "#/world/scene/runtime/update-scene-fog"
-import { updateMonsterLabels } from "#/world/scene/runtime/update-monster-labels"
 import { pickVisibleOwner } from "#/lib/graphics/pick-visible-owner"
 import { ScenePosture } from "#/world/scene/runtime/scene-posture"
 import { SceneCombatFeedback } from "#/world/scene/runtime/scene-combat-feedback"
 import { SceneHitLabels } from "#/world/scene/runtime/scene-hit-labels"
 import { SceneCameraFollow } from "#/world/scene/runtime/scene-camera-follow"
 import { SceneWorldAnimation } from "#/world/scene/runtime/scene-world-animation"
-import { updateSceneWalkers } from "#/world/scene/runtime/update-scene-walkers"
-import type { SceneFrame } from "#/world/scene/runtime/scene-frame-types"
 import { SceneResidentNames } from "#/world/scene/runtime/scene-resident-names"
 import { createResidentNameplate } from "#/world/scene/runtime/create-resident-nameplate"
 import { SceneSpeech } from "#/world/scene/runtime/scene-speech"
@@ -40,16 +37,13 @@ import * as THREE from "three"
 import { initWalk } from "#/world/scene/init-walk"
 import { walkH } from "#/world/scene/walk-h"
 import { setLayout } from "#/world/scene/set-layout"
-import { updateCutaways } from "#/world/scene/update-cutaways"
 import { burst } from "#/world/scene/burst"
 import { makeMonsters } from "#/world/scene/make-monsters"
 import { SceneCombat } from "#/world/scene/runtime/scene-combat"
-import { updateMonsters } from "#/world/scene/update-monsters"
 import { groundOf } from "#/world/scene/ground-of"
 import { occluders, houseGlows, lamps, stalls, movingObjects } from "#/world/scene/construction/registry"
 import { resetRegistries } from "#/world/scene/construction/reset-registries"
 import type { V2 } from "#/world/scene/construction/registry"
-import { daylight } from "#/world/core/daylight"
 import type { Actor } from "#/world/scene/actor"
 import { FIG } from "#/world/scene/figure/display-scale"
 import { critters } from "#/world/scene/critters"
@@ -140,8 +134,6 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     removeRemote = meSource.removeRemote,
     clearRemotes = meSource.clearRemotes,
     moveRemote = meSource.moveRemote,
-    stepWalker = meSource.stepWalker,
-    placeWalker = meSource.placeWalker,
     plate = meSource.plate
   // warps: a soft ring of light on the ground
   const warps = resources.use(new WarpMarkers(scene))
@@ -179,7 +171,6 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
   const walkTo = movementControl.walkTo
   const placePlayer = movementControl.placePlayer
   const hold = movementControl.hold
-  const stepHeld = movementControl.stepHeld
   const stop = movementControl.stop
   // ---------------------------------------------------------------- gathering spots (core/gather.ts)
   const spotsSource = new SceneGathering({ town, map }),
@@ -307,40 +298,8 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
   const worldAnimation = new SceneWorldAnimation({ camera: cam, movement, people, animate: lighting.animate })
   const cameraFollow = new SceneCameraFollow({ camera, movement, me, preview: previewControls, heightAt: walkH })
   const occlusion = new SceneOcclusion({ occluders, camera: cam, me, preview })
-  const frameLoop = new SceneFrameLoop({ clock, running: () => runtime.running, render: frame, tick: () => runtime.events?.tick() })
+  const frameLoop = new SceneFrameLoop({ clock, running: () => runtime.running, render: (frame) => frameRenderer.render(frame), tick: () => runtime.events?.tick() })
   const outlines = new SceneOutlines({ me, people, remotes, monsters, critters, pointer, preview })
-  function frame(input: SceneFrame) {
-    shadows.update(input.at)
-    const dt = input.dt
-    const t = input.time
-    updateSceneWalkers({ me, remotes, preview, frame: input, step: stepWalker, place: placeWalker, stepHeld, arrive: interactions.arrive })
-    marker.scale.setScalar(1 + Math.sin(t * 6) * 0.1)
-    warps.update(t)
-
-    worldAnimation.update(input)
-    cameraFollow.update(dt)
-
-    if (world.indoor) updateCutaways(cam.position)
-    updateSceneFog({ scene, distance: camera.distance, definition: world.layout.fog })
-    const hidden = occlusion.update(dt)
-    pointer.update()
-    outlines.update(hidden)
-    environment.smoke.prepare(cam)
-    render()
-
-    // names over heads: players always, residents when near or under the pointer
-    for (const w of [me, ...remotes.values()]) labelProjection.place({ element: w.label, pos: w.pos, height: w.fig.height, ground: w.fig.root.position.y, offset: 2 })
-    // creatures: where the clock puts them; the one we fight, followed and struck when in reach
-    const wall = Date.now()
-    updateMonsters({ list: monsters, root: town, now: wall, yaw: movement.yaw, dt: dt })
-    updateMonsterLabels({ monsters, me, action, place: labelProjection.place })
-    combat.update(wall)
-    residentNames.update(pointer.hovered)
-    const now = performance.now()
-    speech.update(now)
-    ashfall?.update({ dt: dt, t: t, focus: camFocus, night: 1 - daylight(lighting.minutes) })
-    frameLoop.record(now)
-  }
 
   // ash: settled on everything that faces the sky outdoors, and falling round the player
   const ashfall = world.indoor ? null : new Ashfall()
@@ -348,6 +307,36 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     dustAll(scene, (o) => o === terrain)
     scene.add(ashfall!.points)
   }
+
+  const frameRenderer = new SceneFrameRenderer({
+    world,
+    scene,
+    town,
+    camera,
+    walkers,
+    preview,
+    stepHeld: movementControl.stepHeld,
+    arrive: interactions.arrive,
+    marker,
+    warps,
+    animation: worldAnimation,
+    cameraFollow,
+    shadows,
+    occlusion,
+    pointer,
+    outlines,
+    smoke: environment.smoke,
+    draw: render,
+    projection: labelProjection,
+    monsters,
+    action,
+    combat,
+    residentNames,
+    speech,
+    ashfall,
+    lighting,
+    record: frameLoop.record,
+  })
 
   const runtime = {
     renderer,

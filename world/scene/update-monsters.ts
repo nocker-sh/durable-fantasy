@@ -8,7 +8,7 @@ import { clearBurst } from "#/world/scene/helpers/monsters/clear-burst"
 /** Move each to where the clock puts it, hop it, hide it while it is off recovering. */
 /** `yaw`: where the camera looks from; a creature sitting still turns its face that way. */
 type Props = {
-  list: MonsterView[]
+  list: ReadonlyArray<MonsterView>
   root: THREE.Group
   now: number
   yaw?: number

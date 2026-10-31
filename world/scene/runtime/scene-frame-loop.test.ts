@@ -78,3 +78,26 @@ it("reports strictly after the interval and reserves its timestamp before callba
   f.loop.record(402)
   expect(f.tick).toHaveBeenCalledTimes(2)
 })
+
+it("does not queue another frame when rendering stops the runtime", () => {
+  const f = fixture()
+  f.render.mockImplementation(() => {
+    f.state.running = false
+  })
+  f.loop.start()
+  f.step(0)
+  expect(f.render).toHaveBeenCalledOnce()
+  expect(f.callbacks).toEqual([])
+})
+
+it("does not queue another frame when a completed frame's tick stops the runtime", () => {
+  const f = fixture()
+  f.tick.mockImplementation(() => {
+    f.state.running = false
+  })
+  f.render.mockImplementation(() => f.loop.record(201))
+  f.loop.start()
+  f.step(0)
+  expect(f.tick).toHaveBeenCalledOnce()
+  expect(f.callbacks).toEqual([])
+})
