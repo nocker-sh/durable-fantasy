@@ -1028,6 +1028,8 @@ React との共有の定義は `components/game/game-context.ts` に一つだけ
 
 取引全体の事前検証は `world/core/check-trade.ts` に参加者・各自の提示と時刻を名前で渡す。距離と枠数は `trade-rules.ts`、提示の型は `trade-types.ts`、初期提示は `empty-offer.ts` が持つ。`taken-of.ts` は共通の GameEvent の判別された受渡しイベントから品列を読み、type の文字だけで別のイベントを受渡しの形と仮定しない。双方の送付と受取の順序を保ち、元の状態を変更しない。
 
+対面取引の対応表は `world/server/map-room/trade.ts`、決定と交換の受付は `handle-trade-confirmation.ts` に置く。`get-trade-confirmation-participants.ts` が現在の双方の取引と所有者を照合し、双方の確定を通信前に予約する。`settle-map-trade.ts` は事前検査、保存先での進行、状態通知、終了を順に呼ぶ。保存状態の読取りと検査は `prepare-trade-settlement.ts`、提示の品列と各参加者の版から提案を作る処理は `get-trade-proposals.ts` が持つ。`advance-trade-settlement.ts` は所有者順で担当を一つ決め、登録後の進行を保存境界ごとに呼ぶ。予約開始前の例外と開始後の応答喪失を区別し、保存済みの処理は逆送付で補償せずアラームの回復に任せる。確定後の状態通知は `publish-settled-trade.ts`、同じ取引だけの終了と通知は `close-settled-trade.ts` に置く。必要な RPC の型は `trade-settlement-types.ts` で限定する。
+
 対面取引の招待は `world/server/map-room/handle-trade-ask.ts`、取消は `handle-trade-cancel.ts` が扱う。`same-trade.ts` で相手と共有の取引識別子を照合し、同じ相手との次の取引を古い処理が閉じない。取消と確定後の終了通知で同じ照合を使い、確定処理を始めた取引は取消操作で外さない。
 
 対面取引の招待への返答は `world/server/map-room/handle-trade-answer.ts` が受け持つ。返答時の辞退・参加状態・距離の判定は `get-trade-answer-rejection.ts` に置き、辞退、参加状態、距離の順で理由を決める。`reject-trade-invitation.ts` は招待者の招待を外し、返答者が別に始めた取引を取消通知で閉じない。受諾時だけ共有の識別子を作って双方の取引を開く。
