@@ -1,3 +1,4 @@
+import { assertFiniteEnvelope } from "#/scripts/lib/assert-finite-envelope"
 import { getEnvelopeSource } from "#/scripts/lib/get-envelope-source"
 import { getEnvelopeFlueOutlets } from "#/scripts/lib/get-envelope-flue-outlets"
 import { getEnvelopeEntry } from "#/scripts/lib/get-envelope-entry"
@@ -67,7 +68,7 @@ export function compileEnvelope(
     recess = delta[0] * entrance.outward[0] + delta[1] * entrance.outward[1]
   if (recess < 0 || Math.abs(delta[0] * worldTangent[0] + delta[1] * worldTangent[1]) > 1e-6) throw new Error("Exterior door does not align with its interior opening")
   const hingeSign = Math.sign((hinge[0] - centre[0]) * worldTangent[0] + (hinge[1] - centre[1]) * worldTangent[1])
-  return {
+  const envelope: BuildingEnvelope = {
     windows: plan.windows.map((window) =>
       compileEnvelopeWindow({
         window,
@@ -107,4 +108,6 @@ export function compileEnvelope(
     railHeight: railHeight / TILE_M,
     chimneys: plan.flues.map((f, i) => ({ rect: rect(f), wallThickness: f.wallThickness / TILE_M, top: (datum + roof.ridge_underside_m + flues[i].outlet_above_ridge_m) / TILE_M })),
   }
+  assertFiniteEnvelope(envelope)
+  return envelope
 }

@@ -1,3 +1,4 @@
+import { getEnvelopeSource } from "#/scripts/lib/get-envelope-source"
 import { compileFlues } from "#/scripts/lib/flue-sections"
 import { readFileSync } from "node:fs"
 import { expect, it } from "vitest"
@@ -66,4 +67,13 @@ it("fits the monk home's north doorway to its west-facing site and finished floo
   expect(envelope.door.leafBottom * TILE_M).toBeCloseTo(0.01)
   expect((envelope.door.height - envelope.door.leafTop) * TILE_M).toBeCloseTo(0.005)
   expect(envelope.door.point[0] - envelope.door.outward[0] * envelope.door.recess).toBeCloseTo(23 + layout.cell_m / TILE_M)
+})
+
+it("rejects chimney coordinates that overflow after finite source heights are combined", () => {
+  const request = source()
+  const parsed = getEnvelopeSource(request.building)
+  expect(plan.flues.length).toBeGreaterThan(0)
+  request.building.roof_section = { ...parsed.roof_section, ridge_underside_m: Number.MAX_VALUE }
+  request.building.flues = plan.flues.map(() => ({ outlet_above_ridge_m: Number.MAX_VALUE }))
+  expect(() => compileEnvelope(request.building, request.rooms, plan)).toThrow("exterior.chimneys.0.top")
 })

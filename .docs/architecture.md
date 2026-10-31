@@ -307,6 +307,8 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 `scripts/lib/compile-envelope.ts` は敷地の回転、基礎の床高、軒と棟・軒の出、入口の戸と外階段、煙道から外観の寸法を生成する。`get-envelope-source.ts` が敷地・基礎・屋根と入口階段を検証し、`get-envelope-entry.ts` は一意に特定できる寸法付きの入口戸を取得する。煙道の出口は `get-envelope-flue-outlets.ts` で本数と高さを確認する。型付きの入力を読む際に、元の資料や追加のメタデータは書き換えない。
 
+`assert-finite-envelope.ts` は計算後の全数値も確認し、有限の入力同士の計算で非有限値が生じた場合は、その項目の位置を示して書出しを拒否する。
+
 `compile-envelope-window.ts` は窓を敷地の原点と基礎高さを含む同じ座標系へ投影し、対応する階の高さが一意に定まらない場合は拒否する。既存の描画へ渡す窓台の高さは、基礎からの相対高さとして保持する。`world/scene/construction/authored-building.ts` はこの寸法で建造し、室内表示の拡大倍率を屋外へ持ち込まない。煙突を乱数で増やさず、屋根材は元の建物の材質へ合わせる。寄り合い所の町の外観も同じ寸法で建造する。
 
 窓と吊り灯りは各室の `windows` と `lamps` に持ち、`scripts/lib/room-fixtures.ts` が壁・天井・家具との位置を確認する。窓は階と外壁上の位置・開口幅・腰高・高さ・枠を、灯りは平面位置・本体の上下と天井への吊りを持つ。`world/town/room-fixtures.ts` の形で室内と外観へ投影し、`world/scene/construction/room-fixtures.ts` が共通の窓枠を描く。
