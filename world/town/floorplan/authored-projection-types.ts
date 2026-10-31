@@ -1,6 +1,7 @@
+import type { RoomCell } from "#/world/town/floorplan/room-cell-types"
 import type { PRoom, Placed } from "#/world/town/floorplan/types"
 
-export type AuthoredCoveredCell = Readonly<{ tile: string; boundary: boolean }>
+export type AuthoredCoveredCell = RoomCell
 export type AuthoredProjectionRow = Readonly<{ cells: Map<number, AuthoredCoveredCell>; walls: Set<number> }>
 export type AuthoredProjectedRow = Readonly<{ cells: ReadonlyMap<number, AuthoredCoveredCell>; walls: ReadonlySet<number> }>
 export type AuthoredCoverage = Map<number, Map<number, AuthoredProjectionRow>>

@@ -49,3 +49,16 @@ it("rejects missing origin coordinates and ragged room grids", () => {
     expect(() => authoredFloorPlan(source)).toThrow("Invalid authored room: left")
   }
 })
+
+it.each([
+  { tile: "#", reverse: false },
+  { tile: "#", reverse: true },
+  { tile: "D", reverse: false },
+  { tile: "D", reverse: true },
+])("rejects sharing internal cells through the runtime projection: %j", (input) => {
+  const source = sharedPlan()
+  const outer: AuthoredPlan["rooms"][number] = { ...source.rooms[0], rows: ["####", `#${input.tile}.#`, "#..D", "#..#", "#D##"] }
+  const inner: AuthoredPlan["rooms"][number] = { ...source.rooms[1], origin: [1, 1], rows: [input.tile] }
+  source.rooms = input.reverse ? [inner, outer] : [outer, inner]
+  expect(() => authoredFloorPlan(source)).toThrow("Overlapping authored rooms")
+})
