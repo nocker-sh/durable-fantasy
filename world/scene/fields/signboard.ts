@@ -1,3 +1,4 @@
+import { letter } from "#/world/scene/lettering"
 import * as THREE from "three"
 import { GeometryBuilder as GB } from "#/lib/graphics/geometry-builder"
 import { M } from "#/world/scene/construction/materials"
@@ -9,7 +10,7 @@ type Props = {
   root: THREE.Group
   x: number
   z: number
-  lines: string[]
+  lines: readonly string[]
   rot?: number
 }
 
@@ -25,12 +26,7 @@ export function signboard(props: Props) {
   g.fillStyle = "#8a6a48"
   for (const y = { value: 0 }; y.value < 128; y.value += 32) g.fillRect(0, y.value, 256, 3)
   g.fillStyle = "#1e1410"
-  g.font = 'bold 34px "DotGothic16", sans-serif'
-  g.textAlign = "center"
-  g.textBaseline = "middle"
-  const size = Math.min(34, Math.floor(236 / Math.max(...props.lines.map((l) => l.length))))
-  g.font = `bold ${size}px "DotGothic16", sans-serif`
-  props.lines.forEach((l, i) => g.fillText(l, 128, 64 + (i - (props.lines.length - 1) / 2) * (size + 8)))
+  letter(g, props.lines, 128, 64, 236, 30)
   const tex = new THREE.CanvasTexture(c)
   tex.magFilter = THREE.NearestFilter
   tex.colorSpace = THREE.SRGBColorSpace

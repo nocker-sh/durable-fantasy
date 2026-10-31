@@ -17,13 +17,14 @@ export const GATE: Layout = {
       w: 1.15,
       kind: "cobble",
     },
-    // the lane west between the hunter's and the teacher's houses
+    // the lane west between the hunter's and the teacher's houses, on out to the west fields
     {
       pts: getCatmullPath([
         [23.6, 22.2],
         [16, 21.8],
         [9, 22.1],
         [2.5, 22],
+        [-3, 22],
       ]),
       w: 0.55,
       kind: "dirt",

@@ -1,3 +1,8 @@
+import { hill } from "#/world/maps/landforms/hill"
+import { hollow } from "#/world/maps/landforms/hollow"
+import { terraced } from "#/world/maps/landforms/terraced"
+import { MEADOW_TERRACES } from "#/world/maps/meadow-terraces"
+import { smooth } from "#/lib/engine/smooth"
 import { getCatmullPath } from "#/lib/engine/get-catmull-path"
 import { getDirtRoad } from "#/world/maps/get-dirt-road"
 import { OPEN_GROUND_LAYOUT_BASE } from "#/world/maps/ground-layout-bases"
@@ -9,6 +14,23 @@ export const SOUTH_MEADOW_LAYOUT: Layout = {
   seed: 201,
   relief: [1.4, 1.4],
   biome: "meadow",
+  // the lone tree's hill (gentle from the road, a rocky scarp to the north-east), the pond fed by the
+  // wet ground east of it, the old terraced fields climbing to the stopped windmill in the south-west,
+  // and the hollow where a war engine lies in the grass (landscape.md「マップごとのテーマ」)
+  shape: (inputProps) => {
+    const x = inputProps.x
+    const z = inputProps.z
+    const height = { value: inputProps.h }
+    const dx = x - 34,
+      dz = z - 12.5
+    const ne = smooth(-0.2, 0.6, (dx - dz) / (Math.hypot(dx, dz) || 1) / Math.SQRT2)
+    const d = Math.hypot(dx, dz)
+    height.value += 1.8 * (smooth(7.5, 2.2, d) * (1 - ne) + smooth(4.3, 3.7, d) * ne)
+    const T = MEADOW_TERRACES
+    height.value += terraced(x, z, T.edges, T.step, T.rampX, T.rampW, 3) * smooth(T.x1 + 2, T.x1 - 3, x) * smooth(T.x0 - 3, T.x0, x)
+    height.value -= hill(x, z, 39.5, 37, 4.5, 1.2, 0.7)
+    return hollow(x, z, height.value, 40.5, 19.5, 4.2, -1.35, 31)
+  },
   // south from the gate, then east to the edge of the forest; a branch on south to the dunes
   roads: [
     getDirtRoad(

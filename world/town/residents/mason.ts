@@ -43,7 +43,7 @@ const residents = {
     map: "phanthiet-craft",
     name: "イダ",
     job: "子ども",
-    at: [15.8, 35.4],
+    at: [15.8, 36.1],
     item: null,
     look: { skirt: "short", footwear: "clogs", hose: "cRose", top: "cRose", frill: true, bow: "cWine", sex: "f", age: "child", skin: "skin2", hair: "hBlack", style: "bob", eye: "cBrown" },
   },

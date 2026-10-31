@@ -99,10 +99,10 @@ const many = (inputProps: { map: string; kind: Spawn["kind"]; n: number; area: S
 }
 
 export const SPAWNS: readonly Spawn[] = [
-  ...many({ map: "south-meadow", kind: "slime", n: 6, area: [28, 28, 44, 42] }),
-  ...many({ map: "south-meadow", kind: "slime", n: 4, area: [8, 28, 20, 40], from: 6 }),
-  ...many({ map: "south-meadow", kind: "blue-slime", n: 2, area: [36, 34, 44, 42] }),
-  ...many({ map: "south-meadow", kind: "hare", n: 4, area: [30, 6, 44, 20] }),
+  ...many({ map: "south-meadow", kind: "slime", n: 6, area: [27, 27, 43, 41] }),
+  ...many({ map: "south-meadow", kind: "slime", n: 4, area: [8, 24, 20, 36], from: 6 }),
+  ...many({ map: "south-meadow", kind: "blue-slime", n: 2, area: [35, 33, 43, 41] }),
+  ...many({ map: "south-meadow", kind: "hare", n: 4, area: [28, 12, 42, 26] }),
   ...many({ map: "red-dunes", kind: "sand-slime", n: 2, area: [20, 17, 23, 20] }),
   ...many({ map: "red-dunes", kind: "sand-slime", n: 2, area: [32, 14, 35, 17], from: 2 }),
   ...many({ map: "forest-edge", kind: "blue-slime", n: 3, area: [36, 30, 39, 33] }),

@@ -1,3 +1,4 @@
+import fields from "#resources/world/maps/phanthiet-fields"
 import craft from "#resources/world/maps/phanthiet-craft"
 import gate from "#resources/world/maps/phanthiet-gate"
 import market from "#resources/world/maps/phanthiet-market"
@@ -19,6 +20,7 @@ export const OUTDOOR_MAP_DEFINITIONS: readonly Readonly<MapDefinition>[] = [
   createOutdoorMap({ id: "phanthiet-market", name: "ファンティエット ― 商店通り", grid: market, kind: "town", spawn: [48, 50] }),
   createOutdoorMap({ id: "phanthiet-craft", name: "ファンティエット ― 職人通り", grid: craft, kind: "town", spawn: [40, 46] }),
   createOutdoorMap({ id: "phanthiet-gate", name: "ファンティエット ― 南門", grid: gate, kind: "town", spawn: [48, 40] }),
+  createOutdoorMap({ id: "phanthiet-fields", name: "ファンティエット ― 西の畑", grid: fields, kind: "town", spawn: [42, 46] }),
   createOutdoorMap({ id: "south-meadow", name: "南の草原", grid: south_meadow }),
   createOutdoorMap({ id: "red-dunes", name: "赤い砂丘", grid: red_dunes }),
   createOutdoorMap({ id: "sea-cliff", name: "海沿いの崖道", grid: sea_cliff }),

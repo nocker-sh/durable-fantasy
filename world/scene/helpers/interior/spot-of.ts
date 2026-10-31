@@ -1,4 +1,4 @@
-const SHRINK = 0.78
+const SHRINK = 1
 import type { Furniture, Interior } from "#/world/town/interiors"
 import type { Spot } from "#/world/scene/construction/furnishings"
 

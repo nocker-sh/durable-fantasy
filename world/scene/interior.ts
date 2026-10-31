@@ -19,6 +19,12 @@ type Cutaway = { floor?: number; obj: THREE.Object3D; at: V2; normal: V2; detail
 
 export const cutaways: Cutaway[] = []
 
-export const WALL_SCALE = 1.45
+export const WALL_SCALE = 1
 
 export const INDOOR_WORLDS = INTERIORS.map((it) => ({ id: it.id, it }))
+
+export const TOPS: [RegExp, readonly string[]][] = [
+  [/^(食卓|大きな食卓|長卓|卓)$/, ["皿", "椀", "瓶", "パン", "蝋燭", "壺", "林檎", "布"]],
+  [/^台所の台$/, ["鍋", "包丁", "蕪の籠", "皿", "玉ねぎ", "壺", "パン", "椀"]],
+  [/^(作業台|木工台|修理台)$/, ["鑿", "板", "縄", "箱", "瓶", "布"]],
+]

@@ -1,3 +1,4 @@
+import { smooth } from "#/lib/engine/smooth"
 import type { RGB } from "#/lib/graphics/pixel-types"
 
 const WATER_LINE = -0.95
@@ -45,8 +46,9 @@ export function biomeColor(props: Props): RGB {
       return hash2(props.sx, props.sy, 122) > 0.95 ? lvl("stone", 1) : dirt({ x: props.x, z: props.z, sx: props.sx, sy: props.sy, base: props.biome === "forest" ? 0.32 : 0.42 })
     if (hash2(props.sx >> 1, props.sy >> 1, 123) > 0.55) return props.biome === "forest" ? lvl("needles", 1) : lvl("grass", 1)
   }
-  // mud in the low wet places, a few small puddles in it skinned with ice
-  if ((props.biome === "meadow" || props.biome === "forest") && vnoise({ x: props.x, y: props.z, scale: 0.85, seed: 124 }) > 0.78) {
+  const low = (groundH(props.x + 1.2, props.z) + groundH(props.x - 1.2, props.z) + groundH(props.x, props.z + 1.2) + groundH(props.x, props.z - 1.2)) / 4 - props.h
+  const damp = props.h < WATER_LINE + 0.5 ? 1 : smooth(0.02, 0.1, low)
+  if ((props.biome === "meadow" || props.biome === "forest") && damp > 0 && vnoise({ x: props.x, y: props.z, scale: 0.85, seed: 124 }) > 0.78 - damp * 0.3) {
     const wet = vnoise({ x: props.x, y: props.z, scale: 2.6, seed: 125 })
     if (wet > 0.74)
       return hash2(props.sx, props.sy, 126) > 0.7 ? pick({ ramp: "frost", b: 0.55 + (wet - 0.74) * 1.5, x: props.sx, y: props.sy }) : pick({ ramp: "water", b: 0.3, x: props.sx, y: props.sy })

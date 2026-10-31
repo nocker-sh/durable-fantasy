@@ -1,3 +1,7 @@
+import { lines as elders2 } from "#/world/town/lines/households/elders2"
+import { lines as riverfish } from "#/world/town/lines/households/riverfish"
+import { lines as sweepers } from "#/world/town/lines/households/sweepers"
+import { lines as miller } from "#/world/town/lines/households/miller"
 import { lines as smith } from "#/world/town/lines/households/smith"
 import { lines as bakers } from "#/world/town/lines/households/bakers"
 import { lines as well } from "#/world/town/lines/households/well"
@@ -34,6 +38,7 @@ export const LINES: Record<string, readonly Line[]> = {
   ウルリケ: farm["ウルリケ"],
   カール: farm["カール"],
   マティアス: shepherd["マティアス"],
+  レージ: shepherd["レージ"],
   ベネディクト: priest["ベネディクト"],
   ゾフィー: elder["ゾフィー"],
   ベルタ: carter["ベルタ"],
@@ -52,4 +57,15 @@ export const LINES: Record<string, readonly Line[]> = {
   アウグスト: lamp["アウグスト"],
   ヘートヴィヒ: lamp["ヘートヴィヒ"],
   ティム: lamp["ティム"],
+  ベルトラム: miller["ベルトラム"],
+  イルゼ: miller["イルゼ"],
+  クラウス: miller["クラウス"],
+  グスタフ: sweepers["グスタフ"],
+  ヴィルマ: sweepers["ヴィルマ"],
+  エリアス: sweepers["エリアス"],
+  クーノ: riverfish["クーノ"],
+  テーダ: riverfish["テーダ"],
+  モーリッツ: riverfish["モーリッツ"],
+  エルヴィン: elders2["エルヴィン"],
+  アーデルハイト: elders2["アーデルハイト"],
 }

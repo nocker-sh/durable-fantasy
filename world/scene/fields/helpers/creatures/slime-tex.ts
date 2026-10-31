@@ -13,8 +13,6 @@ export function slimeTex(color: number): THREE.Texture {
   const mix = (k: number, to: number): [number, number, number] => base.map((c) => Math.round(c + (to - c) * k)) as [number, number, number]
   // tones: rim shadow, shade, body, lit, gleam
   const tone = [mix(0.55, 20), mix(0.28, 30), base, mix(0.28, 255), mix(0.88, 255)]
-  const eye: [number, number, number] = [30, 22, 38],
-    white: [number, number, number] = [250, 250, 244]
   const b = new PixBuf(SLIME_W, SLIME_H)
   const front = SLIME_W / 4
   b.fill((x, y) => {
@@ -29,8 +27,6 @@ export function slimeTex(color: number): THREE.Texture {
     // the gleam, up and to the left of the face
     if ((y === 3 && dx >= -7 && dx <= -4) || (y === 4 && dx >= -8 && dx <= -6) || (y === 5 && dx === -8)) t.value = 4
     if (y === 3 && dx === -3) t.value = 3
-    // eyes: two pixels wide, three tall, a catchlight at the top
-    for (const ex of [-4, 3]) if (dx >= ex && dx <= ex + 1 && y >= 6 && y <= 8) return y === 6 && dx === ex ? white : eye
     return tone[Math.max(0, Math.min(4, t.value))]
   })
   const tex = toTex(b, false)

@@ -63,3 +63,7 @@ export type OnWall = (k: Kit, wd: Wood, seed: number) => void
 // ---------------------------------------------------------------- what is left lying about
 
 export type Lying = (k: Kit, seed: number, name: string) => void
+
+export const sausage = colorMat(0x7a3a2a)
+
+export const coal = colorMat(0x22222a)

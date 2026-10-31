@@ -5,7 +5,7 @@ import { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
 import { Rng } from "#/lib/engine/random"
 import { RAMPS } from "#/world/scene/pix"
 
-const tuftGeo = (() => {
+export const tuftGeo = (() => {
   const a = new THREE.PlaneGeometry(0.6, 0.45).translate(0, 0.2, 0)
   const b = a.clone().rotateY(Math.PI / 2)
   const g = new THREE.BufferGeometry()

@@ -1,3 +1,4 @@
+import { letter } from "#/world/scene/lettering"
 import * as THREE from "three"
 
 export function boardTex(text: string, ink: string, ground: string) {
@@ -10,10 +11,7 @@ export function boardTex(text: string, ink: string, ground: string) {
   g.fillStyle = ground
   g.fillRect(3, 3, 90, 38)
   g.fillStyle = ink
-  g.font = 'bold 26px "DotGothic16", sans-serif'
-  g.textAlign = "center"
-  g.textBaseline = "middle"
-  g.fillText(text, 48, 23)
+  letter(g, [text], 48, 23, 84, 22)
   const t = new THREE.CanvasTexture(c)
   t.magFilter = THREE.NearestFilter
   t.colorSpace = THREE.SRGBColorSpace

@@ -1,9 +1,9 @@
 import * as THREE from "three"
 import { createColorMaterial as colorMat } from "#/lib/graphics/create-color-material"
 
-const rustDark = colorMat(0x4a2e2a)
+export const rustDark = colorMat(0x4a2e2a)
 
-const rust = colorMat(0x7a4a3a)
+export const rust = colorMat(0x7a4a3a)
 
 import { GeometryBuilder as GB } from "#/lib/graphics/geometry-builder"
 import { blockRect } from "#/world/scene/block-rect"

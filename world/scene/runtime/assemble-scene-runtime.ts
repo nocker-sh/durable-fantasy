@@ -1,3 +1,4 @@
+import { sceneOf } from "#/world/scene/runtime/scene-of"
 import { SceneRuntimeLifecycle } from "#/world/scene/runtime/scene-runtime-lifecycle"
 import { SceneResidentConversation } from "#/world/scene/runtime/scene-resident-conversation"
 import { SceneFrameRenderer } from "#/world/scene/runtime/scene-frame-renderer"
@@ -66,7 +67,7 @@ export async function assembleSceneRuntime(props: SceneBuildProps & { resources:
     options = props.options,
     preview = !!options.preview
   const lifecycle = resources.use(new SceneRuntimeLifecycle())
-  const world = MAP_SCENES[map] ?? MAP_SCENES.phanthiet
+  const world = sceneOf(map) ?? MAP_SCENES.phanthiet
   setLayout(world.layout)
   resetRegistries()
   critters.length = 0

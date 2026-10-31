@@ -5,6 +5,7 @@
   "imports": {
     "#/*": "./*",
     "#resources/world/maps/phanthiet-craft": "./world/maps/phanthiet-craft.json",
+    "#resources/world/maps/phanthiet-fields": "./world/maps/phanthiet-fields.json",
     "#resources/world/maps/phanthiet-gate": "./world/maps/phanthiet-gate.json",
     "#resources/world/maps/phanthiet-market": "./world/maps/phanthiet-market.json",
     "#resources/world/maps/phanthiet": "./world/maps/phanthiet.json",

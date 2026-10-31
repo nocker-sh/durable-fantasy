@@ -62,7 +62,8 @@ it("rejects separated approaches even when their individual points remain free",
   expect(getEcologyAccessErrors({ ...candidate, site: { ...site, features }, map: { ...props.map, rows } }).length).toBeGreaterThan(0)
 })
 it("checks the body footprint rather than accepting a free centre beside a wall", () => {
-  const rows = props.map.rows.map((row, z) => (z === 69 ? row.slice(0, 83) + "#" + row.slice(84) : row))
+  const wall = [site.grid.origin_tiles[0] * 2 + 11, site.grid.origin_tiles[1] * 2 + 1]
+  const rows = props.map.rows.map((row, z) => (z === wall[1] ? row.slice(0, wall[0]) + "#" + row.slice(wall[0] + 1) : row))
   expect(getEcologyAccessErrors({ ...candidate, map: { ...props.map, rows } }).length).toBeGreaterThan(0)
 })
 it("does not borrow unplanned ground outside the habitat grid to fit the body", () => {
@@ -78,7 +79,8 @@ it.each(zones.filter((zone) => zone.placement !== null))("keeps $species approac
 it("does not count an eastern slime proposal as resources for the western population", () => {
   const ecology_zones = zones.map((zone) => (zone.species === "monster-slime" ? { ...zone, placement } : zone))
   const errors = auditEcologyZones({ ...props, document: { ...document, ecology_zones } })
-  expect(errors.filter((message) => message.includes("Territory 8,28,20,40"))).toHaveLength(4)
+  const western = SPAWNS.find((spawn) => spawn.id === "south-meadow-slime-6")!
+  expect(errors.filter((message) => message.includes(`Territory ${western.area.join(",")}`))).toHaveLength(4)
 })
 it("keeps disjoint sites independent when the ground between them is blocked", () => {
   const rows = props.map.rows.map((row) => row.slice(0, 48) + "#" + row.slice(49))

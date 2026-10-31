@@ -1,3 +1,4 @@
+import { sceneOf } from "#/world/scene/runtime/scene-of"
 import "#resources/dev/dev"
 import { useEffect, useRef, useState } from "react"
 import { MapScene } from "#/world/scene/runtime/scene"
@@ -53,7 +54,7 @@ function MapViewer() {
     loading = loadingState[0],
     setLoading = loadingState[1]
   const map = query.get("map") ?? "phanthiet"
-  const known = map in MAP_SCENES
+  const known = !!sceneOf(map)
 
   useEffect(() => {
     if (!known) document.body.dataset.ready = "missing"

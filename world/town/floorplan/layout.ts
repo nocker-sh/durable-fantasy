@@ -179,7 +179,8 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
           e.name = `placed:${e.name}`
         }
       })
-    f0.clear.push({ x0: corner.x0, z0: corner.z0, x1: corner.x1, z1: corner.z1 })
+    // the corner and the curtain drawn across it later stay clear
+    f0.clear.push({ x0: corner.x0, z0: corner.z0, x1: corner.x1, z1: corner.z1 + DIV })
   }
   // the hearth in the middle of the room they live in, and the table at it
   let hearth: Placed | null = null
@@ -298,6 +299,18 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
     const r = /寝台/.test(name) ? (rooms.find((x) => x.floor === 0 && x.use === "寝間") ?? living) : /樽|甕|桶|籠|箱|袋|薪|木材/.test(name) ? entry : living
     place({ name: name, room: r ?? undefined, how: "wall", at: undefined, sides: ["w", "e", "n", "s"] })
   }
+  // odds and ends: what a lived-in house gathers along its walls over the years, wherever there is
+  // still room for them and the way through stays open (a wash tub, a crate, a stool, a cask, a basket)
+  if (h.household && h.plan.hearth && h.kind !== "public") {
+    const odds = ["洗濯桶", "木箱", "腰掛け", "樽", "野菜籠", "木箱", "腰掛け"]
+    const want = Math.min(odds.length, Math.floor((W * D) / 8))
+    const spare = rooms.filter((r) => r.floor === 0 && r.use !== "寝間" && r.use !== "売り場" && r.name !== "廊下")
+    for (let i = 0; i < want; i++) {
+      const name = odds[(h.seed + i) % odds.length]
+      const s = sizeOf(name)!
+      for (const r of spare) if (f0.againstWall({ name, w: s.w, d: s.d, front: 0.2, room: r, sides: i % 2 ? ["e", "n", "w"] : ["w", "n", "e"], from: i % 3 === 0 ? 0 : 1 })) break
+    }
+  }
   // a sleeping corner on one floor: curtained off where the beds went
   const sleep = rooms.find((r) => r.floor === 0 && r.use === "寝間")
   if (sleep && floors === 1) dividers.push(...across({ floor: 0, kind: "カーテン", x0: sleep.x0, x1: sleep.x1, z: sleep.z1 + DIV / 2, gx: (sleep.x0 + sleep.x1) / 2, gap: 0.8 }))
@@ -309,6 +322,8 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
     const fl = new Floor({ floor: floor, width: W, depth: D, dividers: dividers })
     // the stair comes up at the back of the east wall: its head and landing stay clear
     if (stairRect) fl.add({ name: "階段の口", floor, ...stairRect, solid: true, wall: true }, stairFoot)
+    // one comes up at the stair's head, and must reach every bed from there
+    if (stairFoot) fl.from = centre(stairFoot)
     // rooms side by side across the floor, a passage along the front to reach them all
     const passage = 1.0
     // each room as wide as its beds need (a bed and a half of width each), the rest shared out
@@ -352,6 +367,7 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
         const s = sizeOf(name)!
         const p = fl.againstWall({ name: name, w: s.w, d: s.d, front: s.front, room: room, sides: deep ? ["n", "w", "e"] : ["s", "w", "e"], from: b % 2 ? 1 : 0 })
         if (!p) unplaced.push(`${name}（2階）`)
+        else fl.targets.push(p)
         bedRoom++
       }
     // what else lives upstairs: chests at the beds' feet, the loom by a window, the shelves of stores

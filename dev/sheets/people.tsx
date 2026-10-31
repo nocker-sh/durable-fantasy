@@ -1,3 +1,5 @@
+import { SHIFTS } from "#/world/town/shifts"
+import { DAILY_OUTPUT, PER_HEAD, STORES, TRADE_FIRES, UNITS, made, used, type Good } from "#/world/town/ledger"
 import { RowLink } from "#/dev/sheets/row-link"
 import { formatTime } from "#/world/core/format-time"
 import { RESIDENTS, RESIDENT_LOOKS } from "#/world/town/residents"
@@ -26,6 +28,7 @@ const npcs = sheet({
   name: (r) => r.name,
   kind: (r) => r.job,
   cols: [
+    { label: "番", get: (r) => Object.entries(SHIFTS).find((entry) => entry[1].includes(r.name))?.[0] ?? "", w: "w-16" },
     { label: "年齢", get: (r) => AGE[RESIDENT_LOOKS[residentIndex(r.name)].age ?? "adult"], w: "w-16" },
     {
       label: "家",
@@ -119,4 +122,28 @@ const houses = sheet({
   ],
 })
 
-export { npcs, relations, households, houses }
+export { npcs, relations, households, houses, ledger }
+
+const ledger = sheet<{ good: Good }>({
+  id: "ledger",
+  label: "町の帳簿",
+  rows: () => (Object.keys(UNITS) as Good[]).map((good) => ({ good })),
+  key: (r) => r.good,
+  name: (r) => r.good,
+  kind: (r) => `${made(r.good)}${UNITS[r.good]}作り、${used(r.good)}${UNITS[r.good]}使う`,
+  cols: [
+    { label: "ひとり一日", get: (r) => (PER_HEAD[r.good] ? `${PER_HEAD[r.good]}${UNITS[r.good]}` : "") },
+    { label: "置き場", get: (r) => STORES[r.good].source.replace(/^\^\(?|\)?\$$/g, "").replace(/\|/g, "・") },
+  ],
+  refs: (r) => Object.entries(DAILY_OUTPUT).flatMap(([name, o]) => (o[r.good] ? ref("npcs", name, `${o[r.good]}${UNITS[r.good]}作る`) : [])),
+  more: (r) => [
+    {
+      title: "作る人",
+      head: ["住民", "一日に"],
+      rows: Object.entries(DAILY_OUTPUT).flatMap(([name, o]) => (o[r.good] ? [[name, `${o[r.good]}${UNITS[r.good]}`]] : [])),
+    },
+    ...(r.good === "薪" || r.good === "炭"
+      ? [{ title: "炉と窯", head: ["建物", "一日に"], rows: Object.entries(TRADE_FIRES).flatMap(([id, f]) => (f[r.good as "薪" | "炭"] ? [[id, `${f[r.good as "薪" | "炭"]}${UNITS[r.good]}`]] : [])) }]
+      : []),
+  ],
+})

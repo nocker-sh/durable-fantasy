@@ -3,6 +3,7 @@ export const MAP_EXPORT_IDS = Object.freeze([
   "phanthiet-market",
   "phanthiet-craft",
   "phanthiet-gate",
+  "phanthiet-fields",
   "south-meadow",
   "red-dunes",
   "sea-cliff",

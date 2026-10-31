@@ -1,3 +1,6 @@
+import { lines as nightstall } from "#/world/town/lines/households/nightstall"
+import { lines as lodging } from "#/world/town/lines/households/lodging"
+import { lines as breakfast } from "#/world/town/lines/households/breakfast"
 import { lines as tavern } from "#/world/town/lines/households/tavern"
 import { lines as apothecary } from "#/world/town/lines/households/apothecary"
 import { lines as general } from "#/world/town/lines/households/general"
@@ -28,4 +31,15 @@ export const LINES: Record<string, readonly Line[]> = {
   アガーテ: candle["アガーテ"],
   ジーモン: candle["ジーモン"],
   フェリックス: candle["フェリックス"],
+  オッティリエ: breakfast["オッティリエ"],
+  ベンノ: breakfast["ベンノ"],
+  ユッタ: breakfast["ユッタ"],
+  ヘルタ: lodging["ヘルタ"],
+  キリアン: lodging["キリアン"],
+  ヴィープケ: lodging["ヴィープケ"],
+  ネーレ: lodging["ネーレ"],
+  レオポルト: lodging["レオポルト"],
+  ドミニク: nightstall["ドミニク"],
+  レア: nightstall["レア"],
+  リヌス: nightstall["リヌス"],
 }

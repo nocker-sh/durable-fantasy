@@ -16,7 +16,7 @@ import { hang as hangOn } from "#/world/scene/construction/hang"
 import { hookOf } from "#/world/scene/construction/hook-of"
 import { ON_WALLS } from "#/world/scene/construction/belonging-builders"
 import { floorPlan } from "#/world/town/floorplan/floor-plan"
-import { ROOM_SCALE } from "#/world/town/interior-rules"
+import { FITTED_ROOM_SCALE } from "#/world/town/interior-rules"
 import { SIZES } from "#/world/town/fit"
 import { WALL_H, rugMat, rugEdge, WALL_SCALE } from "#/world/scene/interior"
 import { spotOf } from "#/world/scene/helpers/interior/spot-of"
@@ -37,7 +37,7 @@ type Props = {
 
 export function dress(props: Props) {
   const plan = floorPlan(props.it.house.id)
-  const K = ROOM_SCALE
+  const K = FITTED_ROOM_SCALE
   const windows = [props.it.x0 + (props.it.x1 - props.it.x0) * 0.3, props.it.x0 + (props.it.x1 - props.it.x0) * 0.7]
   const pieces = props.it.house.plan.furniture
     .filter((f) => !/（(外|2階)）$/.test(f))

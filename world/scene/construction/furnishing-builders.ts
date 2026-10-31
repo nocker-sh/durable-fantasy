@@ -1,3 +1,5 @@
+import { cheeseShelf } from "#/world/scene/construction/helpers/furnishings/cheese-shelf"
+import { churn } from "#/world/scene/construction/helpers/furnishings/churn"
 import { bed } from "#/world/scene/construction/helpers/furnishings/bed"
 import { chair } from "#/world/scene/construction/helpers/furnishings/chair"
 import { settle } from "#/world/scene/construction/helpers/furnishings/settle"
@@ -117,6 +119,28 @@ export const FURNISHINGS: Record<string, Builder> = {
   毛糸の籠: B((k, _w, s) => basketOf(k, s, "yarn")),
   編みかけの籠: B((k, _w, s) => basketOf(k, s, "unfinished")),
   羊毛の袋: B((k, _w, s) => sacks(k, s, "wool")),
+  粉袋の山: B((k, _w, s) => sacks(k, s, "flour")),
+  麦の袋: B((k, _w, s) => sacks(k, s, "grain")),
+  炭俵: B((k, _w, s) => sacks(k, s, "charcoal")),
+  チーズの棚: cheeseShelf,
+  撹乳桶: B((k, w) => churn(k, w)),
+  乳の桶: B((k, w, s) =>
+    tub({
+      k: k,
+      wd: w,
+      seed: s,
+      what: "milk",
+    }),
+  ),
+  塩漬けの樽: B((k, w, s) =>
+    cask({
+      k: k,
+      wd: w,
+      seed: s,
+      onCradle: false,
+      tall: 0.7,
+    }),
+  ),
   灰の袋: B((k, _w, s) => sacks(k, s, "ash")),
   柳の束: B((k, _w, s) => bundles(k, s, "willow")),
   木材: B((k, _w, s) => bundles(k, s, "timber")),

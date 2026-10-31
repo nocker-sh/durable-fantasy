@@ -9,7 +9,7 @@ import { blockCircle } from "#/world/scene/block-circle"
 import { M } from "#/world/scene/construction/materials"
 import { animateObject } from "#/world/scene/construction/animate-object"
 
-export function windmill(root: THREE.Group, x: number, z: number) {
+export function windmill(root: THREE.Group, x: number, z: number, still = false) {
   const y0 = groundH(x, z)
   const gb = new GB()
   gb.cyl({ side: M.ashlar, top: null, centerX: x, centerZ: z, fromY: y0 - 0.3, toY: y0 + 4.2, fromRadius: 1.35, toRadius: 0.95, segments: 10, repeat: 4 })
@@ -28,6 +28,12 @@ export function windmill(root: THREE.Group, x: number, z: number) {
     arm.rotation.z = index * ((2 * Math.PI) / rotor.arms)
     const beam = new THREE.Mesh(new THREE.BoxGeometry(...rotor.beam.size), M.woodDark)
     beam.position.set(...rotor.beam.centre)
+    beam.castShadow = true
+    if (still && index % 2 !== 0) {
+      arm.add(beam)
+      hub.add(arm)
+      continue
+    }
     const sail = new THREE.Mesh(new THREE.PlaneGeometry(...rotor.sail.size), sailM)
     sail.position.set(...rotor.sail.centre)
     beam.castShadow = sail.castShadow = true
@@ -35,9 +41,11 @@ export function windmill(root: THREE.Group, x: number, z: number) {
     hub.add(arm)
   }
   root.add(hub)
-  animateObject(hub, (_t, dt) => {
-    hub.rotation.z -= dt * rotor.angularSpeed
-  })
+  if (still) hub.rotation.z = 0.35
+  else
+    animateObject(hub, (_t, dt) => {
+      hub.rotation.z -= dt * rotor.angularSpeed
+    })
   blockCircle(x, z, 1.5)
 }
 

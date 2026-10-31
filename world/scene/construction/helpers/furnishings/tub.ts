@@ -1,3 +1,4 @@
+import { milk } from "#/world/scene/construction/furnishings"
 import { createColorMaterial as colorMat } from "#/lib/graphics/create-color-material"
 import { M } from "#/world/scene/construction/materials"
 import type { Wood } from "#/world/scene/construction/furnishings"
@@ -9,7 +10,7 @@ type Props = {
   k: Kit
   wd: Wood
   seed: number
-  what: "fish" | "wash" | "lye" | "tan" | "water" | "glaze" | "tea" | "oil" | "wax"
+  what: "fish" | "wash" | "lye" | "tan" | "water" | "glaze" | "tea" | "oil" | "wax" | "milk"
 }
 
 export function tub(props: Props) {
@@ -36,7 +37,7 @@ export function tub(props: Props) {
   const h = props.what === "tan" ? 0.8 : props.what === "fish" ? 0.45 : 0.55
   props.k.cyl({ side: props.wd.body, top: null, u: 0, v: 0, y0: 0, y1: h, r0: rr * 0.9, r1: rr, seg: 12 })
   for (const t of [0.2, 0.8]) props.k.cyl({ side: M.iron, top: null, u: 0, v: 0, y0: h * t - 0.02, y1: h * t + 0.02, r0: rr + 0.01, r1: rr + 0.01, seg: 12 })
-  const liquid = props.what === "fish" ? M.water : props.what === "wash" ? colorMat(0x9aa8b0) : props.what === "lye" ? colorMat(0x6a6058) : colorMat(0x5a3a28)
+  const liquid = props.what === "milk" ? milk : props.what === "fish" ? M.water : props.what === "wash" ? colorMat(0x9aa8b0) : props.what === "lye" ? colorMat(0x6a6058) : colorMat(0x5a3a28)
   props.k.cyl({ side: liquid, top: liquid, u: 0, v: 0, y0: h - 0.12, y1: h - 0.06, r0: rr - 0.03, r1: rr - 0.03, seg: 12 })
   if (props.what === "wash") props.k.box({ side: props.wd.top, top: null, u0: rr * 0.2, y0: h - 0.2, v0: -0.15, u1: rr * 0.3, y1: h + 0.25, v1: 0.15 }) // the washboard leaned in it
   if (props.what === "fish")

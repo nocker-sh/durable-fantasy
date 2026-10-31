@@ -1,3 +1,4 @@
+import { letter, signLines, WORDS } from "#/world/scene/lettering"
 import * as THREE from "three"
 import { GeometryBuilder as GB } from "#/lib/graphics/geometry-builder"
 import { M } from "#/world/scene/construction/materials"
@@ -12,10 +13,7 @@ export function rentSign(root: THREE.Group, x: number, z: number) {
   g.fillStyle = "#c8b090"
   g.fillRect(0, 0, 64, 32)
   g.fillStyle = "#2a1e1a"
-  g.font = 'bold 18px "DotGothic16", sans-serif'
-  g.textAlign = "center"
-  g.textBaseline = "middle"
-  g.fillText("貸家", 32, 17)
+  letter(g, signLines(WORDS.toLet), 32, 17, 58, 14)
   const tex = new THREE.CanvasTexture(c)
   tex.magFilter = THREE.NearestFilter
   tex.colorSpace = THREE.SRGBColorSpace

@@ -1,3 +1,6 @@
+import { lines as carpenter } from "#/world/town/lines/households/carpenter"
+import { lines as charcoal } from "#/world/town/lines/households/charcoal"
+import { lines as loggers } from "#/world/town/lines/households/loggers"
 import { lines as armorer } from "#/world/town/lines/households/armorer"
 import { lines as woodworker } from "#/world/town/lines/households/woodworker"
 import { lines as leather } from "#/world/town/lines/households/leather"
@@ -27,4 +30,14 @@ export const LINES: Record<string, readonly Line[]> = {
   ベルンハルト: sweep["ベルンハルト"],
   モニカ: sweep["モニカ"],
   トビアス: sweep["トビアス"],
+  アンゼルム: loggers["アンゼルム"],
+  ルーペルト: loggers["ルーペルト"],
+  フロリアン: loggers["フロリアン"],
+  ゼヴェリン: charcoal["ゼヴェリン"],
+  ヴァルトラウト: charcoal["ヴァルトラウト"],
+  ティル: charcoal["ティル"],
+  フォルカー: carpenter["フォルカー"],
+  ジビレ: carpenter["ジビレ"],
+  ウルリヒ: carpenter["ウルリヒ"],
+  パウリーネ: carpenter["パウリーネ"],
 }

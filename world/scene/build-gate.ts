@@ -21,34 +21,101 @@ export function buildGate(root: THREE.Group) {
   // the town wall across the south, with the gate in the middle
   const gb = new GB()
   const wallZ = 40
-  for (const entry of [
+  for (const [x0, x1] of [
     [0, 21.6],
     [26.4, 48],
   ] as V2[]) {
-    const x0 = entry[0]
-    const x1 = entry[1]
-
     const y = groundH((x0 + x1) / 2, wallZ)
-    gb.box({ side: M.ashlar, top: null, x0: x0, y0: y - 0.6, z0: wallZ - 0.5, x1: x1, y1: y + 2.6, z1: wallZ + 0.5, repeat: 2 })
-    blockRect({ x0: x0, z0: wallZ - 0.6, x1: x1, z1: wallZ + 0.6 })
+    gb.box({
+      side: M.ashlar,
+      top: null,
+      x0: x0,
+      y0: y - 0.6,
+      z0: wallZ - 0.5,
+      x1: x1,
+      y1: y + 2.6,
+      z1: wallZ + 0.5,
+      repeat: 2,
+    })
+    blockRect({
+      x0: x0,
+      z0: wallZ - 0.6,
+      x1: x1,
+      z1: wallZ + 0.6,
+    })
   }
   // gate towers
   for (const x of [20.4, 27.6]) {
     const y = groundH(x, wallZ)
-    gb.box({ side: M.ashlar, top: null, x0: x - 1.2, y0: y - 0.6, z0: wallZ - 1.2, x1: x + 1.2, y1: y + 3.8, z1: wallZ + 1.2, repeat: 2 })
-    blockRect({ x0: x - 1.25, z0: wallZ - 1.25, x1: x + 1.25, z1: wallZ + 1.25 })
+    gb.box({
+      side: M.ashlar,
+      top: null,
+      x0: x - 1.2,
+      y0: y - 0.6,
+      z0: wallZ - 1.2,
+      x1: x + 1.2,
+      y1: y + 3.8,
+      z1: wallZ + 1.2,
+      repeat: 2,
+    })
+    blockRect({
+      x0: x - 1.25,
+      z0: wallZ - 1.25,
+      x1: x + 1.25,
+      z1: wallZ + 1.25,
+    })
   }
-  barrel({ gb: gb, x: 22.2, z: 37.6 })
-  barrel({ gb: gb, x: 25.8, z: 37.4, h: 0.6, r: 0.25 })
-  crate({ gb: gb, x: 34.5, z: 10.8 })
-  crate({ gb: gb, x: 35.1, z: 11.5, s: 0.45 })
-  crate({ gb: gb, x: 34.6, z: 12.2, s: 0.4 }) // stacked by the warehouse's east wall
-  sack({ gb: gb, x: 35.2, z: 10.2 })
-  sack({ gb: gb, x: 35.5, z: 12.8 })
-  bench({ gb: gb, x: 24, z: 15, w: 1.3, alongX: true })
+  barrel({
+    gb: gb,
+    x: 22.2,
+    z: 37.6,
+  })
+  barrel({
+    gb: gb,
+    x: 25.8,
+    z: 37.4,
+    h: 0.6,
+    r: 0.25,
+  })
+  crate({
+    gb: gb,
+    x: 34.5,
+    z: 10.8,
+  })
+  crate({
+    gb: gb,
+    x: 35.1,
+    z: 11.5,
+    s: 0.45,
+  })
+  crate({
+    gb: gb,
+    x: 34.6,
+    z: 12.2,
+    s: 0.4,
+  }) // stacked by the warehouse's east wall
+  sack({
+    gb: gb,
+    x: 35.2,
+    z: 10.2,
+  })
+  sack({
+    gb: gb,
+    x: 35.5,
+    z: 12.8,
+  })
+  bench({
+    gb: gb,
+    x: 24,
+    z: 15,
+    w: 1.3,
+    alongX: true,
+  })
   root.add(gb.build())
   buildHouses(root, "phanthiet-gate")
   well(root, 24, 18)
+  // the west lane's own well, for the hunter's, the teacher's and the watch's houses
+  well(root, 6.5, 33)
   fence({
     root: root,
     pts: [
@@ -77,10 +144,10 @@ export function buildGate(root: THREE.Group) {
     13,
   )
   forestRing(root, 101, 4)
-
   places.warehouse = [30.8, 14.8]
   places.gateGuard = [22.6, 38.4]
   places.gateGuard2 = [25.4, 38.4]
   places.guide = [25.8, 18.2]
   places.gateWell = [24, 19.6]
+  places.gateWell2 = [6.5, 34.6]
 }

@@ -25,14 +25,25 @@ export const MARKET: Layout = {
       w: 0.8,
       kind: "pave",
     },
+    // south between the night stalls, down to the west fields
+    {
+      pts: getCatmullPath([
+        [17.9, 25],
+        [17.9, 34],
+        [18.3, 44],
+        [18.5, 51],
+      ]),
+      w: 0.7,
+      kind: "dirt",
+    },
     // the back alley behind the north row: washing, barrels, the kitchen doors
     {
       pts: getCatmullPath([
-        [2.5, 16.2],
-        [12, 16.1],
-        [24, 16.2],
-        [36, 16.3],
-        [45, 16.2],
+        [1.5, 16],
+        [12, 15.9],
+        [24, 16],
+        [36, 16.05],
+        [45.5, 16],
       ]),
       w: 0.5,
       kind: "pave",

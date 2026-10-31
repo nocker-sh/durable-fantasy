@@ -6,8 +6,9 @@ it("keeps the fruit stall marker instead of entering the nearby bakery", () => {
   const marker = shopMarkers("phanthiet", 720).find((m) => m.shops.some((s) => s.id === "fruit"))!
   const x = (marker.cell[0] + 0.5) / 2,
     z = (marker.cell[1] + 0.5) / 2
-  expect(minimapTarget({ x: x, z: z, warps: MAPS.phanthiet.warps, inputProps: { snapToWarp: false } })).toEqual({ x, z })
-  expect(minimapTarget({ x: x, z: z, warps: MAPS.phanthiet.warps })).not.toEqual({ x, z })
+  const nearbyDoor = [{ at: [marker.cell[0] + 1, marker.cell[1]] satisfies [number, number] }]
+  expect(minimapTarget({ x: x, z: z, warps: nearbyDoor, inputProps: { snapToWarp: false } })).toEqual({ x, z })
+  expect(minimapTarget({ x: x, z: z, warps: nearbyDoor })).toEqual({ x: x + 0.5, z })
 })
 it("keeps every explicit shop marker at its own coordinates", () => {
   for (const [id, map] of Object.entries(MAPS))

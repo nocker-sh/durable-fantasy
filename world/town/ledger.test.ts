@@ -1,0 +1,82 @@
+import { describe, expect, it } from "vitest"
+import { HOUSEHOLDS, HOUSES } from "#/world/town/houses"
+import { RESIDENTS } from "#/world/town/residents"
+import { DAILY_OUTPUT, MILLER, STORES, TRADE_FIRES, WATER_REACH, made, used, type Good } from "#/world/town/ledger"
+import { MAPS } from "#/world/maps/index"
+import { layoutOf } from "#/world/maps/layouts"
+import { doorStep } from "#/world/maps/siting"
+import type { Vector2Tuple as V2 } from "#/lib/engine/vector2-types"
+
+const segDist = (p: V2, a: V2, b: V2) => {
+  const [dx, dz] = [b[0] - a[0], b[1] - a[1]]
+  const t = Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dz) / (dx * dx + dz * dz || 1)))
+  return Math.hypot(a[0] + dx * t - p[0], a[1] + dz * t - p[1])
+}
+
+describe("the town's day in numbers (economy.md「町の帳簿」)", () => {
+  it("what is made in a day covers what is eaten and burnt", () => {
+    for (const g of ["パン", "粉", "野菜", "おかず", "薪", "炭"] as Good[]) expect(made(g), g).toBeGreaterThanOrEqual(used(g))
+  })
+
+  it("every maker and the miller live in the town, and every fire is in a house that stands", () => {
+    for (const name of [...Object.keys(DAILY_OUTPUT), MILLER])
+      expect(
+        RESIDENTS.some((r) => r.name === name),
+        name,
+      ).toBe(true)
+    for (const id of Object.keys(TRADE_FIRES))
+      expect(
+        HOUSES.some((h) => h.id === id && h.kind !== "vacant"),
+        id,
+      ).toBe(true)
+  })
+
+  it("what is made is kept where it is made, and what is burnt where it burns (town.md「屋内マップ」)", () => {
+    const pieces = (ids: readonly string[]) => HOUSES.filter((h) => ids.includes(h.household ?? "")).flatMap((h) => h.plan.furniture.map((f) => f.replace(/（.+）$/, "").replace(/×\d+$/, "")))
+    const householdOf = (name: string) => HOUSEHOLDS.find((hh) => hh.members.includes(name))?.id ?? ""
+    for (const [maker, out] of Object.entries(DAILY_OUTPUT))
+      for (const g of Object.keys(out) as Good[]) {
+        // a maker who lodges works at another maker's: the store is theirs
+        const others = Object.entries(DAILY_OUTPUT)
+          .filter(([, o]) => o[g])
+          .map(([n]) => householdOf(n))
+        expect(pieces([householdOf(maker)]).some((f) => STORES[g].test(f)) || pieces(others).some((f) => STORES[g].test(f)), `${maker}: ${g}`).toBe(true)
+      }
+    expect(pieces([householdOf(MILLER)]), MILLER).toContain("粉袋の山")
+    for (const [id, f] of Object.entries(TRADE_FIRES)) {
+      const here = HOUSES.find((h) => h.id === id)!.plan.furniture.map((x) => x.replace(/×\d+$/, ""))
+      if ((f.薪 ?? 0) >= 2)
+        expect(
+          here.some((x) => STORES.薪.test(x)),
+          `${id}: 薪`,
+        ).toBe(true)
+      if (f.炭)
+        expect(
+          here.some((x) => STORES.炭.test(x)),
+          `${id}: 炭`,
+        ).toBe(true)
+    }
+  })
+
+  it("every lived house has a well or the river within reach of its door", () => {
+    for (const h of HOUSES) {
+      if (h.kind === "vacant" || !h.household) continue
+      const step = doorStep(h)
+      const wells = Object.entries(MAPS[h.map].places)
+        .filter(([name]) => /well|Well|lavoir/.test(name))
+        .map(([, c]): V2 => [c[0] / 2, c[1] / 2])
+      const layout = layoutOf(h.map)
+      let reach = Math.min(...wells.map((w) => Math.hypot(w[0] - step[0], w[1] - step[1])))
+      if (layout.river[0][0] > -50) for (let i = 0; i < layout.river.length - 1; i++) reach = Math.min(reach, segDist(step, layout.river[i], layout.river[i + 1]) - layout.riverHW)
+      expect(reach, `${h.id} (${h.name})`).toBeLessThanOrEqual(WATER_REACH)
+    }
+  })
+
+  it("every household earns its keep: by a trade, a wage or the town's pension", () => {
+    const earner = (n: string) => {
+      const job = RESIDENTS.find((r) => r.name === n)?.job ?? ""
+      return job !== "子ども" && !job.startsWith("隠居")
+    }
+    for (const hh of HOUSEHOLDS) expect(hh.members.some(earner) || /寄り合い|貸し賃/.test(hh.trade), hh.id).toBe(true)
+  })
+})

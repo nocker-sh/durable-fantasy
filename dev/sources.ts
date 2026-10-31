@@ -3,7 +3,8 @@
 // game exports a new table that is in neither list, so nothing in the game goes unshown.
 export const SOURCES: Record<string, readonly string[]> = {
   items: ["ITEMS", "ITEM_IDS", "ITEM_ICONS", "WEAPONS", "IRON_WEAPONS", "WEAPON_SHAPES", "REMADE_WEAPONS"],
-  npcs: ["RESIDENTS", "RESIDENT_LOOKS", "PEOPLE", "ROUTINES"],
+  npcs: ["RESIDENTS", "RESIDENT_LOOKS", "PEOPLE", "ROUTINES", "SHIFTS"],
+  ledger: ["UNITS", "PER_HEAD", "DAILY_OUTPUT", "TRADE_FIRES", "STORES"],
   households: ["HOUSEHOLDS"],
   houses: ["HOUSES", "INTERIORS", "INDOOR_WORLDS", "OUT_FRONT", "TRACES"],
   maps: ["MAPS", "OUTDOOR_MAP_DEFINITIONS", "OPEN_FIELDS", "TOWN_SPAWN"],
@@ -34,12 +35,20 @@ export const SOURCES: Record<string, readonly string[]> = {
   messages: ["REASON_TEXT"],
   screens: [],
   flavor: ["FLAVOR"],
+  lettering: ["WORDS", "SHOP_SIGN", "KIND_SIGN", "BOARDS"],
 }
 
 /** Exported constants that are not tables of things in the game. */
 export const NOT_TABLES: readonly string[] = [
+  // Default furnishing patterns and decoration pools, not independent game entities.
+  "ESSENTIALS",
+  "TOPS",
+  // The letters the world may be written in, a pattern.
+  "LETTERS",
   // Server command dispatch, not a world data table.
   "HANDLERS",
+  // where a map's landform runs, shared by its ground and its scene
+  "MEADOW_TERRACES",
   // names for codes, shown inside the sheets
   "GATHER_SKILL_NAME",
   "KIND_NAME",
@@ -75,6 +84,7 @@ export const NOT_TABLES: readonly string[] = [
   "DEFAULT_WINDOWS",
   "KEPT_ON_ESC",
   // how the scene lays out and draws
+  "FIELDS",
   "CRAFT",
   "GATE",
   "MARKET",

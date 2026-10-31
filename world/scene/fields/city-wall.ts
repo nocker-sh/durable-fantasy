@@ -1,3 +1,4 @@
+import { BOARDS } from "#/world/scene/lettering"
 import * as THREE from "three"
 import { GeometryBuilder as GB } from "#/lib/graphics/geometry-builder"
 import { M } from "#/world/scene/construction/materials"
@@ -45,7 +46,7 @@ export function cityWall(props: Props) {
   gb.box({ side: M.wood, top: M.wood, x0: props.gx - 1.6, y0: y + 0.7, z0: props.z + 1.38, x1: props.gx + 1.6, y1: y + 0.86, z1: props.z + 1.54, repeat: 2 })
   blockRect({ x0: props.gx - 1.7, z0: props.z + 1.2, x1: props.gx + 1.7, z1: props.z + 1.7 })
   props.root.add(gb.build())
-  signboard({ root: props.root, x: props.gx + 2.4, z: props.z + 2.2, lines: ["この先は工事中", "まだ入れない"], rot: -0.2 })
+  signboard({ root: props.root, x: props.gx + 2.4, z: props.z + 2.2, lines: BOARDS.unbuilt, rot: -0.2 })
   if (props.chimneysBehind)
     for (const entry2 of [
       [14, props.z - 4],

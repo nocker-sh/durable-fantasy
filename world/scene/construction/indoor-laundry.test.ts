@@ -6,7 +6,7 @@ import { HOUSES } from "#/world/town/houses"
 import { interiorPlan } from "#/world/town/interior-plan"
 import { updaters } from "#/world/scene/construction/registry"
 
-it("draws the washers' indoor lines with one still mesh inside each entrance room", () => {
+it("draws the washers' indoor lines with one still mesh along a wall inside each room", () => {
   const before = updaters.length
   const homes = HOUSES.filter((house) => ["fisher", "greengrocer", "fruit"].includes(house.household ?? ""))
   expect(homes).toHaveLength(3)

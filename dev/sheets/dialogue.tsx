@@ -1,3 +1,4 @@
+import { BOARDS, KIND_SIGN, SHOP_SIGN, WORDS } from "#/world/scene/lettering"
 import { eventOf } from "#/world/town/event-of"
 import { REASON_TEXT } from "#/world/core/commands"
 import { FLAVOR } from "#/world/town/flavor"
@@ -69,4 +70,21 @@ const flavor = sheet<(typeof FLAVOR)[number]>({
   refs: (f) => ref("maps", f.at, "その地へ行くとき"),
 })
 
-export { events, lines, messages, flavor }
+export { events, lines, messages, flavor, lettering }
+
+type WrittenRow = { key: string; text: string; where: string }
+
+const lettering = sheet<WrittenRow>({
+  id: "lettering",
+  label: "町の文字",
+  rows: () => [
+    ...Object.entries(WORDS).map(([key, text]) => ({ key, text, where: "札" })),
+    ...Object.entries(SHOP_SIGN).map(([key, text]) => ({ key: `shop-${key}`, text: text!, where: "店の看板" })),
+    ...Object.entries(KIND_SIGN).map(([key, text]) => ({ key: `kind-${key}`, text, where: "店の看板(種類)" })),
+    ...Object.entries(BOARDS).map(([key, ls]) => ({ key: `board-${key}`, text: ls.join(" / "), where: "野の立て札" })),
+  ],
+  key: (r) => r.key,
+  name: (r) => r.text,
+  kind: (r) => r.where,
+  cols: [],
+})

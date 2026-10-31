@@ -8,7 +8,7 @@ import { HOUSES } from "#/world/town/houses"
 import { floorPlan } from "#/world/town/floorplan/floor-plan"
 import { getInteriorPiece } from "#/world/town/get-interior-piece"
 import { INTERIORS } from "#/world/town/interiors"
-import { ROOM_SCALE } from "#/world/town/interior-rules"
+import { FITTED_ROOM_SCALE } from "#/world/town/interior-rules"
 import { interiorPlan } from "#/world/town/interior-plan"
 
 describe("buildings you go into", () => {
@@ -99,9 +99,9 @@ it("distinguishes spinning wheels from looms without moving furniture or changin
   expect(wheel.kind).toBe("spinning-wheel")
   expect(loom.kind).toBe("loom")
   const piece = floorPlan(house.id).pieces.find((piece) => piece.name === "糸車")!
-  expect(wheel.x).toBeCloseTo(room.x0 + ((piece.x0 + piece.x1) / 2) * ROOM_SCALE)
-  expect(wheel.w).toBeCloseTo((piece.x1 - piece.x0) * ROOM_SCALE)
-  expect(wheel.d).toBeCloseTo((piece.z1 - piece.z0) * ROOM_SCALE)
+  expect(wheel.x).toBeCloseTo(room.x0 + ((piece.x0 + piece.x1) / 2) * FITTED_ROOM_SCALE)
+  expect(wheel.w).toBeCloseTo((piece.x1 - piece.x0) * FITTED_ROOM_SCALE)
+  expect(wheel.d).toBeCloseTo((piece.z1 - piece.z0) * FITTED_ROOM_SCALE)
   expect(wheel.solid).toBe(piece.solid)
 })
 it("renders the repair bench at its original planned footprint rather than dropping it", () => {
@@ -122,10 +122,10 @@ it.each([
     furniture = room.furniture.find((piece) => piece.name === name)!
   const piece = floorPlan(house.id).pieces.find((piece) => piece.name === name)!
   expect(furniture.kind).toBe(kind)
-  expect(furniture.x).toBeCloseTo(room.x0 + ((piece.x0 + piece.x1) / 2) * ROOM_SCALE)
-  expect(furniture.z).toBeCloseTo(room.z0 + ((piece.z0 + piece.z1) / 2) * ROOM_SCALE)
-  expect(furniture.w).toBeCloseTo((piece.x1 - piece.x0) * ROOM_SCALE)
-  expect(furniture.d).toBeCloseTo((piece.z1 - piece.z0) * ROOM_SCALE)
+  expect(furniture.x).toBeCloseTo(room.x0 + ((piece.x0 + piece.x1) / 2) * FITTED_ROOM_SCALE)
+  expect(furniture.z).toBeCloseTo(room.z0 + ((piece.z0 + piece.z1) / 2) * FITTED_ROOM_SCALE)
+  expect(furniture.w).toBeCloseTo((piece.x1 - piece.x0) * FITTED_ROOM_SCALE)
+  expect(furniture.d).toBeCloseTo((piece.z1 - piece.z0) * FITTED_ROOM_SCALE)
   expect(furniture.solid).toBe(piece.solid)
   expect(room.unrenderedFurniture.some((piece) => piece.name === name)).toBe(false)
 })
@@ -139,10 +139,10 @@ it.each([
     tool = room.furniture.find((piece) => piece.name === name)!
   const piece = floorPlan(house.id).pieces.find((piece) => piece.name === name)!
   expect(tool.kind).toBe(kind)
-  expect(tool.x).toBeCloseTo(room.x0 + ((piece.x0 + piece.x1) / 2) * ROOM_SCALE)
-  expect(tool.z).toBeCloseTo(room.z0 + ((piece.z0 + piece.z1) / 2) * ROOM_SCALE)
-  expect(tool.w).toBeCloseTo((piece.x1 - piece.x0) * ROOM_SCALE)
-  expect(tool.d).toBeCloseTo((piece.z1 - piece.z0) * ROOM_SCALE)
+  expect(tool.x).toBeCloseTo(room.x0 + ((piece.x0 + piece.x1) / 2) * FITTED_ROOM_SCALE)
+  expect(tool.z).toBeCloseTo(room.z0 + ((piece.z0 + piece.z1) / 2) * FITTED_ROOM_SCALE)
+  expect(tool.w).toBeCloseTo((piece.x1 - piece.x0) * FITTED_ROOM_SCALE)
+  expect(tool.d).toBeCloseTo((piece.z1 - piece.z0) * FITTED_ROOM_SCALE)
   expect(tool.solid).toBe(piece.solid)
   expect(room.unrenderedFurniture.some((piece) => piece.name === name)).toBe(false)
 })
@@ -154,4 +154,13 @@ it.each([undefined, 0, -1, Infinity])("rejects windows without a positive finite
   expect(source.windows?.some((window) => window.floor === 0)).toBe(true)
   source.cellSize = cellSize
   expect(() => interiorPlan(house, 0, source)).toThrow("has no positive wall thickness")
+})
+
+it("keeps fitted room dimensions in the outdoor metric scale", () => {
+  for (const house of HOUSES.filter((house) => !house.authored)) {
+    const room = interiorPlan(house)
+    const plan = floorPlan(house.id)
+    expect((room.x1 - room.x0) / FITTED_ROOM_SCALE, house.id).toBeCloseTo(plan.W)
+    expect((room.z1 - room.z0) / FITTED_ROOM_SCALE, house.id).toBeCloseTo(plan.D)
+  }
 })

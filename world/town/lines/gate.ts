@@ -1,3 +1,5 @@
+import { lines as porters } from "#/world/town/lines/households/porters"
+import { lines as watch } from "#/world/town/lines/households/watch"
 import { lines as guards } from "#/world/town/lines/households/guards"
 import { lines as guide } from "#/world/town/lines/households/guide"
 import { lines as warehouse } from "#/world/town/lines/households/warehouse"
@@ -28,4 +30,10 @@ export const LINES: Record<string, readonly Line[]> = {
   ベンヤミン: teacher["ベンヤミン"],
   エドガー: retired["エドガー"],
   マルグリット: retired["マルグリット"],
+  コンラート: watch["コンラート"],
+  ヘンリケ: watch["ヘンリケ"],
+  ロータル: watch["ロータル"],
+  インゴ: porters["インゴ"],
+  カルラ: porters["カルラ"],
+  ベルント: porters["ベルント"],
 }

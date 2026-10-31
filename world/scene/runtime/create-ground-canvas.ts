@@ -13,7 +13,7 @@ export function createGroundCanvas(ground: PixelBuffer, world: SceneDefinition):
   if (!context) throw new Error("Canvas 2D context unavailable")
   context.putImageData(new ImageData(ground.data, ground.w, ground.h), 0, 0)
   if (world.indoor) {
-    const interior = INTERIORS.find((entry) => MAP_SCENES[entry.id] === world)
+    const interior = world.interior ?? INTERIORS.find((entry) => MAP_SCENES[entry.id] === world)
     if (!interior) throw new Error("Missing indoor minimap definition")
     paintInteriorMinimap(context, ground, interior)
   }

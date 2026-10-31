@@ -1,3 +1,4 @@
+import { cowMesh } from "#/world/scene/construction/cow-mesh"
 import type { Object3D } from "three"
 import type { TownAnimalSpawn } from "#/world/town/animal-types"
 import type { Critter } from "#/world/scene/animal-types"
@@ -17,7 +18,7 @@ export function createTownCritter(props: Props): Critter {
     const framesFor = { hen: henFrames, cat: catFrames }
     return new SpriteCritter({ scene: props.scene, frames: framesFor[spawn.kind](spawn.variant), ppu: GPPU * spawn.scale, area: spawn.area, speed: spawn.speed, kind: spawn.kind })
   }
-  const meshFor = { pig: pigMesh, sheep: sheepMesh },
+  const meshFor = { pig: pigMesh, sheep: sheepMesh, cow: cowMesh },
     mesh = meshFor[spawn.kind]()
   mesh.scale.setScalar(spawn.scale)
 

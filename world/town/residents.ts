@@ -46,8 +46,26 @@ import { keeperPlace } from "#/world/town/keeper-place"
 type V2 = [number, number]
 
 /** A resident: who they are, how they look, which map and spot they stand on. */
-export type { Resident } from "./resident"
+export type { Resident } from "#/world/town/resident"
 import type { Resident } from "#/world/town/resident"
+
+import { residents as r_miller } from "#/world/town/residents/miller"
+import { residents as r_tenant_a } from "#/world/town/residents/tenant-a"
+import { residents as r_tenant_b } from "#/world/town/residents/tenant-b"
+import { residents as r_butcher } from "#/world/town/residents/butcher"
+import { residents as r_dairy } from "#/world/town/residents/dairy"
+import { residents as r_breakfast } from "#/world/town/residents/breakfast"
+import { residents as r_sweepers } from "#/world/town/residents/sweepers"
+import { residents as r_watch } from "#/world/town/residents/watch"
+import { residents as r_loggers } from "#/world/town/residents/loggers"
+import { residents as r_charcoal } from "#/world/town/residents/charcoal"
+import { residents as r_porters } from "#/world/town/residents/porters"
+import { residents as r_nanny } from "#/world/town/residents/nanny"
+import { residents as r_lodging } from "#/world/town/residents/lodging"
+import { residents as r_carpenter } from "#/world/town/residents/carpenter"
+import { residents as r_riverfish } from "#/world/town/residents/riverfish"
+import { residents as r_elders2 } from "#/world/town/residents/elders2"
+import { residents as r_nightstall } from "#/world/town/residents/nightstall"
 
 const LISTED: Resident[] = [
   smith["ギュンター"],
@@ -144,6 +162,62 @@ const LISTED: Resident[] = [
   teacher["ベンヤミン"],
   retired["エドガー"],
   retired["マルグリット"],
+  // the households that came with the three shifts
+  r_miller["ベルトラム"],
+  r_miller["イルゼ"],
+  r_miller["クラウス"],
+  r_tenant_a["オスカー"],
+  r_tenant_a["ヨハンナ"],
+  r_tenant_a["ヴァレンティン"],
+  r_tenant_a["エリーゼ"],
+  r_tenant_b["ヴェンデル"],
+  r_tenant_b["アグネス"],
+  r_tenant_b["ルートヴィヒ"],
+  r_tenant_b["イルマ"],
+  r_butcher["アルブレヒト"],
+  r_butcher["ギーゼラ"],
+  r_butcher["バスティアン"],
+  r_dairy["レーニ"],
+  r_dairy["フーゴ"],
+  r_dairy["ピア"],
+  r_breakfast["オッティリエ"],
+  r_breakfast["ベンノ"],
+  r_breakfast["ユッタ"],
+  r_sweepers["グスタフ"],
+  r_sweepers["ヴィルマ"],
+  r_sweepers["エリアス"],
+  r_watch["コンラート"],
+  r_watch["ヘンリケ"],
+  r_watch["ロータル"],
+  r_loggers["アンゼルム"],
+  r_loggers["ルーペルト"],
+  r_loggers["フロリアン"],
+  r_charcoal["ゼヴェリン"],
+  r_charcoal["ヴァルトラウト"],
+  r_charcoal["ティル"],
+  r_porters["インゴ"],
+  r_porters["カルラ"],
+  r_porters["ベルント"],
+  r_nanny["アンネリー"],
+  r_nanny["エルナ"],
+  r_lodging["ヘルタ"],
+  r_lodging["キリアン"],
+  r_lodging["ヴィープケ"],
+  r_lodging["ネーレ"],
+  r_lodging["レオポルト"],
+  r_carpenter["フォルカー"],
+  r_carpenter["ジビレ"],
+  r_carpenter["ウルリヒ"],
+  r_carpenter["パウリーネ"],
+  r_riverfish["クーノ"],
+  r_riverfish["テーダ"],
+  r_riverfish["モーリッツ"],
+  r_elders2["エルヴィン"],
+  r_elders2["アーデルハイト"],
+  r_nightstall["ドミニク"],
+  r_nightstall["レア"],
+  r_nightstall["リヌス"],
+  shepherd["レージ"],
 ]
 
 /** Everyone, with shopkeepers moved behind the counters of the shops you walk into. */

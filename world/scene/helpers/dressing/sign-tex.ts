@@ -1,3 +1,4 @@
+import { letter, signLines } from "#/world/scene/lettering"
 import * as THREE from "three"
 
 export function signTex(word: string) {
@@ -10,10 +11,7 @@ export function signTex(word: string) {
   g.fillStyle = "#a88a60"
   g.fillRect(3, 3, 58, 34)
   g.fillStyle = "#2a1c14"
-  g.font = `bold ${word.length > 2 ? 15 : 20}px "DotGothic16", sans-serif`
-  g.textAlign = "center"
-  g.textBaseline = "middle"
-  g.fillText(word, 32, 21)
+  letter(g, signLines(word), 32, 21, 54, 14)
   const t = new THREE.CanvasTexture(c)
   t.magFilter = THREE.NearestFilter
   t.colorSpace = THREE.SRGBColorSpace

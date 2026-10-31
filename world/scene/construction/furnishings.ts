@@ -75,3 +75,15 @@ export type Builder = (k: Kit, wd: Wood, seed: number) => void
 export type Stock = "bread" | "jars" | "sundries" | "bottles" | "stores"
 
 export const crust = [colorMat(0xb87a3a), colorMat(0x9a5e2a), colorMat(0xd0a060)]
+
+export const charcoal = colorMat(0x22222a)
+
+export const flourSack = colorMat(0xd8d0bc)
+
+export const flourDust = colorMat(0xe8e2d4)
+
+export const grainMat = colorMat(0xc8a858)
+
+export const milk = colorMat(0xf0ece0)
+
+export const cheese = [colorMat(0xe8d080), colorMat(0xd8b860), colorMat(0xc89a48)]
