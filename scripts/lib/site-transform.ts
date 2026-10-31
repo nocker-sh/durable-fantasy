@@ -1,10 +1,17 @@
+import { SpatialFrame } from "#/lib/engine/spatial-frame"
+
 export type SitePoint = readonly [number, number]
+
 /** One quarter-turn convention for footprints, doorway centres and outward directions. */
 export function siteTransform(width: number, depth: number, quarters: number) {
-  const point = (x: number, z: number): SitePoint => (quarters === 1 ? [z, width - x] : quarters === 2 ? [width - x, depth - z] : quarters === 3 ? [depth - z, x] : [x, z])
-  const direction = (x: number, z: number): SitePoint => {
-    const result = quarters === 1 ? [z, -x] : quarters === 2 ? [-x, -z] : quarters === 3 ? [-z, x] : [x, z]
-    return [result[0] === 0 ? 0 : result[0], result[1] === 0 ? 0 : result[1]]
+  const frame = new SpatialFrame({ origin: [0, 0, 0], width, depth, quarterTurns: quarters })
+  const point = (x: number, z: number): SitePoint => {
+    const position = frame.toWorld([x, 0, z])
+    return [position[0], position[2]]
   }
-  return { point, direction, size: (quarters % 2 ? [depth, width] : [width, depth]) as SitePoint }
+  const direction = (x: number, z: number): SitePoint => {
+    const vector = frame.direction([x, 0, z])
+    return [vector[0], vector[2]]
+  }
+  return { point, direction, size: frame.size }
 }

@@ -28,7 +28,10 @@ export function getRoomSiteRectangle(props: Props): readonly [number, number, nu
   const house = building.data,
     source = room.data
   if (source.building !== house.id || !house.rooms.includes(source.id) || source.grid.cell_m !== house.layout.cell_m) return new Error("Room site rectangle has no matching building frame")
-  const transform = siteTransform((house.layout.width * house.layout.cell_m) / metres, (house.layout.depth * house.layout.cell_m) / metres, house.site_plan.rotation_quarters)
+  const width = (house.layout.width * house.layout.cell_m) / metres
+  const depth = (house.layout.depth * house.layout.cell_m) / metres
+  if (![width, depth].every(Number.isFinite) || width <= 0 || depth <= 0) return new Error("Unbounded room site rectangle")
+  const transform = siteTransform(width, depth, house.site_plan.rotation_quarters)
   const corners = [rect[0], rect[0] + rect[2]].flatMap((x) =>
     [rect[1], rect[1] + rect[3]].map((y) => transform.point((source.origin[0] * source.grid.cell_m + x) / metres, (source.origin[1] * source.grid.cell_m + y) / metres)),
   )
