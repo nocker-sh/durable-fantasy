@@ -54,3 +54,14 @@ it("retains source room ids and exact metric strips for only the selected floor"
     expect(area).toBe(cells * source.cellM ** 2)
   }
 })
+it("uses each declared ceiling relative to its own finished floor without display scaling", () => {
+  const rooms = INTERIORS.filter((room) => room.authored)
+  expect(rooms.length).toBeGreaterThan(0)
+  for (const room of rooms) {
+    const source = room.house.authored,
+      level = source?.floorLevels.find((level) => level.floor === room.floor),
+      space = getInteriorMapSpace(room)
+    if (!level || !space?.rooms?.length) throw new Error("Missing measured room ceiling")
+    for (const shape of space.rooms) expect(shape.heightMetres).toBe(level.ceiling - level.elevation)
+  }
+})

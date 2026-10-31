@@ -325,7 +325,7 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 室内マップは `world/maps/indoor-maps.ts` で組み立てる。現在の町の地上階もこの処理を使い、採用する資料案の上階を追加したときは別のマップIDを持たせる。上階へ街の戸を複製しない。階段の接続は `world/town/interior-stair-links.ts` が同じ断面の上下の踊り場から求める。階とマップの登録を `get-interior-stair-registry.ts` で一意に解決し、乗り口の選択と安全な到着点の探索を分ける。同じ索引に保持した歩行グリッドを階段判定と `world/maps/create-indoor-map.ts` のマップ生成へ渡し、別々に作り直さない。到着点はマップごとに最初の接続を索引にし、各室の生成のたびに全リンクを探索しない。上階の到着点の存在を確認してから描画名や住民の生成を呼ぶ。
 
-既知の室内の親空間の情報は `get-interior-map-space.ts` からマップ定義へ渡す。同じ階の資料の部屋 ID と平面領域は `get-authored-room-space.ts` から親空間の情報に保持し、全マップの登録時に `assert-map-room-spaces.ts` で包含と重なりを検査する。別マップの室内領域は `get-map-room-footprints.ts` と `get-map-space-transform.ts` で親の階層を通して最上位の空間へ投影し、`assert-map-room-separation.ts` が同じ根と完成床高の平面の重複を検査する。単位と未照合の扱いは [[spatial-model#室内マップの親空間]] に従う。
+既知の室内の親空間の情報は `get-interior-map-space.ts` からマップ定義へ渡す。同じ階の資料の部屋 ID と平面領域は `get-authored-room-space.ts` から親空間の情報に保持し、全マップの登録時に `assert-map-room-spaces.ts` で包含と重なりを検査する。別マップの室内領域は `get-map-room-footprints.ts` と `get-map-space-transform.ts` で親の階層を通して最上位の空間へ投影し、`assert-map-room-separation.ts` が同じ根と完成床高の平面の重複を検査する。明示された階の天井と完成床の差は同じ登録の部屋へ渡し、`get-map-room-volumes.ts` で共通基準へ投影した体積の重複を `assert-map-room-volume-separation.ts` が検査する。単位と未照合の扱いは [[spatial-model#室内マップの親空間]] に従う。
 
 全体の空間検査へ渡す登録は `create-map-space-registry.ts` が作る。屋外は既存の升目から共通の基準へ置き、室内は既知の親配置を維持する。基準の根を入室できるマップの一覧へ混ぜず、未知の室内へ配置を補わない。照会の根は `rootSpace` とし、マップでない根も区別する。配置の正と高さの意味は [[spatial-model#屋外の共通基準]] に従う。
 

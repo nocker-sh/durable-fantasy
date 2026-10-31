@@ -1,3 +1,4 @@
+import { assertMapRoomVolumeSeparation } from "#/world/maps/assert-map-room-volume-separation"
 import { assertMapRoomSeparation } from "#/world/maps/assert-map-room-separation"
 import { assertMapSpaceContainment } from "#/world/maps/assert-map-space-containment"
 import type { MapSpaceRegistry } from "#/world/maps/map-space-types"
@@ -18,5 +19,6 @@ export function assertMapSpaceRegistry(maps: MapSpaceRegistry): void {
     for (const member of chain) checked.add(member)
   }
   assertMapRoomSeparation(maps)
+  assertMapRoomVolumeSeparation(maps)
   assertMapSpaceContainment(maps)
 }

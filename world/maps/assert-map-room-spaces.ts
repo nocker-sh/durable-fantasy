@@ -11,6 +11,8 @@ export function assertMapRoomSpaces(space: MapSpace): void {
     occupied: { id: string; rect: Readonly<Rect> }[] = []
   for (const room of space.rooms) {
     if (!room.id || ids.has(room.id) || !room.footprint.length) throw new Error(`Invalid map room space: ${room.id}`)
+    if (room.heightMetres !== undefined && (typeof room.heightMetres !== "number" || !Number.isFinite(room.heightMetres) || room.heightMetres <= 0))
+      throw new Error(`Invalid map room height: ${room.id}`)
     ids.add(room.id)
     for (const rect of room.footprint) {
       if (

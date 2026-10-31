@@ -28,7 +28,7 @@ export function getInteriorMapSpace(interior: Interior): MapSpace | undefined {
   const origin: Vector3 = [site.bounds[0] * TILE_M, site.floorY * TILE_M + level.elevation, site.bounds[1] * TILE_M]
   if (!origin.every(Number.isFinite)) throw new Error(`Unbounded interior map space: ${interior.id}`)
   return {
-    rooms: source.rooms.filter((room) => room.floor === interior.floor).map((room) => getAuthoredRoomSpace(room, source)),
+    rooms: source.rooms.filter((room) => room.floor === interior.floor).map((room) => ({ ...getAuthoredRoomSpace(room, source), heightMetres: level.ceiling - level.elevation })),
     parentMap: source.parentMap,
     frame: { origin, width, depth, quarterTurns: site.quarterTurns },
     planarOrigin: [interior.x0, interior.z0],
