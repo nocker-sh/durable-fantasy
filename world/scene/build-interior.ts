@@ -31,7 +31,6 @@ import { INTERIOR_CLOTH as cloth } from "#/world/scene/construction/interior-clo
 import { workTable } from "#/world/scene/construction/work-table"
 import { chair } from "#/world/scene/construction/chair"
 import { hangingLantern } from "#/world/scene/construction/hanging-lantern"
-import { subtractRectangles } from "#/lib/engine/rectangle-subtraction"
 import { authoredStair } from "#/world/scene/construction/authored-stair"
 import { workshopContainer } from "#/world/scene/construction/workshop-container"
 import { basketry } from "#/world/scene/construction/basketry"
@@ -56,6 +55,7 @@ import { blocked } from "#/world/scene/world"
 import { WN } from "#/world/maps/ground/rules"
 import { groundH } from "#/world/scene/ground-h"
 import { setWalkSurfaces } from "#/world/scene/set-walk-surfaces"
+import { getInteriorWalkSurfaces } from "#/world/town/get-interior-walk-surfaces"
 import { interiorRows } from "#/world/town/interior-rows"
 import type { Interior } from "#/world/town/interiors"
 import { Kit } from "#/world/scene/construction/kit"
@@ -106,7 +106,7 @@ export function buildInterior(it: Interior) {
       root.add(lower)
     }
     floorboards({ root: root, it: it, y0: y0, name: "interior-floor" })
-    setWalkSurfaces(subtractRectangles({ x0: it.x0, z0: it.z0, x1: it.x1, z1: it.z1 }, it.floorOpenings ?? []).map((r) => ({ rect: [r.x0, r.z0, r.x1, r.z1] as const, height: y0 })))
+    setWalkSurfaces(getInteriorWalkSurfaces(it, y0))
     for (const section of it.stairSections ?? []) root.add(authoredStair({ section: section, floor: it.floor, floorY: y0, scale: ROOM_SCALE }))
     const wallHeight = it.wallHeight ?? WALL_H
     const supports = new GB()

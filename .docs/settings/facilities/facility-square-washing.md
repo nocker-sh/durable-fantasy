@@ -28,7 +28,7 @@
     "resident-クララ",
     "resident-エルザ"
   ],
-  "geometry_source": "world/scene/construction/waterworks.ts",
+  "geometry_source": "world/scene/construction/helpers/waterworks/lavoir.ts",
   "terrain_source": "world/maps/ground/create-ground-fields.ts"
 }
 ---

@@ -2,6 +2,10 @@ import type { Polyline } from "#/lib/engine/polyline"
 
 export type RoadPath = { path: Polyline; width: number; kind: number }
 
+/** Coordinates and heights use the map's existing display units, before conversion to metres. */
+export type WalkSurface = Readonly<{ rect: readonly [number, number, number, number]; height: number }>
+export type HeightSampler = (x: number, z: number) => number
+
 /** Ground samples shared by generation, rendering, workers and persisted caches. */
 export type Fields = {
   h: Float32Array

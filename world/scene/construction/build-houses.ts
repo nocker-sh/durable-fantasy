@@ -1,5 +1,6 @@
 import { authoredBuilding } from "#/world/scene/construction/authored-building"
 import { addWalkSurfaces } from "#/world/scene/add-walk-surfaces"
+import { getOutdoorWalkSurfaces } from "#/world/town/get-outdoor-walk-surfaces"
 import { groundH } from "#/world/scene/ground-h"
 import { blockRect } from "#/world/scene/block-rect"
 import * as THREE from "three"
@@ -16,6 +17,7 @@ import { house } from "#/world/scene/construction/house"
 export function buildHouses(root: THREE.Group, map: string) {
   oriels.length = 0
   leanTos.length = 0
+  addWalkSurfaces(getOutdoorWalkSurfaces(map))
   for (const h of HOUSES) {
     if (h.map !== map) continue
     if (h.authored?.exterior) {
@@ -23,7 +25,6 @@ export function buildHouses(root: THREE.Group, map: string) {
         group = authoredBuilding(root, site, groundH)
       occluder(group, 0.22, false)
       blockRect({ x0: h.x0, z0: h.z0, x1: h.x1, z1: h.z1 })
-      addWalkSurfaces(site.steps)
       const xState = site.door.point,
         x = xState[0],
         z = xState[1],

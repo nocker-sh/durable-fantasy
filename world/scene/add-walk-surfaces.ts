@@ -1,5 +1,6 @@
 import { walkSurfaces } from "#/world/scene/world"
+import type { WalkSurface } from "#/world/maps/ground/types"
 
-export function addWalkSurfaces(surfaces: readonly { rect: readonly [number, number, number, number]; height: number }[]) {
+export function addWalkSurfaces(surfaces: readonly WalkSurface[]) {
   walkSurfaces.push(...surfaces)
 }
