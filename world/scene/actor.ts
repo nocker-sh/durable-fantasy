@@ -1,3 +1,4 @@
+import { blendHeading } from "#/lib/engine/blend-heading"
 import { FIG } from "#/world/scene/figure/display-scale"
 import { seatedRoot } from "#/world/scene/seated-root"
 import type { SeatedPlace } from "#/world/scene/seated-pose"
@@ -119,10 +120,7 @@ export class Actor {
         this.pos[0] += (dx / d) * v
         this.pos[1] += (dz / d) * v
         const target = Math.atan2(dx, dz)
-        const diff = { value: target - this.heading }
-        while (diff.value > Math.PI) diff.value -= Math.PI * 2
-        while (diff.value < -Math.PI) diff.value += Math.PI * 2
-        this.heading += diff.value * Math.min(1, dt * 10)
+        this.heading = blendHeading(this.heading, target, Math.min(1, dt * 10))
       }
       if (this.anim !== "carry" && this.anim !== "play") this.anim = "walk"
       if (!this.path.length) this.anim = "idle"

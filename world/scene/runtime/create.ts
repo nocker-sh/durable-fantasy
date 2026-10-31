@@ -1,3 +1,4 @@
+import { updateSceneWalkers } from "#/world/scene/runtime/update-scene-walkers"
 import type { SceneFrame } from "#/world/scene/runtime/scene-frame-types"
 import { SceneResidentNames } from "#/world/scene/runtime/scene-resident-names"
 import { createResidentNameplate } from "#/world/scene/runtime/create-resident-nameplate"
@@ -373,20 +374,9 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
       shadowDirty = false
       shadowAt = at
     }
-    const elapsed = input.elapsed
     const dt = input.dt
     const t = input.time
-    if (!preview) stepHeld()
-    const wasWalking = me.path.length > 0
-    stepWalker(me, dt, elapsed)
-    if (wasWalking && !me.path.length) interactions.arrive()
-    // A path requested by held input starts now; it must not consume time from the previous frame.
-    stepHeld()
-    placeWalker(me)
-    for (const w of remotes.values()) {
-      stepWalker(w, dt, elapsed)
-      placeWalker(w)
-    }
+    updateSceneWalkers({ me, remotes, preview, frame: input, step: stepWalker, place: placeWalker, stepHeld, arrive: interactions.arrive })
     marker.scale.setScalar(1 + Math.sin(t * 6) * 0.1)
     warps.update(t)
 

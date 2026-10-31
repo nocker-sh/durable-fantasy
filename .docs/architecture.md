@@ -110,6 +110,8 @@ Durable Object の入口は `durable-objects/` にあり、どれも Void の規
 
 描画フレームの予約・頻度制限と FPS・状態通知の周期は `scene-frame-loop.ts` の SceneFrameLoop が保持する。起動時に時計を読み直し、描画を省くフレームでは時計と世界を進めない。更新へ渡す実経過時間と、動きの補間用に上限を置いた時間を区別する。世界の更新順と描画後の計測位置はランタイムに残し、停止後はフレームを追加予約しない。
 
+フレーム内の歩行者の更新順は `update-scene-walkers.ts` にまとめる。自分の移動を進めてから到着を通知し、そこで選ばれた次の経路へ前のフレームの時間を使わない。人物の配置はその後に行い、他プレイヤーも移動と配置の順で更新する。`walker-motion.ts` の WalkerMotion は実経過時間で経路を進め、補間用の時間で姿勢と向きを更新する。待機中の自分の一時行動と他プレイヤーの待機を区別し、地面の高さは歩行者ごとに保持する。角度の境界をまたぐ向きの補間は `lib/engine/blend-heading.ts` を住民と共有する。
+
 カメラと人物の間の遮蔽物は `scene-occlusion.ts` の SceneOcclusion が確認する。透過可能な物は目標の不透明度へ補間し、透過しない建物はそのまま保って人物の透視表示へ判定を渡す。プレビューでは物の透過と透視を行わない。材質の更新は `lib/graphics/set-object-opacity.ts` が単一・複数の材質を型で確かめて適用する。
 
 マップの描画の入口は `world/scene/runtime/scene.ts` の MapScene で、地形・住民配置・照明・歩行者・入力は `world/scene/runtime/` に分ける。建物・野外・小物・テクスチャはそれぞれ `construction/`・`fields/`・`props/`・`textures/` に、人物の体・服・髪・装備・描画は `figure/` に分ける。描画は `world/scene/` が受け持ち、ゲームに依存しない部品は `lib/graphics/` と `lib/engine/` にある。

@@ -1,9 +1,7 @@
 import type * as THREE from "three"
-import { PositionSample } from "#/lib/engine/position-sample"
-import { PathFollower } from "#/lib/engine/path-follower"
+import { WalkerMotion } from "#/world/scene/runtime/walker-motion"
 import { walkH } from "#/world/scene/walk-h"
-import { ANIM_DUR } from "#/world/scene/figure/animation"
-import type { Anim } from "#/world/scene/figure/animation"
+import type { WalkerAction } from "#/world/scene/runtime/walker-motion-types"
 import type { Look } from "#/world/scene/figure/look"
 import { Figure } from "#/world/scene/figure/figure"
 import { wearable } from "#/world/town/wearable"
@@ -120,43 +118,7 @@ export function createWalkers(scene: THREE.Scene, onPickPlayer: (id: string) => 
     if (Math.hypot(pts[0][0] - w.pos[0], pts[0][1] - w.pos[1]) > 2) w.pos = pts[0]
     w.path = pts
   }
-  /** what the player is doing with their hands for a moment (chopping, picking, fishing) */
-  let action: { anim: Anim; until: number } | null = null
-  /** Step along the path from cell centre to cell centre; returns true while walking. */
-  const follower = new PathFollower({ speed: STEP_SPEED })
-  function stepWalker(w: Walker, dt: number, elapsed = dt) {
-    if (!w.path.length && w === me && action && performance.now() < action.until) {
-      w.t += (dt * Math.PI * 2) / ANIM_DUR[action.anim]
-      w.fig.pose(action.anim, w.t)
-      return false
-    }
-    if (!w.path.length) {
-      w.t += (dt * Math.PI * 2) / ANIM_DUR.idle
-      w.fig.pose("idle", w.t)
-      return false
-    }
-    const heading = follower.advance(w, elapsed)
-    if (heading !== null) {
-      let diff = heading - w.head
-      while (diff > Math.PI) diff -= Math.PI * 2
-      while (diff < -Math.PI) diff += Math.PI * 2
-      w.head += diff * Math.min(1, dt * 14)
-    }
-    w.t += dt * 13
-    w.fig.pose("walk", w.t)
-    return true
-  }
-  const ground = new WeakMap<Walker, PositionSample>()
-  function placeWalker(w: Walker) {
-    let height = ground.get(w)
-    if (!height) {
-      height = new PositionSample(walkH)
-      ground.set(w, height)
-    }
-    w.fig.root.position.set(w.pos[0], height.at(w.pos[0], w.pos[1]), w.pos[1])
-    w.fig.face(w.head)
-    w.fig.refresh()
-  }
+  const motion = new WalkerMotion({ me, speed: STEP_SPEED, heightAt: walkH })
 
   return {
     me,
@@ -168,8 +130,8 @@ export function createWalkers(scene: THREE.Scene, onPickPlayer: (id: string) => 
     removeRemote,
     clearRemotes,
     moveRemote,
-    stepWalker,
-    placeWalker,
+    stepWalker: motion.step,
+    placeWalker: motion.place,
     plate,
     get layer() {
       return layer
@@ -178,10 +140,10 @@ export function createWalkers(scene: THREE.Scene, onPickPlayer: (id: string) => 
       layer = value
     },
     get action() {
-      return action
+      return motion.action
     },
-    set action(value: typeof action) {
-      action = value
+    set action(value: WalkerAction | null) {
+      motion.action = value
     },
   }
 }
