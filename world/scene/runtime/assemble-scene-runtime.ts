@@ -1,3 +1,4 @@
+import { SceneResidentConversation } from "#/world/scene/runtime/scene-resident-conversation"
 import { SceneFrameRenderer } from "#/world/scene/runtime/scene-frame-renderer"
 import { SceneShadowUpdates } from "#/world/scene/runtime/scene-shadow-updates"
 import { SceneOutlines } from "#/world/scene/runtime/scene-outlines"
@@ -146,13 +147,15 @@ export async function assembleSceneRuntime(props: SceneBuildProps & { resources:
   const spotsSource = new SceneGathering({ town, map }),
     setNodes = spotsSource.setNodes,
     spotHit = spotsSource.spotHit
+  const conversation = new SceneResidentConversation({ me, marker, personOf, idOf: peopleSource.idOf, onReach: (id) => runtime.events?.reach(id) })
+  const faceResident = conversation.faceResident
   const interactions = new SceneInteractions({
     me,
     action,
     movement: movementControl,
     spots: spotsSource.spots,
     personOf,
-    reach,
+    reach: conversation.reach,
     marker,
     stationAt: (id) => runtime.events?.stationAt(id),
     gatherAt: (id) => runtime.events?.gatherAt(id),
@@ -194,18 +197,6 @@ export async function assembleSceneRuntime(props: SceneBuildProps & { resources:
   const setWild = feedback.setWild
   const struck = feedback.struck
   const hurt = feedback.hurt
-
-  function reach(a: Actor) {
-    marker.visible = false
-    faceResident(ids[people.indexOf(a)])
-    runtime.events?.reach(ids[people.indexOf(a)])
-  }
-  function faceResident(id: number) {
-    const a = personOf(id)
-    if (!a) return
-    a.faceTo(me.pos)
-    me.head = Math.atan2(a.pos[0] - me.pos[0], a.pos[1] - me.pos[1])
-  }
 
   const previewControls = preview ? createPreviewControls({ renderer, movement, pan: (dx, dy, yaw) => camera.pan(dx, dy, yaw), zoom }) : null
   const pointer = preview

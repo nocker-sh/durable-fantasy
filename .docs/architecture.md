@@ -112,7 +112,7 @@ Durable Object の入口は `durable-objects/` にあり、どれも Void の規
 
 `scene-house-lights.ts` の SceneHouseLights は各階の使用中の灯りを保持し、窓と鎧戸を家の生活時間に合わせる。同じ階と家の判定は一回の時刻更新の中で共有し、次の更新へ使い回さない。炎・街灯・煙のフレーム更新は `update-scene-flames.ts`・`update-scene-lamps.ts`・`update-scene-smoke.ts` に分ける。街灯の順は生成時の位置から一度並べ、時刻による点灯の番号を保つ。煙の粒の取得は環境の組み立て、描画は一括描画が持ち、照明の更新は粒の位相と位置を渡す。水面の時刻と空の色の一様変数は、生成時から具体的な型を持って照明へ渡す。
 
-移動入力と経路、停止と凍結は `scene-movement.ts` の SceneMovement が描画ごとに保持する。押し続けたキーから格子の候補を作る処理は純粋な `get-held-walk-candidates.ts` に分け、角が塞がれた場合の候補の順と、最初の空き候補での経路の照会を維持する。停止の通知より先に行動予約を外し、追跡で明示した場合だけ予約を保持する。住民・採集・作業場への接近と到着時の通知は `scene-interactions.ts` の SceneInteractions が受け持つ。周囲の候補は `get-approach-candidates.ts` が来た側から近い半径と左右の順で作る。予約を消費してから到着を通知し、通知中に選ばれた次の行動を前の到着で実行しない。
+移動入力と経路、停止と凍結は `scene-movement.ts` の SceneMovement が描画ごとに保持する。押し続けたキーから格子の候補を作る処理は純粋な `get-held-walk-candidates.ts` に分け、角が塞がれた場合の候補の順と、最初の空き候補での経路の照会を維持する。停止の通知より先に行動予約を外し、追跡で明示した場合だけ予約を保持する。住民・採集・作業場への接近と到着時の通知は `scene-interactions.ts` の SceneInteractions が受け持つ。周囲の候補は `get-approach-candidates.ts` が来た側から近い半径と左右の順で作る。予約を消費してから到着を通知し、通知中に選ばれた次の行動を前の到着で実行しない。住民への到着と向き合わせは `scene-resident-conversation.ts` が扱う。住民表の番号は ScenePopulation の人物との対応から取り、向きと移動先の表示を先に更新してから到着を通知する。登録されていない人物から番号のない到着を送らない。
 
 敵の追跡と攻撃間隔は `scene-combat.ts` の SceneCombat が描画ごとに保持する。範囲内では行動予約を保持したまま経路を短くし、向きを合わせてから攻撃の演出と通知を行う。対象を選び直しても前の攻撃からの待機は保持する。命中・消費・報酬はサーバーの判定を使う。
 

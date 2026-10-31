@@ -5,6 +5,7 @@ import { shopBoards } from "#/world/scene/dressing"
 import { getSceneSpotPosition } from "#/world/scene/runtime/get-scene-spot-position"
 import { updateScheduledResident } from "#/world/scene/runtime/update-scheduled-resident"
 import { updateScheduledShopFronts } from "#/world/scene/runtime/update-scheduled-shop-fronts"
+import type { Actor } from "#/world/scene/actor"
 import type { MapResident } from "#/world/scene/runtime/create-map-residents"
 import type { V2 } from "#/world/scene/construction/registry"
 
@@ -22,6 +23,8 @@ export class ScenePopulation {
   }
 
   readonly personOf = (id: number) => this.props.residents.find((resident) => resident.index === id)?.actor
+
+  readonly idOf = (actor: Actor): number | null => this.props.residents.find((resident) => resident.actor === actor)?.index ?? null
 
   readonly applySchedule = (minute: number): void => {
     const spots = this.props.residents.map((resident) => spotAt(resident.actor.name, minute, resident.work))

@@ -156,6 +156,7 @@ it("keeps original resident indices when an earlier resident never visits this m
   expect(population.ids).toEqual([1])
   expect(population.people).toHaveLength(1)
   expect(population.personOf(1)).toBe(population.people[0])
+  expect(population.idOf(population.people[0])).toBe(1)
   expect(population.personOf(0)).toBeUndefined()
   expect(population.personOf(-1)).toBeUndefined()
   expect(Object.isFrozen(population)).toBe(true)
@@ -192,4 +193,11 @@ it("passes the authored figure scale and acquires ownership before initial facin
   expect(actors.create.mock.calls[0][0].figureScale).toBe(2 / FIG)
   expect(own).toHaveBeenCalledTimes(2)
   expect(population.people.every((person) => person.nextSay === Infinity)).toBe(true)
+})
+
+it("resolves index zero and rejects an actor belonging to another population", async () => {
+  const first = await createScenePopulation({ scene: new Scene(), map: "field", world, progress: vi.fn(), tick: async () => {} })
+  const second = await createScenePopulation({ scene: new Scene(), map: "field", world, progress: vi.fn(), tick: async () => {} })
+  expect(first.idOf(first.people[0])).toBe(0)
+  expect(first.idOf(second.people[0])).toBeNull()
 })
