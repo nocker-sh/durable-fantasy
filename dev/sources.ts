@@ -6,7 +6,7 @@ export const SOURCES: Record<string, readonly string[]> = {
   npcs: ["RESIDENTS", "RESIDENT_LOOKS", "PEOPLE", "ROUTINES"],
   households: ["HOUSEHOLDS"],
   houses: ["HOUSES", "INTERIORS", "INDOOR_WORLDS", "OUT_FRONT", "TRACES"],
-  maps: ["MAPS", "OPEN_FIELDS", "TOWN_SPAWN"],
+  maps: ["MAPS", "OUTDOOR_MAP_DEFINITIONS", "OPEN_FIELDS", "TOWN_SPAWN"],
   shops: ["SHOPS"],
   batches: ["BATCHES"],
   makers: ["MAKERS"],

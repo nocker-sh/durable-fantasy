@@ -6,7 +6,7 @@ import type { MapDefinition } from "#/world/maps/types"
 
 /** Build topology on owned map records; each input grid is analyzed once per assembly. */
 export function connectOutdoorMaps(source: Readonly<Record<string, MapDefinition>>): Record<string, MapDefinition> {
-  const maps: Record<string, MapDefinition> = Object.fromEntries(Object.entries(source).map((entry) => [entry[0], { ...entry[1] }]))
+  const maps: Record<string, MapDefinition> = Object.fromEntries(Object.entries(source).map((entry) => [entry[0], { ...entry[1], assets: { ...entry[1].assets } }]))
   const regions = new Map(Object.values(maps).map((map) => [map.id, getLargestWalkableRegion(map)]))
   for (const map of Object.values(maps)) map.warps = getOutdoorCrossings(map, maps, regions)
   const distances = getOutdoorMapDistances(maps)

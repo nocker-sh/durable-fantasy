@@ -28,6 +28,10 @@ A* 探索のコスト・前のセル・候補の展開は `lib/engine/grid-path-
 
 地面の形と配置の共有型は `world/maps/layout-types.ts`、地形の機能がないことを表す定数は `empty-layout-features.ts` に置く。中央の広場と周囲の地区の配置は `layout.ts` の `SQUARE_LAYOUT` が持つ。河川の座標列は一度だけ生成し、共同洗濯場の基準位置も同じ点列から求める。`lib/engine/get-nearest-polyline-x.ts` は行に最も近い標本の x 座標を返し、標本の間の補間とは区別する。各地区と野外の地面は `world/maps/layouts/` に一つずつ置き、`ground-layouts.ts` は野外の定義の対応と外縁を加えた配置だけを組み立てる。共通の空き地の初期値は `ground-layout-bases.ts`、土道の補間は `get-dirt-road.ts`、海岸・砂丘・崖・峠はそれぞれの地形関数を使う。`with-rimmed-layout.ts` は元の地形に閉じた外縁の高さを加え、`get-ground-rim-height.ts` は同じ位置のノイズを各辺で共有する。
 
+マップの公開定義は `world/maps/index.ts`、組み立ての入口は `create-maps.ts` に置く。屋外の初期定義は `outdoor-map-definitions.ts`、定義の生成は `create-outdoor-map.ts`、共通の素材の参照先は `map-asset-rules.ts` が持つ。JSON の読込みは `read-map-grid.ts` が未知の値から行い、`map-grid-schema.ts` で正確な二成分の整数の座標を検証する。行の正方形の形とセルの種類は `assert-map-walk-grid.ts` を読込みと通行領域の探索で共有する。名前付きの場所は範囲内とし、家具や設備の中心も指すため歩けるセルだけには限定しない。
+
+室内の表示名は `get-indoor-map-name.ts`、街側の地上階の戸は `with-indoor-map-doors.ts`、住民の初期配置は `get-map-residents.ts` が担当する。住民は同じ勤務先の定義と確定した地図から一度だけ配置する。名前付きの座標を引く `get-spot-cell.ts` は、その表自身のキーだけを読み、オブジェクトの継承属性を座標として返さない。組み立てたマップの変更可能な定義と素材の設定は別の組み立てや初期定義と共有しない。
+
 屋外マップの接続の組み立ては `world/maps/connect-outdoor-maps.ts` が、入力の地図を変更しない作業用の定義で行う。`get-largest-walkable-region.ts` が地図ごとの最大の通行領域を選び、各領域の探索は `get-walkable-region.ts` が担当する。領域は組み立てごとに一度求め、地図 ID だけで別のグリッドへ使い回さない。`get-outdoor-crossings.ts` が升目の開いた辺を列挙し、`get-outdoor-crossing.ts` が `get-road-ends.ts` の道の端に近い候補を選ぶ。出入口と到着点は `get-crossing-cells.ts`、各点の通行と所属領域の照合は `is-crossing-passable.ts`、境界からの距離は `crossing-rules.ts` が持つ。
 
 町からの接続数は `get-outdoor-map-distances.ts`、野外の出現位置は `get-outdoor-spawn.ts` が求める。候補と辺の順、同じ大きさの通行領域を選ぶ順は保持する。辺の型や通行領域とセルの組を型の強制変換で通さず、各セルの所属する地図の幅で索引を求める。欠けた地図や帰りの接続を仮の位置で補わない。屋外の地図の大きさと並びの仕様は [[town#世界の升目]] に従う。

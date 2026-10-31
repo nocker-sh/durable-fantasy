@@ -7,5 +7,5 @@ type Props = Readonly<{ spot: Spot; places: Readonly<Record<string, Cell>> | nul
 export function getSpotCell(props: Props): Cell | null {
   if ("cell" in props.spot) return props.spot.cell
   if ("tile" in props.spot) return [Math.floor(props.spot.tile[0] * 2), Math.floor(props.spot.tile[1] * 2)]
-  return props.places?.[props.spot.place] ?? null
+  return props.places && Object.hasOwn(props.places, props.spot.place) ? props.places[props.spot.place] : null
 }
