@@ -1,3 +1,4 @@
+import type { Furniture } from "#/world/town/interiors"
 import { MAPS } from "#/world/maps"
 import { SpatialFrame } from "#/lib/engine/spatial-frame"
 import { ROOM_SCALE } from "#/world/town/interior-rules"
@@ -124,4 +125,21 @@ it.each(["point", "outward", "width", "height", "door-cell", "arrival", "missing
   if (invalid === "arrival") room.arrive = [room.arrive[0] + 1, room.arrive[1]]
   if (invalid === "missing") room.entrance = undefined
   expect(() => make(rooms)).toThrow(/Interior entrance/)
+})
+
+it.each(["spawn", "door", "isolated"])("rejects an indoor walk grid with blocked %s access", (invalid) => {
+  const rooms = structuredClone(interiors)
+  const room = rooms[0],
+    at = invalid === "door" ? room.door : room.arrive
+  const cells =
+    invalid === "isolated"
+      ? [
+          [at[0] + 1, at[1]],
+          [at[0] - 1, at[1]],
+          [at[0], at[1] + 1],
+          [at[0], at[1] - 1],
+        ]
+      : [at]
+  room.furniture = [...room.furniture, ...cells.map<Furniture>((cell) => ({ kind: "crate", x: (cell[0] + 0.5) / 2, z: (cell[1] + 0.5) / 2, w: 0.5, d: 0.5, solid: true }))]
+  expect(() => make(rooms)).toThrow(/Indoor map/)
 })

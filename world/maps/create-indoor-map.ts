@@ -1,3 +1,4 @@
+import { assertIndoorMapAccess } from "#/world/maps/assert-indoor-map-access"
 import { assertInteriorMapEntrance } from "#/world/town/assert-interior-map-entrance"
 import { assertInteriorMapWindows } from "#/world/town/assert-interior-map-windows"
 import { getInteriorMapSpace } from "#/world/town/get-interior-map-space"
@@ -21,7 +22,7 @@ export function createIndoorMap(props: Props): MapDefinition {
     assertInteriorMapEntrance(interior, space)
     assertInteriorMapWindows(interior, space)
   }
-  return {
+  const map: MapDefinition = {
     ...(space ? { space } : {}),
     id: interior.id,
     name: props.options.name(interior),
@@ -34,4 +35,6 @@ export function createIndoorMap(props: Props): MapDefinition {
     spawn,
     assets: { sprites: props.options.sprites },
   }
+  assertIndoorMapAccess(map)
+  return map
 }
