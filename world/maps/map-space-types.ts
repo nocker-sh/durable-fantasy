@@ -1,6 +1,7 @@
 import type { SpatialFrameChain } from "#/lib/engine/spatial-frame-chain"
 import type { MapRoomSpace } from "#/world/maps/room-space-types"
 import type { SpatialFrame } from "#/lib/engine/spatial-frame"
+import type { Rect } from "#/world/town/floorplan/types"
 
 /** Frame coordinates are metres; the planar origin and scale describe the existing two-dimensional map units. */
 export type MapSpace = Readonly<{
@@ -12,8 +13,11 @@ export type MapSpace = Readonly<{
   metresPerPlanarUnit: number
 }>
 
+/** Bounds are an explicitly known local horizontal domain, not a ceiling or an inferred region. */
+export type MapSpaceEntry = Readonly<{ id: string; space?: MapSpace; bounds?: Readonly<Rect> }>
+
 /** Map references and explicit non-playable spatial roots, independent of rendering or movement fields. */
-export type MapSpaceRegistry = Readonly<Record<string, Readonly<{ id: string; space?: MapSpace }>>>
+export type MapSpaceRegistry = Readonly<Record<string, MapSpaceEntry>>
 
 /** A query transform to a named spatial root, which need not be a playable map. */
 export type MapSpaceTransform = Readonly<{ rootSpace: string; transform: SpatialFrameChain }>

@@ -1,4 +1,5 @@
 import { assertMapRoomSeparation } from "#/world/maps/assert-map-room-separation"
+import { assertMapSpaceContainment } from "#/world/maps/assert-map-space-containment"
 import type { MapSpaceRegistry } from "#/world/maps/map-space-types"
 
 /** Known frames must lead through registered, uniquely keyed parents to an explicit spatial root. */
@@ -17,4 +18,5 @@ export function assertMapSpaceRegistry(maps: MapSpaceRegistry): void {
     for (const member of chain) checked.add(member)
   }
   assertMapRoomSeparation(maps)
+  assertMapSpaceContainment(maps)
 }
