@@ -1,9 +1,11 @@
 import { afterEach, expect, it, vi } from "vitest"
 import { player } from "#/world/test/player"
-import type { Ctx } from "#/world/server/map-room/context"
-const run = vi.hoisted(() => vi.fn())
-vi.mock("../../../durable-objects/player", () => ({ Player: { get: () => ({ run }) } }))
-import { standUp } from "#/world/server/map-room/posture"
+import type { Player } from "#/durable-objects/player"
+import type { Presence } from "#/world/server/map-room/presence"
+import type { Transition } from "#/world/core/transition"
+const run = vi.hoisted(() => vi.fn<ReturnType<typeof Player.get>["run"]>())
+vi.mock("#/durable-objects/player", () => ({ Player: { get: () => ({ run }) } }))
+import { standUp } from "#/world/server/map-room/stand-up"
 afterEach(() => {
   vi.restoreAllMocks()
   run.mockReset()
@@ -11,19 +13,21 @@ afterEach(() => {
 function fixture() {
   const save = vi.fn(),
     send = vi.fn(async () => {})
-  return { ctx: { connection: { send } }, me: { owner: "owner", sitting: true }, save } as unknown as Pick<Ctx, "ctx" | "me" | "save"> & { save: typeof save }
+  const me: Pick<Presence, "owner" | "sitting"> = { owner: "owner", sitting: true }
+  return { ctx: { connection: { send } }, me, save }
 }
 it("keeps posture unchanged while the player save is outstanding or failed", async () => {
   const f = fixture()
-  let fail!: (error: Error) => void
+  const pending: { fail?: (error: Error) => void } = {}
   run.mockReturnValue(
-    new Promise((_resolve, reject) => {
-      fail = reject
+    new Promise<Transition>((_resolve, reject) => {
+      pending.fail = reject
     }),
   )
   const attempt = standUp(f)
   expect(f.save).not.toHaveBeenCalled()
-  fail(Error("Storage unavailable"))
+  if (!pending.fail) throw Error("Expected an outstanding save")
+  pending.fail(Error("Storage unavailable"))
   await expect(attempt).rejects.toThrow("Storage unavailable")
   expect(f.save).not.toHaveBeenCalled()
 })
@@ -49,4 +53,18 @@ it("skips already standing players and refuses seated players without an owner",
   f.me.owner = null
   expect(await standUp(f)).toBe(false)
   expect(run).not.toHaveBeenCalled()
+})
+
+it("reflects the confirmed posture before sending the result", async () => {
+  const f = fixture()
+  const trace: string[] = []
+  run.mockResolvedValue({ ok: true, state: player({ sitting: false }), events: [{ type: "stood" }] })
+  f.save.mockImplementation(() => {
+    trace.push("save")
+  })
+  f.ctx.connection.send.mockImplementation(async () => {
+    trace.push("send")
+  })
+  expect(await standUp(f)).toBe(true)
+  expect(trace).toEqual(["save", "send"])
 })

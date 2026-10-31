@@ -6,7 +6,7 @@ import { timeFor } from "#/world/server/map-room/time-for"
 import type { Transition } from "#/world/core/transition"
 import type { Ctx, Message } from "#/world/server/map-room/context"
 
-type Props = Readonly<{ context: Ctx; owner: string; message: Message<"command">; keepers: string[] | null }>
+type Props = Readonly<{ context: { me: Ctx["me"]; ctx: { connection: Pick<Ctx["ctx"]["connection"], "id"> } }; owner: string; message: Message<"command">; keepers: string[] | null }>
 
 /** Shop commands keep the durable reservation-and-finish boundary; other commands remain player-local. */
 export async function runMapPlayerCommand(props: Props): Promise<Transition> {

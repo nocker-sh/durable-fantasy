@@ -1,9 +1,11 @@
-// Confirm standing before movement or combat; connection state follows the saved player state.
 import { Player } from "#/durable-objects/player"
 import type { Ctx } from "#/world/server/map-room/context"
 import { notifyClient } from "#/world/server/map-room/notifications"
 
-export async function standUp(inputProps: Pick<Ctx, "ctx" | "me" | "save">): Promise<boolean> {
+type Props = Readonly<Pick<Ctx, "save"> & { me: Pick<Ctx["me"], "owner" | "sitting">; ctx: { connection: Pick<Ctx["ctx"]["connection"], "send"> } }>
+
+/** 保存先が認めた姿勢を通知より先に反映し、移動と攻撃を進めてよいか返す。 */
+export async function standUp(inputProps: Props): Promise<boolean> {
   const ctx = inputProps.ctx
   const me = inputProps.me
   const save = inputProps.save

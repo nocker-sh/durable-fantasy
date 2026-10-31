@@ -4,7 +4,8 @@ import type { Ctx } from "#/world/server/map-room/context"
 import type { MapPlayer } from "#/world/protocol"
 import type { PlayerState } from "#/world/core/player-types"
 
-type Props = Readonly<{ context: Ctx; player: MapPlayer; state: PlayerState }>
+type Context = Readonly<Pick<Ctx, "save"> & { me: Pick<Ctx["me"], "ready">; ctx: { connection: Pick<Ctx["ctx"]["connection"], "id">; room: Pick<Ctx["ctx"]["room"], "broadcast"> } }>
+type Props = Readonly<{ context: Context; player: MapPlayer; state: PlayerState }>
 
 /** Save the confirmed public profile before announcing it; a lost notification cannot revert the player. */
 export async function publishCommandPlayer(props: Props): Promise<void> {

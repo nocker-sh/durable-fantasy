@@ -7,12 +7,12 @@ import { timeFor } from "#/world/server/map-room/time-for"
 import { near } from "#/world/server/map-room/near"
 import type { Command } from "#/world/core/commands"
 import type { Transition } from "#/world/core/transition"
-import type { Ctx } from "#/world/server/map-room/context"
+import type { PlayerCommandContext } from "#/world/server/map-room/player-command-types"
 
 type Access = { ok: true; keepers: string[] | null } | Extract<Transition, { ok: false }>
 
 /** Only keepers currently at the counter receive familiarity; opening is checked before proximity. */
-export function getCommandShopAccess(context: Pick<Ctx, "map" | "me">, command: Command): Access {
+export function getCommandShopAccess(context: Pick<PlayerCommandContext, "map" | "me">, command: Command): Access {
   const shop = shopOf(command)
   if (!shop) return { ok: true, keepers: null }
   const present = SHOPS[shop].keepers.flatMap((name) => {

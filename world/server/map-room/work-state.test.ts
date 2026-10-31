@@ -2,12 +2,13 @@ import { afterEach, expect, it, vi } from "vitest"
 import { player } from "#/world/test/player"
 import { mapPlayer } from "#/world/server/map-room/map-player"
 import type { Presence } from "#/world/server/map-room/presence"
-import type { Ctx } from "#/world/server/map-room/context"
+import type { Player } from "#/durable-objects/player"
+import type { PlayerCommandContext } from "#/world/server/map-room/player-command-types"
 import type { ServerMessage } from "#/world/protocol"
-const run = vi.hoisted(() => vi.fn())
+const run = vi.hoisted(() => vi.fn<ReturnType<typeof Player.get>["run"]>())
 vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }))
-vi.mock("../../../durable-objects/player", () => ({ Player: { get: () => ({ run }) } }))
-import { HANDLERS } from "#/world/server/map-room/work"
+vi.mock("#/durable-objects/player", () => ({ Player: { get: () => ({ run }) } }))
+import { handlePlayerCommand } from "#/world/server/map-room/handle-player-command"
 afterEach(() => {
   vi.restoreAllMocks()
   run.mockReset()
@@ -18,7 +19,7 @@ function fixture() {
   const save = vi.fn((patch: Partial<Presence>) => Object.assign(me, patch))
   const send = vi.fn(async (_message: ServerMessage) => {}),
     broadcast = vi.fn(async () => {})
-  const context = { ctx: { connection: { id: "connection", send }, room: { broadcast } }, me, save } as unknown as Ctx
+  const context: PlayerCommandContext = { ctx: { connection: { id: "connection", send }, room: { broadcast } }, map: { id: "phanthiet" }, me, save }
   return { p, me, save, send, broadcast, context }
 }
 it("keeps the confirmed sitting state when notifying the client fails", async () => {
@@ -26,7 +27,7 @@ it("keeps the confirmed sitting state when notifying the client fails", async ()
   run.mockResolvedValue({ ok: true, state: { ...f.p, sitting: true }, events: [{ type: "sat" }] })
   f.send.mockRejectedValue(Error("Socket unavailable"))
   vi.spyOn(console, "warn").mockImplementation(() => {})
-  await HANDLERS.command!(f.context, { type: "command", seq: 1, command: { type: "sit" } })
+  await handlePlayerCommand(f.context, { type: "command", seq: 1, command: { type: "sit" } })
   expect(f.me.sitting).toBe(true)
   expect(f.save).toHaveBeenCalledExactlyOnceWith({ sitting: true })
 })
@@ -37,7 +38,7 @@ it("updates the saved profile and ready status even if its result notice is lost
   run.mockResolvedValue({ ok: true, state: p, events: [] })
   f.send.mockRejectedValue(Error("Socket unavailable"))
   vi.spyOn(console, "warn").mockImplementation(() => {})
-  await HANDLERS.command!(f.context, { type: "command", seq: 1, command: { type: "profile", name: p.name, look: p.look, neck: p.neck, neckRamp: "cBlue" } })
+  await handlePlayerCommand(f.context, { type: "command", seq: 1, command: { type: "profile", name: p.name, look: p.look, neck: p.neck, neckRamp: "cBlue" } })
   expect(f.me.ready).toBe(true)
   expect(f.me.player?.name).toBe("エルナ")
   expect(f.broadcast).toHaveBeenCalledOnce()
@@ -45,14 +46,14 @@ it("updates the saved profile and ready status even if its result notice is lost
 it("does not change room state or send success when the player save fails", async () => {
   const f = fixture()
   run.mockRejectedValue(Error("Storage unavailable"))
-  await expect(HANDLERS.command!(f.context, { type: "command", seq: 1, command: { type: "sit" } })).rejects.toThrow("Storage unavailable")
+  await expect(handlePlayerCommand(f.context, { type: "command", seq: 1, command: { type: "sit" } })).rejects.toThrow("Storage unavailable")
   expect(f.save).not.toHaveBeenCalled()
   expect(f.send).not.toHaveBeenCalled()
 })
 it("does not change the sitting state when the player refuses the command", async () => {
   const f = fixture()
   run.mockResolvedValue({ ok: false, reason: "NOT_READY" })
-  await HANDLERS.command!(f.context, { type: "command", seq: 1, command: { type: "sit" } })
+  await handlePlayerCommand(f.context, { type: "command", seq: 1, command: { type: "sit" } })
   expect(f.save).not.toHaveBeenCalled()
   expect(f.send).toHaveBeenCalledExactlyOnceWith({ type: "result", seq: 1, result: { ok: false, reason: "NOT_READY" } })
 })
