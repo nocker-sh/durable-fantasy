@@ -2,7 +2,7 @@ import { handlePartyMode } from "#/world/server/map-room/handle-party-mode"
 import { handlePartyLeave } from "#/world/server/map-room/handle-party-leave"
 import { handlePartyInvite } from "#/world/server/map-room/handle-party-invite"
 // The map room's handlers for parties (core/party.ts).
-import { sendPartyChat } from "#/world/server/map-room/send-party-chat"
+import { handlePartyLook } from "#/world/server/map-room/handle-party-look"
 import { Party } from "#/durable-objects/party"
 import { Player } from "#/durable-objects/player"
 import { derive } from "#/world/core/derive"
@@ -47,42 +47,10 @@ async function partyAnswer(roomCtx: Ctx, message: Message<"party-answer">) {
   return
 }
 
-async function partyLook(roomCtx: Ctx, message: Message<"party-look">) {
-  const ctxSource5 = roomCtx,
-    ctx = ctxSource5.ctx,
-    map = ctxSource5.map,
-    me = ctxSource5.me,
-    save = ctxSource5.save
-  if (!me.owner || !me.player) return
-  if (!me.party) {
-    await ctx.connection.send({ type: "party", view: null })
-    return
-  }
-  // report how we are, and see how the others are
-  const d = await Player.get(me.owner).read()
-  const pSource = await Party.get(me.party).poll({
-      owner: me.owner,
-      status: { name: me.player.name, level: d.level, hp: d.hp, maxHp: derive(d).maxHp, map: map.name, at: Date.now() },
-      after: message.chat?.party === me.party ? message.chat.seq : 0,
-    }),
-    p = pSource.party,
-    chat = pSource.chat
-  if (!p.members.some((m) => m.owner === me.owner)) {
-    // the party broke up while we were away
-    save({ party: null })
-    await ctx.connection.send({ type: "result", seq: -1, result: await Player.get(me.owner).run({ type: "set-party", party: null }) })
-    await ctx.connection.send({ type: "party", view: null })
-    return
-  }
-  await ctx.connection.send({ type: "party", view: partyView(p, me.owner) })
-  if (d.party === me.party) await sendPartyChat(roomCtx, chat)
-  return
-}
-
 export const HANDLERS: Handlers = {
   "party-invite": handlePartyInvite,
   "party-answer": partyAnswer,
   "party-leave": handlePartyLeave,
   "party-mode": handlePartyMode,
-  "party-look": partyLook,
+  "party-look": handlePartyLook,
 }

@@ -3,7 +3,9 @@ import type { Ctx } from "#/world/server/map-room/context"
 import { presence } from "#/world/server/map-room/presence"
 import { notifyClient } from "#/world/server/map-room/notifications"
 
-export async function sendPartyChat(context: Pick<Ctx, "ctx" | "me">, batch: ReturnType<typeof readPartyChat>) {
+type Props = Readonly<Pick<Ctx, "me"> & { ctx: Readonly<{ connection: Pick<Ctx["ctx"]["connection"], "state" | "send"> }> }>
+
+export async function sendPartyChat(context: Props, batch: ReturnType<typeof readPartyChat>) {
   const ctx = context.ctx
   const me = context.me
 
