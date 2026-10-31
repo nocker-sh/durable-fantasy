@@ -896,7 +896,7 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 ## 一棟の共有する戸口と板の所有
 
-`audit-building-layout.ts` が建物の資料を検証し、扉の所有、各階の配置、外への接続を順に照合する。`building-layout-schema.ts` が計画矩形、階と所属室の一覧を読み取り、検査で使う `Layout` の型もそのスキーマから導く。不正な計画矩形と一覧を型の強制変換で通さず、扉の所有の検査結果を保持して入力の不備を返す。比較する接続先の選別は `get-room-connection-scope-error.ts` が行い、所属の規則は `.docs/settings/README.md` の「一棟の共通座標」に従う。戸口の走査は `get-grid-boundary-opening.ts` が確認した、実際のグリッド内の開口に限る。
+`audit-building-layout.ts` が建物の資料を検証し、扉の所有、各階の配置、外への接続を順に照合する。`building-dimensions-schema.ts` は計画矩形の寸法を検証し、`audit-building-envelope.ts` と `building-layout-schema.ts` が共有する。後者は階と所属室の一覧も読み取り、検査で使う `Layout` の型もそのスキーマから導く。不正な計画矩形と一覧を型の強制変換で通さず、扉の所有の検査結果を保持して入力の不備を返す。比較する接続先の選別は `get-room-connection-scope-error.ts` が行い、所属の規則は `.docs/settings/README.md` の「一棟の共通座標」に従う。戸口の走査は `get-grid-boundary-opening.ts` が確認した、実際のグリッド内の開口に限る。
 
 `audit-building-floors.ts` は階をまたぐ登録と建物の部屋一覧を照合し、`audit-building-floor.ts` は一階分の占有と各室の接続の検査をまとめる。`get-floor-room-placement.ts` が所属階と種別を確かめ、部屋の原点と矩形グリッドは `room-layout-schema.ts` で検証する。`floor-occupancy.ts` の `FloorOccupancy` は一階分の平面の占有を保持し、境界外と共有を許さない重なりを報告する。部屋の接続や扉の操作はこの集計とは分けて照合し、平面の占有が通ったことを立体の整合とは扱わない。
 
