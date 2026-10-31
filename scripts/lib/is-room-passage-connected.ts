@@ -2,7 +2,6 @@ import { auditRoomConnection } from "#/scripts/lib/audit-room-connection"
 import { roomOriginSchema, roomGridSchema } from "#/scripts/lib/room-layout-schema"
 import { roomConnectionsSchema } from "#/scripts/lib/room-connection-schema"
 import { getReciprocalRoomConnection } from "#/scripts/lib/get-reciprocal-room-connection"
-import { getRoomConnectionOpening } from "#/scripts/lib/get-room-connection-opening"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 import type { Connection } from "#/scripts/lib/building-layout"
 
@@ -22,8 +21,5 @@ export function isRoomPassageConnected(props: Props): boolean {
   const targetOrigin = roomOriginSchema.safeParse(target.origin)
   if (!reciprocal || !targetOrigin.success || auditRoomConnection({ building: props.building, room: target, origin: targetOrigin.data, connection: reciprocal, documents: props.documents }).length)
     return false
-  if (props.connection.kind === "stair") return true
-  const opening = getRoomConnectionOpening(props),
-    targetOpening = getRoomConnectionOpening({ room: target, connection: reciprocal, cellMetres: props.cellMetres })
-  return !!opening && !!targetOpening && opening.outward[0] === -targetOpening.outward[0] && opening.outward[1] === -targetOpening.outward[1]
+  return true
 }

@@ -900,7 +900,7 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 `audit-building-floors.ts` は階をまたぐ登録と建物の部屋一覧を照合し、`audit-building-floor.ts` は一階分の占有と各室の接続の検査をまとめる。`get-floor-room-placement.ts` が所属階と種別を確かめ、部屋の原点と矩形グリッドは `room-layout-schema.ts` で検証する。`floor-occupancy.ts` の `FloorOccupancy` は一階分の平面の占有を保持し、境界外と共有を許さない重なりを報告する。部屋の接続や扉の操作はこの集計とは分けて照合し、平面の占有が通ったことを立体の整合とは扱わない。
 
-`audit-room-layout-connections.ts` は一室の接続と戸口セルを照合する。接続の読み取りと `Connection` の型は `room-connection-schema.ts` に置く。`audit-room-connection.ts` は接続先の所属、検証した原点、逆向きの宣言を解決する。`get-reciprocal-room-connection.ts` は両端を照合し、戸口は `audit-connected-room-door.ts`、階段の平面位置と使用面は `audit-connected-room-stair.ts` が調べる。外へ出られるかの探索も同じ接続スキーマを使い、不正な一覧を未検証の型変換で通さない。
+`audit-room-layout-connections.ts` は一室の接続と戸口セルを照合する。接続の読み取りと `Connection` の型は `room-connection-schema.ts` に置く。`audit-room-connection.ts` は接続先の所属、検証した原点、逆向きの宣言を解決する。`get-reciprocal-room-connection.ts` は両端を照合し、戸口は `audit-connected-room-door.ts`、階段の平面位置と使用面は `audit-connected-room-stair.ts` が調べる。戸口の両側の開口・縮尺・向きは `are-room-doorways-facing.ts` で照合し、接続自体の不備として報告する。外へ出られるかの探索も同じ接続スキーマを使い、不正な一覧を未検証の型変換で通さない。
 
 `audit-building-access.ts` は `is-room-passage-connected.ts` で両方向の幾何が成立する室間の接続だけを探索する。`get-room-connection-opening.ts` は実際の境界の開口と幅・縮尺を照合し、`get-exterior-room-connection-error.ts` は外へ出る探索の起点を判定する。通行の規則と検査の限界は `.docs/settings/README.md` の「一棟の共通座標」に従う。
 

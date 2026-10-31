@@ -1,3 +1,4 @@
+import { areRoomDoorwaysFacing } from "#/scripts/lib/are-room-doorways-facing"
 import { same } from "#/scripts/lib/building-layout/same"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 import type { Connection } from "#/scripts/lib/building-layout"
@@ -11,7 +12,7 @@ type Props = Readonly<{
   reciprocal: Connection | undefined
 }>
 
-/** A reciprocal door must meet at the same building cell and on the same floor. */
+/** Reciprocal doors must share a building cell and floor, with real openings facing each other. */
 export function auditConnectedRoomDoor(props: Props): string[] {
   const errors: string[] = [],
     door = props.connection.door,
@@ -26,6 +27,7 @@ export function auditConnectedRoomDoor(props: Props): string[] {
     errors.push(`${props.room.id}: connected doors do not meet`)
 
   if (props.connection.width_cells !== props.reciprocal?.width_cells) errors.push(`${props.room.id}: door widths disagree`)
+  if (!areRoomDoorwaysFacing(props)) errors.push(`${props.room.id}: connected doorways do not face each other`)
 
   return errors
 }
