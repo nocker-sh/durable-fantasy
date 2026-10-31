@@ -32,3 +32,23 @@ it("rejects ceiling levels which put an occupied landing inside the ceiling", ()
 it("detects the overhead floor when no opening is provided", () => {
   expect(stairHeadroom({ ...section(), opening_length_m: 0 }).minimum_m).toBeLessThan(0)
 })
+
+it("handles a large finite stair without spreading every tread into the minimum call", () => {
+  const input = section()
+  input.risers = 200000
+  input.opening_length_m = (input.risers - 1) * input.going_m
+  expect(stairHeadroom(input)).toEqual({ minimum_m: 4.72 - 2.52, problems: [] })
+})
+
+it("handles the largest safe tread count without allocating per-tread clearances", () => {
+  const input = section()
+  input.risers = Number.MAX_SAFE_INTEGER
+  input.opening_length_m = (input.risers - 1) * input.going_m
+  expect(stairHeadroom(input)).toEqual({ minimum_m: 4.72 - 2.52, problems: [] })
+})
+it.each([0, 1, -1, 2.5, Infinity, NaN])("rejects invalid riser count %s", (risers) => {
+  expect(stairHeadroom({ ...section(), risers })).toEqual({ minimum_m: null, problems: ["Invalid stair headroom dimensions"] })
+})
+it.each([0, -1, Infinity, NaN])("rejects invalid tread depth %s", (going_m) => {
+  expect(stairHeadroom({ ...section(), going_m })).toEqual({ minimum_m: null, problems: ["Invalid stair headroom dimensions"] })
+})

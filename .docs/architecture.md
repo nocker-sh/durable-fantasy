@@ -906,7 +906,7 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 `stair-sections-schema.ts` は資料の読み取りと `audit-stair-sections.ts` の断面の検査で共有する。床高の入力も既存の `floor-levels-schema.ts` を使い、構造の不備を幾何の計算の前に報告する。`get-stair-section-connection.ts` は同じ建物の上下階の部屋と接続・家具を検証して読み、`get-stair-section-frame.ts` が高さと平面の実寸を組み合わせる。
 
-`audit-stair-section.ts` は踏面・蹴上げと手すりの余白、頭上高、上下の踊り場の検査を順にまとめる。`audit-missing-stair-sections.ts` は設計を通過する建物で断面が欠けている接続を調べる。部屋一覧と接続は既存のスキーマを使い、階や接続の型を強制変換して計算へ渡さない。
+`audit-stair-section.ts` は踏面・蹴上げと手すりの余白、頭上高、上下の踊り場の検査を順にまとめる。`stair-headroom.ts` は踊り場の高さと、下側の天井に覆われる最も高い踏面から最小の頭上高を求める。`get-first-covered-stair-tread.ts` は元の積と厳密な比較を使う二分探索で、その踏面を特定する。段数分の配列や関数の引数を作らない。`audit-missing-stair-sections.ts` は設計を通過する建物で断面が欠けている接続を調べる。部屋一覧と接続は既存のスキーマを使い、階や接続の型を強制変換して計算へ渡さない。
 
 `get-room-doorway-review.ts` が境界と幅、連続した戸口セルを照合する。経路に使う開口の読み取りと `room-doorway-inventory.ts` の `RoomDoorwayInventory` がこの判定を共有する。戸口の集計は検証した開口のセルだけを列挙し、重複と未接続を報告する。
 

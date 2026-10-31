@@ -1,3 +1,6 @@
+import { getFirstCoveredStairTread } from "#/scripts/lib/get-first-covered-stair-tread"
+import { getStairHeadroomInputError } from "#/scripts/lib/get-stair-headroom-input-error"
+
 export type StairHeadroom = {
   bottom_m: number
   top_m: number
@@ -7,28 +10,16 @@ export type StairHeadroom = {
   going_m: number
   opening_length_m: number | null
 }
-/** Opening starts at the upper landing and extends down the straight flight. */
+
+/** Landing clearances bound the upper-ceiling steps; only the highest covered tread can lower the remaining minimum. */
 export function stairHeadroom(section: StairHeadroom): { minimum_m: number | null; problems: string[] } {
-  const bottom_mSource = section,
-    bottom_m = bottom_mSource.bottom_m,
-    top_m = bottom_mSource.top_m,
-    lower_ceiling_m = bottom_mSource.lower_ceiling_m,
-    upper_ceiling_m = bottom_mSource.upper_ceiling_m,
-    risers = bottom_mSource.risers,
-    going_m = bottom_mSource.going_m,
-    opening_length_m = bottom_mSource.opening_length_m
-  if (lower_ceiling_m === null || upper_ceiling_m === null || opening_length_m === null) return { minimum_m: null, problems: [] }
-  const run = (risers - 1) * going_m
-  if (lower_ceiling_m <= bottom_m || lower_ceiling_m > top_m || upper_ceiling_m <= top_m) return { minimum_m: null, problems: ["Stair ceiling elevations disagree with floors"] }
-  if (opening_length_m < 0 || opening_length_m > run + 1e-9) return { minimum_m: null, problems: ["Floor opening extends beyond the stair flight"] }
-  const clearances = [lower_ceiling_m - bottom_m, upper_ceiling_m - top_m],
-    rise = (top_m - bottom_m) / risers
-  for (let step = 0; step < risers - 1; step++) {
-    const start = step * going_m,
-      end = (step + 1) * going_m,
-      height = top_m - (step + 1) * rise
-    if (start < opening_length_m - 1e-9) clearances.push(upper_ceiling_m - height)
-    if (end > opening_length_m + 1e-9) clearances.push(lower_ceiling_m - height)
-  }
-  return { minimum_m: Math.min(...clearances), problems: [] }
+  if (section.lower_ceiling_m === null || section.upper_ceiling_m === null || section.opening_length_m === null) return { minimum_m: null, problems: [] }
+  const problem = getStairHeadroomInputError(section)
+  if (problem) return { minimum_m: null, problems: [problem] }
+
+  const tread = getFirstCoveredStairTread({ first: 1, last: section.risers, going: section.going_m, threshold: section.opening_length_m + 1e-9 })
+  const rise = (section.top_m - section.bottom_m) / section.risers
+  const coveredClearance = tread < section.risers ? section.lower_ceiling_m - (section.top_m - tread * rise) : Infinity
+
+  return { minimum_m: Math.min(section.lower_ceiling_m - section.bottom_m, section.upper_ceiling_m - section.top_m, coveredClearance), problems: [] }
 }
