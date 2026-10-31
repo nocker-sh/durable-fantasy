@@ -19,7 +19,7 @@ import { PendingAction } from "#/world/scene/runtime/action-target"
 import { WarpMarkers } from "#/world/scene/runtime/warps"
 import { SceneFrameLoop } from "#/world/scene/runtime/scene-frame-loop"
 import { keyTurn } from "#/world/scene/key-turn"
-import { createGatheringSpots } from "#/world/scene/runtime/gathering"
+import { SceneGathering } from "#/world/scene/runtime/scene-gathering"
 import { createPointer } from "#/world/scene/runtime/pointer"
 import { createPreviewControls } from "#/world/scene/runtime/preview"
 import { createWalkers } from "#/world/scene/runtime/walkers"
@@ -178,7 +178,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
   const stepHeld = movementControl.stepHeld
   const stop = movementControl.stop
   // ---------------------------------------------------------------- gathering spots (core/gather.ts)
-  const spotsSource = createGatheringSpots(town, map),
+  const spotsSource = new SceneGathering({ town, map }),
     setNodes = spotsSource.setNodes,
     spotHit = spotsSource.spotHit
   const interactions = new SceneInteractions({

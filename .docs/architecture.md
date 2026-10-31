@@ -106,6 +106,8 @@ Durable Object の入口は `durable-objects/` にあり、どれも Void の規
 
 住民の名前要素と住民の対応、表示距離、指している住民の名前の強調は `scene-resident-names.ts` の SceneResidentNames が保持する。強調のクラスは対象が変わったときだけ付け替える。位置は人物の描画中の座標を使い、非表示の人物には指していても名札を出さない。
 
+採集物と作業場の描画ごとの保持、残量の表示、クリックした子から対象を引く処理は `scene-gathering.ts` の SceneGathering が担う。資源と設備の生成は `create-gathering-node.ts` と `create-station-spot.ts` に分け、生成順と採集物の通行判定はランタイムと書き出しで共通にする。釣りの利用位置は岸に残し、波紋だけを `find-fishing-water.ts` で橋を避けた近い水面へ置く。
+
 描画フレームの予約・頻度制限と FPS・状態通知の周期は `scene-frame-loop.ts` の SceneFrameLoop が保持する。起動時に時計を読み直し、描画を省くフレームでは時計と世界を進めない。更新へ渡す実経過時間と、動きの補間用に上限を置いた時間を区別する。世界の更新順と描画後の計測位置はランタイムに残し、停止後はフレームを追加予約しない。
 
 カメラと人物の間の遮蔽物は `scene-occlusion.ts` の SceneOcclusion が確認する。透過可能な物は目標の不透明度へ補間し、透過しない建物はそのまま保って人物の透視表示へ判定を渡す。プレビューでは物の透過と透視を行わない。材質の更新は `lib/graphics/set-object-opacity.ts` が単一・複数の材質を型で確かめて適用する。
