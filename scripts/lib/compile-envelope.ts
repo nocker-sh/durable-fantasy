@@ -1,3 +1,4 @@
+import { assertEnvelopePlanDimensions } from "#/scripts/lib/assert-envelope-plan-dimensions"
 import { assertFiniteEnvelope } from "#/scripts/lib/assert-finite-envelope"
 import { getEnvelopeSource } from "#/scripts/lib/get-envelope-source"
 import { getEnvelopeFlueOutlets } from "#/scripts/lib/get-envelope-flue-outlets"
@@ -21,6 +22,7 @@ export function compileEnvelope(
   rooms: ReadonlyMap<string, SettingDocument>,
   plan: Pick<AuthoredPlan, "cellM" | "width" | "depth" | "flues" | "windows" | "floorLevels" | "entryHeight">,
 ): BuildingEnvelope {
+  assertEnvelopePlanDimensions(building, plan)
   const source = getEnvelopeSource(building)
   const site = source.site_plan
   const foundation = source.foundation

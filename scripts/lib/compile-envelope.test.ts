@@ -77,3 +77,8 @@ it("rejects chimney coordinates that overflow after finite source heights are co
   request.building.flues = plan.flues.map(() => ({ outlet_above_ridge_m: Number.MAX_VALUE }))
   expect(() => compileEnvelope(request.building, request.rooms, plan)).toThrow("exterior.chimneys.0.top")
 })
+
+it.each([{ width: plan.width + 1 }, { depth: plan.depth + 1 }, { cellM: plan.cellM * 2 }])("rejects an exterior plan whose dimensions disagree with the building layout: %j", (dimensions) => {
+  const request = source()
+  expect(() => compileEnvelope(request.building, request.rooms, { ...plan, ...dimensions })).toThrow("Exterior dimensions disagree with authored layout")
+})
