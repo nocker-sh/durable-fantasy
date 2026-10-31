@@ -56,6 +56,7 @@ it("rejects overflowing transforms and incomplete or nonfinite origins without t
   for (const invalid of [
     { metres_per_tile: Number.MIN_VALUE },
     { room_origin: [Infinity, 0] },
+    { room_origin: [Number.MAX_VALUE, 0], site_origin: [Number.MAX_VALUE, 0], grid: { ...fixture().grid, cell_m: 1 }, metres_per_tile: 1 },
     { site_origin: [0] },
     { site_origin: [0, NaN] },
     { grid: { ...fixture().grid, cell_m: 1e308 }, width_m: 1e308, depth_m: 1e308, metres_per_tile: 1e308 },

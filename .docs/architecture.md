@@ -309,7 +309,7 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 `assert-finite-envelope.ts` は計算後の全数値も確認し、有限の入力同士の計算で非有限値が生じた場合は、その項目の位置を示して書出しを拒否する。
 
-`compile-envelope-window.ts` は窓を敷地の原点と基礎高さを含む同じ座標系へ投影し、対応する階の高さが一意に定まらない場合は拒否する。既存の描画へ渡す窓台の高さは、基礎からの相対高さとして保持する。`world/scene/construction/authored-building.ts` はこの寸法で建造し、室内表示の拡大倍率を屋外へ持ち込まない。煙突を乱数で増やさず、屋根材は元の建物の材質へ合わせる。寄り合い所の町の外観も同じ寸法で建造する。
+`get-envelope-window-projection.ts` は窓を敷地の原点と基礎高さを含む同じ座標系へ投影し、対応する階の高さが一意に定まらない場合は拒否する。`compile-envelope-window.ts` は投影した位置と向きから描画へ渡す窓の寸法を組み立てる。既存の描画へ渡す窓台の高さは、基礎からの相対高さとして保持する。`world/scene/construction/authored-building.ts` はこの寸法で建造し、室内表示の拡大倍率を屋外へ持ち込まない。煙突を乱数で増やさず、屋根材は元の建物の材質へ合わせる。寄り合い所の町の外観も同じ寸法で建造する。
 
 窓と吊り灯りは各室の `windows` と `lamps` に持ち、`scripts/lib/room-fixtures.ts` が壁・天井・家具との位置を確認する。窓は階と外壁上の位置・開口幅・腰高・高さ・枠を、灯りは平面位置・本体の上下と天井への吊りを持つ。`world/town/room-fixtures.ts` の形で室内と外観へ投影し、`world/scene/construction/room-fixtures.ts` が共通の窓枠を描く。
 
@@ -907,6 +907,8 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 `stair-sections-schema.ts` は資料の読み取りと `audit-stair-sections.ts` の断面の検査で共有する。床高の入力も既存の `floor-levels-schema.ts` を使い、構造の不備を幾何の計算の前に報告する。`get-stair-section-connection.ts` は同じ建物の上下階の部屋と接続・家具を検証して読み、`get-stair-section-frame.ts` が高さと平面の実寸を組み合わせる。
 
 `audit-stair-section.ts` は踏面・蹴上げと手すりの余白、頭上高、上下の踊り場の検査を順にまとめる。`stair-headroom.ts` は踊り場の高さと、下側の天井に覆われる最も高い踏面から最小の頭上高を求める。`get-first-covered-stair-tread.ts` は元の積と厳密な比較を使う二分探索で、その踏面を特定する。段数分の配列や関数の引数を作らない。`audit-missing-stair-sections.ts` は設計を通過する建物で断面が欠けている接続を調べる。部屋一覧と接続は既存のスキーマを使い、階や接続の型を強制変換して計算へ渡さない。
+
+戸口と部屋の敷地の投影は `project-site-door-pose.ts` と `project-room-site-rectangle.ts` に分ける。資料を読む入口が縮尺と所属を検証し、共通変換の数値の不備を各入口の返し方へ対応させる。共通空間の要件と残件は [[spatial-model]] にある。
 
 `get-room-doorway-review.ts` が境界と幅、連続した戸口セルを照合する。経路に使う開口の読み取りと `room-doorway-inventory.ts` の `RoomDoorwayInventory` がこの判定を共有する。戸口の集計は検証した開口のセルだけを列挙し、重複と未接続を報告する。
 

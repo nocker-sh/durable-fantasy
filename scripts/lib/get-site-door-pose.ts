@@ -1,3 +1,5 @@
+import { projectSiteDoorPose } from "#/scripts/lib/project-site-door-pose"
+import type { SiteDoorPose } from "#/scripts/lib/site-door-pose-types"
 import { getGridBoundaryOpening } from "#/scripts/lib/get-grid-boundary-opening"
 import { SpatialFrame } from "#/lib/engine/spatial-frame"
 
@@ -12,10 +14,9 @@ type Props = {
   rotation_quarters: number
   metres_per_tile: number
 }
-type Pose = { point: [number, number]; outward: [number, number]; width_m: number; bounds: [number, number, number, number] }
 
 /** A boundary doorway and its exterior site use the same frame and unit conversion. */
-export function getSiteDoorPose(props: Props): Pose | undefined {
+export function getSiteDoorPose(props: Props): SiteDoorPose | undefined {
   const opening = getGridBoundaryOpening({ rows: props.grid.rows, door: props.door, span: props.span })
   if (!opening || ![0, 1, 2, 3].includes(props.rotation_quarters)) return undefined
   if (![props.metres_per_tile, props.grid.cell_m, props.width_m, props.depth_m].every((value) => Number.isFinite(value) && value > 0)) return undefined
@@ -28,10 +29,11 @@ export function getSiteDoorPose(props: Props): Pose | undefined {
   const scale = props.grid.cell_m / props.metres_per_tile
   const localX = (props.room_origin[0] + opening.cell[0] + opening.offset[0]) * scale
   const localZ = (props.room_origin[1] + opening.cell[1] + opening.offset[1]) * scale
-  const frame = new SpatialFrame({ origin: [props.site_origin[0], 0, props.site_origin[1]], width, depth, quarterTurns: props.rotation_quarters })
-  const point = frame.toWorld([localX, 0, localZ])
-  const outward = frame.direction([opening.outward[0], 0, opening.outward[1]])
-  const bounds: Pose["bounds"] = [props.site_origin[0], props.site_origin[1], props.site_origin[0] + frame.size[0], props.site_origin[1] + frame.size[1]]
-  if (![...point, ...bounds].every(Number.isFinite)) return undefined
-  return { point: [point[0], point[2]], outward: [outward[0], outward[2]], width_m: openingWidth, bounds }
+  try {
+    const frame = new SpatialFrame({ origin: [props.site_origin[0], 0, props.site_origin[1]], width, depth, quarterTurns: props.rotation_quarters })
+    return projectSiteDoorPose({ frame, opening, local: [localX, 0, localZ], siteOrigin: props.site_origin, openingWidth })
+  } catch (error) {
+    if (error instanceof RangeError) return undefined
+    throw error
+  }
 }

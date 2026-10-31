@@ -47,3 +47,30 @@ it("keeps its coordinate frame fixed when the caller later edits the source valu
   expect(frame.size).toEqual([6, 8])
   expect(Object.isFrozen(frame)).toBe(true)
 })
+
+it("rejects nonfinite coordinates and directions at the transform boundary", () => {
+  const frame = new SpatialFrame({ origin: [0, 0, 0], width: 8, depth: 6, quarterTurns: 0 })
+  for (const invalid of [NaN, Infinity, -Infinity]) {
+    expect(() => frame.toWorld([invalid, 0, 0])).toThrow(RangeError)
+    expect(() => frame.toLocal([0, invalid, 0])).toThrow(RangeError)
+    expect(() => frame.direction([0, 0, invalid])).toThrow(RangeError)
+  }
+})
+it("rejects overflowing height addition and inverse subtraction from finite inputs", () => {
+  const upper = new SpatialFrame({ origin: [0, Number.MAX_VALUE, 0], width: 8, depth: 6, quarterTurns: 0 })
+  const lower = new SpatialFrame({ origin: [0, -Number.MAX_VALUE, 0], width: 8, depth: 6, quarterTurns: 0 })
+  expect(() => upper.toWorld([0, Number.MAX_VALUE, 0])).toThrow(RangeError)
+  expect(() => lower.toLocal([0, Number.MAX_VALUE, 0])).toThrow(RangeError)
+})
+it("rejects an overflowing rotated point without clamping it into the frame", () => {
+  const frame = new SpatialFrame({ origin: [0, 0, 0], width: Number.MAX_VALUE, depth: 6, quarterTurns: 2 })
+  expect(() => frame.toWorld([-Number.MAX_VALUE, 0, 0])).toThrow(RangeError)
+  expect(() => frame.toLocal([-Number.MAX_VALUE, 0, 0])).toThrow(RangeError)
+})
+it("rejects incomplete runtime coordinates despite their static tuple type", () => {
+  const source = { origin: [0, 0, 0] satisfies [number, number, number], width: 8, depth: 6, quarterTurns: 0 }
+  for (const origin of [[], [0, 0], new Array<number>(3), null, {}]) {
+    Object.assign(source, { origin })
+    expect(() => new SpatialFrame(source)).toThrow(RangeError)
+  }
+})
