@@ -53,7 +53,7 @@ import { Ashfall } from "#/world/scene/ashfall"
 import { dustAll } from "#/world/scene/dust-all"
 import { MAP_SCENES } from "#/world/scene/runtime/definitions"
 import { diorama } from "#/world/scene/runtime/settings"
-import { createTerrain } from "#/world/scene/runtime/terrain"
+import { createSceneTerrain } from "#/world/scene/runtime/create-scene-terrain"
 import { createEnvironment } from "#/world/scene/runtime/helpers/lighting/create-environment"
 import { createLighting } from "#/world/scene/runtime/helpers/lighting/create-lighting"
 import { createPopulation } from "#/world/scene/runtime/population"
@@ -99,7 +99,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
   const post = resources.use(new DioramaPostProcessing(renderer))
   const render = () => post.render({ scene: scene, cam: cam, diorama: diorama, renderScale: camera.scale })
 
-  const groundCanvasSource = await createTerrain({ scene: scene, world: world, ground: ground, progress: progress, tick: tick, resources: resources }),
+  const groundCanvasSource = await createSceneTerrain({ scene: scene, world: world, ground: ground, progress: progress, tick: tick, resources: resources }),
     groundCanvas = groundCanvasSource.groundCanvas,
     wm = groundCanvasSource.wm,
     terrain = groundCanvasSource.terrain
