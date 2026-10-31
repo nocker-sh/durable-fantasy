@@ -1030,6 +1030,8 @@ React との共有の定義は `components/game/game-context.ts` に一つだけ
 
 パーティの招待は `world/server/map-room/handle-party-invite.ts`、脱退は `handle-party-leave.ts`、分配変更は `handle-party-mode.ts` が受け持つ。`get-party-invitation-rejection.ts` は既存のパーティのリーダーかどうかを満員より先に判定する。招待は接続の招待先を保存してから相手へ通知し、その場で所属を変えない。脱退はパーティの保存先、接続の所属、本人の保存状態の順に更新してから表示を外す。分配の変更権限は保存先に任せる。これらの受付は必要な状態参照・送信・接続の更新だけを引数の型へ表す。
 
+パーティの対応表は `world/server/map-room/party.ts`、招待への返答は `handle-party-answer.ts` に置く。有効な招待を消費してから辞退と既存の所属を調べ、新規の場合は `initialize-party.ts` で招待者を先に登録する。返答者の登録は `join-party-member.ts` が受け持ち、名簿が拒否した場合は本人の所属を保存せず満員を返す。名簿への追加、本人への保存結果の送信、接続の所属の反映を元の順に進める。`read-party-member.ts` は加入時の本人の保存状態から名簿用の値を作る。加入先の参照は `party-join-types.ts` の必要な RPC だけで渡す。
+
 パーティの定期確認は `world/server/map-room/handle-party-look.ts` が一度の照会で名簿と会話を受け取る。同じパーティの会話番号だけを引き継ぎ、名簿から本人が消えていれば `clear-party-membership.ts` で接続の所属、本人の保存状態、表示の順に後始末する。通常の脱退もパーティの保存先から離れた後に同じ処理を使う。照会が失敗しただけでは所属を消さない。表示を送ってから会話を送り、会話は本人の保存済み所属が接続の所属と一致するときだけ送る。`send-party-chat.ts` は接続の状態参照と送信だけに依存する。
 
 対面取引の対応表は `world/server/map-room/trade.ts`、決定と交換の受付は `handle-trade-confirmation.ts` に置く。`get-trade-confirmation-participants.ts` が現在の双方の取引と所有者を照合し、双方の確定を通信前に予約する。`settle-map-trade.ts` は事前検査、保存先での進行、状態通知、終了を順に呼ぶ。保存状態の読取りと検査は `prepare-trade-settlement.ts`、提示の品列と各参加者の版から提案を作る処理は `get-trade-proposals.ts` が持つ。`advance-trade-settlement.ts` は所有者順で担当を一つ決め、登録後の進行を保存境界ごとに呼ぶ。予約開始前の例外と開始後の応答喪失を区別し、保存済みの処理は逆送付で補償せずアラームの回復に任せる。確定後の状態通知は `publish-settled-trade.ts`、同じ取引だけの終了と通知は `close-settled-trade.ts` に置く。必要な RPC の型は `trade-settlement-types.ts` で限定する。
