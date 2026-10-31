@@ -1,3 +1,7 @@
+import { SceneShadowUpdates } from "#/world/scene/runtime/scene-shadow-updates"
+import { SceneOutlines } from "#/world/scene/runtime/scene-outlines"
+import { updateSceneFog } from "#/world/scene/runtime/update-scene-fog"
+import { updateMonsterLabels } from "#/world/scene/runtime/update-monster-labels"
 import { pickVisibleOwner } from "#/lib/graphics/pick-visible-owner"
 import { ScenePosture } from "#/world/scene/runtime/scene-posture"
 import { SceneCombatFeedback } from "#/world/scene/runtime/scene-combat-feedback"
@@ -40,15 +44,12 @@ import { updateCutaways } from "#/world/scene/update-cutaways"
 import { burst } from "#/world/scene/burst"
 import { makeMonsters } from "#/world/scene/make-monsters"
 import { SceneCombat } from "#/world/scene/runtime/scene-combat"
-import { updateMonsterHealth } from "#/world/scene/update-monster-health"
 import { updateMonsters } from "#/world/scene/update-monsters"
-import { MONSTER_KINDS } from "#/world/core/monsters"
 import { groundOf } from "#/world/scene/ground-of"
 import { occluders, houseGlows, lamps, stalls, movingObjects } from "#/world/scene/construction/registry"
 import { resetRegistries } from "#/world/scene/construction/reset-registries"
 import type { V2 } from "#/world/scene/construction/registry"
 import { daylight } from "#/world/core/daylight"
-import { outlineShape } from "#/lib/graphics/outline-shape"
 import type { Actor } from "#/world/scene/actor"
 import { FIG } from "#/world/scene/figure/display-scale"
 import { critters } from "#/world/scene/critters"
@@ -98,7 +99,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
   lap("scene: start")
   initWalk()
   const renderer = createSceneRenderer(resources)
-  let shadowDirty = true
+  const shadows = new SceneShadowUpdates({ shadowMap: renderer.shadowMap })
   const scene = createSceneRoot(resources)
 
   const post = resources.use(new DioramaPostProcessing(renderer))
@@ -165,11 +166,11 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
   const lighting = createLighting({ scene: scene, world: world, wm: wm, applySchedule: applySchedule, environment: environment })
   const setClock = (min: number) => {
     lighting.setClock(min)
-    shadowDirty = true
+    shadows.invalidate()
   }
   const setTod = (k: number) => {
     lighting.setTod(k)
-    shadowDirty = true
+    shadows.invalidate()
   }
   // ---------------------------------------------------------------- movement
   const action = new PendingAction<Actor>()
@@ -307,15 +308,9 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
   const cameraFollow = new SceneCameraFollow({ camera, movement, me, preview: previewControls, heightAt: walkH })
   const occlusion = new SceneOcclusion({ occluders, camera: cam, me, preview })
   const frameLoop = new SceneFrameLoop({ clock, running: () => runtime.running, render: frame, tick: () => runtime.events?.tick() })
-  const SHADOW_MS = 250
-  let shadowAt = 0
+  const outlines = new SceneOutlines({ me, people, remotes, monsters, critters, pointer, preview })
   function frame(input: SceneFrame) {
-    const at = input.at
-    if (shadowDirty || at - shadowAt > SHADOW_MS) {
-      renderer.shadowMap.needsUpdate = true
-      shadowDirty = false
-      shadowAt = at
-    }
+    shadows.update(input.at)
     const dt = input.dt
     const t = input.time
     updateSceneWalkers({ me, remotes, preview, frame: input, step: stepWalker, place: placeWalker, stepHeld, arrive: interactions.arrive })
@@ -326,23 +321,10 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     cameraFollow.update(dt)
 
     if (world.indoor) updateCutaways(cam.position)
-    // a field's fog is measured from the player, not the camera, so it thickens beyond them, never on them
-    const fogDef = world.layout.fog
-    if (fogDef && scene.fog instanceof THREE.Fog) {
-      scene.fog.near = camera.distance + fogDef.near
-      scene.fog.far = camera.distance + fogDef.far
-    }
+    updateSceneFog({ scene, distance: camera.distance, definition: world.layout.fog })
     const hidden = occlusion.update(dt)
     pointer.update()
-    if (!preview) {
-      me.fig.xray(hidden)
-      // the player is always outlined (seen through roofs too); anyone else while the pointer is on them
-      me.fig.outline(true, hidden)
-    }
-    for (const a of people) a.fig.outline(a === pointer.hovered)
-    for (const w of remotes.values()) w.fig.outline(w === pointer.hoveredWalker)
-    for (const m of monsters) outlineShape(m.body, m.spawn.id === pointer.hoveredMonster)
-    for (const c of critters) c.outline(c === pointer.hoveredCritter)
+    outlines.update(hidden)
     environment.smoke.prepare(cam)
     render()
 
@@ -351,12 +333,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     // creatures: where the clock puts them; the one we fight, followed and struck when in reach
     const wall = Date.now()
     updateMonsters({ list: monsters, root: town, now: wall, yaw: movement.yaw, dt: dt })
-    for (const m of monsters) {
-      const kind = MONSTER_KINDS[m.spawn.kind]
-      const show = m.body.visible && (m.spawn.id === action.fighting || m.hp < kind.hp || Math.hypot(m.pos[0] - me.pos[0], m.pos[1] - me.pos[1]) < 4)
-      updateMonsterHealth(m)
-      labelProjection.place({ element: m.label, visible: show, pos: m.pos, height: 0.55, ground: m.groundHeight, offset: 2 })
-    }
+    updateMonsterLabels({ monsters, me, action, place: labelProjection.place })
     combat.update(wall)
     residentNames.update(pointer.hovered)
     const now = performance.now()
