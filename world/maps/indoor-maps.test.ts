@@ -110,3 +110,18 @@ it.each(["point", "width", "sill", "outward", "missing", "outside-extra"])("reje
   }
   expect(() => make(rooms)).toThrow(/Interior window/)
 })
+
+it.each(["point", "outward", "width", "height", "door-cell", "arrival", "missing"])("rejects an authored ground entrance with inconsistent %s", (invalid) => {
+  const rooms = structuredClone(interiors)
+  const room = rooms[0],
+    entrance = room.entrance
+  if (!entrance || !room.doorWidth || !room.doorHeight) throw new Error("Missing authored entrance fixture")
+  if (invalid === "point") entrance.point = [entrance.point[0] + 1, entrance.point[1]]
+  if (invalid === "outward") entrance.outward = [-entrance.outward[0], -entrance.outward[1]]
+  if (invalid === "width") room.doorWidth += 1
+  if (invalid === "height") room.doorHeight += 1
+  if (invalid === "door-cell") room.door = [room.door[0] + 1, room.door[1]]
+  if (invalid === "arrival") room.arrive = [room.arrive[0] + 1, room.arrive[1]]
+  if (invalid === "missing") room.entrance = undefined
+  expect(() => make(rooms)).toThrow(/Interior entrance/)
+})
