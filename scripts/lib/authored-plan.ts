@@ -18,7 +18,8 @@ import { compileEnvelope } from "#/scripts/lib/compile-envelope"
 import { compileFlues } from "#/scripts/lib/flue-sections"
 import { auditStairSections } from "#/scripts/lib/audit-stair-sections"
 import { parseFurnitureKind } from "#/world/town/parse-furniture-kind"
-import { assertAuthoredFloorLevels } from "#/world/town/floorplan/assert-authored-floor-levels"
+import { getAuthoredFloorLevels } from "#/scripts/lib/get-authored-floor-levels"
+import { buildingLayoutSchema } from "#/scripts/lib/building-layout-schema"
 import { authoredFloorPlan } from "#/world/town/floorplan/authored-floor-plan"
 import type { AuthoredPlan, AuthoredRoom } from "#/world/town/floorplan/authored-types"
 import { auditRoomGrid } from "#/scripts/lib/audit-room-grid"
@@ -26,18 +27,10 @@ import type { SettingDocument } from "#/scripts/lib/setting-document"
 
 /** Compile one building from its setting documents; runtime adoption is explicit in HOUSES. */
 export function compileAuthoredPlan(building: SettingDocument, documents: readonly SettingDocument[]): AuthoredPlan {
-  const layout = building.layout as { cell_m: number; width: number; depth: number; floors: { floor: number; rooms: string[] }[] } | undefined
-  if (building.kind !== "buildings" || !layout) throw new Error("Building layout required")
-  const levels = building.floor_levels as { floor: number; elevation_m: number; ceiling_elevation_m: number }[]
-  if (!Array.isArray(levels)) throw new Error("Authored floor levels are incomplete")
-  const foundation = building.foundation as { floor_thickness_m: number } | undefined
-  const floorLevels = levels.map((level) => ({
-    floor: level.floor,
-    elevation: level.elevation_m,
-    ceiling: level.ceiling_elevation_m,
-    thickness: level.floor === 0 ? Number(foundation?.floor_thickness_m) : level.elevation_m - Number(levels.find((below) => below.floor === level.floor - 1)?.ceiling_elevation_m),
-  }))
-  assertAuthoredFloorLevels(floorLevels, layout.floors.length)
+  const parsedLayout = buildingLayoutSchema.safeParse(building.layout)
+  if (building.kind !== "buildings" || !parsedLayout.success) throw new Error("Building layout required")
+  const layout = parsedLayout.data
+  const floorLevels = getAuthoredFloorLevels(building, layout.floors.length)
   const byId = new Map(documents.map((room) => [room.id, room]))
   const stairErrors = auditStairSections(building, byId)
   if (stairErrors.length) throw new Error(stairErrors.join("; "))
@@ -141,8 +134,8 @@ export function compileAuthoredPlan(building: SettingDocument, documents: readon
     const lower = rooms.find((r) => r.id === s.lower_room),
       upper = rooms.find((r) => r.id === s.upper_room)
     const piece = lower?.furniture.find((f) => f.symbol === s.furniture)
-    const lowerLevel = levels.find((l) => l.floor === lower?.floor),
-      upperLevel = levels.find((l) => l.floor === upper?.floor)
+    const lowerLevel = floorLevels.find((l) => l.floor === lower?.floor),
+      upperLevel = floorLevels.find((l) => l.floor === upper?.floor)
     if (!lower || !upper || !piece || !lowerLevel || !upperLevel) throw new Error("Stair section lacks its rooms, furniture or elevations")
     const xState2 = piece.rect,
       x = xState2[0],
@@ -158,8 +151,8 @@ export function compileAuthoredPlan(building: SettingDocument, documents: readon
       z0: (lower.origin[1] + z) * k,
       x1: (lower.origin[0] + x + w) * k,
       z1: (lower.origin[1] + z + d) * k,
-      height: upperLevel.elevation_m - lowerLevel.elevation_m,
-      slabThickness: upperLevel.elevation_m - lowerLevel.ceiling_elevation_m,
+      height: upperLevel.elevation - lowerLevel.elevation,
+      slabThickness: upperLevel.elevation - lowerLevel.ceiling,
       risers: s.risers,
       going: s.going_m,
       axis: s.axis === "y" ? "z" : "x",
