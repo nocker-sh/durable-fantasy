@@ -82,3 +82,10 @@ it.each([{ width: plan.width + 1 }, { depth: plan.depth + 1 }, { cellM: plan.cel
   const request = source()
   expect(() => compileEnvelope(request.building, request.rooms, { ...plan, ...dimensions })).toThrow("Exterior dimensions disagree with authored layout")
 })
+
+it.each([0, 1, 2, 3])("retains the authored quarter-turn for a shared indoor and outdoor frame: %s", (quarterTurns) => {
+  const request = source()
+  const site = getEnvelopeSource(request.building).site_plan
+  request.building.site_plan = { ...site, rotation_quarters: quarterTurns }
+  expect(compileEnvelope(request.building, request.rooms, plan).quarterTurns).toBe(quarterTurns)
+})

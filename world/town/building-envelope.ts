@@ -3,6 +3,8 @@ export type BuildingEnvelope = {
   windows: readonly FramedWindow[]
   id: string
   bounds: readonly [number, number, number, number]
+  /** Rotation from building-local axes into its outdoor map; never inferred from roof or door direction. */
+  quarterTurns: number
   floorY: number
   eaveY: number
   ridgeY: number

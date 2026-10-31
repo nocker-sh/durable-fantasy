@@ -55,6 +55,7 @@ export function compileEnvelope(
     ),
     id: building.id.replace(/^building-/, ""),
     bounds: [...site.origin, site.origin[0] + frame.size[0], site.origin[1] + frame.size[1]],
+    quarterTurns: rotation,
     floorY: datum / TILE_M,
     eaveY: (datum + roof.eave_underside_m) / TILE_M,
     ridgeY: (datum + roof.ridge_underside_m) / TILE_M,
