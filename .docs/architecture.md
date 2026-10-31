@@ -305,7 +305,7 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 煙道は建物の `flues` が炉と上階の区画を結び、`scripts/lib/flue-sections.ts` が支持する炉の占有と上階の保管からの離隔を照合する。上階の煙道は専用の家具種別として同じ平面へ投影し、下階の炉の上部もその矩形へ合わせる。棚を煙道と同じ位置に置いたまま外側に煙突だけを描かない。
 
-`scripts/lib/building-envelope.ts` は敷地の回転、基礎の床高、軒と棟・軒の出、入口の戸と外階段、煙道から外観の寸法を生成する。`world/scene/construction/authored-building.ts` はこの寸法で建造し、室内表示の拡大倍率を屋外へ持ち込まない。煙突を乱数で増やさず、屋根材は元の建物の材質へ合わせる。寄り合い所の町の外観も同じ寸法で建造する。
+`scripts/lib/compile-envelope.ts` は敷地の回転、基礎の床高、軒と棟・軒の出、入口の戸と外階段、煙道から外観の寸法を生成する。`compile-envelope-window.ts` は窓を敷地の原点と基礎高さを含む同じ座標系へ投影し、対応する階の高さが一意に定まらない場合は拒否する。既存の描画へ渡す窓台の高さは、基礎からの相対高さとして保持する。`world/scene/construction/authored-building.ts` はこの寸法で建造し、室内表示の拡大倍率を屋外へ持ち込まない。煙突を乱数で増やさず、屋根材は元の建物の材質へ合わせる。寄り合い所の町の外観も同じ寸法で建造する。
 
 窓と吊り灯りは各室の `windows` と `lamps` に持ち、`scripts/lib/room-fixtures.ts` が壁・天井・家具との位置を確認する。窓は階と外壁上の位置・開口幅・腰高・高さ・枠を、灯りは平面位置・本体の上下と天井への吊りを持つ。`world/town/room-fixtures.ts` の形で室内と外観へ投影し、`world/scene/construction/room-fixtures.ts` が共通の窓枠を描く。
 
@@ -329,7 +329,7 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 戸板、押して入る身体と室内側で開閉する身体、家具の使用面は `scripts/lib/door-axes.ts` の `doorAxes` から同じ閉じた向きと内向きを得る。鏡映した戸や壁の向きによって、それぞれ別の軸を選び直さない。
 
-外観の入口戸は `scripts/lib/building-envelope.ts` が `roomDoorSwing` の閉位置と蝶番を敷地座標へ投影する。壁面の開口中心は階段との接続に使い、戸板は壁厚分だけ室内側へ置く。`world/scene/construction/authored-building.ts` は枠の内端を開閉検査と同じ通り幅に置き、壁面から戸板までの見込みを枠と開口上面でつなぐ。
+外観の入口戸は `scripts/lib/compile-envelope.ts` が `roomDoorSwing` の閉位置と蝶番を敷地座標へ投影する。壁面の開口中心は階段との接続に使い、戸板は壁厚分だけ室内側へ置く。`world/scene/construction/authored-building.ts` は枠の内端を開閉検査と同じ通り幅に置き、壁面から戸板までの見込みを枠と開口上面でつなぐ。
 
 資料から作る平面の入口は `AuthoredPlan.entrySide` と開口セルの中心を持ち、`authoredFloorPlan` が外壁面上の二次元の点と外向きへ変換する。`interiorPlan` は同じ点と向きから戸口セルと内向きの到着セルを求め、`interiorRows` と室内の外壁開口も同じ入口を使う。戸口セルの中心は壁面より必ず内側に置く。外壁の角をまたぐ幅や、グリッドの戸口セルと一致しない入口は拒否する。既存の自動配置の平面が持つ南壁の入口は変更しない。
 

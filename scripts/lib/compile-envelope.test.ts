@@ -2,7 +2,7 @@ import { compileFlues } from "#/scripts/lib/flue-sections"
 import { readFileSync } from "node:fs"
 import { expect, it } from "vitest"
 import { readSetting } from "#/scripts/lib/read-setting"
-import { compileEnvelope } from "#/scripts/lib/building-envelope"
+import { compileEnvelope } from "#/scripts/lib/compile-envelope"
 import plan from "#/world/town/floorplan/authored/h-m5"
 import { TILE_M } from "#/world/town/fit"
 

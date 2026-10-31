@@ -8,7 +8,8 @@ import { entryStepGeometry } from "#/scripts/lib/entry-step-geometry"
 import type { EntrySteps } from "#/scripts/lib/entry-steps-types"
 import { roomDoorSwing } from "#/scripts/lib/room-door-swing"
 import { doorAxes } from "#/scripts/lib/door-axes"
-import { siteTransform } from "#/scripts/lib/site-transform"
+import { SpatialFrame } from "#/lib/engine/spatial-frame"
+import { compileEnvelopeWindow } from "#/scripts/lib/compile-envelope-window"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 
 /** Compile site and interior dimensions together; presentation magnification stays indoors. */
@@ -27,11 +28,12 @@ export function compileEnvelope(
   const width = (plan.width * plan.cellM) / TILE_M,
     depth = (plan.depth * plan.cellM) / TILE_M,
     rotation = site.rotation_quarters
-  const transform = siteTransform(width, depth, rotation)
+  const datum = foundation.floor_elevation_m
+  const frame = new SpatialFrame({ origin: [site.origin[0], datum / TILE_M, site.origin[1]], width, depth, quarterTurns: rotation })
   const rect = (r: { x0: number; z0: number; x1: number; z1: number }): [number, number, number, number] => {
-    const a = transform.point(r.x0 / TILE_M, r.z0 / TILE_M),
-      b = transform.point(r.x1 / TILE_M, r.z1 / TILE_M)
-    return [site.origin[0] + Math.min(a[0], b[0]), site.origin[1] + Math.min(a[1], b[1]), site.origin[0] + Math.max(a[0], b[0]), site.origin[1] + Math.max(a[1], b[1])]
+    const a = frame.toWorld([r.x0 / TILE_M, 0, r.z0 / TILE_M]),
+      b = frame.toWorld([r.x1 / TILE_M, 0, r.z1 / TILE_M])
+    return [Math.min(a[0], b[0]), Math.min(a[2], b[2]), Math.max(a[0], b[0]), Math.max(a[2], b[2])]
   }
   const flues = (building.flues ?? []) as { outlet_above_ridge_m: number }[]
   if (plan.flues.length !== flues.length || flues.some((f) => !Number.isFinite(f.outlet_above_ridge_m) || f.outlet_above_ridge_m <= 0)) throw new Error("Flue outlet height is missing")
@@ -63,8 +65,8 @@ export function compileEnvelope(
   const origin = entryRoom.origin as number[],
     closed = doorAxes(swing).closed
   const project = (x: number, z: number) => {
-    const p = transform.point((origin[0] * plan.cellM + x) / TILE_M, (origin[1] * plan.cellM + z) / TILE_M)
-    return [site.origin[0] + p[0], site.origin[1] + p[1]]
+    const point = frame.toWorld([(origin[0] * plan.cellM + x) / TILE_M, 0, (origin[1] * plan.cellM + z) / TILE_M])
+    return [point[0], point[2]]
   }
   const hinge = project(swing.hinge[0], swing.hinge[1]),
     centre = project(swing.hinge[0] + (closed[0] * swing.radius) / 2, swing.hinge[1] + (closed[1] * swing.radius) / 2)
@@ -73,28 +75,20 @@ export function compileEnvelope(
     recess = delta[0] * entrance.outward[0] + delta[1] * entrance.outward[1]
   if (recess < 0 || Math.abs(delta[0] * worldTangent[0] + delta[1] * worldTangent[1]) > 1e-6) throw new Error("Exterior door does not align with its interior opening")
   const hingeSign = Math.sign((hinge[0] - centre[0]) * worldTangent[0] + (hinge[1] - centre[1]) * worldTangent[1])
-  const datum = foundation.floor_elevation_m
   return {
-    windows: plan.windows.map((window) => {
-      const local =
-        window.side === "n" ? [window.along, 0] : window.side === "s" ? [window.along, plan.depth * plan.cellM] : window.side === "w" ? [0, window.along] : [plan.width * plan.cellM, window.along]
-      const offset = transform.point(local[0] / TILE_M, local[1] / TILE_M),
-        normal = window.side === "n" ? [0, -1] : window.side === "s" ? [0, 1] : window.side === "w" ? [-1, 0] : [1, 0],
-        direction = transform.direction(normal[0], normal[1])
-      return {
-        floor: window.floor,
-        id: window.id,
-        point: [site.origin[0] + offset[0], site.origin[1] + offset[1]],
-        outward: direction,
-        width: window.width / TILE_M,
-        height: window.height / TILE_M,
-        sill: (plan.floorLevels.find((level) => level.floor === window.floor)!.elevation + window.sill) / TILE_M,
-        frame: window.frame / TILE_M,
-        depth: plan.cellM / TILE_M,
-      }
-    }),
+    windows: plan.windows.map((window) =>
+      compileEnvelopeWindow({
+        window,
+        frame,
+        floorLevels: plan.floorLevels,
+        widthMetres: plan.width * plan.cellM,
+        depthMetres: plan.depth * plan.cellM,
+        wallMetres: plan.cellM,
+        metresPerTile: TILE_M,
+      }),
+    ),
     id: building.id.replace(/^building-/, ""),
-    bounds: [...site.origin, site.origin[0] + transform.size[0], site.origin[1] + transform.size[1]],
+    bounds: [...site.origin, site.origin[0] + frame.size[0], site.origin[1] + frame.size[1]],
     floorY: datum / TILE_M,
     eaveY: (datum + roof.eave_underside_m) / TILE_M,
     ridgeY: (datum + roof.ridge_underside_m) / TILE_M,
