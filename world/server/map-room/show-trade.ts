@@ -1,14 +1,15 @@
 import type { WebSocketConnection } from "void/ws"
 import type { ServerMessage } from "#/world/protocol"
-import type { TradeSide } from "#/world/server/map-room/presence"
 import { presence } from "#/world/server/map-room/presence"
+import { getTradeView } from "#/world/server/map-room/get-trade-view"
 
-/** Show both sides of a trade what is on the table. */
-export async function showTrade(a: WebSocketConnection<ServerMessage>, b: WebSocketConnection<ServerMessage>) {
-  const pa = presence(a),
-    pb = presence(b)
-  if (!pa.trade || !pb.trade || !pa.player || !pb.player) return
-  const side = (t: TradeSide) => ({ stacks: t.shown, gold: t.offer.gold, locked: t.locked, done: t.done })
-  await a.send({ type: "trade-view", with: b.id, name: pb.player.name, mine: side(pa.trade), lots: [...pa.trade.offer.lots], theirs: side(pb.trade) })
-  await b.send({ type: "trade-view", with: a.id, name: pa.player.name, mine: side(pb.trade), lots: [...pb.trade.offer.lots], theirs: side(pa.trade) })
+type Connection = Pick<WebSocketConnection<ServerMessage>, "id" | "state" | "send">
+
+/** 接続と提示がそろっている双方へ、各自の向きで順に送る。送信失敗は呼出し元へ返す。 */
+export async function showTrade(sender: Connection, recipient: Connection) {
+  const mine = presence(sender)
+  const other = presence(recipient)
+  if (!mine.trade || !other.trade || !mine.player || !other.player) return
+  await sender.send(getTradeView({ mine: mine.trade, theirs: other.trade, peerId: recipient.id, peerName: other.player.name }))
+  await recipient.send(getTradeView({ mine: other.trade, theirs: mine.trade, peerId: sender.id, peerName: mine.player.name }))
 }
