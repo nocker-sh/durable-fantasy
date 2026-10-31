@@ -27,7 +27,7 @@ import { WarpMarkers } from "#/world/scene/runtime/warps"
 import { SceneFrameLoop } from "#/world/scene/runtime/scene-frame-loop"
 import { keyTurn } from "#/world/scene/key-turn"
 import { SceneGathering } from "#/world/scene/runtime/scene-gathering"
-import { createPointer } from "#/world/scene/runtime/pointer"
+import { ScenePointer } from "#/world/scene/runtime/scene-pointer"
 import { createPreviewControls } from "#/world/scene/runtime/preview"
 import { SceneWalkers } from "#/world/scene/runtime/scene-walkers"
 import { DioramaPostProcessing } from "#/lib/graphics/post-processing"
@@ -248,7 +248,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
   const previewControls = preview ? createPreviewControls({ renderer, movement, pan: (dx, dy, yaw) => camera.pan(dx, dy, yaw), zoom }) : null
   const pointer = preview
     ? { update() {}, dispose() {}, hovered: null, hoveredWalker: null, hoveredMonster: null, hoveredCritter: null }
-    : createPointer({
+    : new ScenePointer({
         renderer,
         cam,
         terrain,
