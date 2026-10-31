@@ -1028,6 +1028,8 @@ React との共有の定義は `components/game/game-context.ts` に一つだけ
 
 取引全体の事前検証は `world/core/check-trade.ts` に参加者・各自の提示と時刻を名前で渡す。距離と枠数は `trade-rules.ts`、提示の型は `trade-types.ts`、初期提示は `empty-offer.ts` が持つ。`taken-of.ts` は共通の GameEvent の判別された受渡しイベントから品列を読み、type の文字だけで別のイベントを受渡しの形と仮定しない。双方の送付と受取の順序を保ち、元の状態を変更しない。
 
+周囲への発言と叫び声の対応表は `world/server/map-room/chat.ts`、受付は `handle-speech.ts` に置く。連投の試行は `world/core/get-speech-attempt.ts` が受理できるかと保存する履歴を返し、拒否した試行も保存してから配信を判断する。`can-receive-speech.ts` は各送信の直前に受信者を調べ、本人、未参加、終了した接続を除く。通常の発言は発言者の位置が分かる場合だけ距離を調べ、位置がなければ配信しない。叫び声は位置の有無によらず部屋全体を対象にする。通知の失敗は既存の通知処理で受け止め、次の対象への配信を続ける。
+
 糸の交換の対応表は `world/server/map-room/threads.ts`、申込みは `handle-thread-ask.ts`、返答は `handle-thread-answer.ts` に置く。申込み先の到達位置がない場合は距離の拒否を返し、保存・通知へ進まない。有効な返答では申込みを消費し、一つの時刻で双方の糸を作る。返答者への保存と結果送信、申込者への保存と結果送信の順を保つ。接続には識別子、送信、状態参照と更新だけを要求し、糸の生成は `world/core/thread-of.ts` に任せる。
 
 パーティの招待は `world/server/map-room/handle-party-invite.ts`、脱退は `handle-party-leave.ts`、分配変更は `handle-party-mode.ts` が受け持つ。`get-party-invitation-rejection.ts` は既存のパーティのリーダーかどうかを満員より先に判定する。招待は接続の招待先を保存してから相手へ通知し、その場で所属を変えない。脱退はパーティの保存先、接続の所属、本人の保存状態の順に更新してから表示を外す。分配の変更権限は保存先に任せる。これらの受付は必要な状態参照・送信・接続の更新だけを引数の型へ表す。
