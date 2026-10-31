@@ -288,3 +288,21 @@ it("does not rewrite authored metadata while validating the layout", () => {
   expect(auditBuildingLayout(request.building, request.documents)).toEqual([])
   expect(request).toEqual(original)
 })
+
+it.each([
+  { cell_m: 1, rows: null },
+  { cell_m: 1, rows: [null] },
+  { cell_m: 1, rows: ["###", "##"] },
+  { cell_m: 1, rows: [] },
+  { cell_m: 1, rows: [""] },
+])("reports a malformed room grid without crashing: %j", (grid) => {
+  const request = fixture()
+  Object.assign(request.a, { grid })
+  expect(auditBuildingLayout(request.building, request.documents)).toContain("room-a: invalid room grid")
+})
+
+it("does not accept another document kind as an interior room", () => {
+  const request = fixture()
+  request.a.kind = "residents"
+  expect(auditBuildingLayout(request.building, request.documents)).toContain("room-a: missing grid or wrong building/floor")
+})

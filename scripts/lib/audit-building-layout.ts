@@ -1,3 +1,5 @@
+import { FloorOccupancy } from "#/scripts/lib/floor-occupancy"
+import { roomOriginSchema, roomGridSchema } from "#/scripts/lib/room-layout-schema"
 import { buildingLayoutSchema, buildingRoomIdsSchema } from "#/scripts/lib/building-layout-schema"
 import { getGridBoundaryOpening } from "#/scripts/lib/get-grid-boundary-opening"
 import { getRoomConnectionScopeError } from "#/scripts/lib/get-room-connection-scope-error"
@@ -29,32 +31,29 @@ export function auditBuildingLayout(building: SettingDocument, documents: Readon
       continue
     }
     levels.add(floor.floor)
-    const cells = new Map<string, string>()
+    const cells = new FloorOccupancy(layout)
     for (const id of floor.rooms) {
       const room = documents.get(id)
       if (placed.has(id)) errors.push(`${id}: room occurs more than once`)
       placed.add(id)
-      if (!room?.grid || room.building !== building.id || room.floor !== floor.floor) {
+      if (room?.kind !== "rooms" || !room.grid || room.building !== building.id || room.floor !== floor.floor) {
         errors.push(`${id}: missing grid or wrong building/floor`)
         continue
       }
-      const origin = room.origin as number[] | undefined
-      if (!Array.isArray(origin) || origin.length !== 2 || origin.some((n) => !Number.isSafeInteger(n))) {
+      const parsedOrigin = roomOriginSchema.safeParse(room.origin)
+      if (!parsedOrigin.success) {
         errors.push(`${id}: invalid room origin`)
         continue
       }
-      if (room.grid.cell_m !== layout.cell_m) errors.push(`${id}: inconsistent cell scale`)
-      for (const y = { value: 0 }; y.value < room.grid.rows.length; y.value++)
-        for (const x = { value: 0 }; x.value < room.grid.rows[y.value].length; x.value++) {
-          const gx = origin[0] + x.value,
-            gy = origin[1] + y.value,
-            key = `${gx},${gy}`,
-            symbol = room.grid.rows[y.value][x.value],
-            old = cells.get(key)
-          if (gx < 0 || gy < 0 || gx >= layout.width || gy >= layout.depth) errors.push(`${id}: outside building`)
-          if (old !== undefined && !(old === symbol && ["#", "D"].includes(symbol))) errors.push(`${id}: conflicting room overlap at ${key}`)
-          cells.set(key, symbol)
-        }
+      const parsedGrid = roomGridSchema.safeParse(room.grid)
+      if (!parsedGrid.success) {
+        errors.push(`${id}: invalid room grid`)
+        continue
+      }
+      const origin = parsedOrigin.data,
+        grid = parsedGrid.data
+      if (grid.cell_m !== layout.cell_m) errors.push(`${id}: inconsistent cell scale`)
+      errors.push(...cells.addRoom({ id, origin, rows: grid.rows }))
       for (const connection of (room.connections ?? []) as Connection[]) {
         const target = documents.get(connection.target)
         const scopeError = getRoomConnectionScopeError({ building, roomId: id, targetId: connection.target, kind: connection.kind ?? "door", target })
