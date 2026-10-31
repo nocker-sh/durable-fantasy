@@ -519,7 +519,7 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 ## 支持面へ沿う腿の衣服
 
-`world/scene/figure/get-supported-thigh-field.ts` は腿の下面を身体の支持高さへ沿わせ、下腿は元の曲面を保つ。`legs.ts` は座り姿勢のズボンだけにこれを使い、描画した部材を `trouserParts` として返す。立位と膝をつく形状は元の描画を保つ。
+`world/scene/figure/get-supported-thigh-field.ts` は腿の下面を身体の支持高さへ沿わせ、下腿は元の曲面を保つ。`create-leg-limb.ts` は座り姿勢のズボンだけにこれを使い、`build-leg.ts` が片脚の膝・靴・ズボンの部材を取得する。`legs.ts` は左脚、右脚の順に取得し、左右が揃った結果と `trouserParts` を返す。立位と膝をつく形状は元の描画を保つ。
 
 形状は下面を支える腿と、切らない下腿のそれぞれの保守的な囲いも返す。`can-rest-garment-on-seat.ts` は同じ囲いで座面の内部への侵入を拒否し、支持面への接触は離隔を広げずに認める。`get-seated-garment-seat-error.ts` が男性の胴衣・上着の裾と同じ実際の座面へ照合する。身体の支持力の証明とは区別する。
 
