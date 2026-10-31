@@ -10,3 +10,6 @@ export type MapSpace = Readonly<{
   planarOrigin: readonly [number, number]
   metresPerPlanarUnit: number
 }>
+
+/** Map identity and known placement used by spatial registration, independent of rendering or movement fields. */
+export type MapSpaceRegistry = Readonly<Record<string, Readonly<{ id: string; space?: MapSpace }>>>

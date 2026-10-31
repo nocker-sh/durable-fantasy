@@ -1,10 +1,8 @@
-import { assertMapRoomSpaces } from "#/world/maps/assert-map-room-spaces"
-import type { MapDefinition } from "#/world/maps/types"
-
-type Registry = Readonly<Record<string, Pick<MapDefinition, "id" | "space">>>
+import { assertMapRoomSeparation } from "#/world/maps/assert-map-room-separation"
+import type { MapSpaceRegistry } from "#/world/maps/map-space-types"
 
 /** Known frames must lead through real, uniquely keyed parents to an unplaced root. */
-export function assertMapSpaceRegistry(maps: Registry): void {
+export function assertMapSpaceRegistry(maps: MapSpaceRegistry): void {
   const checked = new Set<string>()
   for (const id of Object.keys(maps)) {
     const chain = new Set<string>()
@@ -14,14 +12,9 @@ export function assertMapSpaceRegistry(maps: Registry): void {
       if (chain.has(cursor.id)) throw new Error(`Map space parent cycle: ${cursor.id}`)
       chain.add(cursor.id)
       if (!map.space) break
-      try {
-        assertMapRoomSpaces(map.space)
-      } catch (error) {
-        if (error instanceof RangeError) throw new Error(`Map space frame is invalid: ${cursor.id}`, { cause: error })
-        throw error
-      }
       cursor.id = map.space.parentMap
     }
     for (const member of chain) checked.add(member)
   }
+  assertMapRoomSeparation(maps)
 }

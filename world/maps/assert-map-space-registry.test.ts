@@ -69,3 +69,16 @@ it("rejects overlapping physical room strips through the actual registration gua
   }
   expect(() => assertMapSpaceRegistry(maps)).toThrow("Map room footprints overlap: a / b")
 })
+it("rejects coincident room interiors across different maps in the same parent plane", () => {
+  const maps = fixture(),
+    rect = { x0: 1, z0: 1, x1: 3, z1: 2 }
+  maps.lower.space = { ...space("outside"), rooms: [{ id: "lower-room", footprint: [rect] }] }
+  maps.upper.space = { ...space("outside"), rooms: [{ id: "upper-room", footprint: [rect] }] }
+  expect(() => assertMapSpaceRegistry(maps)).toThrow("Map room planes overlap")
+})
+it("rejects a duplicate of an actual placed indoor map", () => {
+  const original = Object.values(MAPS).find((map) => map.space?.rooms?.length)
+  if (!original) throw new Error("Missing known room geometry")
+  const duplicate = { ...original, id: "duplicate-physical-room" }
+  expect(() => assertMapSpaceRegistry({ ...MAPS, [duplicate.id]: duplicate })).toThrow("Map room planes overlap")
+})
