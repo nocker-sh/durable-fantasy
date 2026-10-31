@@ -305,7 +305,9 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 煙道は建物の `flues` が炉と上階の区画を結び、`scripts/lib/flue-sections.ts` が支持する炉の占有と上階の保管からの離隔を照合する。上階の煙道は専用の家具種別として同じ平面へ投影し、下階の炉の上部もその矩形へ合わせる。棚を煙道と同じ位置に置いたまま外側に煙突だけを描かない。
 
-`scripts/lib/compile-envelope.ts` は敷地の回転、基礎の床高、軒と棟・軒の出、入口の戸と外階段、煙道から外観の寸法を生成する。`compile-envelope-window.ts` は窓を敷地の原点と基礎高さを含む同じ座標系へ投影し、対応する階の高さが一意に定まらない場合は拒否する。既存の描画へ渡す窓台の高さは、基礎からの相対高さとして保持する。`world/scene/construction/authored-building.ts` はこの寸法で建造し、室内表示の拡大倍率を屋外へ持ち込まない。煙突を乱数で増やさず、屋根材は元の建物の材質へ合わせる。寄り合い所の町の外観も同じ寸法で建造する。
+`scripts/lib/compile-envelope.ts` は敷地の回転、基礎の床高、軒と棟・軒の出、入口の戸と外階段、煙道から外観の寸法を生成する。`get-envelope-source.ts` が敷地・基礎・屋根と入口階段を検証し、`get-envelope-entry.ts` は一意に特定できる寸法付きの入口戸を取得する。煙道の出口は `get-envelope-flue-outlets.ts` で本数と高さを確認する。型付きの入力を読む際に、元の資料や追加のメタデータは書き換えない。
+
+`compile-envelope-window.ts` は窓を敷地の原点と基礎高さを含む同じ座標系へ投影し、対応する階の高さが一意に定まらない場合は拒否する。既存の描画へ渡す窓台の高さは、基礎からの相対高さとして保持する。`world/scene/construction/authored-building.ts` はこの寸法で建造し、室内表示の拡大倍率を屋外へ持ち込まない。煙突を乱数で増やさず、屋根材は元の建物の材質へ合わせる。寄り合い所の町の外観も同じ寸法で建造する。
 
 窓と吊り灯りは各室の `windows` と `lamps` に持ち、`scripts/lib/room-fixtures.ts` が壁・天井・家具との位置を確認する。窓は階と外壁上の位置・開口幅・腰高・高さ・枠を、灯りは平面位置・本体の上下と天井への吊りを持つ。`world/town/room-fixtures.ts` の形で室内と外観へ投影し、`world/scene/construction/room-fixtures.ts` が共通の窓枠を描く。
 
