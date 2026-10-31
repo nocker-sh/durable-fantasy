@@ -17,25 +17,45 @@ try {
   const ready = () => waitReady(page)
   const route = await walkToMap(page, "south-meadow")
   const before = await page.evaluate(() => game.state.get().player.life.foraging)
-  await page.evaluate(() => game.scene.walkTo(30.5 / 2, 67.5 / 2))
+  await page.evaluate(() => {
+    window.__gatherCamera = null
+    const renderer = game.scene.runtime.renderer
+    const render = renderer.render.bind(renderer)
+    renderer.render = (scene, camera) => {
+      if (scene === window.__scene) window.__gatherCamera = camera
+      return render(scene, camera)
+    }
+  })
+  await page.waitForFunction(() => window.__gatherCamera !== null)
+  await page.evaluate(() => game.scene.walkTo(30.5 / 2, 74.5 / 2))
   await page.waitForFunction(
     () => {
       const at = game.scene.playerCell()
-      return at && Math.hypot(at[0] - 30, at[1] - 66) <= 2 && !game.scene.player().walking
+      return at && Math.hypot(at[0] - 30, at[1] - 74) <= 1 && !game.scene.player().walking
     },
     null,
     { timeout: 120000 },
   )
-  const gathered = await page.evaluate(() => game.gather("south-meadow-herbs-1"))
-  if (!gathered) {
-    const state = await page.evaluate(() => ({
-      busy: game.state.get().busy,
-      engaged: game.session.engaged !== null,
-      online: game.state.get().online,
-      notices: game.state.get().notices.map((n) => n.text),
-    }))
-    throw Error(`Gathering was not accepted: ${JSON.stringify(state)}`)
-  }
+  const point = await page.evaluate(() => {
+    const camera = window.__gatherCamera
+    const canvas = game.scene.runtime.renderer.domElement
+    const points = []
+    window.__scene.traverse((object) => {
+      if (object.userData.node !== "south-meadow-herbs-1" || !object.visible) return
+      object.traverse((mesh) => {
+        if (!mesh.isMesh || !mesh.visible) return
+        mesh.geometry.computeBoundingBox()
+        const at = mesh.geometry.boundingBox?.getCenter(camera.position.clone())
+        if (!at) return
+        mesh.localToWorld(at).project(camera)
+        if (at.z < 1 && Math.abs(at.x) < 1 && Math.abs(at.y) < 1) points.push({ x: ((at.x + 1) / 2) * canvas.clientWidth, y: ((1 - at.y) / 2) * canvas.clientHeight, depth: at.z })
+      })
+    })
+    points.sort((a, b) => a.depth - b.depth)
+    if (!points.length) throw Error("Gathering spot is not visible")
+    return points[0]
+  })
+  await page.mouse.click(point.x, point.y)
   await page.waitForFunction((before) => game.state.get().player.life.foraging > before, before, { timeout: 15000 })
   const result = await page.evaluate(() => ({
     map: game.state.get().map.id,

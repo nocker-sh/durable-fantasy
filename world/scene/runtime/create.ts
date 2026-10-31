@@ -1,3 +1,4 @@
+import { SceneInteractions } from "#/world/scene/runtime/scene-interactions"
 import { SceneMovement } from "#/world/scene/runtime/scene-movement"
 import { createSceneRenderer } from "#/world/scene/runtime/create-scene-renderer"
 import { createSceneRoot } from "#/world/scene/runtime/create-scene-root"
@@ -23,10 +24,8 @@ import { mergeStatic } from "#/lib/graphics/merge-static"
 import * as THREE from "three"
 import { initWalk } from "#/world/scene/init-walk"
 import { walkH } from "#/world/scene/walk-h"
-import { isFree } from "#/world/scene/is-free"
 import { setLayout } from "#/world/scene/set-layout"
 import { updateCutaways } from "#/world/scene/update-cutaways"
-import { REACH } from "#/world/core/gather-rules"
 import { burst } from "#/world/scene/burst"
 import { makeMonsters } from "#/world/scene/make-monsters"
 import { approachMonster } from "#/world/scene/approach-monster"
@@ -179,34 +178,21 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
   const stop = movementControl.stop
   // ---------------------------------------------------------------- gathering spots (core/gather.ts)
   const spotsSource = createGatheringSpots(town, map),
-    spots = spotsSource.spots,
     setNodes = spotsSource.setNodes,
     spotHit = spotsSource.spotHit
-  /** Walk up to a gathering spot, then have a go at it. */
-  function approachSpot(id: string) {
-    const s = spots.get(id)
-    if (!s || movementControl.frozen) return
-    action.clear()
-    const within = (p: V2) => Math.hypot(p[0] - s.at[0], p[1] - s.at[1]) <= (REACH - 0.6) / 2
-    const arrive = (x: string) => (x.startsWith("station:") ? runtime.events?.stationAt(x.slice(8)) : runtime.events?.gatherAt(x))
-    if (within(me.pos)) {
-      arrive(id)
-      return
-    }
-    for (const r of [0.8, 1.1])
-      for (let k = 0; k < 8; k++) {
-        const ang = Math.atan2(me.pos[1] - s.at[1], me.pos[0] - s.at[0]) + (k % 2 ? 1 : -1) * Math.ceil(k / 2) * (Math.PI / 4)
-        const c: V2 = [s.at[0] + Math.cos(ang) * r, s.at[1] + Math.sin(ang) * r]
-        if (isFree(c[0], c[1]) && walkTo(c)) {
-          action.select({ kind: "spot", id })
-          if (!me.path.length) {
-            action.clear()
-            arrive(id)
-          }
-          return
-        }
-      }
-  }
+  const interactions = new SceneInteractions({
+    me,
+    action,
+    movement: movementControl,
+    spots: spotsSource.spots,
+    personOf,
+    reach,
+    marker,
+    stationAt: (id) => runtime.events?.stationAt(id),
+    gatherAt: (id) => runtime.events?.gatherAt(id),
+  })
+  const approachSpot = interactions.approachSpot
+  const approach = interactions.approach
   /** Play an action for a moment, facing the spot. */
   function playAction(anim: Anim, cell: readonly [number, number]) {
     const at: V2 = [(cell[0] + 0.5) / 2, (cell[1] + 0.5) / 2]
@@ -299,37 +285,6 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     walkers.action = on ? { anim: "sit", until: Infinity } : null
   }
 
-  function approach(id: number) {
-    if (movementControl.frozen) return
-    const a = personOf(id)
-    if (!a) return
-    action.clear()
-    action.select({ kind: "talk", resident: a })
-    // stand on a free cell next to the resident, on the side facing the player
-    const dx = me.pos[0] - a.pos[0],
-      dz = me.pos[1] - a.pos[1],
-      d = Math.hypot(dx, dz) || 1
-    if (Math.hypot(dx, dz) < 1.6) {
-      action.arrive()
-      reach(a)
-      return
-    }
-    // the nearest reachable free cell around them, preferring the side the player comes from
-    for (const r of [0.9, 1.3, 1.8, 2.4])
-      for (let k = 0; k < 8; k++) {
-        const ang = Math.atan2(dz / d, dx / d) + (k % 2 ? 1 : -1) * Math.ceil(k / 2) * (Math.PI / 4)
-        const c: V2 = [a.pos[0] + Math.cos(ang) * r, a.pos[1] + Math.sin(ang) * r]
-        if (isFree(c[0], c[1]) && walkTo(c, true)) {
-          if (!me.path.length) {
-            action.arrive()
-            reach(a)
-          }
-          return
-        }
-      }
-    action.arrive()
-    reach(a)
-  }
   function reach(a: Actor) {
     marker.visible = false
     faceResident(ids[people.indexOf(a)])
@@ -447,15 +402,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     if (!preview) stepHeld()
     const wasWalking = me.path.length > 0
     stepWalker(me, dt, elapsed)
-    if (wasWalking && !me.path.length) {
-      marker.visible = false
-      const arrived = action.arrive()
-      if (arrived?.kind === "talk") reach(arrived.resident)
-      else if (arrived?.kind === "spot") {
-        if (arrived.id.startsWith("station:")) runtime.events?.stationAt(arrived.id.slice(8))
-        else runtime.events?.gatherAt(arrived.id)
-      }
-    }
+    if (wasWalking && !me.path.length) interactions.arrive()
     // A path requested by held input starts now; it must not consume time from the previous frame.
     stepHeld()
     placeWalker(me)
