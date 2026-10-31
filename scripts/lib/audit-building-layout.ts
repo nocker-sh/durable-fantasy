@@ -1,28 +1,26 @@
+import { buildingLayoutSchema, buildingRoomIdsSchema } from "#/scripts/lib/building-layout-schema"
 import { getGridBoundaryOpening } from "#/scripts/lib/get-grid-boundary-opening"
 import { getRoomConnectionScopeError } from "#/scripts/lib/get-room-connection-scope-error"
 import { MIN_PASSAGE_WIDTH_M } from "#/scripts/lib/spatial-rules"
 import { auditBuildingDoorInventory } from "#/scripts/lib/audit-building-door-inventory"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
-import type { Connection, Layout } from "#/scripts/lib/building-layout"
+import type { Connection } from "#/scripts/lib/building-layout"
 import { same } from "#/scripts/lib/building-layout/same"
 import { auditBuildingAccess } from "#/scripts/lib/building-layout/audit-building-access"
 
 /** Check the assembled building, without substituting its projection for the room's own design. */
 export function auditBuildingLayout(building: SettingDocument, documents: ReadonlyMap<string, SettingDocument>): string[] {
   const doorErrors = auditBuildingDoorInventory(building, documents)
-  if (!building.layout) return [...doorErrors]
+  if (building.layout === undefined || building.layout === null) return [...doorErrors]
+
+  const parsedLayout = buildingLayoutSchema.safeParse(building.layout)
+  if (!parsedLayout.success) return [...doorErrors, "Invalid building dimensions"]
+
+  const roomIds = buildingRoomIdsSchema.safeParse(building.rooms)
+  if (!roomIds.success) return [...doorErrors, "Invalid building room inventory"]
+
   const errors: string[] = [...doorErrors],
-    layout = building.layout as Layout
-  if (
-    !Number.isFinite(layout.cell_m) ||
-    layout.cell_m <= 0 ||
-    !Number.isSafeInteger(layout.width) ||
-    layout.width <= 0 ||
-    !Number.isSafeInteger(layout.depth) ||
-    layout.depth <= 0 ||
-    !Array.isArray(layout.floors)
-  )
-    return ["Invalid building dimensions"]
+    layout = parsedLayout.data
   const placed = new Set<string>(),
     levels = new Set<number>()
   for (const floor of layout.floors) {
@@ -128,8 +126,8 @@ export function auditBuildingLayout(building: SettingDocument, documents: Readon
     }
     if (cells.size !== layout.width * layout.depth) errors.push(`Floor ${floor.floor}: unassigned building cells`)
   }
-  for (const id of (building.rooms ?? []) as string[]) if (!placed.has(id)) errors.push(`${id}: not placed on a floor`)
-  for (const id of placed) if (!(building.rooms as string[]).includes(id)) errors.push(`${id}: floor room missing from building inventory`)
+  for (const id of roomIds.data) if (!placed.has(id)) errors.push(`${id}: not placed on a floor`)
+  for (const id of placed) if (!roomIds.data.includes(id)) errors.push(`${id}: floor room missing from building inventory`)
   errors.push(...auditBuildingAccess({ building: building, documents: documents, placed: placed, layout: layout }))
   return [...new Set(errors)]
 }

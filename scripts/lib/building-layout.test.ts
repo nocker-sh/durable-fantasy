@@ -233,3 +233,58 @@ it("bounds invalid doorway scans by the real room grid", () => {
   request.a.connections[0].width_cells = Number.MAX_SAFE_INTEGER
   expect(auditBuildingLayout(request.building, request.documents)).toContain("room-a: doorway footprint disagrees with grid")
 })
+
+it.each([{ floors: [null] }, { floors: [{ floor: 0, rooms: null }] }, { floors: [{ floor: 0, rooms: [null] }] }, { floors: [{ rooms: [] }] }])(
+  "reports malformed floor metadata instead of crashing the spatial audit: %j",
+  (layout) => {
+    const request = fixture()
+    Object.assign(request.building.layout, layout)
+    expect(auditBuildingLayout(request.building, request.documents)).toContain("Invalid building dimensions")
+  },
+)
+
+it.each([null, undefined, [null], "room-a"])("rejects an invalid building room inventory: %j", (rooms) => {
+  const request = fixture()
+  Object.assign(request.building, { rooms })
+  expect(auditBuildingLayout(request.building, request.documents)).toContain("Invalid building room inventory")
+})
+
+it("rejects dimensions whose cell count cannot be represented exactly", () => {
+  const request = fixture()
+  request.building.layout.width = Number.MAX_SAFE_INTEGER
+  request.building.layout.depth = 2
+  expect(auditBuildingLayout(request.building, request.documents)).toContain("Invalid building dimensions")
+})
+
+it("rejects finite cell dimensions that overflow when converted to physical metres", () => {
+  const request = fixture()
+  request.building.layout.cell_m = Number.MAX_VALUE
+  expect(auditBuildingLayout(request.building, request.documents)).toContain("Invalid building dimensions")
+})
+
+it("keeps door ownership errors when building dimensions are invalid", () => {
+  const request = fixture()
+  Object.assign(request.building, { door_leaf_inventory: "invalid" })
+  request.building.layout.width = 0
+  expect(auditBuildingLayout(request.building, request.documents)).toEqual(["Invalid building door inventory", "Invalid building dimensions"])
+})
+
+it.each([0, false, ""])("does not confuse an invalid layout with an undesigned layout: %j", (layout) => {
+  const request = fixture()
+  Object.assign(request.building, { layout })
+  expect(auditBuildingLayout(request.building, request.documents)).toContain("Invalid building dimensions")
+})
+
+it.each([null, undefined])("retains the explicit absence of a layout for undesigned buildings: %j", (layout) => {
+  const request = fixture()
+  Object.assign(request.building, { layout })
+  expect(auditBuildingLayout(request.building, request.documents)).toEqual([])
+})
+
+it("does not rewrite authored metadata while validating the layout", () => {
+  const request = fixture()
+  Object.assign(request.building.layout, { notes: { owner: "test-household" } })
+  const original = structuredClone(request)
+  expect(auditBuildingLayout(request.building, request.documents)).toEqual([])
+  expect(request).toEqual(original)
+})
