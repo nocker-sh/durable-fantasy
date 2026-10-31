@@ -171,3 +171,65 @@ it("matches a partial interior to its exterior without rounding away a different
   building.layout_scope = "whole-building"
   expect(auditBuildingEnvelope(building, envelope)).toContain("Layout scope does not match the exterior definition")
 })
+
+it("rejects a connection whose local coordinates match a room in another building", () => {
+  const request = fixture()
+  request.a.grid.rows[0] = "#D#"
+  const foreign = {
+    ...request.b,
+    id: "room-foreign",
+    building: "building-other",
+    origin: [0, 0],
+    grid: { cell_m: 1, rows: ["#D#", "#.#", "###"] },
+    connections: [{ door: [1, 0], target: request.a.id, target_door: [1, 0], width_cells: 1 }],
+  }
+  request.documents.set(foreign.id, foreign)
+  request.a.connections.push({ door: [1, 0], target: foreign.id, target_door: [1, 0], width_cells: 1 })
+  expect(auditBuildingLayout(request.building, request.documents)).toContain("room-a: connection to room-foreign uses another building frame")
+})
+
+it("rejects an unplaced room even when it claims the same building and matching doorway", () => {
+  const request = fixture()
+  request.a.grid.rows[0] = "#D#"
+  const unplaced = {
+    ...request.b,
+    id: "room-unplaced",
+    origin: [0, 0],
+    grid: { cell_m: 1, rows: ["#D#", "#.#", "###"] },
+    connections: [{ door: [1, 0], target: request.a.id, target_door: [1, 0], width_cells: 1 }],
+  }
+  request.documents.set(unplaced.id, unplaced)
+  request.a.connections.push({ door: [1, 0], target: unplaced.id, target_door: [1, 0], width_cells: 1 })
+  expect(auditBuildingLayout(request.building, request.documents)).toContain("room-a: connection to room-unplaced is outside the building inventory")
+})
+
+it("rejects missing destinations and documents that are neither maps nor rooms", () => {
+  const request = fixture()
+  request.a.grid.rows[0] = "#D#"
+  request.a.connections.push({ door: [1, 0], target: "room-absent", target_door: [1, 0], width_cells: 1 })
+  expect(auditBuildingLayout(request.building, request.documents)).toContain("room-a: connection target room-absent is missing")
+  request.documents.set("room-absent", base("room-absent", "residents"))
+  expect(auditBuildingLayout(request.building, request.documents)).toContain("room-a: connection target room-absent is not a room or map")
+})
+
+it("does not treat an indoor stair connection as an exterior map doorway", () => {
+  const request = fixture()
+  Object.assign(request.a.connections[1], { kind: "stair" })
+  expect(auditBuildingLayout(request.building, request.documents)).toContain("room-a: stair connection target is not a room")
+})
+
+it("bounds invalid doorway scans by the real room grid", () => {
+  const request = fixture()
+  const reads = { count: 0 }
+  request.a.grid.rows = new Proxy(request.a.grid.rows, {
+    get(rows, key, receiver) {
+      if (typeof key === "string" && Number.isSafeInteger(Number(key))) {
+        reads.count++
+        if (reads.count > 100) throw new Error("Doorway scan exceeded grid budget")
+      }
+      return Reflect.get(rows, key, receiver)
+    },
+  })
+  request.a.connections[0].width_cells = Number.MAX_SAFE_INTEGER
+  expect(auditBuildingLayout(request.building, request.documents)).toContain("room-a: doorway footprint disagrees with grid")
+})

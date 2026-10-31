@@ -896,7 +896,9 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 ## 一棟の共有する戸口と板の所有
 
-`get-room-door-portals.ts` が室の出入口を一棟の座標と階へ移し、`get-building-door-portals.ts` が所属する全室を解決する。`audit-building-door-inventory.ts` は同じ戸口の両側を一つにまとめ、板の定義と所有室が過不足なく一致することを検査する。`building-layout.ts` から呼び、既存の各室の板の回転検査と併用する。ルードヴィヒの戸口の所有と、身体と立体・日課の残りは [[building-hue-ludwig#戸口と扉を持つ室]] にある。
+`audit-building-layout.ts` が床の占有と室の接続を照合する。比較する接続先の選別は `get-room-connection-scope-error.ts` が行い、所属の規則は `.docs/settings/README.md` の「一棟の共通座標」に従う。戸口の走査は `get-grid-boundary-opening.ts` が確認した、実際のグリッド内の開口に限る。
+
+`get-room-door-portals.ts` が室の出入口を一棟の座標と階へ移し、`get-building-door-portals.ts` が所属する全室を解決する。`audit-building-door-inventory.ts` は同じ戸口の両側を一つにまとめ、板の定義と所有室が過不足なく一致することを検査する。`audit-building-layout.ts` から呼び、既存の各室の板の回転検査と併用する。ルードヴィヒの戸口の所有と、身体と立体・日課の残りは [[building-hue-ludwig#戸口と扉を持つ室]] にある。
 
 
 ## 開位置の板と戸枠を残した平面の通行

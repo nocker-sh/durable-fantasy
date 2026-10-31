@@ -1,3 +1,5 @@
+import { getGridBoundaryOpening } from "#/scripts/lib/get-grid-boundary-opening"
+import { getRoomConnectionScopeError } from "#/scripts/lib/get-room-connection-scope-error"
 import { MIN_PASSAGE_WIDTH_M } from "#/scripts/lib/spatial-rules"
 import { auditBuildingDoorInventory } from "#/scripts/lib/audit-building-door-inventory"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
@@ -56,8 +58,12 @@ export function auditBuildingLayout(building: SettingDocument, documents: Readon
           cells.set(key, symbol)
         }
       for (const connection of (room.connections ?? []) as Connection[]) {
-        if (!["door", "opening", "stair"].includes(connection.kind ?? "door")) errors.push(`${id}: unknown connection kind`)
         const target = documents.get(connection.target)
+        const scopeError = getRoomConnectionScopeError({ building, roomId: id, targetId: connection.target, kind: connection.kind ?? "door", target })
+        if (scopeError) {
+          errors.push(scopeError)
+          continue
+        }
         if (target?.kind !== "rooms") continue
         if (!target.grid || !Array.isArray(target.origin)) {
           errors.push(`${id}: connected room has no grid/origin`)
@@ -99,8 +105,15 @@ export function auditBuildingLayout(building: SettingDocument, documents: Readon
             y = xState[1],
             width = connection.width_cells ?? 1
           const horizontal: boolean = y === 0 || y === room.grid.rows.length - 1
-          if (!horizontal && x !== 0 && x !== room.grid.rows[0].length - 1) errors.push(`${id}: doorway is not on the room boundary`)
-          if (!Number.isSafeInteger(width) || width <= 0 || width * layout.cell_m < MIN_PASSAGE_WIDTH_M) errors.push(`${id}: doorway is narrower than design minimum`)
+          if (!horizontal && x !== 0 && x !== (room.grid.rows[0]?.length ?? 0) - 1) errors.push(`${id}: doorway is not on the room boundary`)
+          if (!Number.isSafeInteger(width) || width <= 0 || width * layout.cell_m < MIN_PASSAGE_WIDTH_M) {
+            errors.push(`${id}: doorway is narrower than design minimum`)
+            continue
+          }
+          if (!getGridBoundaryOpening({ rows: room.grid.rows, door: connection.door, span: width })) {
+            errors.push(`${id}: doorway footprint disagrees with grid`)
+            continue
+          }
           for (const k = { value: 0 }; k.value < width; k.value++) {
             const dx = x + (horizontal ? k.value : 0),
               dy = y + (horizontal ? 0 : k.value)
