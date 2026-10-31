@@ -1,50 +1,8 @@
-// The map room's handlers for swapping muffler threads (core/threads.ts).
-import { threadOf } from "#/world/core/thread-of"
-import { TRADE_CELLS } from "#/world/core/trade-rules"
-import { Player } from "#/durable-objects/player"
-import type { Ctx, Handlers, Message } from "#/world/server/map-room/context"
-import { presence } from "#/world/server/map-room/presence"
-import { setPresence } from "#/world/server/map-room/set-presence"
-import { reachable } from "#/world/server/map-room/reachable"
-import { near } from "#/world/server/map-room/near"
-
-async function threadAsk(roomCtx: Ctx, message: Message<"thread-ask">) {
-  const ctxSource = roomCtx,
-    ctx = ctxSource.ctx,
-    me = ctxSource.me,
-    save = ctxSource.save
-  const them = ctx.room.getConnection(message.target)
-  const other = them && presence(them)
-  if (!me.player || !me.owner || !them || !other?.player || them.id === ctx.connection.id) return
-  if (!near(me, reachable(other).at(-1)!, TRADE_CELLS)) {
-    await ctx.connection.send({ type: "thread-closed", reason: "TOO_FAR" })
-    return
-  }
-  save({ threading: them.id })
-  await them.send({ type: "thread-asked", from: ctx.connection.id, name: me.player.name })
-  return
-}
-
-async function threadAnswer(roomCtx: Ctx, message: Message<"thread-answer">) {
-  const ctxSource2 = roomCtx,
-    ctx = ctxSource2.ctx,
-    me = ctxSource2.me
-  const them = ctx.room.getConnection(message.from)
-  const other = them && presence(them)
-  if (!me.player || !me.owner || !them || !other?.owner || !other.player || other.threading !== ctx.connection.id) return
-  setPresence(them, { threading: undefined })
-  if (!message.yes) {
-    await them.send({ type: "thread-closed", reason: "DECLINED" })
-    return
-  }
-  // each keeps the other's thread
-  const now = Date.now()
-  await ctx.connection.send({ type: "result", seq: -1, result: await Player.get(me.owner).run({ type: "thread", thread: threadOf(other.owner, other.player.name, now) }) })
-  await them.send({ type: "result", seq: -1, result: await Player.get(other.owner).run({ type: "thread", thread: threadOf(me.owner, me.player.name, now) }) })
-  return
-}
+import { handleThreadAsk } from "#/world/server/map-room/handle-thread-ask"
+import { handleThreadAnswer } from "#/world/server/map-room/handle-thread-answer"
+import type { Handlers } from "#/world/server/map-room/context"
 
 export const HANDLERS: Handlers = {
-  "thread-ask": threadAsk,
-  "thread-answer": threadAnswer,
+  "thread-ask": handleThreadAsk,
+  "thread-answer": handleThreadAnswer,
 }

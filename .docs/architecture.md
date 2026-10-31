@@ -1028,6 +1028,8 @@ React との共有の定義は `components/game/game-context.ts` に一つだけ
 
 取引全体の事前検証は `world/core/check-trade.ts` に参加者・各自の提示と時刻を名前で渡す。距離と枠数は `trade-rules.ts`、提示の型は `trade-types.ts`、初期提示は `empty-offer.ts` が持つ。`taken-of.ts` は共通の GameEvent の判別された受渡しイベントから品列を読み、type の文字だけで別のイベントを受渡しの形と仮定しない。双方の送付と受取の順序を保ち、元の状態を変更しない。
 
+糸の交換の対応表は `world/server/map-room/threads.ts`、申込みは `handle-thread-ask.ts`、返答は `handle-thread-answer.ts` に置く。申込み先の到達位置がない場合は距離の拒否を返し、保存・通知へ進まない。有効な返答では申込みを消費し、一つの時刻で双方の糸を作る。返答者への保存と結果送信、申込者への保存と結果送信の順を保つ。接続には識別子、送信、状態参照と更新だけを要求し、糸の生成は `world/core/thread-of.ts` に任せる。
+
 パーティの招待は `world/server/map-room/handle-party-invite.ts`、脱退は `handle-party-leave.ts`、分配変更は `handle-party-mode.ts` が受け持つ。`get-party-invitation-rejection.ts` は既存のパーティのリーダーかどうかを満員より先に判定する。招待は接続の招待先を保存してから相手へ通知し、その場で所属を変えない。脱退はパーティの保存先、接続の所属、本人の保存状態の順に更新してから表示を外す。分配の変更権限は保存先に任せる。これらの受付は必要な状態参照・送信・接続の更新だけを引数の型へ表す。
 
 パーティの対応表は `world/server/map-room/party.ts`、招待への返答は `handle-party-answer.ts` に置く。有効な招待を消費してから辞退と既存の所属を調べ、新規の場合は `initialize-party.ts` で招待者を先に登録する。返答者の登録は `join-party-member.ts` が受け持ち、名簿が拒否した場合は本人の所属を保存せず満員を返す。名簿への追加、本人への保存結果の送信、接続の所属の反映を元の順に進める。`read-party-member.ts` は加入時の本人の保存状態から名簿用の値を作る。加入先の参照は `party-join-types.ts` の必要な RPC だけで渡す。
