@@ -74,3 +74,11 @@ it("rejects incomplete runtime coordinates despite their static tuple type", () 
     expect(() => new SpatialFrame(source)).toThrow(RangeError)
   }
 })
+
+it.each([0, 1, 2, 3])("rejects a frame whose rotated extent collapses at a large origin, rotation=%s", (quarterTurns) => {
+  expect(() => new SpatialFrame({ origin: [1e20, 0, 1e20], width: 8, depth: 6, quarterTurns })).toThrow(RangeError)
+  expect(() => new SpatialFrame({ origin: [-1e20, 0, -1e20], width: 8, depth: 6, quarterTurns })).toThrow(RangeError)
+})
+it.each([0, 1, 2, 3])("rejects a frame whose rotated extent overflows, rotation=%s", (quarterTurns) => {
+  expect(() => new SpatialFrame({ origin: [Number.MAX_VALUE, 0, Number.MAX_VALUE], width: Number.MAX_VALUE, depth: Number.MAX_VALUE, quarterTurns })).toThrow(RangeError)
+})

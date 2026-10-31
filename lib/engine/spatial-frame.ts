@@ -8,6 +8,9 @@ export class SpatialFrame {
     if (!Number.isFinite(props.width) || !Number.isFinite(props.depth) || props.width <= 0 || props.depth <= 0) throw new RangeError("Invalid spatial frame dimensions")
     if (![0, 1, 2, 3].includes(props.quarterTurns)) throw new RangeError("Invalid spatial frame rotation")
     this.checkedVector(props.origin, "Invalid spatial frame origin")
+    const farX = props.origin[0] + this.size[0],
+      farZ = props.origin[2] + this.size[1]
+    if (!Number.isFinite(farX) || !Number.isFinite(farZ) || farX <= props.origin[0] || farZ <= props.origin[2]) throw new RangeError("Invalid spatial frame extent")
     const origin: Vector3 = [props.origin[0], props.origin[1], props.origin[2]]
     this.props = Object.freeze({ ...props, origin: Object.freeze(origin) })
     Object.freeze(this)
