@@ -108,6 +108,8 @@ Durable Object の入口は `durable-objects/` にあり、どれも Void の規
 
 描画フレームの予約・頻度制限と FPS・状態通知の周期は `scene-frame-loop.ts` の SceneFrameLoop が保持する。起動時に時計を読み直し、描画を省くフレームでは時計と世界を進めない。更新へ渡す実経過時間と、動きの補間用に上限を置いた時間を区別する。世界の更新順と描画後の計測位置はランタイムに残し、停止後はフレームを追加予約しない。
 
+カメラと人物の間の遮蔽物は `scene-occlusion.ts` の SceneOcclusion が確認する。透過可能な物は目標の不透明度へ補間し、透過しない建物はそのまま保って人物の透視表示へ判定を渡す。プレビューでは物の透過と透視を行わない。材質の更新は `lib/graphics/set-object-opacity.ts` が単一・複数の材質を型で確かめて適用する。
+
 マップの描画の入口は `world/scene/runtime/scene.ts` の MapScene で、地形・住民配置・照明・歩行者・入力は `world/scene/runtime/` に分ける。建物・野外・小物・テクスチャはそれぞれ `construction/`・`fields/`・`props/`・`textures/` に、人物の体・服・髪・装備・描画は `figure/` に分ける。描画は `world/scene/` が受け持ち、ゲームに依存しない部品は `lib/graphics/` と `lib/engine/` にある。
 
 地形の高さ・道・川の計算は、選んだマップのデータが必要になった時点で行う。Worker の読み込み時に未使用の初期マップを計算せず、保存済みの地形があればそれを使う。道・川・踏み跡までの距離は、地形生成の開始時に線分を `lib/engine/polyline.ts` のインスタンスへ写し、線分の方向と長さを各地点で計算し直さない。

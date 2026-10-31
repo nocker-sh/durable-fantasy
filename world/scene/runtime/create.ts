@@ -13,7 +13,7 @@ import { type CleanupStack } from "#/lib/engine/cleanup-stack"
 import type { SceneOptions } from "#/world/scene/runtime/scene-options"
 import { SceneBuildQueue } from "#/world/scene/runtime/scene-build-queue"
 import type { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
-import { OcclusionQuery } from "#/lib/graphics/occlusion-query"
+import { SceneOcclusion } from "#/world/scene/runtime/scene-occlusion"
 import { SceneLabelProjection } from "#/world/scene/runtime/scene-label-projection"
 import { PendingAction } from "#/world/scene/runtime/action-target"
 import { WarpMarkers } from "#/world/scene/runtime/warps"
@@ -362,11 +362,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
   const camRight = new THREE.Vector3()
   const projection = new THREE.Matrix4()
   const followPosition = new THREE.Vector3()
-  const head = new THREE.Vector3()
-  const occlusion = new OcclusionQuery(
-    occluders.map((o) => o.box),
-    0.3,
-  )
+  const occlusion = new SceneOcclusion({ occluders, camera: cam, me, preview })
   const frameLoop = new SceneFrameLoop({ clock, running: () => runtime.running, render: frame, tick: () => runtime.events?.tick() })
   const SHADOW_MS = 250
   let shadowAt = 0
@@ -427,30 +423,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
       scene.fog.near = camera.distance + fogDef.near
       scene.fog.far = camera.distance + fogDef.far
     }
-    // fade houses and trees standing between the camera and the player
-    head.set(me.pos[0], me.fig.root.position.y + 0.9, me.pos[1])
-    const occluded = occlusion.update(cam.position, head)
-    let hidden = false
-    if (!preview)
-      occluders.forEach((o, i) => {
-        const hit = occluded[i]
-        if (o.opaque) {
-          hidden ||= !!hit
-          return
-        }
-        const want = hit ? o.min : 1
-        if (o.fade === want) return
-        o.fade += (want - o.fade) * Math.min(1, dt * 8)
-        if (Math.abs(o.fade - want) < 0.01) o.fade = want
-        o.obj.traverse((c) => {
-          const mm = (c as THREE.Mesh).material as THREE.Material | undefined
-          if (!mm) return
-          mm.transparent = o.fade < 1
-          mm.opacity = o.fade
-          mm.depthWrite = o.fade >= 1
-        })
-        o.obj.visible = o.fade > 0.03
-      })
+    const hidden = occlusion.update(dt)
     pointer.update()
     if (!preview) {
       me.fig.xray(hidden)
