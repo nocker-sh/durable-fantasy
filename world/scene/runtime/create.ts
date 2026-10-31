@@ -28,10 +28,10 @@ import { setLayout } from "#/world/scene/set-layout"
 import { updateCutaways } from "#/world/scene/update-cutaways"
 import { burst } from "#/world/scene/burst"
 import { makeMonsters } from "#/world/scene/make-monsters"
-import { approachMonster } from "#/world/scene/approach-monster"
+import { SceneCombat } from "#/world/scene/runtime/scene-combat"
 import { updateMonsterHealth } from "#/world/scene/update-monster-health"
 import { updateMonsters } from "#/world/scene/update-monsters"
-import { MELEE_REACH, MONSTER_KINDS } from "#/world/core/monsters"
+import { MONSTER_KINDS } from "#/world/core/monsters"
 import { groundOf } from "#/world/scene/ground-of"
 import { updaters, occluders, houseGlows, lamps, stalls, movingObjects } from "#/world/scene/construction/registry"
 import { resetRegistries } from "#/world/scene/construction/reset-registries"
@@ -57,7 +57,6 @@ import { createPopulation } from "#/world/scene/runtime/population"
 import type { SceneEvents } from "#/world/scene/runtime/types"
 import type { Walker } from "#/world/scene/runtime/walker"
 import { NAME_RANGE } from "#/world/scene/runtime/grid"
-import { cellOf } from "#/world/scene/runtime/cell-of"
 
 const builds = new SceneBuildQueue()
 
@@ -203,9 +202,18 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
 
   // ---------------------------------------------------------------- creatures (core/monsters.ts)
   const monsters = makeMonsters(town, map)
-  let attackDelay = 1500,
-    lastSwing = 0,
-    lastRepath = 0
+  const combat = new SceneCombat({
+    monsters,
+    me,
+    action,
+    movement: movementControl,
+    onWalk: (path) => runtime.events?.walk(path),
+    playSwing: (until) => {
+      walkers.action = { anim: "sword", until }
+    },
+    onSwing: (id) => runtime.events?.swing(id),
+  })
+  const fight = combat.fight
   const monsterHit = (ray: THREE.Raycaster): string | null => {
     const hits = ray.intersectObjects(
       monsters.filter((m) => m.body.visible).map((m) => m.body),
@@ -214,13 +222,6 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     let o: THREE.Object3D | null = hits[0]?.object ?? null
     while (o && !o.userData.monster) o = o.parent
     return (o?.userData.monster as string | undefined) ?? null
-  }
-  function fight(id: string) {
-    if (!movementControl.frozen) {
-      action.clear()
-      action.select({ kind: "fight", id })
-      lastRepath = 0
-    }
   }
   function setWild(states: Readonly<Record<string, { hp: number; back: number }>>) {
     for (const m of monsters) {
@@ -494,29 +495,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
       updateMonsterHealth(m)
       place({ el: m.label, vis: show && toScreen({ pos: m.pos, h: 0.55, out: v, ground: m.groundHeight }), p: v, dy: 2 })
     }
-    const target = action.fighting ? monsters.find((m) => m.spawn.id === action.fighting) : undefined
-    if (target && !target.body.visible) action.endFight()
-    else if (target) {
-      const d = Math.hypot(target.pos[0] - me.pos[0], target.pos[1] - me.pos[1])
-      if (d > MELEE_REACH) {
-        if (wall - lastRepath > 600) {
-          lastRepath = wall
-          approachMonster({ m: target, from: me.pos, reach: MELEE_REACH, tryWalk: (point) => walkTo(point, true) })
-        }
-      } else {
-        if (me.path.length > 1) {
-          me.path = [me.path[0]]
-          runtime.events?.walk([cellOf(me.path[0])])
-        }
-        me.head = Math.atan2(target.pos[0] - me.pos[0], target.pos[1] - me.pos[1])
-        me.fig.face(me.head)
-        if (wall - lastSwing >= attackDelay) {
-          lastSwing = wall
-          walkers.action = { anim: "sword", until: performance.now() + 600 }
-          runtime.events?.swing(target.spawn.id)
-        }
-      }
-    }
+    combat.update(wall)
     const nextHoveredLabel = pointer.hovered ? (residentLabels[people.indexOf(pointer.hovered)] ?? null) : null
     if (nextHoveredLabel !== hoveredLabel) {
       hoveredLabel?.classList.remove("gx-nameplate--hover")
@@ -592,9 +571,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     setDown,
     setSitting,
     fight,
-    setAttackDelay: (ms: number) => {
-      attackDelay = ms
-    },
+    setAttackDelay: combat.setAttackDelay,
     approach,
     stop,
     stopFight(id: string) {

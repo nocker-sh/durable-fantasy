@@ -4,7 +4,7 @@ import type { MonsterView } from "#/world/scene/monsters"
 
 /** Try reachable positions around the creature, preferring the side we come from. */
 type Props = {
-  m: MonsterView
+  m: Pick<MonsterView, "pos">
   from: Vector2Tuple
   reach: number
   tryWalk: (point: Vector2Tuple) => boolean

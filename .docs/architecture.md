@@ -98,6 +98,8 @@ Durable Object の入口は `durable-objects/` にあり、どれも Void の規
 
 移動入力と経路、停止と凍結は `scene-movement.ts` の SceneMovement が描画ごとに保持する。押し続けたキーから格子の候補を作る処理は純粋な `get-held-walk-candidates.ts` に分け、角が塞がれた場合の候補の順と、最初の空き候補での経路の照会を維持する。停止の通知より先に行動予約を外し、追跡で明示した場合だけ予約を保持する。住民・採集・作業場への接近と到着時の通知は `scene-interactions.ts` の SceneInteractions が受け持つ。周囲の候補は `get-approach-candidates.ts` が来た側から近い半径と左右の順で作る。予約を消費してから到着を通知し、通知中に選ばれた次の行動を前の到着で実行しない。
 
+敵の追跡と攻撃間隔は `scene-combat.ts` の SceneCombat が描画ごとに保持する。範囲内では行動予約を保持したまま経路を短くし、向きを合わせてから攻撃の演出と通知を行う。対象を選び直しても前の攻撃からの待機は保持する。命中・消費・報酬はサーバーの判定を使う。
+
 マップの描画の入口は `world/scene/runtime/scene.ts` の MapScene で、地形・住民配置・照明・歩行者・入力は `world/scene/runtime/` に分ける。建物・野外・小物・テクスチャはそれぞれ `construction/`・`fields/`・`props/`・`textures/` に、人物の体・服・髪・装備・描画は `figure/` に分ける。描画は `world/scene/` が受け持ち、ゲームに依存しない部品は `lib/graphics/` と `lib/engine/` にある。
 
 地形の高さ・道・川の計算は、選んだマップのデータが必要になった時点で行う。Worker の読み込み時に未使用の初期マップを計算せず、保存済みの地形があればそれを使う。道・川・踏み跡までの距離は、地形生成の開始時に線分を `lib/engine/polyline.ts` のインスタンスへ写し、線分の方向と長さを各地点で計算し直さない。
