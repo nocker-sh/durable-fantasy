@@ -124,3 +124,12 @@ it("keeps a declared surface in the audit when its required stair data is missin
   }
   expect(hasEntryApproachSections(f.building)).toBe(false)
 })
+
+it("joins a declared straight profile from the lower landing without inventing a turn", () => {
+  const source = fixture()
+  source.section.scope = "straight_road_profile"
+  source.approach.points_tiles = [source.approach.points_tiles[0], source.approach.points_tiles[1], [source.approach.points_tiles[1][0], 16]]
+  expect(auditEntryApproachSections(source)).toEqual([])
+  source.section.maximum_longitudinal_grade = 0.001
+  expect(auditEntryApproachSections(source)).toContain("Entry surface exceeds its reserved longitudinal grade")
+})

@@ -3,7 +3,7 @@ import type { EntryApproachSurface } from "#/scripts/lib/entry-approach-surface-
 
 type Props = Readonly<{ surface: EntryApproachSurface; terrain: ScalarField; point: readonly [number, number] }>
 
-/** Keep the whole corner level, then meet the existing road cross-section at every point along its join. */
+/** Preserve the landing or corner height, then meet the existing road across the complete join. */
 export function getEntryApproachSurfaceHeight(props: Props): number | Error {
   const surface = props.surface
   const point = props.point

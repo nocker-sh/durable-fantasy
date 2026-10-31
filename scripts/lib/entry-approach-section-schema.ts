@@ -3,7 +3,7 @@ import { z } from "zod"
 export const entryApproachSectionSchema = z
   .object({
     status: z.enum(["proposed", "designed"]),
-    scope: z.literal("level_turn_road_profile"),
+    scope: z.enum(["level_turn_road_profile", "straight_road_profile"]),
     road_index: z.number().int().nonnegative(),
     maximum_longitudinal_grade: z.number().positive().max(1),
     maximum_cut_m: z.number().nonnegative(),

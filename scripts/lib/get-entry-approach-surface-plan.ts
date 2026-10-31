@@ -1,10 +1,12 @@
+import { getStraightEntryApproachSurfacePlan } from "#/scripts/lib/get-straight-entry-approach-surface-plan"
 import type { EntryApproachSurface } from "#/scripts/lib/entry-approach-surface-types"
 
 type Point = readonly [number, number]
-type Props = Readonly<{ points: readonly Point[]; widthM: number; elevationM: number; metresPerTile: number }>
+type Props = Readonly<{ points: readonly Point[]; widthM: number; elevationM: number; metresPerTile: number; scope?: "level_turn_road_profile" | "straight_road_profile" }>
 
-/** A perpendicular turn stays level over its complete overlap; the blend starts beyond its outside edge. */
+/** Keep the existing turn profile as the default; explicitly straight approaches have no invented level corner. */
 export function getEntryApproachSurfacePlan(props: Props): EntryApproachSurface | Error {
+  if (props.scope === "straight_road_profile") return getStraightEntryApproachSurfacePlan(props)
   if (
     props.points.length !== 3 ||
     ![props.widthM, props.elevationM, props.metresPerTile].every(Number.isFinite) ||

@@ -1,3 +1,4 @@
+import { auditEntryApproachSections } from "#/scripts/lib/audit-entry-approach-sections"
 import { z } from "zod"
 import { auditEntrySteps } from "#/scripts/lib/audit-entry-steps"
 import { entryStepsSchema } from "#/scripts/lib/entry-steps-schema"
@@ -65,4 +66,11 @@ it("fits the woodworker entrance and both landings without occupying the road or
   if (!formerGeometry) throw new Error("Missing former entrance geometry")
 
   expect(auditSiteBounds({ bounds: formerGeometry.bounds, building: formerBuilding, houses, roads: source.roads, mapTiles: 48 })).toContain("Outdoor footprint covers road 1")
+})
+
+it("fits the woodworker's full-width road join within its authored grade and earthwork limits", () => {
+  const source = fixture()
+  const before = JSON.stringify(source.building)
+  expect(auditEntryApproachSections({ ...source, metres: TILE_M })).toEqual([])
+  expect(JSON.stringify(source.building)).toBe(before)
 })
