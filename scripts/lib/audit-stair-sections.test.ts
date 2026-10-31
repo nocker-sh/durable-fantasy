@@ -1,5 +1,6 @@
+import type { StairFloorLevels, StairSection } from "#/scripts/lib/stair-section-types"
 import { expect, it } from "vitest"
-import { auditStairSections } from "#/scripts/lib/stair-sections"
+import { auditStairSections } from "#/scripts/lib/audit-stair-sections"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
 function fixture() {
   const common = {
@@ -27,6 +28,25 @@ function fixture() {
     furniture: furniture([3, 1]),
     connections: [{ kind: "stair", target: "room-lower", furniture: "S", target_furniture: "S", access: [3, 1], target_access: [3, 12] }],
   }
+  const levels: StairFloorLevels = [
+    { floor: 0, elevation_m: 0, ceiling_elevation_m: null },
+    { floor: 1, elevation_m: 2.52, ceiling_elevation_m: null },
+  ]
+  const sections: StairSection[] = [
+    {
+      lower_room: lower.id,
+      upper_room: upper.id,
+      furniture: "S",
+      risers: 14,
+      going_m: 0.28,
+      axis: "y",
+      lower_end: "end",
+      landing_depth_m: 1,
+      clear_width_m: 0.9,
+      rail_inset_m: 0.05,
+      opening_length_m: null,
+    },
+  ]
   const building = {
     id: "building-a",
     kind: "buildings",
@@ -36,25 +56,8 @@ function fixture() {
     design_gate: "未通過",
     issues: [],
     rooms: [lower.id, upper.id],
-    floor_levels: [
-      { floor: 0, elevation_m: 0, ceiling_elevation_m: null as number | null },
-      { floor: 1, elevation_m: 2.52, ceiling_elevation_m: null as number | null },
-    ],
-    stair_sections: [
-      {
-        lower_room: lower.id,
-        upper_room: upper.id,
-        furniture: "S",
-        risers: 14,
-        going_m: 0.28,
-        axis: "y",
-        lower_end: "end",
-        landing_depth_m: 1,
-        clear_width_m: 0.9,
-        rail_inset_m: 0.05,
-        opening_length_m: null as number | null,
-      },
-    ],
+    floor_levels: levels,
+    stair_sections: sections,
   }
   const documents = new Map<string, SettingDocument>([
     [lower.id, lower],
@@ -130,4 +133,38 @@ it.each([{}, [null], [{ floor: "0", elevation_m: 0 }]])("reports malformed floor
   const request = fixture()
   Object.assign(request.building, { floor_levels })
   expect(auditStairSections(request.building, request.documents)).toContain("Invalid stair floor levels")
+})
+
+it.each([{}, [null], [{ target: null }]])("rejects malformed room connections before section geometry: %j", (connections) => {
+  const request = fixture()
+  Object.assign(request.lower, { connections })
+  expect(auditStairSections(request.building, request.documents)).toContain("Stair section has no matching floor connection")
+})
+it("does not coerce a room floor string into an adjacent floor", () => {
+  const request = fixture()
+  Object.assign(request.upper, { floor: "1" })
+  expect(auditStairSections(request.building, request.documents)).toContain("Stair section has no matching floor connection")
+})
+it("rejects nonfinite physical dimensions after combining finite input values", () => {
+  const request = fixture()
+  request.lower.grid.cell_m = Number.MAX_VALUE
+  expect(auditStairSections(request.building, request.documents)).toEqual(["Stair section has nonfinite physical dimensions"])
+})
+it("reports an invalid completed building room list without throwing", () => {
+  const request = fixture()
+  request.building.design_gate = "通過"
+  Object.assign(request.building, { rooms: {} })
+  expect(auditStairSections(request.building, request.documents)).toContain("Invalid stair building room inventory")
+})
+
+it("rejects nonfinite dimensions on the upper landing", () => {
+  const request = fixture()
+  request.upper.grid.cell_m = Number.MAX_VALUE
+  expect(auditStairSections(request.building, request.documents)).toEqual(["Stair section has nonfinite physical dimensions"])
+})
+it("rejects a nonfinite rise between individually finite floor heights", () => {
+  const request = fixture()
+  request.building.floor_levels[0].elevation_m = -Number.MAX_VALUE
+  request.building.floor_levels[1].elevation_m = Number.MAX_VALUE
+  expect(auditStairSections(request.building, request.documents)).toEqual(["Stair section has nonfinite physical dimensions"])
 })
