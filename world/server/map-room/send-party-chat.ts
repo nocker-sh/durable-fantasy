@@ -1,11 +1,10 @@
 import type { readPartyChat } from "#/world/core/read-party-chat"
-import type { Ctx } from "#/world/server/map-room/context"
+import type { PartyChatContext } from "#/world/server/map-room/party-chat-types"
 import { presence } from "#/world/server/map-room/presence"
 import { notifyClient } from "#/world/server/map-room/notifications"
 
-type Props = Readonly<Pick<Ctx, "me"> & { ctx: Readonly<{ connection: Pick<Ctx["ctx"]["connection"], "state" | "send"> }> }>
-
-export async function sendPartyChat(context: Props, batch: ReturnType<typeof readPartyChat>) {
+/** 所有者の識別子と記録時刻を公開せず、終了した接続への送信は止める。 */
+export async function sendPartyChat(context: PartyChatContext, batch: ReturnType<typeof readPartyChat>) {
   const ctx = context.ctx
   const me = context.me
 
