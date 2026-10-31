@@ -1,4 +1,3 @@
-import { notifyClient } from "#/world/server/map-room/notifications"
 // The map room's handlers for joining, walking, looking about, warping, coming to and engaging a resident.
 import { mayVisit } from "#/world/core/may-visit"
 import { Player } from "#/durable-objects/player"
@@ -10,8 +9,7 @@ import { Wild } from "#/durable-objects/wild"
 import { spawnsOn } from "#/world/core/spawns-on"
 import { Nature } from "#/durable-objects/nature"
 import { Directory } from "#/durable-objects/directory"
-import { MAPS, TALK_CELLS } from "#/world/maps"
-import { isOpen } from "#/world/maps/is-open"
+import { TALK_CELLS } from "#/world/maps"
 import { minutesToClose } from "#/world/maps/minutes-to-close"
 import { npcCell } from "#/world/maps/npc-cell"
 import { walkable } from "#/world/maps/walkable"
@@ -24,7 +22,8 @@ import { timeFor } from "#/world/server/map-room/time-for"
 import { mapPlayer } from "#/world/server/map-room/map-player"
 import { reachable } from "#/world/server/map-room/reachable"
 import { near } from "#/world/server/map-room/near"
-import { atWarp } from "#/world/server/map-room/at-warp"
+import { handleWarp } from "#/world/server/map-room/handle-warp"
+import { handleRevive } from "#/world/server/map-room/handle-revive"
 
 async function join(roomCtx: Ctx, message: Message<"join">) {
   const ctxSource = roomCtx,
@@ -141,20 +140,6 @@ async function engage(roomCtx: Ctx, message: Message<"engage">) {
   return
 }
 
-async function revive(roomCtx: Ctx, _message: Message<"revive">) {
-  const ctxSource4 = roomCtx,
-    ctx = ctxSource4.ctx,
-    me = ctxSource4.me,
-    save = ctxSource4.save
-  if (!me.player || !me.owner || !me.down) return
-  const result = await Player.get(me.owner).reviveAtHome(ctx.connection.id)
-  await notifyClient(ctx.connection.send({ type: "result", seq: -1, result }))
-  if (!result.ok) return
-  save({ down: false, sitting: false })
-  await ctx.connection.send({ type: "warped", map: result.state.savePoint.map, at: result.state.savePoint.cell as Cell })
-  return
-}
-
 async function look(roomCtx: Ctx, message: Message<"look">) {
   const ctxSource5 = roomCtx,
     ctx = ctxSource5.ctx,
@@ -170,39 +155,11 @@ async function look(roomCtx: Ctx, message: Message<"look">) {
   return
 }
 
-async function warp(roomCtx: Ctx, message: Message<"warp">) {
-  const ctxSource6 = roomCtx,
-    ctx = ctxSource6.ctx,
-    map = ctxSource6.map,
-    me = ctxSource6.me
-  const warp = map.warps[message.warp]
-  if (!me.player || me.engaged || me.trade?.open || !warp || !atWarp(me, warp.at as Cell)) {
-    await ctx.connection.send({ type: "refused", what: "warp" })
-    return
-  }
-  // Only checked, playable destinations may be entered (game-system.md §1).
-  if (!isOpen(warp.to.map)) {
-    await ctx.connection.send({ type: "refused", what: "warp", reason: "ROAD_CLOSED" })
-    return
-  }
-  // the road out of town is tiring (game-system.md §3.6); with nothing left you cannot go on
-  if (MAPS[warp.to.map]?.kind === "field" && me.owner) {
-    const tired = await Player.get(me.owner).run({ type: "tire", amount: 4 })
-    if (!tired.ok) {
-      await ctx.connection.send({ type: "refused", what: "warp", reason: tired.reason })
-      return
-    }
-  }
-  if (!me.owner || !(await Player.get(me.owner).travel({ connection: ctx.connection.id, map: warp.to.map, at: warp.to.at as Cell }))) return
-  await ctx.connection.send({ type: "warped", map: warp.to.map, at: warp.to.at as Cell })
-  return
-}
-
 export const HANDLERS: Handlers = {
   join: join,
   move: move,
   engage: engage,
-  revive: revive,
+  revive: handleRevive,
   look: look,
-  warp: warp,
+  warp: handleWarp,
 }

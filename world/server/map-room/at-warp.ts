@@ -1,6 +1,6 @@
 import { cellDistance } from "#/world/maps/cell-distance"
 import { cellsReached } from "#/world/cells-reached"
-import type { Cell } from "#/world/protocol"
+import type { Cell } from "#/world/maps/types"
 import type { Presence } from "#/world/server/map-room/presence"
 
 /**
