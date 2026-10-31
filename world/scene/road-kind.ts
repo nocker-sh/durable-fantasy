@@ -1,4 +1,5 @@
-import { FR, GN, F } from "#/world/scene/world"
+import { F } from "#/world/scene/world"
+import { FR, GN } from "#/world/maps/ground/rules"
 import { ensureFields } from "#/world/scene/ensure-fields"
 
 export function roadKind(x: number, z: number): number {

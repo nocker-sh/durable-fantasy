@@ -1,7 +1,7 @@
 import { lerp } from "#/lib/engine/lerp"
-import { inRect } from "#/world/scene/in-rect"
-import { baseH } from "#/world/scene/helpers/world/base-h"
-import type { GroundHeightContext } from "#/world/scene/helpers/world/ground-height-types"
+import { inRect } from "#/lib/engine/in-rect"
+import { baseH } from "#/world/maps/ground/base-h"
+import type { GroundHeightContext } from "#/world/maps/ground/ground-height-types"
 type Props = Pick<GroundHeightContext, "layout" | "x" | "z">
 
 /** The stair ramp overrides the terrace and meets the base ground beyond its last step. */

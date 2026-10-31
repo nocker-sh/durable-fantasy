@@ -1,7 +1,7 @@
 import { smooth } from "#/lib/engine/smooth"
 import { lerp } from "#/lib/engine/lerp"
-import { segRoad } from "#/world/scene/helpers/world/seg-road"
-import type { GroundHeightContext } from "#/world/scene/helpers/world/ground-height-types"
+import { segRoad } from "#/world/maps/ground/seg-road"
+import type { GroundHeightContext } from "#/world/maps/ground/ground-height-types"
 type Props = Pick<GroundHeightContext, "layout" | "x" | "z" | "roads" | "roadField">
 
 /** Fade the map's landform off near the exact road centreline while retaining its sampled road-distance input. */

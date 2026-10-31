@@ -1,4 +1,4 @@
-import type { RoadPath } from "#/world/scene/world"
+import type { RoadPath } from "#/world/maps/ground/types"
 
 export function segRoad(x: number, z: number, roads: readonly RoadPath[]): number {
   const best = { value: 1e9 }

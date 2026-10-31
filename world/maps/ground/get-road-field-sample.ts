@@ -1,6 +1,6 @@
 import { fbm } from "#/lib/engine/fbm"
 import { vnoise } from "#/lib/engine/vnoise"
-import type { RoadPath } from "#/world/scene/world"
+import type { RoadPath } from "#/world/maps/ground/types"
 
 type Props = Readonly<{ seed: number; roads: readonly RoadPath[] }>
 type Sample = { distance: number; kind: number }

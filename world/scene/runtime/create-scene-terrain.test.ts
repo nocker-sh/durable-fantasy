@@ -7,7 +7,8 @@ import { withCleanup } from "#/lib/engine/with-cleanup"
 import { PixelBuffer } from "#/lib/graphics/pixel-buffer"
 import { MAP_SCENES } from "#/world/scene/runtime/definitions"
 import { INTERIORS } from "#/world/town/interiors"
-import { F, fieldsReady, N } from "#/world/scene/world"
+import { F, fieldsReady } from "#/world/scene/world"
+import { N } from "#/world/maps/ground/rules"
 
 beforeEach(() => {
   fieldsReady.value = true

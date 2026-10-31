@@ -46,9 +46,8 @@ import { auditEntrySteps } from "#/scripts/lib/audit-entry-steps"
 import { entryStepGeometry } from "#/scripts/lib/entry-step-geometry"
 import type { EntrySteps } from "#/scripts/lib/entry-steps-types"
 import { ScalarField } from "#/lib/engine/scalar-field"
-import { F, FR, GRID_N } from "#/world/scene/world"
-import { groundH } from "#/world/scene/ground-h"
-import { setLayout } from "#/world/scene/set-layout"
+import { FR, GRID_N } from "#/world/maps/ground/rules"
+import { createGroundFields } from "#/world/maps/ground/create-ground-fields"
 import { CRAFT_YARD, craftYardFootprints } from "#/world/town/craft-yard"
 import { auditRuntimeStations } from "#/scripts/lib/runtime-stations"
 import { STATIONS } from "#/world/town/stations"
@@ -275,14 +274,13 @@ for (const entry4 of Object.entries(outdoorLayouts)) {
 const terrainFields = new Map<string, ScalarField>()
 function terrainFor(map: string) {
   const id = map.replace(/^map-/, ""),
-    layout = outdoorLayouts[id as keyof typeof outdoorLayouts]
+    layout = Object.entries(outdoorLayouts).find((entry) => entry[0] === id)?.[1]
   if (!layout) return undefined
-  if (!terrainFields.has(id)) {
-    setLayout(layout)
-    groundH(0, 0)
-    terrainFields.set(id, new ScalarField(F.h.slice(), GRID_N, FR))
-  }
-  return terrainFields.get(id)!
+  const known = terrainFields.get(id)
+  if (known) return known
+  const terrain = new ScalarField(createGroundFields(layout).h, GRID_N, FR)
+  terrainFields.set(id, terrain)
+  return terrain
 }
 const entryFootprints = [...documents.values()]
   .filter((doc) => doc.kind === "buildings")

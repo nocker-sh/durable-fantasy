@@ -1,6 +1,7 @@
 import type { Vector2Tuple } from "#/lib/engine/vector2-types"
 import { GridPathfinder } from "#/lib/engine/grid-pathfinder"
-import { blocked, WN, WR } from "#/world/scene/world"
+import { blocked } from "#/world/scene/world"
+import { WN, WR } from "#/world/maps/ground/rules"
 
 const paths = new GridPathfinder({ blocked, size: WN, resolution: WR, clearance: 0.2 })
 

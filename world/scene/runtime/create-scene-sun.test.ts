@@ -2,7 +2,7 @@ import { expect, it, vi } from "vitest"
 import { WebGLRenderTarget } from "three"
 import { createSceneSun } from "#/world/scene/runtime/create-scene-sun"
 import { CleanupStack } from "#/lib/engine/cleanup-stack"
-import { N } from "#/world/scene/world"
+import { N } from "#/world/maps/ground/rules"
 
 it("preserves the sun's shadow camera and disposes both allocated shadow targets once", () => {
   const resources = new CleanupStack()

@@ -1,5 +1,5 @@
 import { layout, walkSurfaces } from "#/world/scene/world"
-import { inRect } from "#/world/scene/in-rect"
+import { inRect } from "#/lib/engine/in-rect"
 import { groundH } from "#/world/scene/ground-h"
 import { bridgeDeckH } from "#/world/scene/bridge-deck-h"
 

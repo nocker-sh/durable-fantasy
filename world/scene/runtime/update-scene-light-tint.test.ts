@@ -4,7 +4,7 @@ import { updateSceneLightTint } from "#/world/scene/runtime/update-scene-light-t
 import { SCENE_LIGHT_PALETTES } from "#/world/scene/runtime/scene-light-palettes"
 import { litSprites } from "#/world/scene/gfx"
 import { view } from "#/world/scene/actors"
-import { N } from "#/world/scene/world"
+import { N } from "#/world/maps/ground/rules"
 
 const originalTint = view.tint.clone()
 afterEach(() => {

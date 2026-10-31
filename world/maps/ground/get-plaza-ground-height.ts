@@ -1,6 +1,6 @@
 import { smooth } from "#/lib/engine/smooth"
 import { lerp } from "#/lib/engine/lerp"
-import type { GroundHeightContext } from "#/world/scene/helpers/world/ground-height-types"
+import type { GroundHeightContext } from "#/world/maps/ground/ground-height-types"
 type Props = Pick<GroundHeightContext, "layout" | "x" | "z" | "plazaHeight">
 
 /** Blend the plaza's fixed level into the surrounding unmodified terrain. */

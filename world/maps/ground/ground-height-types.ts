@@ -1,5 +1,5 @@
 import type { Layout } from "#/world/maps/layout-types"
-import type { RoadPath } from "#/world/scene/world"
+import type { RoadPath } from "#/world/maps/ground/types"
 import type { ScalarField } from "#/lib/engine/scalar-field"
 
 export type GroundHeightContext = Readonly<{

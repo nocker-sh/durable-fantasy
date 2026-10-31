@@ -1,4 +1,4 @@
-import { WR, WN } from "#/world/scene/world"
+import { WR, WN } from "#/world/maps/ground/rules"
 
 const STEP_SPEED = 2.4
 

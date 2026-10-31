@@ -1,10 +1,10 @@
 import { expect, it, vi } from "vitest"
 import { Polyline } from "#/lib/engine/polyline"
-import { getGroundRoadPaths } from "#/world/scene/helpers/world/get-ground-road-paths"
-import { getRoadFieldSample } from "#/world/scene/helpers/world/get-road-field-sample"
-import { getTrailFieldDistance } from "#/world/scene/helpers/world/get-trail-field-distance"
-import { sampleGroundFieldCell } from "#/world/scene/helpers/world/sample-ground-field-cell"
-import type { GroundFieldContext } from "#/world/scene/helpers/world/ground-field-types"
+import { getGroundRoadPaths } from "#/world/maps/ground/get-ground-road-paths"
+import { getRoadFieldSample } from "#/world/maps/ground/get-road-field-sample"
+import { getTrailFieldDistance } from "#/world/maps/ground/get-trail-field-distance"
+import { sampleGroundFieldCell } from "#/world/maps/ground/sample-ground-field-cell"
+import type { GroundFieldContext } from "#/world/maps/ground/ground-field-types"
 import type { Road } from "#/world/maps/layout-types"
 
 it("snapshots road geometry while preserving widths and all three material codes", () => {

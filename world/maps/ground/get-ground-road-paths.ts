@@ -1,6 +1,6 @@
 import { Polyline } from "#/lib/engine/polyline"
 import type { Road } from "#/world/maps/layout-types"
-import type { RoadPath } from "#/world/scene/world"
+import type { RoadPath } from "#/world/maps/ground/types"
 
 /** Snapshot each road centreline while retaining the renderer's material codes and widths. */
 export function getGroundRoadPaths(roads: readonly Road[]): RoadPath[] {

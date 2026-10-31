@@ -1,4 +1,4 @@
-import type { Fields } from "#/world/scene/world"
+import type { Fields } from "#/world/maps/ground/types"
 import { GROUND_VERSION as VERSION } from "#/world/scene/ground-version"
 import { STORE } from "#/world/scene/ground"
 import { db } from "#/world/scene/helpers/ground/db"

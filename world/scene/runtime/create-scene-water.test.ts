@@ -1,7 +1,7 @@
 import { expect, it } from "vitest"
 import { createSceneWater } from "#/world/scene/runtime/create-scene-water"
 import { CleanupStack } from "#/lib/engine/cleanup-stack"
-import { N, WATER_Y } from "#/world/scene/world"
+import { N, WATER_Y } from "#/world/maps/ground/rules"
 
 it("keeps the plane, animated palette and cleanup order of the water surface", () => {
   const resources = new CleanupStack()

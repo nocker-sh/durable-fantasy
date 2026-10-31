@@ -1,6 +1,6 @@
-import { getRoadFieldSample } from "#/world/scene/helpers/world/get-road-field-sample"
-import { getTrailFieldDistance } from "#/world/scene/helpers/world/get-trail-field-distance"
-import type { GroundFieldContext } from "#/world/scene/helpers/world/ground-field-types"
+import { getRoadFieldSample } from "#/world/maps/ground/get-road-field-sample"
+import { getTrailFieldDistance } from "#/world/maps/ground/get-trail-field-distance"
+import type { GroundFieldContext } from "#/world/maps/ground/ground-field-types"
 
 /** Write distance and material fields before height sampling, which reads the progressively generated road field. */
 export function sampleGroundFieldCell(row: number, column: number, context: GroundFieldContext): void {

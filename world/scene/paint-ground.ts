@@ -1,5 +1,5 @@
 import { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
-import { N } from "#/world/scene/world"
+import { N } from "#/world/maps/ground/rules"
 import { PPU } from "#/world/scene/textures/palette"
 import { paintRows } from "#/world/scene/paint-rows"
 

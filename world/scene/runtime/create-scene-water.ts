@@ -1,5 +1,5 @@
 import { Color, Mesh, PlaneGeometry, ShaderMaterial } from "three"
-import { N, WATER_Y } from "#/world/scene/world"
+import { N, WATER_Y } from "#/world/maps/ground/rules"
 import type { CleanupStack } from "#/lib/engine/cleanup-stack"
 
 const shaders = {

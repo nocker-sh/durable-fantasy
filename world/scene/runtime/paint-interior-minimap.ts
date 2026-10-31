@@ -1,4 +1,4 @@
-import { N } from "#/world/scene/world"
+import { N } from "#/world/maps/ground/rules"
 import type { Interior } from "#/world/town/interiors"
 
 type Canvas = Pick<CanvasRenderingContext2D, "fillStyle" | "fillRect">

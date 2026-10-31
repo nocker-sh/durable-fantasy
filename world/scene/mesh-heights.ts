@@ -1,4 +1,5 @@
-import { N, FR, F, GRID_N } from "#/world/scene/world"
+import { F } from "#/world/scene/world"
+import { N, FR, GRID_N } from "#/world/maps/ground/rules"
 import { ensureFields } from "#/world/scene/ensure-fields"
 
 /** Heights for the terrain mesh, at 4 vertices per tile. */

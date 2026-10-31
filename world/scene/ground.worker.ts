@@ -1,7 +1,7 @@
 // Paints a band of a map's ground off the main thread (terrain.ts), and sends the pixels back.
 import { fieldsNow } from "#/world/scene/fields-now"
 import { setLayout } from "#/world/scene/set-layout"
-import type { Fields } from "#/world/scene/world"
+import type { Fields } from "#/world/maps/ground/types"
 import { layoutOf } from "#/world/maps/layouts"
 import { GROUND_PX } from "#/world/scene/terrain"
 import { paintRows } from "#/world/scene/paint-rows"

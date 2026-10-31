@@ -3,7 +3,7 @@ import { createHeightfieldVertices } from "#/lib/graphics/create-heightfield-ver
 import { createGridIndices } from "#/lib/graphics/create-grid-indices"
 import { createGroundMaterial } from "#/world/scene/runtime/create-ground-material"
 import { meshHeights } from "#/world/scene/mesh-heights"
-import { N } from "#/world/scene/world"
+import { N } from "#/world/maps/ground/rules"
 import type { PixelBuffer } from "#/lib/graphics/pixel-buffer"
 import type { CleanupStack } from "#/lib/engine/cleanup-stack"
 

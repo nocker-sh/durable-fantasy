@@ -1,6 +1,6 @@
 import type { RGB } from "#/lib/graphics/pixel-types"
 import { hexToRgb as hex } from "#/lib/graphics/hex-to-rgb"
-import { N } from "#/world/scene/world"
+import { N } from "#/world/maps/ground/rules"
 import { PPU } from "#/world/scene/textures/palette"
 
 export // ---------------------------------------------------------------- little drawn shapes

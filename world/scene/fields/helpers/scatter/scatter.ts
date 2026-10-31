@@ -1,5 +1,5 @@
 import { Rng } from "#/lib/engine/random"
-import { N } from "#/world/scene/world"
+import { N } from "#/world/maps/ground/rules"
 import type { Spot } from "#/world/scene/fields/instancing"
 
 /** Spots scattered over the map that pass `ok`, with a size between `s0` and `s1`. */

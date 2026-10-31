@@ -1,5 +1,5 @@
 import "#/world/scene/runtime/grid"
-import { WR } from "#/world/scene/world"
+import { WR } from "#/world/maps/ground/rules"
 import type { V2 } from "#/world/scene/construction/registry"
 import type { Cell } from "#/world/scene/runtime/types"
 

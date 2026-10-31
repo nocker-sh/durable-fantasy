@@ -29,7 +29,7 @@
     "resident-エルザ"
   ],
   "geometry_source": "world/scene/construction/waterworks.ts",
-  "terrain_source": "world/scene/world.ts"
+  "terrain_source": "world/maps/ground/create-ground-fields.ts"
 }
 ---
 

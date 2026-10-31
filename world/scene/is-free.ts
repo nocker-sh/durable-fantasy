@@ -1,4 +1,5 @@
-import { WR, WN, blocked } from "#/world/scene/world"
+import { blocked } from "#/world/scene/world"
+import { WR, WN } from "#/world/maps/ground/rules"
 
 export function isFree(x: number, z: number): boolean {
   const i = Math.floor(x * WR),

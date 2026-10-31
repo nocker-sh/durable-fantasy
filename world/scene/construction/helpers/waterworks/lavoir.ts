@@ -1,7 +1,7 @@
 import type * as THREE from "three"
 import { GeometryBuilder as GB } from "#/lib/graphics/geometry-builder"
 import { groundH } from "#/world/scene/ground-h"
-import { WATER_Y } from "#/world/scene/world"
+import { WATER_Y } from "#/world/maps/ground/rules"
 import { currentLayout } from "#/world/scene/current-layout"
 import { M } from "#/world/scene/construction/materials"
 import { addSprite } from "#/world/scene/construction/add-sprite"

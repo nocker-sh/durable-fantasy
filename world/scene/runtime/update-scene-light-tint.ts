@@ -1,7 +1,7 @@
 import { Color } from "three"
 import { view } from "#/world/scene/actors"
 import { litSprites } from "#/world/scene/gfx"
-import { N } from "#/world/scene/world"
+import { N } from "#/world/maps/ground/rules"
 import type { DirectionalLight } from "three"
 import type { SceneLight, SceneWaterUniforms } from "#/world/scene/runtime/scene-lighting-types"
 

@@ -38,7 +38,7 @@ A* 探索のコスト・前のセル・候補の展開は `lib/engine/grid-path-
 
 `world/maps/layouts.ts` は地図の選択と町の踏み跡を加えた配置の保持を担当する。地図名は `Map` で照会し、継承したプロパティを地図として使わない。戸口の壁ごとの座標と外向きは `get-house-door-approach.ts`、描画用の踏み跡は `get-house-door-trail.ts`、道路上の最近点は `get-nearest-road-point.ts` が持つ。線分への射影は `lib/engine/get-nearest-segment-point.ts` を使う。踏み跡は通行判定を変えない。地面の保存識別子には地図選択・踏み跡の計算・家と戸口の定義も含め、参照の検査は地図選択からの依存も辿る。識別子の組立ては `lib/engine/get-source-fingerprint.ts`、文字列のハッシュは `get-string-hash.ts` に分ける。既存の保存形式に合わせてパス順の内容を結合し、文字列は UTF-16 の各符号単位を順に処理する。
 
-地面の高さは `world/scene/helpers/world/compute-h.ts` が基礎、広場、台地と階段、川、共同洗濯場、野外の地形の順で組み立てる。各段は同じ場所と地面定義の読取り専用の文脈を受け取り、高さを返す。階段は台地や洗い場の高さより後に適用する。野外の地形の混合では道路の線分からの距離を使い、地形の関数へ渡す道路距離は生成中の道路の標本から読む。これらの二つの距離と、地面の格子を作る順序は混同しない。格子の生成は `compute-fields.ts` が行を先に、各行の列を後に走査し、`sample-ground-field-cell.ts` が川・道路・踏み跡・路面の種類を高さより先に書く。道路の形状は `get-ground-road-paths.ts` が固定し、揺らぎを含む距離と勝った路面の種類は `get-road-field-sample.ts` が組で返す。道がなければ既存の未配置の値を返し、道路用のノイズは計算しない。踏み跡の距離は `get-trail-field-distance.ts` が持つ。
+地面の高さは `world/maps/ground/get-ground-height.ts` が基礎、広場、台地と階段、川、共同洗濯場、野外の地形の順で組み立てる。各段は同じ場所と地面定義の読取り専用の文脈を受け取り、高さを返す。階段は台地や洗い場の高さより後に適用する。野外の地形の混合では道路の線分からの距離を使い、地形の関数へ渡す道路距離は生成中の道路の標本から読む。これらの二つの距離と、地面の格子を作る順序は混同しない。格子の生成は `create-ground-fields.ts` が場面の共有状態を読まず、渡された配置と所有する配列で行を先に、各行の列を後に走査し、`sample-ground-field-cell.ts` が川・道路・踏み跡・路面の種類を高さより先に書く。道路の形状は `get-ground-road-paths.ts` が固定し、揺らぎを含む距離と勝った路面の種類は `get-road-field-sample.ts` が組で返す。道がなければ既存の未配置の値を返し、道路用のノイズは計算しない。踏み跡の距離は `get-trail-field-distance.ts` が持つ。これらの計算と共有する型・寸法は `world/maps/ground/` に置く。矩形内の判定は `lib/engine/in-rect.ts` で共有する。描画側の `compute-fields.ts` は生成済みの値を既存の配列へ写し、場面が保持する標本の参照を維持する。
 
 経路の短縮は `lib/engine/get-shortened-path.ts` に分け、見通しの判定を探索側から渡す。見通しを単調と仮定せず遠い候補から調べ、短縮できない区間では元の隣接点を残す。
 
@@ -279,7 +279,7 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 職人通りの共同炉と金床・薪の既存の配置は `world/town/craft-yard.ts` で共有し、描画と加工判定が別々の座標を持たない。屋内の加工設備は描画の種類だけでなく元の家具名で結び、同じ種類の台を並べ替えても別の作業面を参照しない。設備資料の runtime_station は `scripts/lib/runtime-stations.ts` が実行時の設備とマップへ照合する。
 
-`lib/engine/scalar-field-range.ts` は双線形の補間の格子線と照会矩形の端から最小・最大を求める。補間と同じ座標の切詰めを `ScalarField.gridCoordinate` で使い、四隅だけでは見落とす内部の起伏も含める。設定検査は現行の地形を地区ごとに計算し、独立した配列に保持して床の基礎と入口の外階段へ渡す。実行時の地面や建物をこの検査で変更しない。
+`lib/engine/scalar-field-range.ts` は双線形の補間の格子線と照会矩形の端から最小・最大を求める。補間と同じ座標の切詰めを `ScalarField.gridCoordinate` で使い、四隅だけでは見落とす内部の起伏も含める。設定検査は `create-ground-fields.ts` で現行の地形を地区ごとに直接生成し、独立した配列を床の基礎と入口の外階段へ渡す。描画の地区を切り替えたり共有配列を初期化したりしない。実行時の地面や建物をこの検査で変更しない。
 
 `scripts/lib/audit-building-foundation.ts` は共有の `foundation-schema.ts` で寸法を読み、地形の保持範囲と地面・床下面の隔たりを照合する。`scripts/lib/entry-step-geometry.ts` は戸から階段と踊り場・踏面を求める。入力の敷地・部屋・基礎は `entry-step-site-schema.ts` と `get-entry-step-site.ts` が照合し、戸口への変換は `get-entry-step-door-pose.ts`、断面の長さ・幅・蹴上げは `get-entry-step-section.ts`、踏面と踊り場は `get-entry-step-surfaces.ts` が担当する。各面の位置と矩形は `get-entry-step-point.ts`・`get-entry-step-rectangle.ts` で同じ回転と縮尺を使う。強制変換で未検証の値を渡さず、有限な入力でも計算が表現範囲を超える形状は拒否する。`audit-entry-steps.ts` は階段の配列と重複を検査し、`get-entry-step-errors.ts` から戸・寸法・接近路・地形の個別検査を元の順序で呼ぶ。接近路は `entry-approach-schema.ts` を資料の読取りと共用し、非有限な座標を経路の接続として受け入れない。`entry-opening-height.ts` は戸口の頭上高を確認する。外階段の寸法と型は `entry-steps-schema.ts` と `entry-steps-types.ts` で共用し、保持範囲外の地形を丸めて踏面の支持に使わない。外階段の占有は敷地と屋外の経路へ渡し、別の建物の案で消えないようにする。
 
@@ -1339,7 +1339,7 @@ React との共有の定義は `components/game/game-context.ts` に一つだけ
 開発用の定義表は `dev/sheet-list.tsx` と `dev/sheet-row.tsx` を入口とする。一覧、行、参照、プレビューはそれぞれの定義元を直接参照する。表の登録は `dev/sheets/registry.ts` に保ち、行索引と逆参照のキャッシュは検索する関数のモジュール内で保持する。アイコンの描画と拡大・切り抜きは `world/art/icons/`、表示用 URL は `world/art/icon-url.ts`・`ui-icon-url.ts`・`portrait-url.ts` に置く。接続開始の共有 Promise は `world/client/load-player-id.ts` の内部に置き、完了時と失敗時に同じ共有先を解放する。
 
 
-地形の共有バッファと選択中の配置は `world/scene/world.ts` に保持し、配置の切替、計算済みフィールド、地形の参照と通行判定はそれぞれの定義元から呼ぶ。フィールド計算中の道路サンプルは、準備処理へ戻らず同じ共有バッファを直接読む。保存済みの地面画像の識別子は `ground-version.ts` に列挙した描画依存から作る。`ground-version.test.ts` は描画と地形の入口から依存先をたどり、分離された処理も識別子へ含まれることを確かめる。
+描画の地形の共有バッファと選択中の配置は `world/scene/world.ts` に保持し、配置の切替、計算済みフィールド、地形の参照と通行判定はそれぞれの定義元から呼ぶ。フィールド計算中の道路サンプルは、準備処理へ戻らず生成が所有する道路の配列を読む。保存済みの地面画像の識別子は `ground-version.ts` に列挙した描画依存から作る。`ground-version.test.ts` は描画と地形の入口から依存先をたどり、分離された処理も識別子へ含まれることを確かめる。
 
 人物画像の Worker の生成、破棄、要求の処理は `world/scene/helpers/sprite-pool/` に分ける。生成時に完了通知を受け取り、破棄時に代替 Worker の生成方法を受け取ることで、生成と要求の処理を相互 import しない。Worker の素材 URL は生成処理のファイル位置を基準に解決する。既存の失敗時の再試行、重複通知の抑止、遅れて届く結果の破棄は維持する。
 

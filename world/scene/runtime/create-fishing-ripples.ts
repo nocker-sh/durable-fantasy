@@ -1,5 +1,5 @@
 import { Mesh, MeshBasicMaterial, RingGeometry } from "three"
-import { WATER_Y } from "#/world/scene/world"
+import { WATER_Y } from "#/world/maps/ground/rules"
 import { groundH } from "#/world/scene/ground-h"
 import { currentLayout } from "#/world/scene/current-layout"
 import { updaters } from "#/world/scene/construction/registry"

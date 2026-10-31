@@ -1,7 +1,7 @@
 import { expect, it } from "vitest"
 import { Texture } from "three"
 import { applyGroundShader } from "#/world/scene/runtime/apply-ground-shader"
-import { WATER_Y } from "#/world/scene/world"
+import { WATER_Y } from "#/world/maps/ground/rules"
 
 it("keeps existing uniforms and shader code while selecting wall and ground pixels by normal", () => {
   const wall = new Texture()

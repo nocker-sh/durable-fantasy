@@ -1,4 +1,5 @@
-import { WR, WN, blocked, blockedBy } from "#/world/scene/world"
+import { blocked, blockedBy } from "#/world/scene/world"
+import { WR, WN } from "#/world/maps/ground/rules"
 import { who } from "#/world/scene/helpers/world/who"
 
 export function blockCircle(x: number, z: number, r: number) {

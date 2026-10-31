@@ -1,5 +1,5 @@
 import { DirectionalLight } from "three"
-import { N } from "#/world/scene/world"
+import { N } from "#/world/maps/ground/rules"
 import type { CleanupStack } from "#/lib/engine/cleanup-stack"
 
 /** 影を設定する前に所有し、町の中心を照らす範囲と解像度を保つ。 */

@@ -3,7 +3,8 @@ import type { SceneOptions } from "#/world/scene/runtime/scene-options"
 import type { SceneEvents } from "#/world/scene/runtime/types"
 const factory = vi.hoisted(() => ({ create: vi.fn<(map: string, progress: (text: string) => void, input: { signal: AbortSignal; options: SceneOptions }) => Promise<unknown>>() }))
 vi.mock("#/world/scene/runtime/create-scene-runtime", () => ({ createSceneRuntime: factory.create }))
-vi.mock("../world", () => ({ N: 96, WR: 2, WN: 96, blocked: vi.fn() }))
+vi.mock("#/world/scene/world", () => ({ blocked: vi.fn() }))
+vi.mock("#/world/maps/ground/rules", () => ({ N: 96, WR: 2, WN: 96 }))
 vi.mock("#/world/scene/construction/registry", () => ({ places: {} }))
 vi.mock("#/world/lap", () => ({ lap: vi.fn() }))
 vi.mock("#/world/scene/key-turn", () => ({ keyTurn: vi.fn() }))

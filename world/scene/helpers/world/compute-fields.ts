@@ -1,19 +1,13 @@
-import { Polyline } from "#/lib/engine/polyline"
-import { getIntegerRange } from "#/lib/engine/get-integer-range"
-import { FR, GN, layout, F, PLAZA_H } from "#/world/scene/world"
-import { baseH } from "#/world/scene/helpers/world/base-h"
-import { computeH } from "#/world/scene/helpers/world/compute-h"
-import { getGroundRoadPaths } from "#/world/scene/helpers/world/get-ground-road-paths"
-import { sampleGroundFieldCell } from "#/world/scene/helpers/world/sample-ground-field-cell"
-import type { GroundFieldContext } from "#/world/scene/helpers/world/ground-field-types"
+import { createGroundFields } from "#/world/maps/ground/create-ground-fields"
+import { layout, F, PLAZA_H } from "#/world/scene/world"
 
-/** Generate row-first so height sampling observes the same partial road field as the stored ground format. */
+/** Copy generated samples into the scene's existing buffers, retaining its field views. */
 export function computeFields(): void {
-  const river = new Polyline(layout.value.river)
-  const trails = (layout.value.trails ?? []).map((points) => new Polyline(points))
-  const roads = getGroundRoadPaths(layout.value.roads)
-  const context: GroundFieldContext = { river, trails, roads, fields: F, size: GN, resolution: FR, seed: layout.value.seed, heightAt: computeH }
-  PLAZA_H.value = baseH(layout.value.plaza[0], layout.value.plaza[1], layout.value)
-  const cells = getIntegerRange(0, GN)
-  for (const row of cells) for (const column of cells) sampleGroundFieldCell(row, column, context)
+  const fields = createGroundFields(layout.value)
+  F.h.set(fields.h)
+  F.river.set(fields.river)
+  F.road.set(fields.road)
+  F.roadKind.set(fields.roadKind)
+  F.trail.set(fields.trail)
+  PLAZA_H.value = fields.plazaH
 }

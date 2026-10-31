@@ -1,6 +1,6 @@
 import { smooth } from "#/lib/engine/smooth"
 import { lerp } from "#/lib/engine/lerp"
-import type { GroundHeightContext } from "#/world/scene/helpers/world/ground-height-types"
+import type { GroundHeightContext } from "#/world/maps/ground/ground-height-types"
 type Props = Pick<GroundHeightContext, "layout" | "z" | "riverDistance">
 
 /** Keep the river bed separate from steep town embankments and the wider natural banks. */

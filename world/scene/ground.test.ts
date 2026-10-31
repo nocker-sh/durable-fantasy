@@ -101,7 +101,7 @@ it("promotes fallback permission and restores the layout after main-thread paint
   const world = {
     ...(await import("#/world/scene/world")),
     ...(await import("#/world/scene/river-x")),
-    ...(await import("#/world/scene/in-rect")),
+    ...(await import("#/lib/engine/in-rect")),
     ...(await import("#/world/scene/ensure-fields")),
     ...(await import("#/world/scene/current-layout")),
     ...(await import("#/world/scene/set-layout")),
@@ -305,7 +305,7 @@ it("terminates sibling workers when one prefetch band fails", async () => {
   const world = {
     ...(await import("#/world/scene/world")),
     ...(await import("#/world/scene/river-x")),
-    ...(await import("#/world/scene/in-rect")),
+    ...(await import("#/lib/engine/in-rect")),
     ...(await import("#/world/scene/ensure-fields")),
     ...(await import("#/world/scene/current-layout")),
     ...(await import("#/world/scene/set-layout")),

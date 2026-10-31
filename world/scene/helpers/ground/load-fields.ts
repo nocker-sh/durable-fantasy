@@ -1,6 +1,6 @@
 import { hasFields } from "#/world/scene/has-fields"
 import { primeFields } from "#/world/scene/prime-fields"
-import type { Fields } from "#/world/scene/world"
+import type { Fields } from "#/world/maps/ground/types"
 import { layoutOf } from "#/world/maps/layouts"
 import { GROUND_VERSION as VERSION } from "#/world/scene/ground-version"
 import { STORE } from "#/world/scene/ground"

@@ -1,5 +1,6 @@
-import { N, WATER_Y, layout, walkSurfaces, WR, WN, blocked } from "#/world/scene/world"
-import { inRect } from "#/world/scene/in-rect"
+import { layout, walkSurfaces, blocked } from "#/world/scene/world"
+import { N, WATER_Y, WR, WN } from "#/world/maps/ground/rules"
+import { inRect } from "#/lib/engine/in-rect"
 import { groundH } from "#/world/scene/ground-h"
 
 export function initWalk() {

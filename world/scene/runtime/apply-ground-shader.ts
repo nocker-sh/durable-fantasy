@@ -1,4 +1,4 @@
-import { WATER_Y } from "#/world/scene/world"
+import { WATER_Y } from "#/world/maps/ground/rules"
 import type { MeshLambertMaterial, Texture } from "three"
 
 type Shader = Pick<Parameters<MeshLambertMaterial["onBeforeCompile"]>[0], "uniforms" | "vertexShader" | "fragmentShader">

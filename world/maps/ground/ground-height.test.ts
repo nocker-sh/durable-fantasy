@@ -1,12 +1,12 @@
 import { expect, it, vi } from "vitest"
 import { INDOOR } from "#/world/maps/layouts/indoor"
 import { Polyline } from "#/lib/engine/polyline"
-import { baseH } from "#/world/scene/helpers/world/base-h"
-import { getPlazaGroundHeight } from "#/world/scene/helpers/world/get-plaza-ground-height"
-import { getTerraceGroundHeight } from "#/world/scene/helpers/world/get-terrace-ground-height"
-import { getRiverGroundHeight } from "#/world/scene/helpers/world/get-river-ground-height"
-import { getLavoirGroundHeight } from "#/world/scene/helpers/world/get-lavoir-ground-height"
-import { getShapedGroundHeight } from "#/world/scene/helpers/world/get-shaped-ground-height"
+import { baseH } from "#/world/maps/ground/base-h"
+import { getPlazaGroundHeight } from "#/world/maps/ground/get-plaza-ground-height"
+import { getTerraceGroundHeight } from "#/world/maps/ground/get-terrace-ground-height"
+import { getRiverGroundHeight } from "#/world/maps/ground/get-river-ground-height"
+import { getLavoirGroundHeight } from "#/world/maps/ground/get-lavoir-ground-height"
+import { getShapedGroundHeight } from "#/world/maps/ground/get-shaped-ground-height"
 
 it("holds the plaza level inside its radius and retains base ground beyond the blend", () => {
   const layout = { ...INDOOR, plaza: [10, 20] satisfies [number, number], plazaR: 3 }

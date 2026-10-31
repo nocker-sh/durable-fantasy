@@ -1,4 +1,5 @@
 import { SQUARE_LAYOUT } from "#/world/maps/layout"
+import { GRID_N } from "#/world/maps/ground/rules"
 import { deepStrictEqual } from "node:assert"
 import { afterEach, expect, it, vi } from "vitest"
 
@@ -8,7 +9,7 @@ it("defers default terrain calculation until its first sample", async () => {
   const world = {
     ...(await import("#/world/scene/world")),
     ...(await import("#/world/scene/river-x")),
-    ...(await import("#/world/scene/in-rect")),
+    ...(await import("#/lib/engine/in-rect")),
     ...(await import("#/world/scene/ensure-fields")),
     ...(await import("#/world/scene/current-layout")),
     ...(await import("#/world/scene/set-layout")),
@@ -42,7 +43,7 @@ it("uses primed fields without calculating the unused default or selected layout
   const world = {
     ...(await import("#/world/scene/world")),
     ...(await import("#/world/scene/river-x")),
-    ...(await import("#/world/scene/in-rect")),
+    ...(await import("#/lib/engine/in-rect")),
     ...(await import("#/world/scene/ensure-fields")),
     ...(await import("#/world/scene/current-layout")),
     ...(await import("#/world/scene/set-layout")),
@@ -67,7 +68,7 @@ it("uses primed fields without calculating the unused default or selected layout
     throw Error("Should use primed fields")
   })
   const layout = { ...SQUARE_LAYOUT, shape }
-  const count = world.GRID_N ** 2
+  const count = GRID_N ** 2
   const fields = {
     h: new Float32Array(count).fill(3),
     river: new Float32Array(count).fill(5),

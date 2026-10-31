@@ -1,4 +1,4 @@
-import { inRect } from "#/world/scene/in-rect"
+import { inRect } from "#/lib/engine/in-rect"
 import { getIntegerRange } from "#/lib/engine/get-integer-range"
 import type { V2 } from "#/world/scene/construction/registry"
 
