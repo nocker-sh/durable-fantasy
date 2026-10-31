@@ -6,6 +6,7 @@ export type BuildingEnvelope = {
   /** Rotation from building-local axes into its outdoor map; never inferred from roof or door direction. */
   quarterTurns: number
   floorY: number
+  /** Roof underside heights in the outdoor map's display units, not covering thickness. */
   eaveY: number
   ridgeY: number
   overhang: number
