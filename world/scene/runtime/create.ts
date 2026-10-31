@@ -1,3 +1,4 @@
+import type { SceneFrame } from "#/world/scene/runtime/scene-frame-types"
 import { SceneResidentNames } from "#/world/scene/runtime/scene-resident-names"
 import { createResidentNameplate } from "#/world/scene/runtime/create-resident-nameplate"
 import { SceneSpeech } from "#/world/scene/runtime/scene-speech"
@@ -16,7 +17,7 @@ import { OcclusionQuery } from "#/lib/graphics/occlusion-query"
 import { SceneLabelProjection } from "#/world/scene/runtime/scene-label-projection"
 import { PendingAction } from "#/world/scene/runtime/action-target"
 import { WarpMarkers } from "#/world/scene/runtime/warps"
-import { FrameLimiter } from "#/lib/engine/frame-limiter"
+import { SceneFrameLoop } from "#/world/scene/runtime/scene-frame-loop"
 import { keyTurn } from "#/world/scene/key-turn"
 import { createGatheringSpots } from "#/world/scene/runtime/gathering"
 import { createPointer } from "#/world/scene/runtime/pointer"
@@ -366,28 +367,19 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     occluders.map((o) => o.box),
     0.3,
   )
-  let lastReport = 0
-  let frames = 0,
-    fpsAt = performance.now(),
-    fpsNow = 0
-  // Cap high-refresh displays while allowing smooth movement at 60 frames a second.
-  const framesDue = new FrameLimiter(60)
+  const frameLoop = new SceneFrameLoop({ clock, running: () => runtime.running, render: frame, tick: () => runtime.events?.tick() })
   const SHADOW_MS = 250
   let shadowAt = 0
-  function frame(at: number) {
-    if (!runtime.running) return
-    if (!framesDue.ready(at)) {
-      requestAnimationFrame(frame)
-      return
-    }
+  function frame(input: SceneFrame) {
+    const at = input.at
     if (shadowDirty || at - shadowAt > SHADOW_MS) {
       renderer.shadowMap.needsUpdate = true
       shadowDirty = false
       shadowAt = at
     }
-    const elapsed = clock.getDelta()
-    const dt = Math.min(0.05, elapsed)
-    const t = clock.elapsedTime
+    const elapsed = input.elapsed
+    const dt = input.dt
+    const t = input.time
     if (!preview) stepHeld()
     const wasWalking = me.path.length > 0
     stepWalker(me, dt, elapsed)
@@ -488,17 +480,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     const now = performance.now()
     speech.update(now)
     ashfall?.update({ dt: dt, t: t, focus: camFocus, night: 1 - daylight(lighting.minutes) })
-    frames++
-    if (now - fpsAt >= 1000) {
-      fpsNow = (frames * 1000) / (now - fpsAt)
-      frames = 0
-      fpsAt = now
-    }
-    if (now - lastReport > 200) {
-      lastReport = now
-      runtime.events?.tick()
-    }
-    requestAnimationFrame(frame)
+    frameLoop.record(now)
   }
 
   // ash: settled on everything that faces the sky outdoors, and falling round the player
@@ -519,7 +501,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     running: false,
     events: null as SceneEvents | null,
     heading: () => me.head,
-    fps: () => fpsNow,
+    fps: () => frameLoop.fps,
     lights: () => ({ windows: houseGlows.length, lit: houseGlows.filter((g) => g.mat.emissiveIntensity > 0).length, lamps: lamps.length, lampsOn: lamps.filter((l) => l.light.intensity > 0).length }),
     resize,
     zoom,
@@ -556,10 +538,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
       walkTo(t)
     },
     hold,
-    start: () => {
-      clock.getDelta()
-      requestAnimationFrame(frame)
-    },
+    start: frameLoop.start,
   }
   return runtime
 }
