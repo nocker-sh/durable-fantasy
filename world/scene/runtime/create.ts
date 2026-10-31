@@ -1,3 +1,5 @@
+import { SceneCameraFollow } from "#/world/scene/runtime/scene-camera-follow"
+import { SceneWorldAnimation } from "#/world/scene/runtime/scene-world-animation"
 import { updateSceneWalkers } from "#/world/scene/runtime/update-scene-walkers"
 import type { SceneFrame } from "#/world/scene/runtime/scene-frame-types"
 import { SceneResidentNames } from "#/world/scene/runtime/scene-resident-names"
@@ -38,18 +40,16 @@ import { updateMonsterHealth } from "#/world/scene/update-monster-health"
 import { updateMonsters } from "#/world/scene/update-monsters"
 import { MONSTER_KINDS } from "#/world/core/monsters"
 import { groundOf } from "#/world/scene/ground-of"
-import { updaters, occluders, houseGlows, lamps, stalls, movingObjects } from "#/world/scene/construction/registry"
+import { occluders, houseGlows, lamps, stalls, movingObjects } from "#/world/scene/construction/registry"
 import { resetRegistries } from "#/world/scene/construction/reset-registries"
 import type { V2 } from "#/world/scene/construction/registry"
 import { daylight } from "#/world/core/daylight"
 import type { Anim } from "#/world/scene/figure/animation"
 import { outlineShape } from "#/lib/graphics/outline-shape"
 import type { Actor } from "#/world/scene/actor"
-import { view } from "#/world/scene/actors"
 import { FIG } from "#/world/scene/figure/display-scale"
 import { critters } from "#/world/scene/critters"
 import { spawnAnimals } from "#/world/scene/spawn-animals"
-import { tickSprites } from "#/world/scene/tick-sprites"
 import { lap } from "#/world/lap"
 import { Ashfall } from "#/world/scene/ashfall"
 import { dustAll } from "#/world/scene/dust-all"
@@ -358,10 +358,8 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
   const labelProjection = new SceneLabelProjection({ camera: cam, viewport: camera })
 
   const clock = new THREE.Clock()
-  const v = new THREE.Vector3()
-  const camRight = new THREE.Vector3()
-  const projection = new THREE.Matrix4()
-  const followPosition = new THREE.Vector3()
+  const worldAnimation = new SceneWorldAnimation({ camera: cam, movement, people, animate: lighting.animate })
+  const cameraFollow = new SceneCameraFollow({ camera, movement, me, preview: previewControls, heightAt: walkH })
   const occlusion = new SceneOcclusion({ occluders, camera: cam, me, preview })
   const frameLoop = new SceneFrameLoop({ clock, running: () => runtime.running, render: frame, tick: () => runtime.events?.tick() })
   const SHADOW_MS = 250
@@ -379,31 +377,8 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     marker.scale.setScalar(1 + Math.sin(t * 6) * 0.1)
     warps.update(t)
 
-    tickSprites()
-    view.yaw = movement.yaw
-    view.cam.copy(cam.position)
-    view.frustum.setFromProjectionMatrix(projection.multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse))
-    // residents stand and look around; they speak only through the conversation window
-    people.forEach((p) => p.update(dt, t, () => {}))
-    cam.getWorldDirection(v)
-    camRight.set(-v.z, 0, v.x).normalize()
-    critters.forEach((c) => c.update(dt, camRight))
-    updaters.forEach((u) => u(t, dt))
-    lighting.animate(dt, t)
-
-    // camera
-    // a still middle: the view holds while the player moves about the middle of the screen
-    // (DEAD of its width and height), follows by as much as they step beyond it, and comes back to
-    // centre them after a turn of the view
-    if (previewControls) {
-      movement.yaw = movement.yawTarget
-      previewControls.update(dt, camera.height)
-      camFocus.y = walkH(camFocus.x, camFocus.z) + 0.6
-      camera.look(camFocus, movement.yaw)
-    } else {
-      camera.update({ meAt: followPosition.set(me.pos[0], me.fig.root.position.y + 0.6, me.pos[1]), yaw: movement.yawTarget, turned: movement.yaw !== movement.yawTarget, dt: dt })
-      movement.yaw = movement.yawTarget
-    }
+    worldAnimation.update(input)
+    cameraFollow.update(dt)
 
     if (world.indoor) updateCutaways(cam.position)
     // a field's fog is measured from the player, not the camera, so it thickens beyond them, never on them
