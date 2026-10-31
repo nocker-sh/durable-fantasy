@@ -4,6 +4,7 @@ import { hit } from "#/world/core/wild/hit"
 import { MONSTER_KINDS, SPAWNS } from "#/world/core/monsters"
 import { monsterAt } from "#/world/core/monster-at"
 import { mapPlayer } from "#/world/server/map-room/map-player"
+import type { Wild } from "#/durable-objects/wild"
 import type { Ctx } from "#/world/server/map-room/context"
 import { player } from "#/world/test/player"
 
@@ -30,8 +31,8 @@ it.each(["hunter", "other"])("does not broadcast a blow or retaliate when %s att
   vi.setSystemTime(1000)
   const spawn = SPAWNS.find((s) => s.kind === "slime")!
   const beaten = hit({ state: emptyWild(), id: spawn.id, damage: MONSTER_KINDS[spawn.kind].hp, now: 999, player: "hunter" })
-  calls.beginStrike.mockImplementation(async (id, damage, who) => {
-    const result = hit({ state: beaten.state, id: id, damage: damage, now: Date.now(), player: who })
+  calls.beginStrike.mockImplementation(async (input: Parameters<ReturnType<typeof Wild.get>["beginStrike"]>[0]) => {
+    const result = hit({ state: beaten.state, id: input.target, damage: input.damage, now: Date.now(), player: input.owner })
     return result.refused ? { ok: false, reason: result.reason } : { ok: true, id: 1 }
   })
   const p = player()

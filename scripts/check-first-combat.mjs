@@ -46,11 +46,12 @@ try {
   const before = await page.evaluate(() => ({ exp: game.state.get().player.exp, weapon: game.state.get().player.equipment.weapon }))
   if (before.weapon !== "wooden-stick") throw Error("Unexpected starting equipment")
   const target = await page.evaluate(async () => {
-    const { SPAWNS, monsterAt } = await import("/world/core/monsters")
+    const monsters = await import("/world/core/monsters")
+    const monsterMotion = await import("/world/core/monster-at")
     const cell = game.scene.playerCell()
-    const candidates = SPAWNS.filter((s) => s.map === game.state.get().map.id && s.kind === "slime" && game.session.wild[s.id]?.hp > 0 && game.session.wild[s.id].back <= Date.now())
+    const candidates = monsters.SPAWNS.filter((s) => s.map === game.state.get().map.id && s.kind === "slime" && game.session.wild[s.id]?.hp > 0 && game.session.wild[s.id].back <= Date.now())
     const distance = (s) => {
-      const at = monsterAt(s, Date.now())
+      const at = monsterMotion.monsterAt(s, Date.now())
       return Math.hypot(at.x - (cell[0] + 0.5) / 2, at.z - (cell[1] + 0.5) / 2)
     }
     candidates.sort((a, b) => distance(a) - distance(b))
@@ -102,8 +103,8 @@ try {
   await page.keyboard.press("z")
   await page.waitForFunction(() => game.state.get().player.sitting === true)
   const needsRest = await page.evaluate(async () => {
-    const { derive } = await import("/world/core/stats")
-    return game.state.get().player.hp < derive(game.state.get().player).maxHp
+    const stats = await import("/world/core/derive")
+    return game.state.get().player.hp < stats.derive(game.state.get().player).maxHp
   })
   if (needsRest) await page.waitForFunction((hp) => Number.parseFloat(document.querySelector('[data-slot="meter"][aria-label="HP"]')?.textContent ?? "") > hp, afterMeal.hp, { timeout: 45000 })
   await page.keyboard.press("z")
