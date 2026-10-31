@@ -1,3 +1,4 @@
+import { handleTradeAnswer } from "#/world/server/map-room/handle-trade-answer"
 // The map room's handlers for face-to-face trades between players (core/check-trade.ts).
 import { TRADE_CELLS } from "#/world/core/trade-rules"
 import { checkTrade } from "#/world/core/check-trade"
@@ -32,39 +33,6 @@ async function tradeAsk(roomCtx: Ctx, message: Message<"trade-ask">) {
   }
   save({ trade: { with: them.id, open: false, offer: emptyOffer(), shown: [], locked: false, done: false } })
   await them.send({ type: "trade-asked", from: ctx.connection.id, name: me.player.name })
-  return
-}
-
-async function tradeAnswer(roomCtx: Ctx, message: Message<"trade-answer">) {
-  const ctxSource2 = roomCtx,
-    ctx = ctxSource2.ctx,
-    me = ctxSource2.me,
-    save = ctxSource2.save
-  const them = ctx.room.getConnection(message.from)
-  const other = them && presence(them)
-  if (!me.player || !them || other?.trade?.with !== ctx.connection.id || other.trade.open) return
-  // An invitation does not reserve either player: they may move or become busy before answering.
-  const target = reachable(other).at(-1)
-  const reason = !message.yes
-    ? "DECLINED"
-    : !me.owner || !other.owner || other.closed || me.closed || me.trade?.open || me.down || other.down || me.engaged || other.engaged
-      ? "BUSY"
-      : !target || !near(me, target, TRADE_CELLS)
-        ? "TOO_FAR"
-        : null
-  if (reason) {
-    setTrade(them, undefined)
-    await them.send({ type: "trade-closed", reason })
-    // Do not close an unrelated trade the recipient has since opened.
-    if (message.yes && !me.trade?.open) await ctx.connection.send({ type: "trade-closed", reason })
-    return
-  }
-  const session = crypto.randomUUID()
-  const side = (w: string): TradeSide => ({ session, with: w, open: true, offer: emptyOffer(), shown: [], locked: false, done: false })
-  // standing to trade: both stop where they are
-  save({ trade: side(them.id), route: [reachable(me).at(-1)!], since: Date.now() })
-  setTrade(them, side(ctx.connection.id), { route: [reachable(other).at(-1)!], since: Date.now() })
-  await showTrade(ctx.connection, them)
   return
 }
 
@@ -208,7 +176,7 @@ async function tradeCancel(roomCtx: Ctx, _message: Message<"trade-cancel">) {
 
 export const HANDLERS: Handlers = {
   "trade-ask": tradeAsk,
-  "trade-answer": tradeAnswer,
+  "trade-answer": handleTradeAnswer,
   "trade-offer": tradeOffer,
   "trade-lock": tradeLockOrTradeGo,
   "trade-go": tradeLockOrTradeGo,
