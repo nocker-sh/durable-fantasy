@@ -1,40 +1,15 @@
+import { handlePartyMode } from "#/world/server/map-room/handle-party-mode"
+import { handlePartyLeave } from "#/world/server/map-room/handle-party-leave"
+import { handlePartyInvite } from "#/world/server/map-room/handle-party-invite"
 // The map room's handlers for parties (core/party.ts).
 import { sendPartyChat } from "#/world/server/map-room/send-party-chat"
 import { Party } from "#/durable-objects/party"
-import { PARTY_MAX } from "#/world/core/party/rules"
 import { Player } from "#/durable-objects/player"
 import { derive } from "#/world/core/derive"
 import type { Ctx, Handlers, Message } from "#/world/server/map-room/context"
 import { presence } from "#/world/server/map-room/presence"
 import { setPresence } from "#/world/server/map-room/set-presence"
 import { partyView } from "#/world/server/map-room/party-view"
-
-async function partyInvite(roomCtx: Ctx, message: Message<"party-invite">) {
-  const ctxSource = roomCtx,
-    ctx = ctxSource.ctx,
-    me = ctxSource.me,
-    save = ctxSource.save
-  const them = ctx.room.getConnection(message.target)
-  const other = them && presence(them)
-  if (!me.player || !me.owner || !them || !other?.player || other.party || them.id === ctx.connection.id) {
-    await ctx.connection.send({ type: "party-closed", reason: "BUSY" })
-    return
-  }
-  if (me.party) {
-    const p = await Party.get(me.party).view()
-    if (p.leader !== me.owner) {
-      await ctx.connection.send({ type: "party-closed", reason: "NOT_LEADER" })
-      return
-    }
-    if (p.members.length >= PARTY_MAX) {
-      await ctx.connection.send({ type: "party-closed", reason: "FULL" })
-      return
-    }
-  }
-  save({ inviting: them.id })
-  await them.send({ type: "party-invited", from: ctx.connection.id, name: me.player.name })
-  return
-}
 
 async function partyAnswer(roomCtx: Ctx, message: Message<"party-answer">) {
   const ctxSource2 = roomCtx,
@@ -72,28 +47,6 @@ async function partyAnswer(roomCtx: Ctx, message: Message<"party-answer">) {
   return
 }
 
-async function partyLeave(roomCtx: Ctx, _message: Message<"party-leave">) {
-  const ctxSource3 = roomCtx,
-    ctx = ctxSource3.ctx,
-    me = ctxSource3.me,
-    save = ctxSource3.save
-  if (!me.owner || !me.party) return
-  await Party.get(me.party).leave(me.owner)
-  save({ party: null })
-  await ctx.connection.send({ type: "result", seq: -1, result: await Player.get(me.owner).run({ type: "set-party", party: null }) })
-  await ctx.connection.send({ type: "party", view: null })
-  return
-}
-
-async function partyMode(roomCtx: Ctx, message: Message<"party-mode">) {
-  const ctxSource4 = roomCtx,
-    ctx = ctxSource4.ctx,
-    me = ctxSource4.me
-  if (!me.owner || !me.party) return
-  await ctx.connection.send({ type: "party", view: partyView(await Party.get(me.party).setMode(me.owner, message.mode), me.owner) })
-  return
-}
-
 async function partyLook(roomCtx: Ctx, message: Message<"party-look">) {
   const ctxSource5 = roomCtx,
     ctx = ctxSource5.ctx,
@@ -127,9 +80,9 @@ async function partyLook(roomCtx: Ctx, message: Message<"party-look">) {
 }
 
 export const HANDLERS: Handlers = {
-  "party-invite": partyInvite,
+  "party-invite": handlePartyInvite,
   "party-answer": partyAnswer,
-  "party-leave": partyLeave,
-  "party-mode": partyMode,
+  "party-leave": handlePartyLeave,
+  "party-mode": handlePartyMode,
   "party-look": partyLook,
 }
