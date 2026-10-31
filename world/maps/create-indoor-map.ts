@@ -1,3 +1,4 @@
+import { assertInteriorMapWindows } from "#/world/town/assert-interior-map-windows"
 import { getInteriorMapSpace } from "#/world/town/get-interior-map-space"
 import { INDOOR_SIZE } from "#/world/town/interior-rules"
 import { outsideDoor } from "#/world/town/outside-door"
@@ -15,6 +16,7 @@ export function createIndoorMap(props: Props): MapDefinition {
   const spawn = interior.floor === 0 ? interior.arrive : props.incoming
   if (!spawn) throw new Error(`Indoor upper floor has no stair arrival: ${interior.id}`)
   const space = getInteriorMapSpace(interior)
+  if (space) assertInteriorMapWindows(interior, space)
   return {
     ...(space ? { space } : {}),
     id: interior.id,

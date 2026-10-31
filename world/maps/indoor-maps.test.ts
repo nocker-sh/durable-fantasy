@@ -93,3 +93,20 @@ it("places indoor windows at their measured outdoor positions in the parent spac
   }
   expect(checked).toHaveLength(proposal.windows.length)
 })
+
+it.each(["point", "width", "sill", "outward", "missing", "outside-extra"])("rejects an indoor window that disagrees with its exterior %s", (invalid) => {
+  const rooms = structuredClone(interiors)
+  const window = rooms[0].windows?.[0]
+  if (!window) throw new Error("Missing interior window fixture")
+  if (invalid === "point") window.point = [window.point[0] + 1, window.point[1]]
+  if (invalid === "width") window.width += 1
+  if (invalid === "sill") window.sill += 1
+  if (invalid === "outward") window.outward = [-window.outward[0], -window.outward[1]]
+  if (invalid === "missing") rooms[0].windows = []
+  if (invalid === "outside-extra") {
+    const site = rooms[0].house.authored?.exterior
+    if (!site) throw new Error("Missing authored site fixture")
+    site.windows = [...site.windows, { ...site.windows[0], id: "extra" }]
+  }
+  expect(() => make(rooms)).toThrow(/Interior window/)
+})
