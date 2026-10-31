@@ -15,3 +15,9 @@ it("rejects ambiguous versions and sibling filenames", () => {
   expect(() => getRuntimeModuleUrl({ path: "/world/scene/is-free", resources: [url, `${url}?t=2`] })).toThrow("found 2")
   expect(() => getRuntimeModuleUrl({ path: "/world/scene/is", resources: [url] })).toThrow("found 0")
 })
+
+it("distinguishes executable source from raw text used for cache versioning", () => {
+  const url = "http://localhost:4027/world/scene/world.ts"
+  expect(getRuntimeModuleUrl({ path: "/world/scene/world", resources: [url, `${url}?raw`] })).toBe(url)
+  expect(() => getRuntimeModuleUrl({ path: "/world/scene/world", resources: [`${url}?raw`] })).toThrow("found 0")
+})

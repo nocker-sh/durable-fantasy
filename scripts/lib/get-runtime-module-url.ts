@@ -5,6 +5,7 @@ export function getRuntimeModuleUrl(props: Props): string {
   const matches = new Set<string>()
   for (const resource of props.resources) {
     const url = new URL(resource)
+    if (url.searchParams.has("raw")) continue
     if (url.pathname.replace(/\.(?:[cm]?[jt]sx?)$/, "") === props.path) matches.add(resource)
   }
   if (matches.size !== 1) throw new Error(`Expected one loaded module for ${props.path}; found ${matches.size}`)

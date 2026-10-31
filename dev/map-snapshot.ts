@@ -1,3 +1,4 @@
+import { createGatheringSpots } from "#/world/scene/runtime/gathering"
 import * as THREE from "three"
 import { MAP_SCENES } from "#/world/scene/runtime/definitions"
 import { setLayout } from "#/world/scene/set-layout"
@@ -15,6 +16,7 @@ export function mapSnapshot(id: string) {
   initWalk()
   const root = new THREE.Group()
   definition.build(root)
+  createGatheringSpots(root, id)
   let bits = ""
   for (const cell of blocked) bits += cell ? "1" : "0"
   return {
