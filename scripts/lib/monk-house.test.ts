@@ -11,10 +11,7 @@ import { roomDoorSwing } from "#/scripts/lib/room-door-swing"
 import { auditBuildingSite } from "#/scripts/lib/audit-building-site"
 import { auditSiteBounds } from "#/scripts/lib/audit-site-bounds"
 import { SQUARE_LAYOUT } from "#/world/maps/layout"
-import { currentLayout } from "#/world/scene/current-layout"
-import { setLayout } from "#/world/scene/set-layout"
-import { groundH } from "#/world/scene/ground-h"
-import { F } from "#/world/scene/world"
+import { createGroundFields } from "#/world/maps/ground/create-ground-fields"
 import { FR, GRID_N } from "#/world/maps/ground/rules"
 import { ScalarField } from "#/lib/engine/scalar-field"
 import { TILE_M } from "#/world/town/fit"
@@ -25,30 +22,23 @@ it("fits the monk home's foundation, west-facing entrance and landings to the ac
     room = read("rooms", "room-h10-1"),
     neighbour = read("buildings", "building-h9")
   const documents = new Map([[room.id, room]])
-  const previous = currentLayout()
-  try {
-    setLayout(SQUARE_LAYOUT)
-    groundH(0, 0)
-    const terrain = new ScalarField({ samples: F.h.slice(), size: GRID_N, resolution: FR })
-    expect(auditBuildingFoundation(building, terrain, TILE_M)).toEqual([])
-    expect(auditEntrySteps({ building: building, documents: documents, terrain: terrain, metres: TILE_M })).toEqual([])
-    expect(auditDoorSwings(room)).toEqual([])
-    const entries = building.entry_steps as Parameters<typeof entryStepGeometry>[0]["steps"][]
-    expect(entries).toHaveLength(1)
-    const entrance = entryStepGeometry({ building: building, documents: documents, steps: entries[0], metres: TILE_M })!
-    expect(entrance.outward).toEqual([-1, 0])
-    const bounds = auditBuildingSite({ building: neighbour, houses: [], metresPerTile: TILE_M, roads: [] }).bounds!
-    const house = { id: "h9", map: "phanthiet", x0: bounds[0], z0: bounds[1], x1: bounds[2], z1: bounds[3] }
-    expect(auditSiteBounds({ bounds: entrance.bounds, building: building, houses: [house], roads: [], mapTiles: 48, label: "Entry stair footprint" })).toEqual([])
-    const blockedRoom = structuredClone(room)
-    ;(blockedRoom.door_leaves as { vertical_clearance_m: { bottom: number; top: number } }[])[0].vertical_clearance_m = { bottom: 1, top: 1 }
-    expect(auditEntrySteps({ building: building, documents: new Map([[room.id, blockedRoom]]), terrain: terrain, metres: TILE_M })).toContain("Door leaf needs positive clearances within its opening")
-    const lowered = structuredClone(building)
-    ;(lowered.foundation as { floor_elevation_m: number }).floor_elevation_m = 0.5
-    expect(auditBuildingFoundation(lowered, terrain, TILE_M)).toContain("Raised floor intersects terrain or lacks its designed ground gap")
-  } finally {
-    setLayout(previous)
-  }
+  const terrain = new ScalarField({ samples: createGroundFields(SQUARE_LAYOUT).h, size: GRID_N, resolution: FR })
+  expect(auditBuildingFoundation(building, terrain, TILE_M)).toEqual([])
+  expect(auditEntrySteps({ building: building, documents: documents, terrain: terrain, metres: TILE_M })).toEqual([])
+  expect(auditDoorSwings(room)).toEqual([])
+  const entries = building.entry_steps as Parameters<typeof entryStepGeometry>[0]["steps"][]
+  expect(entries).toHaveLength(1)
+  const entrance = entryStepGeometry({ building: building, documents: documents, steps: entries[0], metres: TILE_M })!
+  expect(entrance.outward).toEqual([-1, 0])
+  const bounds = auditBuildingSite({ building: neighbour, houses: [], metresPerTile: TILE_M, roads: [] }).bounds!
+  const house = { id: "h9", map: "phanthiet", x0: bounds[0], z0: bounds[1], x1: bounds[2], z1: bounds[3] }
+  expect(auditSiteBounds({ bounds: entrance.bounds, building: building, houses: [house], roads: [], mapTiles: 48, label: "Entry stair footprint" })).toEqual([])
+  const blockedRoom = structuredClone(room)
+  ;(blockedRoom.door_leaves as { vertical_clearance_m: { bottom: number; top: number } }[])[0].vertical_clearance_m = { bottom: 1, top: 1 }
+  expect(auditEntrySteps({ building: building, documents: new Map([[room.id, blockedRoom]]), terrain: terrain, metres: TILE_M })).toContain("Door leaf needs positive clearances within its opening")
+  const lowered = structuredClone(building)
+  ;(lowered.foundation as { floor_elevation_m: number }).floor_elevation_m = 0.5
+  expect(auditBuildingFoundation(lowered, terrain, TILE_M)).toContain("Raised floor intersects terrain or lacks its designed ground gap")
 })
 
 it("lets the monk home doorway be operated without moving the praying person out of the way", () => {
