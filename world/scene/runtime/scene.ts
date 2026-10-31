@@ -1,3 +1,5 @@
+import { releaseSceneAttachment } from "#/world/scene/runtime/release-scene-attachment"
+import type { SceneRuntime } from "#/world/scene/runtime/scene-runtime-types"
 import type { HitKind, MonsterStrike } from "#/world/scene/runtime/combat-feedback-types"
 import { N, blocked } from "#/world/scene/world"
 import { places } from "#/world/scene/construction/registry"
@@ -9,65 +11,80 @@ import type { SceneOptions } from "#/world/scene/runtime/scene-options"
 import type { SceneEvents, ResidentInfo, Cell, WalkerInfo, Avatar } from "#/world/scene/runtime/types"
 import { cellOf } from "#/world/scene/runtime/cell-of"
 
-type SceneRuntime = Awaited<ReturnType<typeof createSceneRuntime>>
+type Props = { element: HTMLElement; events: SceneEvents; map?: string; options?: SceneOptions }
 
 export class MapScene {
-  private alive = true
-  private construction = new AbortController()
-  private ro?: ResizeObserver
-  private runtime?: SceneRuntime
-  private layer = document.createElement("div")
-
-  private el: HTMLElement
-  private ev: SceneEvents
+  private readonly state: { alive: boolean; runtime: SceneRuntime | null; observer: ResizeObserver | null } = { alive: true, runtime: null, observer: null }
+  private readonly construction = new AbortController()
+  private readonly layer = document.createElement("div")
+  private readonly options: SceneOptions
   readonly map: string
-  private options: SceneOptions
-  constructor(inputProps2: { element: HTMLElement; events: SceneEvents; map?: string; options?: SceneOptions }) {
-    const el = inputProps2.element
-    const ev = inputProps2.events
-    const map = inputProps2.map === undefined ? "phanthiet" : inputProps2.map
-    const options = inputProps2.options === undefined ? {} : inputProps2.options
-    this.el = el
-    this.ev = ev
-    this.map = map
-    this.options = options
 
-    if (getComputedStyle(el).position === "static") el.style.position = "relative"
-    el.style.overflow = "hidden"
+  constructor(private readonly props: Props) {
+    this.map = props.map ?? "phanthiet"
+    this.options = props.options ?? {}
+    this.prepareElement()
+    this.load()
+    Object.freeze(this)
+  }
+
+  private prepareElement(): void {
+    if (getComputedStyle(this.props.element).position === "static") this.props.element.style.position = "relative"
+    this.props.element.style.overflow = "hidden"
     Object.assign(this.layer.style, { position: "absolute", inset: "0", pointerEvents: "none", overflow: "hidden" })
+  }
+
+  private load(): void {
     createSceneRuntime(
-      map,
-      (t) => {
-        if (this.alive) this.ev.progress(t)
+      this.map,
+      (text) => {
+        if (this.state.alive) this.props.events.progress(text)
       },
-      { signal: this.construction.signal, options },
+      { signal: this.construction.signal, options: this.options },
     ).then(
-      (runtime) => {
-        if (this.alive) this.attach(runtime)
-        else runtime.dispose()
-      },
-      (error) => {
-        if (this.alive) this.ev.failed?.(error)
-      },
+      (runtime) => this.accept(runtime),
+      (error) => this.failed(error),
     )
   }
 
-  destroy() {
-    this.alive = false
-    this.construction.abort()
-    this.ro?.disconnect()
-    const runtime = this.runtime
-    this.runtime = undefined
-    try {
-      if (runtime) {
-        runtime.running = false
-        runtime.renderer.domElement.remove()
-        runtime.events = null
-        runtime.dispose()
-      }
-    } finally {
-      this.layer.remove()
+  private accept(runtime: SceneRuntime): void {
+    if (!this.state.alive) {
+      runtime.dispose()
+      return
     }
+    try {
+      this.attach(runtime)
+    } catch (error) {
+      try {
+        this.release()
+      } catch (cleanupError) {
+        this.failed(new AggregateError([error, cleanupError], "Scene attachment and cleanup failed"))
+        return
+      }
+      this.failed(error)
+    }
+  }
+
+  private failed(error: unknown): void {
+    if (this.state.alive) this.props.events.failed?.(error)
+  }
+
+  private release(): void {
+    const runtime = this.runtime
+    const observer = this.state.observer
+    this.state.runtime = null
+    this.state.observer = null
+    releaseSceneAttachment({ runtime, observer, layer: this.layer })
+  }
+
+  destroy(): void {
+    this.state.alive = false
+    this.construction.abort()
+    this.release()
+  }
+
+  private get runtime(): SceneRuntime | null {
+    return this.state.runtime
   }
 
   get ready() {
@@ -83,7 +100,8 @@ export class MapScene {
   }
   /** Residents on this map; id is their index in RESIDENTS. */
   residents(): ResidentInfo[] {
-    return this.runtime?.people.flatMap((a, i) => (a.fig.root.visible ? [{ id: this.runtime!.ids[i], name: a.name, job: a.job, x: a.pos[0], z: a.pos[1] }] : [])) ?? []
+    const runtime = this.runtime
+    return runtime?.people.flatMap((person, index) => (person.fig.root.visible ? [{ id: runtime.ids[index], name: person.name, job: person.job, x: person.pos[0], z: person.pos[1] }] : [])) ?? []
   }
   /** Where the player is; heading is the facing in radians (0 = south, +x = east). */
   player(): { x: number; z: number; walking: boolean; heading: number } | null {
@@ -230,21 +248,21 @@ export class MapScene {
   }
 
   private attach(runtime: SceneRuntime) {
-    this.runtime = runtime
-    runtime.events = this.ev
-    this.el.appendChild(runtime.renderer.domElement)
+    this.state.runtime = runtime
+    runtime.events = this.props.events
+    this.props.element.appendChild(runtime.renderer.domElement)
     // the preview shows the town alone: no names or bubbles over it
     if (!this.options.preview) {
-      this.el.appendChild(this.layer)
+      this.props.element.appendChild(this.layer)
       runtime.setLayer(this.layer)
     }
-    const resize = () => runtime.resize(this.el.clientWidth, this.el.clientHeight)
-    this.ro = new ResizeObserver(resize)
-    this.ro.observe(this.el)
+    const resize = () => runtime.resize(this.props.element.clientWidth, this.props.element.clientHeight)
+    this.state.observer = new ResizeObserver(resize)
+    this.state.observer.observe(this.props.element)
     resize()
     runtime.running = true
     runtime.start()
     lap("scene: attached")
-    this.ev.ready()
+    this.props.events.ready()
   }
 }
