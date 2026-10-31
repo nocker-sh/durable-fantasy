@@ -301,6 +301,8 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 資料案の階段は `world/town/floorplan/stair-geometry.ts` が段数・床高・踏面・踊り場から一つの階段を計算し、上下階の描画と通行判定で共有する。`world/scene/construction/authored-stair.ts` は上階では同じ階段を下へ降ろし、上向きに複製しない。上階の床は `lib/engine/rectangle-subtraction.ts` で開口を除いた矩形へ分解して描き、上の踊り場の床板を二重に描かない。資料案の縦横は同じ室内倍率で投影し、階高と床厚も資料の差から得る。既存の自動間取りの描画寸法は維持する。
 
+家具と間仕切りの室内投影は `get-interior-furniture-projection.ts` が対象の階の元の順序で組み立てる。中心と幅・奥行への変換は `project-interior-piece-placement.ts` に置き、家具の付属寸法の換算と分ける。描画未対応の家具も名前と占有を保持し、間仕切りの種類は型付きの対応表から選ぶ。
+
 `world/town/interior-plan.ts` の入口の投影は `get-interior-entrance.ts` が描画の点と通行・到着のセルを一緒に求める。壁の内側のセルを選ぶ丸めは `get-interior-door-coordinate.ts` に置く。階段の実寸から表示への換算は `project-interior-stair-section.ts`、階ごとの床開口と通行を塞ぐ範囲は `get-interior-stair-projection.ts` が扱う。矩形の移動と倍率は煙道と階段で `project-interior-rectangle.ts` を共用し、表示倍率を世界の実寸へ戻さない。
 
 窓・灯り・煙道の室内投影は `get-interior-fixture-projection.ts` が対象の階を選び、各 `project-interior-*` の処理へ渡す。窓は外向きの方向と壁上の点を同じ方位から求め、壁厚が未定や正の有限値でない場合、投影結果が非有限になる場合を拒否する。灯りの位置と高さ、煙道の壁厚と床の支持も表示倍率で一度だけ換算する。

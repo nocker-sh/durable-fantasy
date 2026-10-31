@@ -1,17 +1,15 @@
-import { scaleRoomPieceDimensions } from "#/world/town/scale-room-piece-dimensions"
-import { getInteriorPiece } from "#/world/town/get-interior-piece"
+import { getInteriorFurnitureProjection } from "#/world/town/get-interior-furniture-projection"
 import { getInteriorStairProjection } from "#/world/town/get-interior-stair-projection"
 import { getInteriorEntrance } from "#/world/town/get-interior-entrance"
 import { getInteriorFixtureProjection } from "#/world/town/get-interior-fixture-projection"
 import type { HouseDef } from "#/world/town/house-types"
 import { floorPlan } from "#/world/town/floorplan/floor-plan"
-import type { Furniture, UnrenderedFurniture, Interior } from "#/world/town/interiors"
+import type { Interior } from "#/world/town/interiors"
 import { ROOM_SCALE } from "#/world/town/interior-rules"
 import { interiorId } from "#/world/town/interior-id"
 import { interiorCellOf } from "#/world/town/interior-cell-of"
 
 const CENTRE = 24
-const DIVIDER_KIND = { 壁: "partition", 腰壁: "lowwall", カーテン: "curtain", 棚: "shelf" } as const
 
 /** Build one floor for inspection; only INTERIORS registers playable rooms. */
 export function interiorPlan(h: HouseDef, floor = 0, plan = floorPlan(h.id)): Interior {
@@ -23,19 +21,10 @@ export function interiorPlan(h: HouseDef, floor = 0, plan = floorPlan(h.id)): In
     x1 = CENTRE + w / 2,
     z0 = CENTRE - d / 2,
     z1 = CENTRE + d / 2
-  const at = (r: { x0: number; z0: number; x1: number; z1: number }) => ({ x: x0 + ((r.x0 + r.x1) / 2) * K, z: z0 + ((r.z0 + r.z1) / 2) * K, w: (r.x1 - r.x0) * K, d: (r.z1 - r.z0) * K })
-  const furniture: Furniture[] = [],
-    unrenderedFurniture: UnrenderedFurniture[] = []
-  for (const p of plan.pieces) {
-    if (p.floor !== floor) continue
-    const piece = getInteriorPiece({ piece: scaleRoomPieceDimensions(p, K), placement: at(p) })
-    if ("kind" in piece) furniture.push(piece)
-    else unrenderedFurniture.push(piece)
-  }
-  for (const dv of plan.dividers) if (dv.floor === floor) furniture.push({ kind: DIVIDER_KIND[dv.kind], ...at(dv), solid: true, name: dv.kind })
+  const furnishings = getInteriorFurnitureProjection({ plan, floor, x0, z0, scale: K })
   const entry = getInteriorEntrance({ entrance: plan.entrance, door: plan.door, x0, z0, z1, scale: K })
   // the keeper stands behind the counter (between it and the back partition), else at the back of the room
-  const counter = furniture.find((f) => f.kind === "counter")
+  const counter = furnishings.furniture.find((f) => f.kind === "counter")
   const keeper = counter ? interiorCellOf(counter.x, counter.z - counter.d / 2 - 0.35) : interiorCellOf(CENTRE + 0.25, z0 + 1.0)
   const entrance = plan.rooms.find((room) => room.floor === floor && room.name === "土間")
   const drying =
@@ -68,7 +57,7 @@ export function interiorPlan(h: HouseDef, floor = 0, plan = floorPlan(h.id)): In
     door: entry.door,
     arrive: entry.arrive,
     keeper,
-    furniture,
-    unrenderedFurniture,
+    furniture: furnishings.furniture,
+    unrenderedFurniture: furnishings.unrenderedFurniture,
   }
 }
