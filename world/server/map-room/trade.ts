@@ -5,49 +5,11 @@ import { handleTradeAnswer } from "#/world/server/map-room/handle-trade-answer"
 // The map room's handlers for face-to-face trades between players (core/check-trade.ts).
 import { checkTrade } from "#/world/core/check-trade"
 import { Player } from "#/durable-objects/player"
-import { getTradeOfferPresentation } from "#/world/core/get-trade-offer-presentation"
+import { handleTradeOffer } from "#/world/server/map-room/handle-trade-offer"
 import type { Ctx, Handlers, Message } from "#/world/server/map-room/context"
 import { presence } from "#/world/server/map-room/presence"
 import { setTrade } from "#/world/server/map-room/set-trade"
 import { showTrade } from "#/world/server/map-room/show-trade"
-
-async function tradeOffer(roomCtx: Ctx, message: Message<"trade-offer">) {
-  const ctxSource3 = roomCtx,
-    ctx = ctxSource3.ctx,
-    me = ctxSource3.me,
-    save = ctxSource3.save
-  const them = me.trade?.open ? ctx.room.getConnection(me.trade.with) : undefined
-  if (!me.owner || !me.trade || !them || me.trade.locked || me.trade.settling) return
-  const current = presence(ctx.connection).trade
-  if (!current?.open || current.session !== me.trade.session || current.with !== them.id || current.locked || current.settling) return
-  const version = (current.offerVersion ?? 0) + 1
-  save({ trade: { ...current, offerVersion: version } })
-  const data = await Player.get(me.owner).read()
-  const mine = presence(ctx.connection)
-  const other = presence(them)
-  if (
-    mine.closed ||
-    other.closed ||
-    !mine.trade?.open ||
-    !other.trade?.open ||
-    mine.trade.session !== current.session ||
-    other.trade.session !== current.session ||
-    mine.trade.with !== them.id ||
-    other.trade.with !== ctx.connection.id ||
-    mine.trade.offerVersion !== version ||
-    mine.trade.locked ||
-    mine.trade.settling ||
-    other.trade.settling
-  )
-    return
-  const presentation = getTradeOfferPresentation(data, message)
-  if (!presentation) return
-  // a changed offer unsettles both sides
-  save({ trade: { ...mine.trade, offer: presentation.offer, shown: presentation.shown, locked: false, done: false } })
-  setTrade(them, { ...other.trade, locked: false, done: false })
-  await showTrade(ctx.connection, them)
-  return
-}
 
 async function tradeLockOrTradeGo(roomCtx: Ctx, message: Message<"trade-lock" | "trade-go">) {
   const ctxSource4 = roomCtx,
@@ -136,7 +98,7 @@ async function tradeLockOrTradeGo(roomCtx: Ctx, message: Message<"trade-lock" | 
 export const HANDLERS: Handlers = {
   "trade-ask": handleTradeAsk,
   "trade-answer": handleTradeAnswer,
-  "trade-offer": tradeOffer,
+  "trade-offer": handleTradeOffer,
   "trade-lock": tradeLockOrTradeGo,
   "trade-go": tradeLockOrTradeGo,
   "trade-cancel": handleTradeCancel,
