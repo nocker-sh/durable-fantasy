@@ -14,7 +14,7 @@ type PointerScene = {
   town: THREE.Group
   people: Actor[]
   ids: number[]
-  remotes: Map<string, Walker>
+  remotes: ReadonlyMap<string, Walker>
   cursor: THREE.LineSegments
   movement: { yawTarget: number }
   spotHit(ray: THREE.Raycaster): string | null

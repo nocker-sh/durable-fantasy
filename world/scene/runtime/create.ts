@@ -23,7 +23,7 @@ import { keyTurn } from "#/world/scene/key-turn"
 import { SceneGathering } from "#/world/scene/runtime/scene-gathering"
 import { createPointer } from "#/world/scene/runtime/pointer"
 import { createPreviewControls } from "#/world/scene/runtime/preview"
-import { createWalkers } from "#/world/scene/runtime/walkers"
+import { SceneWalkers } from "#/world/scene/runtime/scene-walkers"
 import { DioramaPostProcessing } from "#/lib/graphics/post-processing"
 import { mergeStatic } from "#/lib/graphics/merge-static"
 import * as THREE from "three"
@@ -124,9 +124,8 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     ids = peopleSource.ids,
     personOf = peopleSource.personOf,
     applySchedule = peopleSource.applySchedule
-  const walkers = createWalkers(scene, (id) => runtime.events?.pickPlayer?.(id), world.figureMetres === undefined ? 1 : world.figureMetres / FIG)
-  resources.defer(() => walkers.clearRemotes())
-  resources.use(walkers.me.fig)
+  const walkers = new SceneWalkers({ scene, onPickPlayer: (id) => runtime.events?.pickPlayer?.(id), figureScale: world.figureMetres === undefined ? 1 : world.figureMetres / FIG })
+  resources.use(walkers)
   const meSource = walkers,
     me = meSource.me,
     movement = meSource.movement,
