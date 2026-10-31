@@ -1,3 +1,4 @@
+import { assertMapSpaceRegistry } from "#/world/maps/assert-map-space-registry"
 import type { Cell, MapDefinition, Warp } from "#/world/maps/types"
 import { indoorMaps } from "#/world/maps/indoor-maps"
 import { RESIDENTS } from "#/world/town/residents"
@@ -256,6 +257,7 @@ export const MAPS: Record<string, MapDefinition> = {
   ...Object.fromEntries(Object.values(OUTDOORS).map((d) => [d.id, d.kind === "town" ? withDoors(d) : d])),
   ...INDOORS,
 }
+assertMapSpaceRegistry(MAPS)
 // each map's usual people: those whose work is here (once the places are known)
 for (const m of Object.values(MAPS)) {
   m.npcs = RESIDENTS.flatMap((r) => {
