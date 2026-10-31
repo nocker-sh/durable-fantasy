@@ -56,7 +56,7 @@ import { diorama } from "#/world/scene/runtime/settings"
 import { createSceneTerrain } from "#/world/scene/runtime/create-scene-terrain"
 import { createEnvironment } from "#/world/scene/runtime/helpers/lighting/create-environment"
 import { createLighting } from "#/world/scene/runtime/helpers/lighting/create-lighting"
-import { createPopulation } from "#/world/scene/runtime/population"
+import { createScenePopulation } from "#/world/scene/runtime/create-scene-population"
 import type { SceneEvents } from "#/world/scene/runtime/types"
 
 const builds = new SceneBuildQueue()
@@ -117,7 +117,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
   spawnAnimals(scene, map)
 
   const environment = createEnvironment(scene, resources)
-  const peopleSource = await createPopulation({ scene: scene, map: map, world: world, progress: progress, tick: tick, own: (person) => resources.use(person.fig) }),
+  const peopleSource = await createScenePopulation({ scene: scene, map: map, world: world, progress: progress, tick: tick, own: (person) => resources.use(person.fig) }),
     people = peopleSource.people,
     ids = peopleSource.ids,
     personOf = peopleSource.personOf,

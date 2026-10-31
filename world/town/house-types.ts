@@ -1,3 +1,4 @@
+import type { ShopId } from "#/world/core/shop-types"
 import type { AuthoredPlan } from "#/world/town/floorplan/authored-types"
 export type HouseKind = "home" | "shop" | "public" | "workshop" | "farm" | "vacant"
 
@@ -28,7 +29,7 @@ export type HouseDef = {
   /** the household living here, if any */
   household?: string
   /** the shop on the ground floor (world/core/shops.ts) */
-  shop?: string
+  shop?: ShopId
   // the outside, as house() in scene/build.ts draws it
   x0: number
   z0: number

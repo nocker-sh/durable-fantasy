@@ -100,6 +100,10 @@ Durable Object の入口は `durable-objects/` にあり、どれも Void の規
 
 地形の頂点とテクスチャ座標は `lib/graphics/create-heightfield-vertices.ts`、各セルの三角形は `create-grid-indices.ts` が入力の大きさと高さから作る。`create-ground-surface.ts` がこれらを幾何へ渡し、法線を計算してから `create-ground-material.ts` の地面と斜面の石の材質を使う。`apply-ground-shader.ts` は上向きと斜面、水際の材質の使い分けを保つ。`create-scene-water.ts` は水面の材質と平面を作り、時刻と空の色を照明へ渡す。幾何・地面と石のテクスチャ・材質・水面を取得の都度所有へ登録し、石のテクスチャがシェーダーだけから参照される場合や、水面を根へ追加する途中の失敗でも回収する。屋内でもミニマップは残し、屋外用の地面と水面は隠す。
 
+住民の組み立ては `create-scene-population.ts`、このマップへ一日のどこかで来る人の選択は `create-map-residents.ts`、外見の事前生成との照合と人物の取得は `create-resident-actor.ts` が担う。人物を取得したら次の人物より先に所有へ登録する。`scene-population.ts` の ScenePopulation は人物・住民表の番号・仕事場を一組で保持し、番号の抜けを詰めずに会話の対象へ戻す。公開する人物と番号の配列は読み取り専用とし、人物の状態は描画と日課が更新する。
+
+日課の場所の規則は引き続き `world/town/spot-at.ts`、活動の姿勢は `activity-pose.ts` が持つ。ScenePopulation は各人物の場所を一度引き、店先と人物をその対応から同期する。描画する地点への変換は `get-scene-spot-position.ts`、席・位置と向きの更新は `update-scheduled-resident.ts`、店の札と屋台の品・覆いは `update-scheduled-shop-fronts.ts` に置く。店の営業判定と、そのマップの名前付き地点にいる売り手の判定は混ぜない。
+
 移動入力と経路、停止と凍結は `scene-movement.ts` の SceneMovement が描画ごとに保持する。押し続けたキーから格子の候補を作る処理は純粋な `get-held-walk-candidates.ts` に分け、角が塞がれた場合の候補の順と、最初の空き候補での経路の照会を維持する。停止の通知より先に行動予約を外し、追跡で明示した場合だけ予約を保持する。住民・採集・作業場への接近と到着時の通知は `scene-interactions.ts` の SceneInteractions が受け持つ。周囲の候補は `get-approach-candidates.ts` が来た側から近い半径と左右の順で作る。予約を消費してから到着を通知し、通知中に選ばれた次の行動を前の到着で実行しない。
 
 敵の追跡と攻撃間隔は `scene-combat.ts` の SceneCombat が描画ごとに保持する。範囲内では行動予約を保持したまま経路を短くし、向きを合わせてから攻撃の演出と通知を行う。対象を選び直しても前の攻撃からの待機は保持する。命中・消費・報酬はサーバーの判定を使う。
