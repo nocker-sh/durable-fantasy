@@ -1,10 +1,9 @@
 // The map room's handlers for face-to-face trades between players (core/check-trade.ts).
-import { TRADE_CELLS, TRADE_LOTS } from "#/world/core/trade-rules"
+import { TRADE_CELLS } from "#/world/core/trade-rules"
 import { checkTrade } from "#/world/core/check-trade"
 import { emptyOffer } from "#/world/core/empty-offer"
-import type { Stack } from "#/world/core/bag-types"
 import { Player } from "#/durable-objects/player"
-import { ITEMS } from "#/world/core/items/catalog"
+import { getTradeOfferPresentation } from "#/world/core/get-trade-offer-presentation"
 import type { Ctx, Handlers, Message } from "#/world/server/map-room/context"
 import type { TradeSide } from "#/world/server/map-room/presence"
 import { presence } from "#/world/server/map-room/presence"
@@ -98,16 +97,10 @@ async function tradeOffer(roomCtx: Ctx, message: Message<"trade-offer">) {
     other.trade.settling
   )
     return
-  const lots = message.lots.slice(0, TRADE_LOTS)
-  const shown: Stack[] = []
-  for (const l of lots) {
-    const s = data.bag[l.slot]
-    if (!s || l.count > s.count || ITEMS[s.item].kind === "key") return
-    shown.push({ ...s, count: l.count })
-  }
-  if (new Set(lots.map((l) => l.slot)).size !== lots.length || message.gold > data.gold) return
+  const presentation = getTradeOfferPresentation(data, message)
+  if (!presentation) return
   // a changed offer unsettles both sides
-  save({ trade: { ...mine.trade, offer: { lots, gold: message.gold }, shown, locked: false, done: false } })
+  save({ trade: { ...mine.trade, offer: presentation.offer, shown: presentation.shown, locked: false, done: false } })
   setTrade(them, { ...other.trade, locked: false, done: false })
   await showTrade(ctx.connection, them)
   return
