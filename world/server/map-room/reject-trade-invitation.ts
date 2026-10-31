@@ -1,7 +1,8 @@
 import { setTrade } from "#/world/server/map-room/set-trade"
-import type { Ctx, Message } from "#/world/server/map-room/context"
+import type { Message } from "#/world/server/map-room/context"
+import type { TradeAnswerContext, TradeAnswerConnection } from "#/world/server/map-room/trade-answer-types"
 
-type Props = Readonly<{ room: Ctx; asker: Ctx["ctx"]["connection"]; message: Message<"trade-answer">; reason: string }>
+type Props = Readonly<{ room: TradeAnswerContext; asker: TradeAnswerConnection; message: Message<"trade-answer">; reason: string }>
 
 /** 招待だけを取り消し、返答者が別に開始した取引へ取消通知を送らない。 */
 export async function rejectTradeInvitation(props: Props): Promise<void> {

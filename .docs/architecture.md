@@ -1062,7 +1062,7 @@ React との共有の定義は `components/game/game-context.ts` に一つだけ
 
 対面取引の招待は `world/server/map-room/handle-trade-ask.ts`、取消は `handle-trade-cancel.ts` が扱う。招待先の到達位置がない場合は距離の拒否として扱い、招待を保存・送信しない。招待の受付は必要な接続の識別子と送信、相手の状態参照だけを受け取り、参加状態の読取りも接続全体を要求しない。`same-trade.ts` で相手と共有の取引識別子を照合し、同じ相手との次の取引を古い処理が閉じない。取消と確定後の終了通知で同じ照合を使い、確定処理を始めた取引は取消操作で外さない。
 
-対面取引の招待への返答は `world/server/map-room/handle-trade-answer.ts` が受け持つ。返答時の辞退・参加状態・距離の判定は `get-trade-answer-rejection.ts` に置き、辞退、参加状態、距離の順で理由を決める。`reject-trade-invitation.ts` は招待者の招待を外し、返答者が別に始めた取引を取消通知で閉じない。受諾時だけ共有の識別子を作って双方の取引を開く。
+対面取引の招待への返答は `world/server/map-room/handle-trade-answer.ts` が受け持つ。返答時の辞退・参加状態・距離の判定は純粋な `get-trade-answer.ts` に置き、辞退、参加状態、距離の順で理由を決める。受入れた場合は同じ時刻で確認した双方の停止地点を返し、受付は位置を計算し直さず保存する。停止地点は元の経路から写す。`reject-trade-invitation.ts` は招待者の招待を外し、返答者が別に始めた取引を取消通知で閉じない。受諾時だけ共有の識別子を作って双方の取引を開く。`create-open-trade-side.ts` は参加者ごとに独立した提示と承認の初期状態を作る。入力は `trade-answer-types.ts` に置き、必要な接続の読取り・保存・送信だけを要求する。
 
 対面取引の提示の受付は `world/server/map-room/handle-trade-offer.ts` が持つ。持ち物を読む前に提示の版を進め、読取り後に `get-current-trade-offer.ts` で双方の接続、取引識別子、相手、提示の版と状態を照合する。一致した双方の取引を得てから表示用の品を作り、両方の承認を外す。相手だけが決定済みでも新しい提示を受け付けるが、本人の決定後や双方の確定処理中は変更しない。
 
