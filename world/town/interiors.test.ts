@@ -146,3 +146,12 @@ it.each([
   expect(tool.solid).toBe(piece.solid)
   expect(room.unrenderedFurniture.some((piece) => piece.name === name)).toBe(false)
 })
+
+it.each([undefined, 0, -1, Infinity])("rejects windows without a positive finite wall thickness: %s", (cellSize) => {
+  const house = HOUSES.find((house) => house.id === "h-m5")
+  if (!house) throw new Error("Missing authored building fixture")
+  const source = structuredClone(floorPlan(house.id))
+  expect(source.windows?.some((window) => window.floor === 0)).toBe(true)
+  source.cellSize = cellSize
+  expect(() => interiorPlan(house, 0, source)).toThrow("has no positive wall thickness")
+})

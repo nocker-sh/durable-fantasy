@@ -2,7 +2,7 @@ import { scaleRoomPieceDimensions } from "#/world/town/scale-room-piece-dimensio
 import { getInteriorPiece } from "#/world/town/get-interior-piece"
 import { getInteriorStairProjection } from "#/world/town/get-interior-stair-projection"
 import { getInteriorEntrance } from "#/world/town/get-interior-entrance"
-import { projectInteriorRectangle } from "#/world/town/project-interior-rectangle"
+import { getInteriorFixtureProjection } from "#/world/town/get-interior-fixture-projection"
 import type { HouseDef } from "#/world/town/house-types"
 import { floorPlan } from "#/world/town/floorplan/floor-plan"
 import type { Furniture, UnrenderedFurniture, Interior } from "#/world/town/interiors"
@@ -43,26 +43,9 @@ export function interiorPlan(h: HouseDef, floor = 0, plan = floorPlan(h.id)): In
   const stairs = getInteriorStairProjection({ sections: plan.stairSections, floor, x0, z0, scale: K })
   const level = plan.floorLevels?.find((level) => level.floor === floor)
   const below = plan.floorLevels?.find((level) => level.floor === floor - 1)
-  const windows = plan.windows
-    ?.filter((w) => w.floor === floor)
-    .map((w) => {
-      const point: readonly [number, number] = w.side === "n" ? [x0 + w.along * K, z0] : w.side === "s" ? [x0 + w.along * K, z1] : w.side === "w" ? [x0, z0 + w.along * K] : [x1, z0 + w.along * K]
-      const outward: readonly [number, number] = w.side === "n" ? [0, -1] : w.side === "s" ? [0, 1] : w.side === "w" ? [-1, 0] : [1, 0]
-      return { id: w.id, point, outward, width: w.width * K, sill: w.sill * K, height: w.height * K, frame: w.frame * K, depth: plan.cellSize! * K }
-    })
-  const lamps = plan.lamps
-    ?.filter((l) => l.floor === floor)
-    .map((l) => ({ ...l, x: x0 + l.x * K, z: z0 + l.z * K, bottom: l.bottom * K, top: l.top * K, diameter: l.diameter * K, ceiling: l.ceiling * K }))
+  const fixtures = getInteriorFixtureProjection({ plan, floor, bounds: { x0, z0, x1, z1 }, scale: K })
   return {
-    windows,
-    lamps,
-    flues: plan.flues?.map((s) => ({
-      ...s,
-      wallThickness: s.wallThickness * K,
-      floorCollar: s.floorCollar * K,
-      floorSupport: { depth: s.floorSupport.depth * K, steps: s.floorSupport.steps },
-      ...projectInteriorRectangle({ rect: s, x0, z0, scale: K }),
-    })),
+    ...fixtures,
     below: plan.authored && level && below ? { drop: (level.elevation - below.elevation) * K, interior: interiorPlan(h, floor - 1, plan) } : undefined,
     doorHeight: plan.doorHeight ? plan.doorHeight * K : undefined,
     shellInset: plan.cellSize ? plan.cellSize * K : undefined,
