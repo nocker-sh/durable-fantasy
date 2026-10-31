@@ -92,7 +92,7 @@ Durable Object の入口は `durable-objects/` にあり、どれも Void の規
 
 プレイヤーと他の接続者の地面の高さは、人物ごとに座標が変わったときだけ求める（`lib/engine/position-sample.ts`、`world/scene/runtime/walkers.ts`）。配置済みの高さをカメラ追従・遮蔽の照準・名札と吹き出しでも使う。マップごとに人物と保持値を作り直し、外見の変更後も同じ座標の高さを新しい姿へ適用する。地形が途中で変わる場合は保持値を作り直す必要がある。
 
-破棄したマップの描画から届く進捗や失敗は現在の画面へ送らず、遅れて完成した描画は解放する。地面の画像は並行で準備できるが、共有の地形と灯り・描画物の登録を変更する組み立ては `world/scene/runtime/scene-build-queue.ts` で直列化する。待機中に離れたマップは組み立てず、作成中に離れたマップは完成後に解放してから次へ進む。描画資源は作成の都度 `lib/engine/cleanup-stack.ts` へ登録する。非同期の組み立ては `with-cleanup.ts` が囲み、途中の失敗でも取得と逆順に解放する。住民も一人ずつ登録する。共有する資源は一度だけ解放し、シェーダーだけが参照するテクスチャや影の描画先は `lib/graphics/dispose-object-tree.ts` で回収する。解放に失敗した資源があっても残りを処理し、元の作成エラーを失わない。
+破棄したマップの描画から届く進捗や失敗は現在の画面へ送らず、遅れて完成した描画は解放する。地面の画像は並行で準備できるが、共有の地形と灯り・描画物の登録を変更する組み立ては `world/scene/runtime/scene-build-queue.ts` で直列化する。待機中に離れたマップは組み立てず、作成中に離れたマップは完成後に解放してから次へ進む。描画資源は作成の都度 `lib/engine/cleanup-stack.ts` へ登録する。非同期の組み立ては `with-cleanup.ts` が囲み、途中の失敗でも取得と逆順に解放する。住民も一人ずつ登録する。共有する資源は一度だけ解放し、シェーダーだけが参照するテクスチャや影の描画先は `lib/graphics/dispose-object-tree.ts` で回収する。解放に失敗した資源があっても残りを処理し、元の作成エラーを失わない。収集は `collect-object-assets.ts`・`collect-material-assets.ts`・`collect-texture-assets.ts` に分け、幾何・材質・影の資源は実際に解放可能かを確認する。共有参照の重複排除と解放順、失敗の集約はツリー全体で維持する。
 
 描画器とシーンの根の生成は `world/scene/runtime/create-scene-renderer.ts`・`create-scene-root.ts` に置き、取得時の解放登録と逆順の回収を維持する。カメラの生成は `create-scene-camera.ts`、表示寸法と描画面・後処理の画素数の同期は `resize-scene-viewport.ts`、移動先の輪とカーソルの生成は `create-walk-markers.ts` が担う。
 

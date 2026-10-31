@@ -48,3 +48,41 @@ it("cleans a partially built tree without double-disposing individually owned as
   ).rejects.toThrow("building failed")
   for (const spy of spies) expect(spy).toHaveBeenCalledOnce()
 })
+it("visits nested lines, points, sprites and material arrays in release order", () => {
+  const root = new THREE.Group()
+  const nested = new THREE.Group()
+  const geometry = new THREE.BufferGeometry()
+  const texture = new THREE.Texture()
+  const lineMaterial = new THREE.LineBasicMaterial()
+  const pointsMaterial = new THREE.PointsMaterial({ map: texture })
+  const spriteMaterial = new THREE.SpriteMaterial({ map: texture })
+  const shader = new THREE.ShaderMaterial({ uniforms: { layers: { value: [[texture], texture] } } })
+  const sprite = new THREE.Sprite(spriteMaterial)
+  nested.add(new THREE.Line(geometry, lineMaterial), new THREE.Points(geometry, pointsMaterial), sprite)
+  root.add(nested, new THREE.Mesh(geometry, [shader, lineMaterial]))
+  const released: unknown[] = []
+  disposeObjectTree(root, (asset) => released.push(asset))
+  expect(released).toEqual([geometry, lineMaterial, texture, pointsMaterial, sprite.geometry, spriteMaterial, shader])
+  expect(root.children).toEqual([nested, root.children[1]])
+})
+it("retains every release failure while still releasing later assets", () => {
+  const geometry = new THREE.BufferGeometry()
+  const material = new THREE.MeshBasicMaterial()
+  const light = new THREE.PointLight()
+  const root = new THREE.Group()
+  root.add(new THREE.Mesh(geometry, material), light)
+  const failures = [new Error("geometry failed"), new Error("material failed")]
+  const released: unknown[] = []
+  try {
+    disposeObjectTree(root, (asset) => {
+      released.push(asset)
+      if (asset === geometry) throw failures[0]
+      if (asset === material) throw failures[1]
+    })
+    expect.unreachable("cleanup must report failures")
+  } catch (error) {
+    expect(error).toBeInstanceOf(AggregateError)
+    if (error instanceof AggregateError) expect(error.errors).toEqual(failures)
+  }
+  expect(released).toEqual([geometry, material, light.shadow])
+})
