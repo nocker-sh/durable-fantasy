@@ -56,3 +56,16 @@ it("rejects a key that differs from its declared map id", () => {
   maps.lower.id = "wrong-id"
   expect(() => assertMapSpaceRegistry(maps)).toThrow("Map space parent is missing or miskeyed")
 })
+it("rejects overlapping physical room strips through the actual registration guard", () => {
+  const maps = fixture(),
+    placement = space("outside"),
+    rect = { x0: 1, z0: 1, x1: 2, z1: 2 }
+  maps.lower.space = {
+    ...placement,
+    rooms: [
+      { id: "a", footprint: [rect] },
+      { id: "b", footprint: [rect] },
+    ],
+  }
+  expect(() => assertMapSpaceRegistry(maps)).toThrow("Map room footprints overlap: a / b")
+})

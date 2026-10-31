@@ -39,3 +39,18 @@ it("owns the projected origin and preserves the source", () => {
   room.house.authored.exterior.bounds = [bounds[0] + 1, bounds[1], bounds[2], bounds[3]]
   expect(space.frame.origin).toEqual(origin)
 })
+it("retains source room ids and exact metric strips for only the selected floor", () => {
+  const room = fixture(),
+    source = room.house.authored
+  if (!source) throw new Error("Missing authored fixture")
+  const space = getInteriorMapSpace(room)
+  if (!space?.rooms) throw new Error("Missing physical room geometry")
+  expect(space.rooms.map((room) => room.id)).toEqual(source.rooms.filter((candidate) => candidate.floor === room.floor).map((candidate) => candidate.id))
+  for (const shape of space.rooms) {
+    const original = source.rooms.find((candidate) => candidate.id === shape.id)
+    if (!original) throw new Error("Missing source room")
+    const cells = original.rows.reduce((sum, row) => sum + [...row].filter((tile) => tile !== "#" && tile !== "D").length, 0)
+    const area = shape.footprint.reduce((sum, rect) => sum + (rect.x1 - rect.x0) * (rect.z1 - rect.z0), 0)
+    expect(area).toBe(cells * source.cellM ** 2)
+  }
+})

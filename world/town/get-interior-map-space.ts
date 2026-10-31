@@ -1,3 +1,4 @@
+import { getAuthoredRoomSpace } from "#/world/town/floorplan/get-authored-room-space"
 import { assertAuthoredSiteFrame } from "#/world/town/floorplan/assert-authored-site-frame"
 import { assertAuthoredFloorLevels } from "#/world/town/floorplan/assert-authored-floor-levels"
 import { ROOM_SCALE } from "#/world/town/interior-rules"
@@ -26,5 +27,11 @@ export function getInteriorMapSpace(interior: Interior): MapSpace | undefined {
     throw new Error(`Interior dimensions have no matching authored map space: ${interior.id}`)
   const origin: Vector3 = [site.bounds[0] * TILE_M, site.floorY * TILE_M + level.elevation, site.bounds[1] * TILE_M]
   if (!origin.every(Number.isFinite)) throw new Error(`Unbounded interior map space: ${interior.id}`)
-  return { parentMap: source.parentMap, frame: { origin, width, depth, quarterTurns: site.quarterTurns }, planarOrigin: [interior.x0, interior.z0], metresPerPlanarUnit: 1 / ROOM_SCALE }
+  return {
+    rooms: source.rooms.filter((room) => room.floor === interior.floor).map((room) => getAuthoredRoomSpace(room, source)),
+    parentMap: source.parentMap,
+    frame: { origin, width, depth, quarterTurns: site.quarterTurns },
+    planarOrigin: [interior.x0, interior.z0],
+    metresPerPlanarUnit: 1 / ROOM_SCALE,
+  }
 }

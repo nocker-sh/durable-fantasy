@@ -1,4 +1,4 @@
-import { getMapSpaceFrame } from "#/world/maps/get-map-space-frame"
+import { assertMapRoomSpaces } from "#/world/maps/assert-map-room-spaces"
 import type { MapDefinition } from "#/world/maps/types"
 
 type Registry = Readonly<Record<string, Pick<MapDefinition, "id" | "space">>>
@@ -15,7 +15,7 @@ export function assertMapSpaceRegistry(maps: Registry): void {
       chain.add(cursor.id)
       if (!map.space) break
       try {
-        getMapSpaceFrame(map.space)
+        assertMapRoomSpaces(map.space)
       } catch (error) {
         if (error instanceof RangeError) throw new Error(`Map space frame is invalid: ${cursor.id}`, { cause: error })
         throw error
