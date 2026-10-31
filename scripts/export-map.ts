@@ -4,12 +4,16 @@
 // or residents, with the
 // dev server running:
 //   bun scripts/export-map.ts [dev server URL] [map …]
-import { writeFileSync } from "node:fs"
+import { readdirSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import { chromium } from "playwright-core"
 
 const URL = process.argv[2] ?? "https://durable-fantasy.localhost/"
 const only = process.argv.slice(3)
+const devRoot = join(import.meta.dirname, "..", "dev")
+const snapshotSources = readdirSync(devRoot).filter((file) => file.replace(/\.[^.]+$/, "") === "map-snapshot")
+if (snapshotSources.length !== 1) throw new Error("Expected one map snapshot source")
+const snapshotModule = `/dev/${snapshotSources[0]}`
 const browser = await chromium.launch()
 for (const map of only.length
   ? only
@@ -29,12 +33,16 @@ for (const map of only.length
       "hue-gate",
     ]) {
   const page = await (await browser.newContext({ ignoreHTTPSErrors: true })).newPage()
-  await page.goto(new globalThis.URL(`/dev/maps/${map}`, URL).href)
-  const data = await page.evaluate(async (id) => {
-    const mapSnapshotSource = await import("/dev/map-snapshot"),
-      mapSnapshot = mapSnapshotSource.mapSnapshot
-    return mapSnapshot(id)
-  }, map)
+  const harness = new globalThis.URL("/__map-export", URL).href
+  await page.route(harness, (route) => route.fulfill({ contentType: "text/html", body: "<!doctype html><title>Map export</title>" }))
+  await page.goto(harness)
+  const data = await page.evaluate(
+    async (input) => {
+      const source = await import(input.module)
+      return source.mapSnapshot(input.id)
+    },
+    { id: map, module: snapshotModule },
+  )
   if (data.id !== map) throw new Error(`Refusing grid for a different map: ${data.id}`)
   await page.close()
 

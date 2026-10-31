@@ -1,3 +1,4 @@
+import { readRuntimeModuleUrl } from "#resources/scripts/lib/read-runtime-module-url"
 // Walk through the real client and server; never bypass a warp or place the player directly.
 import { chromium } from "playwright-core"
 import { mkdir } from "node:fs/promises"
@@ -40,6 +41,7 @@ try {
       }
     })
   })
+  await page.addInitScript(() => performance.setResourceTimingBufferSize(20000))
   await page.goto(`${base}/?time=21:30`)
   await page.getByRole("dialog", { name: "キャラクターを作る" }).waitFor({ timeout: 180000 })
   await page.waitForFunction(() => window.game?.state.get().loading === null, null, { timeout: 180000 })
@@ -64,52 +66,59 @@ try {
       { timeout: 180000 },
     )
     console.log("walking toward", target)
-    const from = await page.evaluate(async (target) => {
-      const { MAPS } = await import("/world/maps/index")
-      const game = window.game,
-        id = game.state.get().map.id,
-        map = MAPS[id]
-      const warp = map.warps.find((w) => w.to.map === target)
-      if (!warp) throw new Error(`No direct warp from ${id} to ${target}`)
-      if (id === "phanthiet-market" || id.startsWith("phanthiet-in-h-m5")) {
-        const { activityPose } = await import("/world/town/activity-pose")
-        if (id.startsWith("phanthiet-in-h-m5")) {
-          const { ROOM_SCALE } = await import("/world/town/interiors"),
-            { FIG } = await import("/world/scene/actors")
-          for (const figure of [...game.scene.runtime.people.map((person) => person.fig), ...Array.from(game.scene.runtime.remotes.values(), (person) => person.fig)]) {
-            if (Math.abs(figure.root.scale.x - ROOM_SCALE / FIG) > 1e-6) throw new Error("Interior character and furniture scales disagree")
+    const modules = await Promise.all(
+      ["/world/maps/index", "/world/town/activity-pose", "/world/town/interior-rules", "/world/scene/figure/display-scale"].map((path) => readRuntimeModuleUrl(page, path)),
+    )
+    const from = await page.evaluate(
+      async (input) => {
+        const target = input.target
+        const maps = await import(input.modules[0])
+        const game = window.game,
+          id = game.state.get().map.id,
+          map = maps.MAPS[id]
+        const warp = map.warps.find((w) => w.to.map === target)
+        if (!warp) throw new Error(`No direct warp from ${id} to ${target}`)
+        if (id === "phanthiet-market" || id.startsWith("phanthiet-in-h-m5")) {
+          const poses = await import(input.modules[1])
+          if (id.startsWith("phanthiet-in-h-m5")) {
+            const rules = await import(input.modules[2])
+            const display = await import(input.modules[3])
+            for (const figure of [...game.scene.runtime.people.map((person) => person.fig), ...Array.from(game.scene.runtime.remotes.values(), (person) => person.fig)]) {
+              if (Math.abs(figure.root.scale.x - rules.ROOM_SCALE / display.FIG) > 1e-6) throw new Error("Interior character and furniture scales disagree")
+            }
           }
+          let focused = 0
+          for (const person of game.scene.runtime.people) {
+            if (!person.fig.root.visible) continue
+            const pose = poses.activityPose(person.name, 21 * 60 + 30, id)
+            const target = pose?.facing
+            if (!target) continue
+            focused++
+            const seat = pose?.seat
+            if (seat && (!person.seat || person.anim !== "sit")) throw new Error(`Pupil is not seated: ${person.name}`)
+            const expected = Math.atan2(target[0] - person.pos[0], target[1] - person.pos[1])
+            if (Math.abs(Math.atan2(Math.sin(person.heading - expected), Math.cos(person.heading - expected))) > 0.001) {
+              throw new Error(`Resident faces away from activity: ${person.name}`)
+            }
+          }
+          const expectedResidents = id === "phanthiet-in-h-m5" ? 9 : id === "phanthiet-in-h-m5-floor-2" ? 1 : 0
+          if (focused !== expectedResidents) throw new Error(`Missing activity residents in ${id}: ${focused}/${expectedResidents}`)
+          const grid = game.walkGrid()
+          const mismatches = []
+          for (let z = 0; z < map.size; z++)
+            for (let x = 0; x < map.size; x++) {
+              if (Boolean(grid[z * map.size + x]) !== (map.rows[z][x] === "#")) mismatches.push([x, z])
+            }
+          if (mismatches.length) throw new Error(`Scene and published grid differ in ${id}: ${JSON.stringify(mismatches.slice(0, 10))}`)
         }
-        let focused = 0
-        for (const person of game.scene.runtime.people) {
-          if (!person.fig.root.visible) continue
-          const pose = activityPose(person.name, 21 * 60 + 30, id)
-          const target = pose?.facing
-          if (!target) continue
-          focused++
-          const seat = pose?.seat
-          if (seat && (!person.seat || person.anim !== "sit")) throw new Error(`Pupil is not seated: ${person.name}`)
-          const expected = Math.atan2(target[0] - person.pos[0], target[1] - person.pos[1])
-          if (Math.abs(Math.atan2(Math.sin(person.heading - expected), Math.cos(person.heading - expected))) > 0.001) {
-            throw new Error(`Resident faces away from activity: ${person.name}`)
-          }
-        }
-        const expectedResidents = id === "phanthiet-in-h-m5" ? 9 : id === "phanthiet-in-h-m5-floor-2" ? 1 : 0
-        if (focused !== expectedResidents) throw new Error(`Missing activity residents in ${id}: ${focused}/${expectedResidents}`)
-        const grid = game.walkGrid()
-        const mismatches = []
-        for (let z = 0; z < map.size; z++)
-          for (let x = 0; x < map.size; x++) {
-            if (Boolean(grid[z * map.size + x]) !== (map.rows[z][x] === "#")) mismatches.push([x, z])
-          }
-        if (mismatches.length) throw new Error(`Scene and published grid differ in ${id}: ${JSON.stringify(mismatches.slice(0, 10))}`)
-      }
-      window.__walkGame = game
-      window.__walkRuntime = game.scene.runtime
-      window.__walkFrom = id
-      game.walkTo((warp.at[0] + 0.5) / 2, (warp.at[1] + 0.5) / 2)
-      return id
-    }, target)
+        window.__walkGame = game
+        window.__walkRuntime = game.scene.runtime
+        window.__walkFrom = id
+        game.walkTo((warp.at[0] + 0.5) / 2, (warp.at[1] + 0.5) / 2)
+        return id
+      },
+      { target, modules },
+    )
     await page.waitForFunction(
       (target) => {
         const state = window.game?.state.get()
@@ -150,16 +159,17 @@ try {
           expected,
           { timeout: 60000 },
         )
-        const result = await page.evaluate(async () => {
-          const { fireLights } = await import("/world/scene/construction/registry")
-          const lamps = fireLights.filter((fixture) => fixture.room?.house === "h-m5" && fixture.room.floor === 0)
+        const registryUrl = await readRuntimeModuleUrl(page, "/world/scene/construction/registry")
+        const result = await page.evaluate(async (url) => {
+          const registry = await import(url)
+          const lamps = registry.fireLights.filter((fixture) => fixture.room?.house === "h-m5" && fixture.room.floor === 0)
           return {
             visible: window.game.scene.runtime.people.filter((person) => person.fig.root.visible).map((person) => person.name),
             seated: window.game.scene.runtime.people.filter((person) => person.seat && person.anim === "sit").length,
             lamps: lamps.length,
             lit: lamps.every((fixture) => fixture.light.intensity > 0),
           }
-        })
+        }, registryUrl)
         if (joins.length !== before + 1 || joins.at(-1).time !== minute) throw new Error("Clock change did not join with the displayed server time")
         if (result.lamps !== 2 || result.lit !== expected.lit) throw new Error(`Room lamps disagree with routine: ${JSON.stringify(result)}`)
         clockChecks.push({ minute, ...result })
@@ -194,14 +204,15 @@ try {
   if (errors.length || refused.length) throw new Error(JSON.stringify({ errors, refused }))
   console.log(JSON.stringify({ route, clockChecks, errors, refused }))
 } catch (error) {
+  const mapsUrl = await readRuntimeModuleUrl(page, "/world/maps/index").catch(() => null)
   const state = await page
     ?.evaluate(
-      async ({ target, moves }) => {
-        const { MAPS } = await import("/world/maps/index")
+      async (input) => {
+        const maps = input.mapsUrl ? await import(input.mapsUrl) : null
         const game = window.game
         if (!game) return { missingGame: true }
         const state = game.state.get(),
-          map = MAPS[state.map.id]
+          map = maps?.MAPS[state.map.id]
         return {
           map: state.map.id,
           online: state.online,
@@ -214,16 +225,16 @@ try {
           engaged: game.session.engaged,
           player: game.scene?.player(),
           cell: game.scene?.playerCell(),
-          goal: map?.warps.find((w) => w.to.map === target),
-          badCells: moves
+          goal: map?.warps.find((w) => w.to.map === input.target),
+          badCells: input.moves
             .slice(-1)
             .flatMap((m) => m.path ?? [])
-            .filter(([x, z]) => map.rows?.[z]?.[x] === "#"),
+            .filter(([x, z]) => map?.rows?.[z]?.[x] === "#"),
           refusedWarp: game.session.refusedWarp,
           warping: game.session.warping,
         }
       },
-      { target: lastTarget, moves },
+      { target: lastTarget, moves, mapsUrl },
     )
     .catch((e) => ({ diagnosticError: String(e) }))
   console.error(JSON.stringify({ state, errors, refused, route, moves: moves.slice(-1), transport }))
