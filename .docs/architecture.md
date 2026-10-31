@@ -1028,6 +1028,8 @@ React との共有の定義は `components/game/game-context.ts` に一つだけ
 
 取引全体の事前検証は `world/core/check-trade.ts` に参加者・各自の提示と時刻を名前で渡す。距離と枠数は `trade-rules.ts`、提示の型は `trade-types.ts`、初期提示は `empty-offer.ts` が持つ。`taken-of.ts` は共通の GameEvent の判別された受渡しイベントから品列を読み、type の文字だけで別のイベントを受渡しの形と仮定しない。双方の送付と受取の順序を保ち、元の状態を変更しない。
 
+対面取引の招待は `world/server/map-room/handle-trade-ask.ts`、取消は `handle-trade-cancel.ts` が扱う。`same-trade.ts` で相手と共有の取引識別子を照合し、同じ相手との次の取引を古い処理が閉じない。取消と確定後の終了通知で同じ照合を使い、確定処理を始めた取引は取消操作で外さない。
+
 対面取引の招待への返答は `world/server/map-room/handle-trade-answer.ts` が受け持つ。返答時の辞退・参加状態・距離の判定は `get-trade-answer-rejection.ts` に置き、辞退、参加状態、距離の順で理由を決める。`reject-trade-invitation.ts` は招待者の招待を外し、返答者が別に始めた取引を取消通知で閉じない。受諾時だけ共有の識別子を作って双方の取引を開く。
 
 対面取引の提示品の写しは `world/core/get-trade-offer-presentation.ts` が作る。持ち物・所持金と提示を受け取り、枠数の上限、空の枠、個数不足、取引できない品、重複する枠、所持金不足を検査する。この段階では品物を予約せず、通信の後に同じ取引かを確認する処理は部屋に残す。確定時の保存先での再検証も省かない。

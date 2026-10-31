@@ -1,40 +1,15 @@
+import { handleTradeCancel } from "#/world/server/map-room/handle-trade-cancel"
+import { handleTradeAsk } from "#/world/server/map-room/handle-trade-ask"
+import { sameTrade } from "#/world/server/map-room/same-trade"
 import { handleTradeAnswer } from "#/world/server/map-room/handle-trade-answer"
 // The map room's handlers for face-to-face trades between players (core/check-trade.ts).
-import { TRADE_CELLS } from "#/world/core/trade-rules"
 import { checkTrade } from "#/world/core/check-trade"
-import { emptyOffer } from "#/world/core/empty-offer"
 import { Player } from "#/durable-objects/player"
 import { getTradeOfferPresentation } from "#/world/core/get-trade-offer-presentation"
 import type { Ctx, Handlers, Message } from "#/world/server/map-room/context"
-import type { TradeSide } from "#/world/server/map-room/presence"
 import { presence } from "#/world/server/map-room/presence"
 import { setTrade } from "#/world/server/map-room/set-trade"
 import { showTrade } from "#/world/server/map-room/show-trade"
-import { reachable } from "#/world/server/map-room/reachable"
-import { near } from "#/world/server/map-room/near"
-
-/** A connection can start a later trade with the same partner while an earlier handler awaits RPC. */
-const sameTrade = (a: TradeSide | undefined, b: TradeSide | undefined) => !!a && !!b && a.session === b.session && a.with === b.with
-
-async function tradeAsk(roomCtx: Ctx, message: Message<"trade-ask">) {
-  const ctxSource = roomCtx,
-    ctx = ctxSource.ctx,
-    me = ctxSource.me,
-    save = ctxSource.save
-  const them = ctx.room.getConnection(message.target)
-  const other = them && presence(them)
-  if (!me.player || !me.owner || me.trade?.open || me.down || me.engaged || !them || !other?.player || other.trade?.open || other.down || other.engaged || them.id === ctx.connection.id) {
-    await ctx.connection.send({ type: "trade-closed", reason: "BUSY" })
-    return
-  }
-  if (!near(me, reachable(other).at(-1)!, TRADE_CELLS)) {
-    await ctx.connection.send({ type: "trade-closed", reason: "TOO_FAR" })
-    return
-  }
-  save({ trade: { with: them.id, open: false, offer: emptyOffer(), shown: [], locked: false, done: false } })
-  await them.send({ type: "trade-asked", from: ctx.connection.id, name: me.player.name })
-  return
-}
 
 async function tradeOffer(roomCtx: Ctx, message: Message<"trade-offer">) {
   const ctxSource3 = roomCtx,
@@ -158,27 +133,11 @@ async function tradeLockOrTradeGo(roomCtx: Ctx, message: Message<"trade-lock" | 
   }
 }
 
-async function tradeCancel(roomCtx: Ctx, _message: Message<"trade-cancel">) {
-  const ctxSource5 = roomCtx,
-    ctx = ctxSource5.ctx,
-    save = ctxSource5.save
-  const me = presence(ctx.connection)
-  if (!sameTrade(me.trade, roomCtx.me.trade) || me.trade?.settling) return
-  const them = me.trade ? ctx.room.getConnection(me.trade.with) : undefined
-  save({ trade: undefined })
-  if (them && presence(them).trade?.with === ctx.connection.id && presence(them).trade?.session === me.trade?.session) {
-    setTrade(them, undefined)
-    await them.send({ type: "trade-closed", reason: "CANCELLED" })
-  }
-  await ctx.connection.send({ type: "trade-closed", reason: "CANCELLED" })
-  return
-}
-
 export const HANDLERS: Handlers = {
-  "trade-ask": tradeAsk,
+  "trade-ask": handleTradeAsk,
   "trade-answer": handleTradeAnswer,
   "trade-offer": tradeOffer,
   "trade-lock": tradeLockOrTradeGo,
   "trade-go": tradeLockOrTradeGo,
-  "trade-cancel": tradeCancel,
+  "trade-cancel": handleTradeCancel,
 }
