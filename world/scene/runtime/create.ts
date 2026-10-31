@@ -1,3 +1,4 @@
+import { SceneSpeech } from "#/world/scene/runtime/scene-speech"
 import { SceneInteractions } from "#/world/scene/runtime/scene-interactions"
 import { SceneMovement } from "#/world/scene/runtime/scene-movement"
 import { createSceneRenderer } from "#/world/scene/runtime/create-scene-renderer"
@@ -55,7 +56,6 @@ import { createEnvironment } from "#/world/scene/runtime/helpers/lighting/create
 import { createLighting } from "#/world/scene/runtime/helpers/lighting/create-lighting"
 import { createPopulation } from "#/world/scene/runtime/population"
 import type { SceneEvents } from "#/world/scene/runtime/types"
-import type { Walker } from "#/world/scene/runtime/walker"
 import { NAME_RANGE } from "#/world/scene/runtime/grid"
 
 const builds = new SceneBuildQueue()
@@ -336,16 +336,16 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
     el.textContent = a.name
     return el
   })
-  const speech = new Map<Walker, { el: HTMLDivElement; until: number }>()
-  function bubble(who: string, text: string) {
-    const w = who === "me" ? me : remotes.get(who)
-    if (!w) return
-    speech.get(w)?.el.remove()
-    speech.set(w, { el: plate("gx-bubble", text), until: performance.now() + Math.min(8000, 4000 + text.length * 80) })
-  }
+  const speech = new SceneSpeech({
+    me,
+    remotes,
+    create: (text) => plate("gx-bubble", text),
+    place: (walker, element) => place({ el: element, vis: toScreen({ pos: walker.pos, h: walker.fig.height, out: v, ground: walker.fig.root.position.y }), p: v, dy: 20 }),
+  })
+  const bubble = speech.bubble
   function setLayer(el: HTMLElement) {
     walkers.layer = el
-    for (const node of [me.label, ...residentLabels, ...monsters.map((m) => m.label), ...[...remotes.values()].map((w) => w.label), ...[...speech.values()].map((b) => b.el)]) el.appendChild(node)
+    for (const node of [me.label, ...residentLabels, ...monsters.map((m) => m.label), ...[...remotes.values()].map((w) => w.label), ...speech.elements]) el.appendChild(node)
   }
   const toScreen = (inputProps: { pos: V2; h: number; out: THREE.Vector3; ground?: number }) => {
     const pos = inputProps.pos
@@ -512,18 +512,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
       })
     })
     const now = performance.now()
-    // bubbles sit above the name
-    for (const entry2 of speech) {
-      const w = entry2[0]
-      const b = entry2[1]
-
-      if (now > b.until || (w !== me && !remotes.has(w.id))) {
-        b.el.remove()
-        speech.delete(w)
-        continue
-      }
-      place({ el: b.el, vis: toScreen({ pos: w.pos, h: w.fig.height, out: v, ground: w.fig.root.position.y }), p: v, dy: 20 })
-    }
+    speech.update(now)
     ashfall?.update({ dt: dt, t: t, focus: camFocus, night: 1 - daylight(lighting.minutes) })
     frames++
     if (now - fpsAt >= 1000) {

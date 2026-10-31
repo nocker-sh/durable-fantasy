@@ -41,7 +41,18 @@ try {
   await host.locator("input").filter({ visible: true }).last().fill("一緒に町を歩こう")
   await host.keyboard.press("Enter")
   await guest.waitForFunction(() => game.state.get().chat.some((line) => line.text === "一緒に町を歩こう"))
-  console.log("mutual presence and chat delivery passed")
+  for (const page of pages) await page.locator(".gx-bubble").filter({ hasText: "一緒に町を歩こう" }).waitFor({ state: "visible" })
+  await host.keyboard.press("Enter")
+  await host.locator("input").filter({ visible: true }).last().fill("広場で待っているよ")
+  await host.keyboard.press("Enter")
+  for (const page of pages) {
+    await page.locator(".gx-bubble").filter({ hasText: "広場で待っているよ" }).waitFor({ state: "visible" })
+    if (await page.locator(".gx-bubble").filter({ hasText: "一緒に町を歩こう" }).count()) throw Error("Previous speech bubble was not replaced")
+  }
+  await mkdir("public/tmp", { recursive: true })
+  await host.screenshot({ path: "public/tmp/multiplayer-speech.png" })
+  for (const page of pages) await page.locator(".gx-bubble").filter({ hasText: "広場で待っているよ" }).waitFor({ state: "detached", timeout: 10000 })
+  console.log("mutual presence, chat delivery, speech replacement and expiry passed")
   const inventories = await Promise.all(
     pages.map((page) => page.evaluate(() => ({ gold: game.state.get().player.gold, bread: game.state.get().player.bag.reduce((n, s) => n + (s?.item === "rye-bread" ? s.count : 0), 0) }))),
   )
