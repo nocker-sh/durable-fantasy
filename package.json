@@ -23,6 +23,7 @@
     "#resources/dev/debug": "./dev/debug.css",
     "#resources/components/game/game": "./components/game/game.css",
     "#resources/dev/dev": "./dev/dev.css",
+    "#resources/scripts/lib/read-runtime-module-url": "./scripts/lib/read-runtime-module-url.mjs",
     "#resources/scripts/lib/wait-ready": "./scripts/lib/wait-ready.mjs",
     "#resources/scripts/lib/create-character": "./scripts/lib/create-character.mjs",
     "#resources/scripts/lib/walk-to-map": "./scripts/lib/walk-to-map.mjs",

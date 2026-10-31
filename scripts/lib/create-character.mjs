@@ -1,6 +1,7 @@
 import { waitReady } from "#resources/scripts/lib/wait-ready"
 
 export async function createCharacter(page, name = "エルナ") {
+  await page.addInitScript(() => performance.setResourceTimingBufferSize(20000))
   await page.goto(process.env.BASE ?? "https://durable-fantasy.localhost")
   await page.getByRole("dialog", { name: "キャラクターを作る" }).waitFor({ timeout: 180000 })
   await waitReady(page)

@@ -1,3 +1,4 @@
+import { readRuntimeModuleUrl } from "#resources/scripts/lib/read-runtime-module-url"
 import { chromium } from "playwright-core"
 import { mkdir } from "node:fs/promises"
 import { createCharacter } from "#resources/scripts/lib/create-character"
@@ -32,9 +33,10 @@ try {
     }
   })
   await createCharacter(page)
-  await page.evaluate(async () => {
-    const { LOOKS } = await import("/world/game")
-    const { spriteFrame } = await import("/world/scene/sprite-pool")
+  const modules = await Promise.all(["/world/town/travellers", "/world/scene/sprite-frame"].map((path) => readRuntimeModuleUrl(page, path)))
+  await page.evaluate(async (modules) => {
+    const travellers = await import(modules[0])
+    const sprites = await import(modules[1])
     await new Promise((resolve, reject) => {
       let poll
       const deadline = setTimeout(() => {
@@ -47,13 +49,13 @@ try {
         resolve()
       }
       const request = () => {
-        if (spriteFrame(LOOKS[0].look, null, "idle", 0, 0, 10000, ready)) ready()
+        if (sprites.spriteFrame({ look: travellers.LOOKS[0].look, item: null, anim: "idle", view: 0, f: 0, urgency: 10000, onReady: ready })) ready()
       }
       poll = setInterval(request, 100)
       request()
     })
     if (spriteWorkerFaults.construction !== 1 || spriteWorkerFaults.execution !== 1) throw Error("Worker faults were not exercised")
-  })
+  }, modules)
   await mkdir("public/tmp", { recursive: true })
   await page.screenshot({ path: "public/tmp/sprite-worker-recovery.png" })
   if (errors.length) throw Error(errors.join("\n"))

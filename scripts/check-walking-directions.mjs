@@ -1,3 +1,4 @@
+import { readRuntimeModuleUrl } from "#resources/scripts/lib/read-runtime-module-url"
 // Client walking integration check: bun scripts/check-walking-directions.mjs
 // Disables walk messages to isolate keyboard, path following and camera projection from server corrections.
 // Diagonal key pairs arrive in one frame so a preceding single-key step is not measured.
@@ -13,11 +14,12 @@ try {
   await walkToMap(page, "south-meadow")
   await page.waitForFunction(() => window.game?.scene?.runtime?.running && window.game.state.get().loading === null, null, { timeout: 180000 })
   await page.waitForFunction(() => !document.querySelector('div[style*="Shippori Mincho"]'))
-  await page.evaluate(async () => {
+  const modules = await Promise.all(["/world/scene/is-free", "/world/scene/walk-h"].map((path) => readRuntimeModuleUrl(page, path)))
+  await page.evaluate(async (modules) => {
     const r = window.game.scene.runtime
     r.events = { ...r.events, walk: () => {} }
-    const occupancy = await import("/world/scene/is-free")
-    const height = await import("/world/scene/walk-h")
+    const occupancy = await import(modules[0])
+    const height = await import(modules[1])
     let cell
     for (let j = 20; j < 76 && !cell; j++)
       for (let i = 20; i < 76 && !cell; i++) {
@@ -32,7 +34,7 @@ try {
       if (scene === window.__scene) window.__walkCheck.camera = camera
       return render(scene, camera)
     }
-  })
+  }, modules)
   const cases = [
     ["w", 0, 1],
     ["w d", 1, 1],

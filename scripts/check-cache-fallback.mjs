@@ -1,3 +1,4 @@
+import { readRuntimeModuleUrl } from "#resources/scripts/lib/read-runtime-module-url"
 // An optional graphics cache that never answers must not prevent entry or resuming.
 import { chromium } from "playwright-core"
 import { mkdir } from "node:fs/promises"
@@ -13,18 +14,19 @@ try {
   })
   await createCharacter(page)
   // Ask for a real generated frame and wait for its worker result, not just scene readiness.
-  await page.evaluate(async () => {
-    const { LOOKS } = await import("/world/game")
-    const { spriteFrame } = await import("/world/scene/sprite-pool")
+  const modules = await Promise.all(["/world/town/travellers", "/world/scene/sprite-frame"].map((path) => readRuntimeModuleUrl(page, path)))
+  await page.evaluate(async (modules) => {
+    const travellers = await import(modules[0])
+    const sprites = await import(modules[1])
     await new Promise((resolve, reject) => {
       const timer = setTimeout(() => reject(Error("Character frame did not render without cache")), 30000)
       const ready = () => {
         clearTimeout(timer)
         resolve()
       }
-      if (spriteFrame(LOOKS[0].look, null, "idle", 0, 0, 10000, ready)) ready()
+      if (sprites.spriteFrame({ look: travellers.LOOKS[0].look, item: null, anim: "idle", view: 0, f: 0, urgency: 10000, onReady: ready })) ready()
     })
-  })
+  }, modules)
   await mkdir("public/tmp", { recursive: true })
   await page.screenshot({ path: "public/tmp/cache-fallback.png" })
   await page.reload()
