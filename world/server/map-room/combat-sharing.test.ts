@@ -10,8 +10,8 @@ import { player } from "#/world/test/player"
 import { durableStorage } from "#/world/test/durable-storage"
 import { initialPlayerRecord } from "#/world/server/initial-player-record"
 import { mapPlayer } from "#/world/server/map-room/map-player"
-import type { Ctx } from "#/world/server/map-room/context"
-import { HANDLERS } from "#/world/server/map-room/combat"
+import type { AttackRequestContext } from "#/world/server/map-room/attack-types"
+import { handleAttack } from "#/world/server/map-room/handle-attack"
 
 vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }))
 vi.mock("#/world/maps/walkable", () => ({ walkable: () => true }))
@@ -61,15 +61,15 @@ it.each(["fallen", "left", "removed", "closed", "duplicate", "eligible", "killer
     const broadcast = vi.fn(async () => {})
     if (scenario === "disconnected-killer") send.mockRejectedValue(Error("Socket closed"))
     if (scenario === "failed-broadcast") broadcast.mockRejectedValue(Error("Socket closed"))
-    const context = {
+    const context: AttackRequestContext = {
       ctx: { params: { mapId: "field" }, connection: { send }, room: { broadcast, getConnections: () => (scenario === "duplicate" ? [connection, duplicate] : [connection]) } },
       key: { map: spawn.map },
-      map: {},
-      me: { owner: "hunter", party: "party", player: mapPlayer("connection", hunter, cell), route: [cell], since: 1000 },
+      map: { size: 1, rows: ["."] },
+      me: { owner: "hunter", party: "party", player: mapPlayer("connection", hunter, cell), route: [cell], since: 1000, said: [], engaged: null },
       save: vi.fn(),
       standUp: vi.fn(async () => true),
-    } as unknown as Ctx
-    await HANDLERS.attack!(context, { type: "attack", monster: spawn.id })
+    }
+    await handleAttack(context, { type: "attack", monster: spawn.id })
     const shared = ["eligible", "duplicate", "disconnected-recipient", "failed-broadcast", "disconnected-killer", "failed-share-save"].includes(scenario)
     expect((await hunterActor.read()).exp).toBe(hunter.exp + (shared ? kind.exp - Math.floor(kind.exp / 2) : kind.exp))
     expect((await hunterActor.read()).bag.some((slot) => slot?.item === "jelly")).toBe(true)

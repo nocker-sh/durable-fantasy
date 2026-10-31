@@ -52,7 +52,7 @@ A* 探索のコスト・前のセル・候補の展開は `lib/engine/grid-path-
 
 初期通知は `send-initial-map-state.ts` が本人の状態、採集資源、生き物、周囲への入場通知の順に送る。`get-initial-map-players.ts` は同じ本人の古い接続を閉じ、本人と未確定の姿を初期一覧へ含めない。`read-initial-map-resources.ts` は初期通知と並行して資源と生き物を読み、読取りの例外も結果として受け止める。本人への初期通知が成功した後に読取りの失敗を呼出し元へ返すため、通知が先に失敗しても並行処理の拒否が未処理の Promise として残らない。入場済みの人数は初期通知の失敗では戻さず、接続の退出処理に任せる。
 
-戦闘の受付は接続と対象のマップを確認し、`prepare-map-attack.ts` が保存済みの能力、到達範囲、立ち上がりを確認する。純粋な `world/core/get-attack-readiness.ts` は生存・技の種類・通常攻撃の間隔・スタミナの順を保持し、技固有の待ち時間と支払は保存先へ任せる。到達範囲は `can-reach-monster.ts`、通常攻撃と技の命中計算の組立ては `world/core/get-attack-blow.ts` が受け持つ。乱数は立ち上がりの受入れ後だけ消費する。
+戦闘の受付は接続と対象のマップを確認し、`prepare-map-attack.ts` が保存済みの能力、到達範囲、立ち上がりを確認する。純粋な `world/core/get-attack-readiness.ts` は生存・技の種類・通常攻撃の間隔・スタミナの順を保持し、技固有の待ち時間と支払は保存先へ任せる。受付と配送の入力は `attack-types.ts` に置き、マップの地形、接続の読取りと送信、周囲への通知など実際に使う範囲だけを型で受け取る。到達範囲は `can-reach-monster.ts`、通常攻撃と技の命中計算の組立ては `world/core/get-attack-blow.ts` が受け持つ。乱数は立ち上がりの受入れ後だけ消費する。
 
 命中の予約と実行は `execute-map-attack.ts`、支払結果と命中の公開は `publish-map-strike.ts`・`notify-map-strike.ts` に分ける。`deliver-map-strike.ts` は保存済みの配送を進めてから反撃を通知し、`reconcile-strike-notices.ts` は本人への最後の配送結果を使う。アラームが討伐や反撃を先に配送していた場合だけ現在の保存状態を読み、イベントなしで補う。本人への結果・命中・反撃の通知の失敗は保存処理を止めず、保存先の読取りや配送の失敗は呼出し元へ返す。
 

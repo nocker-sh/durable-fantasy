@@ -5,7 +5,7 @@ import type { Ctx } from "#/world/server/map-room/context"
 import { presence } from "#/world/server/map-room/presence"
 
 type Props = {
-  context: Pick<Ctx, "ctx" | "me">
+  context: { me: Pick<Ctx["me"], "owner" | "party">; ctx: { room: { getConnections(): Iterable<Pick<Ctx["ctx"]["connection"], "state">> } } }
   data: Pick<PlayerState, "party" | "level">
   life: number
   defense: Fighter

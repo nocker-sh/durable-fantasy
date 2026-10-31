@@ -1,13 +1,14 @@
+import type { AttackRequestContext } from "#/world/server/map-room/attack-types"
 import { Player } from "#/durable-objects/player"
 import { getAttackReadiness } from "#/world/core/get-attack-readiness"
 import { getAttackBlow } from "#/world/core/get-attack-blow"
 import { canReachMonster } from "#/world/server/map-room/can-reach-monster"
 import { notifyClient } from "#/world/server/map-room/notifications"
-import type { Ctx, Message } from "#/world/server/map-room/context"
+import type { Message } from "#/world/server/map-room/context"
 import type { Spawn } from "#/world/core/monster-types"
 import type { PreparedMapAttack } from "#/world/server/map-room/attack-types"
 
-type Props = Readonly<{ room: Ctx; message: Message<"attack">; owner: string; playerId: string; spawn: Spawn }>
+type Props = Readonly<{ room: AttackRequestContext; message: Message<"attack">; owner: string; playerId: string; spawn: Spawn }>
 
 /** 保存済みの能力と距離を確認し、立ち上がれた攻撃だけ命中を抽選する。 */
 export async function prepareMapAttack(props: Props): Promise<PreparedMapAttack | null> {

@@ -3,7 +3,10 @@ import type { Ctx } from "#/world/server/map-room/context"
 import { presence } from "#/world/server/map-room/presence"
 import { notifyClient } from "#/world/server/map-room/notifications"
 
-export async function notifyCombat(context: Pick<Ctx, "ctx" | "me">, notices: CombatNotice[]): Promise<void> {
+type Connection = Pick<Ctx["ctx"]["connection"], "state" | "send">
+type Props = Readonly<{ me: Pick<Ctx["me"], "owner">; ctx: { connection: Pick<Connection, "send">; room: { getConnections(): Iterable<Connection> } } }>
+
+export async function notifyCombat(context: Props, notices: readonly CombatNotice[]): Promise<void> {
   const ctx = context.ctx
   const me = context.me
 

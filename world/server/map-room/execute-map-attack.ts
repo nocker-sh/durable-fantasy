@@ -1,12 +1,13 @@
+import type { AttackRequestContext } from "#/world/server/map-room/attack-types"
 import { Wild } from "#/durable-objects/wild"
 import { combatAudience } from "#/world/server/map-room/combat-audience"
 import { notifyClient } from "#/world/server/map-room/notifications"
 import { publishMapStrike } from "#/world/server/map-room/publish-map-strike"
-import type { Ctx, Message } from "#/world/server/map-room/context"
+import type { Message } from "#/world/server/map-room/context"
 import type { PreparedMapAttack } from "#/world/server/map-room/attack-types"
 
 /** 外れでも占有を予約し、保存先が受け付けた要求だけ支払と命中へ進める。 */
-export async function executeMapAttack(room: Ctx, message: Message<"attack">, attack: PreparedMapAttack): Promise<void> {
+export async function executeMapAttack(room: AttackRequestContext, message: Message<"attack">, attack: PreparedMapAttack): Promise<void> {
   const wild = Wild.get(room.ctx.params.mapId)
   const request = await wild.beginStrike({
     target: attack.spawn.id,
