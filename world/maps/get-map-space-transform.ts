@@ -12,7 +12,7 @@ export function getMapSpaceTransform(maps: MapSpaceRegistry, mapId: string): Map
     if (!map || map.id !== cursor.id) throw new Error(`Map space parent is missing or miskeyed: ${cursor.id}`)
     if (seen.has(cursor.id)) throw new Error(`Map space parent cycle: ${cursor.id}`)
     seen.add(cursor.id)
-    if (!map.space) return { rootMap: cursor.id, transform: new SpatialFrameChain({ frames }) }
+    if (!map.space) return { rootSpace: cursor.id, transform: new SpatialFrameChain({ frames }) }
     try {
       frames.push(getMapSpaceFrame(map.space))
     } catch (error) {

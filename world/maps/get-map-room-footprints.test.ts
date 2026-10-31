@@ -19,7 +19,7 @@ const cases = [
 it.each(cases)("projects exact strip corners under quarter turn $turn", (input) => {
   const map = { id: "inside", space: space(input.turn) },
     original = structuredClone(map)
-  expect(project(map)).toEqual([{ mapId: "inside", roomId: "room", rootMap: "outside", elevationMetres: 5, bounds: input.bounds }])
+  expect(project(map)).toEqual([{ mapId: "inside", roomId: "room", rootSpace: "outside", elevationMetres: 5, bounds: input.bounds }])
   expect(map).toEqual(original)
 })
 it("does not apply display scale to an already metric room", () => {

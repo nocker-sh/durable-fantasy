@@ -13,7 +13,7 @@ it("resolves a physical point and its inverse through parents without applying d
   const maps = fixture(),
     original = structuredClone(maps),
     placement = getMapSpaceTransform(maps, "inside")
-  expect(placement.rootMap).toBe("root")
+  expect(placement.rootSpace).toBe("root")
   expect(placement.transform.toWorld([0, 0, 0])).toEqual([101, 7, 207])
   expect(placement.transform.toLocal([103, 7, 205])).toEqual([2, 0, 2])
   expect(maps).toEqual(original)
@@ -21,7 +21,7 @@ it("resolves a physical point and its inverse through parents without applying d
 it("leaves an unplaced root explicitly named and local", () => {
   const maps = fixture(),
     placement = getMapSpaceTransform(maps, "root")
-  expect(placement.rootMap).toBe("root")
+  expect(placement.rootSpace).toBe("root")
   expect(placement.transform.toWorld([10, 20, 30])).toEqual([10, 20, 30])
   expect(maps.root.space).toBeUndefined()
 })
@@ -53,7 +53,7 @@ it("traverses long chains iteratively in both directions", () => {
   for (const index of Array.from({ length: 1000 }, (_, index) => index))
     maps[`map-${index}`] = { id: `map-${index}`, space: { ...space(index === 0 ? "root" : `map-${index - 1}`), frame: { origin: [1, 1, 1], width: 2, depth: 2, quarterTurns: 0 } } }
   const placement = getMapSpaceTransform(maps, "map-999")
-  expect(placement.rootMap).toBe("root")
+  expect(placement.rootSpace).toBe("root")
   expect(placement.transform.toWorld([0, 0, 0])).toEqual([1000, 1000, 1000])
   expect(placement.transform.toLocal([1000, 1000, 1000])).toEqual([0, 0, 0])
 })

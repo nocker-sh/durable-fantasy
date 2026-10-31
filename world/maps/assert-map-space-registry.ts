@@ -1,7 +1,7 @@
 import { assertMapRoomSeparation } from "#/world/maps/assert-map-room-separation"
 import type { MapSpaceRegistry } from "#/world/maps/map-space-types"
 
-/** Known frames must lead through real, uniquely keyed parents to an unplaced root. */
+/** Known frames must lead through registered, uniquely keyed parents to an explicit spatial root. */
 export function assertMapSpaceRegistry(maps: MapSpaceRegistry): void {
   const checked = new Set<string>()
   for (const id of Object.keys(maps)) {

@@ -8,8 +8,8 @@ export function assertMapRoomSeparation(maps: MapSpaceRegistry): void {
   const roots = new Map<string, Map<number, MapRoomFootprint[]>>()
   for (const map of Object.values(maps))
     for (const current of getMapRoomFootprints(maps, map.id)) {
-      const elevations = roots.get(current.rootMap) ?? new Map<number, MapRoomFootprint[]>()
-      roots.set(current.rootMap, elevations)
+      const elevations = roots.get(current.rootSpace) ?? new Map<number, MapRoomFootprint[]>()
+      roots.set(current.rootSpace, elevations)
       const plane = elevations.get(current.elevationMetres) ?? []
       elevations.set(current.elevationMetres, plane)
       for (const previous of plane)

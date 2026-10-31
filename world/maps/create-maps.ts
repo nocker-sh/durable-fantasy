@@ -1,6 +1,7 @@
 import { OUTDOOR_MAP_DEFINITIONS } from "#/world/maps/outdoor-map-definitions"
 import { connectOutdoorMaps } from "#/world/maps/connect-outdoor-maps"
 import { assertMapSpaceRegistry } from "#/world/maps/assert-map-space-registry"
+import { createMapSpaceRegistry } from "#/world/maps/create-map-space-registry"
 import { assertMapConnections } from "#/world/maps/assert-map-connections"
 import { indoorMaps } from "#/world/maps/indoor-maps"
 import { getIndoorMapName } from "#/world/maps/get-indoor-map-name"
@@ -15,7 +16,7 @@ export function createMaps(): Record<string, MapDefinition> {
   const indoors = indoorMaps(INTERIORS, { sprites: MAP_SPRITES, name: getIndoorMapName, npcs: () => [] })
   const outdoors = connectOutdoorMaps(Object.fromEntries(OUTDOOR_MAP_DEFINITIONS.map((map) => [map.id, map])))
   const maps = { ...Object.fromEntries(Object.values(outdoors).map((map) => [map.id, map.kind === "town" ? withIndoorMapDoors(map, INTERIORS) : map])), ...indoors }
-  assertMapSpaceRegistry(maps)
+  assertMapSpaceRegistry(createMapSpaceRegistry(maps))
   assertMapConnections(maps)
   for (const map of Object.values(maps)) map.npcs = getMapResidents(map)
   return maps

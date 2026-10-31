@@ -12,8 +12,8 @@ export type MapSpace = Readonly<{
   metresPerPlanarUnit: number
 }>
 
-/** Map identity and known placement used by spatial registration, independent of rendering or movement fields. */
+/** Map references and explicit non-playable spatial roots, independent of rendering or movement fields. */
 export type MapSpaceRegistry = Readonly<Record<string, Readonly<{ id: string; space?: MapSpace }>>>
 
-/** A query transform to a named root; this does not assign an absolute world position to that root. */
-export type MapSpaceTransform = Readonly<{ rootMap: string; transform: SpatialFrameChain }>
+/** A query transform to a named spatial root, which need not be a playable map. */
+export type MapSpaceTransform = Readonly<{ rootSpace: string; transform: SpatialFrameChain }>
