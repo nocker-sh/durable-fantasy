@@ -1,3 +1,5 @@
+import { SceneResidentNames } from "#/world/scene/runtime/scene-resident-names"
+import { createResidentNameplate } from "#/world/scene/runtime/create-resident-nameplate"
 import { SceneSpeech } from "#/world/scene/runtime/scene-speech"
 import { SceneInteractions } from "#/world/scene/runtime/scene-interactions"
 import { SceneMovement } from "#/world/scene/runtime/scene-movement"
@@ -56,7 +58,6 @@ import { createEnvironment } from "#/world/scene/runtime/helpers/lighting/create
 import { createLighting } from "#/world/scene/runtime/helpers/lighting/create-lighting"
 import { createPopulation } from "#/world/scene/runtime/population"
 import type { SceneEvents } from "#/world/scene/runtime/types"
-import { NAME_RANGE } from "#/world/scene/runtime/grid"
 
 const builds = new SceneBuildQueue()
 
@@ -328,11 +329,19 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
   }
 
   // ---------------------------------------------------------------- names (DOM over the canvas)
-  const residentLabels = people.map((a) => {
-    const el = document.createElement("div")
-    el.className = "gx-nameplate gx-nameplate--npc"
-    el.textContent = a.name
-    return el
+  const residentNames = new SceneResidentNames({
+    people,
+    me,
+    create: createResidentNameplate,
+    place: (person, element, visible) =>
+      labelProjection.place({
+        element,
+        visible,
+        pos: [person.fig.root.position.x, person.fig.root.position.z],
+        height: person.fig.height,
+        ground: person.fig.root.position.y,
+        offset: 2,
+      }),
   })
   const speech = new SceneSpeech({
     me,
@@ -343,10 +352,9 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
   const bubble = speech.bubble
   function setLayer(el: HTMLElement) {
     walkers.layer = el
-    for (const node of [me.label, ...residentLabels, ...monsters.map((m) => m.label), ...[...remotes.values()].map((w) => w.label), ...speech.elements]) el.appendChild(node)
+    for (const node of [me.label, ...residentNames.elements, ...monsters.map((m) => m.label), ...[...remotes.values()].map((w) => w.label), ...speech.elements]) el.appendChild(node)
   }
   const labelProjection = new SceneLabelProjection({ camera: cam, viewport: camera })
-  let hoveredLabel: HTMLElement | null = null
 
   const clock = new THREE.Clock()
   const v = new THREE.Vector3()
@@ -476,23 +484,7 @@ async function assembleSceneRuntime(props: BuildProps & { resources: CleanupStac
       labelProjection.place({ element: m.label, visible: show, pos: m.pos, height: 0.55, ground: m.groundHeight, offset: 2 })
     }
     combat.update(wall)
-    const nextHoveredLabel = pointer.hovered ? (residentLabels[people.indexOf(pointer.hovered)] ?? null) : null
-    if (nextHoveredLabel !== hoveredLabel) {
-      hoveredLabel?.classList.remove("gx-nameplate--hover")
-      nextHoveredLabel?.classList.add("gx-nameplate--hover")
-      hoveredLabel = nextHoveredLabel
-    }
-    people.forEach((a, i) => {
-      const near = Math.hypot(a.pos[0] - me.pos[0], a.pos[1] - me.pos[1]) < NAME_RANGE || a === pointer.hovered
-      labelProjection.place({
-        element: residentLabels[i],
-        visible: a.fig.root.visible && near,
-        pos: [a.fig.root.position.x, a.fig.root.position.z],
-        height: a.fig.height,
-        ground: a.fig.root.position.y,
-        offset: 2,
-      })
-    })
+    residentNames.update(pointer.hovered)
     const now = performance.now()
     speech.update(now)
     ashfall?.update({ dt: dt, t: t, focus: camFocus, night: 1 - daylight(lighting.minutes) })
