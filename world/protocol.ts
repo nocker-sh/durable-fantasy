@@ -99,7 +99,7 @@ export const clientMessage = z.discriminatedUnion("type", [
     player: playerId,
     at: cellSchema,
     time: z.number().int().min(0).max(1439).optional(),
-    /** following a party member or friend in: allowed a little over the cap */ following: z.boolean().optional(),
+    /** ignored: the room itself sees whether a party mate or friend is in the channel */ following: z.boolean().optional(),
   }),
   /** Walk along these cells, one step apart, starting on or next to the current path. */
   z.object({ type: z.literal("move"), path: z.array(cellSchema).min(1).max(MAX_PATH) }),
