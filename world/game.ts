@@ -196,7 +196,8 @@ export class Game {
   preview(command: Command): Reason | null {
     const player = this.state.get().player
     if (!player) return "OFFLINE"
-    const result = apply(player, command)
+    // the same clock as the server's waits (skills and medicine), or a past wait would still hold
+    const result = apply(player, command, { now: Date.now() })
     return result.ok ? null : result.reason
   }
 
@@ -491,8 +492,11 @@ export class Game {
           },
           gatherAt: (node) => this.gather(node),
           swing: (monster) => {
-            this.session.fighting = { monster, at: performance.now() }
-            this.session.socket?.send({ type: "attack", monster })
+            const at = performance.now()
+            const art = this.session.art && at - this.session.art.at <= 4000 ? this.session.art.skill : null
+            this.session.fighting = { monster, at }
+            this.session.art = null
+            this.session.socket?.send({ type: "attack", monster, ...(art ? { art } : {}) })
           },
           stationAt: (station) => (station === "exchange-board" ? this.openBoard() : this.update({ craft: station })),
           tick: () => this.onTick(),

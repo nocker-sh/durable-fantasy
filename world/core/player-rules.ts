@@ -19,7 +19,7 @@ export const MAX_STAMINA = 100
 /** fullness falls by one every this many ms */
 export const DIGEST_MS = 3 * 60_000
 
-/** HP and SP come back this often while up and about (more with VIT and INT, twice as much sitting) */
+/** HP and SP come back this often while up and about (a share of each maximum, so VIT and MND raise it; twice as much sitting) */
 export const REGEN_MS = 20_000
 
 export const DEFAULT_NAME = "シグレニ"

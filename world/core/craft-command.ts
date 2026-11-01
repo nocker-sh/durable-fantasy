@@ -33,7 +33,7 @@ export function craft(state: PlayerState, command: Extract<ServerCommand, { type
   if ((command.roll * 15485863) % 1 < failChance(skill, recipe.min)) {
     const grown = gainLife(state.life, recipe.skill, Math.floor(craftExp(recipe.min) / 2))
     return accept(
-      { ...state, bag: materials.bag, gold: state.gold - station.fee, stamina: state.stamina - cost, life: grown.life },
+      { ...state, bag: materials.bag, gold: state.gold - station.fee, stamina: state.stamina - cost, life: grown.life, sitting: false },
       { type: "spoiled", recipe: recipe.id, skill: recipe.skill, level: grown.level, up: grown.up, fee: station.fee },
     )
   }
@@ -43,7 +43,7 @@ export function craft(state: PlayerState, command: Extract<ServerCommand, { type
   if (!added) return reject("BAG_FULL")
   const grown = gainLife(state.life, recipe.skill, craftExp(recipe.min))
   return accept(
-    { ...state, bag: added, gold: state.gold - station.fee, stamina: state.stamina - cost, life: grown.life },
+    { ...state, bag: added, gold: state.gold - station.fee, stamina: state.stamina - cost, life: grown.life, sitting: false },
     { type: "crafted", item: out.item, count: out.count, q, skill: recipe.skill, level: grown.level, up: grown.up, fee: station.fee },
   )
 }

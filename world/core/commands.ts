@@ -175,6 +175,8 @@ export type Reason =
   | "NOT_TRADABLE"
   | "COOLDOWN"
   | "SP_SHORT"
+  | "WALKING"
+  | "MEDICINE_WAIT"
 
 export type GameEvent =
   | { type: "bought"; item: ItemId; count: number; cost: number; by?: string }
@@ -266,4 +268,6 @@ export const REASON_TEXT: Record<Reason, string> = {
   NOT_TRADABLE: "それは渡せない。",
   COOLDOWN: "まだ使えない。",
   SP_SHORT: "SP が足りない。",
+  WALKING: "歩きながらは座れない。",
+  MEDICINE_WAIT: "まだ次の薬は使えない。",
 }

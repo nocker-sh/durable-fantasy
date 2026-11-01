@@ -14,5 +14,8 @@ export async function handleCraft(roomCtx: Ctx, message: Message<"craft">): Prom
   const station = stationAt(message.station)
   const answer = (result: Transition) => ctx.connection.send({ type: "result", seq: message.seq, result })
   if (!station || station.map !== key.map || !near(me, station.cell, REACH + 1)) return answer({ ok: false, reason: "TOO_FAR" })
-  return answer(await Player.get(me.owner).run({ type: "craft", recipe: message.recipe, station: station.id, roll: Math.random() }))
+  const result = await Player.get(me.owner).run({ type: "craft", recipe: message.recipe, station: station.id, roll: Math.random() })
+  // working at a station gets them up; keep the room's posture with the saved one before answering
+  if (result.ok) roomCtx.save({ sitting: result.state.sitting })
+  return answer(result)
 }

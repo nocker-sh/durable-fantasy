@@ -8,5 +8,5 @@ import type { PlayerState } from "#/world/core/player-types"
 export function share(state: PlayerState, command: Extract<ServerCommand, { type: "share" }>): Transition {
   const grown = growCombatPlayer(state, command.exp)
 
-  return accept(grown.state, { type: "shared", monster: command.monster, exp: command.exp, level: grown.state.level, gained: grown.gained })
+  return accept(grown.state, { type: "shared", monster: command.monster, exp: grown.exp, level: grown.state.level, gained: grown.gained })
 }

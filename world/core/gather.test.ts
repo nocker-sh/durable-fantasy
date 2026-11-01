@@ -60,6 +60,11 @@ describe("gathering", () => {
     expect(result.events[0]).toMatchObject({ type: "gathered", broke: "wood-axe" })
   })
 
+  it("gathering gets a sitting player up", () => {
+    const r = apply(player({ sitting: true }), { type: "gather", node: herb.id, roll: 0.1 })
+    expect(r.ok && r.state.sitting).toBe(false)
+  })
+
   it("too tired to gather at all", () => {
     expect(apply(player({ stamina: 1 }), { type: "gather", node: herb.id, roll: 0.1 })).toEqual({ ok: false, reason: "EXHAUSTED" })
   })

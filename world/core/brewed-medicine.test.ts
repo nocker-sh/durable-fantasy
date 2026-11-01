@@ -44,3 +44,16 @@ it.each(["blue-potion", "orange-potion"] as const)("still uses an unmarked saved
   expect(used.state.hp - p.hp).toBe(ITEMS[id].use!.hp ?? 0)
   expect(used.state.sp - p.sp).toBe(ITEMS[id].use!.sp ?? 0)
 })
+
+it("brewing gets a sitting player up", () => {
+  const recipe = RECIPES.find((r) => r.id === "potion")!
+  const p = player({
+    gold: 100,
+    sitting: true,
+    life: { ...player().life, alchemy: lifeExpAt(LIFE_CAP) },
+    bag: bagWith(...recipe.inputs.map((i) => [i.item, i.count] as [ItemId, number])),
+  })
+  const result = apply(p, { type: "craft", recipe: "potion", station: "workshop-hearth", roll: 0.2 })
+  if (!result.ok) throw Error(result.reason)
+  expect(result.state.sitting).toBe(false)
+})

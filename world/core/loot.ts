@@ -23,6 +23,6 @@ export function loot(state: PlayerState, command: Extract<ServerCommand, { type:
 
   return accept(
     { ...grown.state, bag: collected.bag, stamina: Math.max(0, state.stamina - FIGHT_STAMINA) },
-    { type: "looted", monster: command.monster, exp: command.exp, items: kept, left: left, level: grown.state.level, gained: grown.gained },
+    { type: "looted", monster: command.monster, exp: grown.exp, items: kept, left: left, level: grown.state.level, gained: grown.gained },
   )
 }

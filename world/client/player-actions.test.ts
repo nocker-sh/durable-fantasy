@@ -16,7 +16,7 @@ it("does not send a repeated art during its cooldown and accepts it at the deadl
   const send = vi.fn()
   const notify = vi.fn()
   session.socket = { send } as unknown as VoidSocket<"/map/:mapId">
-  session.fighting = { monster: "test-monster", at: performance.now() }
+  session.fighting = { monster: "test-monster", at: performance.now() - 2000 }
   session.state.set((s) => ({
     ...s,
     player: player({
@@ -32,6 +32,18 @@ it("does not send a repeated art during its cooldown and accepts it at the deadl
   vi.setSystemTime(2000)
   actions.useSkill("pierce")
   expect(send).toHaveBeenCalledExactlyOnceWith({ type: "attack", monster: "test-monster", art: "pierce" })
+})
+
+it("holds an art pressed right after a swing for the next swing", () => {
+  const session = new GameSession()
+  const send = vi.fn()
+  session.socket = { send } as unknown as VoidSocket<"/map/:mapId">
+  session.fighting = { monster: "test-monster", at: performance.now() }
+  session.state.set((s) => ({ ...s, player: player({ equipment: { ...emptyEquipment(), weapon: "dagger" }, stats: { ...player().stats, dex: 9 } }) }))
+  const actions = new PlayerActions({ session, notify: vi.fn(), run: vi.fn(), lookAtShop: vi.fn(), getScene: () => null, update: vi.fn() })
+  actions.useSkill("pierce")
+  expect(send).not.toHaveBeenCalled()
+  expect(session.art).toMatchObject({ skill: "pierce" })
 })
 
 it.each([true, false])("returns the authoritative gathering outcome %s after the reply", async (accepted) => {
@@ -73,7 +85,7 @@ it("rejects an art with insufficient SP locally and sends it after regeneration 
   const send = vi.fn()
   const notify = vi.fn()
   session.socket = { send } as unknown as VoidSocket<"/map/:mapId">
-  session.fighting = { monster: "test-monster", at: performance.now() }
+  session.fighting = { monster: "test-monster", at: performance.now() - 2000 }
   const p = player({
     equipment: { ...emptyEquipment(), weapon: "dagger" },
     stats: { ...player().stats, dex: 9 },
@@ -88,7 +100,7 @@ it("rejects an art with insufficient SP locally and sends it after regeneration 
   expect(send).not.toHaveBeenCalled()
   expect(notify).toHaveBeenCalledWith(REASON_TEXT.SP_SHORT, "bad")
   vi.setSystemTime(61000)
-  session.fighting.at = performance.now()
+  session.fighting.at = performance.now() - 2000
   actions.useSkill("pierce")
   expect(send).toHaveBeenCalledExactlyOnceWith({ type: "attack", monster: "test-monster", art: "pierce" })
   expect(session.state.get().player).toEqual(before)

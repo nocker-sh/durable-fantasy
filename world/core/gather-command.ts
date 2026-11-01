@@ -18,6 +18,7 @@ import { accept } from "#/world/core/accept"
 import { reject } from "#/world/core/reject"
 import type { Transition } from "#/world/core/transition"
 
+/** 採るには立ち上がる（game-system.md §9.2）。 */
 export function gather(state: PlayerState, command: Extract<ServerCommand, { type: "gather" }>, now: number): Transition {
   const node = nodeOf(command.node)
   if (!node) return reject("SPENT")
@@ -34,7 +35,7 @@ export function gather(state: PlayerState, command: Extract<ServerCommand, { typ
   if (!added) return reject("BAG_FULL")
   const grown = gainLife(state.life, node.skill, GATHER_EXP)
   return accept(
-    { ...state, bag: added, equipment: wornTool.equipment, worn: wornTool.worn, stamina: state.stamina - cost, life: grown.life },
+    { ...state, bag: added, equipment: wornTool.equipment, worn: wornTool.worn, stamina: state.stamina - cost, life: grown.life, sitting: false },
     { type: "gathered", item: got.item, count: got.count, skill: node.skill, level: grown.level, up: grown.up, broke: wornTool.broke },
   )
 }
