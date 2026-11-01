@@ -19,6 +19,9 @@ import { across } from "#/world/town/floorplan/across"
 import { along } from "#/world/town/floorplan/along"
 import { Floor } from "#/world/town/floorplan/placement"
 
+/** What a shop sells from its floor: the goods on its shelves and in its baskets. */
+const GOODS = /商品棚|薬棚|陳列|^(パン籠|果物籠|野菜籠|魚桶)$/
+
 function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"): FloorPlan {
   // the wall with the door is the front: a door in the east or west wall turns the inside a quarter round,
   // so the room is as wide along its door wall, and as deep behind it, as the house outside
@@ -233,7 +236,14 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
             f0.againstWall({ name: name, w: s.w, d: s.d, front: s.front, room: r, sides: sides, from: from })),
       )
     // where it was meant to go, else any other room downstairs but the sleeping corner
-    const p = tryIn(room, true) ?? rooms.filter((r) => r.floor === 0 && r !== room && r.use !== "寝間").reduce<Placed | null>((got, r) => got ?? tryIn(r, false), null)
+    // (the customers' shop floor last, unless it is on sale there)
+    const others = rooms.filter((r) => r.floor === 0 && r !== room && r.use !== "寝間")
+    const p =
+      tryIn(room, true) ??
+      [...others.filter((r) => r.use !== "売り場" || GOODS.test(name)), ...others.filter((r) => r.use === "売り場" && !GOODS.test(name))].reduce<Placed | null>(
+        (got, r) => got ?? tryIn(r, false),
+        null,
+      )
     if (!p && !inputProps.quiet) unplaced.push(name)
     return p
   }
@@ -479,7 +489,6 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
   // a hall keeps its stores, its crockery and its fuel in its kitchen
   const store = rooms.find((r) => r.floor === 0 && r.use === "貯蔵") ?? (hall && kitchen ? kitchen : work)
   // the goods on sale stand in the shop, along its side and front walls
-  const GOODS = /商品棚|薬棚|陳列|^(パン籠|果物籠|野菜籠|魚桶)$/
   const forSale = (n: string) => !!shop && GOODS.test(n) && (n.endsWith("棚") || !!h.shop)
   for (const name of take((n) => SHELVES.test(n))) place({ name: name, room: forSale(name) ? shop : store, how: "wall", at: undefined, sides: forSale(name) ? ["w", "e", "s"] : ["n", "w", "e"] })
   // containers by the door in the entry, or in the stores; beds and chests in their sleepers' rooms
