@@ -22,7 +22,7 @@ const houses: readonly HouseDef[] = [
     seed: 91,
     sign: "key",
     ramp: "plaster",
-    plan: home([room("預かり場", 0), room("倉", 0), room("居間兼台所", 0), bed("ヒルデとゲオルクの部屋", 1, 2)], ["帳場", "棚×3", "木箱×3", "食卓", "樽×2", "寝台（二人用）", "椅子×2"]),
+    plan: home([room("預かり場", 0), room("倉", 0), bed("ヒルデとゲオルクの部屋", 1, 2), room("居間兼台所", 0)], ["帳場", "棚×3", "木箱×3", "食卓", "樽×2", "寝台（二人用）", "椅子×2"]),
   },
   {
     id: "guardhouse",

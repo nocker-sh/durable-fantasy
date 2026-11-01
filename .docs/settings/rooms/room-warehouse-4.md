@@ -1,6 +1,6 @@
 ---
 {
-  "id": "room-warehouse-household",
+  "id": "room-warehouse-4",
   "kind": "rooms",
   "source": "world/town/houses.ts",
   "town": "town-phanthiet",

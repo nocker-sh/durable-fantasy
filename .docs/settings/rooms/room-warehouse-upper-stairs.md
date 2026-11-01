@@ -80,7 +80,7 @@
         15
       ],
       "width_cells": 2,
-      "target": "room-warehouse-household",
+      "target": "room-warehouse-4",
       "target_door": [
         0,
         4

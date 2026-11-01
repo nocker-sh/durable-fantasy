@@ -2195,9 +2195,9 @@
       "source": "world/town/houses.ts"
     },
     {
-      "id": "room-warehouse-household",
+      "id": "room-warehouse-4",
       "kind": "rooms",
-      "file": "rooms/room-warehouse-household.md",
+      "file": "rooms/room-warehouse-4.md",
       "source": "world/town/houses.ts"
     },
     {
