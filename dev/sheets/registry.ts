@@ -5,6 +5,7 @@ import { maps, world } from "#/dev/sheets/maps"
 import { shops, batches, makers } from "#/dev/sheets/shops"
 import { recipes, stations, commissions, errands, nodes } from "#/dev/sheets/crafting"
 import { monsters, skills, life } from "#/dev/sheets/combat"
+import { monsterDrafts } from "#/dev/sheets/monster-drafts"
 import { objects } from "#/dev/sheets/objects"
 import { uiIcons, textures, ramps, parts, presets, motions, anims } from "#/dev/sheets/art"
 import { lines, events, messages, flavor, lettering } from "#/dev/sheets/dialogue"
@@ -26,6 +27,7 @@ export const SHEETS: Sheet[] = [
   commissions,
   errands,
   monsters,
+  monsterDrafts,
   nodes,
   skills,
   life,

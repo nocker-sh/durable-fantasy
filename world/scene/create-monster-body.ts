@@ -1,13 +1,20 @@
 import { hareBody } from "#/world/scene/fields/hare-body"
 import { slimeBody } from "#/world/scene/fields/slime-body"
+import { figureBody } from "#/world/scene/fields/figure-body"
 import type { MonsterKind } from "#/world/core/monster-types"
 import type { Group } from "three"
-type Props = Pick<MonsterKind, "look" | "color" | "size">
+type Props = Pick<MonsterKind, "look" | "color" | "size" | "figure">
 
 /** The live scene and definition viewer use the same archetype, palette and authored scale. */
 export function createMonsterBody(kind: Props): Group {
   if (kind.look === "slime") {
     const body = slimeBody(kind.color ?? 0x8ac06a)
+    body.scale.setScalar(kind.size ?? 1)
+    return body
+  }
+
+  if (kind.look === "figure" && kind.figure) {
+    const body = figureBody(kind.figure)
     body.scale.setScalar(kind.size ?? 1)
     return body
   }

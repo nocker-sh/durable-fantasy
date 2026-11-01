@@ -16,6 +16,7 @@ export const SOURCES: Record<string, readonly string[]> = {
   commissions: ["COMMISSIONS"],
   errands: ["ERRANDS"],
   monsters: ["MONSTER_KINDS", "SPAWNS", "HARE_BODY_PARTS"],
+  "monster-drafts": ["MONSTER_DRAFTS"],
   nodes: ["NODES", "LATER_SPOTS"],
   skills: ["SKILLS", "SKILL_IDS"],
   life: ["LIFE_SKILLS", "LIFE_MILESTONE_TEXT", "MILESTONES"],
