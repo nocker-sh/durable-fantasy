@@ -585,7 +585,7 @@ const baseRoutines: Record<string, readonly Slot[]> = {
   ],
   ヴァレンティン: [
     at({ from: "05:00", where: "home", doing: "起きて母の手伝い" }),
-    at({ from: "06:00", where: "work", doing: "鶏を追って遊ぶ" }),
+    at({ from: "06:00", where: { map: "phanthiet-fields", tile: [5.4, 23.2] }, doing: "鶏を追って遊ぶ" }),
     at({ from: "09:00", where: P("phanthiet-fields", "sties"), doing: "バスティアンと豚を見る" }),
     at({ from: "10:30", where: "work", doing: "井戸のそばで遊ぶ" }),
     at({ from: "15:30", where: "home", doing: "夕餉" }),

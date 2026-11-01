@@ -6,6 +6,7 @@ const patterns: ReadonlyArray<Readonly<{ pattern: RegExp; kind: FurnitureKind }>
   { pattern: /^長椅子$/, kind: "bench" },
   { pattern: /椅子/, kind: "chair" },
   { pattern: /寝台/, kind: "bed" },
+  { pattern: /^揺りかご$/, kind: "bed" },
   { pattern: /^水甕$/, kind: "water-jar" },
   { pattern: /^(樽|酒樽|仕込み樽|塩漬けの樽|魚桶|洗濯桶|乳の桶|撹乳桶|大鍋)$/, kind: "barrel" },
   { pattern: /^荷車$/, kind: "parked-cart" },
