@@ -26,7 +26,7 @@ const DEFINITIONS = {
   // ---------------------------------------------------------------- baked, cooked and poured (made by someone: §4.2.1)
   "rye-bread": dish({ name: "黒パン", price: 6, use: { hp: 12, stamina: 14, full: 18 }, icon: "bread", description: "どっしりした黒パン。一つで半日もつ。" }),
   roll: dish({ name: "白パン", price: 3, use: { hp: 6, stamina: 6, full: 8 }, icon: "roll", description: "小さくて柔らかい丸パン。", weight: 1 }),
-  "apple-pie": dish({ name: "りんごのパイ", price: 16, use: { hp: 18, stamina: 14, full: 16, warm: 5 }, icon: "pie", description: "蔵で寝かせたりんごを詰めて焼いた。焼きたては湯気が立つ。" }),
+  "apple-pie": dish({ name: "りんごのパイ", price: 16, use: { hp: 18, stamina: 14, full: 16, warm: 5 }, icon: "pie", description: "土間で寝かせたりんごを詰めて焼いた。焼きたては湯気が立つ。" }),
   "honey-cake": dish({ name: "蜜の焼き菓子", price: 12, use: { hp: 10, sp: 6, stamina: 10, full: 10 }, icon: "honeyCake", description: "農家の巣箱の蜜を練り込んだ。甘い匂いがする。", weight: 2 }),
   cheese: { ...dish({ name: "チーズ", price: 10, use: { hp: 18, stamina: 10, full: 12 }, icon: "cheese", description: "羊の乳で作ったチーズ。" }), rarity: "fine" },
   wine: { ...dish({ name: "ぶどう酒", price: 12, use: { sp: 6, stamina: 4, full: 4, warm: 15 }, icon: "jug", description: "醸造所で仕込んだ酒。", weight: 5 }), rarity: "fine", drink: true },

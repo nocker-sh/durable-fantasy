@@ -9,7 +9,7 @@ export const SHOPS = {
     kind: "food",
     map: "phanthiet",
     keepers: ["オットー"],
-    greeting: "蔵で寝かせた果物は甘いよ。",
+    greeting: "土間で寝かせた果物は甘いよ。",
     stock: ["apple", "green-apple", "pear", "plum", "grape", "dried-apple"],
   },
   vegetables: {

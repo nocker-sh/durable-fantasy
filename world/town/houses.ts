@@ -44,9 +44,15 @@ export const HOUSEHOLDS: readonly Household[] = [
     name: "魚屋のヤコブとエルザ",
     members: ["ヤコブ", "エルザ", "パウル", "レナ"],
     living: "ふつう",
-    trade: "川の漁と、浜の網小屋での海の漁と魚屋。エルザは洗濯の仕事。息子のパウルが網を手伝う",
+    trade: "川の漁と、浜の網小屋での海の漁と魚屋。エルザは洗濯の仕事と夜市の揚げ菓子。息子のパウルが網を手伝う",
   },
-  { id: "greengrocer", name: "八百屋のグレーテとアンナ", members: ["グレーテ", "アンナ"], living: "ふつう", trade: "野菜の店（キャベツはカールの畑、根菜は町の菜園から）と洗濯の仕事（姉妹）" },
+  {
+    id: "greengrocer",
+    name: "八百屋のグレーテとアンナ",
+    members: ["グレーテ", "アンナ"],
+    living: "ふつう",
+    trade: "野菜と酢漬けの店（キャベツはカールの畑、根菜は町の菜園から。酢漬けは姉妹で漬ける）と洗濯の仕事（姉妹）",
+  },
   {
     id: "fruit",
     name: "果物屋のオットーとクララ",
@@ -56,7 +62,7 @@ export const HOUSEHOLDS: readonly Household[] = [
   },
   { id: "elder", name: "ヴィルヘルムと孫娘のゾフィー", members: ["ヴィルヘルム", "ゾフィー"], living: "ゆとりがある", trade: "隠居と庭仕事。暮らしは空き家の貸し賃で立てる" },
   { id: "well", name: "ヘレナと娘のリーゼル", members: ["ヘレナ", "リーゼル"], living: "慎ましい", trade: "ヘレナは繕い物、リーゼルは水汲み" },
-  { id: "carter", name: "ルカスとベルタ", members: ["ルカス", "ベルタ", "エミール"], living: "ふつう", trade: "荷運びと機織り" },
+  { id: "carter", name: "ルカスとベルタ", members: ["ルカス", "ベルタ", "エミール"], living: "ふつう", trade: "荷運び（ルカス）と、糸紡ぎと機織りと古着の繕い売り（ベルタ）" },
   {
     id: "lamp",
     name: "灯り直しのアウグスト",
