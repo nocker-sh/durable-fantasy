@@ -10,6 +10,7 @@ export function tradeClosedText(reason: string): string {
     LEFT: "相手がいなくなった。",
     BUSY: "今は取引できない。",
     TOO_FAR: "相手が遠すぎる。",
+    WAIT: "続けては申し込めない。",
   }
   const reasons: Readonly<Record<string, string | undefined>> = REASON_TEXT
   return text[reason] ?? (reason in reasons ? `取引できなかった: ${reasons[reason]}` : "取引できなかった。")

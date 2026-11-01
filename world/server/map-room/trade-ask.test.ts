@@ -5,6 +5,9 @@ import { newPlayer } from "#/world/core/new-player"
 import type { Presence } from "#/world/server/map-room/presence"
 import type { ServerMessage } from "#/world/protocol"
 
+const rpc = vi.hoisted(() => ({ pace: vi.fn(async () => true) }))
+vi.mock("#/durable-objects/player", () => ({ Player: { get: () => ({ pace: rpc.pace }) } }))
+
 function fixture() {
   const trace: string[] = []
   const me: Presence = { owner: "sender", player: mapPlayer("sender", newPlayer(), [10, 10]), route: [[10, 10]], since: Date.now(), said: [], engaged: null }
@@ -51,4 +54,12 @@ it("keeps availability ahead of distance and does not replace the peer's state",
   expect(request.send).toHaveBeenCalledExactlyOnceWith({ type: "trade-closed", reason: "BUSY" })
   expect(request.save).not.toHaveBeenCalled()
   expect(request.other).toEqual(before)
+})
+
+it("refuses another ask within a few seconds of the last", async () => {
+  const request = fixture()
+  rpc.pace.mockResolvedValueOnce(false)
+  await handleTradeAsk(request.room, { type: "trade-ask", target: "peer" })
+  expect(request.send).toHaveBeenCalledExactlyOnceWith({ type: "trade-closed", reason: "WAIT" })
+  expect(request.save).not.toHaveBeenCalled()
 })

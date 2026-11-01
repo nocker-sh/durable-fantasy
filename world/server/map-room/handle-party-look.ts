@@ -1,6 +1,7 @@
 import { Party } from "#/durable-objects/party"
 import { Player } from "#/durable-objects/player"
 import { derive } from "#/world/core/derive"
+import { PARTY_LOOK_GAP_MS } from "#/world/core/pace-rules"
 import { partyView } from "#/world/server/map-room/party-view"
 import { sendPartyChat } from "#/world/server/map-room/send-party-chat"
 import { clearPartyMembership } from "#/world/server/map-room/clear-party-membership"
@@ -13,10 +14,13 @@ export async function handlePartyLook(room: Props, message: Message<"party-look"
   const me = room.me
   if (!me.owner || !me.player) return
   if (!me.party) return room.ctx.connection.send({ type: "party", view: null })
+  const now = Date.now()
+  if (me.lookedAt !== undefined && now - me.lookedAt < PARTY_LOOK_GAP_MS) return
+  room.save({ lookedAt: now })
   const player = await Player.get(me.owner).read()
   const polled = await Party.get(me.party).poll({
     owner: me.owner,
-    status: { name: me.player.name, level: player.level, hp: player.hp, maxHp: derive(player).maxHp, map: room.map.name, at: Date.now() },
+    status: { name: me.player.name, level: player.level, hp: player.hp, maxHp: derive(player).maxHp, map: room.map.name, at: now },
     after: message.chat?.party === me.party ? message.chat.seq : 0,
   })
   if (!polled.party.members.some((member) => member.owner === me.owner)) return clearPartyMembership(room, me.owner)

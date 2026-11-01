@@ -7,6 +7,7 @@ import type { CombatDelivery } from "#/world/core/combat-delivery-types"
 import type { CombatPayment } from "#/world/core/combat-payment"
 import type { TradeParticipant } from "#/world/server/trade-coordinator"
 import { restoreSavedPlayer } from "#/world/server/restore-saved-player"
+import type { PaceKind } from "#/world/core/pace-rules"
 
 export type PlayerRecord = TradeParticipant & {
   credential: string | null
@@ -19,6 +20,8 @@ export type PlayerRecord = TradeParticipant & {
   shopReceipts: Record<string, ShopReceipt>
   gatherReceipts: Record<string, GatherReceipt>
   combatLife: number
+  /** when this player last asked someone or shouted (server/pace-player.ts); missing in older saves */
+  paces?: Partial<Record<PaceKind, number>>
 }
 
 export type MigrationFields = Partial<PlayerRecord> & { combatRevision?: number }

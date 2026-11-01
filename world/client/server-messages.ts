@@ -211,6 +211,10 @@ export class ServerMessages {
           this.target.enterMap("phanthiet", null)
           return
         }
+        if (message.what === "say") {
+          this.target.addChat({ channel: "system", text: "続けては叫べない。" })
+          return
+        }
         if (message.what === "party-chat") {
           this.target.addChat({ channel: "system", text: message.reason === "RATE_LIMIT" ? "続けては話せない。" : "パーティに入っていない。" })
           return

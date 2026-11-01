@@ -1,4 +1,6 @@
 import { Party } from "#/durable-objects/party"
+import { Player } from "#/durable-objects/player"
+import { ASK_GAP_MS } from "#/world/core/pace-rules"
 import { presence } from "#/world/server/map-room/presence"
 import { getPartyInvitationRejection } from "#/world/server/map-room/get-party-invitation-rejection"
 import type { Ctx, Message } from "#/world/server/map-room/context"
@@ -22,6 +24,10 @@ export async function handlePartyInvite(roomCtx: Props, message: Message<"party-
       await ctx.connection.send({ type: "party-closed", reason })
       return
     }
+  }
+  if (!(await Player.get(me.owner).pace({ kind: "ask", gap: ASK_GAP_MS }))) {
+    await ctx.connection.send({ type: "party-closed", reason: "WAIT" })
+    return
   }
   roomCtx.save({ inviting: them.id })
   await them.send({ type: "party-invited", from: ctx.connection.id, name: me.player.name })

@@ -39,6 +39,8 @@ export type Presence = {
   /** the party they are in (core/party.ts), and whom they have asked to join it */
   party?: string | null
   inviting?: string
+  /** when they last looked up their party (core/pace-rules.ts) */
+  lookedAt?: number
   /** whom they have asked to swap muffler threads with (core/threads.ts) */
   threading?: string
 }

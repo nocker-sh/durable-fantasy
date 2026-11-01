@@ -42,7 +42,8 @@ function fixture() {
     return { ok: true, state: newPlayer(), events: [] }
   })
   rpc.party.mockReturnValue({ view, leave, setMode })
-  rpc.player.mockReturnValue({ run })
+  const pace = vi.fn(async () => true)
+  rpc.player.mockReturnValue({ run, pace })
   const room = { me, save, ctx: { connection: { id: "sender", send }, room: { getConnection: () => peer } } }
   return { room, me, peer, send, save, party, view, leave, setMode, run, trace }
 }
@@ -61,7 +62,7 @@ it("saves an invitation before sending it without enrolling the peer", async () 
   expect(request.trace).toEqual(["save", "invite"])
   expect(request.save).toHaveBeenCalledExactlyOnceWith({ inviting: "peer" })
   expect(request.peer.state.party).toBeNull()
-  expect(rpc.player).not.toHaveBeenCalled()
+  expect(request.run).not.toHaveBeenCalled()
 })
 
 it("rejects a non-leader before saving or sending an invitation", async () => {
