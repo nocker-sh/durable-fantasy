@@ -3,6 +3,10 @@ import { type RGB } from "#/lib/graphics/pixel-types"
 
 export const PPU = 32
 
+/** What a building's surfaces end up at, in texture pixels to a unit: painted finer, then shrunk to
+ * chunky texels with the old consoles' dither (lib/graphics/downsample-dithered.ts). */
+export const TEXEL_PPU = 16
+
 const S = PPU / 16
 
 /** A ramp's colour at a level (0 darkest), clamped. */

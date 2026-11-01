@@ -1,7 +1,8 @@
 import { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
 import { pick } from "#/world/scene/pick"
 import { RAMPS } from "#/world/scene/pix"
-import { PPU } from "#/world/scene/textures/palette"
+import { PPU, TEXEL_PPU } from "#/world/scene/textures/palette"
+import { downsampleDithered } from "#/lib/graphics/downsample-dithered"
 import { plasterWall } from "#/world/scene/textures/plaster-wall"
 import { ToneMap } from "#/world/scene/textures/tone-map"
 
@@ -29,12 +30,12 @@ export function gableTex(props: Props): PixBuf {
     return { ...p, level: p.level - Math.max(0, 1 - y / H) * 0.4 }
   })
   t.strokes({ seed: props.seed, density: 0.1, along: "x", len: [2, 5], thick: [1, 2], step: 0.5, bleed: 0.06 })
-  const b = t.paint(0.18)
+  const b = t.paint(0.1)
   // small attic vent
   const cx = W >> 1,
     cy = Math.round(H * 0.55)
   for (const y = { value: cy - 6 }; y.value < cy + 6; y.value++)
     for (const x = { value: cx - 8 }; x.value < cx + 8; x.value++)
       if (Math.abs(x.value - cx + 0.5) > 3 && (x.value + y.value) % 4 !== 0) b.set({ x: x.value, y: y.value, color: pick({ ramp: "glass", b: 0.2, x: x.value, y: y.value, dither: 0.2 }) })
-  return b
+  return downsampleDithered(b, PPU / TEXEL_PPU)
 }
