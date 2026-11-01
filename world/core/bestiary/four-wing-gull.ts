@@ -1,0 +1,52 @@
+import type { MonsterDraft } from "#/world/core/monster-draft-types"
+
+/** A cliff gull with a second, smaller pair of wings behind the first, from a wartime carrier bird. */
+export const draft: MonsterDraft = {
+  home: "sea-cliff",
+  life: "崖下の潮だまりで小魚や貝を拾って食べ、崖の岩棚に群れで巣を作って休む。人が近づくと鳴きながら飛び立って少し先の岩に降りる。",
+  origin: "大戦で重い荷を吊って飛んだ鳥の兵器の子孫で、後ろの小さなもう一対の羽だけが残った。",
+  kind: {
+    name: "四つ羽かもめ",
+    hp: 96,
+    def: 3,
+    flee: 24,
+    atk: 12,
+    hit: 20,
+    exp: 46,
+    respawn: 150,
+    look: "figure",
+    size: 1.1,
+    drops: [
+      { item: "feather", chance: 0.65 },
+      { item: "old-bone", chance: 0.1 },
+    ],
+    figure: {
+      palette: { hide: 0x8e949a, belly: 0xdcdcd2, dark: 0x34383e, accent: 0xc0a058, eye: 0x18181c },
+      parts: [
+        { shape: "ball", size: [0.095, 0.088, 0.18], at: [0, 0.29, -0.01], turn: [0.12, 0, 0], paint: "belly" },
+        { shape: "ball", size: [0.08, 0.08, 0.085], at: [0, 0.31, 0.09], paint: "belly" },
+        { shape: "ball", size: [0.05, 0.06, 0.05], at: [0, 0.37, 0.12], paint: "belly" },
+        { shape: "ball", size: [0.064, 0.06, 0.072], at: [0, 0.43, 0.15], paint: "belly" },
+        { shape: "box", size: [0.026, 0.026, 0.09], at: [0, 0.42, 0.245], paint: "accent" },
+        { shape: "box", size: [0.026, 0.03, 0.02], at: [0, 0.405, 0.28], paint: "accent" },
+        { shape: "box", size: [0.018, 0.018, 0.018], at: [-0.055, 0.445, 0.17], paint: "eye" },
+        { shape: "box", size: [0.018, 0.018, 0.018], at: [0.055, 0.445, 0.17], paint: "eye" },
+        { shape: "ball", size: [0.08, 0.04, 0.15], at: [0, 0.35, -0.04], turn: [0.12, 0, 0], paint: "hide" },
+        { shape: "box", size: [0.085, 0.014, 0.11], at: [0, 0.32, -0.2], turn: [0.25, 0, 0], paint: "hide" },
+        { shape: "box", size: [0.085, 0.016, 0.03], at: [0, 0.333, -0.262], turn: [0.25, 0, 0], paint: "dark" },
+        { shape: "rod", size: [0.01, 0.219, 0.014], at: [-0.042, 0.121, 0.01], turn: [-0.091, 0.002, 3.119], paint: "accent", swing: "stride-a", pivot: [-0.04, 0.23, 0] },
+        { shape: "box", size: [0.05, 0.01, 0.06], at: [-0.045, 0.005, 0.045], paint: "accent", swing: "stride-a", pivot: [-0.04, 0.23, 0] },
+        { shape: "rod", size: [0.01, 0.219, 0.014], at: [0.042, 0.121, 0.01], turn: [-0.091, -0.002, -3.119], paint: "accent", swing: "stride-b", pivot: [0.04, 0.23, 0] },
+        { shape: "box", size: [0.05, 0.01, 0.06], at: [0.045, 0.005, 0.045], paint: "accent", swing: "stride-b", pivot: [0.04, 0.23, 0] },
+        { shape: "box", size: [0.13, 0.235, 0.016], at: [-0.173, 0.415, 0.015], turn: [-1.393, 0.457, 1.185], paint: "hide", swing: "flap", pivot: [-0.075, 0.36, 0.05] },
+        { shape: "box", size: [0.1, 0.16, 0.014], at: [-0.325, 0.52, -0.05], turn: [-1.206, 0.58, 0.962], paint: "dark", swing: "flap", pivot: [-0.075, 0.36, 0.05] },
+        { shape: "box", size: [0.08, 0.231, 0.012], at: [-0.16, 0.37, -0.14], turn: [-1.368, 0.293, 0.953], paint: "hide", swing: "flap", pivot: [-0.07, 0.33, -0.08] },
+        { shape: "box", size: [0.06, 0.087, 0.013], at: [-0.235, 0.408, -0.187], turn: [-1.41, 0.244, 0.98], paint: "dark", swing: "flap", pivot: [-0.07, 0.33, -0.08] },
+        { shape: "box", size: [0.13, 0.235, 0.016], at: [0.173, 0.415, 0.015], turn: [-1.393, -0.457, -1.185], paint: "hide", swing: "flap", pivot: [0.075, 0.36, 0.05] },
+        { shape: "box", size: [0.1, 0.16, 0.014], at: [0.325, 0.52, -0.05], turn: [-1.206, -0.58, -0.962], paint: "dark", swing: "flap", pivot: [0.075, 0.36, 0.05] },
+        { shape: "box", size: [0.08, 0.231, 0.012], at: [0.16, 0.37, -0.14], turn: [-1.368, -0.293, -0.953], paint: "hide", swing: "flap", pivot: [0.07, 0.33, -0.08] },
+        { shape: "box", size: [0.06, 0.087, 0.013], at: [0.235, 0.408, -0.187], turn: [-1.41, -0.244, -0.98], paint: "dark", swing: "flap", pivot: [0.07, 0.33, -0.08] },
+      ],
+    },
+  },
+}
