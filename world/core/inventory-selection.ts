@@ -3,7 +3,7 @@ import type { Command, ServerCommand } from "#/world/core/commands"
 import type { PlayerState } from "#/world/core/player-types"
 /** A delayed inventory operation must still refer to the goods grabbed, including wear and quantity. */
 export function inventorySelectionMatches(state: PlayerState, command: Command | ServerCommand): boolean {
-  if (command.type !== "move" && command.type !== "equip" && command.type !== "unequip" && command.type !== "use" && command.type !== "sell") return true
+  if (command.type !== "move" && command.type !== "equip" && command.type !== "unequip" && command.type !== "use" && command.type !== "sell" && command.type !== "discard") return true
   if (command.type === "move" && command.expectedTarget !== undefined && !sameStack(state.bag[command.to], command.expectedTarget)) return false
   if (!command.expectedStack) return true
   if (command.type === "unequip") {

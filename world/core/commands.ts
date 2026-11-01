@@ -45,6 +45,8 @@ export const commandSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("sell"), shop: shopId, slot: slotIndex, count, expectedStack: stackSchema.optional() }),
   z.object({ type: z.literal("use"), slot: slotIndex, expectedStack: stackSchema.optional() }),
   z.object({ type: z.literal("use-item"), item: itemId }),
+  /** throw away some of one slot (not key items) */
+  z.object({ type: z.literal("discard"), slot: slotIndex, count, expectedStack: stackSchema.optional() }),
   z.object({ type: z.literal("move"), from: slotIndex, to: slotIndex, expectedStack: stackSchema.optional(), expectedTarget: stackSchema.nullable().optional() }),
   /** wear the item in a bag slot; `to` picks one of two accessory slots */
   z.object({ type: z.literal("equip"), slot: slotIndex, to: equipSlot.optional(), expectedStack: stackSchema.optional() }),
@@ -181,6 +183,7 @@ export type Reason =
   | "WALKING"
   | "MEDICINE_WAIT"
   | "NAME_TAKEN"
+  | "NOT_DISCARDABLE"
   | "RENAME_WAIT"
 
 export type GameEvent =
@@ -201,6 +204,7 @@ export type GameEvent =
   | { type: "raised"; stat: Stat; value: number }
   | { type: "renamed"; name: string }
   | { type: "rearranged" }
+  | { type: "discarded"; item: ItemId; count: number; by?: string }
   | { type: "errand-taken"; errand: string }
   | { type: "hurt"; amount: number; by: string; hp: number }
   | { type: "fell"; by: string }
@@ -279,5 +283,6 @@ export const REASON_TEXT: Record<Reason, string> = {
   WALKING: "歩きながらは座れない。",
   MEDICINE_WAIT: "まだ次の薬は使えない。",
   NAME_TAKEN: "その名前は使えない。",
+  NOT_DISCARDABLE: "それは捨てられない。",
   RENAME_WAIT: "名前はまだ変えられない。",
 }

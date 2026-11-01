@@ -47,6 +47,7 @@ import type { PlayerState } from "#/world/core/player-types"
 import { derive } from "#/world/core/derive"
 import { unmet } from "#/world/core/unmet"
 import { setProfile } from "#/world/core/set-profile"
+import { discard } from "#/world/core/discard"
 
 /**
  * What the server knows when it runs a command: the time (for fullness and warmth), for a
@@ -140,6 +141,8 @@ export function apply(before: PlayerState, command: Command | ServerCommand, ctx
       const stamina = state.stamina - loss
       return accept({ ...state, stamina }, { type: "tired", stamina })
     }
+    case "discard":
+      return discard(state, command)
     case "move": {
       const bag = moveSlot(state.bag, command.from, command.to)
       if (!bag) return reject("EMPTY_SLOT")

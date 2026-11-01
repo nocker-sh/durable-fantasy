@@ -355,6 +355,7 @@ export class Game {
   unequip = this.playerActions.unequip.bind(this.playerActions)
 
   moveSlot = this.playerActions.moveSlot.bind(this.playerActions)
+  discard = this.playerActions.discard.bind(this.playerActions)
 
   forgetLife = this.playerActions.forgetLife.bind(this.playerActions)
   raise = this.playerActions.raise.bind(this.playerActions)

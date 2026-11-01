@@ -149,6 +149,10 @@ export function tell(event: GameEvent, me: string | undefined): Told {
     chat(`名前と見た目を変えた（${event.name}）。`)
     return out
   }
+  if (event.type === "discarded") {
+    notify(`${name(event.item, event.by)}を${event.count > 1 ? ` ${event.count} 個` : ""}捨てた。`)
+    return out
+  }
   if (event.type === "rearranged") {
     return out
   }

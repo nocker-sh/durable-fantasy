@@ -179,6 +179,10 @@ export class PlayerActions {
     if (from !== to && expectedStack) void this.target.run({ type: "move", from, to, expectedStack, expectedTarget })
   }
 
+  discard(slot: number, count: number, expectedStack = this.target.session.state.get().player?.bag[slot] ?? undefined) {
+    if (expectedStack) void this.target.run({ type: "discard", slot, count, expectedStack })
+  }
+
   forgetLife(skill: Skill, exp: number) {
     return this.target.run({ type: "forget-life", skill, exp })
   }
