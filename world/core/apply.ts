@@ -132,10 +132,11 @@ export function apply(before: PlayerState, command: Command | ServerCommand, ctx
     case "share":
       return share(state, command)
     case "tire": {
-      // the cold outside wears you down half as fast again, unless something warm is in you
+      // the cold outside wears you down half as fast again, unless something warm is in you; too
+      // little left for the road and they cannot set out (game-system.md §3.6)
       const loss = Math.ceil(command.amount * (warmNow(state, now) ? 1 : 1.5))
-      if (state.stamina <= 0) return reject("EXHAUSTED")
-      const stamina = Math.max(0, state.stamina - loss)
+      if (state.stamina < loss) return reject("EXHAUSTED")
+      const stamina = state.stamina - loss
       return accept({ ...state, stamina }, { type: "tired", stamina })
     }
     case "move": {

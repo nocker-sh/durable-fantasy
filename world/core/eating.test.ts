@@ -28,12 +28,13 @@ describe("eating: stamina, fullness and warmth", () => {
     expect(apply(p, { type: "use", slot: 0 }, { now: 30 * DIGEST_MS }).ok).toBe(true)
   })
 
-  it("the road out of town tires you, more in the cold unless you are warm, and stops you at nothing", () => {
+  it("the road out of town tires you, more in the cold unless you are warm, and stops you when too little is left", () => {
     const cold = apply(player({ stamina: 50 }), { type: "tire", amount: 4 }, { now: 0 })
     expect(cold.ok && cold.state.stamina).toBe(44)
     const warm = apply(player({ stamina: 50, warmUntil: 10 * MIN }), { type: "tire", amount: 4 }, { now: MIN })
     expect(warm.ok && warm.state.stamina).toBe(46)
     expect(apply(player({ stamina: 0 }), { type: "tire", amount: 4 })).toEqual({ ok: false, reason: "EXHAUSTED" })
+    expect(apply(player({ stamina: 5 }), { type: "tire", amount: 4 }, { now: 0 })).toEqual({ ok: false, reason: "EXHAUSTED" })
   })
 
   it("the porridge at the chapel is always cheap enough to keep going", () => {
