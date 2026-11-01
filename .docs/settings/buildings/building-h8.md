@@ -134,15 +134,6 @@
         ]
       }
     ]
-  },
-  "runtime_layout_omissions": {
-    "source": "world/town/floorplan/floor-plan.ts",
-    "rooms": [
-      {
-        "floor": 0,
-        "name": "台所"
-      }
-    ]
   }
 }
 ---

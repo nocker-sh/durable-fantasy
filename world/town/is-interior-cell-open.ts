@@ -1,6 +1,9 @@
 import { ELBOW_M, WALL_GAP_M } from "#/world/town/floorplan/geometry"
 import { TILE_M } from "#/world/town/fit"
 import type { Interior } from "#/world/town/interiors"
+import type { FurnitureKind } from "#/world/town/furniture-kinds"
+
+const DIVIDERS: ReadonlySet<FurnitureKind> = new Set<FurnitureKind>(["partition", "lowwall", "curtain"])
 
 /** The authored entrance joins the room floor; furniture and stair wells still block it. */
 export function isInteriorCellOpen(interior: Interior, column: number, row: number): boolean {
@@ -26,6 +29,17 @@ export function isInteriorCellOpen(interior: Interior, column: number, row: numb
         Math.abs(z - furniture.z) < furniture.d / 2 + elbow
       )
         cell.free = false
+  // a partition, low wall or curtain is thinner than a step: it closes the row of cells its line runs through, so
+  // nobody slips through it between two cells that both lie clear of it
+  if (cell.free && !interior.authored)
+    for (const furniture of interior.furniture) {
+      if (!furniture.solid || !(DIVIDERS.has(furniture.kind) || (furniture.kind === "shelf" && furniture.name === "棚"))) continue
+      const crossesZ = furniture.w >= furniture.d
+      const line = crossesZ ? furniture.z : furniture.x
+      const at = crossesZ ? z : x
+      const runs = crossesZ ? Math.abs(x - furniture.x) < furniture.w / 2 + elbow : Math.abs(z - furniture.z) < furniture.d / 2 + elbow
+      if (runs && line >= at - 0.25 && line < at + 0.25) cell.free = false
+    }
   if (cell.free) for (const block of interior.stairBlocks ?? []) if (x > block.x0 - 0.15 && x < block.x1 + 0.15 && z > block.z0 - 0.15 && z < block.z1 + 0.15) cell.free = false
   if (!interior.authored && column === interior.door[0] && row === interior.door[1]) cell.free = true
   return cell.free

@@ -6,7 +6,7 @@ import { layout } from "#/world/town/floorplan/layout"
 
 /**
  * Lay out one building: the shop floor is tried at a few depths, and the layout that holds
- * everything, with a table standing free near the fire, is kept.
+ * everything and draws every room the plan names, with a table standing free near the fire, is kept.
  */
 export function planOf(h: HouseDef): FloorPlan {
   if (h.authored) {
@@ -23,7 +23,8 @@ export function planOf(h: HouseDef): FloorPlan {
       const fireAt = p.pieces.find((x) => x.floor === 0 && (x.name === "炉" || x.name === "暖炉"))
       const gap = (a: Rect, b: Rect) => Math.hypot(Math.max(0, a.x0 - b.x1, b.x0 - a.x1), Math.max(0, a.z0 - b.z1, b.z0 - a.z1))
       const byFire = !fireAt || tables.some((t) => gap(t, fireAt) <= 1.8)
-      const score = p.unplaced.length * 10 + (h.plan.hearth && !free ? 5 : 0) + (h.plan.hearth && !byFire ? 3 : 0)
+      // a room the plan names but the layout could not draw counts nearly as badly as a thing left out
+      const score = p.unplaced.length * 10 + p.unrepresentedRooms.length * 8 + (h.plan.hearth && !free ? 5 : 0) + (h.plan.hearth && !byFire ? 3 : 0)
       if (!best.value || score < best.value.score) best.value = { p, score }
       if (score === 0) return p
     }

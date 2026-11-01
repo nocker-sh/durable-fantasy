@@ -28,7 +28,12 @@ export type DividerKind = "壁" | "腰壁" | "カーテン" | "棚"
 export type Divider = Rect & {
   floor: number
   kind: DividerKind
+  /** the household passes here (a counter flap, a curtain over the way to the back); visitors do not */
+  staff?: boolean
 }
+
+/** A bed and the declared room whose sleeper it is. */
+export type BedPlace = { name: string; room: string; floor: number }
 
 export type Placed = Rect & {
   cookingTop?: CookingTopSpec

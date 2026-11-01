@@ -12,6 +12,19 @@ export function walkCells(W: number, D: number, blockers: readonly Rect[]) {
       if (blockers.some((b) => x > b.x0 - ELBOW_M && x < b.x1 + ELBOW_M && z > b.z0 - ELBOW_M && z < b.z1 + ELBOW_M)) continue
       free[j * nx + i] = 1
     }
+  // a partition is thinner than a step: nobody steps through it between two cells that both lie clear of it
+  const thin = blockers.filter((b) => Math.min(b.x1 - b.x0, b.z1 - b.z0) < CELL_M / 4)
+  const crosses = (i: number, j: number, ii: number, jj: number) =>
+    thin.some((b) => {
+      const across = b.x1 - b.x0 >= b.z1 - b.z0
+      if (across !== (j !== jj)) return false
+      const line = across ? (b.z0 + b.z1) / 2 : (b.x0 + b.x1) / 2
+      const a = ((across ? j : i) + 0.5) * CELL_M,
+        c = ((across ? jj : ii) + 0.5) * CELL_M
+      const at = ((across ? i : j) + 0.5) * CELL_M
+      const runs = across ? at > b.x0 - ELBOW_M && at < b.x1 + ELBOW_M : at > b.z0 - ELBOW_M && at < b.z1 + ELBOW_M
+      return runs && Math.min(a, c) < line && line < Math.max(a, c)
+    })
   const cellOf = (x: number, z: number): [number, number] => [Math.min(nx - 1, Math.max(0, Math.floor(x / CELL_M))), Math.min(nz - 1, Math.max(0, Math.floor(z / CELL_M)))]
   /** The cells one can walk to from (x, z): the start cell counts even if something stands on it. */
   const flood = (from: [number, number]) => {
@@ -32,7 +45,7 @@ export function walkCells(W: number, D: number, blockers: readonly Rect[]) {
         const ii = i + di,
           jj = j + dj,
           n = jj * nx + ii
-        if (ii < 0 || jj < 0 || ii >= nx || jj >= nz || seen[n] || !free[n]) continue
+        if (ii < 0 || jj < 0 || ii >= nx || jj >= nz || seen[n] || !free[n] || crosses(i, j, ii, jj)) continue
         seen[n] = 1
         queue.push(n)
       }

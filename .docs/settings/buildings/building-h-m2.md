@@ -116,15 +116,6 @@
   "runtime_graphics_omissions": {
     "source": "world/town/interiors.ts",
     "pieces": []
-  },
-  "runtime_layout_omissions": {
-    "source": "world/town/floorplan/floor-plan.ts",
-    "rooms": [
-      {
-        "floor": 0,
-        "name": "台所"
-      }
-    ]
   }
 }
 ---

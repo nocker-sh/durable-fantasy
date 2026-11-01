@@ -148,15 +148,6 @@
       }
     ]
   },
-  "runtime_layout_omissions": {
-    "source": "world/town/floorplan/floor-plan.ts",
-    "rooms": [
-      {
-        "floor": 0,
-        "name": "ゲルトルートの部屋"
-      }
-    ]
-  },
   "facilities": [
     "facility-square-pasture",
     "facility-square-windmill"

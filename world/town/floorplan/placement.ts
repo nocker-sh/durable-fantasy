@@ -36,10 +36,10 @@ class Floor {
     return this.reachable(r)
   }
 
-  /** With `extra` standing too, can one still walk from the door to every target? (20 cm cells, 18 cm of elbow room) */
+  /** With `extra` standing too, can the household still walk from the door to every target? (20 cm cells, 18 cm of elbow room; the ways kept for the household are open to them) */
   reachable(extra: Rect | null = null): boolean {
     if (!this.from || !this.targets.length) return true
-    const blockers: Rect[] = [...this.pieces.filter((p) => p.solid), ...this.dividers.filter((d) => d.floor === this.floor), ...(extra ? [extra] : [])]
+    const blockers: Rect[] = [...this.pieces.filter((p) => p.solid), ...this.dividers.filter((d) => d.floor === this.floor && !d.staff), ...(extra ? [extra] : [])]
     const g = walkCells(this.W, this.D, blockers)
     const seen = g.flood(this.from)
     return this.targets.every((t) => g.reaches(seen, t))

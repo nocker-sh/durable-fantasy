@@ -13,13 +13,13 @@ const lived = PLANS.filter(({ h }) => h.plan.hearth && h.kind !== "vacant")
 const overlap = (a: Rect, b: Rect) => a.x0 < b.x1 - 1e-6 && b.x0 < a.x1 - 1e-6 && a.z0 < b.z1 - 1e-6 && b.z0 < a.z1 - 1e-6
 const touchesWall = (r: Rect, p: FloorPlan) => r.x0 < 0.3 || r.z0 < 0.3 || r.x1 > p.W - 0.3 || r.z1 > p.D - 0.3
 
-/** Cells (20 cm) on a floor someone can stand in: clear of walls, partitions and solid furniture by 20 cm. */
+/** Cells (20 cm) on a floor someone of the household can stand in: clear of walls, partitions and solid furniture by 20 cm (the flap and curtain kept for them are open to them). */
 function walkGrid(p: FloorPlan, floor: number) {
   const C = 0.2,
     nx = Math.ceil(p.W / C),
     nz = Math.ceil(p.D / C)
   const free = new Uint8Array(nx * nz)
-  const blockers: Rect[] = [...p.pieces.filter((x) => x.floor === floor && x.solid), ...p.dividers.filter((d) => d.floor === floor)]
+  const blockers: Rect[] = [...p.pieces.filter((x) => x.floor === floor && x.solid), ...p.dividers.filter((d) => d.floor === floor && !d.staff)]
   for (let j = 0; j < nz; j++)
     for (let i = 0; i < nx; i++) {
       const x = (i + 0.5) * C,
@@ -134,10 +134,10 @@ it("reports an unknown building without caching a fabricated plan", () => {
   expect(floorPlan(house.id)).toBe(floorPlan(house.id))
 })
 
-it("records a declared smoking room that the generated house has merged or omitted", () => {
+it("draws a declared smoking room as its own room off the room they live in, not merged into it", () => {
   const house = HOUSES.find((h) => h.id === "h-g4")!,
     plan = planOf(house)
   expect(house.plan.rooms.some((room) => room.name === "燻し部屋")).toBe(true)
-  expect(plan.rooms.some((room) => room.name === "燻し部屋")).toBe(false)
-  expect(plan.unrepresentedRooms).toContainEqual({ floor: 0, name: "燻し部屋" })
+  expect(plan.rooms.some((room) => room.floor === 0 && room.name === "燻し部屋")).toBe(true)
+  expect(plan.unrepresentedRooms).not.toContainEqual({ floor: 0, name: "燻し部屋" })
 })
