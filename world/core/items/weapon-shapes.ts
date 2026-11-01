@@ -9,7 +9,7 @@ export const WEAPON_SHAPES = {
     needs: { dex: 8 },
     scale: { dex: "C", str: "E" },
     weight: 30,
-    price: 60,
+    price: 65,
     forge: { iron: 1, plank: 0, fur: 1, min: 2 },
     text: "獲物をさばくための刃の厚い小刀。森へ入る者はたいてい腰に下げている。",
   },

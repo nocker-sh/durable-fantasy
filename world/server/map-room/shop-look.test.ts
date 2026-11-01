@@ -48,7 +48,7 @@ function fixture() {
   })
   rpc.buying.mockImplementation(async () => {
     trace.push("buying")
-    return { apple: 3 }
+    return { buys: { apple: 3 }, held: { apple: 40 } }
   })
   rpc.market.mockReturnValue({ look: rpc.look, buying: rpc.buying })
   rpc.player.mockReturnValue({ read: rpc.read })
@@ -61,7 +61,7 @@ it("reads stock before inventory and unique sellable types before replying", asy
   expect(request.trace).toEqual(["look", "read", "buying", "send"])
   expect(rpc.look).toHaveBeenCalledExactlyOnceWith("fruit", 10)
   expect(rpc.buying).toHaveBeenCalledExactlyOnceWith("fruit", ["apple"])
-  expect(request.send).toHaveBeenCalledExactlyOnceWith({ type: "stock", shop: "fruit", offers: [], buys: { apple: 3 } })
+  expect(request.send).toHaveBeenCalledExactlyOnceWith({ type: "stock", shop: "fruit", offers: [], buys: { apple: 3 }, held: { apple: 40 } })
 })
 
 it("does not query storage for an inherited shop name", async () => {

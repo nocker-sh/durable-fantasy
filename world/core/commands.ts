@@ -173,6 +173,7 @@ export type Reason =
   | "STORAGE_FULL"
   | "NOT_STORABLE"
   | "NOT_TRADABLE"
+  | "WORN_TOOL"
   | "COOLDOWN"
   | "SP_SHORT"
   | "WALKING"
@@ -266,6 +267,7 @@ export const REASON_TEXT: Record<Reason, string> = {
   STORAGE_FULL: "倉庫に空きがない。",
   NOT_STORABLE: "それは預けられない。",
   NOT_TRADABLE: "それは渡せない。",
+  WORN_TOOL: "使い減りした道具は出品できない。",
   COOLDOWN: "まだ使えない。",
   SP_SHORT: "SP が足りない。",
   WALKING: "歩きながらは座れない。",

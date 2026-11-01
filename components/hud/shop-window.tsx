@@ -4,11 +4,15 @@ import { useEffect, useState } from "react"
 import { REASON_TEXT } from "#/world/core/commands"
 import { roomFor } from "#/world/core/room-for"
 import { ITEMS } from "#/world/core/items/catalog"
-import { QUALITIES, QUALITY_PRICE } from "#/world/core/items/kinds"
-import { sellable } from "#/world/core/items/sellable"
+import { QUALITIES } from "#/world/core/items/kinds"
 import { SHOPS } from "#/world/core/shops"
 import { makerAt } from "#/world/core/maker-at"
 import { sellsFor } from "#/world/core/sells-for"
+import { buybackOf } from "#/world/core/buyback-of"
+import { bulkBuyingPrice } from "#/world/core/bulk-buying-price"
+import { bulkStockPrice } from "#/world/core/bulk-stock-price"
+import { shopRate } from "#/world/core/shop-rate"
+import { shopTakes } from "#/world/core/shop-takes"
 import { shopFriend } from "#/world/core/shop-friend"
 import { friendPrice } from "#/world/core/friend-price"
 import { displayName } from "#/world/core/display-name"
@@ -107,6 +111,7 @@ function BuyRow(inputProps: { offer: Offer }) {
   const player = useGameState((s) => s.player)
   const shop = useGameState((s) => s.shop)!
   const busy = useGameState((s) => s.busy)
+  const stock = useGameState((s) => s.stock)
   const countState = useState(1),
     count = countState[0],
     setCount = countState[1]
@@ -121,10 +126,14 @@ function BuyRow(inputProps: { offer: Offer }) {
   const list = priceOf(item, offer.q, by)
   const mark = by ? { q: offer.q, by } : undefined
   // what we pay: the shop's price, less a friend's discount (core/friend-price.ts)
-  const pay = player ? friendPrice(price, shopFriend(player, shop)) : price
-  const affordable = player ? Math.floor(player.gold / pay) : 0
+  const one = player ? friendPrice(price, shopFriend(player, shop)) : price
+  const affordable = player ? Math.floor(player.gold / one) : 0
   const max = Math.max(1, Math.min(99, affordable, left ?? 99, player ? roomFor(player.bag, item, mark) : 1))
   const n = Math.min(count, max)
+  // several together: each one is priced at the stock it leaves, as the server does (core/bulk-stock-price.ts)
+  const held = stock?.shop === shop ? stock.held[item] : undefined
+  const each = held === undefined ? price : bulkStockPrice({ item, q: offer.q, by, stock: held, count: n })
+  const pay = player ? friendPrice(each, shopFriend(player, shop)) : each
   const soldOut = left === 0
   const reason = soldOut ? "SOLD_OUT" : game.preview({ type: "buy", shop, item, count: n, ...(q !== undefined ? { q } : {}) })
   const buy = (
@@ -133,7 +142,7 @@ function BuyRow(inputProps: { offer: Offer }) {
       size="sm"
       disabled={!!reason || busy}
       onClick={() => {
-        game.buy({ item: item, count: n, q: q, price: price })
+        game.buy({ item: item, count: n, q: q, price: each })
         setCount(1)
       }}
     >
@@ -191,10 +200,10 @@ function SellPanel(inputProps2: { picked: number | null; onPick: (slot: number |
   const stock = useGameState((s) => s.stock)
   const bag = player?.bag ?? []
   const stack = picked !== null ? bag[picked] : null
-  // what the shop pays now (by its stock), else its list price
-  const each = (s: NonNullable<typeof stack>) => {
-    const now = stock?.buys[s.item]
-    return now === undefined ? sellsFor(shop!, s) : ITEMS[s.item].made ? Math.max(1, Math.floor(now * QUALITY_PRICE[s.q ?? 1])) : now
+  // what the shop pays per one for this many now (by its stock, as the server prices it), else at its usual stock
+  const each = (s: NonNullable<typeof stack>, n: number) => {
+    const held = stock?.shop === shop ? stock.held[s.item] : undefined
+    return held === undefined ? sellsFor(shop!, s) : buybackOf(bulkBuyingPrice({ item: s.item, stock: held, rate: shopRate(shop!, s.item), count: n }), s)
   }
   useEffect(() => setCount(1), [picked])
   return (
@@ -206,9 +215,9 @@ function SellPanel(inputProps2: { picked: number | null; onPick: (slot: number |
               icon={s ? game.iconUrl(s.item, s.by) : null}
               rarity={s ? ITEMS[s.item].rarity : undefined}
               count={s?.count}
-              dim={!!s && !sellable(s.item)}
+              dim={!!s && !shopTakes(shop!, s.item)}
               over={picked === index}
-              disabled={!s || !sellable(s.item)}
+              disabled={!s || !shopTakes(shop!, s.item)}
               aria-label={s ? displayName(s.item, s.by) : "空き"}
               onClick={() => onPick(index)}
               className="disabled:cursor-default"
@@ -223,12 +232,12 @@ function SellPanel(inputProps2: { picked: number | null; onPick: (slot: number |
               {displayName(stack.item, stack.by)}
               {ITEMS[stack.item].made && `（${QUALITIES[stack.q ?? 1]}）`}
             </span>
-            <Gold amount={each(stack) * Math.min(count, stack.count)} className="text-xs" />
+            {shopTakes(shop!, stack.item) ? <Gold amount={each(stack, Math.min(count, stack.count)) * Math.min(count, stack.count)} className="text-xs" /> : <span className="font-head text-[11px] text-bad">{REASON_TEXT.NOT_WANTED}</span>}
             <Stepper value={Math.min(count, stack.count)} max={stack.count} onChange={setCount} />
             <Button
               variant="primary"
               size="sm"
-              disabled={busy}
+              disabled={busy || !shopTakes(shop!, stack.item)}
               onClick={() => {
                 game.sell(picked!, Math.min(count, stack.count))
                 if (Math.min(count, stack.count) === stack.count) onPick(null)

@@ -18,12 +18,12 @@ const H = 3_600_000
 
 describe("commissions", () => {
   it("buys hides, tans leather, then commissions armor without using loose fur", () => {
-    let state = player({ gold: 500 })
-    const buy = apply(state, { type: "buy", shop: "leather", item: "raw-hide", count: 4 })
+    let state = player({ gold: 500, bag: bag(["yarn", 2]) })
+    const buy = apply(state, { type: "buy", shop: "leather", item: "raw-hide", count: 6 })
     expect(buy.ok).toBe(true)
     if (!buy.ok) return
     state = buy.state
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 3; i++) {
       const order = apply(state, { type: "order", commission: "rudolf-leather", roll: 0.5 }, { now: 0 })
       expect(order.ok).toBe(true)
       if (!order.ok) return
@@ -31,20 +31,22 @@ describe("commissions", () => {
     }
     expect(countItem(state.bag, "raw-hide")).toBe(0)
     expect(apply(state, { type: "collect", index: 0, expectedOrders: state.orders }, { now: H })).toEqual({ ok: false, reason: "NOT_READY" })
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 3; i++) {
       const collect = apply(state, { type: "collect", index: 0, expectedOrders: state.orders }, { now: 2 * H })
       expect(collect.ok).toBe(true)
       if (!collect.ok) return
       state = collect.state
     }
-    expect(countItem(state.bag, "tanned-leather")).toBe(4)
+    expect(countItem(state.bag, "tanned-leather")).toBe(6)
     const armor = apply(state, { type: "order", commission: "rudolf-armor", roll: 0.5 }, { now: 2 * H })
     expect(armor.ok).toBe(true)
     if (!armor.ok) return
-    expect(countItem(armor.state.bag, "tanned-leather")).toBe(0)
+    // the same five hides' leather and two yarns the loom takes (commissions match the recipe)
+    expect(countItem(armor.state.bag, "tanned-leather")).toBe(1)
+    expect(countItem(armor.state.bag, "yarn")).toBe(0)
     const ready = apply(armor.state, { type: "collect", index: 0, expectedOrders: armor.state.orders }, { now: 5 * H })
     expect(ready.ok && countItem(ready.state.bag, "leather-armor")).toBe(1)
-    expect(armor.state.gold).toBe(326)
+    expect(armor.state.gold).toBe(500 - 6 * ITEMS["raw-hide"].price - 3 * 16 - 50)
     expect(500 - armor.state.gold).toBeLessThan(ITEMS["leather-armor"].price)
     expect(apply(player({ gold: 500, bag: bag(["soft-fur", 4]) }), { type: "order", commission: "rudolf-armor", roll: 0.5 })).toEqual({ ok: false, reason: "MISSING_INPUTS" })
   })
@@ -56,11 +58,12 @@ describe("commissions", () => {
   })
 
   it("takes the iron and the fee now, and the sword is ready in two hours", () => {
-    const p = player({ gold: 200, bag: bag(["iron-ingot", 3]) })
+    const p = player({ gold: 200, bag: bag(["iron-ingot", 3], ["plank", 1], ["soft-fur", 1]) })
     const r = apply(p, { type: "order", commission: "gunter-sword", roll: 0.5 }, { now: 0 })
     expect(r.ok).toBe(true)
     if (!r.ok) return
     expect(countItem(r.state.bag, "iron-ingot")).toBe(0)
+    expect(countItem(r.state.bag, "soft-fur")).toBe(0)
     expect(r.state.gold).toBe(80)
     expect(apply(r.state, { type: "collect", index: 0, expectedOrders: r.state.orders }, { now: H })).toEqual({ ok: false, reason: "NOT_READY" })
     const got = apply(r.state, { type: "collect", index: 0, expectedOrders: r.state.orders }, { now: 2 * H })
@@ -69,10 +72,10 @@ describe("commissions", () => {
   })
 
   it("a made thing comes with the craftsman's name and their quality", () => {
-    const p = player({ gold: 200, bag: bag(["herb", 10], ["jelly", 2]) })
+    const p = player({ gold: 200, bag: bag(["herb", 6], ["jelly", 2]) })
     const r = apply(p, { type: "order", commission: "irmgard-potions", roll: 0.5 }, { now: 0 })
     const got = r.ok ? apply(r.state, { type: "collect", index: 0, expectedOrders: r.state.orders }, { now: H }) : r
-    expect(got.ok && got.state.bag.find((s) => s?.item === "potion")).toMatchObject({ by: "イルムガルト", count: 5 })
+    expect(got.ok && got.state.bag.find((s) => s?.item === "potion")).toMatchObject({ by: "イルムガルト", count: 4 })
   })
 
   it.each(["rudolf-armor", "beatrix-mail"])("retains commissioned armor quality through saving, equipment and removal: %s", (id) => {
@@ -102,12 +105,13 @@ describe("commissions", () => {
   })
 
   it("turns bought leather into boots and preserves their maker and quality when worn", () => {
-    const bought = apply(player({ gold: 100 }), { type: "buy", shop: "leather", item: "tanned-leather", count: 1 })
+    const bought = apply(player({ gold: 100, bag: bag(["yarn", 1]) }), { type: "buy", shop: "leather", item: "tanned-leather", count: 2 })
     if (!bought.ok) throw Error(bought.reason)
     const ordered = apply(bought.state, { type: "order", commission: "rudolf-boots", roll: 0.8 }, { now: 0 })
     if (!ordered.ok) throw Error(ordered.reason)
     expect(countItem(ordered.state.bag, "tanned-leather")).toBe(0)
-    expect(ordered.state.gold).toBe(100 - ITEMS["tanned-leather"].price - 12)
+    expect(countItem(ordered.state.bag, "yarn")).toBe(0)
+    expect(ordered.state.gold).toBe(100 - 2 * ITEMS["tanned-leather"].price - 12)
     expect(apply(ordered.state, { type: "collect", index: 0, expectedOrders: ordered.state.orders }, { now: H - 1 })).toEqual({ ok: false, reason: "NOT_READY" })
     const collected = apply(
       loadPlayer(JSON.parse(JSON.stringify(ordered.state))),
@@ -197,7 +201,7 @@ describe("commissions", () => {
 
 it("commissions SP medicine without alchemy, saves the waiting order, then consumes one bottle", () => {
   const job = COMMISSIONS.find((job) => job.id === "irmgard-blue-potions")!
-  const start = player({ gold: 200, bag: bag(["blue-herb", 3], ["blue-jelly", 1]) })
+  const start = player({ gold: 200, bag: bag(["blue-herb", 4], ["blue-jelly", 2]) })
   const ordered = apply(start, { type: "order", commission: job.id, roll: 0.5 }, { now: 1 })
   if (!ordered.ok) throw Error(ordered.reason)
   expect(ordered.state.life.alchemy).toBe(0)

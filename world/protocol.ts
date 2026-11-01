@@ -246,7 +246,8 @@ export const serverMessage = z.discriminatedUnion("type", [
     type: z.literal("stock"),
     shop: z.string(),
     offers: z.array(z.object({ item: z.string(), q: z.number(), price: z.number(), left: z.number().nullable(), next: z.number().nullable() })),
-    /** what it pays now for what you carry */ buys: z.record(z.string(), z.number()).optional(),
+    /** what it pays now for one of each thing you carry that it takes */ buys: z.record(z.string(), z.number()).optional(),
+    /** the stock behind its prices, to price several together (core/bulk-stock-price.ts, bulk-buying-price.ts) */ held: z.record(z.string(), z.number()).optional(),
   }),
   /** The server turned the last request down (a bad path, too far from a warp…). */
   z.object({ type: z.literal("refused"), what: z.string(), reason: z.string().optional(), monster: z.string().optional(), at: cellSchema.optional() }),

@@ -1,7 +1,7 @@
 import { takeFromSlot } from "#/world/core/take-from-slot"
 import { sellable } from "#/world/core/items/sellable"
-import { ITEMS } from "#/world/core/items/catalog"
-import { QUALITY_PRICE } from "#/world/core/items/kinds"
+import { buybackOf } from "#/world/core/buyback-of"
+import { shopTakes } from "#/world/core/shop-takes"
 import { SHOPS } from "#/world/core/shops"
 import { sellsFor } from "#/world/core/sells-for"
 import { dealtWith } from "#/world/core/commerce-friendship"
@@ -21,9 +21,10 @@ export function sell(props: Props): Transition {
   const slot = state.bag[command.slot]
   if (!slot) return reject("EMPTY_SLOT")
   if (!sellable(slot.item)) return reject("NOT_SELLABLE")
+  if (!shopTakes(command.shop, slot.item)) return reject("NOT_WANTED")
   const bag = takeFromSlot(state.bag, command.slot, command.count)
   if (!bag) return reject("NOT_ENOUGH")
-  const each = context.price !== undefined ? (ITEMS[slot.item].made ? Math.max(1, Math.floor(context.price * QUALITY_PRICE[slot.q ?? 1])) : context.price) : sellsFor(command.shop, slot)
+  const each = context.price !== undefined ? buybackOf(context.price, slot) : sellsFor(command.shop, slot)
   const gain = each * command.count
   if (!Number.isSafeInteger(gain) || !Number.isSafeInteger(state.gold + gain)) return reject("NOT_READY")
   const known = SHOPS[command.shop].kind === "buyer" ? dealtWith(state, context.keepers ?? SHOPS[command.shop].keepers, props.now) : state

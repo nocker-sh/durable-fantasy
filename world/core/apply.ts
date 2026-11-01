@@ -1,6 +1,7 @@
 // Run one command against a player's data. Pure: the same input always gives the same result,
 // and a refused command never changes anything. The server runs this to decide; the client runs
 // it only to grey out what would be refused.
+import { exchangeReady } from "#/world/core/exchange-ready"
 import { inventorySelectionMatches } from "#/world/core/inventory-selection"
 import { firstOf } from "#/world/core/first-of"
 import { moveSlot } from "#/world/core/move-slot"
@@ -89,7 +90,8 @@ export function apply(before: PlayerState, command: Command | ServerCommand, ctx
     case "escrow-sell": {
       const slot = state.bag[command.slot]
       if (!slot) return reject("EMPTY_SLOT")
-      if (!sellable(slot.item) || ITEMS[slot.item].tool) return reject("NOT_SELLABLE")
+      if (!sellable(slot.item)) return reject("NOT_SELLABLE")
+      if (!exchangeReady(slot)) return reject("WORN_TOOL")
       if (state.gold < command.fee) return reject("NO_GOLD")
       const bag = takeFromSlot(state.bag, command.slot, command.qty)
       if (!bag) return reject("NOT_ENOUGH")

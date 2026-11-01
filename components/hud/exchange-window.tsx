@@ -2,6 +2,7 @@
 // has gone these past days, put up an order, take yours down, collect what changed hands.
 import { useState } from "react"
 import { escrowFor } from "#/world/core/escrow-for"
+import { exchangeReady } from "#/world/core/exchange-ready"
 import { parseSymbol } from "#/world/core/parse-symbol"
 import { symbolKey } from "#/world/core/symbol-key"
 import { TRADE_FEE } from "#/world/core/exchange-rules"
@@ -21,7 +22,7 @@ import { Window } from "#/components/game/window"
 
 /** Everything that can be traded: plain things as they are, made things by quality. */
 const SYMBOLS = (Object.keys(ITEMS) as ItemId[])
-  .filter((id) => sellable(id) && !ITEMS[id].tool && ITEMS[id].kind !== "key")
+  .filter((id) => sellable(id) && ITEMS[id].kind !== "key")
   .flatMap((id) => (ITEMS[id].made ? ([0, 1, 2, 3] as const).map((q) => symbolKey({ item: id, q })) : [id]))
 
 const label = (key: string) => {
@@ -52,7 +53,8 @@ export function ExchangeWindow() {
   const bestAsk = v?.book.asks[0]?.price,
     bestBid = v?.book.bids[0]?.price
   const p = Number(price) || (side === "buy" ? bestAsk : bestBid) || (sym ? Math.max(1, Math.round(ITEMS[sym.item].price * 0.8)) : 1)
-  const slot = sym ? player.bag.findIndex((s) => s?.item === sym.item && s.q === sym.q) : -1
+  // a tool goes on the board only unworn (core/exchange-ready.ts)
+  const slot = sym ? player.bag.findIndex((s) => s?.item === sym.item && s.q === sym.q && exchangeReady(s)) : -1
   const have = slot >= 0 ? player.bag[slot]!.count : 0
   const needsSource = escrowFor(side, p, qty),
     needs = needsSource.gold,

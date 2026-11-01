@@ -177,7 +177,7 @@ export class ServerMessages {
       }
       case "stock": {
         if (isShopId(message.shop) && message.shop === this.target.session.state.get().shop)
-          this.target.update({ stock: { shop: message.shop, offers: message.offers as Offer[], buys: message.buys ?? {} } })
+          this.target.update({ stock: { shop: message.shop, offers: message.offers as Offer[], buys: message.buys ?? {}, held: message.held ?? {} } })
         return
       }
       case "warped": {

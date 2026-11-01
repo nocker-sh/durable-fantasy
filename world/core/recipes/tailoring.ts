@@ -16,7 +16,7 @@ export const TAILORING_RECIPES: readonly Recipe[] = [
     min: 2,
   }),
   r({ id: "wool-muffler", skill: "tailoring", station: "loom", inputs: [["yarn", 3]], output: ["wool-muffler", 1], min: 2 }),
-  r({ id: "striped-muffler", skill: "tailoring", station: "loom", inputs: [["yarn", 4]], output: ["striped-muffler", 1], min: 4 }),
+  r({ id: "striped-muffler", skill: "tailoring", station: "loom", inputs: [["yarn", 5]], output: ["striped-muffler", 1], min: 4 }),
   r({
     id: "fur-stole",
     skill: "tailoring",

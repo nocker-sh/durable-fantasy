@@ -7,9 +7,10 @@ import { skillOf } from "#/world/core/skill-of"
 import { equipmentAttack } from "#/world/core/equipment-attack"
 import { equipmentDefense } from "#/world/core/equipment-defense"
 import { standing } from "#/world/core/standing"
-import { GATHER_SKILL_NAME, KIND_NAME, QUALITIES, QUALITY_PRICE, RARITY_NAME } from "#/world/core/items/kinds"
+import { GATHER_SKILL_NAME, KIND_NAME, QUALITIES, RARITY_NAME } from "#/world/core/items/kinds"
 import { ITEMS } from "#/world/core/items/catalog"
 import { sellPrice } from "#/world/core/items/sell-price"
+import { buybackOf } from "#/world/core/buyback-of"
 import { sellable } from "#/world/core/items/sellable"
 import type { ItemId } from "#/world/core/items/catalog"
 import type { Quality } from "#/world/core/items/kinds"
@@ -188,8 +189,8 @@ export function ItemTooltip(inputProps: {
           <dd className="text-right">{RARITY_NAME[d.rarity]}</dd>
           <dt className="text-text-dim">重さ</dt>
           <dd className="text-right">{d.weight}</dd>
-          <dt className="text-text-dim">売値</dt>
-          <dd className="text-right">{sellable(item) ? <Gold amount={d.made ? Math.max(1, Math.floor(sellPrice(item) * QUALITY_PRICE[q])) : sellPrice(item)} /> : "売れない"}</dd>
+          <dt className="text-text-dim">買取の目安</dt>
+          <dd className="text-right">{sellable(item) ? <Gold amount={buybackOf(sellPrice(item), { item, q })} /> : "売れない"}</dd>
         </dl>
       </TooltipContent>
     </Tooltip>

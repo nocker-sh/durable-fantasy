@@ -105,7 +105,7 @@ export type GameState = {
   /** the time of day: minutes since midnight, Japan time, and whether it is held (?time=HH:MM) */
   clock: { min: number; held: boolean }
   /** what the open shop has now, as the server last said (the shelves are shared) */
-  stock: { shop: ShopId; offers: readonly Offer[]; buys: Readonly<Record<string, number>> } | null
+  stock: { shop: ShopId; offers: readonly Offer[]; buys: Readonly<Record<string, number>>; held: Readonly<Record<string, number>> } | null
   /** the exchange board is open, and what it last showed (core/exchange.ts) */
   board: { symbol: string; view: ExchangeView | null } | null
   /** the craftsman whose commissions are open (core/commissions.ts) */

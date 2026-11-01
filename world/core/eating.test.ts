@@ -40,4 +40,10 @@ describe("eating: stamina, fullness and warmth", () => {
     expect(priceOf("porridge", 0, "ベネディクト")).toBeLessThanOrEqual(2)
     expect(effectOf("porridge", 0, "ベネディクト").stamina).toBeGreaterThan(0)
   })
+
+  it("the porridge only keeps you going: gold for gold it does less than ordinary bread", () => {
+    const per = (item: "porridge" | "rye-bread", key: "stamina" | "full" | "hp") => effectOf(item, 1)[key] / priceOf(item, 1)
+    for (const key of ["stamina", "full", "hp"] as const) expect(per("porridge", key), key).toBeLessThan(per("rye-bread", key))
+    expect(effectOf("porridge", 1).warm).toBe(0)
+  })
 })

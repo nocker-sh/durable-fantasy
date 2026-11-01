@@ -1,4 +1,5 @@
 import { formatTime } from "#/world/core/format-time"
+import { usedVerb } from "#/world/core/used-verb"
 import { jstMinutes } from "#/world/core/jst-minutes"
 import { COMMISSIONS } from "#/world/core/commissions"
 import type { GameEvent } from "#/world/core/commands"
@@ -127,7 +128,7 @@ export function tell(event: GameEvent, me: string | undefined): Told {
   }
   if (event.type === "used") {
     notify(
-      `${name(event.item, event.by)}を${ITEMS[event.item].use?.full ? "食べた" : "使った"}。${[event.hp ? `HP +${event.hp}` : "", event.sp ? `SP +${event.sp}` : "", event.stamina ? `スタミナ +${event.stamina}` : "", event.warm ? `体が温まった（${event.warm}分）` : "", event.focus ? `集中（${event.focus}分）` : ""].filter(Boolean).join(" ")}`,
+      `${name(event.item, event.by)}を${usedVerb(event.item)}。${[event.hp ? `HP +${event.hp}` : "", event.sp ? `SP +${event.sp}` : "", event.stamina ? `スタミナ +${event.stamina}` : "", event.warm ? `体が温まった（${event.warm}分）` : "", event.focus ? `集中（${event.focus}分）` : ""].filter(Boolean).join(" ")}`,
       "good",
     )
     return out

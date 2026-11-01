@@ -72,9 +72,9 @@ export const COOKING_RECIPES: readonly Recipe[] = [
     skill: "cooking",
     station: "hearth",
     inputs: [
-      ["hot-milk", 1],
-      ["carrot", 1],
-      ["turnip", 1],
+      ["hot-milk", 2],
+      ["carrot", 2],
+      ["turnip", 2],
       ["firewood", 1],
     ],
     output: ["stew", 2],

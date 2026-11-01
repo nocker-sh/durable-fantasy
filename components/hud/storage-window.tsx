@@ -54,7 +54,7 @@ export function StorageWindow() {
       footer={
         <div className="flex items-center justify-between font-head text-xs text-text-dim">
           <span>
-            預かり賃 一つにつき <Gold amount={STORE_FEE} /> ・ 引き取りはただ
+            預かり賃 一回 <Gold amount={STORE_FEE} />（数によらない） ・ 引き取りはただ
           </span>
           <span className="tabular-nums">
             {used} / {STORAGE_SIZE}

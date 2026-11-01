@@ -14,6 +14,7 @@ import { dayOf } from "#/world/core/day-of"
 import { NODES } from "#/world/core/gather"
 import { ITEMS } from "#/world/core/items/catalog"
 import { sellPrice } from "#/world/core/items/sell-price"
+import { cheapestShopPrice } from "#/world/core/cheapest-shop-price"
 import { MONSTER_KINDS } from "#/world/core/monsters"
 import { MAPS } from "#/world/maps"
 import { npcCell } from "#/world/maps/npc-cell"
@@ -55,8 +56,9 @@ describe("errands", () => {
 
   it("buying the things to hand over never pays; gathering them pays more than selling them to a shop", () => {
     for (const e of ERRANDS.filter((x) => x.kind === "bring")) {
-      const value = ITEMS[e.wants.item].price * e.wants.count
-      expect(e.gold, e.id).toBeLessThanOrEqual(value)
+      // below the least any shop ever asks (closing discount, a full shelf, a friend's discount)
+      const value = (cheapestShopPrice(e.wants.item) ?? ITEMS[e.wants.item].price) * e.wants.count
+      expect(e.gold, e.id).toBeLessThan(value)
       expect(e.gold, e.id).toBeGreaterThan(sellPrice(e.wants.item) * e.wants.count)
     }
   })

@@ -10,6 +10,8 @@ import { buyingPrice } from "#/world/core/buying-price"
 import { moveStock } from "#/world/core/move-stock"
 import { stockPrice } from "#/world/core/stock-price"
 import { wantsMore } from "#/world/core/wants-more"
+import { shopRate } from "#/world/core/shop-rate"
+import { shopTakes } from "#/world/core/shop-takes"
 import { SHOPS } from "#/world/core/shops"
 import { sameShopCommand } from "#/world/core/same-shop-command"
 import type { ShopCommand, ShopQuote } from "#/world/core/shop-receipt-types"
@@ -45,7 +47,7 @@ export async function beginShopTrade(props: Props): Promise<{ ok: true; id: numb
     const by = ITEMS[props.command.item].made ? shopMaker(props.command.shop, props.command.item) : undefined
     const unitPrice = batched(props.command.shop, props.command.item)
       ? priceNow({ item: props.command.item, q: props.command.q ?? 1, by: by, toClose: props.toClose, isBatched: true })
-      : stockPrice({ state: market, shop: props.command.shop, item: props.command.item, q: props.command.q ?? 1, by: by })
+      : stockPrice({ state: market, shop: props.command.shop, item: props.command.item, q: props.command.q ?? 1, by: by, count: props.command.count })
     const taken = take({ state: market, shop: props.command.shop, item: props.command.item, q: props.command.q ?? 1, count: props.command.count, price: unitPrice, expected: props.command.price })
     if (!taken.ok) return taken
     props.context.state.market = taken.state
@@ -55,6 +57,7 @@ export async function beginShopTrade(props: Props): Promise<{ ok: true; id: numb
     if (props.command.expectedStack && !sameStack(stack, props.command.expectedStack)) return { ok: false, reason: "ITEM_CHANGED" }
     if (!stack) return { ok: false, reason: "EMPTY_SLOT" }
     if (!sellable(stack.item)) return { ok: false, reason: "NOT_SELLABLE" }
+    if (!shopTakes(props.command.shop, stack.item)) return { ok: false, reason: "NOT_WANTED" }
     if (stack.count < props.command.count) return { ok: false, reason: "NOT_ENOUGH" }
     // Capacity and quotes include reserved sales, but unpaid goods are never offered to buyers.
     const reserved = { market }
@@ -63,12 +66,10 @@ export async function beginShopTrade(props: Props): Promise<{ ok: true; id: numb
         reserved.market = moveStock({ state: reserved.market, shop: props.command.shop, item: stack.item, delta: job.quote.count })
     }
     if (!wantsMore({ state: reserved.market, shop: props.command.shop, item: stack.item, count: props.command.count })) return { ok: false, reason: "NOT_WANTED" }
-    const shop: ShopDefinition = SHOPS[props.command.shop]
-    const rate = shop.rates?.[ITEMS[stack.item].kind] ?? 1
     quote.value = {
       ...props.command,
       id,
-      unitPrice: buyingPrice({ state: reserved.market, shop: props.command.shop, item: stack.item, rate: rate }),
+      unitPrice: buyingPrice({ state: reserved.market, shop: props.command.shop, item: stack.item, rate: shopRate(props.command.shop, stack.item), count: props.command.count }),
       keepers: [...props.keepers],
       stack: structuredClone(stack),
     }

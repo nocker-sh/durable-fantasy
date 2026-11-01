@@ -7,7 +7,7 @@ export function creditExchangeInbox(props: Props) {
   box.gold += props.gold
   const item = props.item
   if (item && item.count > 0) {
-    const same = box.items.find((candidate) => candidate.item === item.item && candidate.q === item.q && candidate.by === item.by)
+    const same = box.items.find((candidate) => candidate.item === item.item && candidate.q === item.q && candidate.by === item.by && candidate.dur === item.dur)
     if (same) same.count += item.count
     else box.items.push({ ...item })
   }
