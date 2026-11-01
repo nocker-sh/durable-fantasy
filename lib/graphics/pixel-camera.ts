@@ -5,7 +5,7 @@ export class PixelCamera {
   readonly camera = new THREE.PerspectiveCamera(32, 1, 0.5, 200)
   readonly focus: THREE.Vector3
   private readonly pitch = 0.82
-  private readonly deadZone = 0.4
+  private readonly deadZone = 0.15
   private centring = false
   private level = 0
   width = 1
@@ -22,7 +22,7 @@ export class PixelCamera {
     const position = inputProps2.position
     const pixelsPerUnit = inputProps2.pixelsPerUnit
     const onResize = inputProps2.onResize
-    const zooms = inputProps2.zooms === undefined ? [1, 2] : inputProps2.zooms
+    const zooms = inputProps2.zooms === undefined ? [1, 2, 3, 4] : inputProps2.zooms
     const level = inputProps2.level === undefined ? 0 : inputProps2.level
     this.pixelsPerUnit = pixelsPerUnit
     this.onResize = onResize

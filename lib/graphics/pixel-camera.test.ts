@@ -12,9 +12,13 @@ it("keeps the pixel scale and projection consistent when resizing and zooming", 
   camera.zoom(1)
   expect(resize).toHaveBeenLastCalledWith(800, 600, 2)
   expect(camera.distance).toBeCloseTo(distance / 2)
-  expect(camera.zoomLevel()).toEqual({ level: 1, max: 1 })
+  expect(camera.zoomLevel()).toEqual({ level: 1, max: 3 })
   camera.zoom(1)
-  expect(camera.zoomLevel().level).toBe(1)
+  camera.zoom(1)
+  expect(resize).toHaveBeenLastCalledWith(800, 600, 4)
+  expect(camera.distance).toBeCloseTo(distance / 4)
+  camera.zoom(1)
+  expect(camera.zoomLevel().level).toBe(3)
 })
 
 it("holds the central region still and follows a turn around the same focus", () => {

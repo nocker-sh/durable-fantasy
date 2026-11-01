@@ -22,7 +22,7 @@ it("connects ordinary camera resizing and zoom to the same render and postproces
   const camera = createSceneCamera({ viewport: target, position, preview: false, zoom: 2 })
   expect(camera.focus.toArray()).toEqual([1, 2, 3])
   expect(camera.focus).not.toBe(position)
-  expect(camera.zoomLevel()).toEqual({ level: 0, max: 1 })
+  expect(camera.zoomLevel()).toEqual({ level: 0, max: 3 })
   camera.resize(801, 603)
   expect(target.renderer.setSize).toHaveBeenLastCalledWith(801, 603, false)
   camera.zoom(1)
