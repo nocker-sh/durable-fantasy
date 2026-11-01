@@ -1,7 +1,8 @@
-import { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
-import { pick } from "#/world/scene/pick"
+import type { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
+import { RAMPS } from "#/world/scene/pix"
 import { hash2 } from "#/lib/engine/hash2"
-import { vnoise } from "#/lib/engine/vnoise"
+import { seamlessNoise } from "#/world/scene/textures/seamless-noise"
+import { ToneMap } from "#/world/scene/textures/tone-map"
 
 type Props = {
   light?: number
@@ -11,24 +12,29 @@ type Props = {
   vertical?: boolean
 }
 
+/** Planks painted soft: each plank its own tone, a soft dark gap, the grain laid in strokes along it. */
 export function woodTex(props: Props): PixBuf {
   const light = props.light === undefined ? 0.55 : props.light
-  const plank = props.plank === undefined ? 9 : props.plank
   const seed = props.seed === undefined ? 2 : props.seed
-  const size = props.size === undefined ? 64 : props.size
+  const size = props.size === undefined ? 128 : props.size
+  // plank widths are given for a 64-pixel texture; a larger one paints the same planks finer
+  const fine = size / 64
   const vertical = props.vertical === undefined ? false : props.vertical
+  const planks = Math.max(1, Math.round(size / ((props.plank === undefined ? 9 : props.plank) * fine)))
+  const plank = size / planks
 
-  const b = new PixBuf(size, size)
-  b.fill((x, y) => {
-    const a = vertical ? x : y,
-      o = vertical ? y : x
+  const top = RAMPS.wood.length - 1
+  const t = new ToneMap(size, size)
+  t.fill((x, y) => {
+    const a = vertical ? x : y
     const k = Math.floor(a / plank),
       f = a / plank - k
-    const v = { value: light + (hash2(k, 0, seed) - 0.5) * 0.2 }
-    v.value += (vnoise({ x: o, y: k * 7, scale: 0.15, seed: seed }) - 0.5) * 0.15
-    if (f > 0.8) v.value = light - 0.3
-    if (hash2(o, k, seed + 9) > 0.97) v.value -= 0.2
-    return pick({ ramp: "wood", b: v.value, x: x, y: y, dither: 0.4 })
+    const wash = seamlessNoise({ x: x, y: y, scale: 0.08 / fine, seed: seed, w: size, h: size })
+    const l = { value: light * top + (hash2(k, 0, seed) - 0.5) * 0.8 + (wash - 0.5) * 0.7 }
+    if (f > 0.84) return { ramp: "wood", level: l.value - 1.2, region: -1 }
+    if (f < 0.16) l.value += 0.5
+    return { ramp: "wood", level: l.value, region: k }
   })
-  return b
+  t.strokes({ seed: seed, density: 0.14, along: vertical ? "y" : "x", len: [3, 7], thick: [1, 1], step: 0.5, bleed: 0.03, wrap: true })
+  return t.paint(0.15)
 }
