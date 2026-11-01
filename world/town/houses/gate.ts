@@ -41,7 +41,11 @@ const houses: readonly HouseDef[] = [
       u: 2,
     },
     seed: 92,
-    plan: home([room("詰所", 0), room("台所", 0), bed("寝所", 1, 2), bed("二つ目の寝所", 1, 2)], ["槍立て", "地図の卓", "寝台×4", "椅子×4"]),
+    // day and night watches sleep at different hours, so each guard has a room of their own (building-guardhouse.md)
+    plan: home(
+      [room("詰所", 0), room("台所", 0), bed("オイゲンの寝室", 1, 1), bed("ディーターの寝室", 1, 1), bed("シュテファンの寝室", 1, 1), bed("ヴェロニカの寝室", 1, 1)],
+      ["槍立て", "鎧掛け", "地図の卓", "油壺", "寝台×4", "椅子×4"],
+    ),
   },
   {
     id: "h-g1",
@@ -119,7 +123,7 @@ const houses: readonly HouseDef[] = [
       u: 2,
     },
     seed: 97,
-    plan: home([room("居間", 0), room("台所", 0), bed("寝室", 1, 2), bed("子ども部屋", 1, 2)], ["本棚", "石板の束", "食卓", "寝台（二人用）", "子どもの寝台×2", "椅子×4"]),
+    plan: home([room("居間", 0), room("台所", 0), bed("寝室", 1, 2), bed("子ども部屋", 1, 2)], ["本棚", "石板の束", "吊るした薬草", "食卓", "寝台（二人用）", "子どもの寝台×2", "椅子×4"]),
   },
   {
     id: "h-g6",
@@ -138,7 +142,7 @@ const houses: readonly HouseDef[] = [
       u: 1.8,
     },
     seed: 98,
-    plan: home([room("居間兼台所", 0), bed("寝室", 0, 2)], ["揺り椅子", "古い槍", "食卓", "寝台（二人用）", "椅子×2"]),
+    plan: home([room("居間兼台所", 0), bed("寝室", 0, 2)], ["揺り椅子", "古い槍", "毛糸の籠", "食卓", "寝台（二人用）", "椅子×2"]),
   },
   {
     id: "h-g3",
@@ -180,7 +184,8 @@ const houses: readonly HouseDef[] = [
       u: 2,
     },
     seed: 99,
-    plan: home([room("居間兼台所", 0), bed("寝所", 1, 3)], ["槍立て", "食卓", "寝台×3", "椅子×3"]),
+    // three watches, three sleeping hours: each guard sleeps in a room of their own
+    plan: home([room("居間兼台所", 0), bed("コンラートの寝室", 1, 1), bed("ヘンリケの寝室", 1, 1), bed("ロータルの寝室", 1, 1)], ["槍立て", "食卓", "寝台×3", "椅子×3"]),
   },
   {
     id: "h-g8",

@@ -1,8 +1,8 @@
 ---
 {
-  "id": "room-guardhouse-stefan",
+  "id": "room-guardhouse-6",
   "kind": "rooms",
-  "title": "門の詰所／2階 シュテファンの寝室",
+  "title": "門の詰所／2階 ヴェロニカの寝室",
   "status": "設計中",
   "source": "world/town/houses.ts",
   "design_gate": "未通過",
@@ -10,34 +10,34 @@
   "building": "building-guardhouse",
   "floor": 1,
   "origin": [
-    15,
+    20,
     0
   ],
-  "room_name": "シュテファンの寝室",
+  "room_name": "ヴェロニカの寝室",
   "use": "寝",
   "occupants": [
-    "シュテファン"
+    "ヴェロニカ"
   ],
   "private_for": [
-    "resident-シュテファン"
+    "resident-ヴェロニカ"
   ],
   "bed_capacity": 1,
   "guest_capacity": 0,
   "sleeping_places": [
     {
-      "id": "bed-guardhouse-4-2",
-      "resident": "resident-シュテファン",
+      "id": "bed-guardhouse-3-2",
+      "resident": "resident-ヴェロニカ",
       "kind": "個別寝台",
       "grid_symbol": "B",
       "storage_status": "本人の衣服箱を配置。容量と開閉は未照合",
-      "storage_id": "storage-guardhouse-4-2",
+      "storage_id": "storage-guardhouse-3-2",
       "storage_symbol": "L"
     }
   ],
   "personal_storage": [
     {
-      "id": "storage-guardhouse-4-2",
-      "resident": "resident-シュテファン",
+      "id": "storage-guardhouse-3-2",
+      "resident": "resident-ヴェロニカ",
       "contents": [
         "衣服",
         "首巻き",
@@ -53,7 +53,7 @@
   ],
   "design_dependencies": [
     "building-guardhouse",
-    "resident-シュテファン"
+    "resident-ヴェロニカ"
   ],
   "connections": [
     {
@@ -65,7 +65,7 @@
       "width_cells": 2,
       "target": "room-guardhouse-upper-hall",
       "target_door": [
-        13,
+        18,
         0
       ]
     }
@@ -73,11 +73,11 @@
   "furniture": [
     {
       "symbol": "B",
-      "name": "シュテファンの寝台",
-      "owner": "シュテファン",
-      "source": "町の木工所で製作し、寝具は仕立屋へ頼む案。シュテファンが手入れする案",
+      "name": "ヴェロニカの寝台",
+      "owner": "ヴェロニカ",
+      "source": "町の木工所で製作し、寝具は仕立屋へ頼む案。ヴェロニカが手入れする案",
       "maintainers": [
-        "resident-シュテファン"
+        "resident-ヴェロニカ"
       ],
       "rect": [
         1,
@@ -93,7 +93,7 @@
       ],
       "use_space": [
         {
-          "activity": "シュテファンの寝台を使う",
+          "activity": "ヴェロニカの寝台を使う",
           "rect": [
             3,
             1,
@@ -106,11 +106,11 @@
     },
     {
       "symbol": "L",
-      "name": "シュテファンの衣服箱",
-      "owner": "シュテファン",
-      "source": "町の木工所で製作し、寝具は仕立屋へ頼む案。シュテファンが手入れする案",
+      "name": "ヴェロニカの衣服箱",
+      "owner": "ヴェロニカ",
+      "source": "町の木工所で製作し、寝具は仕立屋へ頼む案。ヴェロニカが手入れする案",
       "maintainers": [
-        "resident-シュテファン"
+        "resident-ヴェロニカ"
       ],
       "rect": [
         1,
@@ -126,7 +126,7 @@
       ],
       "use_space": [
         {
-          "activity": "シュテファンの衣服箱を使う",
+          "activity": "ヴェロニカの衣服箱を使う",
           "rect": [
             3,
             7,
@@ -157,11 +157,11 @@
   }
 }
 ---
-# 門の詰所／2階 シュテファンの寝室
+# 門の詰所／2階 ヴェロニカの寝室
 
 ## 用途と暮らし
 
-[[building-guardhouse]] の平面案に属する。シュテファン本人の寝台と衣服箱を持つ。勤務時間の違う同僚と寝台を共用せず、各人の昼と夜の睡眠を別の室に分ける。遮光と音・換気、実際の睡眠時間と交代は未照合である。
+[[building-guardhouse]] の平面案に属する。ヴェロニカ本人の寝台と衣服箱を持つ。勤務時間の違う同僚と寝台を共用せず、各人の昼と夜の睡眠を別の室に分ける。遮光と音・換気、実際の睡眠時間と交代は未照合である。
 
 ## 未解決の条件
 

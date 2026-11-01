@@ -1,0 +1,79 @@
+---
+{
+  "id": "resident-インゴ",
+  "kind": "residents",
+  "title": "インゴ",
+  "status": "設計中",
+  "source": "world/town/residents.ts",
+  "design_gate": "未通過",
+  "town": "town-phanthiet",
+  "household": "porters",
+  "buildings": [
+    "building-h-g8"
+  ],
+  "bedroom_candidates": [
+    "room-h-g8-2"
+  ],
+  "work": "荷担ぎ",
+  "relationships": [
+    {
+      "a": "インゴ",
+      "b": "カルラ",
+      "kind": "夫婦",
+      "note": ""
+    },
+    {
+      "a": "インゴ",
+      "b": "ベルント",
+      "kind": "兄弟",
+      "note": "兄の後について荷を担ぐ"
+    }
+  ],
+  "issues": [
+    "寝台・個人収納のグリッド照合未完了",
+    "食事・水・便所・衣服の手入れの場所照合未完了"
+  ],
+  "bedroom": "room-h-g8-2",
+  "bed_id": "bed-h-g8-2-1",
+  "design_dependencies": [
+    "building-h-g8",
+    "room-h-g8-1",
+    "room-h-g8-2"
+  ],
+  "storage_ids": [
+    "storage-h-g8-2-1"
+  ],
+  "routine_source": {
+    "file": "world/town/routines.ts",
+    "export": "ROUTINES",
+    "key": "インゴ"
+  },
+  "appearance_source": {
+    "file": "world/town/residents.ts",
+    "export": "RESIDENT_LOOKS",
+    "key": "インゴ"
+  }
+}
+---
+
+# インゴ
+
+## 暮らしの立場
+
+インゴは荷担ぎ。インゴとカルラの家に属し、妻のカルラ、弟のベルントと暮らす。倉庫と門の荷を上げ下ろしして、倉庫のヒルデから日当を受け取る。
+
+## 人柄と話し方
+
+性格は力自慢、気さく、妻に頭が上がらない。話し方は「おれ。気さくな口調。「〜さ」」。口癖は「荷は腰で持て」。
+
+## 一日の居場所
+
+日課の時刻・場所・行動は routine_source が指すコードの定義を正とする。朝に起きて倉庫の前で荷を担ぎ、昼は門の井戸端で食べ、夕方に戻って家族と夕餉をとって眠る。単に予定の座標へ移動できるだけで生活の成立としない。
+
+## 固有の寝床
+
+常用の寝床は [[room-h-g8-2]] の bed-h-g8-2-1 に割り当てる。妻のカルラと二人用の寝台を分け合い、寝台の自分の側を本人の寝床とする。衣服、首巻き、私物の収納は storage_ids の個人区画へ割り当て、寝台の使用面と合わせて容量・開閉を照合する。
+
+## 描画へ渡す条件
+
+外見は appearance_source が指す実際の描画定義を基準とする。荷縄と肩当ては荷担ぎの道具であり、帰宅すると荷縄は1階の壁、肩当ては炉のそばへ置く。部屋と動線が未確認のため、現時点では生活の整合を検証済みとしない。

@@ -257,7 +257,7 @@ const baseRoutines: Record<string, readonly Slot[]> = {
     at({ from: "07:00", where: "home", doing: "眠る" }),
     at({ from: "15:30", where: P("phanthiet-gate", "gateWell"), doing: "井戸端でテオと話す" }),
     at({ from: "16:00", where: "work", doing: "荷を預かる" }),
-    at({ from: "23:00", where: { map: "phanthiet-gate", tile: [30.5, 25.5] }, doing: "倉庫の前の灰を掃く" }),
+    at({ from: "23:00", where: { map: "phanthiet-gate", tile: [30.25, 16.75] }, doing: "倉庫の前の灰を掃く" }),
     at({ from: "23:30", where: "work", doing: "荷を預かる" }),
   ],
   // ---------------------------------------------------------------- the households that grew, and the ones that moved in
