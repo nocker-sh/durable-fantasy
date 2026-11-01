@@ -21,7 +21,7 @@ const M = {
   rockDark: mat(rockTex({ ramp: "stone", light: 0.38, seed: 4 })),
   ashlar: mat(stoneTex({ ramp: "sand", light: 0.62, seed: 3, bw: 26, bh: 12 })),
   wood: mat(woodTex({ light: 0.55, plank: 9, seed: 2 })),
-  woodV: mat(woodTex({ light: 0.5, plank: 9, seed: 5, size: 64, vertical: true })),
+  woodV: mat(woodTex({ light: 0.5, plank: 9, seed: 5, vertical: true })),
   woodDark: mat(woodTex({ light: 0.32, plank: 9, seed: 6 })),
   roof: mat(roofTex({ ramp: "roof", light: 0.6, seed: 3 }), { side: THREE.DoubleSide }),
   roof2: mat(roofTex({ ramp: "roof2", light: 0.6, seed: 4 }), { side: THREE.DoubleSide }),
