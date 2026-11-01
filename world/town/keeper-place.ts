@@ -19,10 +19,13 @@ export function keeperPlace(name: string): { map: string; cell: Cell } | null {
     const k = keepers.indexOf(name)
     if (k < 0) continue
     const counter = it.furniture.find((f) => f.kind === "counter")
-    // the open cells behind the counter whose middle lies over it (a cell is half a tile)
+    // the open cells behind the counter whose middle lies over it (a cell is half a tile), then the open cells a step
+    // further back, where a short counter leaves no room beside the first keeper
     const behind = ASIDE.filter((s) => (!counter || Math.abs((it.keeper[0] + s + 0.5) / 2 - counter.x) <= counter.w / 2 + 0.05) && (s === 0 || isInteriorCellOpen(it, it.keeper[0] + s, it.keeper[1])))
-    const step = behind[k] ?? ASIDE[k] ?? k * 2
-    return { map: it.id, cell: [it.keeper[0] + step, it.keeper[1]] }
+    const back = ASIDE.filter((s) => isInteriorCellOpen(it, it.keeper[0] + s, it.keeper[1] - 1))
+    const steps: Cell[] = [...behind.map((s): Cell => [s, 0]), ...back.map((s): Cell => [s, -1])]
+    const step = steps[k] ?? [ASIDE[k] ?? k * 2, 0]
+    return { map: it.id, cell: [it.keeper[0] + step[0], it.keeper[1] + step[1]] }
   }
   return null
 }
