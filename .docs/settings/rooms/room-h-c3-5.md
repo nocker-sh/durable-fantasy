@@ -1,32 +1,35 @@
 ---
 {
-  "id": "room-h-c3-niklas",
+  "id": "room-h-c3-5",
   "kind": "rooms",
   "source": "world/town/houses.ts",
   "town": "town-phanthiet",
   "building": "building-h-c3",
   "bed_capacity": 1,
-  "title": "エマの家／2階 ニクラスの寝室",
-  "room_name": "2階 ニクラスの寝室",
+  "title": "エマの家／2階 フリーダの寝室",
+  "room_name": "2階 フリーダの寝室",
   "status": "設計中",
   "design_gate": "未通過",
   "floor": 1,
   "origin": [
-    12,
+    19,
     0
   ],
   "use": "寝",
   "occupants": [
-    "ニクラス"
+    "エマ",
+    "フリーダ",
+    "ローゼマリー"
   ],
   "furniture": [
     {
       "symbol": "B",
-      "name": "ニクラスの寝台",
-      "owner": "ニクラス",
-      "source": "町の木工所で寝台を作り、仕立屋へ寝具を頼む案。ニクラスが手入れする案",
+      "name": "フリーダの寝台",
+      "owner": "フリーダ",
+      "source": "町の木工所で製作し、寝具は仕立屋へ頼む案。エマが寝具と衣服を手入れし、フリーダが片付ける案",
       "maintainers": [
-        "resident-ニクラス"
+        "resident-エマ",
+        "resident-フリーダ"
       ],
       "rect": [
         1,
@@ -42,7 +45,7 @@
       ],
       "use_space": [
         {
-          "activity": "ニクラスの寝台を使う",
+          "activity": "フリーダの寝台を使う",
           "rect": [
             3,
             1,
@@ -55,11 +58,12 @@
     },
     {
       "symbol": "L",
-      "name": "ニクラスの衣服箱",
-      "owner": "ニクラス",
-      "source": "町の木工所と鍛冶場へ用途に合う部材と製作を頼む案。ニクラスが手入れする案",
+      "name": "フリーダの衣服箱",
+      "owner": "フリーダ",
+      "source": "町の木工所で製作し、寝具は仕立屋へ頼む案。エマが寝具と衣服を手入れし、フリーダが片付ける案",
       "maintainers": [
-        "resident-ニクラス"
+        "resident-エマ",
+        "resident-フリーダ"
       ],
       "rect": [
         1,
@@ -75,7 +79,7 @@
       ],
       "use_space": [
         {
-          "activity": "ニクラスの衣服箱を使う",
+          "activity": "フリーダの衣服箱を使う",
           "rect": [
             3,
             7,
@@ -97,7 +101,7 @@
       "width_cells": 2,
       "target": "room-h-c3-upper-hall",
       "target_door": [
-        10,
+        17,
         0
       ]
     }
@@ -114,40 +118,42 @@
     "resident-ローゼマリー"
   ],
   "private_for": [
-    "resident-ニクラス"
+    "resident-エマ",
+    "resident-フリーダ",
+    "resident-ローゼマリー"
   ],
   "grid": {
     "cell_m": 0.5,
     "origin": "北西",
     "rows": [
-      "########",
-      "#BB....#",
-      "#BB....#",
-      "#BB....#",
-      "#BB....#",
-      "#......#",
-      "#......#",
-      "#LL....#",
-      "#LL....#",
-      "#......#",
-      "###DD###"
+      "#######",
+      "#BB...#",
+      "#BB...#",
+      "#BB...#",
+      "#BB...#",
+      "#.....#",
+      "#.....#",
+      "#LL...#",
+      "#LL...#",
+      "#.....#",
+      "###DD##"
     ]
   },
   "sleeping_places": [
     {
-      "id": "bed-h-c3-3-2",
-      "resident": "resident-ニクラス",
+      "id": "bed-h-c3-5-1",
+      "resident": "resident-フリーダ",
       "kind": "個別寝台",
       "grid_symbol": "B",
       "storage_status": "本人の衣服箱を配置。容量と開閉は未照合",
-      "storage_id": "storage-h-c3-3-2",
+      "storage_id": "storage-h-c3-5-1",
       "storage_symbol": "L"
     }
   ],
   "personal_storage": [
     {
-      "id": "storage-h-c3-3-2",
-      "resident": "resident-ニクラス",
+      "id": "storage-h-c3-5-1",
+      "resident": "resident-フリーダ",
       "contents": [
         "衣服",
         "首巻き",
@@ -160,26 +166,26 @@
   "guest_capacity": 0
 }
 ---
-# エマの家／2階 ニクラスの寝室
+# エマの家／2階 フリーダの寝室
 
 ## 用途と暮らし
 
-[[building-h-c3]] の平面案に属する。ニクラスの個室として本人の寝台と衣服箱を持つ。木工所へ働きに出る既存の仕事を保ち、エマの仕事部屋の常勤の担当へ置き換えない。
+[[building-h-c3]] の平面案に属する。フリーダの個室として本人の寝台と衣服箱を持つ。エマとローゼマリーは寝具と衣服の世話に入れるようにする。木工所の道具や仕事の柳を子どもの私物と混ぜない。
 
 ## 未解決の条件
 
 敷地と構造・戸と窓、柳と水・籠を編む姿勢と材料・端材、家庭の給排水と便所・火と灰、衣服と寝具、勤務と食事・休息、立体は未照合である。現行の建物と描画は切り替えない。
 
 ```grid
-########
-#BB....#
-#BB....#
-#BB....#
-#BB....#
-#......#
-#......#
-#LL....#
-#LL....#
-#......#
-###DD###
+#######
+#BB...#
+#BB...#
+#BB...#
+#BB...#
+#.....#
+#.....#
+#LL...#
+#LL...#
+#.....#
+###DD##
 ```

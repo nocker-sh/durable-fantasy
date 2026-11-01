@@ -13,7 +13,7 @@
     "building-h-c2"
   ],
   "bedroom_candidates": [
-    "room-woodworker-2"
+    "room-woodworker-3"
   ],
   "work": "木工師",
   "relationships": [
@@ -40,12 +40,13 @@
     "寝台と衣服箱・階段と居住部の木屑と音・日課の照合未完了",
     "食事・水・便所・衣服の手入れの場所照合未完了"
   ],
-  "bedroom": "room-woodworker-2",
-  "bed_id": "bed-woodworker-2-1",
+  "bedroom": "room-woodworker-3",
+  "bed_id": "bed-woodworker-3-1",
   "design_dependencies": [
     "building-woodworker",
-    "room-woodworker-2",
     "room-woodworker-1",
+    "room-woodworker-3",
+    "room-woodworker-2",
     "room-h-c2-1",
     "room-h-c2-entry",
     "room-h-c2-2",
@@ -55,7 +56,7 @@
     "facility-square-pasture"
   ],
   "storage_ids": [
-    "storage-woodworker-2-1"
+    "storage-woodworker-3-1"
   ],
   "routine_source": {
     "file": "world/town/routines.ts",
@@ -64,6 +65,7 @@
   },
   "work_rooms": [
     "room-woodworker-1",
+    "room-woodworker-2",
     "room-h-c2-1",
     "room-h-c2-entry",
     "room-h-c2-2",
@@ -101,11 +103,11 @@
 
 ## 固有の寝床
 
-常用の寝床は [[room-woodworker-2]] の bed-woodworker-2-1 に割り当てる。客室や仕事場の休憩用家具を、本人の寝床の代わりに数えない。衣服、首巻き、私物の収納は storage_ids の個人区画へ割り当て、寝台の使用面と合わせて容量・開閉を照合する。
+常用の寝床は [[room-woodworker-3]] の bed-woodworker-3-1 に割り当てる。客室や仕事場の休憩用家具を、本人の寝床の代わりに数えない。衣服、首巻き、私物の収納は storage_ids の個人区画へ割り当て、寝台の使用面と合わせて容量・開閉を照合する。
 
 ## 木工所の仕事と寝床
 
-仕事先は[[room-woodworker-1]]へ結ぶ。ゴットフリートとアントンが同居し、ニクラスは自分の世帯から働きに来る関係を保持する。工房の材料・完成品と家族の食卓・寝床を分け、屋外での長材と搬入、夜食と帰宅を含む日課、立体と描画の照合は残る。
+仕事先は店番をする[[room-woodworker-1]]と、木を削る[[room-woodworker-2]]へ結ぶ。ゴットフリートとアントンが同居し、ニクラスは自分の世帯から働きに来る関係を保持する。工房の材料・完成品と家族の食卓・寝床を分け、屋外での長材と搬入、夜食と帰宅を含む日課、立体と描画の照合は残る。
 
 ## 二人の寝台へ供給する案
 

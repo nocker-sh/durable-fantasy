@@ -230,7 +230,7 @@ const baseRoutines: Record<string, readonly Slot[]> = {
   ゴットフリート: [
     at({ from: "07:30", where: "home", doing: "眠る" }),
     at({ from: "16:00", where: "work", doing: "木を削って売る" }),
-    at({ from: "23:00", where: P("phanthiet-craft", "h-c3"), doing: "空き家の戸を直してやる" }),
+    at({ from: "23:00", where: P("phanthiet-craft", "h-c3"), doing: "エマの家の戸を直してやる" }),
     at({ from: "00:00", where: "work", doing: "木を削って売る" }),
   ],
   ルドルフ: [

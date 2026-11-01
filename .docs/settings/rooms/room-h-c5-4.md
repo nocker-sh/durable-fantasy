@@ -1,6 +1,6 @@
 ---
 {
-  "id": "room-h-c5-tobias",
+  "id": "room-h-c5-4",
   "kind": "rooms",
   "title": "ベルンハルトの家／2階 トビアスの寝室",
   "status": "設計中",
@@ -125,12 +125,12 @@
   ],
   "sleeping_places": [
     {
-      "id": "bed-h-c5-3-3",
+      "id": "bed-h-c5-4-1",
       "resident": "resident-トビアス",
       "kind": "個別寝台",
       "grid_symbol": "B",
       "storage_status": "本人の衣服箱を配置。容量と開閉は未照合",
-      "storage_id": "storage-h-c5-3-3",
+      "storage_id": "storage-h-c5-4-1",
       "storage_symbol": "L"
     }
   ],
@@ -143,7 +143,7 @@
   ],
   "personal_storage": [
     {
-      "id": "storage-h-c5-3-3",
+      "id": "storage-h-c5-4-1",
       "resident": "resident-トビアス",
       "contents": [
         "衣服",

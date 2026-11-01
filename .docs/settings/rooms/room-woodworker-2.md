@@ -2,32 +2,41 @@
 {
   "id": "room-woodworker-2",
   "kind": "rooms",
-  "title": "ゴットフリートの木工所／2階 屋根裏の寝間",
+  "title": "ゴットフリートの木工所／1階 工房",
   "status": "設計中",
   "source": "world/town/houses.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "building": "building-woodworker",
-  "floor": 1,
-  "room_name": "屋根裏の寝間",
-  "use": "寝",
+  "floor": 0,
+  "room_name": "工房",
+  "use": "作業",
   "occupants": [
     "ゴットフリート",
-    "アントン"
+    "アントン",
+    "ニクラス"
   ],
-  "bed_capacity": 2,
+  "bed_capacity": 0,
   "grid": {
     "cell_m": 0.5,
     "origin": "北西",
     "rows": [
-      "#####DD####",
-      "#GG.......#",
-      "#GG....AA.#",
-      "#GG....AA.#",
-      "#GG....AA.#",
-      "#......AA.#",
-      "#CC....FF.#",
-      "###########"
+      "##########",
+      "#SSTT..OO#",
+      "#SS....OO#",
+      "#SS......D",
+      "#SS......D",
+      "#SS..BBBB#",
+      "#SS..BBBB#",
+      "#SS......#",
+      "#SS......#",
+      "#SS....AA#",
+      "#SS....AA#",
+      "#SS....AA#",
+      "#SS......#",
+      "#....LLLL#",
+      "#EE..LLLL#",
+      "##########"
     ],
     "legend": {
       "#": "壁",
@@ -38,275 +47,343 @@
   "connections": [
     {
       "kind": "door",
-      "target": "room-woodworker-kitchen",
+      "target": "room-woodworker-1",
       "door": [
-        5,
-        0
+        9,
+        3
       ],
       "width_cells": 2,
       "target_door": [
-        5,
-        8
+        0,
+        3
+      ]
+    },
+    {
+      "kind": "stair",
+      "target": "room-woodworker-stairs",
+      "furniture": "S",
+      "target_furniture": "S",
+      "access": [
+        3,
+        12
+      ],
+      "target_access": [
+        3,
+        1
       ]
     }
   ],
   "furniture": [
     {
-      "symbol": "G",
-      "name": "ゴットフリートの寝台",
-      "owner": "ゴットフリート",
+      "symbol": "S",
+      "name": "家族の上階へ上がる直階段",
+      "owner": "woodworker",
       "source": "木工所で組む木製の家具",
       "rect": [
         1,
         1,
         2,
-        4
+        12
       ],
       "access": [
         [
           3,
-          3
+          12
         ]
       ],
       "use_space": [
         {
-          "activity": "寝具を整えて横になる",
+          "activity": "階段の下端へ出入りする",
           "rect": [
             3,
-            2,
+            11,
             2,
             2
           ]
         }
-      ],
-      "role": "bed"
-    },
-    {
-      "symbol": "A",
-      "name": "アントンの寝台",
-      "owner": "アントン",
-      "source": "木工所で組む木製の家具",
-      "rect": [
-        7,
-        2,
-        2,
-        4
-      ],
-      "access": [
-        [
-          6,
-          3
-        ]
-      ],
-      "use_space": [
-        {
-          "activity": "寝具を整えて横になる",
-          "rect": [
-            5,
-            3,
-            2,
-            2
-          ]
-        }
-      ],
-      "role": "bed"
-    },
-    {
-      "symbol": "C",
-      "name": "ゴットフリートの衣服箱",
-      "owner": "ゴットフリート",
-      "source": "木工所で組む木製の家具",
-      "rect": [
-        1,
-        6,
-        2,
-        1
-      ],
-      "access": [
-        [
-          3,
-          6
-        ]
-      ],
-      "use_space": [
-        {
-          "activity": "衣服と私物を出し入れする",
-          "rect": [
-            3,
-            5,
-            2,
-            2
-          ]
-        }
-      ],
-      "role": "storage",
-      "owners": [
-        "ゴットフリート"
-      ],
-      "compartments": [
-        "本人の区画"
       ]
     },
     {
-      "symbol": "F",
-      "name": "アントンの衣服箱",
+      "symbol": "B",
+      "name": "ゴットフリートの木工台",
+      "owner": "ゴットフリート",
+      "source": "木工所で組む木製の家具",
+      "rect": [
+        5,
+        5,
+        4,
+        2
+      ],
+      "access": [
+        [
+          6,
+          4
+        ],
+        [
+          6,
+          7
+        ]
+      ],
+      "use_space": [
+        {
+          "activity": "台の奥側で部品を確かめる",
+          "rect": [
+            5,
+            3,
+            4,
+            2
+          ]
+        },
+        {
+          "activity": "台の手前で木を削る",
+          "rect": [
+            5,
+            7,
+            3,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "symbol": "A",
+      "name": "アントンが樽を組む台",
       "owner": "アントン",
       "source": "木工所で組む木製の家具",
       "rect": [
         7,
-        6,
+        9,
+        2,
+        3
+      ],
+      "access": [
+        [
+          6,
+          10
+        ],
+        [
+          7,
+          8
+        ]
+      ],
+      "use_space": [
+        {
+          "activity": "樽の部材を合わせる",
+          "rect": [
+            5,
+            9,
+            2,
+            3
+          ]
+        },
+        {
+          "activity": "樽の部材を北側から確かめる",
+          "rect": [
+            7,
+            7,
+            2,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "symbol": "T",
+      "name": "鉋と鋸の掛け台",
+      "owner": "woodworker",
+      "source": "木工所で組む木製の家具",
+      "rect": [
+        3,
+        1,
         2,
         1
       ],
       "access": [
         [
-          6,
-          6
+          3,
+          2
         ]
       ],
       "use_space": [
         {
-          "activity": "衣服と私物を出し入れする",
+          "activity": "刃を覆った道具を出し入れする",
           "rect": [
-            5,
-            5,
+            3,
+            2,
             2,
             2
           ]
         }
       ],
-      "role": "storage",
-      "owners": [
-        "アントン"
+      "role": "storage"
+    },
+    {
+      "symbol": "L",
+      "name": "短い板と部材の置き場",
+      "owner": "woodworker",
+      "source": "ヨーゼフから受け取り、屋外で荒取りした短い板を店先から運び入れる",
+      "rect": [
+        5,
+        13,
+        4,
+        2
       ],
-      "compartments": [
-        "本人の区画"
+      "access": [
+        [
+          4,
+          13
+        ]
+      ],
+      "use_space": [
+        {
+          "activity": "室内で使う部材を出し入れする",
+          "rect": [
+            3,
+            13,
+            2,
+            2
+          ]
+        }
+      ],
+      "role": "storage"
+    },
+    {
+      "symbol": "O",
+      "name": "扉を閉じて使う暖房炉",
+      "owner": "woodworker",
+      "source": "石工の炉と鍛冶屋の金物",
+      "rect": [
+        7,
+        1,
+        2,
+        2
+      ],
+      "access": [
+        [
+          6,
+          2
+        ]
+      ],
+      "use_space": [
+        {
+          "activity": "火と燃料を扱う",
+          "rect": [
+            5,
+            1,
+            2,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "symbol": "E",
+      "name": "仕事着と靴を下ろす受け",
+      "owner": "woodworker",
+      "source": "木工所で組む木製の家具",
+      "rect": [
+        1,
+        14,
+        2,
+        1
+      ],
+      "access": [
+        [
+          3,
+          14
+        ]
+      ],
+      "use_space": [
+        {
+          "activity": "居住部へ上がる前に仕事着を下ろす",
+          "rect": [
+            3,
+            13,
+            2,
+            2
+          ]
+        }
       ]
     }
   ],
   "issues": [
-    "寝具と箱の容量・着替えと蓋・夜の目隠しは未照合",
-    "屋根の梁と床・工房の音と埃・換気と火の立体照合未完了",
-    "戸と金具・就寝前後の動きと日課は未照合"
+    "長材の搬入・旋回・屋外の原木置場は未設計",
+    "刃・木屑と暖房炉・換気と火や灰の搬出経路は未照合",
+    "作業中の道具と部材・三人の移動と受渡しは未照合",
+    "階段と居住部の木屑・音と埃の遮断・夜の灯りは未照合",
+    "店先との間の戸の板と金具・客の目と音の仕切りは未設計"
   ],
-  "sleeping_places": [
-    {
-      "id": "bed-woodworker-2-1",
-      "resident": "resident-ゴットフリート",
-      "kind": "個別寝台",
-      "grid_symbol": "G",
-      "storage_status": "本人の衣服箱へ配置。容量と可動域は未照合",
-      "storage_id": "storage-woodworker-2-1",
-      "storage_symbol": "C"
-    },
-    {
-      "id": "bed-woodworker-2-2",
-      "resident": "resident-アントン",
-      "kind": "個別寝台",
-      "grid_symbol": "A",
-      "storage_status": "本人の衣服箱へ配置。容量と可動域は未照合",
-      "storage_id": "storage-woodworker-2-2",
-      "storage_symbol": "F"
-    }
-  ],
-  "guest_capacity": 0,
   "design_dependencies": [
     "building-woodworker",
-    "room-woodworker-kitchen",
+    "room-woodworker-1",
+    "room-woodworker-stairs",
+    "map-phanthiet-craft",
     "resident-ゴットフリート",
-    "resident-アントン"
-  ],
-  "personal_storage": [
-    {
-      "id": "storage-woodworker-2-1",
-      "resident": "resident-ゴットフリート",
-      "contents": [
-        "衣服",
-        "首巻き",
-        "私物"
-      ],
-      "furniture_symbol": "C",
-      "compartment": "本人の区画"
-    },
-    {
-      "id": "storage-woodworker-2-2",
-      "resident": "resident-アントン",
-      "contents": [
-        "衣服",
-        "首巻き",
-        "私物"
-      ],
-      "furniture_symbol": "F",
-      "compartment": "本人の区画"
-    }
+    "resident-アントン",
+    "resident-ニクラス",
+    "resident-ヨーゼフ"
   ],
   "origin": [
-    5,
-    8
+    0,
+    0
   ],
-  "private_for": [
-    "resident-ゴットフリート",
-    "resident-アントン"
-  ],
-  "door_leaves": [
+  "parallel_use": [
     {
-      "door": [
-        5,
-        0
-      ],
-      "hinge": "end",
-      "frame_inset_m": 0.05,
-      "thickness_m": 0.04,
-      "waits_for": [],
-      "operation": {
-        "body_radius_m": 0.4,
-        "orbit_radius_m": 1.5,
-        "start_deg": 20,
-        "end_deg": 70,
-        "waits_for": [
-          {
-            "furniture": "G",
-            "space_index": 0,
-            "reason": "ゴットフリートが寝具を整える作業と寝台への出入りを終え、使用面を空けてから戸を扱う"
-          },
-          {
-            "furniture": "A",
-            "space_index": 0,
-            "reason": "アントンが寝具を整える作業と寝台への出入りを終え、使用面を空けてから戸を扱う"
-          }
-        ]
-      }
+      "activity": "木を削る仕事と樽の部材合わせ",
+      "operations": [
+        {
+          "resident": "ゴットフリート",
+          "furniture": "B",
+          "space_index": 1
+        },
+        {
+          "resident": "アントン",
+          "furniture": "A",
+          "space_index": 0
+        }
+      ]
     }
   ]
 }
 ---
 
-# ゴットフリートの木工所／2階 屋根裏の寝間
+# ゴットフリートの木工所／1階 工房
 
-## 父子の寝床と衣服
+## 作り手と仕事の区別
 
-ゴットフリートとアントンにそれぞれ常用寝台と衣服箱を置き、既存の固有IDへ結び付ける。二人の寝具と衣服は、仕事の材料・道具・完成品・客の預かり品の収納と重複させない。働きに来るニクラスの寝床を、この家の父子の枠で満たさない。
+[[resident-ゴットフリート]]の木工台、[[resident-アントン]]の樽を組む場所、[[resident-ニクラス]]が部材を運ぶ経路を持つ。ニクラスは働きに来る人であり、この家の常用寝台へ割り当てない。原木は[[resident-ヨーゼフ]]から受け取る。長い原木の荒取りと保管を室内の通路だけで成立させず、屋外の仕事場を別に設計する。
 
-## 居住部のつながり
+## 店先との区切り
 
-[[room-woodworker-kitchen]]から入る家族の寝間であり、工房の客や材料の搬入経路として通り抜けない。寝台を戸の開閉域から外し、着替えと衣服箱の床を本人ごとに取る。戸と枠・身体の操作の平面を持つが、金具と姿勢・目隠し・夜の灯りは引き続き照合する。
+客は[[room-woodworker-1]]で受け渡しを済ませ、工房へは入らない。工房へは店先の売り台の裏にある戸から入る。短い板は店先の戸から運び入れ、工房の南の置き場へ納める。完成した弓と木工品は店先の棚へ出し、工房には仕掛品と道具だけを置く。
+
+## 材料と道具
+
+短い板と部材、刃を覆った鉋・鋸を別の場所に置く。修理する物は店先の預かり棚で持ち主を確かめてから工房へ運び、完成品の在庫と預かり品を同じ棚の中身として数えない。台の占有と作業する床を分け、木を削る作業と樽の部材合わせの静止した組合せを記録する。
+
+## 木屑と居住部
+
+暖房は扉を閉じて使う炉を東北に置く案とし、開いた火口の脇で木屑を積まない。掃き取る木屑と灰、火と材料の離隔、燃料の保管と換気はまだ設計が残る。家族は階段の下の受けで仕事着と靴を下ろして西の直階段から[[room-woodworker-stairs]]へ上がり、上の戸で調理と就寝の床を工房から分ける。
 
 ## 平面案
 
-
-屋根の下面と使用面は断面へ対応させる。工房からの音と埃、梁と床、窓と換気を閉じてから描画する。
-
-## 戸を扱う身体と作業の順番
-
-ゴットフリートが寝具を整える作業と寝台への出入りを終え、使用面を空けてから戸を扱う。アントンが寝具を整える作業と寝台への出入りを終え、使用面を空けてから戸を扱う。戸板の回転とは別に、開閉する身体の円弧と家具の使用面を照合する。同時使用できる面としては扱わず、待つ人の位置と道側からの操作・人の移動の連続は別に照合する。
+一セルは半メートル。西に階段とその脇の通り道、北に鉋と鋸の掛け台と暖房炉、東の壁沿いに木工台と樽を組む台、南に短い板の置き場、階段の下に仕事着の受けを置く。東北の戸は店先の売り台の裏へ通じる。身体だけが通れる検査で、長い板や完成した家具を運べるとは判定しない。木を持った旋回、三人の受渡しと日課、屋外の置き場を照合してから描画へ進む。
 
 ```grid
-#####DD####
-#GG.......#
-#GG....AA.#
-#GG....AA.#
-#GG....AA.#
-#......AA.#
-#CC....FF.#
-###########
+##########
+#SSTT..OO#
+#SS....OO#
+#SS......D
+#SS......D
+#SS..BBBB#
+#SS..BBBB#
+#SS......#
+#SS......#
+#SS....AA#
+#SS....AA#
+#SS....AA#
+#SS......#
+#....LLLL#
+#EE..LLLL#
+##########
 ```

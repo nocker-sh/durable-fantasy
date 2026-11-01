@@ -735,6 +735,12 @@
       "source": "world/town/houses.ts"
     },
     {
+      "id": "room-woodworker-3",
+      "kind": "rooms",
+      "file": "rooms/room-woodworker-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
       "id": "room-woodworker-stairs",
       "kind": "rooms",
       "file": "rooms/room-woodworker-stairs.md",
@@ -2495,15 +2501,9 @@
       "source": "world/town/houses.ts"
     },
     {
-      "id": "room-h-c5-monica",
+      "id": "room-h-c5-4",
       "kind": "rooms",
-      "file": "rooms/room-h-c5-monica.md",
-      "source": "world/town/houses.ts"
-    },
-    {
-      "id": "room-h-c5-tobias",
-      "kind": "rooms",
-      "file": "rooms/room-h-c5-tobias.md",
+      "file": "rooms/room-h-c5-4.md",
       "source": "world/town/houses.ts"
     },
     {
@@ -2567,15 +2567,15 @@
       "source": "world/town/houses.ts"
     },
     {
-      "id": "room-h-c3-niklas",
+      "id": "room-h-c3-4",
       "kind": "rooms",
-      "file": "rooms/room-h-c3-niklas.md",
+      "file": "rooms/room-h-c3-4.md",
       "source": "world/town/houses.ts"
     },
     {
-      "id": "room-h-c3-frieda",
+      "id": "room-h-c3-5",
       "kind": "rooms",
-      "file": "rooms/room-h-c3-frieda.md",
+      "file": "rooms/room-h-c3-5.md",
       "source": "world/town/houses.ts"
     },
     {
