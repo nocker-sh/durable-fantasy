@@ -232,7 +232,11 @@ function SellPanel(inputProps2: { picked: number | null; onPick: (slot: number |
               {displayName(stack.item, stack.by)}
               {ITEMS[stack.item].made && `（${QUALITIES[stack.q ?? 1]}）`}
             </span>
-            {shopTakes(shop!, stack.item) ? <Gold amount={each(stack, Math.min(count, stack.count)) * Math.min(count, stack.count)} className="text-xs" /> : <span className="font-head text-[11px] text-bad">{REASON_TEXT.NOT_WANTED}</span>}
+            {shopTakes(shop!, stack.item) ? (
+              <Gold amount={each(stack, Math.min(count, stack.count)) * Math.min(count, stack.count)} className="text-xs" />
+            ) : (
+              <span className="font-head text-[11px] text-bad">{REASON_TEXT.NOT_WANTED}</span>
+            )}
             <Stepper value={Math.min(count, stack.count)} max={stack.count} onChange={setCount} />
             <Button
               variant="primary"

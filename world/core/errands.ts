@@ -43,7 +43,14 @@ export const ERRANDS: readonly Errand[] = [
     ask: "窯の薪が心もとないのよ。五束あると、明日の朝まで焼けるんだけど。",
     thanks: "これで朝の窯が焚けるわ。ありがとうね。",
   }),
-  bringErrand({ id: "gunter-charcoal", from: "ギュンター", item: "charcoal", count: 3, ask: "炭を三つ持ってきてくれ。ゼヴェリンの俵じゃ足りねえ晩なんだ。ヨーゼフの店ので構わん。", thanks: "上等だ。これで今夜も鉄が打てるぜ。" }),
+  bringErrand({
+    id: "gunter-charcoal",
+    from: "ギュンター",
+    item: "charcoal",
+    count: 3,
+    ask: "炭を三つ持ってきてくれ。ゼヴェリンの俵じゃ足りねえ晩なんだ。ヨーゼフの店ので構わん。",
+    thanks: "上等だ。これで今夜も鉄が打てるぜ。",
+  }),
   bringErrand({
     id: "gunter-scrap",
     from: "ギュンター",

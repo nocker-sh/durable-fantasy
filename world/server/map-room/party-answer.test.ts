@@ -138,4 +138,3 @@ it("does not join a party whose inviter no longer leads it", async () => {
   expect(request.join).not.toHaveBeenCalled()
   expect(request.save).not.toHaveBeenCalled()
 })
-

@@ -23,9 +23,7 @@ export function cheapestShopPrice(item: ItemId): number | null {
     .flatMap((shop) => {
       const by = ITEMS[item].made ? makerAt(shop, item) : undefined
       return qualitiesOf(item, by).map((q) => {
-        const asked = batched(shop, item)
-          ? priceNow({ item, q, by, toClose: 0, isBatched: true })
-          : Math.max(1, Math.round(priceOf(item, q, by) * stockFactor(Number.MAX_SAFE_INTEGER, item)))
+        const asked = batched(shop, item) ? priceNow({ item, q, by, toClose: 0, isBatched: true }) : Math.max(1, Math.round(priceOf(item, q, by) * stockFactor(Number.MAX_SAFE_INTEGER, item)))
         return friendPrice(asked, CLOSEST)
       })
     })

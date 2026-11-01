@@ -177,8 +177,24 @@ export const clientMessage = z.discriminatedUnion("type", [
   z.object({ type: z.literal("party-leave") }),
   z.object({ type: z.literal("party-mode"), mode: z.enum(["own", "even"]) }),
   /** the leader removes a member, or hands the lead over; members are named by place in the list and name */
-  z.object({ type: z.literal("party-kick"), member: z.number().int().min(0).max(PARTY_MAX - 1), name: z.string().max(NAME_MAX) }),
-  z.object({ type: z.literal("party-lead"), member: z.number().int().min(0).max(PARTY_MAX - 1), name: z.string().max(NAME_MAX) }),
+  z.object({
+    type: z.literal("party-kick"),
+    member: z
+      .number()
+      .int()
+      .min(0)
+      .max(PARTY_MAX - 1),
+    name: z.string().max(NAME_MAX),
+  }),
+  z.object({
+    type: z.literal("party-lead"),
+    member: z
+      .number()
+      .int()
+      .min(0)
+      .max(PARTY_MAX - 1),
+    name: z.string().max(NAME_MAX),
+  }),
   z.object({ type: z.literal("party-look"), chat: partyChatCursor.optional() }),
   z.object({ type: z.literal("party-say"), text: z.string().trim().min(1).max(140), chat: partyChatCursor.optional() }),
   /** Fallen, come to in town (game-system.md §8). */
