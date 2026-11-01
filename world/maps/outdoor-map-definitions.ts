@@ -12,6 +12,10 @@ import deep_forest from "#resources/world/maps/deep-forest"
 import quynhon_gate from "#resources/world/maps/quynhon-gate"
 import mountain_pass from "#resources/world/maps/mountain-pass"
 import hue_gate from "#resources/world/maps/hue-gate"
+import grass_highland from "#resources/world/maps/grass-highland"
+import lily_marsh from "#resources/world/maps/lily-marsh"
+import falls_valley from "#resources/world/maps/falls-valley"
+import salt_flats from "#resources/world/maps/salt-flats"
 import { createOutdoorMap } from "#/world/maps/create-outdoor-map"
 import type { MapDefinition } from "#/world/maps/types"
 
@@ -30,4 +34,8 @@ export const OUTDOOR_MAP_DEFINITIONS: readonly Readonly<MapDefinition>[] = [
   createOutdoorMap({ id: "quynhon-gate", name: "クイニョンの門前", grid: quynhon_gate }),
   createOutdoorMap({ id: "mountain-pass", name: "峠道", grid: mountain_pass }),
   createOutdoorMap({ id: "hue-gate", name: "フエの門前", grid: hue_gate }),
+  createOutdoorMap({ id: "grass-highland", name: "すすきの高原", grid: grass_highland }),
+  createOutdoorMap({ id: "lily-marsh", name: "睡蓮の沼", grid: lily_marsh }),
+  createOutdoorMap({ id: "falls-valley", name: "滝の谷", grid: falls_valley }),
+  createOutdoorMap({ id: "salt-flats", name: "塩の原", grid: salt_flats }),
 ]

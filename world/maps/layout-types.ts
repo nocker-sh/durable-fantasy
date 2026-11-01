@@ -37,7 +37,7 @@ export type Layout = {
   /** a field's own landform, applied over the rolling ground: dunes, a sea cliff, a pass */
   shape?: (inputProps: { x: number; z: number; h: number; roadD: number }) => number
   /** a field's ground: what grows or lies where no road or yard is (terrain.ts) */
-  biome?: "meadow" | "dune" | "coast" | "forest" | "pass"
+  biome?: "meadow" | "dune" | "coast" | "forest" | "pass" | "highland" | "marsh" | "valley" | "salt"
   /** fog colour and range (in tiles beyond the player), for haze over dunes or mist in the forest */
   fog?: { color: number; near: number; far: number }
   /** footpaths worn into the ground by people and animals: drawn only, they block and flatten nothing */

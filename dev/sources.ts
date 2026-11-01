@@ -50,6 +50,9 @@ export const NOT_TABLES: readonly string[] = [
   "HANDLERS",
   // where a map's landform runs, shared by its ground and its scene
   "MEADOW_TERRACES",
+  "MARSH_PONDS",
+  "VALLEY_STREAM",
+  "VALLEY_POOL",
   // names for codes, shown inside the sheets
   "GATHER_SKILL_NAME",
   "KIND_NAME",
@@ -102,6 +105,10 @@ export const NOT_TABLES: readonly string[] = [
   "QUYNHON_GATE_LAYOUT",
   "MOUNTAIN_PASS_LAYOUT",
   "HUE_GATE_LAYOUT",
+  "GRASS_HIGHLAND_LAYOUT",
+  "LILY_MARSH_LAYOUT",
+  "FALLS_VALLEY_LAYOUT",
+  "SALT_FLATS_LAYOUT",
   "GROUND_LAYOUT_BASE",
   "OPEN_GROUND_LAYOUT_BASE",
   "FIELD_BUILDERS",

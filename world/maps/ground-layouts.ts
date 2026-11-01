@@ -7,6 +7,10 @@ import { DEEP_FOREST_LAYOUT } from "#/world/maps/layouts/deep-forest"
 import { QUYNHON_GATE_LAYOUT } from "#/world/maps/layouts/quynhon-gate"
 import { MOUNTAIN_PASS_LAYOUT } from "#/world/maps/layouts/mountain-pass"
 import { HUE_GATE_LAYOUT } from "#/world/maps/layouts/hue-gate"
+import { GRASS_HIGHLAND_LAYOUT } from "#/world/maps/layouts/grass-highland"
+import { LILY_MARSH_LAYOUT } from "#/world/maps/layouts/lily-marsh"
+import { FALLS_VALLEY_LAYOUT } from "#/world/maps/layouts/falls-valley"
+import { SALT_FLATS_LAYOUT } from "#/world/maps/layouts/salt-flats"
 import { withRimmedLayout } from "#/world/maps/with-rimmed-layout"
 import type { Layout } from "#/world/maps/layout-types"
 
@@ -20,6 +24,10 @@ export const LAYOUTS: Record<string, Layout> = {
   "quynhon-gate": QUYNHON_GATE_LAYOUT,
   "mountain-pass": MOUNTAIN_PASS_LAYOUT,
   "hue-gate": HUE_GATE_LAYOUT,
+  "grass-highland": GRASS_HIGHLAND_LAYOUT,
+  "lily-marsh": LILY_MARSH_LAYOUT,
+  "falls-valley": FALLS_VALLEY_LAYOUT,
+  "salt-flats": SALT_FLATS_LAYOUT,
 }
 
 export const OPEN_SIDES: Record<string, string> = { "sea-cliff": "e", "net-sheds": "e", "quynhon-gate": "e" }

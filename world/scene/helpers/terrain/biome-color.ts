@@ -23,6 +23,7 @@ import { lvl } from "#/world/scene/helpers/terrain/lvl"
 import { patchLevel } from "#/world/scene/helpers/terrain/patch-level"
 import { grass } from "#/world/scene/helpers/terrain/grass"
 import { dirt } from "#/world/scene/helpers/terrain/dirt"
+import { saltCrack } from "#/world/scene/helpers/terrain/salt-crack"
 
 /** The ground of the fields outside town. */
 type Props = {
@@ -102,6 +103,58 @@ export function biomeColor(props: Props): RGB {
     const lf = stampAt({ sx: props.sx, sy: props.sy, cell: 11, seed: 100, shapes: LEAVES, dense: () => (vnoise({ x: props.x, y: props.z, scale: 0.7, seed: 101 }) > 0.55 ? 0.6 : 0.05) })
     if (lf) return lvl("autumn", lf === "a" ? 3 : 2)
     return lvl("needles", nl)
+  }
+  if (props.biome === "highland") {
+    // the highland: pale pampas grass in sweeping drifts, short turf between them, frost on the shadowed side
+    if (frost) return lvl("frost", 3)
+    const steep = Math.abs(groundH(props.x + 0.25, props.z) - props.h) + Math.abs(groundH(props.x, props.z + 0.25) - props.h) > 0.3
+    if (steep) return pick({ ramp: "stone", b: 0.34 + vnoise({ x: props.x, y: props.z, scale: 2, seed: 140 }) * 0.3, x: props.sx, y: props.sy })
+    // the drifts' edges fray into the turf in pixels, not in a line
+    const drift = vnoise({ x: props.x, y: props.z, scale: 0.22, seed: 141 }) + Math.sin(props.x * 0.21 + props.z * 0.09) * 0.12 + (hash2(props.sx, props.sy, 143) - 0.5) * 0.14
+    if (drift > 0.46) {
+      // strokes of dry stalks, leaning the way the wind combs them
+      const lean = hash2((props.sx + (props.sy >> 1)) >> 1, props.sy >> 2, 142)
+      return pick({ ramp: "thatch", b: 0.34 + Math.min(0.2, (drift - 0.46) * 0.5) + (lean > 0.72 ? 0.12 : lean < 0.2 ? -0.1 : 0), x: props.sx, y: props.sy })
+    }
+    return grass({ x: props.x, z: props.z, sx: props.sx, sy: props.sy, ramp: "wild", bias: 0.02 + drift * 0.04 })
+  }
+  if (props.biome === "marsh") {
+    // the marsh: rank grass and moss on the hummocks, black mud at the water's edge
+    if (props.h < WATER_LINE + 0.12) return dirt({ x: props.x, z: props.z, sx: props.sx, sy: props.sy, base: 0.16 + vnoise({ x: props.x, y: props.z, scale: 2, seed: 143 }) * 0.12, ramp: "mud" })
+    if (props.h < WATER_LINE + 0.3 && hash2(props.sx >> 1, props.sy >> 1, 144) > 0.35) return lvl("moss", 1 + (hash2(props.sx, props.sy, 145) > 0.6 ? 1 : 0))
+    if (frost) return lvl("frost", 2)
+    const v = vnoise({ x: props.x, y: props.z, scale: 0.5, seed: 146 })
+    if (v > 0.6) {
+      const t = stampAt({ sx: props.sx, sy: props.sy, cell: 6, seed: 147, shapes: TUFTS, dense: () => 0.6 })
+      return lvl("moss", t ? 2 + Number(t) - 3 : 2)
+    }
+    return grass({ x: props.x, z: props.z, sx: props.sx, sy: props.sy, ramp: "wild", bias: -0.05 + v * 0.06 })
+  }
+  if (props.biome === "valley") {
+    // the valley: wet stone at the falls and the stream, moss over the boulders, ferny grass on the benches
+    const steep = Math.abs(groundH(props.x + 0.25, props.z) - props.h) + Math.abs(groundH(props.x, props.z + 0.25) - props.h) > 0.22
+    if (steep) {
+      const wet = vnoise({ x: props.x, y: props.z, scale: 1.2, seed: 148 })
+      return wet > 0.55 ? lvl("moss", 1 + (hash2(props.sx, props.sy, 149) > 0.5 ? 1 : 0)) : pick({ ramp: "stone", b: 0.22 + wet * 0.35, x: props.sx, y: props.sy })
+    }
+    if (props.h < WATER_LINE + 0.2) return pick({ ramp: "stone", b: 0.3 + hash2(props.sx >> 1, props.sy >> 1, 150) * 0.3, x: props.sx, y: props.sy })
+    if (frost) return lvl("frost", 3)
+    const v = vnoise({ x: props.x, y: props.z, scale: 0.4, seed: 151 })
+    if (v > 0.58) {
+      const ml = patchLevel({ x: props.x, z: props.z, sx: props.sx, sy: props.sy, levels: [2, 3], scale: 1.1, seed: 152 })
+      return lvl("moss", ml)
+    }
+    return grass({ x: props.x, z: props.z, sx: props.sx, sy: props.sy, ramp: "grass", bias: -0.04 + v * 0.05 })
+  }
+  if (props.biome === "salt") {
+    // the salt flat: a white crust cracked into plates, the cracks grey and the ridges along them bright
+    if (props.h < WATER_LINE + 0.12) return pick({ ramp: "frost", b: 0.34 + vnoise({ x: props.x, y: props.z, scale: 1.5, seed: 153 }) * 0.2, x: props.sx, y: props.sy })
+    const plate = saltCrack(props.x, props.z)
+    if (plate < 0.022) return pick({ ramp: "frost", b: 0.28 + hash2(props.sx, props.sy, 154) * 0.12, x: props.sx, y: props.sy })
+    if (plate < 0.05) return pick({ ramp: "frost", b: 0.9, x: props.sx, y: props.sy })
+    const v = vnoise({ x: props.x, y: props.z, scale: 0.3, seed: 155 })
+    if (v > 0.8 && hash2(props.sx >> 1, props.sy >> 1, 156) > 0.5) return pick({ ramp: "sand", b: 0.6 + (v - 0.68) * 0.8, x: props.sx, y: props.sy })
+    return pick({ ramp: "frost", b: 0.6 + v * 0.22 + (hash2(props.sx, props.sy, 157) > 0.92 ? 0.12 : 0), x: props.sx, y: props.sy })
   }
   // the pass: thin grass between stones, frost in the hollows
   const steep = Math.abs(groundH(props.x + 0.25, props.z) - props.h) + Math.abs(groundH(props.x, props.z + 0.25) - props.h) > 0.26

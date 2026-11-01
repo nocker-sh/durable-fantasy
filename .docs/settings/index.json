@@ -1725,6 +1725,30 @@
       "source": "world/maps/index.ts"
     },
     {
+      "id": "map-grass-highland",
+      "kind": "maps",
+      "file": "maps/map-grass-highland.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-lily-marsh",
+      "kind": "maps",
+      "file": "maps/map-lily-marsh.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-falls-valley",
+      "kind": "maps",
+      "file": "maps/map-falls-valley.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-salt-flats",
+      "kind": "maps",
+      "file": "maps/map-salt-flats.md",
+      "source": "world/maps/index.ts"
+    },
+    {
       "id": "map-phanthiet-in-bakery",
       "kind": "maps",
       "file": "maps/map-phanthiet-in-bakery.md",
