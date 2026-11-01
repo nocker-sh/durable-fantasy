@@ -3,6 +3,7 @@ import { RAMPS } from "#/world/scene/pix"
 import { hash2 } from "#/lib/engine/hash2"
 import { seamlessNoise } from "#/world/scene/textures/seamless-noise"
 import { ToneMap } from "#/world/scene/textures/tone-map"
+import { downsampleDithered } from "#/lib/graphics/downsample-dithered"
 
 type Props = {
   light?: number
@@ -33,8 +34,13 @@ export function woodTex(props: Props): PixBuf {
     const l = { value: light * top + (hash2(k, 0, seed) - 0.5) * 0.8 + (wash - 0.5) * 0.7 }
     if (f > 0.84) return { ramp: "wood", level: l.value - 1.2, region: -1 }
     if (f < 0.16) l.value += 0.5
+    // weathered grey and dark wet stains in patches along the boards
+    const stain = seamlessNoise({ x: x, y: y, scale: 0.1 / fine, seed: seed + 3, w: size, h: size })
+    if (stain > 0.7) l.value -= 0.8
+    if (hash2(x >> 2, y >> 2, seed + 9) > 0.985) l.value -= 1.2 // a knot
     return { ramp: "wood", level: l.value, region: k }
   })
   t.strokes({ seed: seed, density: 0.14, along: vertical ? "y" : "x", len: [3, 7], thick: [1, 1], step: 0.5, bleed: 0.03, wrap: true })
-  return t.paint(0.15)
+  // shrunk to the chunky texels: a quarter of the painting
+  return downsampleDithered(t.paint(0.1), 4)
 }

@@ -20,6 +20,8 @@ export const SIZES: Readonly<Record<string, Omit<Piece, "name"> | "wall">> = {
   寝台: { w: 0.9, d: 2.0, front: 0.5 },
   "寝台（二人用）": { w: 1.4, d: 2.0, front: 0.5 },
   子どもの寝台: { w: 0.8, d: 1.6, front: 0.4 },
+  // a baby's cot on rockers, its head to the wall (the nanny's house)
+  揺りかご: { w: 0.5, d: 0.9, front: 0.4 },
   食卓: { w: 1.2, d: 0.8, front: 0.9 },
   大きな食卓: { w: 2.0, d: 0.9, front: 0.9 },
   地図の卓: { w: 1.2, d: 0.8, front: 0.9 },
@@ -91,6 +93,7 @@ export const SIZES: Readonly<Record<string, Omit<Piece, "name"> | "wall">> = {
   荷車: { w: 1.4, d: 2.6, front: 0.6 },
   巣箱: { w: 0.6, d: 0.5, front: 0.4 },
   止まり木: { w: 1.2, d: 0.4, front: 0.3 },
+  産卵箱: { w: 0.9, d: 0.4, front: 0.3 },
   取引の掲示板: "wall",
   // what the households that came later live and work with
   修理台: { w: 1.2, d: 0.6, front: 0.7 },

@@ -11,7 +11,7 @@ import { rect } from "#/world/town/floorplan/rect"
 import { inside } from "#/world/town/floorplan/inside"
 import { overlap } from "#/world/town/floorplan/overlap"
 import { entries } from "#/world/town/floorplan/entries"
-import { COUNTERS, WORK, TABLES, SEATS, SHELVES } from "#/world/town/floorplan/furniture"
+import { COUNTERS, WORK, TABLES, SEATS, SHELVES, GOODS } from "#/world/town/floorplan/furniture"
 import { useOf } from "#/world/town/floorplan/use-of"
 import { sizeOf } from "#/world/town/floorplan/size-of"
 import { split } from "#/world/town/floorplan/split"
@@ -76,13 +76,12 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
   const main = { value: null as PRoom | null }
   const side: Room[] = []
   if (farm) {
-    rooms.push({ name: frontRoom?.name ?? "納屋", use: useOf(frontRoom?.name ?? ""), floor: 0, x0: 0, z0: 0, x1: W, z1: D })
-    ground.slice(1).forEach((r, k) => {
-      const aState = split(0, W, ground.length)[k + 1] ?? [0, W],
-        a = aState[0],
-        b = aState[1]
-      rooms.push({ name: r.name, use: useOf(r.name), floor: 0, x0: a, z0: 0, x1: b, z1: D })
-    })
+    // a farm building's rooms stand side by side across it, a low wall between each that stops short of the front,
+    // where one walks from the door to all of them
+    const named = ground.length ? ground : [{ name: "納屋", floor: 0 }]
+    const parts = split(0, W, named.length)
+    named.forEach((r, k) => rooms.push({ name: r.name, use: useOf(r.name), floor: 0, x0: parts[k][0], z0: 0, x1: parts[k][1], z1: D }))
+    for (let k = 1; k < parts.length; k++) dividers.push(...along({ floor: 0, kind: "腰壁", z0: 0, z1: Math.max(0.5, D - 1.3), x: parts[k][0] - DIV / 2, gz: null }))
   } else if (oneRoom) {
     // one workroom over the whole floor, the household's other rooms off it along the back wall
     const work = ground.find((r) => !sleeps(r)) ?? frontRoom
@@ -101,8 +100,13 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
     ;(backRooms.length ? backRooms : [{ name: "奥の仕事場", floor: 0 }]).forEach((r, k) =>
       rooms.push({ name: r.name, use: useOf(r.name), floor: 0, x0: parts[k][0], z0: 0, x1: parts[k][1], z1: split0 - DIV / 2 }),
     )
-    for (let k = 1; k < parts.length; k++)
-      dividers.push(...along({ floor: 0, kind: "腰壁", z0: 0, z1: split0 - DIV / 2, x: parts[k][0] - DIV / 2, gz: onStep(split0 * 0.6, 0.5, split0 - DIV / 2 - 0.5), gap: 0.9 }))
+    // the back rooms open into each other through a doorway in the low wall between them, kept clear like the others
+    for (let k = 1; k < parts.length; k++) {
+      const gz = onStep(split0 * 0.6, 0.5, split0 - DIV / 2 - 0.5)
+      const x = parts[k][0] - DIV / 2
+      dividers.push(...along({ floor: 0, kind: "腰壁", z0: 0, z1: split0 - DIV / 2, x: x, gz: gz, gap: 0.9 }))
+      gaps.push({ x0: x - 0.7, z0: gz - 0.45, x1: x + 0.7, z1: gz + 0.45 })
+    }
   } else {
     // a home: the earth-floored entry at the front behind a low wall (named as the plan names it), the room round
     // the hearth behind it, and the household's other rooms on this floor off that room along the back wall
@@ -129,7 +133,7 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
     for (const r of side) {
       const use = sleeps(r) ? "寝間" : useOf(r.name)
       const bedWidths = all.filter((e) => e.room === r.name && /寝台/.test(e.name)).map((e) => sizeOf(e.name)?.w ?? 0.9)
-      const width = sleeps(r) ? Math.max(1.5, bedWidths.reduce((a, b) => a + b, 0) + 0.15 * Math.max(0, bedWidths.length - 1) + 0.5) : use === "台所" ? 1.9 : 1.7
+      const width = sleeps(r) ? Math.max(1.5, bedWidths.reduce((a, b) => a + b, 0) + 0.15 * Math.max(0, bedWidths.length - 1) + 0.6) : use === "台所" ? 1.9 : 1.7
       // a bed stands with its head to the back wall and room to get in beside it; a kitchen or a store is shallower,
       // and leaves more of the room in front of it
       const depth = sleeps(r) ? Math.min(2.7, room.z1 - room.z0 - 0.9) : Math.min(use === "台所" ? 2.0 : 1.9, room.z1 - room.z0 - 1.6)
@@ -191,7 +195,7 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
   const living = farm
     ? null
     : shopFront
-      ? (rooms.find((r) => r.floor === 0 && r.use !== "売り場" && r.x1 >= W - 0.01) ?? rooms[1])
+      ? (rooms.find((r) => r.floor === 0 && r !== rooms[0] && r.use !== "売り場" && r.x1 >= W - 0.01) ?? rooms[1] ?? rooms[0])
       : home || oneRoom
         ? (main.value ?? rooms[0])
         : (roomOf(["食事", "台所"]) ?? roomOf(["作業場"]) ?? roomOf(["貯蔵"]) ?? rooms[0])
@@ -205,7 +209,7 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
     return got
   }
 
-  const place = (inputProps: { name: string; room: Rect | undefined; how: "wall" | "near"; at?: [number, number]; sides?: ("n" | "e" | "s" | "w")[]; from?: number }) => {
+  const place = (inputProps: { name: string; room: Rect | undefined; how: "wall" | "near"; at?: [number, number]; sides?: ("n" | "e" | "s" | "w")[]; from?: number; quiet?: boolean }) => {
     const name = inputProps.name
     const room = inputProps.room
     const how = inputProps.how
@@ -234,27 +238,36 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
             f0.againstWall({ name: name, w: s.w, d: s.d, front: s.front, room: r, sides: sides, from: from })),
       )
     // where it was meant to go, else any other room downstairs but the sleeping corner
-    const p = tryIn(room, true) ?? rooms.filter((r) => r.floor === 0 && r !== room && r.use !== "寝間").reduce<Placed | null>((got, r) => got ?? tryIn(r, false), null)
-    if (!p) unplaced.push(name)
+    // (the customers' shop floor last, unless it is on sale there)
+    const others = rooms.filter((r) => r.floor === 0 && r !== room && r.use !== "寝間")
+    const p =
+      tryIn(room, true) ??
+      [...others.filter((r) => r.use !== "売り場" || GOODS.test(name)), ...others.filter((r) => r.use === "売り場" && !GOODS.test(name))].reduce<Placed | null>(
+        (got, r) => got ?? tryIn(r, false),
+        null,
+      )
+    if (!p && !inputProps.quiet) unplaced.push(name)
     return p
   }
-  // the sleeping rooms down here take their sleepers' beds first (and, in a house of one floor, the clothes chest
-  // at their feet); after that every side room is shut to the main room's things
-  const chest = { value: floors === 1 }
+  // the sleeping rooms down here take their sleepers' beds first, and the clothes chest at their feet; after that
+  // every side room is shut to the main room's things
+  const isChest = (n: string) => n === "衣装箱" || n === "箪笥"
   for (const corner of alcoves.filter((r) => r.use === "寝間")) {
     all
-      .filter((e) => (/寝台/.test(e.name) && e.room === corner.name) || (e.name === "衣装箱" && chest.value))
+      .filter((e) => !e.up && e.room === corner.name && (/寝台/.test(e.name) || isChest(e.name)))
       .forEach((e, k) => {
         const sz = sizeOf(e.name)!
-        const isChest = e.name === "衣装箱"
+        const chest = isChest(e.name)
         const got =
-          f0.againstWall({ name: e.name, w: sz.w, d: sz.d, front: isChest ? 0.3 : sz.front, room: corner, sides: isChest ? ["s", "e", "w"] : ["n", "w", "e"], from: k % 2 ? 1 : 0 }) ??
-          (isChest ? f0.near({ name: e.name, w: sz.w, d: sz.d, front: 0.2, room: corner, at: centre(corner) }) : null)
+          f0.againstWall({ name: e.name, w: sz.w, d: sz.d, front: chest ? 0.3 : sz.front, room: corner, sides: chest ? ["s", "e", "w"] : ["n", "w", "e"], from: k % 2 ? 1 : 0 }) ??
+          (chest
+            ? (f0.againstWall({ name: e.name, w: sz.w, d: sz.d, front: 0, room: corner, sides: ["e", "w", "n", "s"], from: 0 }) ??
+              f0.near({ name: e.name, w: sz.w, d: sz.d, front: 0, room: corner, at: centre(corner) }))
+            : null)
         // a chest with no room in the corner stands out in the room with the rest
-        if (got || !isChest) {
+        if (got || !chest) {
           if (!got) unplaced.push(e.name)
           e.name = `placed:${e.name}`
-          if (isChest) chest.value = false
         }
       })
   }
@@ -328,8 +341,32 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
     if (!hearth) unplaced.push(fireplace ? "暖炉" : "炉")
     else f0.targets.push(hearth)
   }
+  // a hall cooks for its guests in its own kitchen, on a fire against the kitchen's back wall (the big pot hangs over it)
+  const kitchen = rooms.find((r) => r.floor === 0 && r.use === "台所")
+  if (hall && h.plan.hearth && h.plan.kitchen && kitchen) {
+    const cook = within(kitchen, () => f0.againstWall({ name: "炉", w: 1.2, d: 1.0, front: 0.6, room: kitchen, sides: ["n", "w", "e"], from: 0.3 }))
+    if (!cook) unplaced.push("炉")
+    else f0.targets.push(cook)
+  }
+  // the kitchen worktop against a wall of the kitchen, or of the room by the fire, or of the entry, before the
+  // trade's big pieces take the walls' floor
+  const top = sizeOf("台所の台")!
+  const worktop =
+    h.plan.hearth && h.plan.kitchen && living
+      ? [kitchen, living, rooms.find((r) => r.floor === 0 && r.use === "土間")]
+          .filter((r): r is PRoom => !!r)
+          .reduce<Placed | null>((got, r) => got ?? within(r, () => f0.againstWall({ name: "台所の台", w: top.w, d: top.d, front: top.front, room: r, sides: ["n", "w", "e", "s"], from: 0.3 })), null)
+      : null
   const groundEntries = all.filter((e) => !e.up && e.name !== "暖炉" && !e.name.startsWith("placed:"))
-  const take = (test: (n: string) => boolean) => groundEntries.filter((e) => test(e.name)).map((e) => e.name)
+  // each piece goes once, to the first list that takes it
+  const take = (test: (n: string) => boolean) =>
+    groundEntries
+      .filter((e) => !e.name.startsWith("placed:") && test(e.name))
+      .map((e) => {
+        const name = e.name
+        e.name = `placed:${name}`
+        return name
+      })
   // the counter across the shop (or along the hall), the keeper behind it with the back partition behind them
   const hallRoom = hall ? rooms.find((r) => r.floor === 0 && r.use === "食事") : undefined
   const counterRoom = shop ?? hallRoom
@@ -344,16 +381,48 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
   // the trade's big pieces stand free in the workshop
   const work = rooms.find((r) => r.floor === 0 && r.use === "作業場") ?? living ?? rooms[0]
   const bigWork = (n: string) => /木工台|作業台|搾り台|干し草|荷車/.test(n)
-  for (const name of take((n) => WORK.test(n) && bigWork(n))) place({ name: name, room: farm ? rooms[0] : work, how: "near", at: farm ? undefined : [centre(work)[0] - 0.5, centre(work)[1]] })
+  // on a farm each thing goes to the room named for it, against its walls: the hay and the grain to the hay store,
+  // the tools and the cart to the tool store, the hens' things to the coop; the floor between stays open for work
+  const farmRoom = (n: string): PRoom => {
+    const here = rooms.filter((r) => r.floor === 0)
+    const by = (re: RegExp) => here.find((r) => re.test(r.name))
+    const named = /干し草|麦|藁|飼い葉/.test(n) ? by(/干し草|藁|穀|麦/) : /荷車|鋤|鍬|鎌|農具/.test(n) ? by(/農具|道具/) : /止まり木|巣箱|産卵箱/.test(n) ? by(/鶏/) : undefined
+    return named ?? here[0]
+  }
+  for (const name of take((n) => WORK.test(n) && bigWork(n)))
+    if (farm) place({ name: name, room: farmRoom(name), how: "wall", sides: ["n", "w", "e"] })
+    // (against a wall where the household also lives in the workshop, which leaves the floor to the hearth and the table)
+    else place({ name: name, room: work, how: shopFront && work === living ? "wall" : "near", at: [centre(work)[0] - 0.5, centre(work)[1]] })
   // tables round the hearth, spread about it
   const near: [number, number] = hearth ? [(hearth.x0 + hearth.x1) / 2, (hearth.z0 + hearth.z1) / 2] : living ? centre(living) : [W / 2, D / 2]
   const tableRoom = hallRoom ?? living
   const tableNames = take((n) => TABLES.test(n))
+  // in a hall one walks in from the door straight to the counter between the tables, which stand either side of
+  // that way, over the whole floor
+  const way: Rect | null = hall && walkIn && tableRoom ? { x0: door - 0.5, z0: (served[0]?.z1 ?? tableRoom.z0) + 0.5, x1: door + 0.5, z1: D } : null
+  if (way) f0.clear.push(way)
+  const sideOf = (k: number, n: number): [number, number] | null => {
+    if (!way || !tableRoom) return null
+    const west = { x0: tableRoom.x0, x1: way.x0 },
+      east = { x0: way.x1, x1: tableRoom.x1 }
+    // the wider side takes the first table, the sides take turns
+    const sides = west.x1 - west.x0 >= east.x1 - east.x0 ? [west, east] : [east, west]
+    const half = sides[k % 2]
+    const rowsHere = Math.ceil((n - (k % 2)) / 2)
+    const row = Math.floor(k / 2)
+    return [(half.x0 + half.x1) / 2, tableRoom.z0 + ((row + 0.5) * (tableRoom.z1 - tableRoom.z0)) / Math.max(1, rowsHere)]
+  }
   tableNames.forEach((name, k) => {
     const s = sizeOf(name)!
     const room = tableRoom ?? rooms[0]
-    // first round the fire, out of reach of the walls; then anywhere it will go
+    // first round the fire (in a hall, its place on its side of the way), out of reach of the walls; then anywhere it will go
     const inset: Rect = { x0: room.x0 + 0.45, z0: room.z0 + 0.45, x1: room.x1 - 0.45, z1: room.z1 - 0.45 }
+    const spot = sideOf(k, tableNames.length)
+    const spread = spot && inset.x1 - inset.x0 > s.d && inset.z1 - inset.z0 > s.d ? f0.near({ name: name, w: s.w, d: s.d, front: 0.45, room: inset, at: spot }) : null
+    if (spread) {
+      f0.targets.push(spread)
+      return
+    }
     for (const r of hall ? [1.9, 2.4] : [1.2, 1.6, 2.0])
       for (let t = 0; t < 8; t++) {
         const a = ((k + t / 8) / Math.max(1, tableNames.length)) * Math.PI * 2 + 0.3
@@ -377,11 +446,11 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
     const spotsAt = (tbl: Rect): Rect[] => {
       const cx = (tbl.x0 + tbl.x1) / 2,
         cz = (tbl.z0 + tbl.z1) / 2
+      // a bench runs along a long side of the table
       if (/長椅子/.test(name))
-        return [
-          rect({ x: cx, z: tbl.z1 + s.d / 2 + 0.05, w: Math.min(s.w, tbl.x1 - tbl.x0 + 0.4), d: s.d }),
-          rect({ x: cx, z: tbl.z0 - s.d / 2 - 0.05, w: Math.min(s.w, tbl.x1 - tbl.x0 + 0.4), d: s.d }),
-        ]
+        return tbl.z1 - tbl.z0 > tbl.x1 - tbl.x0
+          ? [rect({ x: tbl.x1 + s.d / 2 + 0.05, z: cz, w: s.d, d: Math.min(s.w, tbl.z1 - tbl.z0 + 0.4) }), rect({ x: tbl.x0 - s.d / 2 - 0.05, z: cz, w: s.d, d: Math.min(s.w, tbl.z1 - tbl.z0 + 0.4) })]
+          : [rect({ x: cx, z: tbl.z1 + s.d / 2 + 0.05, w: Math.min(s.w, tbl.x1 - tbl.x0 + 0.4), d: s.d }), rect({ x: cx, z: tbl.z0 - s.d / 2 - 0.05, w: Math.min(s.w, tbl.x1 - tbl.x0 + 0.4), d: s.d })]
       return [
         rect({ x: cx, z: tbl.z1 + s.d / 2 + 0.05, w: s.w, d: s.d }),
         rect({ x: cx, z: tbl.z0 - s.d / 2 - 0.05, w: s.w, d: s.d }),
@@ -409,38 +478,66 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
     const order = /揺り椅子/.test(name) ? byFire : [...tablesHere.slice(k % Math.max(1, tablesHere.length)), ...tablesHere].flatMap(spotsAt).concat(atCounter, byFire)
     const ok = (r: Rect) => inside(r, seatRoom) && !f0.pieces.some((p) => overlap(r, p, -0.01)) && !dividers.some((d) => d.floor === 0 && overlap(r, d))
     const at = order.find(ok)
+    // a plain rocking chair with no room by the fire stands against a wall of the room instead
+    if (!at && name === "揺り椅子" && place({ name: name, room: seatRoom, how: "wall", quiet: true })) return
     if (!at) {
       unplaced.push(name)
       return
     }
     f0.pieces.push({ name: k === 0 && !/揺り椅子|長椅子/.test(name) ? `${name}（引いたまま）` : name, floor: 0, ...at, solid: false, wall: false })
   })
-  // the kitchen worktop against a wall of the kitchen, or of the room by the fire
-  if (h.plan.hearth && h.plan.kitchen && living)
-    place({ name: "台所の台", room: rooms.find((r) => r.floor === 0 && r.use === "台所") ?? living, how: "wall", at: undefined, sides: ["n", "w", "e"], from: 0.3 })
+  // standing free in the room only where no wall had room for it
+  if (h.plan.hearth && h.plan.kitchen && living && !worktop) place({ name: "台所の台", room: kitchen ?? living, how: "wall", at: undefined, sides: ["n", "w", "e"], from: 0.3 })
   // the rest of the trade's things along the workshop's walls
   // (the big pot goes on the kitchen fire, where there is a kitchen)
-  for (const name of take((n) => WORK.test(n) && !bigWork(n)))
-    place({ name: name, room: farm ? rooms[0] : name === "大鍋" ? (rooms.find((r) => r.floor === 0 && r.use === "台所") ?? work) : work, how: "wall" })
-  const store = rooms.find((r) => r.floor === 0 && r.use === "貯蔵") ?? work
-  for (const name of take((n) => SHELVES.test(n)))
-    place({ name: name, room: /商品棚|薬棚|陳列/.test(name) ? (shop ?? store) : store, how: "wall", at: undefined, sides: /商品棚|薬棚|陳列/.test(name) ? ["w", "e", "s"] : ["n", "w", "e"] })
-  // containers by the door in the entry, or in the stores
+  for (const name of take((n) => WORK.test(n) && !bigWork(n))) place({ name: name, room: farm ? farmRoom(name) : name === "大鍋" ? (kitchen ?? work) : work, how: "wall" })
+  // a hall keeps its stores, its crockery and its fuel in its kitchen
+  const store = rooms.find((r) => r.floor === 0 && r.use === "貯蔵") ?? (hall && kitchen ? kitchen : work)
+  // the goods on sale stand in the shop, along its side and front walls
+  const forSale = (n: string) => !!shop && GOODS.test(n) && (n.endsWith("棚") || !!h.shop)
+  // the food and the crockery are kept by the kitchen fire, or in a store that is not for tools, ash or timber
+  const pantry =
+    rooms.find((r) => r.floor === 0 && r.use === "台所") ??
+    rooms.find((r) => r.floor === 0 && r.use === "貯蔵" && !/道具|農具|灰|薪|材/.test(r.name)) ??
+    (store.use === "貯蔵" ? living : store) ??
+    store
+  const shelfRoom = (n: string) => (forSale(n) ? shop : /保存食|食器/.test(n) ? pantry : store)
+  for (const name of take((n) => SHELVES.test(n))) place({ name: name, room: shelfRoom(name), how: "wall", at: undefined, sides: forSale(name) ? ["w", "e", "s"] : ["n", "w", "e"] })
+  // containers by the door in the entry, or in the stores; beds and chests in their sleepers' rooms
   const entry = rooms.find((r) => r.floor === 0 && r.use === "土間") ?? store
-  const rest = groundEntries.map((e) => e.name).filter((n) => !COUNTERS.test(n) && !TABLES.test(n) && !SEATS.test(n) && !WORK.test(n) && !SHELVES.test(n))
-  for (const name of rest) {
-    if (!sizeOf(name)) continue
-    const r = /寝台/.test(name) ? (rooms.find((x) => x.floor === 0 && x.use === "寝間") ?? living) : /樽|甕|桶|籠|箱|袋|薪|木材/.test(name) ? entry : living
-    place({ name: name, room: r ?? undefined, how: "wall", at: undefined, sides: ["w", "e", "n", "s"] })
+  const ownRoom = (n?: string) => (n ? rooms.find((x) => x.floor === 0 && x.name === n) : undefined)
+  for (const e of groundEntries.filter((x) => !x.name.startsWith("placed:"))) {
+    const name = e.name
+    if (!sizeOf(name) || COUNTERS.test(name) || TABLES.test(name) || SEATS.test(name) || WORK.test(name) || SHELVES.test(name)) continue
+    e.name = `placed:${name}`
+    const r = farm
+      ? farmRoom(name)
+      : /寝台/.test(name) || isChest(name)
+        ? (ownRoom(e.room) ?? rooms.find((x) => x.floor === 0 && x.use === "寝間") ?? living)
+        : forSale(name)
+          ? shop
+          : /樽|甕|桶|籠|箱|袋|俵|薪|木材/.test(name)
+            ? entry
+            : living
+    // a chest with no room downstairs goes up to the bedrooms
+    const moveUp = isChest(name) && floors > 1
+    if (!place({ name: name, room: r ?? undefined, how: "wall", at: undefined, sides: ["w", "e", "n", "s"], quiet: moveUp }) && moveUp) {
+      e.name = name
+      e.up = true
+      e.room = undefined
+    }
   }
   // odds and ends: what a lived-in house gathers along its walls over the years, wherever there is
-  // still room for them and the way through stays open (a wash tub, a crate, a stool, a cask, a basket)
+  // still room for them and the way through stays open (a wash tub, a crate, a stool, a cask, a basket);
+  // nothing the household has already
   if (h.household && h.plan.hearth && h.kind !== "public") {
     const odds = ["洗濯桶", "木箱", "腰掛け", "樽", "野菜籠", "木箱", "腰掛け"]
     const want = Math.min(odds.length, Math.floor((W * D) / 8))
     const spare = rooms.filter((r) => r.floor === 0 && r.use !== "寝間" && r.use !== "売り場" && r.name !== "廊下")
+    const owned = new Set(all.map((e) => e.name.replace(/^placed:/, "")))
     for (let i = 0; i < want; i++) {
       const name = odds[(h.seed + i) % odds.length]
+      if (owned.has(name)) continue
       const s = sizeOf(name)!
       for (const r of spare) if (f0.againstWall({ name, w: s.w, d: s.d, front: 0.2, room: r, sides: i % 2 ? ["e", "n", "w"] : ["w", "n", "e"], from: i % 3 === 0 ? 0 : 1 })) break
     }
@@ -483,9 +580,20 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
         a = aState2[0],
         b = aState2[1]
       rooms.push({ name: r.name, use: useOf(r.name), floor, x0: a, z0: rz0, x1: b, z1: rz1 })
-      if (k > 0) dividers.push(...along({ floor: floor, kind: /客室|部屋|寝室/.test(r.name) ? "壁" : "カーテン", z0: rz0, z1: rz1, x: a - DIV / 2, gz: null }))
+      // a room of one's own (a guest's, a child's, a couple's) is walled off with a doorway onto the passage; a
+      // sleeping place in the loft hangs a curtain; a store keeps a low wall
+      const walled = /客室|部屋|寝室/.test(r.name)
+      if (k > 0) dividers.push(...along({ floor: floor, kind: walled || /客室|部屋|寝室/.test(here[k - 1].name) ? "壁" : "カーテン", z0: rz0, z1: rz1, x: a - DIV / 2, gz: null }))
       dividers.push(
-        ...across({ floor: floor, kind: /倉|物置|蔵|乾燥/.test(r.name) ? "腰壁" : "カーテン", x0: a, x1: b, z: back ? passage : D - passage, gx: onStep((a + b) / 2, a + 0.3, b - 0.3), gap: 0.8 }),
+        ...across({
+          floor: floor,
+          kind: /倉|物置|蔵|乾燥/.test(r.name) ? "腰壁" : walled ? "壁" : "カーテン",
+          x0: a,
+          x1: b,
+          z: back ? passage : D - passage,
+          gx: onStep((a + b) / 2, a + 0.3, b - 0.3),
+          gap: 0.8,
+        }),
       )
     })
     rooms.push({ name: "廊下", use: "住まい", floor, x0: 0, z0: back ? 0 : D - passage, x1: W, z1: back ? passage : D })
@@ -508,7 +616,18 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
         else fl.targets.push(p)
         bedRoom++
       }
-    // what else lives upstairs: chests at the beds' feet, the loom by a window, the shelves of stores
+    // each sleeper's room keeps its own clothes chest, by the beds
+    for (const r of here)
+      for (const e of up.filter((x) => isChest(x.name) && x.room === r.name)) {
+        const room = roomsUp.find((x) => x.name === r.name)!
+        const s = sizeOf(e.name)!
+        const p =
+          fl.againstWall({ name: e.name, w: s.w, d: s.d, front: 0.3, room: room, sides: deep ? ["n", "w", "e", "s"] : ["s", "w", "e", "n"], from: 0.5 }) ??
+          fl.near({ name: e.name, w: s.w, d: s.d, front: 0.3, room: room, at: centre(room) })
+        if (!p) continue
+        up.splice(up.indexOf(e), 1)
+      }
+    // what else lives upstairs: a chest that found no room by its beds, the loom by a window, the shelves of stores
     for (const e of up) {
       const s = sizeOf(e.name)
       if (!s) continue
@@ -525,14 +644,41 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
   }
 
   // ---------------------------------------------------------------- traces of the life lived here
+  // what hangs on a wall goes on a wall of the room they live in, clear of the sleeping rooms and of anything tall
+  const wallSpot = (): Rect | null => {
+    const r = living ?? rooms[0]
+    const taken = pieces.filter((p) => p.on === "壁")
+    const tall = (p: Placed) => p.floor === 0 && p.solid && /棚|階段|暖炉|箪笥|機織り機/.test(p.name)
+    for (let x = r.x0 + 0.35; x <= r.x1 - 0.35 + 1e-6; x += 0.1) {
+      const spot = rect({ x: x, z: r.z0 + 0.05, w: 0.5, d: 0.1 })
+      const wide: Rect = { x0: spot.x0 - 0.1, z0: spot.z0, x1: spot.x1 + 0.1, z1: spot.z1 + 0.3 }
+      if (rooms.some((q) => q.floor === 0 && q.use === "寝間" && overlap(q, wide))) continue
+      if (pieces.some((p) => tall(p) && overlap(p, wide)) || taken.some((p) => overlap(p, wide))) continue
+      return spot
+    }
+    return null
+  }
   for (const t of TRACES[h.id] ?? []) {
     const floor = 0
     const tableP = pieces.find((p) => p.floor === floor && TABLES.test(p.name))
     let at: Rect | null = null
     if (t.on === "卓" && tableP) at = rect({ x: (tableP.x0 + tableP.x1) / 2 + (pieces.filter((p) => p.on === "卓").length - 1) * 0.25, z: (tableP.z0 + tableP.z1) / 2, w: 0.25, d: 0.2 })
-    else if (t.on === "炉" && hearth) at = rect({ x: (hearth.x0 + hearth.x1) / 2, z: hearth.z0 - 0.1, w: 0.4, d: 0.1 })
-    else if (t.on === "戸口") at = rect({ x: door + (door > W / 2 ? -1 : 1) * 0.9, z: D - 0.35, w: 0.4, d: 0.3 })
-    else if (t.on === "壁") at = rect({ x: 0.6 + pieces.filter((p) => p.on === "壁").length * 0.7, z: 0.05, w: 0.5, d: 0.1 })
+    else if (t.on === "炉" && hearth) {
+      // in front of the fire: off its open side where it stands against a wall, else behind it
+      const c = centre(hearth)
+      at =
+        hearth.z0 < 0.05
+          ? rect({ x: c[0], z: hearth.z1 + 0.1, w: 0.4, d: 0.1 })
+          : hearth.x0 < 0.05
+            ? rect({ x: hearth.x1 + 0.1, z: c[1], w: 0.1, d: 0.4 })
+            : hearth.x1 > W - 0.05
+              ? rect({ x: hearth.x0 - 0.1, z: c[1], w: 0.1, d: 0.4 })
+              : rect({ x: c[0], z: hearth.z0 - 0.1, w: 0.4, d: 0.1 })
+    } else if (t.on === "戸口") {
+      // side by side along the wall inside the door, away from the door's own swing
+      const k = pieces.filter((p) => p.on === "戸口").length
+      at = rect({ x: door + (door > W / 2 ? -1 : 1) * (0.9 + 0.5 * k), z: D - 0.35, w: 0.4, d: 0.3 })
+    } else if (t.on === "壁") at = wallSpot() ?? rect({ x: 0.6 + pieces.filter((p) => p.on === "壁").length * 0.7, z: 0.05, w: 0.5, d: 0.1 })
     else {
       // on the floor: somewhere in the room they live in, out of the way
       const r = living ?? rooms[0]

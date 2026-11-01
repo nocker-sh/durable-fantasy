@@ -83,7 +83,7 @@
         0
       ],
       "width_cells": 2,
-      "target": "room-guardhouse-stefan",
+      "target": "room-guardhouse-5",
       "target_door": [
         3,
         10
@@ -96,7 +96,7 @@
         0
       ],
       "width_cells": 2,
-      "target": "room-guardhouse-veronika",
+      "target": "room-guardhouse-6",
       "target_door": [
         3,
         10

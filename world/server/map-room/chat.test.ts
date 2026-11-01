@@ -5,6 +5,9 @@ import { mapPlayer } from "#/world/server/map-room/map-player"
 import type { Presence } from "#/world/server/map-room/presence"
 import { handleSpeech } from "#/world/server/map-room/handle-speech"
 
+const rpc = vi.hoisted(() => ({ pace: vi.fn(async () => true) }))
+vi.mock("#/durable-objects/player", () => ({ Player: { get: () => ({ pace: rpc.pace }) } }))
+
 afterEach(() => {
   vi.restoreAllMocks()
   vi.useRealTimers()
@@ -80,4 +83,12 @@ it.each([false, true])("handles an unlocated speaker without inventing local hea
   expect(request.far.send).toHaveBeenCalledTimes(shout ? 1 : 0)
   expect(request.self.send).not.toHaveBeenCalled()
   expect(request.closed.send).not.toHaveBeenCalled()
+})
+
+it("lets a player shout only once in a while, kept by their saved record", async () => {
+  const f = fixture()
+  rpc.pace.mockResolvedValueOnce(false)
+  await handleSpeech(f.context, { type: "say", text: "おーい", shout: true })
+  expect(f.far.send).not.toHaveBeenCalled()
+  expect(f.self.send).toHaveBeenCalledExactlyOnceWith({ type: "refused", what: "say", reason: "RATE_LIMIT" })
 })

@@ -1,0 +1,79 @@
+---
+{
+  "id": "resident-ロータル",
+  "kind": "residents",
+  "title": "ロータル",
+  "status": "設計中",
+  "source": "world/town/residents.ts",
+  "design_gate": "未通過",
+  "town": "town-phanthiet",
+  "household": "watch",
+  "buildings": [
+    "building-h-g7"
+  ],
+  "bedroom_candidates": [
+    "room-h-g7-4"
+  ],
+  "work": "衛兵（夜番）",
+  "relationships": [
+    {
+      "a": "ヘンリケ",
+      "b": "ロータル",
+      "kind": "仕事仲間",
+      "note": "昼番と夜番"
+    },
+    {
+      "a": "ロータル",
+      "b": "コンラート",
+      "kind": "仕事仲間",
+      "note": "夜番と朝番。夜明け前に番を渡す"
+    }
+  ],
+  "issues": [
+    "寝台・個人収納のグリッド照合未完了",
+    "食事・水・便所・衣服の手入れの場所照合未完了"
+  ],
+  "bedroom": "room-h-g7-4",
+  "bed_id": "bed-h-g7-4-1",
+  "design_dependencies": [
+    "building-h-g7",
+    "room-h-g7-1",
+    "room-h-g7-4"
+  ],
+  "storage_ids": [
+    "storage-h-g7-4-1"
+  ],
+  "routine_source": {
+    "file": "world/town/routines.ts",
+    "export": "ROUTINES",
+    "key": "ロータル"
+  },
+  "appearance_source": {
+    "file": "world/town/residents.ts",
+    "export": "RESIDENT_LOOKS",
+    "key": "ロータル"
+  }
+}
+---
+
+# ロータル
+
+## 暮らしの立場
+
+ロータルは衛兵（夜番）。衛兵の宿舎に属し、コンラート、ヘンリケと暮らす。三交代で門と通りを見回り、給金は町の寄り合いから受け取る。夕方に広場でヘンリケから番を受け、夜明け前に門でコンラートへ渡す。
+
+## 人柄と話し方
+
+性格は無口、夜目が利く、甘いものに弱い。話し方は「おれ。低い声で短く。「……ああ」」。口癖は「夜は耳で見る」。
+
+## 一日の居場所
+
+日課の時刻・場所・行動は routine_source が指すコードの定義を正とする。昼過ぎに起きて支度し、夕方に広場で番を受けて夜の通りを見回り、明け方に宿舎へ戻って眠る。単に予定の座標へ移動できるだけで生活の成立としない。
+
+## 固有の寝床
+
+常用の寝床は [[room-h-g7-4]] の bed-h-g7-4-1 に割り当てる。二階の個室に本人の寝台を一つ持ち、昼に眠るため同僚と寝台を共用しない。衣服、首巻き、私物の収納は storage_ids の個人区画へ割り当て、寝台の使用面と合わせて容量・開閉を照合する。
+
+## 描画へ渡す条件
+
+外見は appearance_source が指す実際の描画定義を基準とする。斧槍と兜、鉄の籠手は夜番の装備であり、帰宅すると斧槍は1階の槍立て、兜は戸口の棚へ置く。部屋と動線が未確認のため、現時点では生活の整合を検証済みとしない。

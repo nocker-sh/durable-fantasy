@@ -5,6 +5,8 @@ import { emptyParty } from "#/world/core/party/empty-party"
 import { join } from "#/world/core/party/join"
 import { leave } from "#/world/core/party/leave"
 import { report } from "#/world/core/party/report"
+import { kick } from "#/world/core/party/kick"
+import { promote } from "#/world/core/party/promote"
 import { type Member, type Party as PartyState, type ShareMode } from "#/world/core/party/types"
 import { emptyPartyChat } from "#/world/core/empty-party-chat"
 import { joinPartyChat } from "#/world/core/join-party-chat"
@@ -47,6 +49,21 @@ export const Party = defineDurableState({
 
       context.state.party = report(context.state.party, owner, status)
       return { party: context.state.party, chat: readPartyChat({ chat: context.state.chat ?? emptyPartyChat(), party: context.state.party, owner: owner, after: after, now: Date.now() }) }
+    },
+    /** The leader removes a member; null when they may not. */
+    kick(context, input: { leader: string; target: string }): PartyState | null {
+      const next = kick({ party: context.state.party, leader: input.leader, target: input.target })
+      if (!next) return null
+      context.state.party = next
+      context.state.chat = leavePartyChat(context.state.chat ?? emptyPartyChat(), next)
+      return next
+    },
+    /** The leader hands the lead to another member; null when they may not. */
+    promote(context, input: { leader: string; target: string }): PartyState | null {
+      const next = promote({ party: context.state.party, leader: input.leader, target: input.target })
+      if (!next) return null
+      context.state.party = next
+      return next
     },
     setMode(context, owner: string, mode: ShareMode): PartyState {
       if (context.state.party.leader === owner) context.state.party = { ...context.state.party, mode }

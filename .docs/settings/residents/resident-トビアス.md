@@ -12,7 +12,7 @@
     "building-h-c5"
   ],
   "bedroom_candidates": [
-    "room-h-c5-tobias"
+    "room-h-c5-4"
   ],
   "work": "煙突掃除の弟子",
   "relationships": [
@@ -39,15 +39,15 @@
     "寝台・個人収納のグリッド照合未完了",
     "食事・水・便所・衣服の手入れの場所照合未完了"
   ],
-  "bedroom": "room-h-c5-tobias",
-  "bed_id": "bed-h-c5-3-3",
+  "bedroom": "room-h-c5-4",
+  "bed_id": "bed-h-c5-4-1",
   "design_dependencies": [
     "building-h-c5",
     "room-h-c5-processing",
-    "room-h-c5-tobias"
+    "room-h-c5-4"
   ],
   "storage_ids": [
-    "storage-h-c5-3-3"
+    "storage-h-c5-4-1"
   ],
   "routine_source": {
     "file": "world/town/routines.ts",
@@ -89,4 +89,4 @@
 
 ## 固有の寝床
 
-常用の寝床は [[room-h-c5-tobias]] の bed-h-c5-3-3 に割り当てる。客室や仕事場の休憩用家具を、本人の寝床の代わりに数えない。衣服、首巻き、私物の収納は storage_ids の個人区画へ割り当て、寝台の使用面と合わせて容量・開閉を照合する。
+常用の寝床は [[room-h-c5-4]] の bed-h-c5-4-1 に割り当てる。客室や仕事場の休憩用家具を、本人の寝床の代わりに数えない。衣服、首巻き、私物の収納は storage_ids の個人区画へ割り当て、寝台の使用面と合わせて容量・開閉を照合する。

@@ -43,7 +43,7 @@ export const ERRANDS: readonly Errand[] = [
     ask: "窯の薪が心もとないのよ。五束あると、明日の朝まで焼けるんだけど。",
     thanks: "これで朝の窯が焚けるわ。ありがとうね。",
   }),
-  bringErrand({ id: "gunter-charcoal", from: "ギュンター", item: "charcoal", count: 3, ask: "炭を三つ持ってきてくれ。ヨーゼフの窯のでいい。", thanks: "上等だ。これで今夜も鉄が打てるぜ。" }),
+  bringErrand({ id: "gunter-charcoal", from: "ギュンター", item: "charcoal", count: 3, ask: "炭を三つ持ってきてくれ。ゼヴェリンの俵じゃ足りねえ晩なんだ。ヨーゼフの店ので構わん。", thanks: "上等だ。これで今夜も鉄が打てるぜ。" }),
   bringErrand({
     id: "gunter-scrap",
     from: "ギュンター",
@@ -162,7 +162,7 @@ export const ERRANDS: readonly Errand[] = [
     to: "ブルーノ",
     parcel: "灯り油の注文",
     gold: 8,
-    ask: "道具屋のブルーノに、この書き付けを渡してくれ。街灯の油の注文だ。",
+    ask: "門の灯りの油が切れかけている。この注文の書き付けを、道具屋のブルーノに渡してくれ。番の間は門を離れられんのでな。",
     thanks: "油の注文ですね。毎度どうも。明日の夕方までに揃えておきますよ。",
   }),
   deliverErrand({
@@ -187,10 +187,10 @@ export const ERRANDS: readonly Errand[] = [
     id: "klara-lunch",
     from: "クララ",
     to: "オットー",
-    parcel: "弁当",
+    parcel: "夜食の包み",
     gold: 8,
-    ask: "うちの人に弁当、届けてくれる？寝顔しか見ないのよ、あはは。",
-    thanks: "クララの弁当か！夜市の前に食っとくよ！",
+    ask: "うちの人に夜食の包み、届けてくれる？家じゃ寝顔しか見ないのよ、あはは。",
+    thanks: "クララの夜食か！夜中の腹ぺこにちょうどいい！",
   }),
   deliverErrand({
     id: "magdalena-muffler",
@@ -198,7 +198,7 @@ export const ERRANDS: readonly Errand[] = [
     to: "ヴィルヘルム",
     parcel: "直した首巻き",
     gold: 12,
-    ask: "ゾフィーさんに渡しそびれてしまいました。直した首巻きを、ヴィルヘルムさんに届けていただけますか。",
+    ask: "ゾフィーさんから預かった、おじいさまの首巻きが直りました。ヴィルヘルムさんに直接届けていただけますか。",
     thanks: "おお、ほつれが消えておる。ありがたいのう。",
   }),
 ]

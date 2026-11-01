@@ -11,6 +11,7 @@ export function weapon(metal: Metal, shape: Omit<Shape, "forge" | "text">, text:
     atk: Math.round(shape.atk * rule.atk),
     delay: Math.round((shape.delay * rule.delay) / 50) * 50,
     needs,
+    ...(rule.level > 1 ? { level: rule.level } : {}),
     scale: shape.scale,
     ...(shape.twoHanded ? { twoHanded: true } : {}),
   }

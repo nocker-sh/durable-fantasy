@@ -20,6 +20,8 @@ export type PlayerState = {
   readonly revision: number
   readonly name: string
   readonly profileComplete: boolean
+  /** when the name was last changed after creation (core/set-profile.ts); missing until then */
+  readonly renamedAt?: number
   /** index into the look presets */
   readonly look: number
   /** what they wrap round the neck, and its colour (everyone wears one) */

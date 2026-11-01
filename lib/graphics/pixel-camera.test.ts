@@ -4,7 +4,7 @@ import { PixelCamera } from "#/lib/graphics/pixel-camera"
 
 it("keeps the pixel scale and projection consistent when resizing and zooming", () => {
   const resize = vi.fn()
-  const camera = new PixelCamera({ position: new THREE.Vector3(2, 3, 4), pixelsPerUnit: 48, onResize: resize })
+  const camera = new PixelCamera({ position: new THREE.Vector3(2, 3, 4), pitch: 0.82, pixelsPerUnit: 48, onResize: resize })
   camera.resize(800, 600)
   const distance = camera.distance
   expect(resize).toHaveBeenLastCalledWith(800, 600, 1)
@@ -22,7 +22,7 @@ it("keeps the pixel scale and projection consistent when resizing and zooming", 
 })
 
 it("holds the central region still and follows a turn around the same focus", () => {
-  const camera = new PixelCamera({ position: new THREE.Vector3(0, 0, 0), pixelsPerUnit: 48, onResize: () => {} })
+  const camera = new PixelCamera({ position: new THREE.Vector3(0, 0, 0), pitch: 0.82, pixelsPerUnit: 48, onResize: () => {} })
   camera.resize(800, 600)
   camera.update({ meAt: new THREE.Vector3(0, 0, 0), yaw: 0, turned: false, dt: 1 / 60 })
   expect(camera.focus.toArray()).toEqual([0, 0, 0])

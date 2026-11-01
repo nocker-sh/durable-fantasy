@@ -18,6 +18,10 @@
     "#resources/world/maps/quynhon-gate": "./world/maps/quynhon-gate.json",
     "#resources/world/maps/mountain-pass": "./world/maps/mountain-pass.json",
     "#resources/world/maps/hue-gate": "./world/maps/hue-gate.json",
+    "#resources/world/maps/grass-highland": "./world/maps/grass-highland.json",
+    "#resources/world/maps/lily-marsh": "./world/maps/lily-marsh.json",
+    "#resources/world/maps/falls-valley": "./world/maps/falls-valley.json",
+    "#resources/world/maps/salt-flats": "./world/maps/salt-flats.json",
     "#resources/world/scene/anims": "./world/scene/anims.json",
     "#resources/components/hud/character-creation": "./components/hud/character-creation.css",
     "#resources/packages/fontsource/shippori-mincho/400": "@fontsource/shippori-mincho/400.css",
@@ -28,7 +32,10 @@
     "#resources/scripts/lib/wait-ready": "./scripts/lib/wait-ready.mjs",
     "#resources/scripts/lib/create-character": "./scripts/lib/create-character.mjs",
     "#resources/scripts/lib/walk-to-map": "./scripts/lib/walk-to-map.mjs",
-    "#resources/scripts/lib/configure-cpu": "./scripts/lib/configure-cpu.mjs"
+    "#resources/scripts/lib/configure-cpu": "./scripts/lib/configure-cpu.mjs",
+    "#resources/three/gltf-loader": "three/examples/jsm/loaders/GLTFLoader.js",
+    "#resources/three/meshopt-decoder": "three/examples/jsm/libs/meshopt_decoder.module.js",
+    "#resources/three/skeleton-utils": "three/examples/jsm/utils/SkeletonUtils.js"
   },
   "scripts": {
     "dev": "portless run vp dev",

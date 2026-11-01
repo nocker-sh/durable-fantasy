@@ -79,10 +79,10 @@ it.each(["declined", "already-member"])("consumes the invitation without enrollm
 it("joins an existing party before saving membership and sending each member's view", async () => {
   const request = fixture()
   await handlePartyAnswer(request.room, { type: "party-answer", from: "host", yes: true })
-  expect(request.trace).toEqual(["host-state", "read-guest-owner", "join-guest-owner", "run-guest-owner", "guest-result", "guest-state", "view", "guest-party", "view", "host-party"])
+  expect(request.trace).toEqual(["host-state", "view", "read-guest-owner", "join-guest-owner", "run-guest-owner", "guest-result", "guest-state", "view", "guest-party", "view", "host-party"])
   expect(request.join).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ owner: "guest-owner", name: "Guest", map: "広場", hp: expect.any(Number), maxHp: expect.any(Number) }))
   expect(request.save).toHaveBeenCalledExactlyOnceWith({ party: "group" })
-  expect(request.view).toHaveBeenCalledTimes(2)
+  expect(request.view).toHaveBeenCalledTimes(3)
 })
 
 it("registers the inviter before the guest when creating a new party", async () => {
@@ -116,7 +116,7 @@ it("does not save guest membership or send views when enrollment is refused", as
   await handlePartyAnswer(request.room, { type: "party-answer", from: "host", yes: true })
   expect(request.send).toHaveBeenCalledExactlyOnceWith({ type: "party-closed", reason: "FULL" })
   expect(request.save).not.toHaveBeenCalled()
-  expect(request.view).not.toHaveBeenCalled()
+  expect(request.view).toHaveBeenCalledOnce()
   expect(request.trace).not.toContain("run-guest-owner")
 })
 
@@ -126,5 +126,16 @@ it("propagates enrollment failure without inventing a membership change", async 
   await expect(handlePartyAnswer(request.room, { type: "party-answer", from: "host", yes: true })).rejects.toThrow("Unavailable")
   expect(request.save).not.toHaveBeenCalled()
   expect(request.send).not.toHaveBeenCalled()
-  expect(request.view).not.toHaveBeenCalled()
+  expect(request.view).toHaveBeenCalledOnce()
 })
+
+it("does not join a party whose inviter no longer leads it", async () => {
+  const request = fixture()
+  request.view.mockResolvedValue({ leader: "someone-else", mode: "own", members: [] })
+  await handlePartyAnswer(request.room, { type: "party-answer", from: "host", yes: true })
+  expect(request.peer.send).toHaveBeenCalledExactlyOnceWith({ type: "party-closed", reason: "NOT_LEADER" })
+  expect(request.send).toHaveBeenCalledExactlyOnceWith({ type: "party-closed", reason: "CHANGED" })
+  expect(request.join).not.toHaveBeenCalled()
+  expect(request.save).not.toHaveBeenCalled()
+})
+

@@ -1,6 +1,7 @@
 // Manufacturing rules (economy.md §2). The dispatcher settles recovery and rejects fallen
 // players before calling this pure transition; a rejected craft never consumes inputs.
 import { addItem } from "#/world/core/add-item"
+import { overWeight } from "#/world/core/over-weight"
 import { takeCraftInputs } from "#/world/core/take-craft-inputs"
 import type { ServerCommand } from "#/world/core/commands"
 import { STAMINA_PER_CRAFT } from "#/world/core/crafting-rules"
@@ -33,7 +34,7 @@ export function craft(state: PlayerState, command: Extract<ServerCommand, { type
   if ((command.roll * 15485863) % 1 < failChance(skill, recipe.min)) {
     const grown = gainLife(state.life, recipe.skill, Math.floor(craftExp(recipe.min) / 2))
     return accept(
-      { ...state, bag: materials.bag, gold: state.gold - station.fee, stamina: state.stamina - cost, life: grown.life },
+      { ...state, bag: materials.bag, gold: state.gold - station.fee, stamina: state.stamina - cost, life: grown.life, sitting: false },
       { type: "spoiled", recipe: recipe.id, skill: recipe.skill, level: grown.level, up: grown.up, fee: station.fee },
     )
   }
@@ -41,9 +42,10 @@ export function craft(state: PlayerState, command: Extract<ServerCommand, { type
   const q = ITEMS[out.item].made ? craftedQuality(skill, materials.made ? materials.weight / materials.made : 1, command.roll) : null
   const added = addItem({ bag: materials.bag, item: out.item, count: out.count, mark: q !== null ? { q, by: state.name } : undefined })
   if (!added) return reject("BAG_FULL")
+  if (overWeight(state, { ...state, bag: added })) return reject("TOO_HEAVY")
   const grown = gainLife(state.life, recipe.skill, craftExp(recipe.min))
   return accept(
-    { ...state, bag: added, gold: state.gold - station.fee, stamina: state.stamina - cost, life: grown.life },
+    { ...state, bag: added, gold: state.gold - station.fee, stamina: state.stamina - cost, life: grown.life, sitting: false },
     { type: "crafted", item: out.item, count: out.count, q, skill: recipe.skill, level: grown.level, up: grown.up, fee: station.fee },
   )
 }

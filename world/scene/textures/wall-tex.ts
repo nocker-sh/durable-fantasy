@@ -5,7 +5,8 @@ import { Rng } from "#/lib/engine/random"
 import { hexToRgb as hex } from "#/lib/graphics/hex-to-rgb"
 import { hash2 } from "#/lib/engine/hash2"
 import { vnoise } from "#/lib/engine/vnoise"
-import { PPU, S } from "#/world/scene/textures/palette"
+import { PPU, S, TEXEL_PPU } from "#/world/scene/textures/palette"
+import { downsampleDithered } from "#/lib/graphics/downsample-dithered"
 import { boardWall } from "#/world/scene/textures/board-wall"
 import type { WallOpts } from "#/world/scene/textures/walls"
 import { stoneWall } from "#/world/scene/textures/stone-wall"
@@ -102,7 +103,7 @@ export function wallTex(o: WallOpts): [PixBuf, PixBuf | null] {
       }
   }
   tm.strokes({ seed: o.seed, density: material === "board" ? 0.12 : 0.1, along: material === "board" ? "y" : "x", len: material === "board" ? [3, 8] : [2, 5], thick: [1, 2], step: 0.5, bleed: 0.06 })
-  tm.paint(0.18, b)
+  tm.paint(0.1, b)
   // what goes on after the strokes is drawn with only a light dither, so it reads as flat paint
   const pk = (p: Parameters<typeof pick>[0]) => pick({ ...p, dither: Math.min(p.dither ?? 0.7, 0.25) })
   const timberC = (x: number, y: number, l = 0.5) => pk({ ramp: "timber", b: 0.35 + l * 0.6, x: x, y: y })
@@ -253,5 +254,7 @@ export function wallTex(o: WallOpts): [PixBuf, PixBuf | null] {
       })
     }
   }
-  return [b, anyLit.value ? glow : null]
+  // shrunk to the chunky texels, the glow of the windows with it
+  const f = PPU / TEXEL_PPU
+  return [downsampleDithered(b, f), anyLit.value ? downsampleDithered(glow, f) : null]
 }

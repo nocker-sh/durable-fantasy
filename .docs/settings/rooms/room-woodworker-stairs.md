@@ -81,7 +81,7 @@
   "connections": [
     {
       "kind": "stair",
-      "target": "room-woodworker-1",
+      "target": "room-woodworker-2",
       "furniture": "S",
       "target_furniture": "S",
       "access": [
@@ -117,7 +117,7 @@
   ],
   "design_dependencies": [
     "building-woodworker",
-    "room-woodworker-1",
+    "room-woodworker-2",
     "room-woodworker-kitchen"
   ]
 }
@@ -127,7 +127,7 @@
 
 ## 工房と家族の床を分ける
 
-[[room-woodworker-1]]で仕事着と靴を下ろして上がり、上の戸で[[room-woodworker-kitchen]]へ入る。材料や完成品を置く棚にせず、工房の客や働きに来る人の通路と家族の生活を分ける。
+[[room-woodworker-2]]で仕事着と靴を下ろして上がり、上の戸で[[room-woodworker-kitchen]]へ入る。材料や完成品を置く棚にせず、工房の客や働きに来る人の通路と家族の生活を分ける。
 
 ## 平面案
 

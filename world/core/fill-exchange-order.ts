@@ -12,7 +12,11 @@ export function fillExchangeOrder(placement: ExchangePlacement, other: Order): b
   if (placement.offer.side === "buy") placement.budget -= price * qty
   const buyer = placement.offer.side === "buy" ? placement.order : other
   const seller = placement.offer.side === "buy" ? other : placement.order
-  const fee = Math.ceil(price * qty * TRADE_FEE)
+  // the fee is rounded down on what the order has sold in all, so splitting it into small fills neither
+  // raises the rate (rounding up each fill made 3% into 10% on cheap things) nor escapes it
+  const before = seller.sold ?? 0
+  const fee = Math.floor((before + price * qty) * TRADE_FEE) - Math.floor(before * TRADE_FEE)
+  seller.sold = before + price * qty
   placement.state.fees += fee
   creditExchangeInbox({ inbox: placement.state.inbox, owner: seller.owner, gold: price * qty - fee })
   creditExchangeInbox({ inbox: placement.state.inbox, owner: buyer.owner, gold: 0, item: heldExchangeItem(seller, qty) })

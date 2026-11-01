@@ -11,7 +11,7 @@ import { ITEMS } from "#/world/core/items/catalog"
 import type { ItemId } from "#/world/core/items/catalog"
 import { SHOPS } from "#/world/core/shops"
 import { shopOfKeeper } from "#/world/core/shop-of-keeper"
-import type { ShopId } from "#/world/core/shop-types"
+import type { ShopDefinition, ShopId } from "#/world/core/shop-types"
 import { keeperPresent } from "#/world/maps/keeper-present"
 import { RESIDENTS } from "#/world/town/residents"
 import { choicesFor } from "#/world/parts/choices-for"
@@ -29,8 +29,8 @@ export class DialogueActions {
   say(text: string) {
     const input = parseChatInput(text)
     if (!input) return
-    if (input.kind === "unavailable") {
-      this.target.addChat({ channel: "system", text: input.text })
+    if (input.kind === "whisper") {
+      this.target.session.socket?.send({ type: "whisper", to: input.to, text: input.text })
       return
     }
     if (input.kind === "party") {
@@ -117,7 +117,8 @@ export class DialogueActions {
       const min = this.target.session.state.get().clock.min
       const shop = shopOfKeeper(dialogue.name, (id) => keeperPresent(id, dialogue.name, min))
       if (!shop || !keeperPresent(shop, dialogue.name, min)) return
-      this.target.addChat({ channel: "npc", name: dialogue.name, text: SHOPS[shop].greeting })
+      const def: ShopDefinition = SHOPS[shop]
+      this.target.addChat({ channel: "npc", name: dialogue.name, text: def.greetings?.[dialogue.name] ?? def.greeting })
       this.shopKeeper = dialogue.name
       this.target.update({ dialogue: null, shop, stock: null })
       this.lookAtShop()

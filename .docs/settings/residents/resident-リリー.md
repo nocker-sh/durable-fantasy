@@ -39,7 +39,7 @@
     "building-tavern",
     "room-tavern-5",
     "room-tavern-1",
-    "room-tavern-2"
+    "room-tavern-4"
   ],
   "storage_ids": [
     "storage-tavern-5-1"
@@ -51,7 +51,7 @@
   },
   "work_rooms": [
     "room-tavern-1",
-    "room-tavern-2"
+    "room-tavern-4"
   ],
   "appearance_source": {
     "file": "world/town/residents.ts",
@@ -89,7 +89,7 @@
 
 ## 住み込みの個室案
 
-酒場の共用廊下から専用の戸で入る個室を提案する。常用の寝台と衣服箱のIDは維持し、他の住み込みの者と寝間を共有しない。現行の相部屋と寝具・勤務と休息の運用、戸と視線・音の照合は別に行い、日課や描画を変更済みとしない。
+酒場の共用廊下から入る個室で眠る（実行時のデータにも反映済み）。他の住み込みの者と寝間を共有しない。寝具・勤務と休息の運用、戸と視線・音の照合は別に行う。
 
 
 ## 居住と作業の区別

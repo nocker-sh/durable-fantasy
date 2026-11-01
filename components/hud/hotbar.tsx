@@ -3,6 +3,8 @@
 // from the skills window; right-click a shortcut to clear it.
 import { useState, type DragEvent, type MouseEvent } from "react"
 import { countItem } from "#/world/core/count-item"
+import { isMedicine } from "#/world/core/is-medicine"
+import { MEDICINE_KEY } from "#/world/core/medicine-rules"
 import { REASON_TEXT } from "#/world/core/commands"
 import { SKILLS } from "#/world/core/skills"
 import { artBlocked } from "#/world/core/art-blocked"
@@ -56,7 +58,8 @@ export function Hotbar() {
   const until =
     player?.hotbar.reduce((latest, entry) => {
       const id = entry && skillOfKey(entry)
-      return id ? Math.max(latest, player.ready[id] ?? 0) : latest
+      if (id) return Math.max(latest, player.ready[id] ?? 0)
+      return entry && isMedicine(entry as ItemId) ? Math.max(latest, player.ready[MEDICINE_KEY] ?? 0) : latest
     }, 0) ?? 0
   const now = useDeadlineClock(until)
   const need = player ? expToNext(player.level) : 0
@@ -110,9 +113,21 @@ export function Hotbar() {
           }
           const item = entry as ItemId | null
           const count = item && player ? countItem(player.bag, item) : 0
+          // medicine shares one wait (game-system.md §3.6), shown like a skill's
+          const wait = item && isMedicine(item) ? Math.max(0, Math.ceil(((player?.ready[MEDICINE_KEY] ?? 0) - now) / 1000)) : 0
           return (
             <ItemTooltip key={key} item={item}>
-              <Slot round icon={item ? game.iconUrl(item) : null} count={item ? count : undefined} dim={!!item && count === 0} keyHint={key} aria-label={`ショートカット ${key}`} {...drop_} />
+              <Slot
+                round
+                icon={item ? game.iconUrl(item) : null}
+                count={item ? count : undefined}
+                dim={!!item && (count === 0 || wait > 0)}
+                keyHint={key}
+                aria-label={`ショートカット ${key}${wait ? `（あと${wait}秒）` : ""}`}
+                {...drop_}
+              >
+                {wait > 0 && <span className="pointer-events-none absolute bottom-1 font-tiny text-xs text-white ui-text-shadow">{wait}</span>}
+              </Slot>
             </ItemTooltip>
           )
         })}

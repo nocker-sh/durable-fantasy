@@ -133,7 +133,7 @@
 
 [[room-h-c1-1]] はろくろ・乾燥中の器・絵付けと釉・仕事の洗い物・焼いて冷めた器を持つ。[[room-h-c1-materials]] は補充分の土と出荷の箱・戻った梱包材・破損した器を区別する。裏の焼成設備は [[facility-pottery-kiln]] として家の中の炉と分け、現行に確定した敷地や形状があるとは扱わない。
 
-[[room-h-c1-entry]] と [[room-h-c1-lower-stairs]]、[[room-h-c1-upper-stairs]] と [[room-h-c1-upper-hall]] は家族の経路を持つ。[[room-h-c1-2]] は両親の寝室、[[room-h-c1-3]] は上階へ移すアデーレの個室とし、既存の寝台と衣服箱のIDを維持する。[[room-h-c1-kitchen]] は三人の家庭の食事と調理、[[room-h-c1-drying]] は衣服と寝具の手入れを持つ。夜市から帰る娘が工房や窯を通り抜けて寝床へ行く前提にしない。
+[[room-h-c1-entry]] と [[room-h-c1-lower-stairs]]、[[room-h-c1-upper-stairs]] と [[room-h-c1-upper-hall]] は家族の経路を持つ。[[room-h-c1-2]] は両親の寝室、[[room-h-c1-3]] は上階のアデーレの個室とし（現行の間取りも二階に置く）、既存の寝台と衣服箱のIDを維持する。[[room-h-c1-kitchen]] は三人の家庭の食事と調理、[[room-h-c1-drying]] は衣服と寝具の手入れを持つ。夜市から帰る娘が工房や窯を通り抜けて寝床へ行く前提にしない。
 
 ## 描画へ渡す条件
 

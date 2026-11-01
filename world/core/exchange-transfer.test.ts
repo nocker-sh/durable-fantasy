@@ -16,6 +16,7 @@ import { ITEM_IDS } from "#/world/core/items/item-ids"
 import { sellable } from "#/world/core/items/sellable"
 import type { Quality } from "#/world/core/items/kinds"
 import { player } from "#/world/test/player"
+import { fullDurability } from "#/world/core/full-durability"
 
 it.each(["constructor", "__proto__", "toString", "unknown", "potion", "potion@", "potion@01", "potion@1.0", "potion@1e0", "potion@ 1", "potion@1@extra", "log@1", "potion@4"])(
   "rejects a non-canonical exchange symbol: %s",
@@ -24,7 +25,7 @@ it.each(["constructor", "__proto__", "toString", "unknown", "potion", "potion@",
 
 it("accepts exactly the tradable item and quality combinations", () => {
   for (const item of ITEM_IDS) {
-    const allowed = sellable(item) && !ITEMS[item].tool
+    const allowed = sellable(item)
     expect(parseSymbol(item)).toEqual(allowed && !ITEMS[item].made ? { item } : null)
     for (const q of [0, 1, 2, 3] as const) {
       const symbol = { item, q }
@@ -82,4 +83,16 @@ it("refuses a partly fitting collection without changing items or crediting gold
     }),
   ).toEqual({ ok: false, reason: "BAG_FULL" })
   expect(before).toEqual(snapshot)
+})
+
+it("lists a tool only unworn and hands it over at its full durability", () => {
+  const full = fullDurability("sickle", 1)!
+  const worn = apply(player({ gold: 100, bag: [{ item: "sickle", count: 1, q: 1, by: "ギュンター", dur: full - 1 }, ...emptyBag().slice(1)] }), { type: "escrow-sell", slot: 0, qty: 1, fee: 1 })
+  expect(worn).toEqual({ ok: false, reason: "WORN_TOOL" })
+  const selling = place(emptyExchange(), { owner: "seller", name: "売り手", side: "sell", symbol: "sickle@1", price: 30, qty: 1, by: "ギュンター" }, 0).state
+  const matched = place(selling, { owner: "buyer", name: "買い手", side: "buy", symbol: "sickle@1", price: 30, qty: 1 }, 1).state
+  const inbox = reserveInbox(matched, emptyClaims(), "buyer").claim.inbox
+  const received = apply(player({ bag: emptyBag() }), { type: "receive", ...inbox })
+  if (!received.ok) throw Error(received.reason)
+  expect(received.state.bag[0]).toEqual({ item: "sickle", count: 1, q: 1, by: "ギュンター", dur: full })
 })

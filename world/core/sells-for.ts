@@ -1,11 +1,9 @@
 import { shopBuys } from "#/world/core/shop-buys"
-import { ITEMS } from "#/world/core/items/catalog"
-import { QUALITY_PRICE } from "#/world/core/items/kinds"
+import { buybackOf } from "#/world/core/buyback-of"
 import type { Stack } from "#/world/core/bag-types"
 import type { ShopId } from "#/world/core/shop-types"
 
-/** Quality affects made goods after this counter's base payment has been rounded. */
+/** What this counter pays for one of the stack at its usual stock, after quality. */
 export function sellsFor(shop: ShopId, slot: Stack): number {
-  const base = shopBuys(shop, slot.item)
-  return ITEMS[slot.item].made ? Math.max(1, Math.floor(base * QUALITY_PRICE[slot.q ?? 1])) : base
+  return buybackOf(shopBuys(shop, slot.item), slot)
 }

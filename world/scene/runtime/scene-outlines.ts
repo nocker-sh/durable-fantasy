@@ -6,7 +6,7 @@ import type { Critter } from "#/world/scene/animal-types"
 type Person = { fig: Pick<Figure, "outline"> }
 type Animal = Pick<Critter, "outline">
 type Props = Readonly<{
-  me: { fig: Pick<Figure, "xray" | "outline"> }
+  me: { fig: Pick<Figure, "xray" | "outline" | "lighten"> }
   people: ReadonlyArray<Person>
   remotes: ReadonlyMap<string, Person>
   monsters: ReadonlyArray<Pick<MonsterView, "body" | "spawn">>
@@ -15,7 +15,10 @@ type Props = Readonly<{
   preview: boolean
 }>
 
-/** 自分の輪郭と遮蔽物越しの表示を保ち、他の人物と生き物は指された対象だけを囲む。 */
+/** 自分の色を夜も町より少し明るく保つ割合。0 は時刻の色のまま、1 は昼の色。 */
+const SELF_LIFT = 0.35
+
+/** 自分の輪郭と遮蔽物越しの表示と夜の明るさを保ち、他の人物と生き物は指された対象だけを囲む。 */
 export class SceneOutlines {
   constructor(private readonly props: Props) {
     Object.freeze(this)
@@ -25,6 +28,7 @@ export class SceneOutlines {
     if (!this.props.preview) {
       this.props.me.fig.xray(hidden)
       this.props.me.fig.outline(true, hidden)
+      this.props.me.fig.lighten(SELF_LIFT)
     }
     for (const person of this.props.people) person.fig.outline(person === this.props.pointer.hovered)
     for (const walker of this.props.remotes.values()) walker.fig.outline(walker === this.props.pointer.hoveredWalker)

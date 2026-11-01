@@ -38,7 +38,7 @@ it.each(["group", "previous-group"])("polls status and private speech once with 
   expect(calls.poll).toHaveBeenCalledExactlyOnceWith({ owner: "self", status: expect.objectContaining({ name: "エルナ", map: "南門" }), after: cursorParty === "group" ? 2 : 0 })
   expect(calls.chat).not.toHaveBeenCalled()
   expect(request.send).toHaveBeenCalledWith({ type: "party-chat", party: "group", seq: 3, lines: [{ seq: 3, name: "エルナ", text: "待ち合わせ", self: true }] })
-  expect(request.trace).toEqual(["party", "party-chat"])
+  expect(request.trace).toEqual(["save", "party", "party-chat"])
 })
 
 it("returns an empty view without storage access when no party is present", async () => {
@@ -54,8 +54,8 @@ it("clears a missing membership before returning the saved player and empty view
   const request = fixture()
   calls.poll.mockResolvedValue({ party: { leader: "other", mode: "own", members: [] }, chat: null })
   await handlePartyLook(request.room, { type: "party-look" })
-  expect(request.trace).toEqual(["save", "run", "result", "party"])
-  expect(request.save).toHaveBeenCalledExactlyOnceWith({ party: null })
+  expect(request.trace).toEqual(["save", "save", "run", "result", "party"])
+  expect(request.save).toHaveBeenLastCalledWith({ party: null })
   expect(calls.run).toHaveBeenCalledExactlyOnceWith({ type: "set-party", party: null })
   expect(request.send).toHaveBeenLastCalledWith({ type: "party", view: null })
 })
@@ -64,15 +64,23 @@ it("does not forward private speech when the saved player belongs to another par
   const request = fixture()
   calls.read.mockResolvedValue(player({ party: "other-group" }))
   await handlePartyLook(request.room, { type: "party-look" })
-  expect(request.trace).toEqual(["party"])
-  expect(request.save).not.toHaveBeenCalled()
+  expect(request.trace).toEqual(["save", "party"])
+  expect(request.save).not.toHaveBeenCalledWith({ party: null })
 })
 
 it("does not erase membership after a failed poll", async () => {
   const request = fixture()
   calls.poll.mockRejectedValue(Error("Unavailable"))
   await expect(handlePartyLook(request.room, { type: "party-look" })).rejects.toThrow("Unavailable")
-  expect(request.save).not.toHaveBeenCalled()
+  expect(request.save).not.toHaveBeenCalledWith({ party: null })
   expect(calls.run).not.toHaveBeenCalled()
+  expect(request.send).not.toHaveBeenCalled()
+})
+
+it("answers at most one look per few seconds from the same connection", async () => {
+  const request = fixture()
+  request.me.lookedAt = Date.now()
+  await handlePartyLook(request.room, { type: "party-look" })
+  expect(calls.poll).not.toHaveBeenCalled()
   expect(request.send).not.toHaveBeenCalled()
 })

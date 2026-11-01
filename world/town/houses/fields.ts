@@ -41,8 +41,8 @@ const houses: readonly HouseDef[] = [
     seed: 112,
     timber: true,
     plan: home(
-      [room("居間兼台所", 0), bed("ヴェンデルとアグネスの寝室", 1, 2), bed("ルートヴィヒとイルマの部屋", 1, 2)],
-      ["鋤と鍬", "糸車", "麦の袋", "野菜籠", "食卓", "寝台（二人用）", "寝台×2", "揺り椅子", "椅子×4"],
+      [room("居間兼台所", 0), bed("ヴェンデルとアグネスの寝室", 1, 2), bed("ルートヴィヒの部屋", 1, 1), bed("イルマの寝間", 0, 1)],
+      ["鋤と鍬", "糸車×2", "麦の袋", "野菜籠", "食卓", "寝台（二人用）", "寝台×2", "揺り椅子", "椅子×4"],
     ),
   },
   {
@@ -64,7 +64,7 @@ const houses: readonly HouseDef[] = [
     seed: 113,
     plan: home(
       [room("仕事場", 0), room("台所", 0), bed("アルブレヒトとギーゼラの寝室", 1, 2), bed("バスティアンの部屋", 1, 1)],
-      ["作業台", "燻しの棚", "腸詰めの吊るし", "塩漬けの樽", "食卓", "寝台（二人用）", "子どもの寝台", "椅子×3"],
+      ["作業台", "燻しの棚", "腸詰めの吊るし", "塩漬けの樽×3", "食卓", "寝台（二人用）", "子どもの寝台", "椅子×3"],
       "豚の解体と燻製",
     ),
   },
@@ -86,7 +86,7 @@ const houses: readonly HouseDef[] = [
     },
     seed: 114,
     plan: home(
-      [room("乳の仕事場", 0), room("居間兼台所", 0), bed("レーニとピアの部屋", 1, 2), bed("フーゴの部屋", 1, 1)],
+      [room("乳の仕事場", 0), room("居間兼台所", 0), bed("フーゴの寝間", 0, 1), bed("レーニとピアの部屋", 1, 2)],
       ["作業台", "撹乳桶", "乳の桶", "チーズの棚", "樽", "食卓", "寝台×2", "子どもの寝台", "椅子×3"],
       "乳しぼりとバター作り",
     ),
@@ -108,13 +108,14 @@ const houses: readonly HouseDef[] = [
       u: 2.25,
     },
     seed: 17,
-    plan: home([room("子守りの部屋", 0), room("台所", 0), bed("アンネリーとエルナの寝室", 1, 2)], ["長椅子", "毛糸の籠", "食卓", "寝台×2", "揺り椅子", "椅子×2"]),
+    plan: home([room("子守りの居間", 0), room("台所", 0), bed("アンネリーとエルナの寝室", 1, 2)], ["長椅子", "毛糸の籠", "揺り椅子", "揺りかご", "食卓", "寝台×2", "椅子×2"]),
   },
   {
     id: "cowshed",
     map: "phanthiet-fields",
     kind: "farm",
     name: "牛小屋",
+    household: "dairy",
     x0: 23.5,
     z0: 38.5,
     x1: 27.5,
@@ -130,7 +131,8 @@ const houses: readonly HouseDef[] = [
       rooms: [room("牛小屋", 0)],
       hearth: false,
       kitchen: false,
-      furniture: ["干し草"],
+      // the hay is stacked out by the pasture (world/scene/build-fields.ts); the evening's armful lies on the floor (traces.ts)
+      furniture: ["干し草（外）", "乳の桶×2", "樽", "縄の束"],
     },
   },
 ]

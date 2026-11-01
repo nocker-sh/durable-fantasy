@@ -48,10 +48,12 @@ for (const m of maps) {
   for (const shot of shots) {
     const page = await browser.newPage({ ignoreHTTPSErrors: true, viewport: { width: 1280, height: 800 } })
     await page.goto(`${BASE}/dev/view?map=${m.id}&${shot.query}&blur=0&ui=0`, { waitUntil: "domcontentloaded" })
-    const ready = await page.waitForFunction(() => document.body.dataset.ready === "1", undefined, { timeout: 240_000 }).then(
-      () => true,
-      () => false,
-    )
+    const ready = await page
+      .waitForFunction(() => document.body.dataset.ready === "1", undefined, { timeout: 240_000 })
+      .then(
+        () => true,
+        () => false,
+      )
     await page.waitForTimeout(1500)
     await page.screenshot({ path: join(dev, `${m.id}-${shot.view}.jpg`), type: "jpeg", quality: 84 })
     console.log(m.id, shot.view, ready ? "" : "(not ready)")

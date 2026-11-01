@@ -60,20 +60,26 @@ describe("every map can be walked through", () => {
     const open = reach("phanthiet")
     expect([...open].filter((id) => MAPS[id].kind === "field").sort()).toEqual([
       "deep-forest",
+      "falls-valley",
       "forest-edge",
+      "grass-highland",
       "hue-gate",
+      "lily-marsh",
       "mountain-pass",
       "net-sheds",
       "quynhon-gate",
       "red-dunes",
+      "salt-flats",
       "sea-cliff",
       "south-meadow",
     ])
+    // the west is reached from the meadow, one land after another down to the salt flat
+    expect(MAPS["south-meadow"].warps.some((w) => w.to.map === "grass-highland")).toBe(true)
     // the forest is reached from the meadow, not round by the sea
     expect(MAPS["south-meadow"].warps.some((w) => w.to.map === "forest-edge")).toBe(true)
     // every town map and building is open
     for (const id of Object.keys(MAPS)) if (MAPS[id].kind !== "field") expect(open.has(id), id).toBe(true)
-    for (const id of ["red-dunes", "sea-cliff", "net-sheds", "quynhon-gate", "mountain-pass", "hue-gate"]) {
+    for (const id of ["red-dunes", "sea-cliff", "net-sheds", "quynhon-gate", "mountain-pass", "hue-gate", "grass-highland", "lily-marsh", "falls-valley", "salt-flats"]) {
       expect(isOpen(id), id).toBe(true)
       expect(open.has(id), `town to ${id}`).toBe(true)
       expect(reach(id).has("phanthiet"), `${id} back to town`).toBe(true)

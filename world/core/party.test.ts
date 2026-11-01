@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { PARTY_MAX } from "#/world/core/party/rules"
+import { PARTY_BONUS, PARTY_MAX, SHARE_LEVELS } from "#/world/core/party/rules"
 import { emptyParty } from "#/world/core/party/empty-party"
 import { join } from "#/world/core/party/join"
 import { leave } from "#/world/core/party/leave"
@@ -40,7 +40,7 @@ describe("parties", () => {
     ])
   })
 
-  it("an even share rounds down, the one who beat it gets what is left over, and the shares never pass the whole", () => {
+  it("an even share adds a little per member, rounds down, gives the one who beat it what is left over and never passes the bonus", () => {
     const three = shareOut({
       exp: 10,
       mode: "even",
@@ -52,18 +52,37 @@ describe("parties", () => {
     })
     expect(three).toEqual([
       { owner: "a", exp: 4 },
-      { owner: "b", exp: 3 },
-      { owner: "c", exp: 3 },
+      { owner: "b", exp: 4 },
+      { owner: "c", exp: 4 },
     ])
     for (let exp = 0; exp <= 40; exp++)
       for (let n = 0; n < PARTY_MAX; n++) {
         const near = Array.from({ length: n }, (_, i) => ({ owner: `m${i}`, level: 1 }))
         const shares = shareOut({ exp: exp, mode: "even", killer: { owner: "k", level: 1 }, near: near })
+        const total = Math.floor(exp * (1 + PARTY_BONUS * n))
         expect(
           shares.reduce((a, x) => a + x.exp, 0),
           `${exp} among ${n + 1}`,
-        ).toBe(exp)
-        expect(Math.max(...shares.map((x) => x.exp)) - Math.min(...shares.map((x) => x.exp))).toBeLessThan(n + 1)
+        ).toBe(total)
+        expect(shares.filter((x) => x.owner !== "k").every((x) => x.exp > 0)).toBe(true)
+        if (shares.length > 1) expect(Math.max(...shares.map((x) => x.exp)) - Math.min(...shares.map((x) => x.exp))).toBeLessThan(n + 1)
       }
+  })
+
+  it("keeps members more than a few levels apart out of the share", () => {
+    const shares = shareOut({
+      exp: 20,
+      mode: "even",
+      killer: { owner: "a", level: 10 },
+      near: [
+        { owner: "near", level: 10 + SHARE_LEVELS },
+        { owner: "far", level: 10 + SHARE_LEVELS + 1 },
+      ],
+    })
+    expect(shares.map((x) => x.owner)).toEqual(["a", "near"])
+  })
+
+  it("sends nothing to members whose share rounds down to nothing", () => {
+    expect(shareOut({ exp: 1, mode: "even", killer: { owner: "a", level: 1 }, near: [{ owner: "b", level: 1 }] })).toEqual([{ owner: "a", exp: 1 }])
   })
 })

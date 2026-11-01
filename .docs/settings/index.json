@@ -735,6 +735,12 @@
       "source": "world/town/houses.ts"
     },
     {
+      "id": "room-woodworker-3",
+      "kind": "rooms",
+      "file": "rooms/room-woodworker-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
       "id": "room-woodworker-stairs",
       "kind": "rooms",
       "file": "rooms/room-woodworker-stairs.md",
@@ -1080,6 +1086,60 @@
       "id": "room-h-g3-2",
       "kind": "rooms",
       "file": "rooms/room-h-g3-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h-g7",
+      "kind": "buildings",
+      "file": "buildings/building-h-g7.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g7-1",
+      "kind": "rooms",
+      "file": "rooms/room-h-g7-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g7-2",
+      "kind": "rooms",
+      "file": "rooms/room-h-g7-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g7-3",
+      "kind": "rooms",
+      "file": "rooms/room-h-g7-3.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g7-4",
+      "kind": "rooms",
+      "file": "rooms/room-h-g7-4.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "building-h-g8",
+      "kind": "buildings",
+      "file": "buildings/building-h-g8.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g8-1",
+      "kind": "rooms",
+      "file": "rooms/room-h-g8-1.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g8-2",
+      "kind": "rooms",
+      "file": "rooms/room-h-g8-2.md",
+      "source": "world/town/houses.ts"
+    },
+    {
+      "id": "room-h-g8-3",
+      "kind": "rooms",
+      "file": "rooms/room-h-g8-3.md",
       "source": "world/town/houses.ts"
     },
     {
@@ -1647,6 +1707,42 @@
       "source": "world/town/residents.ts"
     },
     {
+      "id": "resident-コンラート",
+      "kind": "residents",
+      "file": "residents/resident-コンラート.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ヘンリケ",
+      "kind": "residents",
+      "file": "residents/resident-ヘンリケ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ロータル",
+      "kind": "residents",
+      "file": "residents/resident-ロータル.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-インゴ",
+      "kind": "residents",
+      "file": "residents/resident-インゴ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-カルラ",
+      "kind": "residents",
+      "file": "residents/resident-カルラ.md",
+      "source": "world/town/residents.ts"
+    },
+    {
+      "id": "resident-ベルント",
+      "kind": "residents",
+      "file": "residents/resident-ベルント.md",
+      "source": "world/town/residents.ts"
+    },
+    {
       "id": "map-phanthiet",
       "kind": "maps",
       "file": "maps/map-phanthiet.md",
@@ -1722,6 +1818,30 @@
       "id": "map-hue-gate",
       "kind": "maps",
       "file": "maps/map-hue-gate.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-grass-highland",
+      "kind": "maps",
+      "file": "maps/map-grass-highland.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-lily-marsh",
+      "kind": "maps",
+      "file": "maps/map-lily-marsh.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-falls-valley",
+      "kind": "maps",
+      "file": "maps/map-falls-valley.md",
+      "source": "world/maps/index.ts"
+    },
+    {
+      "id": "map-salt-flats",
+      "kind": "maps",
+      "file": "maps/map-salt-flats.md",
       "source": "world/maps/index.ts"
     },
     {
@@ -2015,9 +2135,9 @@
       "source": "world/town/houses.ts"
     },
     {
-      "id": "room-tavern-max",
+      "id": "room-tavern-6",
       "kind": "rooms",
-      "file": "rooms/room-tavern-max.md",
+      "file": "rooms/room-tavern-6.md",
       "source": "world/town/houses.ts"
     },
     {
@@ -2039,9 +2159,9 @@
       "source": "world/town/houses.ts"
     },
     {
-      "id": "room-smithy-peter",
+      "id": "room-smithy-3",
       "kind": "rooms",
-      "file": "rooms/room-smithy-peter.md",
+      "file": "rooms/room-smithy-3.md",
       "source": "world/town/houses.ts"
     },
     {
@@ -2075,9 +2195,9 @@
       "source": "world/town/houses.ts"
     },
     {
-      "id": "room-warehouse-household",
+      "id": "room-warehouse-4",
       "kind": "rooms",
-      "file": "rooms/room-warehouse-household.md",
+      "file": "rooms/room-warehouse-4.md",
       "source": "world/town/houses.ts"
     },
     {
@@ -2381,15 +2501,9 @@
       "source": "world/town/houses.ts"
     },
     {
-      "id": "room-h-c5-monica",
+      "id": "room-h-c5-4",
       "kind": "rooms",
-      "file": "rooms/room-h-c5-monica.md",
-      "source": "world/town/houses.ts"
-    },
-    {
-      "id": "room-h-c5-tobias",
-      "kind": "rooms",
-      "file": "rooms/room-h-c5-tobias.md",
+      "file": "rooms/room-h-c5-4.md",
       "source": "world/town/houses.ts"
     },
     {
@@ -2453,15 +2567,15 @@
       "source": "world/town/houses.ts"
     },
     {
-      "id": "room-h-c3-niklas",
+      "id": "room-h-c3-4",
       "kind": "rooms",
-      "file": "rooms/room-h-c3-niklas.md",
+      "file": "rooms/room-h-c3-4.md",
       "source": "world/town/houses.ts"
     },
     {
-      "id": "room-h-c3-frieda",
+      "id": "room-h-c3-5",
       "kind": "rooms",
-      "file": "rooms/room-h-c3-frieda.md",
+      "file": "rooms/room-h-c3-5.md",
       "source": "world/town/houses.ts"
     },
     {
@@ -2645,15 +2759,15 @@
       "source": "world/town/houses.ts"
     },
     {
-      "id": "room-guardhouse-stefan",
+      "id": "room-guardhouse-5",
       "kind": "rooms",
-      "file": "rooms/room-guardhouse-stefan.md",
+      "file": "rooms/room-guardhouse-5.md",
       "source": "world/town/houses.ts"
     },
     {
-      "id": "room-guardhouse-veronika",
+      "id": "room-guardhouse-6",
       "kind": "rooms",
-      "file": "rooms/room-guardhouse-veronika.md",
+      "file": "rooms/room-guardhouse-6.md",
       "source": "world/town/houses.ts"
     },
     {

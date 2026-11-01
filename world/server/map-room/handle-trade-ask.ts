@@ -1,3 +1,5 @@
+import { Player } from "#/durable-objects/player"
+import { ASK_GAP_MS } from "#/world/core/pace-rules"
 import { TRADE_CELLS } from "#/world/core/trade-rules"
 import { emptyOffer } from "#/world/core/empty-offer"
 import { presence } from "#/world/server/map-room/presence"
@@ -21,6 +23,10 @@ export async function handleTradeAsk(roomCtx: Props, message: Message<"trade-ask
   const target = reachable(other).at(-1)
   if (!target || !near(me, target, TRADE_CELLS)) {
     await ctx.connection.send({ type: "trade-closed", reason: "TOO_FAR" })
+    return
+  }
+  if (!(await Player.get(me.owner).pace({ kind: "ask", gap: ASK_GAP_MS }))) {
+    await ctx.connection.send({ type: "trade-closed", reason: "WAIT" })
     return
   }
   roomCtx.save({ trade: { with: them.id, open: false, offer: emptyOffer(), shown: [], locked: false, done: false } })

@@ -45,6 +45,8 @@ export const commandSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("sell"), shop: shopId, slot: slotIndex, count, expectedStack: stackSchema.optional() }),
   z.object({ type: z.literal("use"), slot: slotIndex, expectedStack: stackSchema.optional() }),
   z.object({ type: z.literal("use-item"), item: itemId }),
+  /** throw away some of one slot (not key items) */
+  z.object({ type: z.literal("discard"), slot: slotIndex, count, expectedStack: stackSchema.optional() }),
   z.object({ type: z.literal("move"), from: slotIndex, to: slotIndex, expectedStack: stackSchema.optional(), expectedTarget: stackSchema.nullable().optional() }),
   /** wear the item in a bag slot; `to` picks one of two accessory slots */
   z.object({ type: z.literal("equip"), slot: slotIndex, to: equipSlot.optional(), expectedStack: stackSchema.optional() }),
@@ -134,6 +136,7 @@ export type Reason =
   | "SP_FULL"
   | "NOT_EQUIPPABLE"
   | "STAT_TOO_LOW"
+  | "LEVEL_TOO_LOW"
   | "SKILL_TOO_LOW"
   | "NO_WEAPON"
   | "NO_HERB"
@@ -163,6 +166,7 @@ export type Reason =
   | "ORDER_CHANGED"
   | "TOO_MANY_ORDERS"
   | "NOT_READY"
+  | "NOT_DONE"
   | "NOT_WANTED"
   | "NO_ERRAND"
   | "TOO_MANY_ERRANDS"
@@ -173,8 +177,14 @@ export type Reason =
   | "STORAGE_FULL"
   | "NOT_STORABLE"
   | "NOT_TRADABLE"
+  | "WORN_TOOL"
   | "COOLDOWN"
   | "SP_SHORT"
+  | "WALKING"
+  | "MEDICINE_WAIT"
+  | "NAME_TAKEN"
+  | "NOT_DISCARDABLE"
+  | "RENAME_WAIT"
 
 export type GameEvent =
   | { type: "bought"; item: ItemId; count: number; cost: number; by?: string }
@@ -194,6 +204,7 @@ export type GameEvent =
   | { type: "raised"; stat: Stat; value: number }
   | { type: "renamed"; name: string }
   | { type: "rearranged" }
+  | { type: "discarded"; item: ItemId; count: number; by?: string }
   | { type: "errand-taken"; errand: string }
   | { type: "hurt"; amount: number; by: string; hp: number }
   | { type: "fell"; by: string }
@@ -225,6 +236,7 @@ export const REASON_TEXT: Record<Reason, string> = {
   SP_FULL: "SP は満ちている。",
   NOT_EQUIPPABLE: "それは装備できない。",
   STAT_TOO_LOW: "能力が足りない。",
+  LEVEL_TOO_LOW: "Lv が足りない。",
   SKILL_TOO_LOW: "生活スキルの腕が足りない。",
   NO_WEAPON: "その技に合う武器を手にしていない。",
   NO_HERB: "薬草を持っていない。",
@@ -251,7 +263,8 @@ export const REASON_TEXT: Record<Reason, string> = {
   NOT_SKILLED: "まだ腕が足りない。",
   MISSING_INPUTS: "材料が足りない。",
   TOO_MANY_ORDERS: "頼めるのは三つまで。",
-  NOT_READY: "まだできていない。",
+  NOT_READY: "今は手が離せない。",
+  NOT_DONE: "まだできていない。",
   ORDER_CHANGED: "品物が変わった。",
   ITEM_CHANGED: "品物が変わった。",
   NOT_WANTED: "今は買い取ってもらえない。",
@@ -264,6 +277,12 @@ export const REASON_TEXT: Record<Reason, string> = {
   STORAGE_FULL: "倉庫に空きがない。",
   NOT_STORABLE: "それは預けられない。",
   NOT_TRADABLE: "それは渡せない。",
+  WORN_TOOL: "使い減りした道具は出品できない。",
   COOLDOWN: "まだ使えない。",
   SP_SHORT: "SP が足りない。",
+  WALKING: "歩きながらは座れない。",
+  MEDICINE_WAIT: "まだ次の薬は使えない。",
+  NAME_TAKEN: "その名前は使えない。",
+  NOT_DISCARDABLE: "それは捨てられない。",
+  RENAME_WAIT: "名前はまだ変えられない。",
 }

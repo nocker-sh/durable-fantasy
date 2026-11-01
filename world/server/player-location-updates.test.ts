@@ -38,9 +38,16 @@ it("redirects a mismatched map without changing the saved route or owner", () =>
   expect(arrivePlayer(record, { world: 2, map: "phanthiet", connection: "replacement" }, 1250)).toEqual({ map: "south-meadow", at: [11, 10], accepted: false })
   expect(record).toEqual(before)
 })
-it("does not commit a different world's town fallback until that map is accepted", () => {
+it("keeps a player out in the wild in their own world instead of crossing to another town", () => {
   const record = fixture(),
     before = structuredClone(record)
+  expect(arrivePlayer(record, { world: 3, map: TOWN_SPAWN.map, connection: "replacement" }, 1250)).toEqual({ map: "south-meadow", at: [11, 10], world: 2, accepted: false })
+  expect(record).toEqual(before)
+})
+it("does not commit a different world's town fallback until that map is accepted", () => {
+  const record = fixture()
+  record.location = { world: 2, map: TOWN_SPAWN.map, route: [[38, 80]], since: 1000, connection: "connection" }
+  const before = structuredClone(record)
   expect(arrivePlayer(record, { world: 3, map: "south-meadow", connection: "replacement" }, 1250)).toEqual({ map: TOWN_SPAWN.map, at: TOWN_SPAWN.cell, accepted: false })
   expect(record).toEqual(before)
   expect(arrivePlayer(record, { world: 3, map: TOWN_SPAWN.map, connection: "replacement" }, 1300).accepted).toBe(true)

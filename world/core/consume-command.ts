@@ -1,8 +1,11 @@
-// Food, drinks and medicine share recovery, fullness and timed-effect rules.
+// Food, drinks and medicine share recovery, fullness and timed-effect rules. Medicine also waits
+// between doses (medicine-rules.ts); food is held back by fullness instead.
 import { takeFromSlot } from "#/world/core/take-from-slot"
 import { ITEMS } from "#/world/core/items/catalog"
 import { effectOf } from "#/world/core/effect-of"
 import { MAX_STAMINA } from "#/world/core/player-rules"
+import { MEDICINE_KEY, MEDICINE_WAIT_MS } from "#/world/core/medicine-rules"
+import { isMedicine } from "#/world/core/is-medicine"
 import { fullNow } from "#/world/core/full-now"
 import type { PlayerState } from "#/world/core/player-types"
 import { derive } from "#/world/core/derive"
@@ -26,6 +29,8 @@ export function consume(state: PlayerState, index: number, now: number): Transit
   const extendsWarmth = effect.warm > 0 && now + effect.warm * 60_000 > state.warmUntil
   const extendsFocus = effect.focus > 0 && now + effect.focus * 60_000 > state.focusUntil
   if (!wantsHp && !wantsSp && !wantsStamina && !extendsWarmth && !extendsFocus) return reject(food ? "NOTHING_TO_GAIN" : effect.sp && !effect.hp ? "SP_FULL" : "HP_FULL")
+  const medicine = isMedicine(item)
+  if (medicine && (state.ready[MEDICINE_KEY] ?? 0) > now) return reject("MEDICINE_WAIT")
   const bag = takeFromSlot(state.bag, index, 1)
   if (!bag) return reject("NOT_OWNED")
   const hp = Math.min(stats.maxHp, state.hp + effect.hp)
@@ -35,7 +40,19 @@ export function consume(state: PlayerState, index: number, now: number): Transit
   const focusUntil = effect.focus > 0 ? Math.max(state.focusUntil, now + effect.focus * 60_000) : state.focusUntil
   const focusAt = effect.focus > 0 && state.focusUntil <= now ? now : state.focusAt
   return accept(
-    { ...state, hp, sp, stamina, focusAt, focusUntil, full: effect.full > 0 ? full + effect.full : state.full, fullAt: effect.full > 0 ? now : state.fullAt, warmUntil, bag },
+    {
+      ...state,
+      hp,
+      sp,
+      stamina,
+      focusAt,
+      focusUntil,
+      full: effect.full > 0 ? full + effect.full : state.full,
+      fullAt: effect.full > 0 ? now : state.fullAt,
+      warmUntil,
+      bag,
+      ready: medicine ? { ...state.ready, [MEDICINE_KEY]: now + MEDICINE_WAIT_MS } : state.ready,
+    },
     {
       type: "used",
       item,

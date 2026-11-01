@@ -13,7 +13,7 @@ export async function arriveMapPlayer(room: JoinRequestContext, owner: string): 
     return null
   }
   if (!arrival.accepted) {
-    await connection.send({ type: "warped", map: arrival.map, at: arrival.at })
+    await connection.send({ type: "warped", map: arrival.map, at: arrival.at, ...(arrival.world !== undefined ? { world: arrival.world } : {}) })
     return null
   }
   return arrival

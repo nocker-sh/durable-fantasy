@@ -52,6 +52,7 @@ export function Chat() {
           <p key={line.id} className="break-all">
             <span className={NAME_COLOR(line)}>{line.name}</span>
             {line.channel === "party" && <span className="text-text-dim">（パーティ）</span>}
+            {line.channel === "whisper" && <span className="text-text-dim">{line.self ? "へ（ささやき）" : "（ささやき）"}</span>}
             {line.shout && <span className="text-text-dim">（叫ぶ）</span>}
             <span className="text-text-dim">：</span>
             <span className={line.channel === "npc" ? "text-npc" : "text-white"}>{line.text}</span>

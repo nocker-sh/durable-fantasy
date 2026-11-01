@@ -1,6 +1,7 @@
 import { escrowFor } from "#/world/core/escrow-for"
 import { orderFailure } from "#/world/core/order-failure"
 import { parseSymbol } from "#/world/core/parse-symbol"
+import { exchangeReady } from "#/world/core/exchange-ready"
 import type { OrderIntent } from "#/world/core/exchange-types"
 import type { Reason, ServerCommand } from "#/world/core/commands"
 import type { PlayerState } from "#/world/core/player-types"
@@ -16,6 +17,7 @@ export function getOrderEscrowCommand(player: Pick<PlayerState, "bag">, intent: 
     if (intent.slot === undefined) return { reason: "EMPTY_SLOT" }
     const slot = player.bag[intent.slot]
     if (!slot || slot.item !== symbol.item || slot.q !== symbol.q) return { reason: "EMPTY_SLOT" }
+    if (!exchangeReady(slot)) return { reason: "WORN_TOOL" }
     const escrow = escrowFor(intent.side, intent.price, intent.qty)
     return { command: { type: "escrow-sell", slot: intent.slot, qty: intent.qty, fee: escrow.fee }, ...(slot.by !== undefined ? { by: slot.by } : {}) }
   }

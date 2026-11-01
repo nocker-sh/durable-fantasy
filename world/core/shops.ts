@@ -9,7 +9,7 @@ export const SHOPS = {
     kind: "food",
     map: "phanthiet",
     keepers: ["オットー"],
-    greeting: "蔵で寝かせた果物は甘いよ。",
+    greeting: "土間で寝かせた果物は甘いよ。",
     stock: ["apple", "green-apple", "pear", "plum", "grape", "dried-apple"],
   },
   vegetables: {
@@ -34,6 +34,7 @@ export const SHOPS = {
     map: "phanthiet",
     keepers: ["マルタ", "ハンス"],
     greeting: "焼きたてよ。マティアスさんの羊のチーズもあるわ。",
+    greetings: { ハンス: "黒パンは日持ちするよ！　マティアスさんのチーズもあるよ！" },
     stock: ["rye-bread", "roll", "apple-pie", "honey-cake", "cheese", "porridge"],
     makers: { porridge: "ベネディクト" }, // the monk's porridge, handed out wherever someone is minding a counter
   },
@@ -42,7 +43,7 @@ export const SHOPS = {
     kind: "food",
     map: "phanthiet",
     keepers: ["ベネディクト"],
-    greeting: "温かいうちにどうぞ。一椀二枚、足りなければあとで結構です。",
+    greeting: "温かいうちにどうぞ。一椀二ゴールド、足りなければあとで結構です。",
     stock: ["porridge"],
     makers: { porridge: "ベネディクト" },
   },
@@ -53,6 +54,7 @@ export const SHOPS = {
     keepers: ["ギュンター"],
     greeting: "腕に合うのを選びな。",
     stock: ["wood-axe", "sickle", "dagger", "short-sword", "iron-sword", "hand-axe", "battle-axe", "spear", "mace", ...IRON_WEAPONS],
+    takes: ["rusty-scrap", "iron-ingot", "charcoal"],
   },
   inn: {
     name: "ゲルダの宿",
@@ -60,6 +62,7 @@ export const SHOPS = {
     map: "phanthiet",
     keepers: ["ゲルダ", "ニーナ"],
     greeting: "温かいスープがあるよ。外は冷えたろう。",
+    greetings: { ニーナ: "はい、ただいま！　温かいスープ、すぐお持ちしますよ！" },
     stock: ["stew", "mushroom-soup", "mushroom-stew", "cabbage-soup", "hot-milk", "rye-bread", "porridge", "potion"],
     makers: { potion: "ゲルダ", "rye-bread": "マルタ", porridge: "ベネディクト" },
   },
@@ -70,6 +73,7 @@ export const SHOPS = {
     map: "phanthiet-market",
     keepers: ["フランツ", "リリー"],
     greeting: "何にする？温めたぶどう酒がおすすめだ。",
+    greetings: { リリー: "いらっしゃい！　温めたぶどう酒、フランツさんのおすすめよ！" },
     stock: ["hot-wine", "wine", "cheese-toast", "fish-soup", "cheese", "smoked-fish", "pickles"],
   },
   apothecary: {
@@ -78,7 +82,9 @@ export const SHOPS = {
     map: "phanthiet-market",
     keepers: ["イルムガルト", "エーファ"],
     greeting: "薬は多めに持っていきなさい。",
+    greetings: { エーファ: "お薬ですね。……多めに持っていくように、と師匠なら言います。" },
     stock: ["potion", "herb", "blue-herb", "herb-tea", "red-potion", "orange-potion", "blue-potion", "white-potion"],
+    takes: ["jelly", "blue-jelly"],
   },
   general: {
     name: "ブルーノの道具屋",
@@ -86,7 +92,9 @@ export const SHOPS = {
     map: "phanthiet-market",
     keepers: ["ブルーノ", "ヘレナ"], // the night and the day shift
     greeting: "旅支度ならおまかせを。",
-    stock: ["potion", "ration", "porridge", "lamp-oil", "herb", "wooden-stick", "cloth-hat", "leather-boots", "traveller-coat"],
+    greetings: { ヘレナ: "いらっしゃいませ。外へ出る支度でしたら、ひと通り揃っています。" },
+    stock: ["potion", "ration", "porridge", "herb", "wooden-stick", "cloth-hat", "leather-boots", "traveller-coat"],
+    takes: ["lamp-oil"], // the guards' oil is kept behind the counter; what a traveller still carries is taken back
     makers: { potion: "ベネディクト", porridge: "ベネディクト" }, // the monk's, sold for the chapel
   },
   tailor: {
@@ -95,7 +103,9 @@ export const SHOPS = {
     map: "phanthiet-market",
     keepers: ["マグダレーナ", "ロッテ"],
     greeting: "寒さに負けない服を仕立てていますよ。",
+    greetings: { ロッテ: "いらっしゃい！　この色、似合うと思うな！" },
     stock: ["white-fleece", "wool-muffler", "striped-muffler", "embroidered-scarf", "fur-stole", "traveller-coat", "wool-cape", "cloth-hat", "silver-ring"],
+    takes: ["yarn", "soft-fur", "feather"],
   },
   crystal: {
     name: "コンスタンティンの結晶屋",
@@ -112,7 +122,7 @@ export const SHOPS = {
     keepers: ["ラインホルト"],
     greeting: "素材はここが一番高く買うよ。",
     stock: [],
-    rates: { material: 1.3 },
+    rates: { material: 1.1 },
   },
   // ---------------------------------------------------------------- the craftsmen's lane (craft)
   armorer: {
@@ -121,7 +131,9 @@ export const SHOPS = {
     map: "phanthiet-craft",
     keepers: ["ベアトリクス", "ルイーゼ"],
     greeting: "体に合わせて直してあげるよ。",
+    greetings: { ルイーゼ: "防具です。……体に合わなければ、師匠が直します。" },
     stock: ["iron-helm", "chain-mail", "wooden-shield", "leather-boots"],
+    takes: ["iron-ingot", "tanned-leather"],
   },
   woodworker: {
     name: "ゴットフリートの木工所",
@@ -130,6 +142,7 @@ export const SHOPS = {
     keepers: ["ゴットフリート"],
     greeting: "いい木で作ったものしか置いてない。",
     stock: ["fishing-rod", "wooden-stick", "oak-staff", "short-bow", "wooden-shield"],
+    takes: ["log", "plank"],
   },
   leather: {
     name: "ルドルフの革工房",
@@ -138,6 +151,7 @@ export const SHOPS = {
     keepers: ["ルドルフ"],
     greeting: "革は手間をかけた分だけ応えるぞ。",
     stock: ["raw-hide", "tanned-leather", "leather-armor", "leather-boots", "fang-charm"],
+    takes: ["soft-fur", "sharp-fang"],
     rates: { material: 1.1 },
   },
   // ---------------------------------------------------------------- street sellers, at their hours (economy.md §4.6)

@@ -75,7 +75,7 @@
     },
     {
       "kind": "door",
-      "target": "room-tavern-max",
+      "target": "room-tavern-6",
       "door": [
         14,
         4

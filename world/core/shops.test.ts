@@ -1,4 +1,12 @@
 import { describe, expect, it } from "vitest"
+import { shopTakes } from "#/world/core/shop-takes"
+import { shopRate } from "#/world/core/shop-rate"
+import { unitBuyingPrice } from "#/world/core/unit-buying-price"
+import { bulkBuyingPrice } from "#/world/core/bulk-buying-price"
+import { bulkStockPrice } from "#/world/core/bulk-stock-price"
+import { target } from "#/world/core/target"
+import { ITEM_IDS } from "#/world/core/items/item-ids"
+import type { ShopId } from "#/world/core/shop-types"
 import { apply } from "#/world/core/apply"
 import { BAG_SIZE } from "#/world/core/bag-rules"
 import { addItem } from "#/world/core/add-item"
@@ -61,11 +69,34 @@ describe("shop", () => {
     expect(result.ok && result.state.bag[0]).toBeNull()
   })
 
-  it("the buyer pays more for monster materials", () => {
-    const start = player({ gold: 0, bag: bagWith(["soft-fur", 10]) })
+  it("the buyer pays more for materials than a shop that only takes them in, and a fruit stand does not buy them at all", () => {
+    const start = player({ gold: 0, bag: bagWith(["tanned-leather", 10]) })
     const there = apply(start, { type: "sell", shop: "buyer", slot: 0, count: 10 })
-    const here = apply(start, { type: "sell", shop: "fruit", slot: 0, count: 10 })
+    const here = apply(start, { type: "sell", shop: "armorer", slot: 0, count: 10 })
     expect(there.ok && here.ok && there.state.gold > here.state.gold).toBe(true)
+    expect(apply(start, { type: "sell", shop: "fruit", slot: 0, count: 10 })).toEqual({ ok: false, reason: "NOT_WANTED" })
+  })
+
+  it("only the buyer takes everything; the others take what they deal in, and never their own fresh batches", () => {
+    expect(shopTakes("buyer", "chain-mail")).toBe(true)
+    expect(shopTakes("fruit", "chain-mail")).toBe(false)
+    expect(shopTakes("fruit", "apple")).toBe(true)
+    expect(shopTakes("tailor", "soft-fur")).toBe(true)
+    expect(shopTakes("bakery", "rye-bread")).toBe(false)
+    expect(shopTakes("buyer", "sealed-letter")).toBe(false)
+  })
+
+  it("no counter pays half of what a shop asks, even with its preference and an empty shelf", () => {
+    for (const shop of Object.keys(SHOPS) as ShopId[])
+      for (const item of ITEM_IDS.filter((id) => shopTakes(shop, id) && ITEMS[id].price >= 10))
+        expect(unitBuyingPrice({ item, stock: 0, rate: shopRate(shop, item) }), `${shop} ${item}`).toBeLessThan(ITEMS[item].price * 0.5)
+  })
+
+  it("sells and buys many at the price each one moves the stock to", () => {
+    const one = bulkBuyingPrice({ item: "herb", stock: target("herb") * 2, rate: 1, count: 1 })
+    const many = bulkBuyingPrice({ item: "herb", stock: target("herb") * 2, rate: 1, count: 40 })
+    expect(many).toBeLessThanOrEqual(one)
+    expect(bulkStockPrice({ item: "herb", q: 1, by: undefined, stock: 10, count: 9 })).toBeGreaterThan(bulkStockPrice({ item: "herb", q: 1, by: undefined, stock: 10, count: 1 }))
   })
 
   it("keeps the shop stole at its ordinary price with its maker", () => {

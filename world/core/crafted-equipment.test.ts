@@ -2,7 +2,7 @@ import { expect, it } from "vitest"
 import { RECIPES } from "#/world/core/recipes/catalog"
 import { STATION_RULES } from "#/world/core/crafting-rules"
 import { ITEMS } from "#/world/core/items/catalog"
-import { QUALITY_PRICE } from "#/world/core/items/kinds"
+import { buybackOf } from "#/world/core/buyback-of"
 import { sellPrice } from "#/world/core/items/sell-price"
 import type { Slot } from "#/world/core/items/kinds"
 import { LIFE_CAP } from "#/world/core/life-rules"
@@ -42,9 +42,10 @@ it.each(equipmentRecipes.filter((recipe) => recipe.min <= LIFE_CAP))("preserves 
   if (!removed.ok) throw Error(removed.reason)
   expect(removed.state.bag).toContainEqual(original)
   const soldSlot = removed.state.bag.findIndex((s) => s?.item === original.item && s.by === original.by && s.q === original.q)
-  const sold = apply(removed.state, { type: "sell", shop: "general", slot: soldSlot, count: 1 })
+  // the buyer takes anything, and pays no more than the ordinary for a fine make
+  const sold = apply(removed.state, { type: "sell", shop: "buyer", slot: soldSlot, count: 1 })
   if (!sold.ok) throw Error(sold.reason)
-  expect(sold.state.gold - removed.state.gold).toBe(Math.max(1, Math.floor(sellPrice(original.item) * QUALITY_PRICE[original.q!])))
+  expect(sold.state.gold - removed.state.gold).toBe(buybackOf(sellPrice(original.item), original))
 })
 
 it.each(["prayer-necklace", "traveller-coat", "short-sword", "battle-axe", "dagger", "leather-armor", "chain-mail", "cloth-hat", "iron-helm", "leather-boots", "charm", "fur-stole"] as const)(

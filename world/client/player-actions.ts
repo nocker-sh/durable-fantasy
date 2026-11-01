@@ -1,6 +1,7 @@
 import { sameStack } from "#/world/core/same-stack"
 import type { Stack } from "#/world/core/bag-types"
 import { apply } from "#/world/core/apply"
+import { derive } from "#/world/core/derive"
 import type { GameSession } from "#/world/client/game-session"
 import { skillOf } from "#/world/core/skill-of"
 import { skillOfKey } from "#/world/core/skill-of-key"
@@ -22,7 +23,7 @@ import type { GameContext } from "#/world/client/context"
 
 export class PlayerActions {
   constructor(
-    private readonly target: Pick<GameContext, "run" | "lookAtShop" | "getScene" | "update" | "notify"> & { readonly session: Pick<GameSession, "socket" | "state" | "engaged" | "fighting"> },
+    private readonly target: Pick<GameContext, "run" | "lookAtShop" | "getScene" | "update" | "notify"> & { readonly session: Pick<GameSession, "socket" | "state" | "engaged" | "fighting" | "art"> },
   ) {}
   revive() {
     this.target.session.socket?.send({ type: "revive" })
@@ -129,8 +130,17 @@ export class PlayerActions {
     // Preview the same recovery and cost rules; only the server commits the result.
     const preview = apply(p, { type: "art", skill }, { now: Date.now() })
     if (!preview.ok) return this.target.notify(REASON_TEXT[preview.reason], "bad")
-    if (!this.target.session.fighting || performance.now() - this.target.session.fighting.at > 4000) return this.target.notify("戦っている相手がいない。", "bad")
-    this.target.session.socket?.send({ type: "attack", monster: this.target.session.fighting.monster, art: skill })
+    const fighting = this.target.session.fighting
+    const now = performance.now()
+    if (!fighting || now - fighting.at > 4000) return this.target.notify("戦っている相手がいない。", "bad")
+    // an art is a swing too: too soon after the last one, it takes the place of the next
+    if (now - fighting.at < derive(p).attackDelay * 0.85) {
+      this.target.session.art = { skill, at: now }
+      return
+    }
+    this.target.session.art = null
+    fighting.at = now
+    this.target.session.socket?.send({ type: "attack", monster: fighting.monster, art: skill })
   }
 
   toggleSit() {
@@ -167,6 +177,10 @@ export class PlayerActions {
   moveSlot(from: number, to: number, expectedStack = this.target.session.state.get().player?.bag[from] ?? undefined) {
     const expectedTarget = this.target.session.state.get().player?.bag[to] ?? null
     if (from !== to && expectedStack) void this.target.run({ type: "move", from, to, expectedStack, expectedTarget })
+  }
+
+  discard(slot: number, count: number, expectedStack = this.target.session.state.get().player?.bag[slot] ?? undefined) {
+    if (expectedStack) void this.target.run({ type: "discard", slot, count, expectedStack })
   }
 
   forgetLife(skill: Skill, exp: number) {

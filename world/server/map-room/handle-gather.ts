@@ -21,6 +21,8 @@ export async function handleGather(roomCtx: Ctx, message: Message<"gather">): Pr
   const leftSource = await nature.finishGather(me.owner, request.id),
     left = leftSource.left,
     result = withoutKeys(leftSource, ["left"])
+  // gathering gets them up; keep the room's posture with the saved one before answering
+  if (result.ok) roomCtx.save({ sitting: result.state.sitting })
   await answer(result)
   if (left !== undefined) await ctx.room.broadcast({ type: "nodes", left: { [node.id]: left } })
   return

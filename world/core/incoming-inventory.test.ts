@@ -44,11 +44,11 @@ describe("incoming inventory", () => {
     expect(state.bag).toEqual([null, null])
   })
 
-  it("keeps the trade weight check separate from delivery acceptance", () => {
+  it("refuses a delivery or trade that would be too heavy to carry", () => {
     const state = player({ bag: emptyBag(3) })
     const stacks: readonly Stack[] = [{ item: "log", count: 297 }]
     expect(carried({ ...state, bag: stacks })).toBeGreaterThan(derive(state).maxWeight)
-    expect(receiveItems(state, { type: "receive", items: stacks, gold: 0 }).ok).toBe(true)
+    expect(receiveItems(state, { type: "receive", items: stacks, gold: 0 })).toEqual({ ok: false, reason: "TOO_HEAVY" })
     expect(tradeIn(state, { type: "trade-in", stacks, gold: 0 })).toEqual({ ok: false, reason: "TOO_HEAVY" })
   })
 

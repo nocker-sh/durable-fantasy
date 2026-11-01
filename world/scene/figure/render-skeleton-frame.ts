@@ -2,8 +2,6 @@ import { hexToRgb as hex } from "#/lib/graphics/hex-to-rgb"
 import type { Primitive } from "#/lib/graphics/ray/primitive-types"
 const BLUSH = hex("#e89c8c")
 
-const PITCH = 0.36
-
 const NB4 = [
   [1, 0],
   [-1, 0],
@@ -40,6 +38,7 @@ import { getConeSurfaceNormal } from "#/lib/graphics/ray/get-cone-surface-normal
 import { FW, FH, OX, OY, SPPU, eyesDrawn, EYE_DARK } from "#/world/scene/figure/render"
 import { shadeRGB } from "#/world/scene/figure/helpers/render/shade-rgb"
 import type { PoseFrameOptions } from "#/world/scene/figure/render"
+import { SPRITE_PITCH as PITCH } from "#/world/scene/figure/sprite-pitch"
 
 type Props = {
   L: Look

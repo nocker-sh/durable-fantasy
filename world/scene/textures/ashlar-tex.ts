@@ -3,7 +3,8 @@ import { pick } from "#/world/scene/pick"
 import { RAMPS } from "#/world/scene/pix"
 import { hash2 } from "#/lib/engine/hash2"
 import { vnoise } from "#/lib/engine/vnoise"
-import { PPU } from "#/world/scene/textures/palette"
+import { PPU, TEXEL_PPU } from "#/world/scene/textures/palette"
+import { downsampleDithered } from "#/lib/graphics/downsample-dithered"
 import { ToneMap } from "#/world/scene/textures/tone-map"
 
 type Props = {
@@ -40,7 +41,7 @@ export function ashlarTex(props: Props): [PixBuf, PixBuf] {
     return { ramp: "sand", level: l.value, region: c * 64 + row }
   })
   t.strokes({ seed: seed, density: 0.12, along: "x", len: [2, 5], thick: [1, 2], step: 0.5, bleed: 0.05 })
-  const b = t.paint(0.15)
+  const b = t.paint(0.1)
   const glow = new PixBuf(W, H)
   glow.fill(() => [0, 0, 0])
   const lancet = (inputProps: { cx: number; top: number; ww: number; hh: number }) => {
@@ -98,7 +99,11 @@ export function ashlarTex(props: Props): [PixBuf, PixBuf] {
         const outer = Math.abs(x.value - cx) > ww / 2 + 8 || (dy < ww / 2 && Math.hypot(x.value - cx, dy - ww / 2) > ww / 2 + 8)
         if (outer) continue
         if (pad) {
-          b.set({ x: x.value, y: y.value, color: pick({ ramp: "sand", b: 0.82 - ((Math.hypot(x.value - cx, Math.min(0, dy - ww / 2)) | 0) % 4 === 0 ? 0.3 : 0), x: x.value, y: y.value, dither: 0.3 }) })
+          b.set({
+            x: x.value,
+            y: y.value,
+            color: pick({ ramp: "sand", b: 0.82 - ((Math.hypot(x.value - cx, Math.min(0, dy - ww / 2)) | 0) % 4 === 0 ? 0.3 : 0), x: x.value, y: y.value, dither: 0.3 }),
+          })
           continue
         }
         const k = (x.value - cx + 64) % 6
@@ -106,5 +111,5 @@ export function ashlarTex(props: Props): [PixBuf, PixBuf] {
         if (dy % 16 === 10 && Math.abs(x.value - cx) > 2) b.set({ x: x.value, y: y.value, color: RAMPS.iron[2] })
       }
   }
-  return [b, glow]
+  return [downsampleDithered(b, PPU / TEXEL_PPU), downsampleDithered(glow, PPU / TEXEL_PPU)]
 }

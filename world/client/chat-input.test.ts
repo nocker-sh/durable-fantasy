@@ -1,8 +1,11 @@
 import { expect, it } from "vitest"
 import { parseChatInput } from "#/world/client/chat-input"
 
-it.each(["/w", "/w エルナ 内緒", "/w\nエルナ 内緒"])("does not turn an unsupported private command into public speech: %s", (text) => {
-  expect(parseChatInput(text)?.kind).toBe("unavailable")
+it.each(["/w", "/w エルナ", "/w   "])("does not turn a malformed whisper into public speech: %s", (text) => {
+  expect(parseChatInput(text)).toBeNull()
+})
+it.each(["/w エルナ 内緒", "/w\nエルナ 内緒", "/w エルナ  内緒 "])("whispers to one name: %s", (text) => {
+  expect(parseChatInput(text)).toEqual({ kind: "whisper", to: "エルナ", text: "内緒" })
 })
 it.each(["", "   ", "/s", " /s   ", "/p", " /p   "])("ignores empty speech: %s", (text) => {
   expect(parseChatInput(text)).toBeNull()

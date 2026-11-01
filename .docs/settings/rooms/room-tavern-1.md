@@ -59,7 +59,7 @@
         14
       ],
       "width_cells": 2,
-      "target": "room-tavern-2",
+      "target": "room-tavern-4",
       "target_door": [
         4,
         0
@@ -72,7 +72,7 @@
         14
       ],
       "width_cells": 2,
-      "target": "room-tavern-4",
+      "target": "room-tavern-2",
       "target_door": [
         4,
         0

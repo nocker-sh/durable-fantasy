@@ -31,7 +31,8 @@ export const SOUTH_MEADOW_LAYOUT: Layout = {
     height.value -= hill(x, z, 39.5, 37, 4.5, 1.2, 0.7)
     return hollow(x, z, height.value, 40.5, 19.5, 4.2, -1.35, 31)
   },
-  // south from the gate, then east to the edge of the forest; a branch on south to the dunes
+  // south from the gate, then east to the edge of the forest; a branch on south to the dunes, and one
+  // west between the vineyard and the old terraces, up to the silver-grass highland
   roads: [
     getDirtRoad(
       [
@@ -53,6 +54,15 @@ export const SOUTH_MEADOW_LAYOUT: Layout = {
         [24.5, 51],
       ],
       0.8,
+    ),
+    getDirtRoad(
+      [
+        [24, 24],
+        [18, 25],
+        [10, 24.4],
+        [-3, 24.5],
+      ],
+      0.75,
     ),
   ],
   // worn by feet: into the orchard, up to the lone tree on the hill, and the slimes' ground

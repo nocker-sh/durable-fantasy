@@ -23,7 +23,7 @@ export class ServerMessages {
     > & {
       readonly session: Pick<
         GameSession,
-        "partyChat" | "net" | "arriveAt" | "others" | "socket" | "waiting" | "wild" | "fighting" | "state" | "engaged" | "fullTries" | "warping" | "warpAgainAt" | "refusedWarp"
+        "partyChat" | "net" | "arriveAt" | "others" | "socket" | "waiting" | "wild" | "fighting" | "state" | "engaged" | "fullTries" | "warping" | "warpAgainAt" | "refusedWarp" | "rooms" | "wantChannel"
       >
     },
   ) {}
@@ -70,6 +70,10 @@ export class ServerMessages {
       case "moved": {
         this.target.session.others.move(message.id, message.path)
         scene?.moveRemote(message.id, message.path)
+        return
+      }
+      case "whispered": {
+        this.target.addChat({ channel: "whisper", name: message.name, text: message.text, self: !!message.sent })
         return
       }
       case "said": {
@@ -130,6 +134,11 @@ export class ServerMessages {
         this.target.update({ party: message.view })
         if (!before && message.view) this.target.notify("パーティに入った。", "good")
         if (before && !message.view) this.target.notify("パーティを抜けた。")
+        if (before && message.view) {
+          const leader = message.view.members.find((member) => member.leader)
+          if (leader && before.members.find((member) => member.leader)?.name !== leader.name) this.target.addChat({ channel: "system", text: leader.me ? "パーティのリーダーになった。" : `${leader.name}がパーティのリーダーになった。` })
+          if (before.mode !== message.view.mode) this.target.addChat({ channel: "system", text: message.view.mode === "even" ? "経験値を均等に分けることになった。" : "経験値は各自のものになった。" })
+        }
         return
       }
       case "party-closed": {
@@ -177,11 +186,17 @@ export class ServerMessages {
       }
       case "stock": {
         if (isShopId(message.shop) && message.shop === this.target.session.state.get().shop)
-          this.target.update({ stock: { shop: message.shop, offers: message.offers as Offer[], buys: message.buys ?? {} } })
+          this.target.update({ stock: { shop: message.shop, offers: message.offers as Offer[], buys: message.buys ?? {}, held: message.held ?? {} } })
         return
       }
       case "warped": {
-        if (isMapId(message.map)) this.target.enterMap(message.map, message.at)
+        if (!isMapId(message.map)) return
+        // the crossing was refused (not from a town): stay in the world we are still in
+        if (message.world !== undefined && message.world !== this.target.session.rooms.world) {
+          this.target.session.rooms.world = message.world
+          this.target.session.wantChannel = null
+        }
+        this.target.enterMap(message.map, message.at)
         return
       }
       case "refused": {
@@ -200,7 +215,17 @@ export class ServerMessages {
         if (message.what === "join" && message.reason === "NOT_YOUR_TOWN") {
           // no thread leads here: our muffler takes us home
           this.target.notify("この町へつながる糸を持っていない。", "bad")
-          this.target.visitTown(this.target.session.state.get().homeTown)
+          this.target.session.rooms.world = this.target.session.state.get().homeTown
+          this.target.session.wantChannel = null
+          this.target.enterMap("phanthiet", null)
+          return
+        }
+        if (message.what === "whisper") {
+          this.target.addChat({ channel: "system", text: "その人はこのあたりにいない。" })
+          return
+        }
+        if (message.what === "say") {
+          this.target.addChat({ channel: "system", text: "続けては叫べない。" })
           return
         }
         if (message.what === "party-chat") {

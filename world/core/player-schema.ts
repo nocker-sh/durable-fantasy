@@ -11,6 +11,7 @@ import { STORAGE_SIZE } from "#/world/core/storage/rules"
 import { emptyStorage } from "#/world/core/storage/empty-storage"
 import { MAX_LEVEL } from "#/world/core/growth-rules"
 import { emptyLife } from "#/world/core/empty-life"
+import { reservedName } from "#/world/core/reserved-name"
 
 /** an item id, checked against the item table */
 export const itemId = z.custom<ItemId>((value) => typeof value === "string" && isItemId(value), "unknown item")
@@ -45,7 +46,8 @@ export const profileNameSchema = z
       .string()
       .min(1)
       .max(NAME_MAX)
-      .refine((value) => !/[\p{Cc}\p{Cf}\p{Cs}]/u.test(value), "名前に制御文字は使えません"),
+      .refine((value) => !/[\p{Cc}\p{Cf}\p{Cs}]/u.test(value), "名前に制御文字は使えません")
+      .refine((value) => !reservedName(value), "住民の名前は使えません"),
   )
 
 const quality = z.literal([0, 1, 2, 3])
@@ -78,6 +80,7 @@ const common = {
   revision: count.default(0),
   name: nameSchema,
   profileComplete: z.boolean().default(true),
+  renamedAt: count.optional(),
   look: z
     .number()
     .int()

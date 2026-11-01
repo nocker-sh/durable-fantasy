@@ -57,7 +57,7 @@
         0
       ],
       "width_cells": 2,
-      "target": "room-h-c3-niklas",
+      "target": "room-h-c3-4",
       "target_door": [
         3,
         10
@@ -70,7 +70,7 @@
         0
       ],
       "width_cells": 2,
-      "target": "room-h-c3-frieda",
+      "target": "room-h-c3-5",
       "target_door": [
         3,
         10

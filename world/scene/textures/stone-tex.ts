@@ -3,6 +3,7 @@ import { RAMPS } from "#/world/scene/pix"
 import { hash2 } from "#/lib/engine/hash2"
 import { seamlessNoise } from "#/world/scene/textures/seamless-noise"
 import { ToneMap } from "#/world/scene/textures/tone-map"
+import { downsampleDithered } from "#/lib/graphics/downsample-dithered"
 
 type Props = {
   ramp?: string
@@ -11,6 +12,8 @@ type Props = {
   bw?: number
   bh?: number
   size?: number
+  /** the size it is shrunk to at the end (64: a 4-unit repeat at the walls' chunky texels) */
+  out?: number
 }
 
 /**
@@ -45,10 +48,14 @@ export function stoneTex(props: Props): PixBuf {
     const corner = cu < 2 * k && cv < 2 * k && Math.hypot(2 * k - cu, 2 * k - cv) > 2 * k
     if (fu * bw < k * 1.2 || fv > 0.88 || corner) return { ramp: ramp, level: base - 1.1 + (wash - 0.5) * 0.5, region: -1 }
     const l = { value: base + (hash2(c % cols, row, seed) - 0.5) * 0.8 + (wash - 0.5) * 0.8 }
+    // soot and damp stains over several blocks, moss where it stays wet
+    const stain = seamlessNoise({ x: x, y: y, scale: 0.07 / k, seed: seed + 7, w: size, h: size })
+    if (stain > 0.76) return { ramp: "moss", level: 2.6 + (fv < 0.3 ? 0.5 : 0), region: (c % cols) * 64 + row }
+    if (stain > 0.62) l.value -= 0.7
     if (fv < 0.2 || fu < 0.1) l.value += 0.5
     else if (fv > 0.72 || fu > 0.9) l.value -= 0.5
     return { ramp: ramp, level: l.value, region: (c % cols) * 64 + row }
   })
   t.strokes({ seed: seed, density: 0.12, along: "x", len: [2, 4], thick: [1, 2], step: 0.5, bleed: 0.05, wrap: true })
-  return t.paint(0.15)
+  return downsampleDithered(t.paint(0.1), size / (props.out ?? 64))
 }

@@ -118,8 +118,7 @@ export class Game {
     try {
       this.session.playerId = await this.loadId()
     } catch {
-      if (version === this.mountVersion)
-        this.update({ failed: true, failureMessage: "保存された内容はそのまま残っている。" })
+      if (version === this.mountVersion) this.update({ failed: true, failureMessage: "保存された内容はそのまま残っている。" })
       return
     }
     if (version !== this.mountVersion) return
@@ -196,7 +195,8 @@ export class Game {
   preview(command: Command): Reason | null {
     const player = this.state.get().player
     if (!player) return "OFFLINE"
-    const result = apply(player, command)
+    // the same clock as the server's waits (skills and medicine), or a past wait would still hold
+    const result = apply(player, command, { now: Date.now() })
     return result.ok ? null : result.reason
   }
 
@@ -332,6 +332,8 @@ export class Game {
   answerParty = this.socialActions.answerParty.bind(this.socialActions)
   leaveParty = this.socialActions.leaveParty.bind(this.socialActions)
   setPartyMode = this.socialActions.setPartyMode.bind(this.socialActions)
+  kickPartyMember = this.socialActions.kickPartyMember.bind(this.socialActions)
+  passPartyLead = this.socialActions.passPartyLead.bind(this.socialActions)
   answerTrade = this.socialActions.answerTrade.bind(this.socialActions)
   offerTrade = this.socialActions.offerTrade.bind(this.socialActions)
   lockTrade = this.socialActions.lockTrade.bind(this.socialActions)
@@ -355,6 +357,7 @@ export class Game {
   unequip = this.playerActions.unequip.bind(this.playerActions)
 
   moveSlot = this.playerActions.moveSlot.bind(this.playerActions)
+  discard = this.playerActions.discard.bind(this.playerActions)
 
   forgetLife = this.playerActions.forgetLife.bind(this.playerActions)
   raise = this.playerActions.raise.bind(this.playerActions)
@@ -491,8 +494,11 @@ export class Game {
           },
           gatherAt: (node) => this.gather(node),
           swing: (monster) => {
-            this.session.fighting = { monster, at: performance.now() }
-            this.session.socket?.send({ type: "attack", monster })
+            const at = performance.now()
+            const art = this.session.art && at - this.session.art.at <= 4000 ? this.session.art.skill : null
+            this.session.fighting = { monster, at }
+            this.session.art = null
+            this.session.socket?.send({ type: "attack", monster, ...(art ? { art } : {}) })
           },
           stationAt: (station) => (station === "exchange-board" ? this.openBoard() : this.update({ craft: station })),
           tick: () => this.onTick(),

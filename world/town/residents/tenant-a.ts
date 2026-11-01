@@ -13,7 +13,7 @@ const residents = {
     map: "phanthiet-fields",
     name: "ヨハンナ",
     job: "小作の農婦",
-    at: [30, 15],
+    at: [30.6, 30.4],
     item: "basket",
     look: {
       skirt: "mid",
@@ -34,7 +34,7 @@ const residents = {
     map: "phanthiet-fields",
     name: "ヴァレンティン",
     job: "子ども",
-    at: [18.2, 26],
+    at: [16.7, 26.3],
     item: null,
     look: {
       legs: "breeches",

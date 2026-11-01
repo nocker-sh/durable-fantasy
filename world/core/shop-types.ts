@@ -13,10 +13,14 @@ export type ShopDefinition = {
   keepers: readonly string[]
   /** Line said when the shop window opens. */
   greeting: string
+  /** the opening line in a keeper's own voice where it differs from `greeting`; each keeper speaks as themselves */
+  greetings?: Readonly<Record<string, string>>
   stock: readonly ItemId[]
   /** whose made things these are (game-system.md §4.2.1); the usual maker when not named */
   makers?: Partial<Record<ItemId, string>>
-  /** pays this many times the base price for these kinds */
+  /** what it buys from you besides its own stock (core/shop-takes.ts; the buyer takes everything) */
+  takes?: readonly ItemId[]
+  /** pays this many times the base price for these kinds, capped at MAX_SHOP_RATE (core/shop-rate.ts) */
   rates?: Partial<Record<ItemKind, number>>
   /** a street seller's pitch: open only while the seller stands there (town/routines.ts) */
   at?: { map: string; place: string }

@@ -18,6 +18,8 @@ export const BATCHES: Record<string, Partial<Record<ItemId, Batch>>> = {
   },
   // the monk boils his potions before he wakes the chapel; only a few a day
   general: { potion: { at: [H(17)], count: 3 } },
+  // the monks' white potion: one bottle comes to the apothecary when it opens, and none is kept over
+  apothecary: { "white-potion": { at: [H(16, 30)], count: 1 } },
   // street sellers: what they bring out when they set up, and the residents who buy a little
   "fried-dough": { "fried-dough": { at: [H(16, 30)], count: 20, eaten: { after: 60, count: 6 } } },
   "old-clothes": { "cloth-hat": { at: [H(20)], count: 2 }, "traveller-coat": { at: [H(20)], count: 1 }, "wool-cape": { at: [H(20)], count: 1 } },

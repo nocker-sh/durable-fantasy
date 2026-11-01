@@ -1,5 +1,6 @@
 import { PixelCamera } from "#/lib/graphics/pixel-camera"
 import { FIG_PPU } from "#/world/scene/figure/display-scale"
+import { CAMERA_PITCH } from "#/world/scene/camera-pitch"
 import { resizeSceneViewport } from "#/world/scene/runtime/resize-scene-viewport"
 import type { Vector3 } from "three"
 import type { SceneViewport } from "#/world/scene/runtime/scene-viewport-types"
@@ -10,6 +11,7 @@ type Props = Readonly<{ viewport: SceneViewport; position: Vector3; preview: boo
 export function createSceneCamera(props: Props): PixelCamera {
   return new PixelCamera({
     position: props.position,
+    pitch: CAMERA_PITCH,
     pixelsPerUnit: FIG_PPU,
     onResize: (width, height, scale) => resizeSceneViewport({ ...props.viewport, width, height, scale }),
     zooms: props.preview ? [0.5, 1, 2] : undefined,

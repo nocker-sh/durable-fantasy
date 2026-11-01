@@ -40,7 +40,7 @@
         17
       ],
       "width_cells": 2,
-      "target": "room-smithy-peter",
+      "target": "room-smithy-3",
       "target_door": [
         0,
         6

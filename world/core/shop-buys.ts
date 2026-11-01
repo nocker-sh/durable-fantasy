@@ -1,12 +1,10 @@
-import { SHOPS } from "#/world/core/shops"
-import { ITEMS } from "#/world/core/items/catalog"
-import { sellPrice } from "#/world/core/items/sell-price"
+import { shopRate } from "#/world/core/shop-rate"
+import { target } from "#/world/core/target"
+import { unitBuyingPrice } from "#/world/core/unit-buying-price"
 import type { ItemId } from "#/world/core/items/catalog"
-import type { ShopDefinition, ShopId } from "#/world/core/shop-types"
+import type { ShopId } from "#/world/core/shop-types"
 
-/** Apply this counter's preferred item kinds, rounding down while keeping the existing minimum payment. */
+/** What this counter pays for one at its usual stock, with its capped preference for the kind. */
 export function shopBuys(shop: ShopId, item: ItemId): number {
-  const definition: ShopDefinition = SHOPS[shop]
-  const rate = definition.rates?.[ITEMS[item].kind] ?? 1
-  return Math.max(1, Math.floor(sellPrice(item) * rate))
+  return unitBuyingPrice({ item, stock: target(item), rate: shopRate(shop, item) })
 }

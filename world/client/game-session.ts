@@ -2,6 +2,7 @@ import { createGameState } from "#/world/client/initial-state"
 import type { VoidSocket } from "void/ws"
 import type { Transition } from "#/world/core/transition"
 import type { Cell } from "#/world/protocol"
+import type { SkillId } from "#/world/core/skill-types"
 import type { WildView } from "#/world/client/wild-publication"
 import { Others } from "#/world/parts/others"
 import { Rooms } from "#/world/parts/rooms"
@@ -19,7 +20,10 @@ export class GameSession {
   wild: WildView = {}
   engaged: string | null = null
   warping = false
+  /** the last swing sent at a creature (performance clock) */
   fighting: { monster: string; at: number } | null = null
+  /** an art pressed too soon after a swing: it goes with the next swing instead (game-system.md §9.3) */
+  art: { skill: SkillId; at: number } | null = null
   refusedWarp = -1
   warpAgainAt = 0
   readonly rooms = new Rooms()

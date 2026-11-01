@@ -5,7 +5,7 @@ const residents = {
     map: "phanthiet-fields",
     name: "アルブレヒト",
     job: "肉屋",
-    at: [38.6, 22.8],
+    at: [38.6, 24.7],
     item: "sack",
     look: { legs: "straight", footwear: "boots", top: "cWine", bottom: "cGray", apron: "leather", gloves: "leatherD", sex: "m", skin: "skin1", hair: "hBlack", style: "short", eye: "cBlue" },
   },

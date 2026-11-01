@@ -30,12 +30,15 @@ export type Order = {
   expires: number
   /** a sell order of a made thing: whose make it is */
   by?: string
+  /** a sell order: the gold its fills have come to so far, so the trade fee is rounded on the total (fill-exchange-order.ts) */
+  sold?: number
 }
 
 /** What waits for a player at the board: gold, and things (with their maker for made things). */
 export type Inbox = {
   gold: number
-  items: { item: ItemId; count: number; q?: Quality; by?: string }[]
+  /** a tool comes with its full durability (held-exchange-item.ts) */
+  items: { item: ItemId; count: number; q?: Quality; by?: string; dur?: number }[]
 }
 
 export type Fill = {

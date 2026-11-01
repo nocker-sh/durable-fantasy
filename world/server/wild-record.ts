@@ -19,6 +19,8 @@ export type StrikeIntent = {
   target: string
   damage: number
   owner: string
+  /** the striker's party when it was reserved, so a party mate's fight can be shared */
+  party?: string
   art?: SkillId
   at: number
   plan?: CombatPlan

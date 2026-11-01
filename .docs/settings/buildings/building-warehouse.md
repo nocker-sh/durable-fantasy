@@ -19,7 +19,7 @@
     "room-warehouse-lower-stairs",
     "room-warehouse-upper-stairs",
     "room-warehouse-3",
-    "room-warehouse-household"
+    "room-warehouse-4"
   ],
   "role": "public",
   "issues": [
@@ -33,7 +33,7 @@
     "room-warehouse-lower-stairs",
     "room-warehouse-upper-stairs",
     "room-warehouse-3",
-    "room-warehouse-household",
+    "room-warehouse-4",
     "resident-ヒルデ",
     "resident-ゲオルク"
   ],
@@ -59,7 +59,7 @@
         "rooms": [
           "room-warehouse-upper-stairs",
           "room-warehouse-3",
-          "room-warehouse-household"
+          "room-warehouse-4"
         ]
       }
     ]
@@ -110,7 +110,11 @@
 
 地上階の [[room-warehouse-1]] で荷と預かり証を確認し、[[room-warehouse-2]] の区画へ運ぶ。重い荷の搬入口は保管室の屋外に持たせ、私室や階段へ運ばない。荷を受ける寸法と重量・危険物と湿った物の扱い、取違えの防止は未確定であり、四区画を設けただけで保管量を保証しない。
 
-[[room-warehouse-lower-stairs]] と [[room-warehouse-upper-stairs]] は住人の区画へ分ける。上階は [[room-warehouse-3]] と [[room-warehouse-household]] に分かれ、二人の寝台と衣服箱、家庭の食材と食事を仕事の預かり荷から分ける。
+[[room-warehouse-lower-stairs]] と [[room-warehouse-upper-stairs]] は住人の区画へ分ける。上階は [[room-warehouse-3]] と [[room-warehouse-4]] に分かれ、二人の寝台と衣服箱、家庭の食材と食事を仕事の預かり荷から分ける。
+
+## 現行の内装との差分
+
+現行の自動間取りは、帳場の奥を西の倉と東の居間兼台所に分け、二つの間の腰壁の戸口を空けておく。二人は居間兼台所の炉で煮炊きと食事をし、上階には二人用の寝台の寝室を置く。設計では [[room-warehouse-4]] の台所と食事を上階に置くが、自動間取りは炉を地上階にしか置けないため、描画では地上階の東の奥に置く。預かり荷の棚と木箱は倉の壁際に並び、家庭の水甕と保存食の棚も倉に置く。帳場が短いため、ゲオルクはヒルデの一歩後ろに立つ。
 
 ## 未解決の条件
 

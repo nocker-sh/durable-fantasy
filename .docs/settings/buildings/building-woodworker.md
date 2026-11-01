@@ -17,7 +17,8 @@
     "room-woodworker-1",
     "room-woodworker-2",
     "room-woodworker-stairs",
-    "room-woodworker-kitchen"
+    "room-woodworker-kitchen",
+    "room-woodworker-3"
   ],
   "role": "shop",
   "issues": [
@@ -32,6 +33,7 @@
     "map-phanthiet-craft",
     "room-woodworker-1",
     "room-woodworker-2",
+    "room-woodworker-3",
     "room-woodworker-stairs",
     "room-woodworker-kitchen",
     "resident-ゴットフリート",
@@ -52,7 +54,8 @@
       {
         "floor": 0,
         "rooms": [
-          "room-woodworker-1"
+          "room-woodworker-1",
+          "room-woodworker-2"
         ]
       },
       {
@@ -60,7 +63,7 @@
         "rooms": [
           "room-woodworker-stairs",
           "room-woodworker-kitchen",
-          "room-woodworker-2"
+          "room-woodworker-3"
         ]
       }
     ]
@@ -84,7 +87,7 @@
   ],
   "stair_sections": [
     {
-      "lower_room": "room-woodworker-1",
+      "lower_room": "room-woodworker-2",
       "upper_room": "room-woodworker-stairs",
       "furniture": "S",
       "risers": 14,
@@ -124,7 +127,7 @@
       {
         "room": "room-woodworker-1",
         "door": [
-          10,
+          1,
           15
         ],
         "width_m": 1.5,
@@ -163,7 +166,7 @@
     {
       "room": "room-woodworker-1",
       "door": [
-        10,
+        1,
         15
       ],
       "risers": 3,
@@ -186,7 +189,7 @@
 
 ## 部屋の構成
 
-地上階を[[room-woodworker-1]]とする。上階は[[room-woodworker-stairs]]から[[room-woodworker-kitchen]]を通って[[room-woodworker-2]]へつなぐ。
+地上階は道に面した[[room-woodworker-1]]と、その裏の[[room-woodworker-2]]に分ける。客は店先で品を受け取り、工房へは売り台の裏の戸から家族と働き手だけが入る。上階は工房の階段から[[room-woodworker-stairs]]、[[room-woodworker-kitchen]]を通って[[room-woodworker-3]]へつなぐ。
 
 ## 生活と仕事の設計条件
 
@@ -196,11 +199,11 @@
 
 ## 現状との差分
 
-現行の家具候補は木工台、鉋と鋸、弓の並んだ棚、木材、寝台×2、椅子×2。これは配置の正しさを示すものではない。各部屋のグリッドで、家具の実寸、使用面、扉の開閉、階段と通路を検証する。便所・排水・換気の配置は本資料ではまだ確定していない。
+現行の家具候補は木工台、鉋と鋸、弓の並んだ棚、削り馬、卓、寝台×2、椅子×2で、木材は屋外に積む。これは配置の正しさを示すものではない。各部屋のグリッドで、家具の実寸、使用面、扉の開閉、階段と通路を検証する。便所・排水・換気の配置は本資料ではまだ確定していない。
 
 ## 工房と家族の居住部
 
-壁込み八メートル四方の二階建て案とし、地上を工房、上階を家族の階段区画・台所と寝間へ分ける。父子と働きに来るニクラスを workers に持ち、同居する residents と区別する。現在の二室に台所と階段区画を追加する計画であり、既存の描画の追認ではない。道幅と軒に収まるよう北へ寄せた敷地案を持ち、長材と屋外の仕事場・煙突や木屑と火、日課と描画を照合してから反映する。
+壁込み八メートル四方の二階建て案とし、地上を店先と工房、上階を家族の階段区画・台所と寝間へ分ける。父子と働きに来るニクラスを workers に持ち、同居する residents と区別する。現在の三室に台所と階段区画を追加する計画であり、既存の描画の追認ではない。道幅と軒に収まるよう北へ寄せた敷地案を持ち、長材と屋外の仕事場・煙突や木屑と火、日課と描画を照合してから反映する。
 
 ## 地形と地上階の床
 

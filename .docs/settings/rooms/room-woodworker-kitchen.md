@@ -326,7 +326,7 @@
     },
     {
       "kind": "door",
-      "target": "room-woodworker-2",
+      "target": "room-woodworker-3",
       "door": [
         5,
         8
@@ -349,7 +349,7 @@
   "design_dependencies": [
     "building-woodworker",
     "room-woodworker-stairs",
-    "room-woodworker-2",
+    "room-woodworker-3",
     "facility-square-well"
   ]
 }
@@ -359,7 +359,7 @@
 
 ## 木工台を食卓にしない
 
-工房の上に家族の台所と食卓を設け、木屑・刃物・仕掛品のある作業台で調理や食事をしない。[[room-woodworker-stairs]]の戸を通って入り、食事の先で[[room-woodworker-2]]へつながる。働きに来るニクラスをこの家の同居人へ変えず、本人の世帯と夜食の日課を保持する。
+工房の上に家族の台所と食卓を設け、木屑・刃物・仕掛品のある作業台で調理や食事をしない。[[room-woodworker-stairs]]の戸を通って入り、食事の先で[[room-woodworker-3]]へつながる。働きに来るニクラスをこの家の同居人へ変えず、本人の世帯と夜食の日課を保持する。
 
 ## 水と火と片付け
 

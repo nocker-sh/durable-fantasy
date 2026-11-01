@@ -1,6 +1,7 @@
 // Run one command against a player's data. Pure: the same input always gives the same result,
 // and a refused command never changes anything. The server runs this to decide; the client runs
 // it only to grey out what would be refused.
+import { exchangeReady } from "#/world/core/exchange-ready"
 import { inventorySelectionMatches } from "#/world/core/inventory-selection"
 import { firstOf } from "#/world/core/first-of"
 import { moveSlot } from "#/world/core/move-slot"
@@ -45,6 +46,8 @@ import { sellable } from "#/world/core/items/sellable"
 import type { PlayerState } from "#/world/core/player-types"
 import { derive } from "#/world/core/derive"
 import { unmet } from "#/world/core/unmet"
+import { setProfile } from "#/world/core/set-profile"
+import { discard } from "#/world/core/discard"
 
 /**
  * What the server knows when it runs a command: the time (for fullness and warmth), for a
@@ -89,7 +92,8 @@ export function apply(before: PlayerState, command: Command | ServerCommand, ctx
     case "escrow-sell": {
       const slot = state.bag[command.slot]
       if (!slot) return reject("EMPTY_SLOT")
-      if (!sellable(slot.item) || ITEMS[slot.item].tool) return reject("NOT_SELLABLE")
+      if (!sellable(slot.item)) return reject("NOT_SELLABLE")
+      if (!exchangeReady(slot)) return reject("WORN_TOOL")
       if (state.gold < command.fee) return reject("NO_GOLD")
       const bag = takeFromSlot(state.bag, command.slot, command.qty)
       if (!bag) return reject("NOT_ENOUGH")
@@ -130,12 +134,15 @@ export function apply(before: PlayerState, command: Command | ServerCommand, ctx
     case "share":
       return share(state, command)
     case "tire": {
-      // the cold outside wears you down half as fast again, unless something warm is in you
+      // the cold outside wears you down half as fast again, unless something warm is in you; too
+      // little left for the road and they cannot set out (game-system.md §3.6)
       const loss = Math.ceil(command.amount * (warmNow(state, now) ? 1 : 1.5))
-      if (state.stamina <= 0) return reject("EXHAUSTED")
-      const stamina = Math.max(0, state.stamina - loss)
+      if (state.stamina < loss) return reject("EXHAUSTED")
+      const stamina = state.stamina - loss
       return accept({ ...state, stamina }, { type: "tired", stamina })
     }
+    case "discard":
+      return discard(state, command)
     case "move": {
       const bag = moveSlot(state.bag, command.from, command.to)
       if (!bag) return reject("EMPTY_SLOT")
@@ -168,6 +175,6 @@ export function apply(before: PlayerState, command: Command | ServerCommand, ctx
       return accept({ ...state, hotbar }, { type: "rearranged" })
     }
     case "profile":
-      return accept({ ...state, profileComplete: true, name: command.name, look: command.look, neck: command.neck, neckRamp: command.neckRamp }, { type: "renamed", name: command.name })
+      return setProfile(state, command, now)
   }
 }

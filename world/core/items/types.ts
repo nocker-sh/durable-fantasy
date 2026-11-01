@@ -18,6 +18,8 @@ export type Equipment = {
   twoHanded?: boolean
   /** stats (as raised, not with what is worn) and life skill levels needed to wear it */
   needs?: Partial<Record<Stat | Skill, number>>
+  /** the character level needed to wear it (game-system.md §4.3) */
+  level?: number
   /** how its attack grows with stats (weapons) */
   scale?: Partial<Record<Stat, Grade>>
   /** milliseconds between blows with it (weapons) */
@@ -44,6 +46,8 @@ export type ItemDefinition = {
    * 100) and keeps you warm for `warm` minutes (game-system.md §3.6)
    */
   use?: { hp?: number; sp?: number; stamina?: number; full?: number; warm?: number; focus?: number }
+  /** drunk rather than eaten (the log says 飲んだ: core/used-verb.ts) */
+  drink?: true
   /** made by someone: each one has a quality and a maker (§4.2.1), and its name carries the maker's */
   made?: true
   /** a gathering tool: what it gathers with, how much more it brings in, how many uses before it breaks (economy.md §1) */

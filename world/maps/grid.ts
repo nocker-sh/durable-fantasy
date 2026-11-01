@@ -29,6 +29,12 @@ export const WORLD: readonly Square[] = [
   { at: [1, 3], map: "red-dunes" },
   { at: [2, 3], map: "net-sheds" },
   { at: [2, 4], map: "sea-cliff" },
+  // west of the meadow: the silver-grass highland, the lily marsh below it, the valley of the falls,
+  // and the salt flats east of the valley, shut off from the dunes and the sea cliff by low scarps
+  { at: [0, 2], map: "grass-highland" },
+  { at: [0, 3], map: "lily-marsh", walls: ["e"] },
+  { at: [0, 4], map: "falls-valley" },
+  { at: [1, 4], map: "salt-flats", walls: ["n", "e"] },
 ]
 
 export const STEP: Record<Side, readonly [number, number]> = { n: [0, -1], e: [1, 0], s: [0, 1], w: [-1, 0] }

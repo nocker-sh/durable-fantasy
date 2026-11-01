@@ -24,6 +24,7 @@ export async function advanceStrike(props: Props): Promise<StrikeResult> {
   }
   await props.context.setAlarm(Date.now() + RETRY_MS)
   const spawn = spawnOf(job.target)!
+  const reserved = job.plan ? null : hit({ state: props.context.state.wild, id: job.target, damage: job.damage, now: job.at, player: props.owner, party: job.party })
   const plan =
     job.plan ??
     (await planCombat({
@@ -32,7 +33,8 @@ export async function advanceStrike(props: Props): Promise<StrikeResult> {
       owner: props.owner,
       monster: job.target,
       kind: MONSTER_KINDS[spawn.kind],
-      beaten: hit({ state: props.context.state.wild, id: job.target, damage: job.damage, now: job.at, player: props.owner }).beaten,
+      beaten: !!reserved?.beaten,
+      counters: reserved?.counters ?? 0,
       audience: undefined,
       random: Math.random,
     }))

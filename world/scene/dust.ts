@@ -24,7 +24,10 @@ export function dust(material: THREE.Material, amount = 1) {
         #endif
         vAshP = (modelMatrix * ashP).xyz;`,
     )
-    shader.fragmentShader = shader.fragmentShader.replace("#include <common>", `#include <common>
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        "#include <common>",
+        `#include <common>
 varying vec3 vAshN;
 varying vec3 vAshP;
 uniform vec3 ashColor;
@@ -34,23 +37,25 @@ float ashNoise(vec2 p) {
   vec2 i = floor(p), f = fract(p);
   f = f * f * (3.0 - 2.0 * f);
   return mix(mix(ashHash(i), ashHash(i + vec2(1.0, 0.0)), f.x), mix(ashHash(i + vec2(0.0, 1.0)), ashHash(i + vec2(1.0, 1.0)), f.x), f.y);
-}`).replace(
-      "#include <map_fragment>",
-      `#include <map_fragment>
+}`,
+      )
+      .replace(
+        "#include <map_fragment>",
+        `#include <map_fragment>
         {
-          // painted like the meadows: a thin film everywhere, patches and deeper drifts where a
+          // a thin film everywhere, patches and deeper drifts where a
           // broad soft noise rises, in two or three flat tones whose edges are broken at the size
-          // of a texture pixel (64 to a unit), so it lies as brush marks rather than as a grid of blocks
+          // of a building's texture pixel (16 to a unit), so it lies in drifts rather than as random blocks
           vec2 ashQ = vAshP.xz + vAshP.y * 0.37;
-          vec2 ashTexel = floor(ashQ * 64.0);
-          vec2 ashS = ashTexel / 64.0;
+          vec2 ashTexel = floor(ashQ * 16.0);
+          vec2 ashS = ashTexel / 16.0;
           float drift = ashNoise(ashS * 0.9) * 0.65 + ashNoise(ashS * 3.1 + 17.0) * 0.35;
-          drift += (ashHash(ashTexel) - 0.5) * 0.1;
-          float up = smoothstep(0.45, 0.92, vAshN.y);
-          float k = up * ashAmount * (drift > 0.6 ? 0.66 : drift > 0.48 ? 0.42 : 0.2);
-          diffuseColor.rgb = mix(diffuseColor.rgb, ashColor, clamp(k, 0.0, 0.75));
+          drift += (ashHash(ashTexel) - 0.5) * 0.16;
+          float up = smoothstep(0.35, 0.85, vAshN.y);
+          float k = up * ashAmount * (drift > 0.6 ? 0.7 : drift > 0.47 ? 0.42 : 0.18);
+          diffuseColor.rgb = mix(diffuseColor.rgb, ashColor, clamp(k, 0.0, 0.8));
         }`,
-    )
+      )
   }
   m.needsUpdate = true
 }

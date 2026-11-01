@@ -26,14 +26,14 @@ const DEFINITIONS = {
   // ---------------------------------------------------------------- baked, cooked and poured (made by someone: §4.2.1)
   "rye-bread": dish({ name: "黒パン", price: 6, use: { hp: 12, stamina: 14, full: 18 }, icon: "bread", description: "どっしりした黒パン。一つで半日もつ。" }),
   roll: dish({ name: "白パン", price: 3, use: { hp: 6, stamina: 6, full: 8 }, icon: "roll", description: "小さくて柔らかい丸パン。", weight: 1 }),
-  "apple-pie": dish({ name: "りんごのパイ", price: 16, use: { hp: 18, stamina: 14, full: 16, warm: 5 }, icon: "pie", description: "蔵で寝かせたりんごを詰めて焼いた。焼きたては湯気が立つ。" }),
+  "apple-pie": dish({ name: "りんごのパイ", price: 16, use: { hp: 18, stamina: 14, full: 16, warm: 5 }, icon: "pie", description: "土間で寝かせたりんごを詰めて焼いた。焼きたては湯気が立つ。" }),
   "honey-cake": dish({ name: "蜜の焼き菓子", price: 12, use: { hp: 10, sp: 6, stamina: 10, full: 10 }, icon: "honeyCake", description: "農家の巣箱の蜜を練り込んだ。甘い匂いがする。", weight: 2 }),
   cheese: { ...dish({ name: "チーズ", price: 10, use: { hp: 18, stamina: 10, full: 12 }, icon: "cheese", description: "羊の乳で作ったチーズ。" }), rarity: "fine" },
-  wine: { ...dish({ name: "ぶどう酒", price: 12, use: { sp: 6, stamina: 4, full: 4, warm: 15 }, icon: "jug", description: "醸造所で仕込んだ酒。", weight: 5 }), rarity: "fine" },
-  "hot-wine": dish({ name: "温めたぶどう酒", price: 14, use: { sp: 10, stamina: 6, full: 4, warm: 40 }, icon: "cupWine", description: "香辛料と一緒に温めた。体の芯まで届く。" }),
-  "herb-tea": dish({ name: "薬草茶", price: 6, use: { sp: 8, stamina: 4, full: 2, warm: 25, focus: 10 }, icon: "cupTea", description: "苦いが、喉にいい。", weight: 1 }),
-  "hot-milk": dish({ name: "温めた羊の乳", price: 6, use: { hp: 6, stamina: 6, full: 6, warm: 20 }, icon: "cupMilk", description: "蜜をひとさじ落として。", weight: 2 }),
-  "hot-water": dish({ name: "白湯", price: 1, use: { full: 1, warm: 10 }, icon: "cupWater", description: "湯売りの桶から汲んだ。ただの湯だが、ありがたい。", weight: 1 }),
+  wine: { ...dish({ name: "ぶどう酒", price: 12, use: { sp: 6, stamina: 4, full: 4, warm: 15 }, icon: "jug", description: "醸造所で仕込んだ酒。", weight: 5 }), rarity: "fine", drink: true },
+  "hot-wine": { ...dish({ name: "温めたぶどう酒", price: 14, use: { sp: 10, stamina: 6, full: 4, warm: 40 }, icon: "cupWine", description: "香辛料と一緒に温めた。体の芯まで届く。" }), drink: true },
+  "herb-tea": { ...dish({ name: "薬草茶", price: 8, use: { sp: 8, stamina: 4, full: 2, warm: 25, focus: 10 }, icon: "cupTea", description: "苦いが、喉にいい。", weight: 1 }), drink: true },
+  "hot-milk": { ...dish({ name: "温めた羊の乳", price: 6, use: { hp: 6, stamina: 6, full: 6, warm: 20 }, icon: "cupMilk", description: "蜜をひとさじ落として。", weight: 2 }), drink: true },
+  "hot-water": { ...dish({ name: "白湯", price: 1, use: { full: 1, warm: 10 }, icon: "cupWater", description: "湯売りの桶から汲んだ。ただの湯だが、ありがたい。", weight: 1 }), drink: true },
   "mushroom-soup": {
     ...dish({ name: "きのこのスープ", price: 18, use: { hp: 30, stamina: 22, full: 25, warm: 25 }, icon: "soup", description: "森のきのこを煮込んだ。冷めてもうまい。", weight: 4 }),
     rarity: "fine",
@@ -48,7 +48,14 @@ const DEFINITIONS = {
   },
   "fish-soup": dish({ name: "魚のスープ", price: 20, use: { hp: 30, stamina: 22, full: 25, warm: 25, focus: 15 }, icon: "fishSoup", description: "浜の魚の骨でだしをとった。", weight: 4 }),
   "cabbage-soup": dish({ name: "キャベツのスープ", price: 14, use: { hp: 20, stamina: 18, full: 22, warm: 20 }, icon: "greenSoup", description: "くたくたのキャベツ。どこの家でも作る。", weight: 4 }),
-  porridge: dish({ name: "粥", price: 2, use: { hp: 8, stamina: 12, full: 20 }, icon: "porridge", description: "麦を水で煮ただけの粥。礼拝堂の前で配られる。", weight: 3 }),
+  porridge: dish({
+    name: "粥",
+    price: 2,
+    use: { hp: 2, stamina: 4, full: 5 },
+    icon: "porridge",
+    description: "麦を水で煮ただけの薄い粥。寄進の麦で炊き、礼拝堂の前で安く売られる。腹の足しにはなるが、温まらない。",
+    weight: 3,
+  }),
   "cheese-toast": dish({ name: "チーズのせパン", price: 14, use: { hp: 22, stamina: 16, full: 18, warm: 10 }, icon: "bread", description: "炉で炙った黒パンに、とろけたチーズ。" }),
   skewer: dish({ name: "串焼き", price: 12, use: { hp: 18, stamina: 12, full: 12, warm: 8 }, icon: "skewer", description: "炭火で焼いた川マス。焚き火の匂い。", weight: 1 }),
   "roast-chestnuts": dish({ name: "焼き栗", price: 8, use: { hp: 6, stamina: 8, full: 8, warm: 10 }, icon: "nuts", description: "紙袋の中で、まだ熱い。", weight: 1 }),
@@ -62,11 +69,16 @@ const DEFINITIONS = {
   // ---------------------------------------------------------------- medicine
   herb: medicine({ name: "薬草", price: 6, use: { hp: 15 }, icon: "herb", description: "草原に生える苦い葉。噛むと傷の痛みがひく。", rarity: "common", weight: 1 }),
   "blue-herb": medicine({ name: "青い薬草", price: 25, use: { sp: 12 }, icon: "herbB", description: "日陰や湿った草地にまれに混じる青い葉。頭がすっと冴える。", rarity: "fine", weight: 1 }),
-  potion: brewedMedicine({ name: "回復薬", price: 40, use: { hp: 60 }, icon: "potionR", description: "薬草を煮詰めた回復薬。作り手で効き目も味も違う。" }),
-  "red-potion": medicine({ name: "赤い水薬", price: 30, use: { hp: 45 }, icon: "potionR", description: "薬草を煮詰めた水薬。旅人の必需品。" }),
-  "orange-potion": brewedMedicine({ name: "橙の水薬", price: 75, use: { hp: 100 }, icon: "potionO", description: "蜜を加えてよく効くようにした水薬。", rarity: "fine" }),
-  "white-potion": medicine({ name: "白い水薬", price: 180, use: { hp: 220 }, icon: "potionW", description: "修道士に伝わる処方。滅多に出回らない。", rarity: "rare" }),
-  "blue-potion": brewedMedicine({ name: "青い水薬", price: 90, use: { sp: 40 }, icon: "potionB", description: "青い薬草から作る水薬。結晶を扱う者が好む。", rarity: "fine" }),
+  potion: { ...brewedMedicine({ name: "回復薬", price: 40, use: { hp: 60 }, icon: "potionR", description: "薬草を煮詰めた回復薬。作り手で効き目も味も違う。" }), drink: true },
+  // not the brewed potion: a spiced field draught, less healing, but it warms like a hot drink
+  "red-potion": {
+    ...medicine({ name: "赤い水薬", price: 30, use: { hp: 30 }, icon: "potionR", description: "薬草に唐辛子を加えて煮詰めた水薬。傷の治りは回復薬に劣るが、飲むと体が芯から温まる。" }),
+    use: { hp: 30, warm: 30 },
+    drink: true,
+  },
+  "orange-potion": { ...brewedMedicine({ name: "橙の水薬", price: 110, use: { hp: 150 }, icon: "potionO", description: "蜜を加えてよく効くようにした水薬。", rarity: "fine" }), drink: true },
+  "white-potion": { ...medicine({ name: "白い水薬", price: 180, use: { hp: 220 }, icon: "potionW", description: "修道士に伝わる処方。薬屋に日に一本入るかどうか。", rarity: "rare" }), drink: true },
+  "blue-potion": { ...brewedMedicine({ name: "青い水薬", price: 90, use: { sp: 40 }, icon: "potionB", description: "青い薬草から作る水薬。結晶を扱う者が好む。", rarity: "fine" }), drink: true },
 
   // ---------------------------------------------------------------- gathering tools (economy.md §1)
   // with the practice of a woodcutter (and the arm for it), the axe is a weapon too (game-system.md §9.3)
@@ -87,7 +99,8 @@ const DEFINITIONS = {
       scale: { str: "D" },
     },
   }),
-  sickle: tool({ name: "鎌", price: 35, icon: "sickle", skill: "foraging", power: 1, durability: 50, description: "草も薬草もきのこも、根を残して刈れる。", weight: 6 }),
+  // foraging needs no tool: the sickle is worth carrying only because it brings in more (yield-of.ts)
+  sickle: tool({ name: "鎌", price: 35, icon: "sickle", skill: "foraging", power: 1.5, durability: 50, description: "草も薬草もきのこも、根を残して刈れる。手で摘むより多く採れる。", weight: 6 }),
   "fishing-rod": tool({ name: "釣り竿", price: 45, icon: "rod", skill: "fishing", power: 1, durability: 40, description: "しなりのいい竿。", weight: 6 }),
 
   // ---------------------------------------------------------------- gathering
@@ -97,8 +110,15 @@ const DEFINITIONS = {
   yarn: material({ name: "毛糸", price: 10, icon: "thread", description: "白い毛を紡いだ糸。首巻きはこれで編む。", rarity: "common", weight: 1 }),
   log: material({ name: "原木", price: 8, icon: "log", description: "切り出したばかりの丸太。木工師が板にし、木こりが薪にする。", rarity: "common", weight: 8 }),
   "sea-fish": food({ name: "浜の小魚", price: 5, hp: 9, icon: "herring", description: "網の小魚。焼いても汁にしてもうまい。", weight: 1 }),
-  "lamp-oil": material({ name: "灯り油", price: 5, icon: "jug", description: "街灯と窓の灯りに。衛兵が夕方、道具屋で買っていく。", rarity: "common", weight: 2 }),
-  firewood: material({ name: "薪", price: 3, icon: "firewood", description: "割った薪の束。かまどにも作業場の炉にも要る。", rarity: "common", weight: 4 }),
+  "lamp-oil": material({
+    name: "灯り油",
+    price: 5,
+    icon: "jug",
+    description: "街灯と窓の灯りに使う油。衛兵が夕方、道具屋の奥からまとめて引き取っていく。旅の荷には要らない。",
+    rarity: "common",
+    weight: 2,
+  }),
+  firewood: material({ name: "薪", price: 4, icon: "firewood", description: "割った薪の束。かまどにも作業場の炉にも要る。", rarity: "common", weight: 4 }),
   charcoal: material({ name: "炭", price: 6, icon: "charcoal", description: "樹海の入り口の窯で焼いた炭。鍛冶と料理の火に。", rarity: "common", weight: 2 }),
   mushroom: material({ name: "森のきのこ", price: 5, icon: "mushroom", description: "木陰に生える茶色いきのこ。スープの具になる。" }),
 
@@ -108,8 +128,6 @@ const DEFINITIONS = {
   // ---------------------------------------------------------------- monster materials (drops)
   jelly: material({ name: "ぷるぷるのゼリー", price: 3, icon: "jelly", description: "スライムが残す粘液のかたまり。乾くと固くなり、糊に使える。" }),
   "blue-jelly": material({ name: "青いゼリー", price: 9, icon: "jellyB", description: "水辺のスライムが残す冷たいゼリー。薬の材料になる。", rarity: "fine" }),
-  "violet-jelly": material({ name: "紫のゼリー", price: 20, icon: "jellyP", description: "毒をもつスライムのゼリー。素手で触らないこと。", rarity: "fine" }),
-  "ember-jelly": material({ name: "熾火のゼリー", price: 45, icon: "jellyR", description: "ほんのり温かいゼリー。冬の懐炉に重宝される。", rarity: "rare" }),
   "soft-fur": material({ name: "やわらかい冬毛", price: 8, icon: "fur", description: "野うさぎが逃げるときに残していく冬毛のかたまり。仕立て屋が喜んで買う。" }),
   "white-fleece": material({ name: "白い毛", price: 14, icon: "furW", description: "ふわふわの白い毛。紡げば上等な糸になる。", rarity: "fine" }),
   "sharp-fang": material({ name: "鋭い牙", price: 12, icon: "fang", description: "森の灰うさぎが残した硬い歯。根や樹皮をかじって鋭くなり、お守りに加工される。" }),
@@ -153,7 +171,7 @@ const DEFINITIONS = {
   }),
   dagger: craftedGear({
     name: "ダガー",
-    price: 40,
+    price: 65,
     icon: "dagger",
     equip: { part: "weapon", atk: 9, delay: 1200, needs: { dex: 7 }, scale: { dex: "C", str: "E" } },
     weight: 40,
@@ -214,7 +232,7 @@ const DEFINITIONS = {
   },
   "oak-staff": craftedGear({
     name: "樫の杖",
-    price: 110,
+    price: 150,
     icon: "staff",
     equip: { part: "weapon", atk: 6, delay: 1700, needs: { mnd: 7 }, bonus: { maxSp: 15 } },
     weight: 50,
@@ -222,11 +240,11 @@ const DEFINITIONS = {
   }),
   "short-bow": craftedGear({
     name: "短弓",
-    price: 140,
+    price: 130,
     icon: "bow",
     equip: { part: "weapon", atk: 18, delay: 1600, twoHanded: true, needs: { dex: 10 }, scale: { dex: "C" } },
     weight: 50,
-    description: "狩人が使う小ぶりの弓。両手で引く。",
+    description: "狩人が使う小ぶりの弓。握りに革を巻いてある。両手で引く。",
   }),
   ...WEAPONS,
 
@@ -253,7 +271,7 @@ const DEFINITIONS = {
     description: "白い毛を織った外套。夜の野営でも体が冷えない。",
     rarity: "fine",
   }),
-  "leather-boots": craftedGear({ name: "革の靴", price: 50, icon: "boots", equip: { part: "feet", def: 1 }, weight: 20, description: "長い道のりでも足が痛まない。" }),
+  "leather-boots": craftedGear({ name: "革の靴", price: 90, icon: "boots", equip: { part: "feet", def: 1 }, weight: 20, description: "長い道のりでも足が痛まない。" }),
   "wooden-shield": craftedGear({ name: "木の盾", price: 60, icon: "shield", equip: { part: "shield", def: 3 }, weight: 50, description: "樫の板に鉄の縁を打った丸盾。" }),
 
   // ---------------------------------------------------------------- neck wraps (for looks; the tailor sells them)

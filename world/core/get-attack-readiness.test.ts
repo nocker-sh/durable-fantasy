@@ -19,10 +19,12 @@ it("keeps the attack interval boundary and checks it before stamina", () => {
   expect(getAttackReadiness({ player: hunter, struck: 1000, now: boundary })).toEqual({ kind: "refused", reason: "EXHAUSTED" })
 })
 
-it("leaves an offensive skill's own wait and payment to the authoritative strike", () => {
+it("holds an offensive skill to the same swing interval and leaves its own wait and payment to the authoritative strike", () => {
   const hunter = player({ stamina: FIGHT_STAMINA })
   const before = structuredClone(hunter)
-  expect(getAttackReadiness({ player: hunter, struck: 1000, art: "lunge", now: 1001 })).toMatchObject({ kind: "ready", art: { kind: "strike" } })
+  const boundary = 1000 + derive(hunter).attackDelay * 0.85
+  expect(getAttackReadiness({ player: hunter, struck: 1000, art: "lunge", now: 1001 })).toEqual({ kind: "ignore" })
+  expect(getAttackReadiness({ player: hunter, struck: 1000, art: "lunge", now: boundary })).toMatchObject({ kind: "ready", art: { kind: "strike" } })
   expect(getAttackReadiness({ player: hunter, struck: 1000, now: 1001 })).toEqual({ kind: "ignore" })
   expect(hunter).toEqual(before)
 })

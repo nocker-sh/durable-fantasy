@@ -4,7 +4,7 @@ import type { Phase } from "#/world/core/clock-types"
 import { RESIDENTS } from "#/world/town/residents"
 import { fit } from "#/world/town/lines/fit"
 import { pick } from "#/world/town/lines/pick"
-import type { Situation } from "#/world/town/lines/line"
+import type { Line, Situation } from "#/world/town/lines/line"
 import { ALL_LINES } from "#/world/town/lines/index"
 import { RELATIONS } from "#/world/town/people"
 import { ROUTINES } from "#/world/town/routines"
@@ -32,7 +32,7 @@ describe("what residents say", () => {
   })
 
   it("keeps to the world: a town, the goddess and her monk, no strangers called travellers", () => {
-    for (const { name, l } of all) for (const bad of [/村/, /旅の人/, /旅のお方/, /神父/, /商会/, /自治会/]) expect(bad.test(l.text), `${name}: ${l.text}`).toBe(false)
+    for (const { name, l } of all) for (const bad of [/村/, /旅の人/, /旅のお方/, /神父/, /商会/, /自治会/, /銅貨/, /弁当/, /天国/]) expect(bad.test(l.text), `${name}: ${l.text}`).toBe(false)
   })
 
   it("speaks of people nearby only if they know them, and of doings that are theirs", () => {
@@ -56,6 +56,16 @@ describe("what residents say", () => {
       const up = (p: Phase) => EVERY.some((m) => phase(m) === p && !asleep(name, m))
       expect(l.phase.some(up), `${name} [${l.phase}]: ${l.text}`).toBe(true)
     }
+  })
+
+  it("a line for a time of day or a doing can be heard: they are out of doors then, not at home out of sight", () => {
+    const heard = (name: string, l: Line) =>
+      EVERY.some((m) => {
+        const s = slotAt(name, m)
+        return !!s && s.where !== "home" && (!l.phase || l.phase.includes(phase(m))) && (!l.doing || s.doing.includes(l.doing))
+      })
+    const unheard = all.filter((x) => (x.l.phase || x.l.doing) && !heard(x.name, x.l)).map((x) => `${x.name} [${x.l.phase ?? x.l.doing}]: ${x.l.text}`)
+    expect(unheard).toEqual([])
   })
 
   it("good morning is said by someone just up, at the part of the day they get up", () => {

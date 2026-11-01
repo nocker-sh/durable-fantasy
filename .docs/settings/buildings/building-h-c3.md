@@ -23,8 +23,8 @@
     "room-h-c3-lower-stairs",
     "room-h-c3-upper-stairs",
     "room-h-c3-3",
-    "room-h-c3-niklas",
-    "room-h-c3-frieda",
+    "room-h-c3-4",
+    "room-h-c3-5",
     "room-h-c3-upper-hall",
     "room-h-c3-drying"
   ],
@@ -42,8 +42,8 @@
     "room-h-c3-lower-stairs",
     "room-h-c3-upper-stairs",
     "room-h-c3-3",
-    "room-h-c3-niklas",
-    "room-h-c3-frieda",
+    "room-h-c3-4",
+    "room-h-c3-5",
     "room-h-c3-upper-hall",
     "room-h-c3-drying",
     "resident-エマ",
@@ -113,8 +113,8 @@
         "rooms": [
           "room-h-c3-upper-stairs",
           "room-h-c3-3",
-          "room-h-c3-niklas",
-          "room-h-c3-frieda",
+          "room-h-c3-4",
+          "room-h-c3-5",
           "room-h-c3-upper-hall",
           "room-h-c3-drying"
         ]
@@ -133,8 +133,8 @@
 
 [[room-h-c3-work]] に乾いた柳と湿らせる受け、二人の編む椅子、完成品と編みかけ・道具と端材を分ける。二人の作業の使用面とその間を通る床を照合する。[[room-h-c3-entry]] は [[room-h-c3-2]] と [[room-h-c3-1]] につながり、ローゼマリーの寝床・食事・籠編みを地上階でつなぐ。家庭の食卓と仕事の材料は混ぜない。
 
-[[room-h-c3-lower-stairs]] と [[room-h-c3-upper-stairs]] から [[room-h-c3-upper-hall]] へ行き、[[room-h-c3-3]]・[[room-h-c3-niklas]]・[[room-h-c3-frieda]] に別々に入る。[[room-h-c3-drying]] は四人の家庭の衣服と寝具の手入れに使う。ニクラスの勤務先の木工所との参照と仕事は維持する。
+[[room-h-c3-lower-stairs]] と [[room-h-c3-upper-stairs]] から [[room-h-c3-upper-hall]] へ行き、[[room-h-c3-3]]・[[room-h-c3-4]]・[[room-h-c3-5]] に別々に入る。[[room-h-c3-drying]] は四人の家庭の衣服と寝具の手入れに使う。ニクラスの勤務先の木工所との参照と仕事は維持する。
 
 ## 描画へ渡す条件
 
-この外形を現行の敷地へ置けるとは判断しない。川べりからの柳の量と寸法・受取りと搬送、湿しと乾燥・水と汚水・端材、座って編む姿勢と手を動かす幅・完成品の容量、敷地と道・隣家・地形・構造、便所と家庭の給排水・火と灰、ローゼマリーの生活と手入れの負担・四人の衣服と寝具・勤務と休息、立体を詰めてから描画へ渡す。現行の柳の束と編みかけの籠の未描画の記録は維持する。
+この外形を現行の敷地へ置けるとは判断しない。川べりからの柳の量と寸法・受取りと搬送、湿しと乾燥・水と汚水・端材、座って編む姿勢と手を動かす幅・完成品の容量、敷地と道・隣家・地形・構造、便所と家庭の給排水・火と灰、ローゼマリーの生活と手入れの負担・四人の衣服と寝具・勤務と休息、立体を詰めてから描画へ渡す。現行の柳の束と編みかけの籠は描画されており、未描画の記録はない。

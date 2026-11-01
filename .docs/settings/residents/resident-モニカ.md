@@ -12,7 +12,7 @@
     "building-h-c5"
   ],
   "bedroom_candidates": [
-    "room-h-c5-monica"
+    "room-h-c5-3"
   ],
   "work": "灰売り",
   "relationships": [
@@ -52,12 +52,12 @@
       "scope": "再利用する灰の受取・保管・引渡し。汚水の収集担当ではない"
     }
   ],
-  "bedroom": "room-h-c5-monica",
+  "bedroom": "room-h-c5-3",
   "bed_id": "bed-h-c5-3-2",
   "design_dependencies": [
     "building-h-c5",
     "room-h-c5-2",
-    "room-h-c5-monica"
+    "room-h-c5-3"
   ],
   "storage_ids": [
     "storage-h-c5-3-2"
@@ -106,4 +106,4 @@
 
 ## 固有の寝床
 
-常用の寝床は [[room-h-c5-monica]] の bed-h-c5-3-2 に割り当てる。客室や仕事場の休憩用家具を、本人の寝床の代わりに数えない。衣服、首巻き、私物の収納は storage_ids の個人区画へ割り当て、寝台の使用面と合わせて容量・開閉を照合する。
+常用の寝床は [[room-h-c5-3]] の bed-h-c5-3-2 に割り当てる。客室や仕事場の休憩用家具を、本人の寝床の代わりに数えない。衣服、首巻き、私物の収納は storage_ids の個人区画へ割り当て、寝台の使用面と合わせて容量・開閉を照合する。

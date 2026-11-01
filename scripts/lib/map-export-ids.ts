@@ -13,4 +13,8 @@ export const MAP_EXPORT_IDS = Object.freeze([
   "quynhon-gate",
   "mountain-pass",
   "hue-gate",
+  "grass-highland",
+  "lily-marsh",
+  "falls-valley",
+  "salt-flats",
 ])

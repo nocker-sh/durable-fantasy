@@ -78,7 +78,8 @@ function bestFood(): { item: ItemId; perFull: number; perPoint: number } {
     const it = entry[1]
 
     const e = effectOf(id, 1)
-    if (!it.use || e.stamina <= 0 || e.full <= 0) continue
+    // only what a shop sells in v0.1 (not the milestone dishes nobody can have yet)
+    if (!it.use || it.milestone || !Object.values(SHOPS).some((shop) => (shop.stock as readonly ItemId[]).includes(id)) || e.stamina <= 0 || e.full <= 0) continue
     const perFull = e.stamina / e.full
     if (perFull > best.perFull) best = { item: id, perFull, perPoint: priceOf(id, 1) / e.stamina }
   }

@@ -2,6 +2,8 @@ import { defineDurableState } from "void/durable"
 import { arrivePlayer } from "#/world/server/arrive-player"
 import { walkPlayer } from "#/world/server/walk-player"
 import { travelPlayer } from "#/world/server/travel-player"
+import { journeyPlayer } from "#/world/server/journey-player"
+import { pacePlayer } from "#/world/server/pace-player"
 import { leavePlayer } from "#/world/server/leave-player"
 import { revivePlayerAtHome } from "#/world/server/revive-player-at-home"
 import { beginPlayerTrade } from "#/world/server/begin-player-trade"
@@ -22,7 +24,7 @@ import { resetPlayerRecord } from "#/world/server/reset-player-record"
 import { initialPlayerRecord } from "#/world/server/initial-player-record"
 import { readPlayerRecord } from "#/world/server/read-player-record"
 import { playerMigrations } from "#/world/server/player-record"
-import type { PlayerArrivalInput, PlayerWalkInput, PlayerTravelInput } from "#/world/server/player-location-types"
+import type { PlayerArrivalInput, PlayerWalkInput, PlayerTravelInput, PlayerJourneyInput, PlayerJourney } from "#/world/server/player-location-types"
 import type { PlayerTradeInput, PlayerTradeDecision, PlayerStrikeInput } from "#/world/server/player-operation-types"
 import type { GatherRequest } from "#/world/core/gather-receipt-types"
 import type { ShopQuote } from "#/world/core/shop-receipt-types"
@@ -36,6 +38,7 @@ import type { TradeProposal, TradeRecord } from "#/world/core/trade-transaction-
 import type { TradeJob } from "#/world/server/trade-coordinator"
 import type { OrderIntent } from "#/world/core/exchange-types"
 import type { ItemId } from "#/world/core/items/catalog"
+import type { PaceKind } from "#/world/core/pace-rules"
 
 /** One player per durable instance; each operation publishes its state and receipts in one save (game-system.md §13). */
 export const Player = defineDurableState({
@@ -54,6 +57,14 @@ export const Player = defineDurableState({
     },
     travel(context, input: PlayerTravelInput): boolean {
       return travelPlayer(context.state, input, Date.now())
+    },
+    /** Through a way out: the road's tiredness and the destination are saved together. */
+    journey(context, input: PlayerJourneyInput): PlayerJourney {
+      return journeyPlayer(context.state, input, Date.now())
+    },
+    /** Whether this player may ask someone or shout again yet; a yes is recorded. */
+    pace(context, input: { kind: PaceKind; gap: number }): boolean {
+      return pacePlayer(context.state, input, Date.now())
     },
     reviveAtHome(context, connection: string): Transition {
       return revivePlayerAtHome(context.state, connection, Date.now())

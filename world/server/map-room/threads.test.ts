@@ -37,9 +37,10 @@ function fixture() {
     trace.push("save")
   })
   const run = vi.fn(async (_command: ServerCommand) => ({ ok: true, state: newPlayer(), events: [] }))
+  const pace = vi.fn(async () => true)
   rpc.get.mockImplementation((owner: string) => {
     trace.push(owner)
-    return { run }
+    return { run, pace }
   })
   const room = { me, save, ctx: { connection: { id: "self", send }, room: { getConnection: () => peer } } }
   return { me, other, peer, send, save, run, room, trace }
@@ -57,10 +58,10 @@ it("rejects an unlocated peer without saving or delivering an invitation", async
 it("saves a nearby request before notifying the peer without exchanging threads", async () => {
   const request = fixture()
   await handleThreadAsk(request.room, { type: "thread-ask", target: "peer" })
-  expect(request.trace).toEqual(["save", "peer-send"])
+  expect(request.trace).toEqual(["self-owner", "save", "peer-send"])
   expect(request.save).toHaveBeenCalledExactlyOnceWith({ threading: "peer" })
   expect(request.peer.send).toHaveBeenCalledExactlyOnceWith({ type: "thread-asked", from: "self", name: "Self" })
-  expect(rpc.get).not.toHaveBeenCalled()
+  expect(request.run).not.toHaveBeenCalled()
 })
 
 it("ignores a response to a withdrawn request", async () => {
@@ -95,5 +96,36 @@ it("propagates the first save failure without sending results or starting the se
   await expect(handleThreadAnswer(request.room, { type: "thread-answer", from: "peer", yes: true })).rejects.toThrow("Unavailable")
   expect(rpc.get).toHaveBeenCalledExactlyOnceWith("self-owner")
   expect(request.send).not.toHaveBeenCalled()
+  expect(request.peer.send).not.toHaveBeenCalled()
+})
+
+it("checks distance and state again when the answer comes, and tells both sides", async () => {
+  const request = fixture()
+  request.other.route = [[40, 40]]
+  await handleThreadAnswer(request.room, { type: "thread-answer", from: "peer", yes: true })
+  expect(request.peer.send).toHaveBeenCalledExactlyOnceWith({ type: "thread-closed", reason: "TOO_FAR" })
+  expect(request.send).toHaveBeenCalledExactlyOnceWith({ type: "thread-closed", reason: "TOO_FAR" })
+  expect(rpc.get).not.toHaveBeenCalled()
+  const fallen = fixture()
+  fallen.other.down = true
+  await handleThreadAnswer(fallen.room, { type: "thread-answer", from: "peer", yes: true })
+  expect(fallen.peer.send).toHaveBeenCalledExactlyOnceWith({ type: "thread-closed", reason: "BUSY" })
+  expect(rpc.get).not.toHaveBeenCalled()
+})
+
+it("does not give the asker a thread when the answerer's could not be saved", async () => {
+  const request = fixture()
+  request.run.mockResolvedValueOnce({ ok: false, reason: "FALLEN" } as never)
+  await handleThreadAnswer(request.room, { type: "thread-answer", from: "peer", yes: true })
+  expect(request.run).toHaveBeenCalledOnce()
+  expect(request.peer.send).toHaveBeenCalledExactlyOnceWith({ type: "thread-closed", reason: "BUSY" })
+})
+
+it("refuses a second ask within a few seconds without saving it", async () => {
+  const request = fixture()
+  rpc.get.mockReturnValue({ run: request.run, pace: vi.fn(async () => false) })
+  await handleThreadAsk(request.room, { type: "thread-ask", target: "peer" })
+  expect(request.send).toHaveBeenCalledExactlyOnceWith({ type: "thread-closed", reason: "WAIT" })
+  expect(request.save).not.toHaveBeenCalled()
   expect(request.peer.send).not.toHaveBeenCalled()
 })

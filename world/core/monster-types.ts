@@ -1,6 +1,7 @@
 import type { ItemId } from "#/world/core/items/catalog"
 import type { MONSTER_KINDS } from "#/world/core/monsters"
 import type { MonsterFigure } from "#/world/core/monster-figure-types"
+import type { MonsterModel } from "#/world/core/monster-model-types"
 
 export type MonsterKind = {
   name: string
@@ -10,14 +11,18 @@ export type MonsterKind = {
   /** how hard and how surely it strikes back when struck (0: it only runs) */
   atk: number
   hit: number
+  /** ms between its blows once it is fighting (game-system.md §8); COUNTER_INTERVAL when left out */
+  interval?: number
   exp: number
   drops: readonly { item: ItemId; chance: number }[]
   /** seconds before it is back after being beaten */
   respawn: number
   /** how it looks (scene) */
-  look: "slime" | "hare" | "figure"
+  look: "slime" | "hare" | "figure" | "model"
   /** the blocks a `figure` is built from */
   figure?: MonsterFigure
+  /** the rigged model a `model` is drawn from */
+  model?: MonsterModel
   color?: number
   size?: number
 }

@@ -22,5 +22,6 @@ export async function handleShopLook(room: Props, message: Message<"look">) {
   if (!keepers.some((cell) => near(me, cell, TALK_CELLS + 1))) return
   const offers = await Market.get(TOWN).look(shop, minutesToClose(shop, timeFor(me)))
   const carried = me.owner ? getCarriedSellableItemIds((await Player.get(me.owner).read()).bag) : []
-  await room.ctx.connection.send({ type: "stock", shop, offers, buys: await Market.get(TOWN).buying(shop, carried) })
+  const buying = await Market.get(TOWN).buying(shop, carried)
+  await room.ctx.connection.send({ type: "stock", shop, offers, buys: buying.buys, held: buying.held })
 }

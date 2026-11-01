@@ -5,6 +5,8 @@ import { MONSTER_DRAFTS } from "#/world/core/monster-drafts"
 import { createMonsterBody } from "#/world/scene/create-monster-body"
 import { updaters } from "#/world/scene/construction/registry"
 import { poseFigure } from "#/world/scene/fields/pose-figure"
+import { poseModel } from "#/world/scene/fields/pose-model"
+import { ModelReady } from "#/dev/model-ready"
 import { MAPS } from "#/world/maps/index"
 import type * as THREE from "three"
 
@@ -17,10 +19,12 @@ function walkInPlace(body: THREE.Group) {
   walking.add(body)
   if (walk.registered) return
   walk.registered = true
-  updaters.push((t) => {
+  updaters.push((t, dt) => {
     for (const b of walking) {
+      const moving = Math.floor(t / 3) % 2 === 0
       if (!b.parent) walking.delete(b)
-      else poseFigure({ body: b, now: t * 1000, moving: Math.floor(t / 3) % 2 === 0 })
+      else if (b.userData.joints) poseFigure({ body: b, now: t * 1000, moving })
+      else poseModel({ body: b, dt, moving })
     }
   })
 }
@@ -56,28 +60,48 @@ const monsterDrafts = sheet({
     { label: "大きさ", get: (id) => MONSTER_DRAFTS[id].kind.size ?? 1, w: "w-14" },
     { label: "叩かれると", get: (id) => (MONSTER_DRAFTS[id].kind.atk ? "反撃する" : "逃げる"), w: "w-20" },
   ],
-  icon: (id) => <ObjectThumbnail id={`monster-draft-${id}`} build={draftBuild(id)} px={32} />,
+  icon: (id) => {
+    const kind = MONSTER_DRAFTS[id].kind
+    return (
+      <ModelReady id={kind.look === "model" ? kind.model.id : null}>
+        <ObjectThumbnail id={`monster-draft-${id}`} build={draftBuild(id)} px={32} />
+      </ModelReady>
+    )
+  },
   refs: (id) => [
     ...MONSTER_DRAFTS[id].kind.drops.map((d) => ({ sheet: "items", id: d.item, as: `落とす ${Math.round(d.chance * 100)}%` })),
     { sheet: "maps", id: MONSTER_DRAFTS[id].home, as: "住むなら" },
   ],
   build: draftBuild,
-  more: (id) => [
-    {
-      title: "暮らしと出どころ",
-      head: ["", ""],
-      rows: [
-        ["暮らし", MONSTER_DRAFTS[id].life],
-        ["大戦の名残", MONSTER_DRAFTS[id].origin],
-      ],
-      wide: true,
-    },
-    {
-      title: "身体の部材（拡大前）",
-      head: ["部材", "形", "色", "位置", "寸法", "動き"],
-      rows: MONSTER_DRAFTS[id].kind.figure.parts.map((part, index) => [index + 1, part.shape, part.paint, part.at.join(", "), part.size.join(", "), part.swing ?? ""]),
-    },
-  ],
+  more: (id) => {
+    const draft = MONSTER_DRAFTS[id]
+    const kind = draft.kind
+    return [
+      {
+        title: "暮らしと出どころ",
+        head: ["", ""],
+        rows: [
+          ["暮らし", draft.life],
+          ["大戦の名残", draft.origin],
+        ],
+        wide: true,
+      },
+      kind.look === "model"
+        ? {
+            title: "モデル",
+            head: ["", ""],
+            rows: [
+              ["ファイル", `public/models/monsters/${kind.model.id}/`],
+              ["長さ（拡大前）", `${kind.model.length}（${kind.model.axis}）`],
+            ],
+          }
+        : {
+            title: "身体の部材（拡大前）",
+            head: ["部材", "形", "色", "位置", "寸法", "動き"],
+            rows: kind.figure.parts.map((part, index) => [index + 1, part.shape, part.paint, part.at.join(", "), part.size.join(", "), part.swing ?? ""]),
+          },
+    ]
+  },
 })
 
 export { monsterDrafts }

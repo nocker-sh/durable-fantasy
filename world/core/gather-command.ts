@@ -2,6 +2,7 @@ import { wearGatheringTool } from "#/world/core/wear-gathering-tool"
 // Gathering transition after the dispatcher's recovery and fallen-player checks.
 // Node distance and shared stock are checked by the map room before this command.
 import { addItem } from "#/world/core/add-item"
+import { overWeight } from "#/world/core/over-weight"
 import type { ServerCommand } from "#/world/core/commands"
 import { GATHER_STAMINA } from "#/world/core/gather-rules"
 import { nodeOf } from "#/world/core/node-of"
@@ -18,6 +19,7 @@ import { accept } from "#/world/core/accept"
 import { reject } from "#/world/core/reject"
 import type { Transition } from "#/world/core/transition"
 
+/** 採るには立ち上がる（game-system.md §9.2）。 */
 export function gather(state: PlayerState, command: Extract<ServerCommand, { type: "gather" }>, now: number): Transition {
   const node = nodeOf(command.node)
   if (!node) return reject("SPENT")
@@ -32,9 +34,10 @@ export function gather(state: PlayerState, command: Extract<ServerCommand, { typ
   const made = ITEMS[got.item].made ? { q: 1 as Quality, by: state.name } : undefined
   const added = addItem({ bag: wornTool.bag, item: got.item, count: got.count, mark: made })
   if (!added) return reject("BAG_FULL")
+  if (overWeight(state, { ...state, bag: added, equipment: wornTool.equipment })) return reject("TOO_HEAVY")
   const grown = gainLife(state.life, node.skill, GATHER_EXP)
   return accept(
-    { ...state, bag: added, equipment: wornTool.equipment, worn: wornTool.worn, stamina: state.stamina - cost, life: grown.life },
+    { ...state, bag: added, equipment: wornTool.equipment, worn: wornTool.worn, stamina: state.stamina - cost, life: grown.life, sitting: false },
     { type: "gathered", item: got.item, count: got.count, skill: node.skill, level: grown.level, up: grown.up, broke: wornTool.broke },
   )
 }

@@ -52,6 +52,10 @@ import { scatter } from "#/world/scene/fields/helpers/scatter/scatter"
 import { edgeward } from "#/world/scene/fields/helpers/scatter/edgeward"
 import { offRoad } from "#/world/scene/fields/helpers/scatter/off-road"
 import { type Spot, instanced } from "#/world/scene/fields/instancing"
+import { grassHighland } from "#/world/scene/fields/grass-highland"
+import { lilyMarsh } from "#/world/scene/fields/lily-marsh"
+import { fallsValley } from "#/world/scene/fields/falls-valley"
+import { saltFlats } from "#/world/scene/fields/salt-flats"
 
 // ---------------------------------------------------------------- builders
 function meadow(root: THREE.Group) {
@@ -1005,7 +1009,7 @@ function hueGate(root: THREE.Group) {
 /** Trees (or, in the dunes, dead trees and stones) thick on the rim, closing the view at the edges. */
 function rim(root: THREE.Group, id: string, seed: number) {
   const ok = (x: number, z: number) => edgeward(3.5)(x, z) && offRoad(2.2)(x, z) && !(OPEN_SIDES[id]?.includes("e") && x > 30)
-  if (id === "red-dunes") {
+  if (id === "red-dunes" || id === "salt-flats") {
     deadTrees(
       root,
       scatter({
@@ -1051,6 +1055,10 @@ const BUILDERS: Record<string, (root: THREE.Group) => void> = {
   "quynhon-gate": quynhonGate,
   "mountain-pass": pass,
   "hue-gate": hueGate,
+  "grass-highland": grassHighland,
+  "lily-marsh": lilyMarsh,
+  "falls-valley": fallsValley,
+  "salt-flats": saltFlats,
 }
 export const FIELD_BUILDERS: Record<string, (root: THREE.Group) => void> = Object.fromEntries(
   Object.entries(BUILDERS).map((entry4, i) => {

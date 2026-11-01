@@ -27,8 +27,8 @@
     "room-guardhouse-drying",
     "room-guardhouse-3",
     "room-guardhouse-4",
-    "room-guardhouse-stefan",
-    "room-guardhouse-veronika"
+    "room-guardhouse-5",
+    "room-guardhouse-6"
   ],
   "role": "home",
   "issues": [
@@ -48,8 +48,8 @@
     "room-guardhouse-drying",
     "room-guardhouse-3",
     "room-guardhouse-4",
-    "room-guardhouse-stefan",
-    "room-guardhouse-veronika",
+    "room-guardhouse-5",
+    "room-guardhouse-6",
     "resident-オイゲン",
     "resident-ディーター",
     "resident-シュテファン",
@@ -120,8 +120,8 @@
           "room-guardhouse-drying",
           "room-guardhouse-3",
           "room-guardhouse-4",
-          "room-guardhouse-stefan",
-          "room-guardhouse-veronika"
+          "room-guardhouse-5",
+          "room-guardhouse-6"
         ]
       }
     ]
@@ -138,8 +138,8 @@
 
 [[room-guardhouse-1]] に引継ぎと地図・鍵と記録、[[room-guardhouse-gear]] に槍と防具・街灯の油と道具を分ける。[[room-guardhouse-entry]] は勤務からの出入りと [[room-guardhouse-dining]]・[[room-guardhouse-2]]・階段を結ぶ。食卓は四人それぞれの席を持つが、交代で食べる案とし、四人が同時に警備を離れる前提にしない。
 
-[[room-guardhouse-lower-stairs]] と [[room-guardhouse-upper-stairs]]、[[room-guardhouse-upper-hall]] から [[room-guardhouse-3]]・[[room-guardhouse-4]]・[[room-guardhouse-stefan]]・[[room-guardhouse-veronika]] へ別々に入る。既存の寝台と衣服箱のIDを維持し、寝る時間の違う人の寝室を通り抜けない。[[room-guardhouse-drying]] は共用の衣服と寝具の手入れに使う。
+[[room-guardhouse-lower-stairs]] と [[room-guardhouse-upper-stairs]]、[[room-guardhouse-upper-hall]] から [[room-guardhouse-3]]・[[room-guardhouse-4]]・[[room-guardhouse-5]]・[[room-guardhouse-6]] へ別々に入る。既存の寝台と衣服箱のIDを維持し、寝る時間の違う人の寝室を通り抜けない。[[room-guardhouse-drying]] は共用の衣服と寝具の手入れに使う。
 
 ## 描画へ渡す条件
 
-この外形を現行の敷地へ置けるとは判断しない。門と巡回・街灯の作業と油の運搬、引継ぎと警備の空白・交代の食事と調理・昼と夜の睡眠・遮光と物音、油の容器と量・漏れと火・装備の長さと手入れ、敷地と道・隣家・地形と構造、便所と給排水・暖房、四人の衣服と寝具の乾燥量、立体を詰めてから描画へ渡す。現行の自動間取りは台所を、居間の奥に腰壁で仕切った独立した区画として持つ。
+この外形を現行の敷地へ置けるとは判断しない。門と巡回・街灯の作業と油の運搬、引継ぎと警備の空白・交代の食事と調理・昼と夜の睡眠・遮光と物音、油の容器と量・漏れと火・装備の長さと手入れ、敷地と道・隣家・地形と構造、便所と給排水・暖房、四人の衣服と寝具の乾燥量、立体を詰めてから描画へ渡す。現行の自動間取りは台所を、居間の奥に腰壁で仕切った独立した区画として持つ。2階も現行の描画で四人の個室に分け、それぞれに寝台を一つ置く。

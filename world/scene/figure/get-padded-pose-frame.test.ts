@@ -18,12 +18,24 @@ it.each([0, 1, 2, 3, 4, 5, 6, 7])("preserves native interior pixels and anchor a
     for (const x of Array.from({ length: FW - 2 }, (_, i) => i + 1))
       for (const channel of [0, 1, 2, 3]) expect(frame.pixels.data[((y + 11) * frame.pixels.w + x + 11) * 4 + channel]).toBe(original.data[(y * FW + x) * 4 + channel])
 })
-it("recovers the clipped boots in the actual procedural side-step pose", () => {
+it("keeps the boots of the actual procedural side-step pose whole", () => {
   const pose = getNativeSideStepPose({ look, phase: 0.625, stride: 0.12, lift: 0.05, pelvisDrop: 0.02, direction: "left" })
   if (pose instanceof Error) throw pose
   const original = new PixBuf(FW, FH)
   renderSkeletonFrame({ L: look, skeleton: pose.skeleton, view: 0, item: null, out: original, ox: 0, oy: 0 })
   const frame = getPaddedPoseFrame({ look, skeleton: pose.skeleton, view: 0, item: null, padding: 12, blink: false })
+  if (frame instanceof Error) throw frame
+  const before = Array.from({ length: FW * FH }, (_, i) => original.data[i * 4 + 3]).filter(Boolean).length
+  const after = Array.from({ length: frame.pixels.w * frame.pixels.h }, (_, i) => frame.pixels.data[i * 4 + 3]).filter(Boolean).length
+  // the native frame leaves room below the feet, so the stepping boots already fit and padding adds nothing
+  expect(after).toBe(before)
+  expect(before).toBeGreaterThan(0)
+})
+it("recovers the blade a sword swing reaches past the native frame", () => {
+  const skeleton = skelFor(look, "sword", 9)
+  const original = new PixBuf(FW, FH)
+  renderSkeletonFrame({ L: look, skeleton, view: 0, item: "sword", out: original, ox: 0, oy: 0 })
+  const frame = getPaddedPoseFrame({ look, skeleton, view: 0, item: "sword", padding: 24, blink: false })
   if (frame instanceof Error) throw frame
   const before = Array.from({ length: FW * FH }, (_, i) => original.data[i * 4 + 3]).filter(Boolean).length
   const after = Array.from({ length: frame.pixels.w * frame.pixels.h }, (_, i) => frame.pixels.data[i * 4 + 3]).filter(Boolean).length

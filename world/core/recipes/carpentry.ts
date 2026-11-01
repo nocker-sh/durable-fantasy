@@ -10,7 +10,7 @@ export const CARPENTRY_RECIPES: readonly Recipe[] = [
     skill: "carpentry",
     station: "workbench",
     inputs: [
-      ["plank", 1],
+      ["plank", 2],
       ["yarn", 1],
     ],
     output: ["fishing-rod", 1],
@@ -44,8 +44,9 @@ export const CARPENTRY_RECIPES: readonly Recipe[] = [
     skill: "carpentry",
     station: "workbench",
     inputs: [
-      ["plank", 2],
+      ["plank", 3],
       ["yarn", 2],
+      ["tanned-leather", 1],
     ],
     output: ["short-bow", 1],
     min: 8,

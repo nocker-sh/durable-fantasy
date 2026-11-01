@@ -59,6 +59,13 @@ describe("the exchange", () => {
     expect(r.state.fees).toBe(3)
   })
 
+  it("the trade fee is rounded on what an order has sold in all: cheap single fills neither pay 10% nor slip through", () => {
+    const listed = sell(emptyExchange(), "A", 10, 99)
+    const filled = Array.from({ length: 99 }, (_, i) => i).reduce((s, i) => buy(s, `X${i}`, 10, 1).state, listed)
+    expect(filled.fees).toBe(Math.floor(10 * 99 * TRADE_FEE))
+    expect(filled.inbox.A.gold).toBe(10 * 99 - Math.floor(10 * 99 * TRADE_FEE))
+  })
+
   it("keeps every coin and every item: nothing made or lost by trading, cancelling or expiring", () => {
     let s = emptyExchange()
     let goldPut = 0,

@@ -157,9 +157,10 @@ it("keeps listing fees, traded goods and collected proceeds consistent through m
   await f.source.place("owner", second)
   const claim = await f.source.reserveInbox("owner")
   expect((await f.source.deliverInbox("owner", claim.id)).ok).toBe(true)
-  expect((await f.recipient.read()).gold).toBe(97)
+  // the 3% trade fee on 20G rounds down to nothing; only the listing fees are kept
+  expect((await f.recipient.read()).gold).toBe(98)
   expect((await f.recipient.read()).bag[0]).toMatchObject({ item: "potion", count: 3, by: "イルムガルト" })
-  expect(f.exchangeStore.saved.get("__void_durable_state")).toMatchObject({ value: { ex: { fees: 3, orders: [] } } })
+  expect(f.exchangeStore.saved.get("__void_durable_state")).toMatchObject({ value: { ex: { fees: 2, orders: [] } } })
 })
 
 it("recognizes a prior escrow during a later reserved trade", async () => {

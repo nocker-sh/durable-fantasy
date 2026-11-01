@@ -1,4 +1,6 @@
+import { Player } from "#/durable-objects/player"
 import { getSpeechAttempt } from "#/world/core/get-speech-attempt"
+import { SHOUT_GAP_MS } from "#/world/core/pace-rules"
 import { canReceiveSpeech } from "#/world/server/map-room/can-receive-speech"
 import { presence } from "#/world/server/map-room/presence"
 import { reachable } from "#/world/server/map-room/reachable"
@@ -6,9 +8,9 @@ import { notifyClient } from "#/world/server/map-room/notifications"
 import type { Ctx, Message } from "#/world/server/map-room/context"
 
 type Connection = Pick<Ctx["ctx"]["connection"], "id" | "state" | "send">
-type Props = Readonly<Pick<Ctx, "me" | "save"> & { ctx: Readonly<{ connection: Pick<Connection, "id">; room: Readonly<{ getConnections(): Iterable<Connection> }> }> }>
+type Props = Readonly<Pick<Ctx, "me" | "save"> & { ctx: Readonly<{ connection: Pick<Connection, "id" | "send">; room: Readonly<{ getConnections(): Iterable<Connection> }> }> }>
 
-/** 連投の試行を先に保存し、各受信者を送信の直前に判定する。 */
+/** 連投の試行を先に保存し、叫びは本人ごとの間隔も確かめてから、各受信者を送信の直前に判定する。 */
 export async function handleSpeech(room: Props, message: Message<"say">) {
   const me = room.me
   if (!me.player) return
@@ -16,6 +18,11 @@ export async function handleSpeech(room: Props, message: Message<"say">) {
   room.save({ said: attempt.said })
   if (!attempt.canSpeak) return
   const shout = !!message.shout
+  // a shout reaches the whole map: once in a while per player, however they reconnect
+  if (shout && (!me.owner || !(await Player.get(me.owner).pace({ kind: "shout", gap: SHOUT_GAP_MS })))) {
+    await notifyClient(room.ctx.connection.send({ type: "refused", what: "say", reason: "RATE_LIMIT" }))
+    return
+  }
   const origin = reachable(me)[0]
   for (const recipient of room.ctx.room.getConnections()) {
     if (!canReceiveSpeech({ senderId: room.ctx.connection.id, recipientId: recipient.id, recipient: presence(recipient), origin, shout })) continue
