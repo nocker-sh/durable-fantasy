@@ -72,6 +72,10 @@ export class ServerMessages {
         scene?.moveRemote(message.id, message.path)
         return
       }
+      case "whispered": {
+        this.target.addChat({ channel: "whisper", name: message.name, text: message.text, self: !!message.sent })
+        return
+      }
       case "said": {
         const p = this.target.session.others.get(message.id)
         if (!p) return
@@ -214,6 +218,10 @@ export class ServerMessages {
           this.target.session.rooms.world = this.target.session.state.get().homeTown
           this.target.session.wantChannel = null
           this.target.enterMap("phanthiet", null)
+          return
+        }
+        if (message.what === "whisper") {
+          this.target.addChat({ channel: "system", text: "その人はこのあたりにいない。" })
           return
         }
         if (message.what === "say") {

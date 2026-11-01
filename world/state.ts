@@ -18,7 +18,7 @@ export const DEFAULT_WINDOWS: readonly WindowId[] = ["minimap", "chat", "syslog"
 export const KEPT_ON_ESC: readonly WindowId[] = ["minimap", "chat", "syslog"]
 /** Modal screens that sit over everything (ui.md §3.14). */
 export type ModalId = "system" | "character" | "help" | "channel"
-export type ChatChannel = "player" | "npc" | "system" | "party"
+export type ChatChannel = "player" | "npc" | "system" | "party" | "whisper"
 
 export type ChatLine = {
   id: number

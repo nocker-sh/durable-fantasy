@@ -29,8 +29,8 @@ export class DialogueActions {
   say(text: string) {
     const input = parseChatInput(text)
     if (!input) return
-    if (input.kind === "unavailable") {
-      this.target.addChat({ channel: "system", text: input.text })
+    if (input.kind === "whisper") {
+      this.target.session.socket?.send({ type: "whisper", to: input.to, text: input.text })
       return
     }
     if (input.kind === "party") {

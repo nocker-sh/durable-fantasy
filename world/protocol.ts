@@ -107,6 +107,8 @@ export const clientMessage = z.discriminatedUnion("type", [
   z.object({ type: z.literal("move"), path: z.array(cellSchema).min(1).max(MAX_PATH) }),
   /** Speak to players nearby, or shout to the whole map. */
   z.object({ type: z.literal("say"), text: z.string().trim().min(1).max(140), shout: z.boolean().optional() }),
+  /** say something to one player by name in the same channel of this map */
+  z.object({ type: z.literal("whisper"), to: z.string().trim().min(1).max(NAME_MAX), text: z.string().trim().min(1).max(140) }),
   /** Run a command on the player's data; the answer comes back as `result` with the same seq. */
   z.object({ type: z.literal("command"), seq: z.number().int(), command: commandSchema }),
   /** Start talking to an NPC (by name), or stop with null. While talking the player cannot move. */
@@ -196,6 +198,8 @@ export const serverMessage = z.discriminatedUnion("type", [
   z.object({ type: z.literal("left"), id: z.string() }),
   z.object({ type: z.literal("moved"), id: z.string(), path: z.array(cellSchema) }),
   z.object({ type: z.literal("said"), id: z.string(), text: z.string(), shout: z.boolean() }),
+  /** a whisper: from `name`, or (sent) our own to `name` as delivered */
+  z.object({ type: z.literal("whispered"), name: z.string(), text: z.string(), sent: z.boolean().optional() }),
   z.object({ type: z.literal("result"), seq: z.number(), result: z.custom<Transition>(() => true) }),
   /** The warp was allowed: leave this room and join `map` at `at`. */
   z.object({ type: z.literal("warped"), map: z.string(), at: cellSchema, /** the world they are still in, when a crossing was refused */ world: z.number().int().min(1).optional() }),
