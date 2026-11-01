@@ -1,8 +1,9 @@
 import { hexToRgb as hex } from "#/lib/graphics/hex-to-rgb"
 import type { Primitive } from "#/lib/graphics/ray/primitive-types"
 
+// below the feet (OY) the frame keeps room for toes, a broom head and a low sword tip, nearer the camera than the feet
 export const FW = 76,
-  FH = 100,
+  FH = 112,
   OX = 38,
   OY = 92
 

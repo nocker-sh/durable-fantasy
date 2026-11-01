@@ -13,6 +13,7 @@ const shadowGeo = new THREE.CircleGeometry(0.26, 12)
 const MAX_STRIPS = 16
 
 const tmpV = new THREE.Vector3()
+const DAYLIGHT = new THREE.Color(1, 1, 1)
 import { FIG } from "#/world/scene/figure/display-scale"
 
 import { FRAMES } from "#/world/scene/figure/animation"
@@ -22,6 +23,8 @@ import { bakedStrip } from "#/world/scene/baked-strip"
 import { lookKey } from "#/world/scene/sprite-key"
 import { spriteFrame } from "#/world/scene/sprite-frame"
 import { view } from "#/world/scene/actors"
+import { SPRITE_PITCH } from "#/world/scene/figure/sprite-pitch"
+import { CAMERA_PITCH } from "#/world/scene/camera-pitch"
 import type { Strip, BakedStrips } from "#/world/scene/actors"
 
 /** Villager drawn as an 8-direction pixel sprite; strips are rendered on demand. */
@@ -37,6 +40,11 @@ export class Figure {
   private disposed = false
   private strips = new Map<string, Strip>()
   private id: string
+  /** how far the time of day's tint is eased back toward daylight on this figure (0 keeps the tint) */
+  private lift = 0
+  lighten(amount: number) {
+    this.lift = amount
+  }
   /** a silhouette drawn through walls, while something we cannot see into stands in front */
   private ghost: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial> | null = null
   xray(on: boolean) {
@@ -111,7 +119,8 @@ export class Figure {
     sh.position.y = 0.03
     sh.scale.set((look.age === "child" ? 0.75 : 1) * FIG, FIG, (look.age === "child" ? 0.6 : 0.8) * FIG)
     this.root.add(this.sprite, sh)
-    this.height = (look.age === "child" ? 1.25 : 1.65) * FIG * scale
+    // the drawn head top: the figure's height seen from SPRITE_PITCH, at the height where the camera sees that
+    this.height = ((look.age === "child" ? 0.91 : 1.2) * FIG * scale * Math.cos(SPRITE_PITCH)) / Math.cos(CAMERA_PITCH)
     this.id = lookKey(look, null)
   }
   dispose() {
@@ -276,7 +285,7 @@ export class Figure {
       m.map = show.value.tex
       m.needsUpdate = true
     }
-    m.color.copy(view.tint)
+    m.color.copy(view.tint).lerp(DAYLIGHT, this.lift)
     // face the camera around y only; stretch so the foreshortened card shows the sprite at full height
     tmpV.set(view.cam.x - x, view.cam.y - y, view.cam.z - z)
     const hd = Math.hypot(tmpV.x, tmpV.z) || 1

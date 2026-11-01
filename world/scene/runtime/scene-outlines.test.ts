@@ -9,7 +9,7 @@ vi.mock("#/lib/graphics/outline-shape", () => ({ outlineShape: vi.fn() }))
 afterEach(() => vi.clearAllMocks())
 
 function person() {
-  return { fig: { outline: vi.fn<Figure["outline"]>(), xray: vi.fn<Figure["xray"]>() } }
+  return { fig: { outline: vi.fn<Figure["outline"]>(), xray: vi.fn<Figure["xray"]>(), lighten: vi.fn<Figure["lighten"]>() } }
 }
 
 function creature(id: string) {
@@ -39,6 +39,10 @@ it("always outlines the player and marks just the hovered owner in each other ca
   expect(f.me.fig.xray).toHaveBeenCalledExactlyOnceWith(true)
   expect(f.me.fig.outline).toHaveBeenCalledExactlyOnceWith(true, true)
   expect(f.me.fig.xray.mock.invocationCallOrder[0]).toBeLessThan(f.me.fig.outline.mock.invocationCallOrder[0])
+  expect(f.me.fig.lighten).toHaveBeenCalledOnce()
+  expect(f.me.fig.lighten.mock.calls[0][0]).toBeGreaterThan(0)
+  expect(f.me.fig.lighten.mock.calls[0][0]).toBeLessThan(1)
+  expect(f.people[0].fig.lighten).not.toHaveBeenCalled()
   expect(f.people[0].fig.outline).toHaveBeenCalledExactlyOnceWith(false)
   expect(f.people[1].fig.outline).toHaveBeenCalledExactlyOnceWith(true)
   expect(f.walker.fig.outline).toHaveBeenCalledExactlyOnceWith(true)
@@ -55,6 +59,7 @@ it("skips the preview player while still synchronizing the other outlines", () =
   f.outlines.update(true)
   expect(f.me.fig.xray).not.toHaveBeenCalled()
   expect(f.me.fig.outline).not.toHaveBeenCalled()
+  expect(f.me.fig.lighten).not.toHaveBeenCalled()
   expect(f.people[1].fig.outline).toHaveBeenCalledExactlyOnceWith(true)
   expect(outlineShape).toHaveBeenCalledTimes(2)
 })

@@ -4,7 +4,7 @@ import * as THREE from "three"
 export class PixelCamera {
   readonly camera = new THREE.PerspectiveCamera(32, 1, 0.5, 200)
   readonly focus: THREE.Vector3
-  private readonly pitch = 0.82
+  private readonly pitch: number
   private readonly deadZone = 0.15
   private centring = false
   private level = 0
@@ -18,12 +18,21 @@ export class PixelCamera {
   private readonly onResize: (width: number, height: number, scale: number) => void
   /** Screen pixels per rendered pixel, from the furthest zoom out; values below one render finer pixels. */
   private readonly zooms: readonly number[]
-  constructor(inputProps2: { position: THREE.Vector3; pixelsPerUnit: number; onResize: (width: number, height: number, scale: number) => void; zooms?: readonly number[]; level?: number }) {
+  constructor(inputProps2: {
+    position: THREE.Vector3
+    pitch: number
+    pixelsPerUnit: number
+    onResize: (width: number, height: number, scale: number) => void
+    zooms?: readonly number[]
+    level?: number
+  }) {
     const position = inputProps2.position
+    const pitch = inputProps2.pitch
     const pixelsPerUnit = inputProps2.pixelsPerUnit
     const onResize = inputProps2.onResize
     const zooms = inputProps2.zooms === undefined ? [1, 2, 3, 4] : inputProps2.zooms
     const level = inputProps2.level === undefined ? 0 : inputProps2.level
+    this.pitch = pitch
     this.pixelsPerUnit = pixelsPerUnit
     this.onResize = onResize
     this.zooms = zooms
