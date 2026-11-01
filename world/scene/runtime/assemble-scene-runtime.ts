@@ -15,7 +15,7 @@ import { createResidentNameplate } from "#/world/scene/runtime/create-resident-n
 import { SceneSpeech } from "#/world/scene/runtime/scene-speech"
 import { SceneInteractions } from "#/world/scene/runtime/scene-interactions"
 import { SceneMovement } from "#/world/scene/runtime/scene-movement"
-import { createSceneRenderer } from "#/world/scene/runtime/create-scene-renderer"
+import { createSceneRenderer, keepPrograms } from "#/world/scene/runtime/create-scene-renderer"
 import { createSceneRoot } from "#/world/scene/runtime/create-scene-root"
 import { createSceneCamera } from "#/world/scene/runtime/create-scene-camera"
 import { createWalkMarkers } from "#/world/scene/runtime/create-walk-markers"
@@ -230,6 +230,7 @@ export async function assembleSceneRuntime(props: SceneBuildProps & { resources:
   /** Release all construction resources together when the map is left. */
   function dispose() {
     resources.release(lifecycle)
+    keepPrograms(renderer)
     resources.dispose()
   }
 
