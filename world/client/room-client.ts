@@ -89,7 +89,7 @@ export class RoomClient {
       if (event.code === 4001) {
         socket.close()
         this.target.update({ connectionReplaced: true })
-        this.target.notify("このキャラクターは別の画面で開かれました。", "bad")
+        this.target.notify("このキャラクターは別の画面で開かれた。", "bad")
       }
       this.target.update({
         online: "offline",

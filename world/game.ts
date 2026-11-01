@@ -119,7 +119,7 @@ export class Game {
       this.session.playerId = await this.loadId()
     } catch {
       if (version === this.mountVersion)
-        this.update({ failed: true, failureMessage: "キャラクターを読み込めなかった。接続と、このキャラクターで遊んだブラウザかどうかを確かめてください。保存データは変更していません。" })
+        this.update({ failed: true, failureMessage: "保存された内容はそのまま残っている。" })
       return
     }
     if (version !== this.mountVersion) return

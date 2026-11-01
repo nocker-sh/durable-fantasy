@@ -8,7 +8,7 @@ export function Offline() {
   if (!lost) return null
   if (replaced)
     return (
-      <Between title="別の画面で開かれました">
+      <Between title="別の画面で開かれた">
         <button type="button" onClick={() => location.reload()} className="text-sm text-[#d8d4cc]">
           この画面で再開
         </button>

@@ -2,7 +2,7 @@ import type { SkillDef } from "#/world/core/skill-types"
 import { weaponsOf } from "#/world/core/items/weapons-of"
 
 export const SKILLS = {
-  sit: { kind: "action", name: "座る", sp: 0, cooldown: 0, text: "道ばたでも腰を下ろして休める。座っている間は HP と SP が倍の速さで戻る（Z キー）。" },
+  sit: { kind: "action", name: "座る", sp: 0, cooldown: 0, text: "道ばたでも腰を下ろして休める。座っている間は HP と SP が倍の速さで戻る。" },
   "first-aid": { kind: "action", name: "応急手当", sp: 3, cooldown: 4000, text: "薬草を一つ使い、傷を洗って当てる。調合の腕があるほどよく効く。" },
   chop: { kind: "strike", name: "薪割り", sp: 4, cooldown: 6000, weapons: ["wood-axe", "steel-axe"], needs: { woodcutting: 4, str: 8 }, power: 1.8, text: "薪を割る要領で、斧を真上から振り下ろす。" },
   fell: {

@@ -81,7 +81,6 @@ export function CraftWindow() {
           )
         })}
       </ul>
-      <p className="mt-2 font-body text-[11px] text-text-faint">{GATHER_SKILL_NAME[recipes[0]?.skill ?? "cooking"]}の腕は作るほど上がる。作った物には、あなたの名前が付く。</p>
     </Window>
   )
 }

@@ -46,8 +46,7 @@ export class PlayerActions {
     const player = this.target.session.state.get().player
     if (player && spot.needsTool && !gatheringTool(player, spot.skill)) {
       const tool = { woodcutting: "斧", fishing: "釣り竿", foraging: "鎌" }[spot.skill]
-      const prepare = spot.skill === "woodcutting" ? "持ち物に入れるか、装備して" : "持ち物に入れて"
-      this.target.notify(`${tool}が必要。耐久の残った道具を${prepare}から採集しよう。`, "bad")
+      this.target.notify(`使える${tool}を持っていない。`, "bad")
       return false
     }
     this.target.getScene()?.playAction(spot.kind === "tree" ? "chop" : spot.kind === "fish" ? "draw" : "scrub", spot.cell)
@@ -130,7 +129,7 @@ export class PlayerActions {
     // Preview the same recovery and cost rules; only the server commits the result.
     const preview = apply(p, { type: "art", skill }, { now: Date.now() })
     if (!preview.ok) return this.target.notify(REASON_TEXT[preview.reason], "bad")
-    if (!this.target.session.fighting || performance.now() - this.target.session.fighting.at > 4000) return this.target.notify("戦っている相手がいない。生き物をクリックしてから使おう。", "bad")
+    if (!this.target.session.fighting || performance.now() - this.target.session.fighting.at > 4000) return this.target.notify("戦っている相手がいない。", "bad")
     this.target.session.socket?.send({ type: "attack", monster: this.target.session.fighting.monster, art: skill })
   }
 

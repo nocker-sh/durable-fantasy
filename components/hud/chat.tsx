@@ -3,7 +3,6 @@ import type { FormEvent } from "react"
 import { useGame } from "#/hooks/use-game"
 import { useGameState } from "#/hooks/use-game-state"
 import { Input } from "#/components/game/input"
-import { Kbd } from "#/components/game/kbd"
 import { Window } from "#/components/game/window"
 import { useWindow } from "#/components/hud/use-window"
 import { NAME_COLOR } from "#/components/hud/name_color"
@@ -61,14 +60,14 @@ export function Chat() {
       </div>
       <form onSubmit={send} className="px-2.5 pt-1 pb-2.5">
         {typing ? (
-          <Input ref={input} value={text} maxLength={140} placeholder="メッセージを入力…（/p 仲間・/s 叫ぶ）" onChange={(e) => setText(e.target.value)} onBlur={() => !text && game.setTyping(false)} />
+          <Input ref={input} value={text} maxLength={140} placeholder="メッセージを入力…" onChange={(e) => setText(e.target.value)} onBlur={() => !text && game.setTyping(false)} />
         ) : (
           <button
             type="button"
             onClick={() => game.setTyping(true)}
             className="flex h-8 w-full cursor-text items-center gap-1.5 rounded-full bg-black/35 px-3.5 text-left font-body text-[13px] text-text-faint shadow-[inset_0_0_0_1px_rgb(255_255_255/0.1)]"
           >
-            メッセージを入力… <Kbd className="ml-auto">Enter</Kbd>
+            メッセージを入力…
           </button>
         )}
       </form>

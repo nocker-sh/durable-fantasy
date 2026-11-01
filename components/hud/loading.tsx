@@ -34,7 +34,7 @@ export function Loading() {
   const passage = useMemo(() => flavorFor(map).text, [map])
   if (departed)
     return (
-      <Between title="Durable Fantasy">
+      <Between title="町を離れた">
         <button type="button" onClick={() => location.reload()} className="text-sm text-[#d8d4cc]">
           町に戻る
         </button>

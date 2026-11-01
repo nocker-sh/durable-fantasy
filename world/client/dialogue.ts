@@ -165,8 +165,8 @@ export class DialogueActions {
         const batch = entry2[1]
 
         if (!batch.at.some((m) => within(m, from + 1, to + 1))) continue
-        const baked = shop === "bakery"
-        this.target.addChat({ channel: "npc", name: keeper, text: `${ITEMS[item].name}が${baked ? "焼けた" : "できた"}よ！${baked ? "焼きたてだよ。" : "温かいうちにどうぞ。"}` })
+        const verb = shop === "bakery" ? "焼けた" : ITEMS[item].use?.full ? "できた" : "入った"
+        this.target.addChat({ channel: "npc", name: keeper, text: `${ITEMS[item].name}が${verb}よ。` })
       }
     }
   }

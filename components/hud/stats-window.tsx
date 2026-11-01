@@ -95,7 +95,6 @@ export function StatsWindow() {
           })}
         </dl>
       </div>
-      <p className="mt-2 font-body text-[11px] leading-relaxed text-text-dim">能力値の横の加減算は装備の補正。装備・技の条件は補正前の能力値で判定します。</p>
     </Window>
   )
 }

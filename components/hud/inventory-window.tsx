@@ -62,18 +62,6 @@ export function InventoryWindow() {
             item={stack?.item}
             mark={stack}
             side="left"
-            hint={
-              stack &&
-              (trade
-                ? "右クリックで取引に出す"
-                : storage
-                  ? "右クリックで倉庫に預ける"
-                  : shop
-                    ? "右クリックで売る品に選ぶ"
-                    : ITEMS[stack.item].equip
-                      ? "ダブルクリックで装備"
-                      : "ダブルクリックで使う · ショートカットへドラッグ")
-            }
           >
             <Slot
               icon={stack ? game.iconUrl(stack.item, stack.by) : null}

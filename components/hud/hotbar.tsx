@@ -35,7 +35,7 @@ const MENU: { id: WindowId | "system"; label: string; icon: LucideIcon; keys: st
   { id: "skills", label: "スキル", icon: SquareStar, keys: "K" },
   { id: "worldmap", label: "地図", icon: Map, keys: "M" },
   { id: "friends", label: "糸をつないだ人", icon: Users, keys: "F" },
-  { id: "system", label: "設定", icon: Settings, keys: "Esc" },
+  { id: "system", label: "メニュー", icon: Settings, keys: "Esc" },
 ]
 
 export function Hotbar() {
@@ -103,7 +103,7 @@ export function Hotbar() {
                 />
                 <TooltipContent className="font-head text-xs">
                   {SKILLS[skill].name}
-                  {blocked ? `（${REASON_TEXT[blocked]}）` : seconds ? `（あと${seconds}秒）` : ""} ・ SP {SKILLS[skill].sp} ・ 右クリックで外す
+                  {blocked ? `（${REASON_TEXT[blocked]}）` : seconds ? `（あと${seconds}秒）` : ""} ・ SP {SKILLS[skill].sp}
                 </TooltipContent>
               </Tooltip>
             )
@@ -111,7 +111,7 @@ export function Hotbar() {
           const item = entry as ItemId | null
           const count = item && player ? countItem(player.bag, item) : 0
           return (
-            <ItemTooltip key={key} item={item} hint="クリックか数字キーで使う · 右クリックで外す">
+            <ItemTooltip key={key} item={item}>
               <Slot round icon={item ? game.iconUrl(item) : null} count={item ? count : undefined} dim={!!item && count === 0} keyHint={key} aria-label={`ショートカット ${key}`} {...drop_} />
             </ItemTooltip>
           )

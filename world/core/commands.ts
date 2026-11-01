@@ -185,7 +185,7 @@ export type GameEvent =
   | { type: "ordered"; commission: string; readyAt: number }
   | { type: "escrowed"; item: ItemId | null; q?: Quality; by?: string; gold: number }
   | { type: "received"; gold: number; items: number }
-  | { type: "looted"; monster: string; exp: number; items: readonly ItemId[]; level: number; gained: number }
+  | { type: "looted"; monster: string; exp: number; items: readonly ItemId[]; left?: readonly ItemId[]; level: number; gained: number }
   | { type: "collected"; item: ItemId; count: number; q: Quality | null; by: string }
   | { type: "crafted"; item: ItemId; count: number; q: Quality | null; skill: CraftSkill; level: number; up: boolean; fee: number }
   | { type: "spoiled"; recipe: string; skill: CraftSkill; level: number; up: boolean; fee: number }
@@ -234,27 +234,27 @@ export const REASON_TEXT: Record<Reason, string> = {
   NOT_OWNED: "それを持っていない。",
   NO_POINTS: "能力ポイントが足りない。",
   STAT_MAX: "これ以上は上げられない。",
-  TOO_FAR: "遠すぎる。もっと近づいて。",
-  LIFE_CHANGED: "生活スキルの経験が変わった。もう一度確認してほしい。",
-  LIFE_EQUIPPED: "このスキルが必要な装備を先に外してほしい。",
+  TOO_FAR: "遠すぎる。",
+  LIFE_CHANGED: "生活スキルの経験が変わった。",
+  LIFE_EQUIPPED: "このスキルが要る装備を身につけている。",
   NO_LIFE_EXP: "まだ忘れる経験がない。",
   OFFLINE: "接続が切れている。",
   TOO_FULL: "もうお腹いっぱいだ。",
   NOTHING_TO_GAIN: "いまは食べても飲んでも変わらない。",
   CLOSED: "いまは店番がいない。",
-  SOLD_OUT: "売り切れだ。次の焼き上がりを待とう。",
-  PRICE_CHANGED: "値段が変わった。もう一度見てから買おう。",
-  EXHAUSTED: "くたくたで、これ以上は進めない。何か食べよう。",
+  SOLD_OUT: "売り切れだ。",
+  PRICE_CHANGED: "値段が変わった。",
+  EXHAUSTED: "くたくたで、これ以上は進めない。",
   NO_TOOL: "道具がない。",
-  SPENT: "取り尽くされている。少し待てば戻る。",
+  SPENT: "取り尽くされている。",
   WRONG_STATION: "ここでは作れない。",
   NOT_SKILLED: "まだ腕が足りない。",
   MISSING_INPUTS: "材料が足りない。",
-  TOO_MANY_ORDERS: "頼めるのは三つまで。先に受け取ろう。",
+  TOO_MANY_ORDERS: "頼めるのは三つまで。",
   NOT_READY: "まだできていない。",
-  ORDER_CHANGED: "品物を選び直して。",
-  ITEM_CHANGED: "品物を選び直して。",
-  NOT_WANTED: "もう十分ある。今は買い取れない、と言われた。",
+  ORDER_CHANGED: "品物が変わった。",
+  ITEM_CHANGED: "品物が変わった。",
+  NOT_WANTED: "今は買い取ってもらえない。",
   NO_ERRAND: "今日はもう頼まれていない。",
   TOO_MANY_ERRANDS: "頼まれごとは一度に三つまで。",
   FALLEN: "倒れていて動けない。",

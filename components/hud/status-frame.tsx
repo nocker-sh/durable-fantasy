@@ -63,16 +63,16 @@ function Body(inputProps2: { full: number; fullAt: number; warmUntil: number; fo
   const warm = Math.max(0, Math.ceil((warmUntil - now) / 60_000))
   return (
     <div className="mt-0.5 flex flex-wrap items-center gap-3 font-head text-[11px] leading-none text-text-dim ui-text-shadow">
-      <span className="flex items-center gap-1" title="満腹（食べ過ぎると食べられない）">
+      <span className="flex items-center gap-1" title="満腹度">
         <img src={uiIconUrl("full", 14)} alt="" className="size-[14px]" />
         {f >= 80 ? "満腹" : f >= 40 ? "腹八分" : f > 0 ? "小腹" : "空腹"}
       </span>
-      <span className={warm ? "flex items-center gap-1 text-[#f0b060]" : "flex items-center gap-1 opacity-60"} title="温まり（外の寒さでスタミナが余計に減らない）">
+      <span className={warm ? "flex items-center gap-1 text-[#f0b060]" : "flex items-center gap-1 opacity-60"} title="温まり：寒さでスタミナが減りにくい">
         <img src={uiIconUrl("warm", 14)} alt="" className={warm ? "size-[14px]" : "size-[14px] grayscale"} />
         {warm ? `温まっている ${warm}分` : "冷えている"}
       </span>
       {focus > 0 && (
-        <span className="text-good" title="集中（SPの自然回復量 +1）">
+        <span className="text-good" title="集中：SP自然回復 +1">
           集中 {focus}分
         </span>
       )}

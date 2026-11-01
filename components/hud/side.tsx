@@ -21,7 +21,7 @@ export function Side(inputProps: { title: string; side: TradeSideView; onPick?: 
       </div>
       <div className={`ui-well grid grid-cols-4 gap-1 p-1.5 ${side.locked ? "shadow-[inset_0_0_0_1px_var(--color-good)]" : ""}`}>
         {Array.from({ length: TRADE_LOTS }, (_, i) => side.stacks[i] ?? null).map((s, i) => (
-          <ItemTooltip key={i} item={s?.item} mark={s ?? undefined} side="left" hint={s && onPick ? "右クリックで下げる" : undefined}>
+          <ItemTooltip key={i} item={s?.item} mark={s ?? undefined} side="left">
             <Slot
               icon={s ? game.iconUrl(s.item, s.by) : null}
               rarity={s ? ITEMS[s.item].rarity : undefined}

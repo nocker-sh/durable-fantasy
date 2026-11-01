@@ -128,11 +128,11 @@ describe("the creatures outside town", () => {
     expect(up.ok && apply(up.state, { type: "revive" }, { now: 600_001 })).toEqual({ ok: false, reason: "NOT_FALLEN" })
   })
 
-  it("past level 5, falling costs 1% of what the next level needs", () => {
+  it("past level 5, falling costs 5% of what the next level needs", () => {
     const p = player({ hp: 1, level: 10, exp: 500 })
     const fell = apply(p, { type: "hurt", amount: 5, by: "スライム" }, { now: 1 })
     const up = fell.ok ? apply(fell.state, { type: "revive" }, { now: 2 }) : fell
-    expect(up.ok && up.state.exp).toBe(500 - Math.floor(expToNext(10) / 100))
+    expect(up.ok && up.state.exp).toBe(Math.max(0, 500 - Math.floor(expToNext(10) / 20)))
   })
 
   it("HP and SP come back every twenty seconds while up, more with VIT and MND, twice sitting, up to the most", () => {

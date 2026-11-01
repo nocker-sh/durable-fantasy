@@ -103,7 +103,7 @@ function Worn(inputProps: { slot: SlotId }) {
     if (drag && "slot" in drag && slotsFor(drag.item).includes(slot)) game.equip(drag.slot, slot, drag.stack)
   }
   return (
-    <ItemTooltip item={item} mark={mark} side="left" hint="ダブルクリックで外す">
+    <ItemTooltip item={item} mark={mark} side="left">
       <Slot
         icon={item ? game.iconUrl(item, mark?.by) : null}
         rarity={item ? ITEMS[item].rarity : undefined}

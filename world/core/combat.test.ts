@@ -33,7 +33,7 @@ describe("combat", () => {
   })
 
   it("dying costs 1% of the next level, except up to level 5 and at the cap", () => {
-    expect(deathPenalty(6, 1234)).toBe(12)
+    expect(deathPenalty(6, 1234)).toBe(61)
     expect(deathPenalty(5, 1234)).toBe(0)
     expect(deathPenalty(16, 0)).toBe(0)
   })

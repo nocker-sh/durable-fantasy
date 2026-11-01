@@ -1,5 +1,5 @@
 // What an item is (ui.md §6.5), shown on hover wherever an item appears.
-import type { ReactElement, ReactNode } from "react"
+import type { ReactElement } from "react"
 import { usePlayerIfAny } from "#/hooks/use-player-if-any"
 import { fullDurability } from "#/world/core/full-durability"
 import { artsOf } from "#/world/core/arts-of"
@@ -31,14 +31,12 @@ export function ItemTooltip(inputProps: {
   item: ItemId | null | undefined
   /** a made thing's quality and maker */ mark?: { q?: Quality; by?: string; dur?: number } | null
   children: ReactElement
-  hint?: ReactNode
   side?: "top" | "right" | "left" | "bottom"
   /** hold it open (dev previews) */ open?: boolean
 }) {
   const item = inputProps.item
   const mark = inputProps.mark
   const children = inputProps.children
-  const hint = inputProps.hint
   const sideValue = inputProps.side
   const side = sideValue === undefined ? "top" : sideValue
   const open = inputProps.open
@@ -193,7 +191,6 @@ export function ItemTooltip(inputProps: {
           <dt className="text-text-dim">売値</dt>
           <dd className="text-right">{sellable(item) ? <Gold amount={d.made ? Math.max(1, Math.floor(sellPrice(item) * QUALITY_PRICE[q])) : sellPrice(item)} /> : "売れない"}</dd>
         </dl>
-        {hint && <p className="mt-1.5 text-[11px] text-text-faint">{hint}</p>}
       </TooltipContent>
     </Tooltip>
   )

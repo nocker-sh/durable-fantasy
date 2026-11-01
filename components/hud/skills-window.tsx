@@ -119,9 +119,6 @@ export function SkillsWindow() {
               )
             })}
           </ul>
-          <p className="mt-1 font-body text-[11px] text-text-faint">
-            道具があれば誰でもできる。採るほど、作るほど上がる。合計が {LIFE_TOTAL_CAP} に届くと、どれも上がらなくなる。専門を変えたいときは、経験を忘れて合計に空きを作れる。
-          </p>
         </section>
         <section>
           <h3 className="mb-1 font-head text-xs text-brass-hi">動作</h3>
@@ -132,8 +129,7 @@ export function SkillsWindow() {
           </ul>
         </section>
         <section>
-          <h3 className="mb-1 font-head text-xs text-brass-hi">戦技と魔法</h3>
-          <p className="mb-1 font-body text-[11px] text-text-dim">戦技・術は、生き物をクリックして戦い始めてから使う。アイコンをショートカットバーへドラッグしても使える。</p>
+          <h3 className="mb-1 font-head text-xs text-brass-hi">戦技と術</h3>
           {held.length ? (
             <ul className="flex flex-col gap-1">
               {held.map((id) => (
@@ -174,7 +170,7 @@ function SkillRow(inputProps: { id: SkillId; player: PlayerState; now: number })
   return (
     <li className="ui-well flex flex-col gap-1 p-2">
       <div className="flex items-center gap-2">
-        <img src={icon} alt="" draggable title="ショートカットバーへドラッグ" onDragStart={(e) => startDrag(e, { skill: id }, icon)} className={`size-6 cursor-grab ${blocked ? "opacity-40" : ""}`} />
+        <img src={icon} alt="" draggable onDragStart={(e) => startDrag(e, { skill: id }, icon)} className={`size-6 cursor-grab ${blocked ? "opacity-40" : ""}`} />
         <span className="font-body text-[13px]">{sk.name}</span>
         <span className="font-head text-[11px] text-text-dim">
           {KIND[sk.kind]}

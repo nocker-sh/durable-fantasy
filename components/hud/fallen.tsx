@@ -9,9 +9,9 @@ export function Fallen() {
   const game = useGame()
   const player = useGameState((s) => s.player)
   if (!player || player.hp > 0) return null
-  const lost = deathPenalty(player.level, expToNext(player.level))
+  const lost = Math.min(player.exp, deathPenalty(player.level, expToNext(player.level)))
   return (
-    <Between title="倒れた" passage={lost ? `経験値 ${lost} を失った` : "失ったものはない"}>
+    <Between title="倒れた" passage={lost ? `町へ戻ると経験値を ${lost} 失う` : undefined}>
       <button type="button" onClick={() => game.revive()} className="text-[12px] tracking-[0.2em] text-[#9a968e] underline-offset-4 hover:underline">
         町へ戻る
       </button>

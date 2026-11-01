@@ -117,10 +117,9 @@ export function CharacterScreen() {
             ))}
           </div>
         </div>
-        {!creating && <p className="font-body text-xs leading-relaxed text-text-dim">名前と見た目は、ほかのプレイヤーにも見える。あとから変更できる。</p>}
         {name && !parsedName.success && (
           <p role="alert" className="text-xs">
-            名前には空白だけの文字列や制御文字は使えません。
+            この名前は使えない。
           </p>
         )}
         {error && (
@@ -130,7 +129,7 @@ export function CharacterScreen() {
         )}
         {online !== "online" && (
           <p role="status" className="text-xs">
-            接続が戻るまで、このままお待ちください。
+            接続が戻るのを待っている。
           </p>
         )}
         <div className={creating ? "creation-submit" : "mt-auto flex justify-end gap-2"}>
@@ -150,9 +149,9 @@ export function CharacterScreen() {
                 if (await game.setProfile({ name: name, look: look, neck: neck, neckRamp: ramp })) {
                   writeProfileDraft(localStorage, null)
                   game.openModal(null)
-                } else setError("保存できませんでした。内容を確認して、もう一度お試しください。")
+                } else setError("保存できなかった。")
               } catch {
-                setError("保存できませんでした。もう一度お試しください。")
+                setError("保存できなかった。")
               } finally {
                 setSaving(false)
               }

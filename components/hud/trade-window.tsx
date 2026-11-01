@@ -1,5 +1,4 @@
 import { useState } from "react"
-import { TRADE_LOTS } from "#/world/core/trade-rules"
 import { useGame } from "#/hooks/use-game"
 import { useGameState } from "#/hooks/use-game-state"
 import { Button } from "#/components/game/button"
@@ -38,7 +37,6 @@ export function TradeWindow() {
         />
         <Side title={`${trade.name}が出すもの`} side={theirs} />
       </div>
-      <p className="mt-2 font-body text-[12px] text-text-dim">持ち物を右クリックすると、取引に出せる（{TRADE_LOTS}つまで）。どちらかが出す物を変えると、決定は取り消される。</p>
       <div className="mt-2 flex items-center gap-2 font-head text-xs">
         <label className="flex items-center gap-1.5 text-text-dim">
           お金 <Input value={gold} placeholder={String(mine.gold)} disabled={mine.locked} onChange={(e) => setGold(e.target.value.replace(/\D/g, ""))} className="h-7 w-24 text-xs" />G

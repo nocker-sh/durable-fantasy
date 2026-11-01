@@ -35,7 +35,7 @@ export function ErrandsWindow() {
             </li>
           )
         })}
-        {!today.length && <li className="font-body text-[12px] text-text-faint">住民に話しかけると、頼みごとをされることがある。頼まれごとはその日のうちに。</li>}
+        {!today.length && <li className="font-body text-[12px] text-text-faint">今日はまだ何も引き受けていない。</li>}
       </ul>
       <p className="mb-1 font-head text-xs text-brass-hi">親しい人</p>
       <ul className="ui-scroll flex max-h-48 flex-col gap-1 overflow-y-auto pr-1">

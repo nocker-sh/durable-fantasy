@@ -107,7 +107,7 @@ it.each([
   expect(await actions.gather(NODES.find((node) => node.kind === kind)!.id)).toBe(false)
   expect(run).not.toHaveBeenCalled()
   expect(getScene).not.toHaveBeenCalled()
-  expect(notify).toHaveBeenCalledWith(expect.stringContaining(`${name}が必要`), "bad")
+  expect(notify).toHaveBeenCalledWith(expect.stringContaining(`使える${name}を持っていない`), "bad")
 })
 
 it("accepts an equipped usable axe without requiring another in the bag", async () => {

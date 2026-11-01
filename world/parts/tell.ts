@@ -24,7 +24,10 @@ export function tell(event: GameEvent, me: string | undefined): Told {
   const name = (id: ItemId, by?: string) => displayName(id, by)
   if (event.type === "looted") {
     const what = event.items.map((i) => ITEMS[i].name).join("、")
-    chat(`${MONSTER_KINDS[spawnOf(event.monster)?.kind ?? "slime"].name}を追い払った。経験値 +${event.exp}${what ? `、${what}を拾った` : ""}。`)
+    const kind = spawnOf(event.monster)?.kind
+    const gains = [event.exp ? `経験値 +${event.exp}` : "", what ? `${what}を手に入れた` : ""].filter(Boolean).join("、")
+    chat(`${kind ? `${MONSTER_KINDS[kind].name}を` : ""}追い払った。${gains ? `${gains}。` : ""}`)
+    if (event.left?.length) notify(`持ちきれず、${event.left.map((i) => ITEMS[i].name).join("、")}を置いてきた。`, "bad")
     if (event.gained) notify(`レベルが ${event.level} に上がった！`, "good")
     return out
   }
@@ -34,16 +37,17 @@ export function tell(event: GameEvent, me: string | undefined): Told {
     return out
   }
   if (event.type === "received") {
-    notify(`掲示板から受け取った: ${event.gold}G、品物 ${event.items}個。`, "good")
+    notify(`掲示板から ${event.gold}G と品物 ${event.items} 個を受け取った。`, "good")
     return out
   }
   if (event.type === "shared") {
-    chat(`仲間が${MONSTER_KINDS[spawnOf(event.monster)?.kind ?? "slime"].name}を追い払った。経験値 +${event.exp}。`)
+    const kind = spawnOf(event.monster)?.kind
+    if (event.exp) chat(`仲間が${kind ? `${MONSTER_KINDS[kind].name}を` : ""}追い払った。経験値 +${event.exp}。`)
     if (event.gained) notify(`レベルが ${event.level} に上がった！`, "good")
     return out
   }
   if (event.type === "threaded") {
-    notify(`${event.name}とマフラーの糸を交換した。糸をたどれば、その人の町へ行ける。`, "good")
+    notify(`${event.name}とマフラーの糸を交換した。`, "good")
     return out
   }
   if (event.type === "partied" || event.type === "sat" || event.type === "stood") {
@@ -54,7 +58,6 @@ export function tell(event: GameEvent, me: string | undefined): Told {
     return out
   }
   if (event.type === "art") {
-    notify(`${SKILLS[event.skill].name}！`, "good")
     return out
   }
   if (event.type === "traded-in" || event.type === "traded-out") {
@@ -69,11 +72,11 @@ export function tell(event: GameEvent, me: string | undefined): Told {
     return out
   }
   if (event.type === "fell") {
-    notify(`${event.by}に叩き返されて、倒れた。`, "bad")
+    notify(`${event.by}にやられて、倒れた。`, "bad")
     return out
   }
   if (event.type === "revived") {
-    notify(event.lost ? `町で気がついた。経験値を ${event.lost} 失った。` : "町で気がついた。", "good")
+    notify(event.lost ? `町で気がついた。経験値を ${event.lost} 失った。` : "町で気がついた。", event.lost ? "bad" : "info")
     return out
   }
   if (event.type === "hurt") {
@@ -85,10 +88,7 @@ export function tell(event: GameEvent, me: string | undefined): Told {
     return out
   }
   if (event.type === "errand-done") {
-    const known = Object.entries(event.friends)
-      .map((entry) => `${entry[0]} ${entry[1]}`)
-      .join("、")
-    notify(`頼まれごとを済ませた。${event.gold}G を受け取った（親しさ: ${known}）。`, "good")
+    notify(`頼まれごとを済ませた。${event.gold}G を受け取った。`, "good")
     return out
   }
   if (event.type === "ordered") {

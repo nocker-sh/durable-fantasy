@@ -204,11 +204,11 @@ export class ServerMessages {
           return
         }
         if (message.what === "party-chat") {
-          this.target.addChat({ channel: "system", text: message.reason === "RATE_LIMIT" ? "少し間をあけて話そう。" : "パーティに入ってから話そう。" })
+          this.target.addChat({ channel: "system", text: message.reason === "RATE_LIMIT" ? "続けては話せない。" : "パーティに入っていない。" })
           return
         }
         if (message.what === "art") {
-          this.target.notify(REASON_TEXT[message.reason && message.reason in REASON_TEXT ? (message.reason as Reason) : "COOLDOWN"], "bad")
+          this.target.notify(message.reason && message.reason in REASON_TEXT ? REASON_TEXT[message.reason as Reason] : "使えなかった。", "bad")
           return
         }
         if (message.what === "attack") {
@@ -216,7 +216,7 @@ export class ServerMessages {
             scene?.stopFight(message.monster)
             if (this.target.session.fighting?.monster === message.monster) this.target.session.fighting = null
           }
-          this.target.notify(REASON_TEXT[message.reason && message.reason in REASON_TEXT ? (message.reason as Reason) : "EXHAUSTED"], "bad")
+          this.target.notify(message.reason && message.reason in REASON_TEXT && message.reason !== "NOT_READY" ? REASON_TEXT[message.reason as Reason] : "攻撃できなかった。", "bad")
           return
         }
         if (message.what === "warp") {

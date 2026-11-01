@@ -11,17 +11,18 @@ import type { ItemId } from "#/world/core/items/catalog"
 export function loot(state: PlayerState, command: Extract<ServerCommand, { type: "loot" }>): Transition {
   const collected = { bag: state.bag }
   const kept: ItemId[] = []
+  const left: ItemId[] = []
   for (const item of command.items) {
     const next = addItem({ bag: collected.bag, item, count: 1 })
     if (next) {
       collected.bag = next
       kept.push(item)
-    }
+    } else left.push(item)
   }
   const grown = growCombatPlayer(state, command.exp)
 
   return accept(
     { ...grown.state, bag: collected.bag, stamina: Math.max(0, state.stamina - FIGHT_STAMINA) },
-    { type: "looted", monster: command.monster, exp: command.exp, items: kept, level: grown.state.level, gained: grown.gained },
+    { type: "looted", monster: command.monster, exp: command.exp, items: kept, left: left, level: grown.state.level, gained: grown.gained },
   )
 }

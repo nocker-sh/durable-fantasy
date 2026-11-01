@@ -36,7 +36,7 @@ export function FriendsWindow() {
             </Button>
           </li>
         ))}
-        {!threads.length && <li className="font-body text-[12px] text-text-faint">まだ誰とも糸を交換していない。別れ際、そばにいる人の名札を押すと、マフラーの糸を交換できる。</li>}
+        {!threads.length && <li className="font-body text-[12px] text-text-faint">まだ誰とも糸を交換していない。</li>}
       </ul>
     </Window>
   )

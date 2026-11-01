@@ -80,7 +80,7 @@ export function StorageWindow() {
         }}
       >
         {lots.map((lot, index) => (
-          <ItemTooltip key={index} item={lot?.item} mark={lot} side="left" hint={lot && "クリックで個数を選ぶ・右クリックで全部引き取る"}>
+          <ItemTooltip key={index} item={lot?.item} mark={lot} side="left">
             <Slot
               icon={lot ? game.iconUrl(lot.item, lot.by) : null}
               rarity={lot ? ITEMS[lot.item].rarity : undefined}
@@ -110,7 +110,7 @@ export function StorageWindow() {
             </Button>
           </>
         ) : (
-          <span className="text-text-dim">品物を選ぶと、個数を決めて引き取れます。</span>
+          null
         )}
       </div>
       {preview && !preview.ok && (
