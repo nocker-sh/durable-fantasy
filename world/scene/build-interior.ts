@@ -378,7 +378,8 @@ export function buildInterior(it: Interior) {
       addSprite({ root: g, b: hanging(k, seed + i), x: 0, y: y0 + WALL_H - 34 / GPPU, z: 0 })
     })
     if (it.authored) for (const fixture of it.lamps ?? []) root.add(hangingLantern({ f: fixture, floorY: y0, scale: ROOM_SCALE, house: it.house.id }))
-    else lamp({ root: root, x: (it.x0 + it.x1) / 2, z: (it.z0 + it.z1) / 2 + 0.6, y0: y0 })
+    // no open flame hangs over the hay of a barn or in a coop
+    else if (it.house.kind !== "farm") lamp({ root: root, x: (it.x0 + it.x1) / 2, z: (it.z0 + it.z1) / 2 + 0.6, y0: y0 })
     if (it.house.id === "h-m5" && !it.authored) noticeBoard({ root: root, x: (it.keeper[0] + 0.5) / 2, z: it.z0 + 0.06, y0: y0 })
 
     // the walk grid is the server's, exactly

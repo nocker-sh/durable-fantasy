@@ -6,6 +6,8 @@ export function useOf(name: string): Use {
   if (/土間/.test(name)) return "土間"
   if (/台所/.test(name) && !/居間/.test(name)) return "台所"
   if (/客室/.test(name)) return "客室"
+  // where the children are minded by day, not where anyone sleeps
+  if (/子守り/.test(name)) return "食事"
   if (/寝|寝所/.test(name)) return "寝間"
   if (/倉|貯蔵|物置|置き場|酒蔵|乾燥|干し草|農具/.test(name)) return "貯蔵"
   if (/鶏/.test(name)) return "家畜"
