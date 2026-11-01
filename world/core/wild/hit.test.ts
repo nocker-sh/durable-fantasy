@@ -1,11 +1,11 @@
 import { expect, it } from "vitest"
-import { COUNTER_MAX, MONSTER_KINDS, SPAWNS } from "#/world/core/monsters"
+import { COUNTER_INTERVAL, COUNTER_MAX, MONSTER_KINDS, SPAWNS } from "#/world/core/monsters"
 import { emptyWild } from "#/world/core/wild/empty-wild"
 import { hit } from "#/world/core/wild/hit"
 
 const slime = SPAWNS.find((s) => s.kind === "slime")!
 const hare = SPAWNS.find((s) => s.kind === "hare")!
-const interval = MONSTER_KINDS.slime.interval
+const interval = MONSTER_KINDS.slime.interval ?? COUNTER_INTERVAL
 
 it("lets the holder's party mates strike the same creature, but not strangers or another party", () => {
   const first = hit({ state: emptyWild(), id: slime.id, damage: 5, now: 0, player: "a", party: "p" })

@@ -1,4 +1,4 @@
-import { MONSTER_KINDS } from "#/world/core/monsters"
+import { COUNTER_INTERVAL, MONSTER_KINDS } from "#/world/core/monsters"
 import { spawnOf } from "#/world/core/spawn-of"
 import { about } from "#/world/core/wild/about"
 import { countersDue } from "#/world/core/wild/counters-due"
@@ -23,7 +23,7 @@ export function hit(props: Props): HitResult {
   const hp = Math.max(0, hpOf(props.state, props.id, props.now) - props.damage)
   const by = { ...props.state.by }
   if (hp > 0) {
-    const timing = countersDue({ fight, now: props.now, interval: kind.interval })
+    const timing = countersDue({ fight, now: props.now, interval: kind.interval ?? COUNTER_INTERVAL })
     const next = { player: props.player, at: props.now, ...(props.party ? { party: props.party } : {}), next: timing.next }
     return { state: { ...props.state, hp: { ...props.state.hp, [props.id]: hp }, by: { ...by, [props.id]: next } }, hp, beaten: false, counters: kind.atk > 0 ? timing.counters : 0, refused: false }
   }

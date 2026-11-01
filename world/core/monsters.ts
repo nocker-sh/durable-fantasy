@@ -130,5 +130,7 @@ export const CLAIM_MS = 30_000
  * land when its opponent strikes again, so a long pause is not charged in full (backlog.md).
  */
 export const COUNTER_MAX = 3
+/** A creature's time between blows when its kind does not name one. */
+export const COUNTER_INTERVAL = 2000
 /** Stamina a fight costs when it is won. */
 export const FIGHT_STAMINA = 2
