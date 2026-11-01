@@ -1,0 +1,51 @@
+import type { MonsterDraft } from "#/world/core/monster-draft-types"
+
+/** A looping caterpillar striped like a measuring stick that always steps the same length, the last of a wartime ranging crawler. */
+export const draft: MonsterDraft = {
+  home: "south-meadow",
+  life: "草の葉をかじって食べ、草の茎に体をまっすぐ伸ばして小枝のふりをして休む。人が近づくと伸びたまま動かなくなり、叩かれると頭を振ってぶつかってくる。",
+  origin: "大戦で歩いた歩数で距離を測った兵器の子孫。いつも同じ幅で進む歩き方と背の縞が残った。",
+  kind: {
+    name: "物差し虫",
+    hp: 24,
+    def: 1,
+    flee: 6,
+    atk: 2,
+    hit: 6,
+    exp: 8,
+    respawn: 100,
+    look: "figure",
+    size: 1.2,
+    drops: [
+      { item: "sticky-thread", chance: 0.35 },
+      { item: "herb", chance: 0.15 },
+    ],
+    figure: {
+      palette: { hide: 0x7e9254, belly: 0xa8b07a, dark: 0x3a3a2a, accent: 0xd4cca0 },
+      parts: [
+        { shape: "ball", size: [0.042, 0.042, 0.042], at: [0, 0.042, 0.15], paint: "hide" },
+        { shape: "ball", size: [0.042, 0.042, 0.042], at: [0, 0.119, 0.139], paint: "accent" },
+        { shape: "ball", size: [0.042, 0.042, 0.042], at: [0, 0.183, 0.106], paint: "hide" },
+        { shape: "ball", size: [0.042, 0.042, 0.042], at: [0, 0.227, 0.057], paint: "accent" },
+        { shape: "ball", size: [0.042, 0.042, 0.042], at: [0, 0.242, 0], paint: "hide" },
+        { shape: "ball", size: [0.042, 0.042, 0.042], at: [0, 0.227, -0.057], paint: "accent" },
+        { shape: "ball", size: [0.042, 0.042, 0.042], at: [0, 0.183, -0.106], paint: "hide" },
+        { shape: "ball", size: [0.042, 0.042, 0.042], at: [0, 0.119, -0.139], paint: "accent" },
+        { shape: "ball", size: [0.042, 0.042, 0.042], at: [0, 0.042, -0.15], paint: "hide" },
+        { shape: "ball", size: [0.046, 0.046, 0.044], at: [0, 0.048, 0.2], paint: "hide", swing: "nod", pivot: [0, 0.05, 0.16] },
+        { shape: "box", size: [0.014, 0.014, 0.014], at: [-0.026, 0.075, 0.225], paint: "eye", swing: "nod", pivot: [0, 0.05, 0.16] },
+        { shape: "rod", size: [0.003, 0.06, 0.005], at: [-0.027, 0.095, 0.248], turn: [0, 1.064, 1.043], paint: "dark", swing: "nod", pivot: [0, 0.05, 0.16] },
+        { shape: "box", size: [0.014, 0.014, 0.014], at: [0.026, 0.075, 0.225], paint: "eye", swing: "nod", pivot: [0, 0.05, 0.16] },
+        { shape: "rod", size: [0.003, 0.06, 0.005], at: [0.028, 0.095, 0.248], turn: [0, 2.078, 1.043], paint: "dark", swing: "nod", pivot: [0, 0.05, 0.16] },
+        { shape: "rod", size: [0.006, 0.036, 0.004], at: [-0.032, 0.02, 0.135], turn: [0, -2.554, 0.527], paint: "dark", swing: "stride-a", pivot: [-0.025, 0.035, 0.13] },
+        { shape: "rod", size: [0.006, 0.036, 0.004], at: [0.033, 0.02, 0.135], turn: [0, -0.588, 0.527], paint: "dark", swing: "stride-b", pivot: [0.025, 0.035, 0.13] },
+        { shape: "rod", size: [0.006, 0.036, 0.004], at: [-0.032, 0.02, 0.09], turn: [0, -2.554, 0.527], paint: "dark", swing: "stride-b", pivot: [-0.025, 0.035, 0.085] },
+        { shape: "rod", size: [0.006, 0.036, 0.004], at: [0.033, 0.02, 0.09], turn: [0, -0.588, 0.527], paint: "dark", swing: "stride-a", pivot: [0.025, 0.035, 0.085] },
+        { shape: "box", size: [0.022, 0.024, 0.026], at: [-0.03, 0.012, -0.13], paint: "belly" },
+        { shape: "box", size: [0.022, 0.024, 0.026], at: [0.03, 0.012, -0.13], paint: "belly" },
+        { shape: "box", size: [0.022, 0.024, 0.026], at: [-0.03, 0.012, -0.17], paint: "belly" },
+        { shape: "box", size: [0.022, 0.024, 0.026], at: [0.03, 0.012, -0.17], paint: "belly" },
+      ],
+    },
+  },
+}
