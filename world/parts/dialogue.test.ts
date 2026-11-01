@@ -1,5 +1,6 @@
 import { afterEach, expect, it, vi } from "vitest"
 import { choicesFor } from "#/world/parts/choices-for"
+import { menuFor } from "#/world/parts/menu-for"
 import { linesFor } from "#/world/parts/lines-for"
 import { createGameState } from "#/world/client/initial-state"
 import { player } from "#/world/test/player"
@@ -98,4 +99,17 @@ it.each(["beatrix-ingots", "gottfried-logs", "rudolf-fur"])("keeps the craftsper
   }
   const tomorrow = linesFor({ state: state, name: errand.from, spokenKey: "spoken", now: now + 86400000 })
   for (const line of lines) expect(tomorrow).not.toContain(line.text)
+})
+
+it("lets a keeper at the counter be asked to sell without talking first", () => {
+  const base = createGameState().get()
+  const state = { ...base, player: player(), clock: { ...base.clock, min: 18 * 60 } }
+  const menu = menuFor(choicesFor(state, "ハンス"))!
+  expect(menu[0]).toEqual({ label: "買い物をする", action: "shop" })
+  expect(menu.slice(-2)).toEqual([
+    { label: "話をする", action: "talk" },
+    { label: "さようなら", action: "close" },
+  ])
+  expect(menuFor(choicesFor(state, "マルタ"))).toBeNull()
+  expect(menuFor([{ label: "頼まれごとを聞く", action: "errand-ask", errand: "irmgard-herbs" }, { label: "さようなら", action: "close" }])).toBeNull()
 })

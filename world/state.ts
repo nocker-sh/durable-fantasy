@@ -32,7 +32,7 @@ export type ChatLine = {
 
 export type DialogueChoice = {
   label: string
-  action: "shop" | "commission" | "storage" | "close" | "errand-ask" | "errand-take" | "errand-hand"
+  action: "shop" | "commission" | "storage" | "talk" | "close" | "errand-ask" | "errand-take" | "errand-hand"
   /** the errand a choice is about (core/errands.ts) */
   errand?: string
 }
@@ -41,6 +41,7 @@ export type Dialogue = {
   resident: number
   name: string
   job: string
+  /** an empty single page is a menu: only the choices show */
   pages: readonly string[]
   page: number
   /** offered on the last page */

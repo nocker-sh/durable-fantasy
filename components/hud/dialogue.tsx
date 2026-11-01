@@ -39,17 +39,19 @@ export function DialogueBox() {
         <span className="font-head text-[13px] text-brass-hi ui-text-shadow">{dialogue.name}</span>
         <span className="font-head text-[11px] text-text-dim">{dialogue.job}</span>
       </div>
-      <button
-        type="button"
-        onClick={() => game.advanceDialogue()}
-        className="relative block min-h-[88px] w-full cursor-pointer px-6 pt-6 pb-4 text-left font-body text-[15px] leading-7 text-text ui-text-shadow"
-      >
-        {text.slice(0, shown)}
-        <span className="invisible">{text.slice(shown)}</span>
-        {done && !last && <span className="absolute right-5 bottom-3 animate-ui-blink font-head text-xs text-brass-hi">▼</span>}
-      </button>
+      {text !== "" && (
+        <button
+          type="button"
+          onClick={() => game.advanceDialogue()}
+          className="relative block min-h-[88px] w-full cursor-pointer px-6 pt-6 pb-4 text-left font-body text-[15px] leading-7 text-text ui-text-shadow"
+        >
+          {text.slice(0, shown)}
+          <span className="invisible">{text.slice(shown)}</span>
+          {done && !last && <span className="absolute right-5 bottom-3 animate-ui-blink font-head text-xs text-brass-hi">▼</span>}
+        </button>
+      )}
       {done && last && (
-        <div className="flex flex-col gap-0.5 border-t border-brass-lo/60 px-5 py-2">
+        <div className={`flex flex-col gap-0.5 px-5 ${text === "" ? "pt-5 pb-2" : "border-t border-brass-lo/60 py-2"}`}>
           {dialogue.choices.map((choice, index) => (
             <button
               key={choice.label}

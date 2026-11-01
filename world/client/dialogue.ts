@@ -17,6 +17,7 @@ import { RESIDENTS } from "#/world/town/residents"
 import { choicesFor } from "#/world/parts/choices-for"
 import { keepingShop } from "#/world/parts/keeping-shop"
 import { linesFor } from "#/world/parts/lines-for"
+import { menuFor } from "#/world/parts/menu-for"
 import { fullyShown } from "#/world/fully-shown"
 import type { GameContext } from "#/world/client/context"
 
@@ -91,6 +92,12 @@ export class DialogueActions {
           if (action === "hand") this.target.addChat({ channel: "npc", name: dialogue.name, text })
           this.target.update({ dialogue: { ...now, pages: [text], page: 0, shownAt: performance.now(), choices: [{ label: "さようなら", action: "close" }] } })
         })
+      return
+    }
+    if (choice.action === "talk") {
+      const pages = linesFor({ state: this.target.session.state.get(), name: dialogue.name, spokenKey: `${STORAGE}/spoken` })
+      this.target.addChat({ channel: "npc", name: dialogue.name, text: pages[0] })
+      this.target.update({ dialogue: { ...dialogue, pages, page: 0, choices: choicesFor(this.target.session.state.get(), dialogue.name), shownAt: performance.now() } })
       return
     }
     if (choice.action === "storage") {
@@ -183,6 +190,13 @@ export class DialogueActions {
     const resident = RESIDENTS[id]
     if (!resident) return
     const choices = choicesFor(this.target.session.state.get(), resident.name)
+    // someone who serves you (a keeper at the counter, a craftsman, the storekeeper) asks what you came for first
+    const menu = menuFor(choices)
+    if (menu) {
+      this.target.update({ dialogue: { resident: id, name: resident.name, job: resident.job, pages: [""], page: 0, choices: menu, shownAt: 0 }, shop: null })
+      this.syncEngaged()
+      return
+    }
     const pages = linesFor({ state: this.target.session.state.get(), name: resident.name, spokenKey: `${STORAGE}/spoken` })
     this.target.addChat({ channel: "npc", name: resident.name, text: pages[0] })
     this.target.update({ dialogue: { resident: id, name: resident.name, job: resident.job, pages, page: 0, choices, shownAt: performance.now() }, shop: null })
