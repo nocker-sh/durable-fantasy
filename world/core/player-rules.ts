@@ -24,4 +24,7 @@ export const REGEN_MS = 20_000
 
 export const DEFAULT_NAME = "シグレニ"
 
+/** a name, once chosen, can be changed again only after this long (core/set-profile.ts) */
+export const RENAME_GAP_MS = 30 * 24 * 60 * 60_000
+
 export const TOWN_SPAWN: SavePoint = { map: "phanthiet", cell: [38, 80] }

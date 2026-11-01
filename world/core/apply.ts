@@ -46,6 +46,7 @@ import { sellable } from "#/world/core/items/sellable"
 import type { PlayerState } from "#/world/core/player-types"
 import { derive } from "#/world/core/derive"
 import { unmet } from "#/world/core/unmet"
+import { setProfile } from "#/world/core/set-profile"
 
 /**
  * What the server knows when it runs a command: the time (for fullness and warmth), for a
@@ -171,6 +172,6 @@ export function apply(before: PlayerState, command: Command | ServerCommand, ctx
       return accept({ ...state, hotbar }, { type: "rearranged" })
     }
     case "profile":
-      return accept({ ...state, profileComplete: true, name: command.name, look: command.look, neck: command.neck, neckRamp: command.neckRamp }, { type: "renamed", name: command.name })
+      return setProfile(state, command, now)
   }
 }

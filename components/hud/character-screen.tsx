@@ -7,6 +7,8 @@ import { Button } from "#/components/game/button"
 import { Input } from "#/components/game/input"
 import { Modal } from "#/components/game/modal"
 import { NAME_MAX } from "#/world/core/player-rules"
+import { RENAME_GAP_MS } from "#/world/core/player-rules"
+import { reservedName } from "#/world/core/reserved-name"
 import { NECK_KINDS } from "#/world/core/player-rules"
 import { NECK_RAMPS } from "#/world/core/player-rules"
 import { profileNameSchema } from "#/world/core/player-schema"
@@ -62,6 +64,9 @@ export function CharacterScreen() {
   }, [game, look, neck, ramp])
   if (!player) return null
   const parsedName = profileNameSchema.safeParse(name)
+  // a chosen name stays for a while (core/set-profile.ts); the field shows when it opens again
+  const renameAt = creating || player.renamedAt === undefined || reservedName(player.name) ? 0 : player.renamedAt + RENAME_GAP_MS
+  const nameLocked = renameAt > Date.now()
   const changed = creating || (parsedName.success && parsedName.data !== player.name) || look !== player.look || neck !== player.neck || ramp !== player.neckRamp
   const close = creating || saving ? undefined : () => game.openModal("system")
   const editor = (
@@ -92,7 +97,14 @@ export function CharacterScreen() {
       <div className={creating ? "creation-details" : "flex flex-1 flex-col gap-3"}>
         <label className="flex flex-col gap-1 font-head text-xs text-text-dim">
           名前
-          <Input value={name} maxLength={NAME_MAX} disabled={saving} onChange={(e) => setName(e.target.value)} aria-invalid={!!name && !parsedName.success} />
+          <Input
+            value={nameLocked ? player.name : name}
+            maxLength={NAME_MAX}
+            disabled={saving || nameLocked}
+            title={nameLocked ? `${new Date(renameAt).getMonth() + 1}月${new Date(renameAt).getDate()}日から変えられる` : undefined}
+            onChange={(e) => setName(e.target.value)}
+            aria-invalid={!!name && !parsedName.success}
+          />
         </label>
         <div className="flex flex-col gap-1 font-head text-xs text-text-dim">
           首巻き

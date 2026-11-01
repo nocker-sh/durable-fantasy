@@ -180,6 +180,8 @@ export type Reason =
   | "SP_SHORT"
   | "WALKING"
   | "MEDICINE_WAIT"
+  | "NAME_TAKEN"
+  | "RENAME_WAIT"
 
 export type GameEvent =
   | { type: "bought"; item: ItemId; count: number; cost: number; by?: string }
@@ -276,4 +278,6 @@ export const REASON_TEXT: Record<Reason, string> = {
   SP_SHORT: "SP が足りない。",
   WALKING: "歩きながらは座れない。",
   MEDICINE_WAIT: "まだ次の薬は使えない。",
+  NAME_TAKEN: "その名前は使えない。",
+  RENAME_WAIT: "名前はまだ変えられない。",
 }
