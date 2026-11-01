@@ -155,6 +155,6 @@ export const SKILLS = {
     weapons: ["oak-staff", "amber-staff", "world-branch-staff"],
     needs: { woodcutting: 4, fth: 9 },
     heal: { base: 10, per: 2, stat: "fth" },
-    text: "森の木に宿るものに呼びかける、木こりに伝わる祈り。傷がふさがる。",
+    text: "森の木を通して女神さまに呼びかける、木こりに伝わる祈り。傷がふさがる。",
   },
 } satisfies Record<string, SkillDef>

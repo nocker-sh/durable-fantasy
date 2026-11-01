@@ -48,7 +48,7 @@ const DEFINITIONS = {
   },
   "fish-soup": dish({ name: "魚のスープ", price: 20, use: { hp: 30, stamina: 22, full: 25, warm: 25, focus: 15 }, icon: "fishSoup", description: "浜の魚の骨でだしをとった。", weight: 4 }),
   "cabbage-soup": dish({ name: "キャベツのスープ", price: 14, use: { hp: 20, stamina: 18, full: 22, warm: 20 }, icon: "greenSoup", description: "くたくたのキャベツ。どこの家でも作る。", weight: 4 }),
-  porridge: dish({ name: "粥", price: 2, use: { hp: 8, stamina: 12, full: 20 }, icon: "porridge", description: "麦を水で煮ただけの粥。礼拝堂の前で配られる。", weight: 3 }),
+  porridge: dish({ name: "粥", price: 2, use: { hp: 8, stamina: 12, full: 20 }, icon: "porridge", description: "麦を水で煮ただけの粥。寄進の麦で炊き、礼拝堂の前で安く売られる。", weight: 3 }),
   "cheese-toast": dish({ name: "チーズのせパン", price: 14, use: { hp: 22, stamina: 16, full: 18, warm: 10 }, icon: "bread", description: "炉で炙った黒パンに、とろけたチーズ。" }),
   skewer: dish({ name: "串焼き", price: 12, use: { hp: 18, stamina: 12, full: 12, warm: 8 }, icon: "skewer", description: "炭火で焼いた川マス。焚き火の匂い。", weight: 1 }),
   "roast-chestnuts": dish({ name: "焼き栗", price: 8, use: { hp: 6, stamina: 8, full: 8, warm: 10 }, icon: "nuts", description: "紙袋の中で、まだ熱い。", weight: 1 }),

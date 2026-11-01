@@ -34,6 +34,7 @@ export const SHOPS = {
     map: "phanthiet",
     keepers: ["マルタ", "ハンス"],
     greeting: "焼きたてよ。マティアスさんの羊のチーズもあるわ。",
+    greetings: { ハンス: "黒パンは日持ちするよ！　マティアスさんのチーズもあるよ！" },
     stock: ["rye-bread", "roll", "apple-pie", "honey-cake", "cheese", "porridge"],
     makers: { porridge: "ベネディクト" }, // the monk's porridge, handed out wherever someone is minding a counter
   },
@@ -42,7 +43,7 @@ export const SHOPS = {
     kind: "food",
     map: "phanthiet",
     keepers: ["ベネディクト"],
-    greeting: "温かいうちにどうぞ。一椀二枚、足りなければあとで結構です。",
+    greeting: "温かいうちにどうぞ。一椀二ゴールド、足りなければあとで結構です。",
     stock: ["porridge"],
     makers: { porridge: "ベネディクト" },
   },
@@ -60,6 +61,7 @@ export const SHOPS = {
     map: "phanthiet",
     keepers: ["ゲルダ", "ニーナ"],
     greeting: "温かいスープがあるよ。外は冷えたろう。",
+    greetings: { ニーナ: "はい、ただいま！　温かいスープ、すぐお持ちしますよ！" },
     stock: ["stew", "mushroom-soup", "mushroom-stew", "cabbage-soup", "hot-milk", "rye-bread", "porridge", "potion"],
     makers: { potion: "ゲルダ", "rye-bread": "マルタ", porridge: "ベネディクト" },
   },
@@ -70,6 +72,7 @@ export const SHOPS = {
     map: "phanthiet-market",
     keepers: ["フランツ", "リリー"],
     greeting: "何にする？温めたぶどう酒がおすすめだ。",
+    greetings: { リリー: "いらっしゃい！　温めたぶどう酒、フランツさんのおすすめよ！" },
     stock: ["hot-wine", "wine", "cheese-toast", "fish-soup", "cheese", "smoked-fish", "pickles"],
   },
   apothecary: {
@@ -78,6 +81,7 @@ export const SHOPS = {
     map: "phanthiet-market",
     keepers: ["イルムガルト", "エーファ"],
     greeting: "薬は多めに持っていきなさい。",
+    greetings: { エーファ: "お薬ですね。……多めに持っていくように、と師匠なら言います。" },
     stock: ["potion", "herb", "blue-herb", "herb-tea", "red-potion", "orange-potion", "blue-potion", "white-potion"],
   },
   general: {
@@ -86,6 +90,7 @@ export const SHOPS = {
     map: "phanthiet-market",
     keepers: ["ブルーノ", "ヘレナ"], // the night and the day shift
     greeting: "旅支度ならおまかせを。",
+    greetings: { ヘレナ: "いらっしゃいませ。外へ出る支度でしたら、ひと通り揃っています。" },
     stock: ["potion", "ration", "porridge", "lamp-oil", "herb", "wooden-stick", "cloth-hat", "leather-boots", "traveller-coat"],
     makers: { potion: "ベネディクト", porridge: "ベネディクト" }, // the monk's, sold for the chapel
   },
@@ -95,6 +100,7 @@ export const SHOPS = {
     map: "phanthiet-market",
     keepers: ["マグダレーナ", "ロッテ"],
     greeting: "寒さに負けない服を仕立てていますよ。",
+    greetings: { ロッテ: "いらっしゃい！　この色、似合うと思うな！" },
     stock: ["white-fleece", "wool-muffler", "striped-muffler", "embroidered-scarf", "fur-stole", "traveller-coat", "wool-cape", "cloth-hat", "silver-ring"],
   },
   crystal: {
@@ -121,6 +127,7 @@ export const SHOPS = {
     map: "phanthiet-craft",
     keepers: ["ベアトリクス", "ルイーゼ"],
     greeting: "体に合わせて直してあげるよ。",
+    greetings: { ルイーゼ: "防具です。……体に合わなければ、師匠が直します。" },
     stock: ["iron-helm", "chain-mail", "wooden-shield", "leather-boots"],
   },
   woodworker: {

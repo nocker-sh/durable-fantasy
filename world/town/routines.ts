@@ -42,7 +42,7 @@ const baseRoutines: Record<string, readonly Slot[]> = {
     at({ from: "14:30", where: "work", doing: "日のあるうちに洗う" }),
     at({ from: "16:00", where: "home", doing: "洗濯物を室内の縄に干す" }),
     at({ from: "17:00", where: "home", doing: "繕い物" }),
-    at({ from: "19:00", where: "tavern", doing: "妹と一杯" }),
+    at({ from: "19:00", where: "tavern", doing: "寝る前に一杯" }),
     at({ from: "20:30", where: "home", doing: "眠る" }),
   ],
   クララ: [
@@ -61,6 +61,7 @@ const baseRoutines: Record<string, readonly Slot[]> = {
   ],
   オットー: [
     at({ from: "08:00", where: "home", doing: "眠る" }),
+    at({ from: "14:30", where: { map: "south-meadow", cell: [17, 19] }, doing: "果樹園の木を見回る" }),
     at({ from: "16:30", where: "work", doing: "夜市で果物を売る" }),
     at({ from: "02:00", where: "tavern", doing: "一杯やる" }),
     at({ from: "03:30", where: "work", doing: "夜明け前の客に売る" }),
@@ -68,7 +69,7 @@ const baseRoutines: Record<string, readonly Slot[]> = {
   グレーテ: [
     at({ from: "08:00", where: "home", doing: "眠る" }),
     at({ from: "17:00", where: "work", doing: "夜市で野菜を売る" }),
-    at({ from: "01:30", where: P("phanthiet", "s3b"), doing: "広場で姉と夜食" }),
+    at({ from: "01:30", where: P("phanthiet", "s3b"), doing: "広場で夜食をとる" }),
     at({ from: "02:30", where: "work", doing: "夜市で野菜を売る" }),
   ],
   ヤコブ: [
@@ -547,7 +548,7 @@ const baseRoutines: Record<string, readonly Slot[]> = {
     at({ from: "03:00", where: "work", doing: "風車で麦を挽く" }),
     at({ from: "08:00", where: P("phanthiet", "field"), doing: "カールの麦を受け取る" }),
     at({ from: "08:30", where: "work", doing: "風車で麦を挽く" }),
-    at({ from: "12:30", where: "home", doing: "夕餉" }),
+    at({ from: "12:30", where: "home", doing: "寝る前の食事" }),
     at({ from: "13:30", where: "home", doing: "眠る" }),
   ],
   イルゼ: [
@@ -555,7 +556,7 @@ const baseRoutines: Record<string, readonly Slot[]> = {
     at({ from: "04:00", where: "work", doing: "粉を量って袋に詰める" }),
     at({ from: "06:00", where: P("phanthiet", "oven"), doing: "マルタに粉を届ける" }),
     at({ from: "06:30", where: "work", doing: "粉を量って袋に詰める" }),
-    at({ from: "12:30", where: "home", doing: "夕餉の支度" }),
+    at({ from: "12:30", where: "home", doing: "寝る前の食事の支度" }),
     at({ from: "14:00", where: "home", doing: "眠る" }),
   ],
   クラウス: [
@@ -571,7 +572,7 @@ const baseRoutines: Record<string, readonly Slot[]> = {
     at({ from: "08:00", where: P("phanthiet-fields", "fieldsWell"), doing: "井戸で水を汲む" }),
     at({ from: "08:30", where: P("phanthiet-fields", "rye"), doing: "麦の畑を見回る" }),
     at({ from: "10:30", where: "work", doing: "鍬で畑を起こす" }),
-    at({ from: "13:00", where: "home", doing: "夕餉" }),
+    at({ from: "13:00", where: "home", doing: "寝る前の食事" }),
     at({ from: "14:00", where: "home", doing: "眠る" }),
   ],
   ヨハンナ: [
@@ -579,7 +580,7 @@ const baseRoutines: Record<string, readonly Slot[]> = {
     at({ from: "04:00", where: "work", doing: "蕪を抜く" }),
     at({ from: "09:00", where: P("phanthiet-fields", "fieldsWell"), doing: "井戸端で洗い物" }),
     at({ from: "10:00", where: "work", doing: "蕪を抜く" }),
-    at({ from: "12:30", where: "home", doing: "夕餉の支度" }),
+    at({ from: "12:30", where: "home", doing: "寝る前の食事の支度" }),
     at({ from: "14:00", where: "home", doing: "眠る" }),
   ],
   ヴァレンティン: [
@@ -603,13 +604,13 @@ const baseRoutines: Record<string, readonly Slot[]> = {
     at({ from: "03:30", where: "work", doing: "畑に水を引く" }),
     at({ from: "07:30", where: P("phanthiet-fields", "cabbages"), doing: "キャベツの虫を取る" }),
     at({ from: "10:00", where: "work", doing: "畑に水を引く" }),
-    at({ from: "13:00", where: "home", doing: "夕餉" }),
+    at({ from: "13:00", where: "home", doing: "寝る前の食事" }),
     at({ from: "14:00", where: "home", doing: "眠る" }),
   ],
   アグネス: [
     at({ from: "03:00", where: "home", doing: "起きて火を熾す" }),
     at({ from: "04:00", where: "work", doing: "麦の畑の草を取る" }),
-    at({ from: "12:30", where: "home", doing: "夕餉の支度" }),
+    at({ from: "12:30", where: "home", doing: "寝る前の食事の支度" }),
     at({ from: "13:30", where: "home", doing: "眠る" }),
   ],
   ルートヴィヒ: [
@@ -617,13 +618,13 @@ const baseRoutines: Record<string, readonly Slot[]> = {
     at({ from: "03:30", where: "work", doing: "畝を立てる" }),
     at({ from: "08:00", where: P("phanthiet-fields", "turnips"), doing: "蕪の畑を手伝う" }),
     at({ from: "10:00", where: "work", doing: "畝を立てる" }),
-    at({ from: "13:00", where: "home", doing: "夕餉" }),
+    at({ from: "13:00", where: "home", doing: "寝る前の食事" }),
     at({ from: "14:30", where: "home", doing: "眠る" }),
   ],
   イルマ: [
     at({ from: "04:00", where: "home", doing: "起きて糸を紡ぐ" }),
     at({ from: "06:00", where: "work", doing: "戸口で糸を紡ぐ" }),
-    at({ from: "14:30", where: "home", doing: "夕餉の支度" }),
+    at({ from: "14:30", where: "home", doing: "寝る前の食事の支度" }),
     at({ from: "15:30", where: "home", doing: "眠る" }),
   ],
   アルブレヒト: [
@@ -632,13 +633,13 @@ const baseRoutines: Record<string, readonly Slot[]> = {
     at({ from: "07:00", where: P("phanthiet-fields", "butcherYard"), doing: "肉を燻しにかける" }),
     at({ from: "08:30", where: P("phanthiet-market", "marketWell"), doing: "市場に肉を卸す" }),
     at({ from: "09:30", where: "work", doing: "腸詰めを作る" }),
-    at({ from: "12:30", where: "home", doing: "夕餉" }),
+    at({ from: "12:30", where: "home", doing: "寝る前の食事" }),
     at({ from: "13:30", where: "home", doing: "眠る" }),
   ],
   ギーゼラ: [
     at({ from: "03:00", where: "home", doing: "起きて火を熾す" }),
     at({ from: "04:00", where: "work", doing: "肉を塩に漬ける" }),
-    at({ from: "12:30", where: "home", doing: "夕餉の支度" }),
+    at({ from: "12:30", where: "home", doing: "寝る前の食事の支度" }),
     at({ from: "13:30", where: "home", doing: "眠る" }),
   ],
   バスティアン: [
@@ -654,7 +655,7 @@ const baseRoutines: Record<string, readonly Slot[]> = {
     at({ from: "03:00", where: P("phanthiet-fields", "meadow"), doing: "牛の乳を搾る" }),
     at({ from: "06:00", where: "work", doing: "バターを作る" }),
     at({ from: "08:00", where: "work", doing: "チーズを仕込む" }),
-    at({ from: "12:30", where: "home", doing: "夕餉" }),
+    at({ from: "12:30", where: "home", doing: "寝る前の食事" }),
     at({ from: "13:30", where: "home", doing: "眠る" }),
   ],
   フーゴ: [
@@ -703,7 +704,7 @@ const baseRoutines: Record<string, readonly Slot[]> = {
   ヴィルマ: [
     at({ from: "03:00", where: "home", doing: "起きる" }),
     at({ from: "03:30", where: "work", doing: "石畳の灰を掃く" }),
-    at({ from: "12:00", where: "home", doing: "夕餉の支度" }),
+    at({ from: "12:00", where: "home", doing: "寝る前の食事の支度" }),
     at({ from: "13:00", where: "home", doing: "眠る" }),
   ],
   エリアス: [
@@ -720,13 +721,13 @@ const baseRoutines: Record<string, readonly Slot[]> = {
     at({ from: "02:30", where: "work", doing: "川に網を入れる" }),
     at({ from: "06:30", where: { map: "net-sheds", place: "netRack" }, doing: "ヤコブと網を干す" }),
     at({ from: "08:00", where: "work", doing: "川魚を捌く" }),
-    at({ from: "12:00", where: "home", doing: "夕餉" }),
+    at({ from: "12:00", where: "home", doing: "寝る前の食事" }),
     at({ from: "13:00", where: "home", doing: "眠る" }),
   ],
   テーダ: [
     at({ from: "03:00", where: "home", doing: "起きる" }),
     at({ from: "04:00", where: "work", doing: "網を繕う" }),
-    at({ from: "12:30", where: "home", doing: "夕餉の支度" }),
+    at({ from: "12:30", where: "home", doing: "寝る前の食事の支度" }),
     at({ from: "13:30", where: "home", doing: "眠る" }),
   ],
   モーリッツ: [
@@ -747,7 +748,7 @@ const baseRoutines: Record<string, readonly Slot[]> = {
   コンラート: [
     at({ from: "02:30", where: "home", doing: "起きて支度" }),
     at({ from: "03:00", where: "work", doing: "朝番で門に立つ" }),
-    at({ from: "13:00", where: "home", doing: "夕餉" }),
+    at({ from: "13:00", where: "home", doing: "寝る前の食事" }),
     at({ from: "14:00", where: "home", doing: "眠る" }),
   ],
   ヘンリケ: [
@@ -795,7 +796,7 @@ const baseRoutines: Record<string, readonly Slot[]> = {
   ヴァルトラウト: [
     at({ from: "07:00", where: "home", doing: "起きて火を熾す" }),
     at({ from: "09:00", where: "work", doing: "炭を俵に詰める" }),
-    at({ from: "13:00", where: { map: "phanthiet-craft", tile: [18.6, 28.4] }, doing: "鍛冶場に炭を届ける" }),
+    at({ from: "13:00", where: { map: "phanthiet", tile: [12.9, 30.5] }, doing: "鍛冶場に炭を届ける" }),
     at({ from: "14:00", where: "work", doing: "炭を俵に詰める" }),
     at({ from: "18:00", where: "home", doing: "夕餉の支度" }),
     at({ from: "19:30", where: "home", doing: "眠る" }),

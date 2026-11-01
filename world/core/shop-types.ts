@@ -13,6 +13,8 @@ export type ShopDefinition = {
   keepers: readonly string[]
   /** Line said when the shop window opens. */
   greeting: string
+  /** the opening line in a keeper's own voice where it differs from `greeting`; each keeper speaks as themselves */
+  greetings?: Readonly<Record<string, string>>
   stock: readonly ItemId[]
   /** whose made things these are (game-system.md §4.2.1); the usual maker when not named */
   makers?: Partial<Record<ItemId, string>>

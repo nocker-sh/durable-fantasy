@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import { RESIDENTS } from "#/world/town/residents"
 import { SHOPS } from "#/world/core/shops"
+import type { ShopDefinition } from "#/world/core/shop-types"
 import { ITEMS } from "#/world/core/items/catalog"
 import { HOUSEHOLDS, HOUSES } from "#/world/town/houses"
 import { bedsOf } from "#/world/town/beds-of"
@@ -88,7 +89,7 @@ describe("daily life hangs together (consistency.md)", () => {
       ...RESIDENTS.map((r) => r.job),
       ...HOUSEHOLDS.flatMap((h) => [h.name, h.trade]),
       ...HOUSES.map((h) => h.name),
-      ...Object.values(SHOPS).flatMap((s) => [s.name, s.greeting]),
+      ...Object.values(SHOPS).flatMap((s: ShopDefinition) => [s.name, s.greeting, ...Object.values(s.greetings ?? {})]),
       ...Object.values(ITEMS).map((i) => i.description),
     ]
     for (const t of texts) for (const b of banned) expect(b.test(t), t).toBe(false)
