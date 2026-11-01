@@ -7,6 +7,6 @@ const WORK = /^(作業台|調合台|木工台|なめし桶|搾り台|仕込み�
 
 const TABLES = /^(食卓|大きな食卓|長卓|卓|地図の卓)$/
 
-const SEATS = /^(椅子|長椅子|暖炉の前の揺り椅子)$/
+const SEATS = /^(椅子|長椅子|揺り椅子|暖炉の前の揺り椅子)$/
 
 export { COUNTERS, SHELVES, WORK, TABLES, SEATS }

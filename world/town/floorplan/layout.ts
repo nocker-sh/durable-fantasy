@@ -103,8 +103,13 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
     ;(backRooms.length ? backRooms : [{ name: "奥の仕事場", floor: 0 }]).forEach((r, k) =>
       rooms.push({ name: r.name, use: useOf(r.name), floor: 0, x0: parts[k][0], z0: 0, x1: parts[k][1], z1: split0 - DIV / 2 }),
     )
-    for (let k = 1; k < parts.length; k++)
-      dividers.push(...along({ floor: 0, kind: "腰壁", z0: 0, z1: split0 - DIV / 2, x: parts[k][0] - DIV / 2, gz: onStep(split0 * 0.6, 0.5, split0 - DIV / 2 - 0.5), gap: 0.9 }))
+    // the back rooms open into each other through a doorway in the low wall between them, kept clear like the others
+    for (let k = 1; k < parts.length; k++) {
+      const gz = onStep(split0 * 0.6, 0.5, split0 - DIV / 2 - 0.5)
+      const x = parts[k][0] - DIV / 2
+      dividers.push(...along({ floor: 0, kind: "腰壁", z0: 0, z1: split0 - DIV / 2, x: x, gz: gz, gap: 0.9 }))
+      gaps.push({ x0: x - 0.7, z0: gz - 0.45, x1: x + 0.7, z1: gz + 0.45 })
+    }
   } else {
     // a home: the earth-floored entry at the front behind a low wall (named as the plan names it), the room round
     // the hearth behind it, and the household's other rooms on this floor off that room along the back wall
@@ -475,6 +480,8 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
     const order = /揺り椅子/.test(name) ? byFire : [...tablesHere.slice(k % Math.max(1, tablesHere.length)), ...tablesHere].flatMap(spotsAt).concat(atCounter, byFire)
     const ok = (r: Rect) => inside(r, seatRoom) && !f0.pieces.some((p) => overlap(r, p, -0.01)) && !dividers.some((d) => d.floor === 0 && overlap(r, d))
     const at = order.find(ok)
+    // a plain rocking chair with no room by the fire stands against a wall of the room instead
+    if (!at && name === "揺り椅子" && place({ name: name, room: seatRoom, how: "wall", quiet: true })) return
     if (!at) {
       unplaced.push(name)
       return
