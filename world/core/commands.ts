@@ -134,6 +134,7 @@ export type Reason =
   | "SP_FULL"
   | "NOT_EQUIPPABLE"
   | "STAT_TOO_LOW"
+  | "LEVEL_TOO_LOW"
   | "SKILL_TOO_LOW"
   | "NO_WEAPON"
   | "NO_HERB"
@@ -229,6 +230,7 @@ export const REASON_TEXT: Record<Reason, string> = {
   SP_FULL: "SP は満ちている。",
   NOT_EQUIPPABLE: "それは装備できない。",
   STAT_TOO_LOW: "能力が足りない。",
+  LEVEL_TOO_LOW: "Lv が足りない。",
   SKILL_TOO_LOW: "生活スキルの腕が足りない。",
   NO_WEAPON: "その技に合う武器を手にしていない。",
   NO_HERB: "薬草を持っていない。",

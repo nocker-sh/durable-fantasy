@@ -158,16 +158,17 @@ export function ItemTooltip(inputProps: {
               </dd>
             </>
           ) : null}
-          {e?.needs ? (
+          {e?.needs || e?.level ? (
             <>
               <dt className="text-text-dim">必要</dt>
               <dd className="text-right">
-                {Object.entries(e.needs).map((entry3, i) => {
+                {e.level ? <span className={me && me.level < e.level ? "text-bad" : ""}>Lv {e.level}</span> : null}
+                {Object.entries(e.needs ?? {}).map((entry3, i) => {
                   const k = entry3[0]
                   const n = entry3[1]
                   return (
                     <span key={k} className={me && standing(me, k as Stat | Skill) < (n ?? 0) ? "text-bad" : ""}>
-                      {i ? "・" : ""}
+                      {i || e.level ? "・" : ""}
                       {k in STAT_NAME ? STAT_NAME[k as Stat] : `${GATHER_SKILL_NAME[k as Skill]} Lv`} {n}
                     </span>
                   )

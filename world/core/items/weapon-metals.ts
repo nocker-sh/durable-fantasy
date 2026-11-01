@@ -5,11 +5,15 @@ export const METALS = ["iron", "steel", "engine"] as const
 
 export const METAL_NAME: Record<Metal, string> = { iron: "鉄", steel: "鋼", engine: "機関鋼" }
 
-/** How each metal changes a shape's weapon: attack, pace, what it asks of the arm, price, and the milestone that makes it. */
-export const METAL_RULES: Record<Metal, { atk: number; delay: number; needs: number; price: number; rarity?: Rarity; milestone?: 16 | 32 }> = {
-  iron: { atk: 1, delay: 1, needs: 0, price: 1 },
-  steel: { atk: 1.5, delay: 0.96, needs: 2, price: 4.2, rarity: "rare", milestone: 16 },
-  engine: { atk: 1.9, delay: 0.94, needs: 4, price: 8.5, rarity: "rare", milestone: 32 },
+/**
+ * How each metal changes a shape's weapon: attack, pace, what it asks of the arm, the character
+ * level it asks (a fresh hand cannot carry the best metal however it came by it; spread up to
+ * MAX_LEVEL in growth-rules.ts), price, and the milestone that makes it.
+ */
+export const METAL_RULES: Record<Metal, { atk: number; delay: number; needs: number; level: number; price: number; rarity?: Rarity; milestone?: 16 | 32 }> = {
+  iron: { atk: 1, delay: 1, needs: 0, level: 1, price: 1 },
+  steel: { atk: 1.5, delay: 0.96, needs: 2, level: 12, price: 4.2, rarity: "rare", milestone: 16 },
+  engine: { atk: 1.9, delay: 0.94, needs: 4, level: 22, price: 8.5, rarity: "rare", milestone: 32 },
 }
 
 export const METAL_TEXT: Record<Metal, string> = {

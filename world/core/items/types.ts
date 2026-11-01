@@ -18,6 +18,8 @@ export type Equipment = {
   twoHanded?: boolean
   /** stats (as raised, not with what is worn) and life skill levels needed to wear it */
   needs?: Partial<Record<Stat | Skill, number>>
+  /** the character level needed to wear it (game-system.md §4.3) */
+  level?: number
   /** how its attack grows with stats (weapons) */
   scale?: Partial<Record<Stat, Grade>>
   /** milliseconds between blows with it (weapons) */
