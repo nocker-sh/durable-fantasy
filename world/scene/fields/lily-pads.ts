@@ -20,7 +20,7 @@ const padMat = (() => {
       if (d > 7.6) continue
       const a = Math.atan2(dy, dx)
       if (d > 0.8 && a > -0.32 && a < 0.32) continue // the notch
-      const vein = Math.abs(((a / Math.PI) * 6 + 12) % 1 - 0.5) < 0.08 && d > 2
+      const vein = Math.abs((((a / Math.PI) * 6 + 12) % 1) - 0.5) < 0.08 && d > 2
       const lvl = d > 6.6 ? 1 : vein ? 4 : 2 + ((x * 7 + y * 3) % 5 === 0 ? 1 : 0)
       b.set({ x, y, color: RAMPS.leaf[lvl] })
     }

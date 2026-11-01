@@ -24,7 +24,10 @@ import { dryingRack } from "#/world/scene/fields/drying-rack"
 export function grassHighland(root: THREE.Group) {
   const free = offRoad(1.1)
   // the grass in drifts: thick in the swells, thinning out on the knoll and at the road
-  pampas(root, clusters(2401, 40, 22, 3.4, 0.7, 1.2, (x, z) => free(x, z) && Math.hypot(x - 13, z - 13) > 4.5))
+  pampas(
+    root,
+    clusters(2401, 40, 22, 3.4, 0.7, 1.2, (x, z) => free(x, z) && Math.hypot(x - 13, z - 13) > 4.5),
+  )
   pampas(
     root,
     scatter({
@@ -77,7 +80,15 @@ export function grassHighland(root: THREE.Group) {
     ]),
     M.autumn,
   )
-  shrubs(root, clusters(2408, 0, 4, 2, 0.6, 1.0, offRoad(1.4), [[38, 36], [7, 31], [30, 10.5], [42, 18]]))
+  shrubs(
+    root,
+    clusters(2408, 0, 4, 2, 0.6, 1.0, offRoad(1.4), [
+      [38, 36],
+      [7, 31],
+      [30, 10.5],
+      [42, 18],
+    ]),
+  )
   // the cutters' work: stooks along the south trail, a rack for drying the cut stalks by the road
   for (const p of [
     [28.4, 34.2],

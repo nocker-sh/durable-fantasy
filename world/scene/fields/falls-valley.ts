@@ -103,8 +103,20 @@ export function fallsValley(root: THREE.Group) {
     ]),
     M.leaf,
   )
-  flowers(root, clusters(2608, 0, 12, 1.6, 0.6, 1.0, offRoad(0.9), [[40, 33.5], [26.5, 38]]))
-  mushrooms(root, clusters(2609, 0, 5, 1, 0.8, 1.1, offRoad(1.2), [[12.5, 21], [36, 18]]))
+  flowers(
+    root,
+    clusters(2608, 0, 12, 1.6, 0.6, 1.0, offRoad(0.9), [
+      [40, 33.5],
+      [26.5, 38],
+    ]),
+  )
+  mushrooms(
+    root,
+    clusters(2609, 0, 5, 1, 0.8, 1.1, offRoad(1.2), [
+      [12.5, 21],
+      [36, 18],
+    ]),
+  )
   logs(root, clusters(2610, 0, 2, 1.5, 0.8, 1.1, offRoad(1.6), [[14.5, 24]]), M.woodDark)
   // where people stop to fill their flasks and rest: a ring of stones on the bench above the lower fall
   fireRing(root, 34.6, 31.2)

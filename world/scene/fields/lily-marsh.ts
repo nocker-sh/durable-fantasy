@@ -42,7 +42,10 @@ export function lilyMarsh(root: THREE.Group) {
       ok: shore,
     }),
   )
-  reeds(root, clusters(2503, 14, 14, 1.4, 0.8, 1.2, (x, z) => shore(x, z) || (groundH(x, z) < WATER_Y && !open(x, z, 2.2))))
+  reeds(
+    root,
+    clusters(2503, 14, 14, 1.4, 0.8, 1.2, (x, z) => shore(x, z) || (groundH(x, z) < WATER_Y && !open(x, z, 2.2))),
+  )
   tufts(
     root,
     scatter({
@@ -87,8 +90,20 @@ export function lilyMarsh(root: THREE.Group) {
     }),
     M.woodDark,
   )
-  stumps(root, clusters(2509, 0, 3, 1.2, 0.7, 1.0, offRoad(1.4), [[16, 11], [32, 41]]))
-  mushrooms(root, clusters(2510, 0, 5, 1, 0.8, 1.1, offRoad(1.2), [[6, 26.5], [42, 23.5]]))
+  stumps(
+    root,
+    clusters(2509, 0, 3, 1.2, 0.7, 1.0, offRoad(1.4), [
+      [16, 11],
+      [32, 41],
+    ]),
+  )
+  mushrooms(
+    root,
+    clusters(2510, 0, 5, 1, 0.8, 1.1, offRoad(1.2), [
+      [6, 26.5],
+      [42, 23.5],
+    ]),
+  )
   // the jetty out into the south-east pond, the punt tied at its end
   jetty({ root: root, x0: 29, z0: 31.6, x1: 32.2, z1: 33.6 })
   boat({ root: root, x: 33.4, z: 32.4, rot: 0.6 })
