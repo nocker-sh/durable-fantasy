@@ -2039,9 +2039,9 @@
       "source": "world/town/houses.ts"
     },
     {
-      "id": "room-tavern-max",
+      "id": "room-tavern-6",
       "kind": "rooms",
-      "file": "rooms/room-tavern-max.md",
+      "file": "rooms/room-tavern-6.md",
       "source": "world/town/houses.ts"
     },
     {

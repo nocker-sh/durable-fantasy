@@ -13,7 +13,7 @@
     "building-h-m3"
   ],
   "bedroom_candidates": [
-    "room-tavern-max"
+    "room-tavern-6"
   ],
   "work": "醸造の手伝い",
   "relationships": [
@@ -34,18 +34,18 @@
     "寝台・個人収納のグリッド照合未完了",
     "食事・水・便所・衣服の手入れの場所照合未完了"
   ],
-  "bedroom": "room-tavern-max",
-  "bed_id": "bed-tavern-5-2",
+  "bedroom": "room-tavern-6",
+  "bed_id": "bed-tavern-6-1",
   "design_dependencies": [
     "building-tavern",
     "building-h-m3",
-    "room-tavern-max",
-    "room-tavern-4",
+    "room-tavern-6",
+    "room-tavern-2",
     "room-h-m3-1",
     "room-h-m3-2"
   ],
   "storage_ids": [
-    "storage-tavern-5-2"
+    "storage-tavern-6-1"
   ],
   "routine_source": {
     "file": "world/town/routines.ts",
@@ -53,7 +53,7 @@
     "key": "マックス"
   },
   "work_rooms": [
-    "room-tavern-4",
+    "room-tavern-2",
     "room-h-m3-1",
     "room-h-m3-2"
   ],
@@ -88,12 +88,12 @@
 
 ## 固有の寝床
 
-常用の寝床は [[room-tavern-max]] の bed-tavern-5-2 に割り当てる。客室や仕事場の休憩用家具を、本人の寝床の代わりに数えない。衣服、首巻き、私物の収納は storage_ids の個人区画へ割り当て、寝台の使用面と合わせて容量・開閉を照合する。
+常用の寝床は [[room-tavern-6]] の bed-tavern-6-1 に割り当てる。客室や仕事場の休憩用家具を、本人の寝床の代わりに数えない。衣服、首巻き、私物の収納は storage_ids の個人区画へ割り当て、寝台の使用面と合わせて容量・開閉を照合する。
 
 
 ## 住み込みの個室案
 
-酒場の共用廊下から専用の戸で入る個室を提案する。常用の寝台と衣服箱のIDは維持し、他の住み込みの者と寝間を共有しない。現行の相部屋と寝具・勤務と休息の運用、戸と視線・音の照合は別に行い、日課や描画を変更済みとしない。
+酒場の共用廊下から入る個室で眠る（実行時のデータにも反映済み）。他の住み込みの者と寝間を共有しない。寝具・勤務と休息の運用、戸と視線・音の照合は別に行う。
 
 
 ## 居住と作業の区別

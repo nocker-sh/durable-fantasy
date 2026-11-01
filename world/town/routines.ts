@@ -179,7 +179,7 @@ const baseRoutines: Record<string, readonly Slot[]> = {
   フランツ: [
     at({ from: "08:00", where: "home", doing: "眠る" }),
     at({ from: "15:00", where: "work", doing: "酒場を開ける" }),
-    at({ from: "03:00", where: { map: "phanthiet-market", tile: [6.2, 16.6] }, doing: "酒場の裏で樽を入れ替える" }),
+    at({ from: "03:00", where: { map: "phanthiet-market", tile: [4.4, 34.9] }, doing: "酒場の裏で樽を入れ替える" }),
     at({ from: "04:00", where: "work", doing: "酒場を開ける" }),
   ],
   // herbs picked on the meadow while it is light; before opening, a cup at the inn with Gerda, who learnt her potions from her
@@ -351,7 +351,7 @@ const baseRoutines: Record<string, readonly Slot[]> = {
     at({ from: "15:30", where: "work", doing: "樽を仕込む" }),
     at({ from: "01:00", where: "tavern", doing: "一杯やる" }),
     at({ from: "02:00", where: "work", doing: "樽を仕込む" }),
-    at({ from: "03:00", where: { map: "phanthiet-market", tile: [7.2, 16.6] }, doing: "酒場の裏で樽を運ぶ" }),
+    at({ from: "03:00", where: { map: "phanthiet-market", tile: [6.6, 35.2] }, doing: "酒場の裏で樽を運ぶ" }),
     at({ from: "04:00", where: "work", doing: "樽を仕込む" }),
   ],
   エーファ: [

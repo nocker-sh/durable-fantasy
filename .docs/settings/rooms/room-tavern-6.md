@@ -1,6 +1,6 @@
 ---
 {
-  "id": "room-tavern-max",
+  "id": "room-tavern-6",
   "kind": "rooms",
   "title": "フランツの酒場／2階 マックスの部屋",
   "status": "設計中",
@@ -120,12 +120,12 @@
   ],
   "sleeping_places": [
     {
-      "id": "bed-tavern-5-2",
+      "id": "bed-tavern-6-1",
       "resident": "resident-マックス",
       "kind": "個別寝台",
       "grid_symbol": "C",
       "storage_status": "専用の衣服箱を配置。容量と開閉は未照合",
-      "storage_id": "storage-tavern-5-2",
+      "storage_id": "storage-tavern-6-1",
       "storage_symbol": "M"
     }
   ],
@@ -137,7 +137,7 @@
   ],
   "personal_storage": [
     {
-      "id": "storage-tavern-5-2",
+      "id": "storage-tavern-6-1",
       "resident": "resident-マックス",
       "contents": [
         "衣服",
@@ -165,7 +165,7 @@
 
 ## 未解決の生活
 
-現行の酒場の相部屋とは異なる個室の提案であり、描画や日課の居場所を切替済みとしない。戸と施錠・視線、壁の音と灯り、着替えと衣服の容量、仕事を終えた後の休息と寝具の手入れは未照合である。敷地と建物の立体は [[building-tavern]] を参照する。
+相部屋から個室への変更は実行時のデータにも反映済みで、寝台一つを持つ。戸と施錠・視線、壁の音と灯り、着替えと衣服の容量、仕事を終えた後の休息と寝具の手入れは未照合である。敷地と建物の立体は [[building-tavern]] を参照する。
 
 ```grid
 ####DD#####

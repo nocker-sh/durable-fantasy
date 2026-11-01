@@ -65,7 +65,7 @@
     "building-h-m3",
     "room-tavern-3",
     "room-tavern-1",
-    "room-tavern-2",
+    "room-tavern-4",
     "room-h-m3-1",
     "room-h-m3-2"
   ],
@@ -79,7 +79,7 @@
   },
   "work_rooms": [
     "room-tavern-1",
-    "room-tavern-2",
+    "room-tavern-4",
     "room-h-m3-1",
     "room-h-m3-2"
   ],
