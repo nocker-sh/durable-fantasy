@@ -5,6 +5,7 @@ import { walkH } from "#/world/scene/walk-h"
 import type { MonsterView } from "#/world/scene/monsters"
 import { clearBurst } from "#/world/scene/helpers/monsters/clear-burst"
 import { poseFigure } from "#/world/scene/fields/pose-figure"
+import { poseModel } from "#/world/scene/fields/pose-model"
 
 /** Move each to where the clock puts it, hop it, hide it while it is off recovering. */
 /** `yaw`: where the camera looks from; a creature sitting still turns its face that way. */
@@ -34,10 +35,11 @@ export function updateMonsters(props: Props) {
       // shuffling: small hops; sitting: a slow quiver, each to its own beat
       const beat = props.now / 700 + m.body.id
       const look = MONSTER_KINDS[m.spawn.kind].look
-      const hop = !at.moving ? 0 : look === "figure" ? Math.abs(Math.sin(props.now / 110)) * 0.012 : Math.abs(Math.sin(props.now / 220)) * 0.09
+      const hop = !at.moving || look === "model" ? 0 : look === "figure" ? Math.abs(Math.sin(props.now / 110)) * 0.012 : Math.abs(Math.sin(props.now / 220)) * 0.09
       const squash = at.moving ? 1 - Math.sin(props.now / 110) * SLIME_MOVING_SQUASH : 1 + Math.sin(beat) * SLIME_RESTING_SQUASH
       m.body.position.set(at.x, m.groundHeight! + 0.06 + hop, at.z)
       if (look === "figure") poseFigure({ body: m.body, now: props.now, moving: at.moving })
+      if (look === "model") poseModel({ body: m.body, dt, moving: at.moving })
       if (look === "slime") {
         const sz = MONSTER_KINDS[m.spawn.kind].size ?? 1
         m.body.scale.set(sz / Math.sqrt(squash), sz * squash, sz / Math.sqrt(squash))

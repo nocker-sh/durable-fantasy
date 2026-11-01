@@ -1,7 +1,7 @@
 import { HARE_BODY_PARTS, SLIME_BODY_RADIUS, SLIME_MOVING_SQUASH, SLIME_RESTING_SQUASH } from "#/world/core/monster-body-shapes"
 import type { MonsterKind } from "#/world/core/monster-types"
 import { getFigurePartReach } from "#/world/core/get-figure-part-reach"
-type Props = { kind: Pick<MonsterKind, "look" | "size" | "figure"> }
+type Props = { kind: Pick<MonsterKind, "look" | "size" | "figure" | "model"> }
 /** Covers every yaw and registered squash phase; Float32 vertex storage gets an outward rounding allowance. */
 export function getMonsterBodyRadius(props: Props): number | Error {
   const size = props.kind.size ?? 1
@@ -9,6 +9,10 @@ export function getMonsterBodyRadius(props: Props): number | Error {
 
   const rounding = 1 + 2 ** -22
   if (props.kind.look === "slime") return (SLIME_BODY_RADIUS * size * rounding) / Math.sqrt(1 - Math.max(SLIME_MOVING_SQUASH, SLIME_RESTING_SQUASH))
+  if (props.kind.look === "model") {
+    if (!props.kind.model || !(props.kind.model.reach > 0)) return new Error("A model needs its reach")
+    return props.kind.model.reach * size * rounding
+  }
   if (props.kind.look === "figure") {
     if (!props.kind.figure || props.kind.figure.parts.length === 0) return new Error("A figure needs its parts")
     return Math.max(...props.kind.figure.parts.map(getFigurePartReach)) * size * rounding
