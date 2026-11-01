@@ -24,15 +24,18 @@ export function planOf(h: HouseDef): FloorPlan {
       const fireAt = p.pieces.find((x) => x.floor === 0 && (x.name === "炉" || x.name === "暖炉"))
       const gap = (a: Rect, b: Rect) => Math.hypot(Math.max(0, a.x0 - b.x1, b.x0 - a.x1), Math.max(0, a.z0 - b.z1, b.z0 - a.z1))
       const byFire = !fireAt || tables.some((t) => gap(t, fireAt) <= 1.8)
-      // the household's and the trade's things that had to stand out on the customers' shop floor
+      // the household's and the trade's things that had to stand out on the customers' shop floor: a jar, a firewood
+      // box, a cask or a crate by its wall lightly, a bench, a table or a shelf heavily
       const shop = p.rooms.find((r) => r.floor === 0 && r.use === "売り場")
       const spilt = shop
-        ? p.pieces.filter(
-            (x) => x.floor === 0 && x.solid && !x.on && !COUNTERS.test(x.name) && !GOODS.test(x.name) && (x.z0 + x.z1) / 2 > shop.z0 && (x.x0 + x.x1) / 2 > shop.x0 && (x.x0 + x.x1) / 2 < shop.x1,
-          ).length
+        ? p.pieces
+            .filter(
+              (x) => x.floor === 0 && x.solid && !x.on && !COUNTERS.test(x.name) && !GOODS.test(x.name) && (x.z0 + x.z1) / 2 > shop.z0 && (x.x0 + x.x1) / 2 > shop.x0 && (x.x0 + x.x1) / 2 < shop.x1,
+            )
+            .reduce((n, x) => n + (/甕|薪入れ|樽|木箱/.test(x.name) ? 1 : 3), 0)
         : 0
       // a room the plan names but the layout could not draw counts nearly as badly as a thing left out
-      const score = p.unplaced.length * 10 + p.unrepresentedRooms.length * 8 + (h.plan.hearth && !free ? 5 : 0) + (h.plan.hearth && !byFire ? 3 : 0) + spilt * 2
+      const score = p.unplaced.length * 10 + p.unrepresentedRooms.length * 8 + (h.plan.hearth && !free ? 5 : 0) + (h.plan.hearth && !byFire ? 3 : 0) + spilt
       if (!best.value || score < best.value.score) best.value = { p, score }
       if (score === 0) return p
     }
