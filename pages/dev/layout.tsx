@@ -5,6 +5,7 @@ import type { ReactNode } from "react"
 import { useRouter } from "@void/react"
 import { Sidebar } from "#/components/ui/sidebar"
 import { SidebarContent } from "#/components/ui/sidebar-content"
+import { SidebarFooter } from "#/components/ui/sidebar-footer"
 import { SidebarGroup } from "#/components/ui/sidebar-group"
 import { SidebarGroupContent } from "#/components/ui/sidebar-group-content"
 import { SidebarInset } from "#/components/ui/sidebar-inset"
@@ -41,6 +42,15 @@ export default function DevLayout(inputProps: { children: ReactNode }) {
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
+        <SidebarFooter>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton size="sm" render={<a href="/dev/save" />} isActive={at === "save"}>
+                セーブデータ
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
       </Sidebar>
       <SidebarInset className="min-w-0 overflow-x-hidden overflow-y-auto">
         <div className="flex min-w-0 flex-1 flex-col gap-3 p-3">{children}</div>

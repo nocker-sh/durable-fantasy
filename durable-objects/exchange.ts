@@ -10,6 +10,7 @@ import { reserveExchangeInbox } from "#/world/server/reserve-exchange-inbox"
 import { deliverExchangeInbox } from "#/world/server/deliver-exchange-inbox"
 import { viewExchange } from "#/world/server/view-exchange"
 import { recoverExchange } from "#/world/server/recover-exchange"
+import { forgetExchangeOwner } from "#/world/server/forget-exchange-owner"
 import type { ExchangePlayer } from "#/world/server/exchange-coordinator"
 
 const players = (owner: string): ExchangePlayer => Player.get(owner)
@@ -42,6 +43,10 @@ export const Exchange = defineDurableState({
     },
     look(context, symbol: string, owner: string) {
       return viewExchange(context, symbol, owner)
+    },
+    /** Dev-only save reset. */
+    forget(context, owner: string) {
+      forgetExchangeOwner(context.state, owner)
     },
   },
   alarm(context) {

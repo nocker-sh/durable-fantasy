@@ -1,8 +1,9 @@
 // Dev only (ui.md §8): time of day, the edge blur, position, FPS, sprites, connection and a
-// reset for the player's data. F1 or ` opens it. Built from the dev shadcn kit, not the game UI.
+// reset for this browser's save. F1 or ` opens it. Built from the dev shadcn kit, not the game UI.
 import "#resources/dev/debug"
 import { useEffect, useState } from "react"
 import { Button } from "#/components/ui/button"
+import { ResetSaveButton } from "#/dev/reset-save-button"
 import { Card } from "#/components/ui/card"
 import { CardContent } from "#/components/ui/card-content"
 import { CardHeader } from "#/components/ui/card-header"
@@ -104,16 +105,7 @@ export default function DebugPanel() {
           {tune({ key: "strength", min: 0, max: 40, step: 0.5 })}
           {tune({ key: "saturation", min: 0.8, max: 1.4, step: 0.01 })}
           {tune({ key: "contrast", min: 0.8, max: 1.4, step: 0.01 })}
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={async () => {
-              await fetch("/api/player/reset", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: info.playerId }) })
-              game.rejoin()
-            }}
-          >
-            プレイヤーデータを初期化
-          </Button>
+          <ResetSaveButton onDone={() => location.reload()} />
         </CardContent>
       </Card>
     </div>
