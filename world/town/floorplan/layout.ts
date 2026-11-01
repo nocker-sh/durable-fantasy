@@ -101,7 +101,8 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
     ;(backRooms.length ? backRooms : [{ name: "奥の仕事場", floor: 0 }]).forEach((r, k) =>
       rooms.push({ name: r.name, use: useOf(r.name), floor: 0, x0: parts[k][0], z0: 0, x1: parts[k][1], z1: split0 - DIV / 2 }),
     )
-    for (let k = 1; k < parts.length; k++) dividers.push(...along({ floor: 0, kind: "腰壁", z0: 0, z1: split0 - DIV / 2, x: parts[k][0] - DIV / 2, gz: onStep(split0 * 0.6, 0.5, split0 - DIV / 2 - 0.5), gap: 0.9 }))
+    for (let k = 1; k < parts.length; k++)
+      dividers.push(...along({ floor: 0, kind: "腰壁", z0: 0, z1: split0 - DIV / 2, x: parts[k][0] - DIV / 2, gz: onStep(split0 * 0.6, 0.5, split0 - DIV / 2 - 0.5), gap: 0.9 }))
   } else {
     // a home: the earth-floored entry at the front behind a low wall (named as the plan names it), the room round
     // the hearth behind it, and the household's other rooms on this floor off that room along the back wall
@@ -220,8 +221,15 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
     const tryIn = (r: Rect, first: boolean) =>
       within(r, () =>
         how === "wall" || !first
-          ? (f0.againstWall({ name: name, w: s.w, d: s.d, front: farm ? 0.1 : s.front, room: r, sides: [...sides, ...(["n", "w", "e", "s"] as const).filter((x) => !sides.includes(x))], from: from }) ??
-            f0.near({ name: name, w: s.w, d: s.d, front: Math.min(s.front, 0.5), room: r, at: first && at ? at : centre(r) }))
+          ? (f0.againstWall({
+              name: name,
+              w: s.w,
+              d: s.d,
+              front: farm ? 0.1 : s.front,
+              room: r,
+              sides: [...sides, ...(["n", "w", "e", "s"] as const).filter((x) => !sides.includes(x))],
+              from: from,
+            }) ?? f0.near({ name: name, w: s.w, d: s.d, front: Math.min(s.front, 0.5), room: r, at: first && at ? at : centre(r) }))
           : (f0.near({ name: name, w: s.w, d: s.d, front: Math.min(s.front, 0.6), room: r, at: at ?? centre(r) }) ??
             f0.againstWall({ name: name, w: s.w, d: s.d, front: s.front, room: r, sides: sides, from: from })),
       )
@@ -476,7 +484,9 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
         b = aState2[1]
       rooms.push({ name: r.name, use: useOf(r.name), floor, x0: a, z0: rz0, x1: b, z1: rz1 })
       if (k > 0) dividers.push(...along({ floor: floor, kind: /客室|部屋|寝室/.test(r.name) ? "壁" : "カーテン", z0: rz0, z1: rz1, x: a - DIV / 2, gz: null }))
-      dividers.push(...across({ floor: floor, kind: /倉|物置|蔵|乾燥/.test(r.name) ? "腰壁" : "カーテン", x0: a, x1: b, z: back ? passage : D - passage, gx: onStep((a + b) / 2, a + 0.3, b - 0.3), gap: 0.8 }))
+      dividers.push(
+        ...across({ floor: floor, kind: /倉|物置|蔵|乾燥/.test(r.name) ? "腰壁" : "カーテン", x0: a, x1: b, z: back ? passage : D - passage, gx: onStep((a + b) / 2, a + 0.3, b - 0.3), gap: 0.8 }),
+      )
     })
     rooms.push({ name: "廊下", use: "住まい", floor, x0: 0, z0: back ? 0 : D - passage, x1: W, z1: back ? passage : D })
     if (landing) {
