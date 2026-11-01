@@ -9,4 +9,7 @@ const TABLES = /^(食卓|大きな食卓|長卓|卓|地図の卓)$/
 
 const SEATS = /^(椅子|長椅子|揺り椅子|暖炉の前の揺り椅子)$/
 
-export { COUNTERS, SHELVES, WORK, TABLES, SEATS }
+/** What a shop sells from its floor: the goods on its shelves and in its baskets. */
+const GOODS = /商品棚|薬棚|陳列|弓の並んだ棚|革の棚|糸の棚|^(パン籠|果物籠|野菜籠|魚桶)$/
+
+export { COUNTERS, SHELVES, WORK, TABLES, SEATS, GOODS }

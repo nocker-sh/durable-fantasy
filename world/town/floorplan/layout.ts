@@ -11,16 +11,13 @@ import { rect } from "#/world/town/floorplan/rect"
 import { inside } from "#/world/town/floorplan/inside"
 import { overlap } from "#/world/town/floorplan/overlap"
 import { entries } from "#/world/town/floorplan/entries"
-import { COUNTERS, WORK, TABLES, SEATS, SHELVES } from "#/world/town/floorplan/furniture"
+import { COUNTERS, WORK, TABLES, SEATS, SHELVES, GOODS } from "#/world/town/floorplan/furniture"
 import { useOf } from "#/world/town/floorplan/use-of"
 import { sizeOf } from "#/world/town/floorplan/size-of"
 import { split } from "#/world/town/floorplan/split"
 import { across } from "#/world/town/floorplan/across"
 import { along } from "#/world/town/floorplan/along"
 import { Floor } from "#/world/town/floorplan/placement"
-
-/** What a shop sells from its floor: the goods on its shelves and in its baskets. */
-const GOODS = /商品棚|薬棚|陳列|^(パン籠|果物籠|野菜籠|魚桶)$/
 
 function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"): FloorPlan {
   // the wall with the door is the front: a door in the east or west wall turns the inside a quarter round,
@@ -394,7 +391,8 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
   }
   for (const name of take((n) => WORK.test(n) && bigWork(n)))
     if (farm) place({ name: name, room: farmRoom(name), how: "wall", sides: ["n", "w", "e"] })
-    else place({ name: name, room: work, how: "near", at: [centre(work)[0] - 0.5, centre(work)[1]] })
+    // (against a wall where the household also lives in the workshop, which leaves the floor to the hearth and the table)
+    else place({ name: name, room: work, how: shopFront && work === living ? "wall" : "near", at: [centre(work)[0] - 0.5, centre(work)[1]] })
   // tables round the hearth, spread about it
   const near: [number, number] = hearth ? [(hearth.x0 + hearth.x1) / 2, (hearth.z0 + hearth.z1) / 2] : living ? centre(living) : [W / 2, D / 2]
   const tableRoom = hallRoom ?? living
@@ -497,7 +495,14 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
   const store = rooms.find((r) => r.floor === 0 && r.use === "貯蔵") ?? (hall && kitchen ? kitchen : work)
   // the goods on sale stand in the shop, along its side and front walls
   const forSale = (n: string) => !!shop && GOODS.test(n) && (n.endsWith("棚") || !!h.shop)
-  for (const name of take((n) => SHELVES.test(n))) place({ name: name, room: forSale(name) ? shop : store, how: "wall", at: undefined, sides: forSale(name) ? ["w", "e", "s"] : ["n", "w", "e"] })
+  // the food and the crockery are kept by the kitchen fire, or in a store that is not for tools, ash or timber
+  const pantry =
+    rooms.find((r) => r.floor === 0 && r.use === "台所") ??
+    rooms.find((r) => r.floor === 0 && r.use === "貯蔵" && !/道具|農具|灰|薪|材/.test(r.name)) ??
+    (store.use === "貯蔵" ? living : store) ??
+    store
+  const shelfRoom = (n: string) => (forSale(n) ? shop : /保存食|食器/.test(n) ? pantry : store)
+  for (const name of take((n) => SHELVES.test(n))) place({ name: name, room: shelfRoom(name), how: "wall", at: undefined, sides: forSale(name) ? ["w", "e", "s"] : ["n", "w", "e"] })
   // containers by the door in the entry, or in the stores; beds and chests in their sleepers' rooms
   const entry = rooms.find((r) => r.floor === 0 && r.use === "土間") ?? store
   const ownRoom = (n?: string) => (n ? rooms.find((x) => x.floor === 0 && x.name === n) : undefined)
@@ -511,7 +516,7 @@ function layout(h: HouseDef, shopDepth: number, fire: "auto" | "wall" | "centre"
         ? (ownRoom(e.room) ?? rooms.find((x) => x.floor === 0 && x.use === "寝間") ?? living)
         : forSale(name)
           ? shop
-          : /樽|甕|桶|籠|箱|袋|薪|木材/.test(name)
+          : /樽|甕|桶|籠|箱|袋|俵|薪|木材/.test(name)
             ? entry
             : living
     // a chest with no room downstairs goes up to the bedrooms
