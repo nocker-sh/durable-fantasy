@@ -149,7 +149,7 @@ export function CharacterScreen() {
               try {
                 if (await game.setProfile({ name: name, look: look, neck: neck, neckRamp: ramp })) {
                   writeProfileDraft(localStorage, null)
-                  game.openModal(creating ? "welcome" : null)
+                  game.openModal(null)
                 } else setError("保存できませんでした。内容を確認して、もう一度お試しください。")
               } catch {
                 setError("保存できませんでした。もう一度お試しください。")

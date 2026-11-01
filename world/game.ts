@@ -530,7 +530,9 @@ export class Game {
     this.update((s) => ({ chat: [...s.chat, { ...line, id: ++serial }].slice(-CHAT_KEEP) }))
   }
 
+  /** ui.md §3.15: the notice fades, the same line stays in the system log. */
   private notify(text: string, tone: Notice["tone"] = "info") {
+    this.addChat({ channel: "system", text })
     const id = ++serial
     this.update((s) => ({ notices: [...s.notices, { id, text, tone }].slice(-4) }))
     setTimeout(() => this.dismissNotice(id), 2500)

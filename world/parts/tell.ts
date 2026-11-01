@@ -24,7 +24,7 @@ export function tell(event: GameEvent, me: string | undefined): Told {
   const name = (id: ItemId, by?: string) => displayName(id, by)
   if (event.type === "looted") {
     const what = event.items.map((i) => ITEMS[i].name).join("、")
-    notify(`${MONSTER_KINDS[spawnOf(event.monster)?.kind ?? "slime"].name}を追い払った。経験値 +${event.exp}${what ? `、${what}を拾った` : ""}。`, "good")
+    chat(`${MONSTER_KINDS[spawnOf(event.monster)?.kind ?? "slime"].name}を追い払った。経験値 +${event.exp}${what ? `、${what}を拾った` : ""}。`)
     if (event.gained) notify(`レベルが ${event.level} に上がった！`, "good")
     return out
   }
@@ -38,7 +38,7 @@ export function tell(event: GameEvent, me: string | undefined): Told {
     return out
   }
   if (event.type === "shared") {
-    notify(`仲間が${MONSTER_KINDS[spawnOf(event.monster)?.kind ?? "slime"].name}を追い払った。経験値 +${event.exp}。`, "good")
+    chat(`仲間が${MONSTER_KINDS[spawnOf(event.monster)?.kind ?? "slime"].name}を追い払った。経験値 +${event.exp}。`)
     if (event.gained) notify(`レベルが ${event.level} に上がった！`, "good")
     return out
   }
@@ -118,13 +118,11 @@ export function tell(event: GameEvent, me: string | undefined): Told {
     return out
   }
   if (event.type === "bought") {
-    notify(`${name(event.item, event.by)}を${event.count}個買った。`, "good")
-    chat(`${name(event.item, event.by)}を${event.count}個買った（${event.cost}G）。`)
+    notify(`${name(event.item, event.by)}を${event.count}個買った（${event.cost}G）。`, "good")
     return out
   }
   if (event.type === "sold") {
-    notify(`${name(event.item)}を${event.count}個売った。`, "good")
-    chat(`${name(event.item)}を${event.count}個売った（${event.gain}G）。`)
+    notify(`${name(event.item)}を${event.count}個売った（${event.gain}G）。`, "good")
     return out
   }
   if (event.type === "used") {

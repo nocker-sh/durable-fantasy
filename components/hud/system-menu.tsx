@@ -8,7 +8,6 @@ import { Modal } from "#/components/game/modal"
 import { CHANNEL_CAP } from "#/world/channels"
 
 import { CharacterScreen } from "#/components/hud/character-screen"
-import { Welcome } from "#/components/hud/welcome"
 
 export function SystemModals() {
   const modal = useGameState((s) => s.modal)
@@ -16,7 +15,6 @@ export function SystemModals() {
   if (creating) return <CharacterScreen />
   if (modal === "system") return <SystemMenu />
   if (modal === "character") return <CharacterScreen />
-  if (modal === "welcome") return <Welcome />
   if (modal === "help") return <Controls />
   if (modal === "channel") return <Channels />
   return null
