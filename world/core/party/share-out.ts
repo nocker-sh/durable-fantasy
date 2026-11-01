@@ -13,5 +13,7 @@ export function shareOut(props: Props): { owner: string; exp: number }[] {
   const each = Math.floor(total / participants.length)
   const remainder = total - each * participants.length
 
-  return participants.map((member) => ({ owner: member.owner, exp: member.owner === props.killer.owner ? each + remainder : each })).filter((share) => share.owner === props.killer.owner || share.exp > 0)
+  return participants
+    .map((member) => ({ owner: member.owner, exp: member.owner === props.killer.owner ? each + remainder : each }))
+    .filter((share) => share.owner === props.killer.owner || share.exp > 0)
 }

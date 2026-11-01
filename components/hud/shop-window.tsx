@@ -237,9 +237,7 @@ function SellPanel(inputProps2: { picked: number | null; onPick: (slot: number |
               売る
             </Button>
           </>
-        ) : (
-          null
-        )}
+        ) : null}
       </div>
     </div>
   )

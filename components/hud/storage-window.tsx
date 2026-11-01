@@ -109,9 +109,7 @@ export function StorageWindow() {
               引き取る
             </Button>
           </>
-        ) : (
-          null
-        )}
+        ) : null}
       </div>
       {preview && !preview.ok && (
         <p role="status" className="mt-1 font-body text-xs text-text-dim">

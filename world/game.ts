@@ -118,8 +118,7 @@ export class Game {
     try {
       this.session.playerId = await this.loadId()
     } catch {
-      if (version === this.mountVersion)
-        this.update({ failed: true, failureMessage: "保存された内容はそのまま残っている。" })
+      if (version === this.mountVersion) this.update({ failed: true, failureMessage: "保存された内容はそのまま残っている。" })
       return
     }
     if (version !== this.mountVersion) return

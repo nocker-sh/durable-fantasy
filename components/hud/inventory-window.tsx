@@ -57,12 +57,7 @@ export function InventoryWindow() {
     >
       <div className="ui-well grid grid-cols-6 gap-1 p-1.5">
         {bag.map((stack, index) => (
-          <ItemTooltip
-            key={index}
-            item={stack?.item}
-            mark={stack}
-            side="left"
-          >
+          <ItemTooltip key={index} item={stack?.item} mark={stack} side="left">
             <Slot
               icon={stack ? game.iconUrl(stack.item, stack.by) : null}
               rarity={stack ? ITEMS[stack.item].rarity : undefined}

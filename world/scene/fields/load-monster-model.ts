@@ -10,14 +10,16 @@ export function loadMonsterModel(id: MonsterModel["id"]): Promise<LoadedMonsterM
   if (hit) return hit
   const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder)
   const base = `/models/monsters/${id}/`
-  const loading: Promise<LoadedMonsterModel> = Promise.all([loader.loadAsync(base + "model.glb"), loader.loadAsync(base + "walk.glb"), loader.loadAsync(base + "idle.glb")]).then((files) => ({
-    scene: files[0].scene,
-    walk: files[1].animations[0],
-    idle: files[2].animations[0],
-  })).then((loaded) => {
-    monsterModels.loaded.set(id, loaded)
-    return loaded
-  })
+  const loading: Promise<LoadedMonsterModel> = Promise.all([loader.loadAsync(base + "model.glb"), loader.loadAsync(base + "walk.glb"), loader.loadAsync(base + "idle.glb")])
+    .then((files) => ({
+      scene: files[0].scene,
+      walk: files[1].animations[0],
+      idle: files[2].animations[0],
+    }))
+    .then((loaded) => {
+      monsterModels.loaded.set(id, loaded)
+      return loaded
+    })
   monsterModels.loading.set(id, loading)
   return loading
 }

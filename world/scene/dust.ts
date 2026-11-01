@@ -24,7 +24,10 @@ export function dust(material: THREE.Material, amount = 1) {
         #endif
         vAshP = (modelMatrix * ashP).xyz;`,
     )
-    shader.fragmentShader = shader.fragmentShader.replace("#include <common>", `#include <common>
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        "#include <common>",
+        `#include <common>
 varying vec3 vAshN;
 varying vec3 vAshP;
 uniform vec3 ashColor;
@@ -34,9 +37,11 @@ float ashNoise(vec2 p) {
   vec2 i = floor(p), f = fract(p);
   f = f * f * (3.0 - 2.0 * f);
   return mix(mix(ashHash(i), ashHash(i + vec2(1.0, 0.0)), f.x), mix(ashHash(i + vec2(0.0, 1.0)), ashHash(i + vec2(1.0, 1.0)), f.x), f.y);
-}`).replace(
-      "#include <map_fragment>",
-      `#include <map_fragment>
+}`,
+      )
+      .replace(
+        "#include <map_fragment>",
+        `#include <map_fragment>
         {
           // a thin film everywhere, patches and deeper drifts where a
           // broad soft noise rises, in two or three flat tones whose edges are broken at the size
@@ -50,7 +55,7 @@ float ashNoise(vec2 p) {
           float k = up * ashAmount * (drift > 0.6 ? 0.7 : drift > 0.47 ? 0.42 : 0.18);
           diffuseColor.rgb = mix(diffuseColor.rgb, ashColor, clamp(k, 0.0, 0.8));
         }`,
-    )
+      )
   }
   m.needsUpdate = true
 }

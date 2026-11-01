@@ -99,7 +99,11 @@ export function ashlarTex(props: Props): [PixBuf, PixBuf] {
         const outer = Math.abs(x.value - cx) > ww / 2 + 8 || (dy < ww / 2 && Math.hypot(x.value - cx, dy - ww / 2) > ww / 2 + 8)
         if (outer) continue
         if (pad) {
-          b.set({ x: x.value, y: y.value, color: pick({ ramp: "sand", b: 0.82 - ((Math.hypot(x.value - cx, Math.min(0, dy - ww / 2)) | 0) % 4 === 0 ? 0.3 : 0), x: x.value, y: y.value, dither: 0.3 }) })
+          b.set({
+            x: x.value,
+            y: y.value,
+            color: pick({ ramp: "sand", b: 0.82 - ((Math.hypot(x.value - cx, Math.min(0, dy - ww / 2)) | 0) % 4 === 0 ? 0.3 : 0), x: x.value, y: y.value, dither: 0.3 }),
+          })
           continue
         }
         const k = (x.value - cx + 64) % 6

@@ -29,7 +29,8 @@ export function boardWall(props: Props): { ramp: string; level: number; region: 
   if (stain > 0.6) l.value -= 0.6
   if (hash2(k, 0, props.seed + 9) > 0.7 && props.y < props.H * (0.25 + hash2(k, 1, props.seed + 9) * 0.5)) l.value -= 0.7
   const nail = (props.y + 3) % 22
-  if (f >= 2 && f <= 4 && nail < 5 && hash2(k, (props.y + 3) / 22 | 0, props.seed + 10) > 0.4) return { ramp: nail < 2 && f === 3 ? "iron" : "redsand", level: nail < 2 && f === 3 ? 1 : 1.6, region: k }
+  if (f >= 2 && f <= 4 && nail < 5 && hash2(k, ((props.y + 3) / 22) | 0, props.seed + 10) > 0.4)
+    return { ramp: nail < 2 && f === 3 ? "iron" : "redsand", level: nail < 2 && f === 3 ? 1 : 1.6, region: k }
   // greyed by the wet at the foot, with a ragged top edge
   const wet = 12 + vnoise({ x: props.x, y: 0, scale: 0.3, seed: props.seed + 6 }) * 6
   if (v < wet) return { ramp: "stone", level: 2.6 + (wash - 0.5) * 0.6 + (f === 1 ? 0.5 : 0), region: k }
