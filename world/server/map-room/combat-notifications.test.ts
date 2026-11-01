@@ -1,5 +1,6 @@
 import { afterEach, expect, it, vi } from "vitest"
 import { combatAudience } from "#/world/server/map-room/combat-audience"
+import { HEARING_CELLS } from "#/world/protocol"
 import { notifyCombat } from "#/world/server/map-room/notify-combat"
 import { player } from "#/world/test/player"
 import type { CombatNotice } from "#/world/server/wild-coordinator"
@@ -7,23 +8,25 @@ import type { CombatNotice } from "#/world/server/wild-coordinator"
 const defense = { atk: 1, def: 2, hit: 3, flee: 4, crit: 5 }
 afterEach(() => vi.restoreAllMocks())
 
-it("includes each eligible party owner once and excludes closed, fallen, unrelated and own connections", () => {
+it("includes each eligible party owner in earshot once and excludes closed, fallen, distant, unrelated and own connections", () => {
+  const at = { route: [[10, 10]] as [number, number][], since: 0 }
   const connections = [
-    { state: { owner: "friend", party: "group" } },
-    { state: { owner: "friend", party: "group" } },
-    { state: { owner: "owner", party: "group" } },
-    { state: { owner: "closed", party: "group", closed: true } },
-    { state: { owner: "fallen", party: "group", down: true } },
-    { state: { owner: "other", party: "elsewhere" } },
-    { state: { owner: null, party: "group" } },
+    { state: { owner: "friend", party: "group", ...at } },
+    { state: { owner: "friend", party: "group", ...at } },
+    { state: { owner: "owner", party: "group", ...at } },
+    { state: { owner: "closed", party: "group", closed: true, ...at } },
+    { state: { owner: "fallen", party: "group", down: true, ...at } },
+    { state: { owner: "other", party: "elsewhere", ...at } },
+    { state: { owner: null, party: "group", ...at } },
+    { state: { owner: "distant", party: "group", route: [[10, 10 + HEARING_CELLS + 1]] as [number, number][], since: 0 } },
   ]
-  const context = { me: { owner: "owner", party: "group" }, ctx: { room: { getConnections: () => connections } } }
+  const context = { me: { owner: "owner", party: "group", ...at }, ctx: { room: { getConnections: () => connections } } }
   expect(combatAudience({ context, data: { party: "group", level: 3 }, life: 7, defense })).toEqual({ party: "group", near: ["friend"], level: 3, life: 7, defense })
 })
 
 it("does not inspect peers when saved membership differs from the connection", () => {
   const getConnections = vi.fn(() => [])
-  const context = { me: { owner: "owner", party: "old" }, ctx: { room: { getConnections } } }
+  const context = { me: { owner: "owner", party: "old", route: [[0, 0]] as [number, number][], since: 0 }, ctx: { room: { getConnections } } }
   expect(combatAudience({ context, data: { party: "new", level: 3 }, life: 7, defense })).toEqual({ party: null, near: [], level: 3, life: 7, defense })
   expect(getConnections).not.toHaveBeenCalled()
 })

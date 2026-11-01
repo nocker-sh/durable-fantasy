@@ -10,6 +10,8 @@ export type MonsterKind = {
   /** how hard and how surely it strikes back when struck (0: it only runs) */
   atk: number
   hit: number
+  /** ms between its blows once it is fighting (game-system.md §8) */
+  interval: number
   exp: number
   drops: readonly { item: ItemId; chance: number }[]
   /** seconds before it is back after being beaten */

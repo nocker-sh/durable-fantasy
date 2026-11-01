@@ -291,3 +291,16 @@ it.each([undefined, "lunge"] as const)("finishes an already accepted %s blow aft
   expect((await f.recipient.read()).sp).toBe(revived.state.sp)
   expect((await f.recipient.read()).hp).toBe(revived.state.hp)
 })
+
+it("lets a party mate strike the holder's creature and quietly skips a mate's swing while one is being settled", async () => {
+  const f = await fixture()
+  const combat = await f.recipient.readCombat()
+  const audience = { party: "party", near: [], level: 1, life: combat.life, defense: { atk: 1, def: 0, hit: 1, flee: 0, crit: 0 } }
+  const first = await f.source.beginStrike({ target: spawn.id, damage: 1, owner: "hunter", request: "first", audience })
+  if (!first.ok) throw Error(first.reason)
+  expect(await f.source.beginStrike({ target: spawn.id, damage: 1, owner: "mate", request: "early", audience })).toEqual({ ok: false, reason: "NOT_READY", quiet: true })
+  expect(await f.source.beginStrike({ target: spawn.id, damage: 1, owner: "stranger", request: "early" })).toEqual({ ok: false, reason: "TAKEN" })
+  expect((await f.source.strike("hunter", first.id)).refused).toBe(false)
+  expect((await f.source.beginStrike({ target: spawn.id, damage: 1, owner: "mate", request: "turn", audience })).ok).toBe(true)
+  expect(await f.source.beginStrike({ target: spawn.id, damage: 1, owner: "stranger", request: "late" })).toEqual({ ok: false, reason: "TAKEN" })
+})

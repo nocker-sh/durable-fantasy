@@ -31,6 +31,8 @@ export async function planCombat(inputProps: {
   monster: string
   kind: MonsterKind
   beaten: boolean
+  /** how many of its blows fell due by this strike (core/wild/counters-due.ts) */
+  counters: number
   audience: CombatAudience | undefined
   random: Random
 }): Promise<CombatPlan> {
@@ -44,8 +46,10 @@ export async function planCombat(inputProps: {
   const random = inputProps.random
 
   if (!beaten) {
-    if (kind.atk <= 0) return { life: audience.life, effects: [] }
-    const counter = swing({ atk: kind.atk, def: kind.def, hit: kind.hit, flee: kind.flee, crit: 0 }, audience.defense, random)
+    if (kind.atk <= 0 || inputProps.counters <= 0) return { life: audience.life, effects: [] }
+    const blows = Array.from({ length: inputProps.counters }, () => swing({ atk: kind.atk, def: kind.def, hit: kind.hit, flee: kind.flee, crit: 0 }, audience.defense, random))
+    const damage = blows.reduce((sum, blow) => sum + (blow.kind === "miss" ? 0 : blow.damage), 0)
+    const counter: Swing = blows.every((blow) => blow.kind === "miss") ? { kind: "miss" } : { kind: blows.some((blow) => blow.kind === "critical") ? "critical" : "hit", damage }
     return { life: audience.life, counter, effects: counter.kind === "miss" ? [] : [{ owner, life: audience.life, command: { type: "hurt", amount: counter.damage, by: kind.name } }] }
   }
   const items = dropsOf(kind, kind.drops.map(random))

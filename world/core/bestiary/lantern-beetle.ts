@@ -12,6 +12,7 @@ export const draft: MonsterDraft = {
     flee: 6,
     atk: 6,
     hit: 12,
+    interval: 2600,
     exp: 26,
     respawn: 150,
     look: "figure",

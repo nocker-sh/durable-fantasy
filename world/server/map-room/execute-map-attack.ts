@@ -18,6 +18,7 @@ export async function executeMapAttack(room: AttackRequestContext, message: Mess
     audience: combatAudience({ context: room, data: attack.data, life: attack.life, defense: attack.defense }),
   })
   if (!request.ok) {
+    if (request.quiet) return
     await notifyClient(room.ctx.connection.send({ type: "refused", what: "attack", monster: attack.spawn.id, reason: request.reason }))
     return
   }

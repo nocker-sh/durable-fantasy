@@ -23,7 +23,7 @@ export function applyReservedStrike(props: Props): StrikeResult {
       reason: props.payment.reason,
     }
 
-  const applied = hit({ state: props.context.state.wild, id: props.job.target, damage: props.job.damage, now: props.job.at, player: props.owner })
+  const applied = hit({ state: props.context.state.wild, id: props.job.target, damage: props.job.damage, now: props.job.at, player: props.owner, party: props.job.party })
   if (applied.refused) throw new Error("Reserved strike target changed")
 
   props.context.state.wild = applied.state

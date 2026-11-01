@@ -12,6 +12,7 @@ import { initialPlayerRecord } from "#/world/server/initial-player-record"
 import { mapPlayer } from "#/world/server/map-room/map-player"
 import type { AttackRequestContext } from "#/world/server/map-room/attack-types"
 import { handleAttack } from "#/world/server/map-room/handle-attack"
+import { HEARING_CELLS } from "#/world/protocol"
 
 vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }))
 vi.mock("#/world/maps/walkable", () => ({ walkable: () => true }))
@@ -20,7 +21,7 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-it.each(["fallen", "left", "removed", "closed", "duplicate", "eligible", "killer-left", "disconnected-recipient", "failed-broadcast", "disconnected-killer", "failed-share-save"])(
+it.each(["fallen", "far", "left", "removed", "closed", "duplicate", "eligible", "killer-left", "disconnected-recipient", "failed-broadcast", "disconnected-killer", "failed-share-save"])(
   "saves and delivers a party kill using authoritative eligibility: %s",
   async (scenario) => {
     vi.useFakeTimers()
@@ -54,7 +55,8 @@ it.each(["fallen", "left", "removed", "closed", "duplicate", "eligible", "killer
     vi.spyOn(Wild, "get").mockImplementation(() => source as unknown as ReturnType<typeof Wild.get>)
     const at = monsterAt(spawn, Date.now(), () => true)
     const cell: [number, number] = [Math.floor(at.x * 2), Math.floor(at.z * 2)]
-    const connection = { state: { owner: "friend", party: "party", down: false, closed: scenario === "closed" }, send: vi.fn(async () => {}) }
+    const friendCell: [number, number] = scenario === "far" ? [cell[0], cell[1] + HEARING_CELLS + 1] : cell
+    const connection = { state: { owner: "friend", party: "party", down: false, closed: scenario === "closed", route: [friendCell], since: 1000 }, send: vi.fn(async () => {}) }
     if (scenario === "disconnected-recipient") connection.send.mockRejectedValue(Error("Socket closed"))
     const duplicate = { ...connection, send: vi.fn(async () => {}) }
     const send = vi.fn(async () => {})

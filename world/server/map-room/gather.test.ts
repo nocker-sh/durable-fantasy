@@ -31,8 +31,9 @@ function fixture() {
   const send = vi.fn(async (_message: ServerMessage) => {}),
     broadcast = vi.fn(async (_message: ServerMessage) => {})
   const me: Presence = { owner: "owner", player: mapPlayer("connection", p, [...node.cell]), route: [[...node.cell]], since: 1000, said: [], engaged: null, ready: true }
-  const context = { ctx: { connection: { id: "connection", send }, room: { broadcast } }, key: { world: 1, map: node.map }, me } as unknown as Ctx
-  return { node, store, actor, me, context, send, broadcast }
+  const save = vi.fn()
+  const context = { ctx: { connection: { id: "connection", send }, room: { broadcast } }, key: { world: 1, map: node.map }, me, save } as unknown as Ctx
+  return { node, store, actor, me, context, send, broadcast, save }
 }
 it("routes a gathering attempt through durable reservation, receipt and shared remaining count", async () => {
   const f = fixture()
@@ -40,6 +41,7 @@ it("routes a gathering attempt through durable reservation, receipt and shared r
   await HANDLERS.gather!(f.context, message)
   expect(f.send.mock.calls[0][0]).toMatchObject({ type: "result", seq: 1, result: { ok: true, events: [{ type: "gathered" }] } })
   expect(f.broadcast).toHaveBeenCalledExactlyOnceWith({ type: "nodes", left: { [f.node.id]: f.node.max - 1 } })
+  expect(f.save).toHaveBeenCalledWith({ sitting: false })
   const first = await f.actor.read()
   await HANDLERS.gather!(f.context, message)
   expect((await f.actor.read()).bag).toEqual(first.bag)

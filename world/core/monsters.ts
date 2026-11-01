@@ -8,6 +8,7 @@ export const MONSTER_KINDS: Record<string, MonsterKind> = {
     flee: 5,
     atk: 3,
     hit: 6,
+    interval: 2000,
     exp: 9,
     respawn: 90,
     look: "slime",
@@ -24,6 +25,7 @@ export const MONSTER_KINDS: Record<string, MonsterKind> = {
     flee: 8,
     atk: 7,
     hit: 10,
+    interval: 1900,
     exp: 15,
     respawn: 120,
     look: "slime",
@@ -41,6 +43,7 @@ export const MONSTER_KINDS: Record<string, MonsterKind> = {
     flee: 12,
     atk: 12,
     hit: 18,
+    interval: 2100,
     exp: 42,
     respawn: 120,
     look: "slime",
@@ -58,6 +61,7 @@ export const MONSTER_KINDS: Record<string, MonsterKind> = {
     flee: 24,
     atk: 22,
     hit: 38,
+    interval: 2400,
     exp: 140,
     respawn: 150,
     look: "slime",
@@ -76,6 +80,7 @@ export const MONSTER_KINDS: Record<string, MonsterKind> = {
     flee: 18,
     atk: 10,
     hit: 16,
+    interval: 1500,
     exp: 28,
     respawn: 150,
     look: "hare",
@@ -86,7 +91,7 @@ export const MONSTER_KINDS: Record<string, MonsterKind> = {
       { item: "soft-fur", chance: 0.35 },
     ],
   },
-  hare: { name: "野うさぎ", hp: 22, def: 0, flee: 25, atk: 0, hit: 0, exp: 7, respawn: 150, look: "hare", drops: [{ item: "soft-fur", chance: 0.55 }] },
+  hare: { name: "野うさぎ", hp: 22, def: 0, flee: 25, atk: 0, hit: 0, interval: 2000, exp: 7, respawn: 150, look: "hare", drops: [{ item: "soft-fur", chance: 0.55 }] },
 }
 
 const many = (inputProps: { map: string; kind: Spawn["kind"]; n: number; area: Spawn["area"]; from?: number }): Spawn[] => {
@@ -120,5 +125,10 @@ export const MELEE_REACH = 1.6
  * last blow; others' blows glance off meanwhile. Left alone that long, it goes off and recovers.
  */
 export const CLAIM_MS = 30_000
+/**
+ * The most of a creature's blows one strike settles. Its blows are timed (MonsterKind.interval) but only
+ * land when its opponent strikes again, so a long pause is not charged in full (backlog.md).
+ */
+export const COUNTER_MAX = 3
 /** Stamina a fight costs when it is won. */
 export const FIGHT_STAMINA = 2
