@@ -15,8 +15,8 @@ export function collect(state: PlayerState, command: Extract<ServerCommand, { ty
   if (!sameCommissionOrders(state.orders, command.expectedOrders)) return reject("ORDER_CHANGED")
   const order = state.orders[command.index]
   const job = order && commissionOf(order.commission)
-  if (!order || !job) return reject("NOT_READY")
-  if (order.readyAt > now) return reject("NOT_READY")
+  if (!order || !job) return reject("ORDER_CHANGED")
+  if (order.readyAt > now) return reject("NOT_DONE")
   const made = ITEMS[job.output.item].made
   const bag = addItem({ bag: state.bag, item: job.output.item, count: job.output.count, mark: made ? { q: order.q, by: job.craftsman } : undefined })
   if (!bag) return reject("BAG_FULL")

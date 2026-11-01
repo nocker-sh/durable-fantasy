@@ -163,6 +163,7 @@ export type Reason =
   | "ORDER_CHANGED"
   | "TOO_MANY_ORDERS"
   | "NOT_READY"
+  | "NOT_DONE"
   | "NOT_WANTED"
   | "NO_ERRAND"
   | "TOO_MANY_ERRANDS"
@@ -254,7 +255,8 @@ export const REASON_TEXT: Record<Reason, string> = {
   NOT_SKILLED: "まだ腕が足りない。",
   MISSING_INPUTS: "材料が足りない。",
   TOO_MANY_ORDERS: "頼めるのは三つまで。",
-  NOT_READY: "まだできていない。",
+  NOT_READY: "今は手が離せない。",
+  NOT_DONE: "まだできていない。",
   ORDER_CHANGED: "品物が変わった。",
   ITEM_CHANGED: "品物が変わった。",
   NOT_WANTED: "今は買い取ってもらえない。",

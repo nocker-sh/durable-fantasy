@@ -30,7 +30,7 @@ describe("commissions", () => {
       state = order.state
     }
     expect(countItem(state.bag, "raw-hide")).toBe(0)
-    expect(apply(state, { type: "collect", index: 0, expectedOrders: state.orders }, { now: H })).toEqual({ ok: false, reason: "NOT_READY" })
+    expect(apply(state, { type: "collect", index: 0, expectedOrders: state.orders }, { now: H })).toEqual({ ok: false, reason: "NOT_DONE" })
     for (let i = 0; i < 3; i++) {
       const collect = apply(state, { type: "collect", index: 0, expectedOrders: state.orders }, { now: 2 * H })
       expect(collect.ok).toBe(true)
@@ -65,7 +65,7 @@ describe("commissions", () => {
     expect(countItem(r.state.bag, "iron-ingot")).toBe(0)
     expect(countItem(r.state.bag, "soft-fur")).toBe(0)
     expect(r.state.gold).toBe(80)
-    expect(apply(r.state, { type: "collect", index: 0, expectedOrders: r.state.orders }, { now: H })).toEqual({ ok: false, reason: "NOT_READY" })
+    expect(apply(r.state, { type: "collect", index: 0, expectedOrders: r.state.orders }, { now: H })).toEqual({ ok: false, reason: "NOT_DONE" })
     const got = apply(r.state, { type: "collect", index: 0, expectedOrders: r.state.orders }, { now: 2 * H })
     expect(got.ok && countItem(got.state.bag, "iron-sword")).toBe(1)
     expect(got.ok && got.state.orders).toHaveLength(0)
@@ -112,7 +112,7 @@ describe("commissions", () => {
     expect(countItem(ordered.state.bag, "tanned-leather")).toBe(0)
     expect(countItem(ordered.state.bag, "yarn")).toBe(0)
     expect(ordered.state.gold).toBe(100 - 2 * ITEMS["tanned-leather"].price - 12)
-    expect(apply(ordered.state, { type: "collect", index: 0, expectedOrders: ordered.state.orders }, { now: H - 1 })).toEqual({ ok: false, reason: "NOT_READY" })
+    expect(apply(ordered.state, { type: "collect", index: 0, expectedOrders: ordered.state.orders }, { now: H - 1 })).toEqual({ ok: false, reason: "NOT_DONE" })
     const collected = apply(
       loadPlayer(JSON.parse(JSON.stringify(ordered.state))),
       { type: "collect", index: 0, expectedOrders: loadPlayer(JSON.parse(JSON.stringify(ordered.state))).orders },
@@ -177,7 +177,7 @@ describe("commissions", () => {
     expect(collected.state.orders).toEqual([])
     expect(countItem(collected.state.bag, "leather-boots")).toBe(1)
     expect(collected.state.friends["ルドルフ"]).toBeGreaterThan(waiting.friends["ルドルフ"] ?? 0)
-    expect(apply(collected.state, { type: "collect", index: 0, expectedOrders: collected.state.orders }, { now: H })).toEqual({ ok: false, reason: "NOT_READY" })
+    expect(apply(collected.state, { type: "collect", index: 0, expectedOrders: collected.state.orders }, { now: H })).toEqual({ ok: false, reason: "ORDER_CHANGED" })
   })
 
   it("does not spend the first material or fee when a later ingredient is missing", () => {
@@ -210,7 +210,7 @@ it("commissions SP medicine without alchemy, saves the waiting order, then consu
   expect(countItem(ordered.state.bag, "blue-jelly")).toBe(0)
   const saved = loadPlayer(JSON.parse(JSON.stringify(ordered.state)))
   const ready = saved.orders[0].readyAt
-  expect(apply(saved, { type: "collect", index: 0, expectedOrders: saved.orders }, { now: ready - 1 })).toEqual({ ok: false, reason: "NOT_READY" })
+  expect(apply(saved, { type: "collect", index: 0, expectedOrders: saved.orders }, { now: ready - 1 })).toEqual({ ok: false, reason: "NOT_DONE" })
   const collected = apply(saved, { type: "collect", index: 0, expectedOrders: saved.orders }, { now: ready })
   if (!collected.ok) throw Error(collected.reason)
   const slot = collected.state.bag.findIndex((s) => s?.item === "blue-potion")
@@ -219,7 +219,7 @@ it("commissions SP medicine without alchemy, saves the waiting order, then consu
   if (!used.ok) throw Error(used.reason)
   expect(used.state.sp).toBe(Math.min(40, derive(used.state).maxSp))
   expect(countItem(used.state.bag, "blue-potion")).toBe(1)
-  expect(apply(used.state, { type: "collect", index: 0, expectedOrders: used.state.orders }, { now: ready })).toEqual({ ok: false, reason: "NOT_READY" })
+  expect(apply(used.state, { type: "collect", index: 0, expectedOrders: used.state.orders }, { now: ready })).toEqual({ ok: false, reason: "ORDER_CHANGED" })
   const cost = job.fee + job.inputs.reduce((sum, input) => sum + ITEMS[input.item].price * input.count, 0)
   expect(cost).toBeLessThan(ITEMS["blue-potion"].price * job.output.count)
 })
