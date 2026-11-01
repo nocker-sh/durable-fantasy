@@ -130,6 +130,11 @@ export class ServerMessages {
         this.target.update({ party: message.view })
         if (!before && message.view) this.target.notify("パーティに入った。", "good")
         if (before && !message.view) this.target.notify("パーティを抜けた。")
+        if (before && message.view) {
+          const leader = message.view.members.find((member) => member.leader)
+          if (leader && before.members.find((member) => member.leader)?.name !== leader.name) this.target.addChat({ channel: "system", text: leader.me ? "パーティのリーダーになった。" : `${leader.name}がパーティのリーダーになった。` })
+          if (before.mode !== message.view.mode) this.target.addChat({ channel: "system", text: message.view.mode === "even" ? "経験値を均等に分けることになった。" : "経験値は各自のものになった。" })
+        }
         return
       }
       case "party-closed": {

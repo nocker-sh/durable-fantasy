@@ -66,6 +66,14 @@ export class SocialActions {
     this.target.session.socket?.send({ type: "party-leave" })
   }
 
+  kickPartyMember(member: number, name: string) {
+    this.target.session.socket?.send({ type: "party-kick", member, name })
+  }
+
+  passPartyLead(member: number, name: string) {
+    this.target.session.socket?.send({ type: "party-lead", member, name })
+  }
+
   setPartyMode(mode: "own" | "even") {
     this.target.session.socket?.send({ type: "party-mode", mode })
   }

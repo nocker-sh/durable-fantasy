@@ -24,6 +24,8 @@ import { stackSchema } from "#/world/core/player-schema"
 import type { PlayerState } from "#/world/core/player-types"
 import type { Stack } from "#/world/core/bag-types"
 import { SKILL_IDS } from "#/world/core/skill-ids"
+import { PARTY_MAX } from "#/world/core/party/rules"
+import { NAME_MAX } from "#/world/core/player-rules"
 
 /** A party as its members see it. */
 export type PartyView = {
@@ -172,6 +174,9 @@ export const clientMessage = z.discriminatedUnion("type", [
   z.object({ type: z.literal("party-answer"), from: z.string().max(64), yes: z.boolean() }),
   z.object({ type: z.literal("party-leave") }),
   z.object({ type: z.literal("party-mode"), mode: z.enum(["own", "even"]) }),
+  /** the leader removes a member, or hands the lead over; members are named by place in the list and name */
+  z.object({ type: z.literal("party-kick"), member: z.number().int().min(0).max(PARTY_MAX - 1), name: z.string().max(NAME_MAX) }),
+  z.object({ type: z.literal("party-lead"), member: z.number().int().min(0).max(PARTY_MAX - 1), name: z.string().max(NAME_MAX) }),
   z.object({ type: z.literal("party-look"), chat: partyChatCursor.optional() }),
   z.object({ type: z.literal("party-say"), text: z.string().trim().min(1).max(140), chat: partyChatCursor.optional() }),
   /** Fallen, come to in town (game-system.md §8). */

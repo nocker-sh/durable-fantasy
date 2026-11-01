@@ -34,6 +34,16 @@ export function PartyFrame() {
                 Lv {m.level} ・ {m.map}
               </span>
             </div>
+            {party.leading && !m.me && (
+              <div className="flex justify-end gap-1">
+                <Button size="sm" aria-label={`${m.name}にリーダーを任せる`} onClick={() => game.passPartyLead(i, m.name)}>
+                  任せる
+                </Button>
+                <Button size="sm" aria-label={`${m.name}をパーティから外す`} onClick={() => game.kickPartyMember(i, m.name)}>
+                  外す
+                </Button>
+              </div>
+            )}
             <Meter tone="hp" value={m.hp} max={m.maxHp} className="h-[8px]" aria-label={`${m.name}の HP`} showValue={false} />
           </li>
         ))}

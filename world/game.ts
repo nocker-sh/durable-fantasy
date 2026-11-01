@@ -332,6 +332,8 @@ export class Game {
   answerParty = this.socialActions.answerParty.bind(this.socialActions)
   leaveParty = this.socialActions.leaveParty.bind(this.socialActions)
   setPartyMode = this.socialActions.setPartyMode.bind(this.socialActions)
+  kickPartyMember = this.socialActions.kickPartyMember.bind(this.socialActions)
+  passPartyLead = this.socialActions.passPartyLead.bind(this.socialActions)
   answerTrade = this.socialActions.answerTrade.bind(this.socialActions)
   offerTrade = this.socialActions.offerTrade.bind(this.socialActions)
   lockTrade = this.socialActions.lockTrade.bind(this.socialActions)
