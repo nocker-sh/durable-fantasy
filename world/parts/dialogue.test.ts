@@ -111,5 +111,10 @@ it("lets a keeper at the counter be asked to sell without talking first", () => 
     { label: "さようなら", action: "close" },
   ])
   expect(menuFor(choicesFor(state, "マルタ"))).toBeNull()
-  expect(menuFor([{ label: "頼まれごとを聞く", action: "errand-ask", errand: "irmgard-herbs" }, { label: "さようなら", action: "close" }])).toBeNull()
+  expect(
+    menuFor([
+      { label: "頼まれごとを聞く", action: "errand-ask", errand: "irmgard-herbs" },
+      { label: "さようなら", action: "close" },
+    ]),
+  ).toBeNull()
 })

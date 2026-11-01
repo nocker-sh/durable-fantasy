@@ -1309,7 +1309,7 @@ React との共有の定義は `components/game/game-context.ts` に一つだけ
 
 ## 会話と通知・描画用の小さな変換
 
-会話の店の状態・依頼の選択・操作の選択・台詞の選択は `world/parts/keeping-shop.ts`・`errand-choices.ts`・`choices-for.ts`・`lines-for.ts` が持つ。台詞には名前付きの入力で状態・住民・既読の保存先と時刻を渡し、既読の読取りは `read-spoken-names.ts` に分ける。出来事の通知は `tell.ts`、交流が終了した理由の文言はそれぞれの `*-closed-text.ts` に置く。分離によって表示文言や通知・履歴の順を変えない。
+会話の店の状態・依頼の選択・操作の選択・役目のある人が最初に出す選択肢・台詞の選択は `world/parts/keeping-shop.ts`・`errand-choices.ts`・`choices-for.ts`・`menu-for.ts`・`lines-for.ts` が持つ。台詞には名前付きの入力で状態・住民・既読の保存先と時刻を渡し、既読の読取りは `read-spoken-names.ts` に分ける。出来事の通知は `tell.ts`、交流が終了した理由の文言はそれぞれの `*-closed-text.ts` に置く。分離によって表示文言や通知・履歴の順を変えない。
 
 プロフィールの下書きは `world/client/profile-draft.ts` の同じスキーマで読み、読取りと書込みは `read-profile-draft.ts` と `write-profile-draft.ts` に分ける。敵の更新は `current-creature.ts` と `merge-wild.ts` が同じ個体の版を比較し、遅い更新を捨てても別の個体の新しい情報を失わない。ピクセルの定義表は `world/art/pixel-art.ts` に残し、文字配列の変換と空き装備枠の影は `sprite.ts` と `silhouette.ts`、品目用の色の変換は `items/` の関数の定義元を直接参照する。
 
