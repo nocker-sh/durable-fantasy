@@ -1,72 +1,61 @@
-// Every outdoor map by day and by night, from where you come in, zoomed out: for checking how
-// the maps look (town.md). Writes PNGs to ~/Pictures/durable-fantasy-maps/ and small JPEGs for
-// /dev/maps/<id> to public/dev/maps/. Run with the dev server up: bun scripts/shoot-maps.ts [map …]
+// Every map as /dev/view draws it, for /dev/maps/<id>: outdoor maps by day, by night and from the far
+// side, rooms whole and close. Writes JPEGs to public/dev/maps/<id>-<view>.jpg (kept out of git).
+// Heavy (a browser per picture): run it on a cloud machine, not on the Mac you play on.
+// With the dev server up: node scripts/shoot-maps.ts [map …]
+// BASE: the dev server (https://durable-fantasy.localhost); CHROME: a Chromium to use instead of Chrome.
 import { mkdirSync } from "node:fs"
-import { homedir } from "node:os"
-import { join } from "node:path"
+import { dirname, join } from "node:path"
+import { fileURLToPath } from "node:url"
 import { chromium } from "playwright-core"
-import { MAPS } from "#/world/maps/index"
 
 const BASE = process.env.BASE ?? "https://durable-fantasy.localhost"
-const out = join(homedir(), "Pictures", "durable-fantasy-maps"),
-  dev = join(import.meta.dir, "..", "public", "dev", "maps")
-mkdirSync(out, { recursive: true })
+const dev = join(dirname(fileURLToPath(import.meta.url)), "..", "public", "dev", "maps")
 mkdirSync(dev, { recursive: true })
-const only = process.argv.slice(2)
-const maps = Object.values(MAPS).filter((m) => m.kind !== "indoor" && (!only.length || only.includes(m.id)))
+
+/** What each kind of map is shot as; the same views as SHOTS in dev/sheets/maps.tsx. */
+const OUTDOOR = [
+  { view: "day", query: "time=12:00&zoom=0" },
+  { view: "night", query: "time=21:00&zoom=0" },
+  { view: "back", query: "time=12:00&zoom=0&turn=4" },
+]
+const INDOOR = [
+  { view: "whole", query: "time=12:00&zoom=1" },
+  { view: "close", query: "time=12:00&zoom=2" },
+]
+// the meeting hall is too big for the room views above
+const BIG_ROOM = [
+  { view: "whole", query: "time=12:00&zoom=0" },
+  { view: "close", query: "time=12:00&zoom=1" },
+]
+
 const browser = await chromium.launch({
-  headless: false,
-  channel: "chrome",
-  args: ["--use-angle=metal", "--window-size=1280,860", "--disable-background-timer-throttling", "--disable-renderer-backgrounding", "--disable-backgrounding-occluded-windows"],
+  ...(process.env.CHROME ? { executablePath: process.env.CHROME } : { channel: "chrome" }),
+  args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--disable-background-timer-throttling", "--disable-renderer-backgrounding"],
 })
-for (const m of maps)
-  for (const entry of [
-    ["day", "12:00"],
-    ["night", "21:00"],
-  ] as const) {
-    const when = entry[0]
-    const time = entry[1]
-
-    // a fresh page each time: a running game page is slow to let go of
+// the maps, as the dev server has them
+const list = await browser.newPage({ ignoreHTTPSErrors: true })
+await list.goto(`${BASE}/dev/view?map=-&ui=0`, { waitUntil: "domcontentloaded" })
+await list.waitForFunction(() => document.body.dataset.ready === "missing", undefined, { timeout: 120_000 })
+const all: { id: string; kind: string }[] = await list.evaluate(async () => {
+  const { MAPS } = await import("/world/maps/index.ts")
+  return Object.values(MAPS as Record<string, { id: string; kind: string }>).map((m) => ({ id: m.id, kind: m.kind }))
+})
+await list.close()
+const only = process.argv.slice(2)
+const maps = all.filter((m) => !only.length || only.includes(m.id))
+for (const m of maps) {
+  const shots = m.kind !== "indoor" ? OUTDOOR : m.id.startsWith("phanthiet-in-h-m5") ? BIG_ROOM : INDOOR
+  for (const shot of shots) {
     const page = await browser.newPage({ ignoreHTTPSErrors: true, viewport: { width: 1280, height: 800 } })
-    const xState = [m.size / 4, m.size / 4],
-      x = xState[0],
-      z = xState[1]
-    for (let tries = 0; tries < 3; tries++) {
-      await page.goto(`${BASE}/?map=${m.id}&x=${x}&z=${z}&time=${time}`, { waitUntil: "domcontentloaded" })
-      if (
-        await page
-          .waitForFunction(() => document.body.dataset.ready === "1", undefined, { timeout: 60_000 })
-          .then(
-            () => true,
-            () => false,
-          )
-      )
-        break
-      console.log(m.id, when, "not ready, again")
-    }
-    // the screen between maps gone
-    await page.waitForFunction(() => !document.querySelector(".z-\\[90\\]"), undefined, { timeout: 30_000 }).catch(() => console.log(m.id, when, "cover still up"))
-    // the windows out of the way, and the view pulled back
-    for (let i = 0; i < 4; i++) await page.keyboard.press("Escape")
-    await page.mouse.move(640, 400)
-    for (let i = 0; i < 6; i++) {
-      await page.mouse.wheel(0, 300)
-      await page.waitForTimeout(250)
-    }
-    // the log and the chat out of the picture
-    await page.evaluate(() => {
-      for (const el of document.querySelectorAll("*")) {
-        if (el.children.length || !/^(システムログ|チャット)$/.test(el.textContent ?? "")) continue
-        const buttons = el.parentElement?.querySelectorAll("button") ?? []
-        ;(buttons[buttons.length - 1] as HTMLElement | undefined)?.click()
-      }
-    })
-
-    await page.waitForTimeout(3000)
-    await page.screenshot({ path: join(out, `${m.id}-${when}.png`) })
-    await page.screenshot({ path: join(dev, `${m.id}-${when}.jpg`), type: "jpeg", quality: 70 })
-    console.log(m.id, when)
+    await page.goto(`${BASE}/dev/view?map=${m.id}&${shot.query}&blur=0&ui=0`, { waitUntil: "domcontentloaded" })
+    const ready = await page.waitForFunction(() => document.body.dataset.ready === "1", undefined, { timeout: 240_000 }).then(
+      () => true,
+      () => false,
+    )
+    await page.waitForTimeout(1500)
+    await page.screenshot({ path: join(dev, `${m.id}-${shot.view}.jpg`), type: "jpeg", quality: 84 })
+    console.log(m.id, shot.view, ready ? "" : "(not ready)")
     await page.close()
   }
+}
 await browser.close()

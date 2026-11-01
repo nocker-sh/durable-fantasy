@@ -12,6 +12,19 @@ import { MAP_KIND } from "#/dev/sheets/shared"
 import { mapName } from "#/dev/sheets/map-name"
 import { ref } from "#/dev/sheets/ref"
 
+/** The pictures scripts/shoot-maps.ts takes of each map, in public/dev/maps/<id>-<view>.jpg. */
+const SHOTS = {
+  outdoor: [
+    { view: "day", label: "昼 12:00" },
+    { view: "night", label: "夜 21:00" },
+    { view: "back", label: "反対側から" },
+  ],
+  indoor: [
+    { view: "whole", label: "部屋全体" },
+    { view: "close", label: "寄り" },
+  ],
+}
+
 const maps = sheet({
   id: "maps",
   label: "マップ",
@@ -26,7 +39,7 @@ const maps = sheet({
   ],
   refs: (m) => [...new Set(m.warps.map((w) => w.to.map))].map((id) => ({ sheet: "maps", id, as: "出口" })),
   top: () => <WorldGrid />,
-  // by day and by night, from where you come in (scripts/shoot-maps.ts)
+  // the pictures of each map (scripts/shoot-maps.ts)
   more: (m) => [
     {
       title: "3D",
@@ -40,24 +53,23 @@ const maps = sheet({
         ],
       ],
     },
-    ...(m.kind === "indoor"
-      ? []
-      : [
-          {
-            title: "昼と夜",
-            head: [],
-            wide: true,
-            rows: [
-              [
-                <div key="i" className="grid gap-2 md:grid-cols-2">
-                  {["day", "night"].map((w) => (
-                    <img key={w} src={`/dev/maps/${m.id}-${w}.jpg`} alt={w} className="w-full rounded-md border" />
-                  ))}
-                </div>,
-              ],
-            ],
-          },
-        ]),
+    {
+      title: "見た目",
+      head: [],
+      wide: true,
+      rows: [
+        [
+          <div key="i" className={`grid gap-2 ${m.kind === "indoor" ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
+            {SHOTS[m.kind === "indoor" ? "indoor" : "outdoor"].map((s) => (
+              <figure key={s.view} className="grid gap-1">
+                <img src={`/dev/maps/${m.id}-${s.view}.jpg`} alt={s.label} className="w-full rounded-md border" />
+                <figcaption className="text-muted-foreground text-xs">{s.label}</figcaption>
+              </figure>
+            ))}
+          </div>,
+        ],
+      ],
+    },
   ],
 })
 
