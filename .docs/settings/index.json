@@ -2153,9 +2153,9 @@
       "source": "world/town/houses.ts"
     },
     {
-      "id": "room-smithy-peter",
+      "id": "room-smithy-3",
       "kind": "rooms",
-      "file": "rooms/room-smithy-peter.md",
+      "file": "rooms/room-smithy-3.md",
       "source": "world/town/houses.ts"
     },
     {

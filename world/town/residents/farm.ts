@@ -79,7 +79,7 @@ const residents = {
   ゲルトルート: {
     name: "ゲルトルート",
     job: "糸紡ぎ",
-    at: [40, 23.2],
+    at: [40.6, 19.6],
     item: null,
     look: { skirt: "long", footwear: "clogs", top: "cGray", apron: "cLinen", cape: "cBrown", bow: "cCream", sex: "f", age: "old", skin: "skin1", hair: "hGray", style: "bun", eye: "cBlue" },
   },

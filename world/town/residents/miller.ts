@@ -5,7 +5,7 @@ const residents = {
     map: "phanthiet",
     name: "ベルトラム",
     job: "粉屋",
-    at: [37.4, 6.4],
+    at: [44.9, 5.9],
     item: "sack",
     look: {
       legs: "straight",

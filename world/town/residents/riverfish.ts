@@ -27,7 +27,7 @@ const residents = {
     map: "phanthiet",
     name: "テーダ",
     job: "網繕い",
-    at: [25.4, 44.8],
+    at: [28.4, 39.6],
     item: null,
     look: { skirt: "mid", footwear: "clogs", top: "cBlue", apron: "cGray", sex: "f", skin: "skin2", hair: "hBlack", style: "long", hat: "kerchief", hatRamp: "cSky", eye: "cBlue" },
   },

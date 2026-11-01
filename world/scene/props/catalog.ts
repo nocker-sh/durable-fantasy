@@ -47,12 +47,13 @@ export const THINGS: Readonly<Record<string, Thing>> = {
   "rope-coil": workThings["rope-coil"],
   "bird-feeder": animalsThings["bird-feeder"],
   cat: animalsThings["cat"],
+  beehives: animalsThings["beehives"],
 }
 
 /** What a household keeps by its walls, by what it does and how it lives. */
 /** What each household keeps by its walls beyond what every house has (things.test.ts: every household is here, every thing is used). */
 export const THINGS_BY_HOUSEHOLD: Record<string, readonly string[]> = {
-  farm: ["wheelbarrow", "sack-pile", "basket-stack", "cat", "milk-churns", "hay-bale", "tool-rack"],
+  farm: ["wheelbarrow", "sack-pile", "basket-stack", "cat", "milk-churns", "hay-bale", "tool-rack", "beehives"],
   fisher: ["washtub", "clay-jars", "bucket-yoke", "rope-coil"],
   greengrocer: ["basket-stack", "crate-stack", "washtub"],
   fruit: ["basket-stack", "crate-stack", "ladder"],

@@ -19,7 +19,7 @@
     "room-smithy-lower-stairs",
     "room-smithy-upper-stairs",
     "room-smithy-2",
-    "room-smithy-peter"
+    "room-smithy-3"
   ],
   "role": "workshop",
   "issues": [
@@ -33,7 +33,7 @@
     "room-smithy-household",
     "room-smithy-lower-stairs",
     "room-smithy-upper-stairs",
-    "room-smithy-peter",
+    "room-smithy-3",
     "resident-ギュンター",
     "resident-ペーター"
   ],
@@ -59,7 +59,7 @@
         "rooms": [
           "room-smithy-upper-stairs",
           "room-smithy-2",
-          "room-smithy-peter"
+          "room-smithy-3"
         ]
       }
     ]
@@ -108,7 +108,7 @@
 
 ## 部屋の構成
 
-提案では地上階の [[room-smithy-1]] と [[room-smithy-household]] を分け、[[room-smithy-lower-stairs]]・[[room-smithy-upper-stairs]] から上階の [[room-smithy-2]] と [[room-smithy-peter]] へ別々に入る。
+提案では地上階の [[room-smithy-1]] と [[room-smithy-household]] を分け、[[room-smithy-lower-stairs]]・[[room-smithy-upper-stairs]] から上階の [[room-smithy-2]] と [[room-smithy-3]] へ別々に入る。
 
 ## 生活と仕事の設計条件
 
@@ -118,7 +118,7 @@
 
 ## 現状との差分
 
-現行の家具候補は炉（外）、金床（外）、道具棚、寝台×2、食卓、椅子×2。これは配置の正しさを示すものではない。各部屋のグリッドで、家具の実寸、使用面、扉の開閉、階段と通路を検証する。便所・排水・換気の配置は本資料ではまだ確定していない。
+現行は 2 階建てで、地上に開け放しの鍛冶場、上階にギュンターの部屋とペーターの部屋を分けて置く（[[room-smithy-2]]・[[room-smithy-3]]）。ペーターは子どもなので子どもの寝台で眠る。家具候補は炉（外）、金床（外）、道具棚、素材の箱、炭俵、寝台、子どもの寝台、食卓、椅子×2。[[room-smithy-household]] の食事と身支度の区画は、現行ではまだ鍛冶場と分けていない。これは配置の正しさを示すものではない。各部屋のグリッドで、家具の実寸、使用面、扉の開閉、階段と通路を検証する。便所・排水・換気の配置は本資料ではまだ確定していない。
 
 
 ## 火床・家庭と二人の個室

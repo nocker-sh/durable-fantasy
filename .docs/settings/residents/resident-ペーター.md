@@ -12,7 +12,7 @@
     "building-smithy"
   ],
   "bedroom_candidates": [
-    "room-smithy-peter"
+    "room-smithy-3"
   ],
   "work": "鍛冶見習い",
   "relationships": [
@@ -39,11 +39,11 @@
     "寝台・個人収納のグリッド照合未完了",
     "食事・水・便所・衣服の手入れの場所照合未完了"
   ],
-  "bedroom": "room-smithy-peter",
+  "bedroom": "room-smithy-3",
   "bed_id": "bed-smithy-2-2",
   "design_dependencies": [
     "building-smithy",
-    "room-smithy-peter",
+    "room-smithy-3",
     "room-smithy-1"
   ],
   "storage_ids": [
@@ -88,4 +88,4 @@
 
 ## 固有の寝床
 
-常用の寝床は [[room-smithy-peter]] の bed-smithy-2-2 に割り当てる。客室や仕事場の休憩用家具を、本人の寝床の代わりに数えない。衣服、首巻き、私物の収納は storage_ids の個人区画へ割り当て、寝台の使用面と合わせて容量・開閉を照合する。
+常用の寝床は [[room-smithy-3]] の bed-smithy-2-2 に割り当てる。客室や仕事場の休憩用家具を、本人の寝床の代わりに数えない。衣服、首巻き、私物の収納は storage_ids の個人区画へ割り当て、寝台の使用面と合わせて容量・開閉を照合する。

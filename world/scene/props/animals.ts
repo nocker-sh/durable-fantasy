@@ -48,6 +48,51 @@ const animalsThings: Readonly<Record<string, Thing>> = {
       blockCircle(x, z, 0.1)
     },
   },
+  beehives: {
+    name: "軒下の蜂の巣箱",
+    group: "生き物",
+    wall: "hang",
+    r: 0,
+    build: (inputProps) => {
+      const gb = inputProps.builder
+      const x = inputProps.x
+      const z = inputProps.z
+      const along = inputProps.along
+
+      // two straw skeps on a low bench against the wall, out of the house and the coop
+      const y = y0(x, z)
+      const lState = along ? [0.38, 0.13] : [0.13, 0.38],
+        lx = lState[0],
+        lz = lState[1]
+      gb.box({ side: M.woodDark, top: M.wood, x0: x - lx, y0: y + 0.42, z0: z - lz, x1: x + lx, y1: y + 0.46, z1: z + lz, repeat: 1 })
+      for (const s of [-0.3, 0.3])
+        gb.box({
+          side: M.woodDark,
+          top: null,
+          x0: x + (along ? s : 0) - 0.04,
+          y0: y,
+          z0: z + (along ? 0 : s) - 0.04,
+          x1: x + (along ? s : 0) + 0.04,
+          y1: y + 0.42,
+          z1: z + (along ? 0 : s) + 0.04,
+          repeat: 1,
+        })
+      for (const s of [-0.18, 0.18])
+        for (const t = { value: 0 }; t.value < 4; t.value++)
+          gb.cyl({
+            side: M.thatch,
+            top: t.value === 3 ? M.thatch : null,
+            centerX: x + (along ? s : 0),
+            centerZ: z + (along ? 0 : s),
+            fromY: y + 0.46 + t.value * 0.08,
+            toY: y + 0.54 + t.value * 0.08,
+            fromRadius: 0.13 - t.value * 0.025,
+            toRadius: 0.12 - t.value * 0.03,
+            segments: 9,
+            repeat: 1,
+          })
+    },
+  },
   cat: {
     name: "丸くなった猫",
     group: "生き物",

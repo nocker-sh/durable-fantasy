@@ -42,6 +42,7 @@ import { armorStand } from "#/world/scene/construction/helpers/furnishings/armor
 import { spearRack } from "#/world/scene/construction/helpers/furnishings/spear-rack"
 import { perch } from "#/world/scene/construction/helpers/furnishings/perch"
 import { beehive } from "#/world/scene/construction/helpers/furnishings/beehive"
+import { nestBox } from "#/world/scene/construction/helpers/furnishings/nest-box"
 import { hay } from "#/world/scene/construction/helpers/furnishings/hay"
 import { handcart } from "#/world/scene/construction/helpers/furnishings/handcart"
 import { stool } from "#/world/scene/construction/helpers/furnishings/stool"
@@ -150,6 +151,7 @@ export const FURNISHINGS: Record<string, Builder> = {
   古い槍: B((k, w, s) => spearRack({ k: k, wd: w, seed: s, old: true })),
   止まり木: perch,
   巣箱: B((k) => beehive(k)),
+  産卵箱: nestBox,
   干し草: B((k) => hay(k)),
   荷車: handcart,
   腰掛け: stool,
