@@ -119,8 +119,10 @@ const DEFINITIONS = {
   "sharp-fang": material({ name: "鋭い牙", price: 12, icon: "fang", description: "森の灰うさぎが残した硬い歯。根や樹皮をかじって鋭くなり、お守りに加工される。" }),
   feather: material({ name: "羽根", price: 5, icon: "feather", description: "大きな鳥の羽根。矢羽根や帽子の飾りに使う。" }),
   "hard-shell": material({ name: "硬い甲殻", price: 16, icon: "shell", description: "虫の魔物の甲殻。軽くて丈夫。" }),
+  "old-bone": material({ name: "古い骨", price: 6, icon: "bone", description: "何の骨かはわからない。崩れた砦のあたりでよく見つかる。" }),
   "sticky-thread": material({ name: "粘る糸", price: 10, icon: "thread", description: "虫の魔物が吐く糸。乾くと絹のようにしなやかになる。" }),
   "rusty-scrap": material({ name: "錆びた鉄くず", price: 7, icon: "scrap", description: "大戦の頃の何かの部品。鍛冶屋が溶かして使う。" }),
+  "old-cog": material({ name: "古い歯車", price: 30, icon: "cog", description: "戦時の機械の歯車。いまの機関にもそのまま合うことがある。", rarity: "rare", weight: 2 }),
 
   // ---------------------------------------------------------------- crystals (magic fuel)
   "small-crystal": {
