@@ -193,7 +193,7 @@ export const serverMessage = z.discriminatedUnion("type", [
   z.object({ type: z.literal("said"), id: z.string(), text: z.string(), shout: z.boolean() }),
   z.object({ type: z.literal("result"), seq: z.number(), result: z.custom<Transition>(() => true) }),
   /** The warp was allowed: leave this room and join `map` at `at`. */
-  z.object({ type: z.literal("warped"), map: z.string(), at: cellSchema }),
+  z.object({ type: z.literal("warped"), map: z.string(), at: cellSchema, /** the world they are still in, when a crossing was refused */ world: z.number().int().min(1).optional() }),
   /** The exchange as this player sees it for one symbol. */
   z.object({ type: z.literal("exchange"), symbol: z.string(), view: z.custom<ExchangeView>(() => true) }),
   /** The creatures on this map: what each has left and when the beaten ones are back (on joining). */

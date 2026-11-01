@@ -1,5 +1,6 @@
 import type { GameSession } from "#/world/client/game-session"
 import type { GameContext } from "#/world/client/context"
+import { mayCrossWorldsFrom } from "#/world/maps/may-cross-worlds-from"
 
 export class SocialActions {
   constructor(
@@ -33,12 +34,18 @@ export class SocialActions {
   }
 
   visitTown(town: number) {
-    if (town === this.target.session.rooms.world || this.target.session.engaged || this.target.session.state.get().trade) return
-    const home = town === this.target.session.state.get().homeTown
+    const state = this.target.session.state.get()
+    if (town === this.target.session.rooms.world || this.target.session.engaged || state.trade) return
+    if (!mayCrossWorldsFrom(state.map.id)) {
+      this.target.notify("町の外では糸をたどれない。", "bad")
+      return
+    }
+    const home = town === state.homeTown
+    const friend = [...(state.player?.threads ?? [])].reverse().find((thread) => thread.town === town)
     this.target.session.rooms.world = town
     this.target.session.wantChannel = null
     this.target.enterMap("phanthiet", null)
-    this.target.addChat({ channel: "system", text: home ? "マフラーに引かれて、自分の町に帰った。" : `糸をたどって、町${town}に渡った。` })
+    this.target.addChat({ channel: "system", text: home ? "マフラーに引かれて、自分の町に帰った。" : `糸をたどって、${friend ? `${friend.name}の町` : `町${town}`}に渡った。` })
   }
 
   inviteParty(id: string) {

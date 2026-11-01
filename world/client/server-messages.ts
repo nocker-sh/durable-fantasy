@@ -23,7 +23,7 @@ export class ServerMessages {
     > & {
       readonly session: Pick<
         GameSession,
-        "partyChat" | "net" | "arriveAt" | "others" | "socket" | "waiting" | "wild" | "fighting" | "state" | "engaged" | "fullTries" | "warping" | "warpAgainAt" | "refusedWarp"
+        "partyChat" | "net" | "arriveAt" | "others" | "socket" | "waiting" | "wild" | "fighting" | "state" | "engaged" | "fullTries" | "warping" | "warpAgainAt" | "refusedWarp" | "rooms" | "wantChannel"
       >
     },
   ) {}
@@ -181,7 +181,13 @@ export class ServerMessages {
         return
       }
       case "warped": {
-        if (isMapId(message.map)) this.target.enterMap(message.map, message.at)
+        if (!isMapId(message.map)) return
+        // the crossing was refused (not from a town): stay in the world we are still in
+        if (message.world !== undefined && message.world !== this.target.session.rooms.world) {
+          this.target.session.rooms.world = message.world
+          this.target.session.wantChannel = null
+        }
+        this.target.enterMap(message.map, message.at)
         return
       }
       case "refused": {
@@ -200,7 +206,9 @@ export class ServerMessages {
         if (message.what === "join" && message.reason === "NOT_YOUR_TOWN") {
           // no thread leads here: our muffler takes us home
           this.target.notify("この町へつながる糸を持っていない。", "bad")
-          this.target.visitTown(this.target.session.state.get().homeTown)
+          this.target.session.rooms.world = this.target.session.state.get().homeTown
+          this.target.session.wantChannel = null
+          this.target.enterMap("phanthiet", null)
           return
         }
         if (message.what === "party-chat") {
