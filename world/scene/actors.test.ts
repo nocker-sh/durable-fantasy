@@ -10,6 +10,8 @@ import { spriteFrame } from "#/world/scene/sprite-frame"
 vi.mock("#/world/scene/sprite-key", () => ({ lookKey: () => "test-look" }))
 vi.mock("#/world/scene/baked-strip", () => ({ bakedStrip: vi.fn(() => undefined) }))
 vi.mock("#/world/scene/sprite-frame", () => ({ spriteFrame: vi.fn(() => null) }))
+// frames are shrunk to the world's dot before they are drawn onto a strip; here the pixels do not matter
+vi.mock("#/world/scene/figure/shrink-sprite", () => ({ shrinkSprite: vi.fn(() => ({})) }))
 
 const look = { top: "cCream", bottom: "cGray", sex: "m", skin: "skin1", hair: "hBrown", style: "curly", eye: "cBlue" } as const
 
@@ -20,9 +22,9 @@ afterEach(() => {
 })
 
 function canvasDocument() {
-  const drawImage = vi.fn()
-  vi.stubGlobal("document", { createElement: () => ({ width: 0, height: 0, getContext: () => ({ clearRect: vi.fn(), drawImage }) }) })
-  return drawImage
+  const putImageData = vi.fn()
+  vi.stubGlobal("document", { createElement: () => ({ width: 0, height: 0, getContext: () => ({ clearRect: vi.fn(), putImageData }) }) })
+  return putImageData
 }
 
 it("reuses resident ground height while stationary and resamples after movement or relocation", () => {

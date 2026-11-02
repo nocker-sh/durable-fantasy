@@ -6,7 +6,7 @@ import type { V2 } from "#/world/scene/construction/registry"
 import type { Critter } from "#/world/scene/animal-types"
 import type { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
 import { addSprite } from "#/world/scene/construction/add-sprite"
-import { toTexture as toTex } from "#/lib/graphics/to-texture"
+import { dotTexture } from "#/world/scene/textures/dot-texture"
 import { outlineSprite } from "#/lib/graphics/outline-sprite"
 
 type Props = Readonly<{ scene: THREE.Object3D; frames: readonly PixBuf[]; ppu: number; area: readonly [number, number, number, number]; speed: number; kind: "hen" | "cat" }>
@@ -44,7 +44,7 @@ export class SpriteCritter implements Critter {
       ppu = props.ppu,
       area = props.area
     this.frames = frames.map((f) => {
-      const t = toTex(f, false)
+      const t = dotTexture(f, ppu)
       t.wrapS = THREE.RepeatWrapping
       return t
     })

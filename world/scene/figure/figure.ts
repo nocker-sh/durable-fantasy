@@ -1,4 +1,5 @@
-import { FIG_PPU } from "#/world/scene/figure/display-scale"
+import { FIG_PPU, FIG_DOT } from "#/world/scene/figure/display-scale"
+import { shrinkSprite } from "#/world/scene/figure/shrink-sprite"
 import * as THREE from "three"
 
 import { FW, FH, OY } from "#/world/scene/figure/render"
@@ -9,6 +10,10 @@ const shadowMat = new THREE.MeshBasicMaterial({ color: 0x1a1420, transparent: tr
 const cardGeo = new THREE.PlaneGeometry(FW / FIG_PPU, FH / FIG_PPU).translate(0, (FH / 2 - (FH - OY)) / FIG_PPU, 0)
 
 const shadowGeo = new THREE.CircleGeometry(0.26, 12)
+
+/** a frame as it lies on its strip: shrunk to the world's dot (the card keeps its size in the world) */
+const DW = FW / FIG_DOT,
+  DH = FH / FIG_DOT
 
 const MAX_STRIPS = 16
 
@@ -65,7 +70,7 @@ export class Figure {
    * be found at a glance by night or behind a roof; anyone else only while the pointer is on them.
    */
   private rim: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial> | null = null
-  private rimTexel = { value: new THREE.Vector2(1 / FW, 1 / FH) }
+  private rimTexel = { value: new THREE.Vector2(1 / DW, 1 / DH) }
   outline(on: boolean, through = false) {
     if (!on && !this.rim) return
     if (!this.rim) {
@@ -103,7 +108,7 @@ export class Figure {
       this.rim.material.needsUpdate = true
     }
     // the strip's frames sit side by side: one texel across is 1 / (frame width × frames) of the texture
-    if (map) this.rimTexel.value.set(map.repeat.x / FW, 1 / FH)
+    if (map) this.rimTexel.value.set(map.repeat.x / DW, 1 / DH)
   }
   constructor(
     public look: Look,
@@ -166,8 +171,8 @@ export class Figure {
       }
       const count = FRAMES[anim]
       const canvas = document.createElement("canvas")
-      canvas.width = count * FW
-      canvas.height = FH
+      canvas.width = count * DW
+      canvas.height = DH
       const tex = new THREE.CanvasTexture(canvas)
       tex.magFilter = THREE.NearestFilter
       tex.minFilter = THREE.NearestFilter
@@ -199,8 +204,7 @@ export class Figure {
           s.baked = "failed"
           return
         }
-        s.ctx.clearRect(0, 0, s.canvas.width, s.canvas.height)
-        s.ctx.drawImage(strip, 0, 0)
+        s.ctx.putImageData(shrinkSprite(strip), 0, 0)
         s.ready.fill(1)
         s.tex.needsUpdate = true
       }
@@ -212,8 +216,7 @@ export class Figure {
     s.requested[f] = 1
     const done = (frame: ImageBitmap) => {
       if (this.disposed || s.disposed || s.ready[f]) return
-      s.ctx.clearRect(f * FW, 0, FW, FH)
-      s.ctx.drawImage(frame, f * FW, 0)
+      s.ctx.putImageData(shrinkSprite(frame), f * DW, 0)
       s.ready[f] = 1
       s.tex.needsUpdate = true
     }
