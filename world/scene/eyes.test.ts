@@ -1,14 +1,18 @@
 import { describe, expect, it } from "vite-plus/test"
 import { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
 import { ANIMS } from "#/world/scene/figure/animation"
-import { EYE_DARK, FH, FW, eyesDrawn } from "#/world/scene/figure/render"
+import { EYE_DARK, FH, FW, eyesDrawn, getEyeLid } from "#/world/scene/figure/render"
+import { RAMPS } from "#/world/scene/pix"
 import { renderFrame } from "#/world/scene/figure/render-frame"
 import type { Look } from "#/world/scene/figure/look"
 import { RESIDENTS, RESIDENT_LOOKS } from "#/world/town/residents"
 
+/** The eye's own marks: the dark of a closed eye, or the soft lid of an open T. */
+let lid = EYE_DARK
+const same = (b: PixBuf, k: number, c: readonly number[]) => b.data[k] === c[0] && b.data[k + 1] === c[1] && b.data[k + 2] === c[2]
 const dark = (b: PixBuf, x: number, y: number) => {
   const k = (y * b.w + x) * 4
-  return b.data[k + 3] > 0 && b.data[k] === EYE_DARK[0] && b.data[k + 1] === EYE_DARK[1] && b.data[k + 2] === EYE_DARK[2]
+  return b.data[k + 3] > 0 && (same(b, k, EYE_DARK) || same(b, k, lid))
 }
 
 function frame(look: Look, view: number, f: number, item: (typeof RESIDENTS)[number]["item"]) {
@@ -47,6 +51,7 @@ describe("the T eyes never touch", () => {
   for (const [i, r] of RESIDENTS.entries()) {
     it(`${r.name}: from all eight sides, open and closed, the two bars keep a pixel between them`, () => {
       const look = RESIDENT_LOOKS[i]
+      lid = getEyeLid(RAMPS[look.skin])
       for (let view = 0; view < 8; view++) {
         for (const f of [0, blinkFrame]) {
           const drawn = marks(frame({ ...look, eyeStyle: "t" }, view, f, r.item))

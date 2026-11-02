@@ -35,7 +35,7 @@ import { getCapsuleRayIntersection } from "#/lib/graphics/ray/get-capsule-ray-in
 import { getCapsuleSurfaceNormal } from "#/lib/graphics/ray/get-capsule-surface-normal"
 import { getConeRayIntersection } from "#/lib/graphics/ray/get-cone-ray-intersection"
 import { getConeSurfaceNormal } from "#/lib/graphics/ray/get-cone-surface-normal"
-import { FW, FH, OX, OY, SPPU, eyesDrawn, EYE_DARK } from "#/world/scene/figure/render"
+import { FW, FH, OX, OY, SPPU, eyesDrawn, EYE_DARK, getEyeLid } from "#/world/scene/figure/render"
 import { shadeRGB } from "#/world/scene/figure/helpers/render/shade-rgb"
 import type { PoseFrameOptions } from "#/world/scene/figure/render"
 import { SPRITE_PITCH as PITCH } from "#/world/scene/figure/sprite-pitch"
@@ -272,9 +272,10 @@ export function renderSkeletonFrame(props: Props) {
     if (blink) {
       for (const x of lid) setP(x, iy + 1, EYE_DARK)
     } else if (props.L.eyeStyle !== "stroke") {
-      // a T: the lid and lashes across in the dark, the iris below it in the eye's own colour
-      for (const x of lid) setP(x, iy, EYE_DARK)
-      for (const r = { value: 1 }; r.value <= (wide ? 2 : 1); r.value++) setP(ex, iy + r.value, iris[r.value === 1 ? 3 : 2])
+      // a T: a soft lid across in the skin's own shade (it read as a brow darker than the eye), the iris below it, darker than the lid
+      const lidC = getEyeLid(RAMPS[props.L.skin])
+      for (const x of lid) setP(x, iy, lidC)
+      for (const r = { value: 1 }; r.value <= (wide ? 2 : 1); r.value++) setP(ex, iy + r.value, iris[r.value === 1 ? 1 : 2])
     } else {
       // one dark vertical stroke; it keeps its length: if the fringe hides the top, the stroke starts lower
       for (const r = { value: 0 }; r.value < (wide ? 3 : 2); r.value++) setP(ex, iy + r.value, EYE_DARK)
