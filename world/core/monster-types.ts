@@ -1,6 +1,5 @@
 import type { ItemId } from "#/world/core/items/catalog"
 import type { MONSTER_KINDS } from "#/world/core/monsters"
-import type { MonsterFigure } from "#/world/core/monster-figure-types"
 import type { MonsterModel } from "#/world/core/monster-model-types"
 
 export type MonsterKind = {
@@ -18,10 +17,8 @@ export type MonsterKind = {
   /** seconds before it is back after being beaten */
   respawn: number
   /** how it looks (scene) */
-  look: "slime" | "hare" | "figure" | "model"
-  /** the blocks a `figure` is built from */
-  figure?: MonsterFigure
-  /** the rigged model a `model` is drawn from */
+  look: "slime" | "hare" | "model"
+  /** the rig and blocks a `model` is drawn from */
   model?: MonsterModel
   color?: number
   size?: number

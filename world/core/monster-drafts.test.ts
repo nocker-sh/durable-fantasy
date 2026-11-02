@@ -56,37 +56,33 @@ describe("the drafted creatures", () => {
     }
   })
 
-  it("are built from finite blocks that stand on the ground and fit a creature's footprint", () => {
+  it("are built from finite blocks and fit a creature's footprint", () => {
     for (const entry of entries) {
       const id = entry[0]
-      const kind = entry[1].kind
-      const radius = getMonsterBodyRadius({ kind })
+      const model = entry[1].kind.model
+      const radius = getMonsterBodyRadius({ kind: entry[1].kind })
       if (radius instanceof Error) throw radius
       expect(radius, id).toBeLessThan(2)
-      if (kind.look !== "figure") continue
-      expect(kind.figure.parts.length, id).toBeGreaterThanOrEqual(4)
-      for (const part of kind.figure.parts) {
-        for (const n of [...part.size, ...part.at, ...(part.turn ?? []), ...(part.pivot ?? [])]) expect(Number.isFinite(n), id).toBe(true)
-        for (const n of part.size) expect(n, id).toBeGreaterThan(0)
+      expect(model.blocks.length, id).toBeGreaterThanOrEqual(4)
+      for (const block of model.blocks) {
+        const numbers = "to" in block ? [block.width, block.height, block.grow ?? 0] : [...block.size, ...block.at, ...(block.turn ?? [])]
+        for (const n of numbers) expect(Number.isFinite(n), id).toBe(true)
+        if ("to" in block) expect(Math.min(block.width, block.height), id).toBeGreaterThan(0)
+        else for (const n of block.size) expect(n, id).toBeGreaterThan(0)
       }
-      const lowest = Math.min(...kind.figure.parts.map((p) => p.at[1] - (p.shape === "ball" ? p.size[1] : p.size[1] / 2)))
-      expect(lowest, id).toBeLessThan(0.08)
     }
   })
 
-  it("drawn from a model have its model, walk and idle files and a sensible size", () => {
+  it("are moved by a rig whose model, walk and idle files are here", () => {
     for (const entry of entries) {
       const kind = entry[1].kind
-      if (kind.look !== "model") continue
       for (const file of ["model", "walk", "idle"]) expect(existsSync(new URL(`../../public/models/monsters/${kind.model.id}/${file}.glb`, import.meta.url)), `${entry[0]} ${file}`).toBe(true)
       expect(kind.model.length, entry[0]).toBeGreaterThan(0)
-      expect(kind.model.mute, entry[0]).toBeGreaterThanOrEqual(0)
-      expect(kind.model.mute, entry[0]).toBeLessThanOrEqual(1)
     }
   })
 
   it("differ from one another in shape, not only in colour", () => {
-    const shapes = entries.map((e) => (e[1].kind.look === "model" ? e[1].kind.model.id : JSON.stringify(e[1].kind.figure.parts.map((p) => [p.shape, p.size, p.at, p.turn ?? null]))))
+    const shapes = entries.map((e) => JSON.stringify(e[1].kind.model.blocks))
     expect(new Set(shapes).size).toBe(shapes.length)
   })
 })

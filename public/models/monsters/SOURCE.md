@@ -6,4 +6,4 @@ The models and animations in this folder come from Mesh2Motion (https://github.c
 - snake/model.glb, walk.glb, idle.glb: `snake/model.glb`, `snake/animations/sidewinding.glb`, `snake/animations/idle.glb`
 - trex/model.glb, walk.glb, idle.glb: `kaiju/variations/trex.glb`, `kaiju/animations/walk.glb`, `kaiju/animations/idle.glb`
 
-The files are copied unchanged. The game recolours the painted textures toward its own palette when it draws them.
+The files are copied unchanged. The game uses only their bones and animation clips: it hangs its own plain blocks on the bones and does not draw the models' skins.

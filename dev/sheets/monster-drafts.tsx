@@ -4,7 +4,6 @@ import { sheet } from "#/dev/sheets/schema"
 import { MONSTER_DRAFTS } from "#/world/core/monster-drafts"
 import { createMonsterBody } from "#/world/scene/create-monster-body"
 import { updaters } from "#/world/scene/construction/registry"
-import { poseFigure } from "#/world/scene/fields/pose-figure"
 import { poseModel } from "#/world/scene/fields/pose-model"
 import { ModelReady } from "#/dev/model-ready"
 import { MAPS } from "#/world/maps/index"
@@ -23,7 +22,6 @@ function walkInPlace(body: THREE.Group) {
     for (const b of walking) {
       const moving = Math.floor(t / 3) % 2 === 0
       if (!b.parent) walking.delete(b)
-      else if (b.userData.joints) poseFigure({ body: b, now: t * 1000, moving })
       else poseModel({ body: b, dt, moving })
     }
   })
@@ -63,7 +61,7 @@ const monsterDrafts = sheet({
   icon: (id) => {
     const kind = MONSTER_DRAFTS[id].kind
     return (
-      <ModelReady id={kind.look === "model" ? kind.model.id : null}>
+      <ModelReady id={kind.model.id}>
         <ObjectThumbnail id={`monster-draft-${id}`} build={draftBuild(id)} px={32} />
       </ModelReady>
     )
@@ -86,20 +84,11 @@ const monsterDrafts = sheet({
         ],
         wide: true,
       },
-      kind.look === "model"
-        ? {
-            title: "モデル",
-            head: ["", ""],
-            rows: [
-              ["ファイル", `public/models/monsters/${kind.model.id}/`],
-              ["長さ（拡大前）", `${kind.model.length}（${kind.model.axis}）`],
-            ],
-          }
-        : {
-            title: "身体の部材（拡大前）",
-            head: ["部材", "形", "色", "位置", "寸法", "動き"],
-            rows: kind.figure.parts.map((part, index) => [index + 1, part.shape, part.paint, part.at.join(", "), part.size.join(", "), part.swing ?? ""]),
-          },
+      {
+        title: "ブロック（休みの姿勢、拡大前）",
+        head: ["骨", "形", "色", "大きさ"],
+        rows: kind.model.blocks.map((block) => ("to" in block ? [`${block.bone} → ${block.to}`, "box", block.paint, `${block.width}, ${block.height}`] : [block.bone, block.shape, block.paint, block.size.join(", ")])),
+      },
     ]
   },
 })
