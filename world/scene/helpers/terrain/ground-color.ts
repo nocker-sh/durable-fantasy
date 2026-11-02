@@ -15,6 +15,7 @@ import { grass } from "#/world/scene/helpers/terrain/grass"
 import { dirt } from "#/world/scene/helpers/terrain/dirt"
 import { fringe } from "#/world/scene/helpers/terrain/fringe"
 import { biomeColor } from "#/world/scene/helpers/terrain/biome-color"
+import { groundWobble } from "#/world/scene/helpers/terrain/ground-wobble"
 
 type Props = {
   x: number
@@ -26,7 +27,7 @@ type Props = {
 export function groundColor(props: Props): RGB {
   const h = groundH(props.x, props.z)
   const dr = riverD(props.x, props.z)
-  const wob = (vnoise({ x: props.x, y: props.z, scale: 2.2, seed: 31 }) - 0.5) * 0.18 + (hash2(props.sx, props.sy, 33) - 0.5) * 0.06
+  const wob = groundWobble(props)
   // river bed / banks
   if (inRect({ x: props.x, z: props.z, r: layout().lavoir }) && dr >= layout().riverHW - 0.02)
     return cobble({ x: props.x, z: props.z, sx: props.sx, sy: props.sy, scale: 2.2, ramp: "stone", base: 0.5, seed: 41, rows: true })

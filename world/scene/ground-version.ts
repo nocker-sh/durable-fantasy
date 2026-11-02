@@ -29,6 +29,7 @@ const sources = import.meta.glob<string>(
     "./helpers/terrain/dirt.ts",
     "./helpers/terrain/fringe.ts",
     "./helpers/terrain/grass.ts",
+    "./helpers/terrain/ground-wobble.ts",
     "./helpers/terrain/ground-color.ts",
     "./helpers/terrain/lvl.ts",
     "./helpers/terrain/patch-level.ts",

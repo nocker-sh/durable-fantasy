@@ -3,11 +3,14 @@ import { hash2 } from "#/lib/engine/hash2"
 import { fbm } from "#/lib/engine/fbm"
 import { roadD } from "#/world/scene/road-d"
 import { ASH_LIGHT, ASH_DARK } from "#/world/scene/terrain"
+import { currentLayout as layout } from "#/world/scene/current-layout"
+import { groundWobble } from "#/world/scene/helpers/terrain/ground-wobble"
 
 /**
  * Ash over the ground (world.md「気候」): a thin grey film everywhere, lying in drifts where the
  * wind leaves it, and swept up into a grey bank along each side of a road — the road itself is
- * kept clear, with footprints in what is left on it.
+ * kept clear, with footprints in what is left on it. The plaza is swept the same way, so the banks
+ * of the roads that run into it stop at its rim instead of crossing its stones.
  */
 type Props = {
   x: number
@@ -17,7 +20,8 @@ type Props = {
 }
 
 export function ashAt(props: Props): RGB | null {
-  const d = roadD(props.x, props.z)
+  const plaza = Math.hypot(props.x - layout().plaza[0], props.z - layout().plaza[1]) < layout().plazaR + groundWobble(props)
+  const d = plaza ? -1 : roadD(props.x, props.z)
   // The swept road has its own distribution, independent of the wind drifts.
   const drift = d < -0.05 ? 0 : fbm({ x: props.x, y: props.z, scale: 0.35, seed: 77 })
   // swept to the road's edges, a hand's width either side
