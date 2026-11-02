@@ -3,9 +3,13 @@ import { type RGB } from "#/lib/graphics/pixel-types"
 
 export const PPU = 32
 
-/** What a building's surfaces end up at, in texture pixels to a unit: painted finer, then shrunk to
- * chunky texels with the old consoles' dither (lib/graphics/downsample-dithered.ts). */
-export const TEXEL_PPU = 16
+/**
+ * The one size of a dot in the world, in texture pixels to a unit: the ground is painted at it, and
+ * every other surface and picture (buildings, goods, decals, laundry) is painted at it or finer and
+ * then shrunk to it with the old consoles' dither (lib/graphics/downsample-dithered.ts), so that
+ * nothing in the world has finer or coarser dots than the ground. See architecture.md「描画」.
+ */
+export const TEXEL_PPU = PPU
 
 const S = PPU / 16
 

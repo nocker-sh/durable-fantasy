@@ -26,7 +26,7 @@ export function roofTex(props: Props): PixBuf {
   const light = props.light === undefined ? 0.6 : props.light
   const seed = props.seed === undefined ? 3 : props.seed
   const size = props.size === undefined ? 256 : props.size
-  // painted at 256 pixels to the 4-unit repeat, then shrunk to the chunky texels of the walls
+  // painted at 256 pixels to the 4-unit repeat, then shrunk to the dots of the ground
   const k = size / 128
 
   const n = RAMPS[ramp].length

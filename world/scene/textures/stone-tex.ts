@@ -4,6 +4,7 @@ import { hash2 } from "#/lib/engine/hash2"
 import { seamlessNoise } from "#/world/scene/textures/seamless-noise"
 import { ToneMap } from "#/world/scene/textures/tone-map"
 import { downsampleDithered } from "#/lib/graphics/downsample-dithered"
+import { TEXEL_PPU } from "#/world/scene/textures/palette"
 
 type Props = {
   ramp?: string
@@ -12,7 +13,7 @@ type Props = {
   bw?: number
   bh?: number
   size?: number
-  /** the size it is shrunk to at the end (64: a 4-unit repeat at the walls' chunky texels) */
+  /** the size it is shrunk to at the end (by default the dots of the ground over a 4-unit repeat) */
   out?: number
 }
 
@@ -57,5 +58,5 @@ export function stoneTex(props: Props): PixBuf {
     return { ramp: ramp, level: l.value, region: (c % cols) * 64 + row }
   })
   t.strokes({ seed: seed, density: 0.12, along: "x", len: [2, 4], thick: [1, 2], step: 0.5, bleed: 0.05, wrap: true })
-  return downsampleDithered(t.paint(0.1), size / (props.out ?? 64))
+  return downsampleDithered(t.paint(0.1), size / (props.out ?? TEXEL_PPU * 4))
 }

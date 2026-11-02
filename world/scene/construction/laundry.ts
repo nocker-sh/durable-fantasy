@@ -1,8 +1,8 @@
 import * as THREE from "three"
 import { GeometryBuilder as GB } from "#/lib/graphics/geometry-builder"
-import { toTexture as toTex } from "#/lib/graphics/to-texture"
 import { laundry } from "#/world/scene/laundry"
 import { GPPU } from "#/world/scene/goods"
+import { dotTexture } from "#/world/scene/textures/dot-texture"
 import { groundH } from "#/world/scene/ground-h"
 import { blockCircle } from "#/world/scene/block-circle"
 import { M } from "#/world/scene/construction/materials"
@@ -43,7 +43,7 @@ export function laundryLine(inputProps: { root: THREE.Group; ax: number; az: num
     const b = laundry(k, seed + k * 7)
     const x = ax + Math.cos(ang) * t,
       z = az + Math.sin(ang) * t
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(b.w / GPPU, b.h / GPPU), new THREE.MeshLambertMaterial({ map: toTex(b, false), alphaTest: 0.5, side: THREE.DoubleSide }))
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(b.w / GPPU, b.h / GPPU), new THREE.MeshLambertMaterial({ map: dotTexture(b, GPPU), alphaTest: 0.5, side: THREE.DoubleSide }))
     m.geometry.translate(0, -b.h / GPPU / 2, 0)
     m.position.set(x, (ya + yb) / 2 + 1.68, z)
     m.rotation.y = -ang

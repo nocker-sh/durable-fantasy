@@ -4,6 +4,7 @@ import { hash2 } from "#/lib/engine/hash2"
 import { seamlessNoise } from "#/world/scene/textures/seamless-noise"
 import { ToneMap } from "#/world/scene/textures/tone-map"
 import { downsampleDithered } from "#/lib/graphics/downsample-dithered"
+import { TEXEL_PPU } from "#/world/scene/textures/palette"
 
 type Props = {
   light?: number
@@ -41,6 +42,6 @@ export function woodTex(props: Props): PixBuf {
     return { ramp: "wood", level: l.value, region: k }
   })
   t.strokes({ seed: seed, density: 0.14, along: vertical ? "y" : "x", len: [3, 7], thick: [1, 1], step: 0.5, bleed: 0.03, wrap: true })
-  // shrunk to the chunky texels: a quarter of the painting
-  return downsampleDithered(t.paint(0.1), 4)
+  // painted at twice the dot size over a 2-unit repeat, then shrunk to the dots of the ground
+  return downsampleDithered(t.paint(0.1), size / 2 / TEXEL_PPU)
 }

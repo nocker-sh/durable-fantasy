@@ -2,7 +2,7 @@ import * as THREE from "three"
 import { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
 import { laundry } from "#/world/scene/laundry"
 import { GPPU } from "#/world/scene/goods"
-import { toTexture as toTex } from "#/lib/graphics/to-texture"
+import { dotTexture } from "#/world/scene/textures/dot-texture"
 
 /** Still indoor laundry and its rope share one texture and one draw. */
 export function indoorLaundry(length: number, seed: number): THREE.Mesh {
@@ -16,7 +16,7 @@ export function indoorLaundry(length: number, seed: number): THREE.Mesh {
     strip.blit({ source: cloth, x: x, y: 2 })
     x += cloth.w + 8
   }
-  const material = new THREE.MeshLambertMaterial({ map: toTex(strip, false), alphaTest: 0.5, side: THREE.DoubleSide })
+  const material = new THREE.MeshLambertMaterial({ map: dotTexture(strip, GPPU), alphaTest: 0.5, side: THREE.DoubleSide })
   const geometry = new THREE.PlaneGeometry(width / GPPU, strip.h / GPPU)
   geometry.translate(0, -strip.h / GPPU / 2, 0)
   const mesh = new THREE.Mesh(geometry, material)

@@ -45,10 +45,10 @@ float ashNoise(vec2 p) {
         {
           // a thin film everywhere, patches and deeper drifts where a
           // broad soft noise rises, in two or three flat tones whose edges are broken at the size
-          // of a building's texture pixel (16 to a unit), so it lies in drifts rather than as random blocks
+          // of a dot of the ground (32 to a unit), so it lies in drifts rather than as random blocks
           vec2 ashQ = vAshP.xz + vAshP.y * 0.37;
-          vec2 ashTexel = floor(ashQ * 16.0);
-          vec2 ashS = ashTexel / 16.0;
+          vec2 ashTexel = floor(ashQ * 32.0);
+          vec2 ashS = ashTexel / 32.0;
           float drift = ashNoise(ashS * 0.9) * 0.65 + ashNoise(ashS * 3.1 + 17.0) * 0.35;
           drift += (ashHash(ashTexel) - 0.5) * 0.16;
           float up = smoothstep(0.35, 0.85, vAshN.y);

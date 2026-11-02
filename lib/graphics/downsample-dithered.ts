@@ -4,7 +4,7 @@ import { PixelBuffer } from "#/lib/graphics/pixel-buffer"
 const DITHER = [-4, 0, -3, 1, 2, -2, 3, -1, -3, 1, -4, 0, 3, -1, 2, -2]
 
 /**
- * Shrink a painted picture by a whole factor, each new pixel the average of the block it covers,
+ * Shrink a painted picture by a whole factor, each new pixel the average of the opaque part of the block it covers,
  * then cut every channel to five bits through the 4×4 dither, as textures were on early 3D consoles:
  * the detail of the painting survives as soft, chunky texels in a slightly banded colour.
  */
@@ -25,19 +25,22 @@ export function downsampleDithered(source: PixelBuffer, factor: number): PixelBu
       for (let yy = y * f; yy < Math.min(source.h, y * f + f); yy++)
         for (let xx = x * f; xx < Math.min(source.w, x * f + f); xx++) {
           const i = (yy * source.w + xx) * 4
-          r += s[i]
-          g += s[i + 1]
-          b += s[i + 2]
-          a += s[i + 3]
+          const alpha = s[i + 3]
+          r += s[i] * alpha
+          g += s[i + 1] * alpha
+          b += s[i + 2] * alpha
+          a += alpha
           n++
         }
       const o = DITHER[(y & 3) * 4 + (x & 3)]
-      const cut = (v: number) => Math.max(0, Math.min(248, Math.floor((v / n + o) / 8) * 8)) * (255 / 248)
+      // colours weighted by how opaque they are, so a cut-out picture keeps no dark fringe
+      const cut = (v: number) => (a ? Math.max(0, Math.min(248, Math.floor((v / a + o) / 8) * 8)) * (255 / 248) : 0)
       const i = (y * w + x) * 4
       d[i] = cut(r)
       d[i + 1] = cut(g)
       d[i + 2] = cut(b)
-      d[i + 3] = Math.round(a / n)
+      // a cut-out stays a cut-out: a pixel is there when most of its block was
+      d[i + 3] = a / n >= 127.5 ? 255 : 0
     }
   return out
 }

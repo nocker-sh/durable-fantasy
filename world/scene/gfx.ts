@@ -1,6 +1,6 @@
 import * as THREE from "three"
 import type { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
-import { toTexture as toTex } from "#/lib/graphics/to-texture"
+import { dotTexture } from "#/world/scene/textures/dot-texture"
 
 /**
  * Sprites are not lit by the scene's lights, so every pixel sprite (crops, goods, clutter) is
@@ -9,9 +9,9 @@ import { toTexture as toTex } from "#/lib/graphics/to-texture"
  */
 export const litSprites: THREE.SpriteMaterial[] = []
 
-/** Camera-facing pixel sprite whose bottom centre sits at the given point. ppu = texels per world unit. */
+/** Camera-facing pixel sprite whose bottom centre sits at the given point. ppu = texels per world unit as drawn; shown at the dots of the ground. */
 export function pixSprite(b: PixBuf, ppu: number): THREE.Sprite {
-  const m = new THREE.SpriteMaterial({ map: toTex(b, false), alphaTest: 0.5 })
+  const m = new THREE.SpriteMaterial({ map: dotTexture(b, ppu), alphaTest: 0.5 })
   litSprites.push(m)
   const s = new THREE.Sprite(m)
   s.center.set(0.5, 0)

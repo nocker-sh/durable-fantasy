@@ -1,5 +1,5 @@
 import * as THREE from "three"
-import { toTexture as toTex } from "#/lib/graphics/to-texture"
+import { dotTexture } from "#/world/scene/textures/dot-texture"
 import type { PixelBuffer as PixBuf } from "#/lib/graphics/pixel-buffer"
 import { GPPU } from "#/world/scene/goods"
 import { groundH } from "#/world/scene/ground-h"
@@ -17,7 +17,7 @@ export function flatDecal(props: Props) {
   const scale = props.scale === undefined ? GPPU : props.scale
   const rot = props.rot === undefined ? 0 : props.rot
 
-  const m = new THREE.MeshLambertMaterial({ map: toTex(props.b, false), alphaTest: 0.5, transparent: false })
+  const m = new THREE.MeshLambertMaterial({ map: dotTexture(props.b, scale), alphaTest: 0.5, transparent: false })
   const p = new THREE.Mesh(new THREE.PlaneGeometry(props.b.w / scale, props.b.h / scale), m)
   p.rotation.x = -Math.PI / 2
   p.rotation.z = rot
