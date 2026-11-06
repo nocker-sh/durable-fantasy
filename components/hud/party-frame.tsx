@@ -36,10 +36,10 @@ export function PartyFrame() {
             </div>
             {party.leading && !m.me && (
               <div className="flex justify-end gap-1">
-                <Button size="sm" aria-label={`${m.name}にリーダーを任せる`} onClick={() => game.passPartyLead(i, m.name)}>
+                <Button size="sm" aria-label={`${m.name}にリーダーを任せる`} onClick={() => game.passPartyLead(i, m.name, m.key)}>
                   任せる
                 </Button>
-                <Button size="sm" aria-label={`${m.name}をパーティから外す`} onClick={() => game.kickPartyMember(i, m.name)}>
+                <Button size="sm" aria-label={`${m.name}をパーティから外す`} onClick={() => game.kickPartyMember(i, m.name, m.key)}>
                   外す
                 </Button>
               </div>

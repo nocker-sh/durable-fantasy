@@ -28,7 +28,15 @@ function fixture() {
   const save = vi.fn((_patch: Partial<Presence>) => {
     trace.push("save")
   })
-  const room = { me, save, map: { name: "南門" }, ctx: { connection: { state: me, send } } }
+  const connection = {
+    id: "connection",
+    state: me,
+    send,
+    setState(next: Presence) {
+      connection.state = next
+    },
+  }
+  const room = { me, save, map: { name: "南門" }, ctx: { connection } }
   return { me, send, save, room, trace }
 }
 

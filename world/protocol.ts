@@ -32,7 +32,7 @@ export type PartyView = {
   mode: "own" | "even"
   /** we lead it */
   leading: boolean
-  members: { name: string; level: number; hp: number; maxHp: number; map: string; leader: boolean; me: boolean; away: boolean }[]
+  members: { key: string; name: string; level: number; hp: number; maxHp: number; map: string; leader: boolean; me: boolean; away: boolean }[]
 }
 
 /** One side of a trade as shown: the lots, the gold, settled, pressed exchange. */
@@ -176,7 +176,7 @@ export const clientMessage = z.discriminatedUnion("type", [
   z.object({ type: z.literal("party-answer"), from: z.string().max(64), yes: z.boolean() }),
   z.object({ type: z.literal("party-leave") }),
   z.object({ type: z.literal("party-mode"), mode: z.enum(["own", "even"]) }),
-  /** the leader removes a member, or hands the lead over; members are named by place in the list and name */
+  /** The leader selects a published member without learning their player id. */
   z.object({
     type: z.literal("party-kick"),
     member: z
@@ -185,6 +185,7 @@ export const clientMessage = z.discriminatedUnion("type", [
       .min(0)
       .max(PARTY_MAX - 1),
     name: z.string().max(NAME_MAX),
+    key: z.string().min(1).max(128).optional(),
   }),
   z.object({
     type: z.literal("party-lead"),
@@ -194,6 +195,7 @@ export const clientMessage = z.discriminatedUnion("type", [
       .min(0)
       .max(PARTY_MAX - 1),
     name: z.string().max(NAME_MAX),
+    key: z.string().min(1).max(128).optional(),
   }),
   z.object({ type: z.literal("party-look"), chat: partyChatCursor.optional() }),
   z.object({ type: z.literal("party-say"), text: z.string().trim().min(1).max(140), chat: partyChatCursor.optional() }),

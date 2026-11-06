@@ -38,6 +38,14 @@ export type Presence = {
   sitting?: boolean
   /** the party they are in (core/party.ts), and whom they have asked to join it */
   party?: string | null
+  /** Connection-local selectors; player ids in this table never leave the server. */
+  partySelection?: {
+    connection: string
+    owner: string
+    party: string
+    serial: number
+    members: { key: string; owner: string }[]
+  }
   inviting?: string
   /** when they last looked up their party (core/pace-rules.ts) */
   lookedAt?: number

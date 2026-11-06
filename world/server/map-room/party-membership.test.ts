@@ -44,7 +44,15 @@ function fixture() {
   rpc.party.mockReturnValue({ view, leave, setMode })
   const pace = vi.fn(async () => true)
   rpc.player.mockReturnValue({ run, pace })
-  const room = { me, save, ctx: { connection: { id: "sender", send }, room: { getConnection: () => peer } } }
+  const connection = {
+    id: "sender",
+    state: me,
+    send,
+    setState(next: Presence) {
+      connection.state = next
+    },
+  }
+  const room = { me, save, ctx: { connection, room: { getConnection: () => peer } } }
   return { room, me, peer, send, save, party, view, leave, setMode, run, trace }
 }
 

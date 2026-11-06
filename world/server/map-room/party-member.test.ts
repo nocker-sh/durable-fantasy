@@ -14,28 +14,37 @@ const member = (owner: string): Member => ({ owner, name: owner.toUpperCase(), l
 function fixture() {
   const party: Party = { leader: "a", mode: "own", members: [member("a"), member("b"), member("c")] }
   const me: Presence = { owner: "a", party: "group", player: null, route: [], since: 0, said: [], engaged: null }
+  me.partySelection = { connection: "sender", owner: "a", party: "group", serial: 1, members: [{ key: "sender:1", owner: "b" }] }
   const send = vi.fn(async (_message: ServerMessage) => {})
   const kick = vi.fn(async () => ({ ...party, members: [party.members[0], party.members[2]] }))
   const promote = vi.fn(async () => ({ ...party, leader: "b" }))
   rpc.party.mockReturnValue({ view: async () => party, kick, promote })
-  const room = { me, save: vi.fn(), ctx: { connection: { send } } }
+  const connection = {
+    id: "sender",
+    state: me,
+    send,
+    setState(next: Presence) {
+      connection.state = next
+    },
+  }
+  const room = { me, save: vi.fn(), ctx: { connection } }
   return { room, send, kick, promote }
 }
 
 it("removes the member at that place only when the name still matches", async () => {
   const request = fixture()
-  await handlePartyMember(request.room, { type: "party-kick", member: 1, name: "B" })
+  await handlePartyMember(request.room, { type: "party-kick", member: 1, name: "B", key: "sender:1" })
   expect(request.kick).toHaveBeenCalledExactlyOnceWith({ leader: "a", target: "b" })
   expect(request.send).toHaveBeenCalledWith(expect.objectContaining({ type: "party" }))
   const moved = fixture()
-  await handlePartyMember(moved.room, { type: "party-kick", member: 1, name: "C" })
+  await handlePartyMember(moved.room, { type: "party-kick", member: 1, name: "C", key: "sender:1" })
   expect(moved.kick).not.toHaveBeenCalled()
   expect(moved.send).toHaveBeenCalledExactlyOnceWith({ type: "party-closed", reason: "CHANGED" })
 })
 
 it("hands the lead over and tells the old leader they no longer lead", async () => {
   const request = fixture()
-  await handlePartyMember(request.room, { type: "party-lead", member: 1, name: "B" })
+  await handlePartyMember(request.room, { type: "party-lead", member: 1, name: "B", key: "sender:1" })
   expect(request.promote).toHaveBeenCalledExactlyOnceWith({ leader: "a", target: "b" })
   expect(request.send).toHaveBeenCalledWith({ type: "party", view: expect.objectContaining({ leading: false }) })
 })

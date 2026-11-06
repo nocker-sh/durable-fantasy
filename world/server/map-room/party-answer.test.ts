@@ -33,7 +33,16 @@ function fixture() {
     Object.assign(guest, patch)
     trace.push("guest-state")
   })
-  const room = { me: guest, save, map: { name: "広場" }, ctx: { connection: { id: "guest", send }, room: { getConnection: () => peer } } }
+  const connection = {
+    id: "guest",
+    state: guest,
+    send,
+    setState(next: Presence) {
+      connection.state = next
+      trace.push("guest-state")
+    },
+  }
+  const room = { me: guest, save, map: { name: "広場" }, ctx: { connection, room: { getConnection: () => peer } } }
   const join = vi.fn(async (member: Member) => {
     trace.push("join-" + member.owner)
     return true
@@ -79,7 +88,21 @@ it.each(["declined", "already-member"])("consumes the invitation without enrollm
 it("joins an existing party before saving membership and sending each member's view", async () => {
   const request = fixture()
   await handlePartyAnswer(request.room, { type: "party-answer", from: "host", yes: true })
-  expect(request.trace).toEqual(["host-state", "view", "read-guest-owner", "join-guest-owner", "run-guest-owner", "guest-state", "guest-result", "view", "guest-party", "view", "host-party"])
+  expect(request.trace).toEqual([
+    "host-state",
+    "view",
+    "read-guest-owner",
+    "join-guest-owner",
+    "run-guest-owner",
+    "guest-state",
+    "guest-result",
+    "view",
+    "guest-state",
+    "guest-party",
+    "view",
+    "host-state",
+    "host-party",
+  ])
   expect(request.join).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ owner: "guest-owner", name: "Guest", map: "広場", hp: expect.any(Number), maxHp: expect.any(Number) }))
   expect(request.save).toHaveBeenCalledExactlyOnceWith({ party: "group" })
   expect(request.view).toHaveBeenCalledTimes(3)
@@ -102,8 +125,10 @@ it("registers the inviter before the guest when creating a new party", async () 
     "guest-state",
     "guest-result",
     "view",
+    "guest-state",
     "guest-party",
     "view",
+    "host-state",
     "host-party",
   ])
   expect(request.guest.party).toBeTruthy()

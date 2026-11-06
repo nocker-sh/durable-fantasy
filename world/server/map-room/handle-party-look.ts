@@ -2,12 +2,12 @@ import { Party } from "#/durable-objects/party"
 import { Player } from "#/durable-objects/player"
 import { derive } from "#/world/core/derive"
 import { PARTY_LOOK_GAP_MS } from "#/world/core/pace-rules"
-import { partyView } from "#/world/server/map-room/party-view"
+import { sendPartyView } from "#/world/server/map-room/send-party-view"
 import { sendPartyChat } from "#/world/server/map-room/send-party-chat"
 import { clearPartyMembership } from "#/world/server/map-room/clear-party-membership"
 import type { Ctx, Message } from "#/world/server/map-room/context"
 
-type Props = Readonly<Pick<Ctx, "me" | "save"> & { map: Pick<Ctx["map"], "name">; ctx: Readonly<{ connection: Pick<Ctx["ctx"]["connection"], "state" | "send"> }> }>
+type Props = Readonly<Pick<Ctx, "me" | "save"> & { map: Pick<Ctx["map"], "name">; ctx: Readonly<{ connection: Pick<Ctx["ctx"]["connection"], "id" | "state" | "setState" | "send"> }> }>
 
 /** 状態と会話を一度の照会で受け取り、名簿と本人の保存済み所属に従って公開する。 */
 export async function handlePartyLook(room: Props, message: Message<"party-look">) {
@@ -24,6 +24,6 @@ export async function handlePartyLook(room: Props, message: Message<"party-look"
     after: message.chat?.party === me.party ? message.chat.seq : 0,
   })
   if (!polled.party.members.some((member) => member.owner === me.owner)) return clearPartyMembership(room, me.owner)
-  await room.ctx.connection.send({ type: "party", view: partyView(polled.party, me.owner) })
+  await sendPartyView({ connection: room.ctx.connection, party: polled.party, partyId: me.party, owner: me.owner })
   if (player.party === me.party) await sendPartyChat(room, polled.chat)
 }

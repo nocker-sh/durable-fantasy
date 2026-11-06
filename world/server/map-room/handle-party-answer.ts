@@ -1,17 +1,14 @@
 import { Party } from "#/durable-objects/party"
 import { presence } from "#/world/server/map-room/presence"
 import { setPresence } from "#/world/server/map-room/set-presence"
-import { partyView } from "#/world/server/map-room/party-view"
+import { sendPartyView } from "#/world/server/map-room/send-party-view"
 import { initializeParty } from "#/world/server/map-room/initialize-party"
 import { joinPartyMember } from "#/world/server/map-room/join-party-member"
 import { getPartyInvitationRejection } from "#/world/server/map-room/get-party-invitation-rejection"
-import { notifyClient } from "#/world/server/map-room/notifications"
 import type { Ctx, Message } from "#/world/server/map-room/context"
 
 type Connection = Pick<Ctx["ctx"]["connection"], "id" | "state" | "setState" | "send">
-type Props = Readonly<
-  Pick<Ctx, "me" | "save"> & { map: Pick<Ctx["map"], "name">; ctx: Readonly<{ connection: Pick<Connection, "id" | "send">; room: Readonly<{ getConnection(id: string): Connection | undefined }> }> }
->
+type Props = Readonly<Pick<Ctx, "me" | "save"> & { map: Pick<Ctx["map"], "name">; ctx: Readonly<{ connection: Connection; room: Readonly<{ getConnection(id: string): Connection | undefined }> }> }>
 
 /** 招待を消費してから受諾を処理し、招待者がまだリーダーで空きがあるときだけ、新規の招待者、返答者の順に所属を登録する。 */
 export async function handlePartyAnswer(room: Props, message: Message<"party-answer">) {
@@ -33,8 +30,6 @@ export async function handlePartyAnswer(room: Props, message: Message<"party-ans
   }
   if (!other.party) await initializeParty({ context, owner: other.owner, name: other.player.name, connection: peer })
   if (!(await joinPartyMember({ context, owner: me.owner, name: me.player.name, room }))) return
-  const mine = partyView(await party.view(), me.owner)
-  await notifyClient(connection.send({ type: "party", view: mine }))
-  const theirs = partyView(await party.view(), other.owner)
-  await notifyClient(peer.send({ type: "party", view: theirs }))
+  await sendPartyView({ connection, party: await party.view(), partyId: id, owner: me.owner })
+  await sendPartyView({ connection: peer, party: await party.view(), partyId: id, owner: other.owner })
 }
