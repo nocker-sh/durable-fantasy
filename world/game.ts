@@ -78,6 +78,7 @@ export class Game {
 
   private stopTick: (() => void) | null = null
   private mountVersion = 0
+  private portraitGeneration = 0
 
   // ------------------------------------------------------------------ lifecycle
 
@@ -555,7 +556,10 @@ export class Game {
     const avatar = this.avatar(player)
     this.scene?.setAvatar(avatar)
     if (!before || before.look !== player.look || JSON.stringify(wornNeck(before)) !== JSON.stringify(wornNeck(player))) {
-      portraitUrl(avatar.look, (portrait) => this.update({ portrait }))
+      const generation = ++this.portraitGeneration
+      portraitUrl(avatar.look, (portrait) => {
+        if (generation === this.portraitGeneration) this.update({ portrait })
+      })
     }
   }
 
