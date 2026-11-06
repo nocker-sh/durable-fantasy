@@ -5,6 +5,7 @@ import { partyView } from "#/world/server/map-room/party-view"
 import { initializeParty } from "#/world/server/map-room/initialize-party"
 import { joinPartyMember } from "#/world/server/map-room/join-party-member"
 import { getPartyInvitationRejection } from "#/world/server/map-room/get-party-invitation-rejection"
+import { notifyClient } from "#/world/server/map-room/notifications"
 import type { Ctx, Message } from "#/world/server/map-room/context"
 
 type Connection = Pick<Ctx["ctx"]["connection"], "id" | "state" | "setState" | "send">
@@ -32,6 +33,8 @@ export async function handlePartyAnswer(room: Props, message: Message<"party-ans
   }
   if (!other.party) await initializeParty({ context, owner: other.owner, name: other.player.name, connection: peer })
   if (!(await joinPartyMember({ context, owner: me.owner, name: me.player.name, room }))) return
-  await connection.send({ type: "party", view: partyView(await party.view(), me.owner) })
-  await peer.send({ type: "party", view: partyView(await party.view(), other.owner) })
+  const mine = partyView(await party.view(), me.owner)
+  await notifyClient(connection.send({ type: "party", view: mine }))
+  const theirs = partyView(await party.view(), other.owner)
+  await notifyClient(peer.send({ type: "party", view: theirs }))
 }

@@ -1,5 +1,6 @@
 import { Player } from "#/durable-objects/player"
 import { readPartyMember } from "#/world/server/map-room/read-party-member"
+import { notifyClient } from "#/world/server/map-room/notifications"
 import type { Ctx } from "#/world/server/map-room/context"
 import type { PartyJoinContext } from "#/world/server/map-room/party-join-types"
 
@@ -11,7 +12,8 @@ export async function joinPartyMember(props: Props): Promise<boolean> {
     await props.room.ctx.connection.send({ type: "party-closed", reason: "FULL" })
     return false
   }
-  await props.room.ctx.connection.send({ type: "result", seq: -1, result: await Player.get(props.owner).run({ type: "set-party", party: props.context.id }) })
+  const result = await Player.get(props.owner).run({ type: "set-party", party: props.context.id })
   props.room.save({ party: props.context.id })
+  await notifyClient(props.room.ctx.connection.send({ type: "result", seq: -1, result }))
   return true
 }

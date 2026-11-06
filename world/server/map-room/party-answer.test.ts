@@ -79,7 +79,7 @@ it.each(["declined", "already-member"])("consumes the invitation without enrollm
 it("joins an existing party before saving membership and sending each member's view", async () => {
   const request = fixture()
   await handlePartyAnswer(request.room, { type: "party-answer", from: "host", yes: true })
-  expect(request.trace).toEqual(["host-state", "view", "read-guest-owner", "join-guest-owner", "run-guest-owner", "guest-result", "guest-state", "view", "guest-party", "view", "host-party"])
+  expect(request.trace).toEqual(["host-state", "view", "read-guest-owner", "join-guest-owner", "run-guest-owner", "guest-state", "guest-result", "view", "guest-party", "view", "host-party"])
   expect(request.join).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ owner: "guest-owner", name: "Guest", map: "広場", hp: expect.any(Number), maxHp: expect.any(Number) }))
   expect(request.save).toHaveBeenCalledExactlyOnceWith({ party: "group" })
   expect(request.view).toHaveBeenCalledTimes(3)
@@ -94,13 +94,13 @@ it("registers the inviter before the guest when creating a new party", async () 
     "read-host-owner",
     "join-host-owner",
     "run-host-owner",
-    "host-result",
     "host-state",
+    "host-result",
     "read-guest-owner",
     "join-guest-owner",
     "run-guest-owner",
-    "guest-result",
     "guest-state",
+    "guest-result",
     "view",
     "guest-party",
     "view",
