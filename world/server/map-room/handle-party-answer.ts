@@ -25,7 +25,7 @@ export async function handlePartyAnswer(room: Props, message: Message<"party-ans
     setPresence(peer, { partyPending: true })
     const id = other.party ?? crypto.randomUUID()
     const party = Party.get(id)
-    const context = { id, mapName: room.map.name, party }
+    const context = { id, mapName: room.map.name, party, inviter: other.owner }
     // the lead may have passed on, or the party filled, since the invitation was sent
     const rejection = other.party ? getPartyInvitationRejection(await party.view(), other.owner) : null
     if (rejection) {

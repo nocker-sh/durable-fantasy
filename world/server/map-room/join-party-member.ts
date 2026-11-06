@@ -8,8 +8,10 @@ type Props = Readonly<{ context: PartyJoinContext; owner: string; name: string; 
 
 /** 名簿が受け付けた場合だけ本人の所属を保存し、満員なら接続の所属を変えない。 */
 export async function joinPartyMember(props: Props): Promise<boolean> {
-  if (!(await props.context.party.join(await readPartyMember(props.owner, props.name, props.context.mapName)))) {
-    await props.room.ctx.connection.send({ type: "party-closed", reason: "FULL" })
+  const member = await readPartyMember(props.owner, props.name, props.context.mapName)
+  const joined = await props.context.party.join(member, props.context.inviter)
+  if (joined !== true) {
+    await props.room.ctx.connection.send({ type: "party-closed", reason: joined === "NOT_LEADER" ? "CHANGED" : "FULL" })
     return false
   }
   const result = await Player.get(props.owner).run({ type: "set-party", party: props.context.id })

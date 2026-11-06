@@ -10,6 +10,7 @@ import { TOWN_SPAWN } from "#/world/core/player-rules"
 import type { Cell, ServerMessage } from "#/world/protocol"
 import { initialPlayerRecord } from "#/world/server/initial-player-record"
 import { handlePartyAnswer } from "#/world/server/map-room/handle-party-answer"
+import { handlePartyLeave } from "#/world/server/map-room/handle-party-leave"
 import { handlePartyInvite } from "#/world/server/map-room/handle-party-invite"
 import { mapPlayer } from "#/world/server/map-room/map-player"
 import { setPresence } from "#/world/server/map-room/set-presence"
@@ -68,8 +69,8 @@ async function fixture() {
       const store = durableStorage({ party: emptyParty(), chat: emptyPartyChat() }, 0)
       const actor = new Party.class(store.state, {})
       const join = actor.join.bind(actor)
-      vi.spyOn(actor, "join").mockImplementation(async (member) => {
-        const accepted = await join(member)
+      vi.spyOn(actor, "join").mockImplementation(async (member, inviter) => {
+        const accepted = await join(member, inviter)
         // Delay only the RPC response: the real join and its durable save already finished.
         if (member.owner === host.owner && nextJoin) {
           const held = nextJoin
@@ -160,7 +161,7 @@ async function fixture() {
   await invite(first)
   expect(host.socket.state.inviting).toBe(first.socket.id)
   expect(first.socket.send).toHaveBeenCalledWith({ type: "party-invited", from: host.socket.id, name: "Host" })
-  return { host, first, second, parties, invite, answer, inviteFrom, answerFrom, delayJoin, delayPace, delayRecipientReadFailure, consistent }
+  return { host, first, second, parties, room, dispatch, invite, answer, inviteFrom, answerFrom, delayJoin, delayPace, delayRecipientReadFailure, consistent }
 }
 
 it("can accept consecutive invitations into one durable party", async () => {
@@ -261,4 +262,39 @@ it.each(["inviter", "recipient"] as const)("refuses an already-issued invitation
     await first
   }
   await f.consistent()
+})
+
+it.each(["leave", "promote"] as const)("does not apply an old invitation after %s during the member read", async (change) => {
+  const f = await fixture()
+  await f.answer(f.first)
+  const id = f.host.socket.state.party!
+  vi.setSystemTime(Date.now() + ASK_GAP_MS)
+  await f.invite(f.second)
+  const reached = deferred()
+  const release = deferred()
+  const read = f.second.actor.read.bind(f.second.actor)
+  vi.spyOn(f.second.actor, "read").mockImplementationOnce(async () => {
+    const result = await read()
+    reached.resolve()
+    await release.promise
+    return result
+  })
+  const answering = f.answer(f.second)
+  await reached.promise
+  try {
+    if (change === "leave") {
+      await f.dispatch(f.host, () => handlePartyLeave(f.room(f.host), { type: "party-leave" }))
+      expect((await f.parties.get(id)!.actor.view()).members).toEqual([])
+    } else {
+      await f.parties.get(id)!.actor.promote({ leader: f.host.owner, target: f.first.owner })
+    }
+  } finally {
+    release.resolve()
+    await answering
+  }
+  const group = f.parties.get(id)!
+  expect((await new Party.class(group.store.state, {}).view()).members.map((member) => member.owner)).toEqual(change === "leave" ? [] : [f.host.owner, f.first.owner])
+  expect((await new Player.class(f.second.store.state, {}).read()).party).toBeNull()
+  expect(f.second.socket.state.party ?? null).toBeNull()
+  expect(f.second.socket.send).toHaveBeenLastCalledWith({ type: "party-closed", reason: "CHANGED" })
 })

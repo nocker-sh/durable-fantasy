@@ -108,7 +108,7 @@ it("joins an existing party before saving membership and sending each member's v
     "guest-state",
     "host-state",
   ])
-  expect(request.join).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ owner: "guest-owner", name: "Guest", map: "広場", hp: expect.any(Number), maxHp: expect.any(Number) }))
+  expect(request.join).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ owner: "guest-owner", name: "Guest", map: "広場", hp: expect.any(Number), maxHp: expect.any(Number) }), "host-owner")
   expect(request.save).toHaveBeenCalledExactlyOnceWith({ party: "group" })
   expect(request.view).toHaveBeenCalledTimes(3)
 })

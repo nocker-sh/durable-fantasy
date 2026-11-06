@@ -28,8 +28,9 @@ export const Party = defineDurableState({
     view(context): PartyState {
       return context.state.party
     },
-    /** Add a member; false when the party is full. */
-    join(context, m: Member): boolean {
+    /** Add a member; an invitation also checks the current leader in this same saved operation. */
+    join(context, m: Member, inviter?: string): boolean | "NOT_LEADER" {
+      if (inviter !== undefined && context.state.party.leader !== inviter) return "NOT_LEADER"
       const next = join(context.state.party, m)
       if (!next) return false
       if (!context.state.party.members.some((member) => member.owner === m.owner)) context.state.chat = joinPartyChat(context.state.chat ?? emptyPartyChat(), m.owner)
