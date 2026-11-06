@@ -16,13 +16,8 @@ type Props = Readonly<{
   children: React.ReactNode
 }>
 
-/** Only on request (`?canvas=1`) while this is a trial: a browser that can do it still gets plain HTML by default. */
-function wantsCanvas(): boolean {
-  return supportsHtmlInCanvas() && new URLSearchParams(location.search).get("canvas") === "1"
-}
-
 export function CanvasDrawn(props: Props) {
-  const usesCanvasState = useState(wantsCanvas),
+  const usesCanvasState = useState(supportsHtmlInCanvas),
     usesCanvas = usesCanvasState[0],
     setUsesCanvas = usesCanvasState[1]
   const canvasRef = useRef<HTMLCanvasElement>(null)
