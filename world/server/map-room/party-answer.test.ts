@@ -38,7 +38,8 @@ function fixture() {
     state: guest,
     send,
     setState(next: Presence) {
-      connection.state = next
+      Object.assign(guest, next)
+      connection.state = guest
       trace.push("guest-state")
     },
   }
@@ -90,6 +91,8 @@ it("joins an existing party before saving membership and sending each member's v
   await handlePartyAnswer(request.room, { type: "party-answer", from: "host", yes: true })
   expect(request.trace).toEqual([
     "host-state",
+    "guest-state",
+    "host-state",
     "view",
     "read-guest-owner",
     "join-guest-owner",
@@ -102,6 +105,8 @@ it("joins an existing party before saving membership and sending each member's v
     "view",
     "host-state",
     "host-party",
+    "guest-state",
+    "host-state",
   ])
   expect(request.join).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ owner: "guest-owner", name: "Guest", map: "広場", hp: expect.any(Number), maxHp: expect.any(Number) }))
   expect(request.save).toHaveBeenCalledExactlyOnceWith({ party: "group" })
@@ -113,6 +118,8 @@ it("registers the inviter before the guest when creating a new party", async () 
   request.host.party = null
   await handlePartyAnswer(request.room, { type: "party-answer", from: "host", yes: true })
   expect(request.trace).toEqual([
+    "host-state",
+    "guest-state",
     "host-state",
     "read-host-owner",
     "join-host-owner",
@@ -130,6 +137,8 @@ it("registers the inviter before the guest when creating a new party", async () 
     "view",
     "host-state",
     "host-party",
+    "guest-state",
+    "host-state",
   ])
   expect(request.guest.party).toBeTruthy()
   expect(request.peer.state.party).toBe(request.guest.party)

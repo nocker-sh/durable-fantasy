@@ -6,7 +6,7 @@ import { getPartyInvitationRejection } from "#/world/server/map-room/get-party-i
 import type { Ctx, Message } from "#/world/server/map-room/context"
 
 type Connection = Pick<Ctx["ctx"]["connection"], "id" | "state" | "send">
-type Props = Readonly<{ me: Ctx["me"]; save: Ctx["save"]; ctx: Readonly<{ connection: Pick<Connection, "id" | "send">; room: Readonly<{ getConnection(id: string): Connection | undefined }> }> }>
+type Props = Readonly<{ me: Ctx["me"]; save: Ctx["save"]; ctx: Readonly<{ connection: Connection; room: Readonly<{ getConnection(id: string): Connection | undefined }> }> }>
 
 /** 招待は相手を所属させず、既存の同行者がいる場合はリーダーかどうかと空きを先に確かめる。 */
 export async function handlePartyInvite(roomCtx: Props, message: Message<"party-invite">) {
@@ -14,7 +14,7 @@ export async function handlePartyInvite(roomCtx: Props, message: Message<"party-
   const me = roomCtx.me
   const them = ctx.room.getConnection(message.target)
   const other = them && presence(them)
-  if (!me.player || !me.owner || !them || !other?.player || other.party || them.id === ctx.connection.id) {
+  if (!me.player || !me.owner || !them || !other?.player || other.party || me.partyPending || other.partyPending || them.id === ctx.connection.id) {
     await ctx.connection.send({ type: "party-closed", reason: "BUSY" })
     return
   }
@@ -27,6 +27,12 @@ export async function handlePartyInvite(roomCtx: Props, message: Message<"party-
   }
   if (!(await Player.get(me.owner).pace({ kind: "ask", gap: ASK_GAP_MS }))) {
     await ctx.connection.send({ type: "party-closed", reason: "WAIT" })
+    return
+  }
+  const current = presence(ctx.connection)
+  const recipient = presence(them)
+  if (current.owner !== me.owner || recipient.owner !== other.owner || current.party !== me.party || recipient.party || current.partyPending || recipient.partyPending) {
+    await ctx.connection.send({ type: "party-closed", reason: "BUSY" })
     return
   }
   roomCtx.save({ inviting: them.id })

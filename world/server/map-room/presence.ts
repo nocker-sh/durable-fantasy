@@ -38,6 +38,8 @@ export type Presence = {
   sitting?: boolean
   /** the party they are in (core/party.ts), and whom they have asked to join it */
   party?: string | null
+  /** An accepted invitation is registering these two connections' membership. */
+  partyPending?: boolean
   /** Connection-local selectors; player ids in this table never leave the server. */
   partySelection?: {
     connection: string
