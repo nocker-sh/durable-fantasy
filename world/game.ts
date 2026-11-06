@@ -196,7 +196,7 @@ export class Game {
     const player = this.state.get().player
     if (!player) return "OFFLINE"
     // the same clock as the server's waits (skills and medicine), or a past wait would still hold
-    const result = apply(player, command, { now: Date.now() })
+    const result = apply(player, command, { now: Date.now(), price: command.type === "buy" ? command.price : undefined })
     return result.ok ? null : result.reason
   }
 

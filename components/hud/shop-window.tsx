@@ -135,7 +135,7 @@ function BuyRow(inputProps: { offer: Offer }) {
   const each = held === undefined ? price : bulkStockPrice({ item, q: offer.q, by, stock: held, count: n })
   const pay = player ? friendPrice(each, shopFriend(player, shop)) : each
   const soldOut = left === 0
-  const reason = soldOut ? "SOLD_OUT" : game.preview({ type: "buy", shop, item, count: n, ...(q !== undefined ? { q } : {}) })
+  const reason = soldOut ? "SOLD_OUT" : game.preview({ type: "buy", shop, item, count: n, price: each, ...(q !== undefined ? { q } : {}) })
   const buy = (
     <Button
       variant="primary"
