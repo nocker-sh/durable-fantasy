@@ -2,6 +2,7 @@ import { apply } from "#/world/core/apply"
 import { sameProposal } from "#/world/core/same-proposal"
 import { sameStacks } from "#/world/core/same-stacks"
 import { takenOf } from "#/world/core/taken-of"
+import { tradeIn } from "#/world/core/trade-in"
 import type { PlayerState } from "#/world/core/player-types"
 import type { TradeProposal, TradeRecord, PreparedTrade, TradeFailure } from "#/world/core/trade-transaction-types"
 
@@ -23,7 +24,7 @@ export function prepareTrade(props: Props): PreparedTrade | TradeFailure {
   const outgoing = apply(props.player, { type: "trade-out", offer: proposal.offer }, { now: props.now })
   if (!outgoing.ok) return outgoing
   if (!sameStacks(takenOf(outgoing.events), proposal.outgoing)) return { ok: false, reason: "NOT_READY" }
-  const incoming = apply(outgoing.state, { type: "trade-in", stacks: proposal.incoming, gold: proposal.gold }, { now: props.now })
+  const incoming = tradeIn(outgoing.state, { type: "trade-in", stacks: proposal.incoming, gold: proposal.gold }, props.player)
   if (!incoming.ok) return incoming
 
   return { ok: true, record: { proposal: structuredClone(proposal), status: "prepared", inventory: { bag: incoming.state.bag, gold: incoming.state.gold } } }

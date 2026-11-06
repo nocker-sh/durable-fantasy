@@ -1,5 +1,6 @@
 import { apply } from "#/world/core/apply"
 import { takenOf } from "#/world/core/taken-of"
+import { tradeIn } from "#/world/core/trade-in"
 import type { Offer } from "#/world/core/trade-types"
 import type { Reason } from "#/world/core/commands"
 import type { PlayerState } from "#/world/core/player-types"
@@ -12,9 +13,9 @@ export function checkTrade(props: Props): Reason | null {
   if (!outA.ok) return outA.reason
   const outB = apply(props.playerB, { type: "trade-out", offer: props.offerB }, { now: props.now })
   if (!outB.ok) return outB.reason
-  const inA = apply(outA.state, { type: "trade-in", stacks: takenOf(outB.events), gold: props.offerB.gold }, { now: props.now })
+  const inA = tradeIn(outA.state, { type: "trade-in", stacks: takenOf(outB.events), gold: props.offerB.gold }, props.playerA)
   if (!inA.ok) return inA.reason
-  const inB = apply(outB.state, { type: "trade-in", stacks: takenOf(outA.events), gold: props.offerA.gold }, { now: props.now })
+  const inB = tradeIn(outB.state, { type: "trade-in", stacks: takenOf(outA.events), gold: props.offerA.gold }, props.playerB)
   if (!inB.ok) return inB.reason
 
   return null
