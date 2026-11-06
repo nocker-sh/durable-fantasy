@@ -42,6 +42,7 @@
     "build": "vp build",
     "preview": "vp preview",
     "test": "vp test run",
+    "test:story": "vp test run errand dialogue friendship clock core/player.test lines/lines.test --maxWorkers=1",
     "typecheck": "vp exec void prepare && tsc --noEmit -p . && tsc --noEmit -p scripts/tsconfig.settings.json && tsc --noEmit -p scripts/tsconfig.bake.json",
     "check:settings": "bun scripts/check-settings.ts",
     "lint": "vp lint",

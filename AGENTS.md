@@ -121,3 +121,5 @@ Windows で `better-sqlite3` のソースビルドに失敗する場合は、Voi
 `vp run dev` は Portless 経由で起動し、`portless.json` の名前でアクセスする。共有プロキシがある環境では `PORTLESS_STATE_DIR`・`PORTLESS_PORT`・`PORTLESS_HTTPS` を同じシェルへ設定する。他のアプリの経路と既存の方式を保つ。HTTP の場合の URL は `http://durable-fantasy.localhost/` で、Vite の待受ポートは Portless が割り当てる。
 
 Vite とテストの設定は `vite.config.ts` で管理し、`vitest.config.ts` へ分散しない。単体テストではアプリ用プラグインを起動せず、Node の環境・ファイルごとの分離・既存の制限時間を保つ。
+
+物語・依頼・会話条件を変更したら、本番データと本物の進行処理に対するテストも更新し、`vp run test:story` を実行する。前提不足、表示する選択肢、完了報酬、重複通知、期限と保存再開を確かめる。検査の境界は [[story-validation]]。通常の進行検証はブラウザなしで行い、重い検査は直列、ブラウザ確認は並列にしない。
