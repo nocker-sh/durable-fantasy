@@ -8,7 +8,7 @@ import type { PlayerRecord } from "#/world/server/player-record"
 import type { PlayerCommandInput } from "#/world/server/player-operation-types"
 
 export function runPlayerCommand(record: PlayerRecord, input: PlayerCommandInput, now: number): Transition {
-  if (record.trade?.status === "prepared") return { ok: false, reason: "NOT_READY" }
+  if (record.trade?.status === "prepared" && input.command.type !== "set-party") return { ok: false, reason: "NOT_READY" }
   const result = apply(restoreSavedPlayer(record.player), input.command, { ...input.context, now })
   if (result.ok) {
     publishPlayer(record, result.state)
