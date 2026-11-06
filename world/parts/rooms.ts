@@ -19,9 +19,21 @@ export type Standby = {
 }
 
 export class Rooms {
-  /** the parallel town we are in */
-  world = 1
+  private currentWorld = 1
+  private worldGeneration = 0
   private standby: (Standby & { cancelled: boolean }) | null = null
+
+  /** Changing parallel towns ends the lifetime of that town's preconnections. */
+  get world(): number {
+    return this.currentWorld
+  }
+
+  set world(world: number) {
+    if (world === this.currentWorld) return
+    this.currentWorld = world
+    this.worldGeneration++
+    this.cancelStandby()
+  }
 
   /** Which channel of a map to go into (the directory chooses; channel 1 if it cannot be reached). */
   async askChannel(id: MapId, want: number | null = null): Promise<Channel> {
@@ -48,10 +60,11 @@ export class Rooms {
   standBy(map: MapId) {
     if (this.standby?.map === map) return
     this.cancelStandby()
+    const generation = this.worldGeneration
     // Resolving channel also guarantees socket creation, including when take() transfers ownership
     // before the channel request completes.
     const channel = this.askChannel(map).then((chosen) => {
-      if (entry.cancelled) return chosen
+      if (entry.cancelled || generation !== this.worldGeneration) return chosen
       const socket = this.open(map, chosen.channel)
       entry.socket = socket
       socket.on("open", () => {
