@@ -11,5 +11,5 @@ export function revive(state: PlayerState, now: number): Transition {
   if (state.hp > 0) return reject("NOT_FALLEN")
   const lost = Math.min(state.exp, deathPenalty(state.level, expToNext(state.level)))
   const hp = Math.max(1, Math.floor(derive(state).maxHp / 2))
-  return accept({ ...state, hp, hpAt: now, sitting: false, exp: state.exp - lost }, { type: "revived", hp, lost })
+  return accept({ ...state, hp, hpAt: now, spAt: now, sitting: false, exp: state.exp - lost }, { type: "revived", hp, lost })
 }
