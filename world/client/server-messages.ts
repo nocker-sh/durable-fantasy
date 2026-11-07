@@ -16,6 +16,8 @@ import type { Offer } from "#/world/state"
 import type { ServerMessageContext } from "#/world/client/server-context"
 
 export class ServerMessages {
+  private reportedPlayerRevision = 0
+
   constructor(
     private readonly target: Pick<
       ServerMessageContext,
@@ -103,6 +105,12 @@ export class ServerMessages {
         if (message.seq === -1) {
           if (message.result.ok && currentPublication(this.target.session.state.get().player, message.result.state)) {
             this.target.setPlayer(message.result.state)
+            const revision = message.result.state.revision ?? 0
+            if (revision > 0 && message.result.events.length) {
+              if (revision <= this.reportedPlayerRevision) return
+              // Empty snapshots do not consume an event; commit before notifying so reentry cannot replay it.
+              this.reportedPlayerRevision = revision
+            }
             for (const e of message.result.events) this.target.report(e)
           }
           return
