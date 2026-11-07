@@ -1,3 +1,4 @@
+import { PlayerActions } from "#/world/client/player-actions"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import type { VoidSocket } from "void/ws"
 import type { GameState } from "#/world/state"
@@ -291,3 +292,71 @@ it.each([0, 1390, null])("joins using the current dev clock, including midnight 
   if (minute === null) expect(message).not.toHaveProperty("time")
   else expect(message.time).toBe(minute)
 })
+
+for (const operation of ["place", "cancel", "claim"] as const)
+  for (const accepted of [true, false])
+    for (const change of ["closed", "symbol", "reopened", "unchanged", "room"] as const)
+      it(`${operation}, accepted=${accepted}: a late reply preserves the ${change} exchange window`, async () => {
+        const { session, client, context, callbacks, send } = fixture()
+        const actions = new PlayerActions(context)
+        const initial = player({ revision: 1, gold: 200 })
+        callbacks.update({ player: initial })
+        actions.openBoard("log")
+        send.mockClear()
+        const pending = operation === "place" ? actions.placeOrder({ side: "buy", price: 1, qty: 1 }) : operation === "cancel" ? actions.cancelOrder("local-order") : actions.claimInbox()
+        expect(session.state.get().busy).toBe(true)
+        expect(session.waiting.size).toBe(1)
+        const seq = [...session.waiting.keys()][0]
+        expect(send.mock.calls[0][0]).toMatchObject({ type: operation === "place" ? "ex-place" : operation === "cancel" ? "ex-cancel" : "ex-claim", seq })
+        if (change === "closed") actions.closeBoard()
+        if (change === "symbol") actions.openBoard("stone")
+        if (change === "reopened") {
+          actions.closeBoard()
+          actions.openBoard("log")
+        }
+        const board = session.state.get().board
+        send.mockClear()
+        const reply = player({ revision: 2, gold: 190 })
+        new ServerMessages(context).handle({ type: "result", seq, result: accepted ? { ok: true, state: reply, events: [] } : { ok: false, reason: "OFFLINE" } })
+        // A reply can settle just before leaving; the awaiting continuation runs
+        // after the replacement room has installed its own socket and board.
+        const nextSend = vi.fn()
+        if (change === "room") session.socket = { send: nextSend } as unknown as VoidSocket<"/map/:mapId">
+        await pending
+        expect(session.waiting.size).toBe(0)
+        expect(session.state.get().busy).toBe(false)
+        expect(session.state.get().board).toEqual(board)
+        expect(session.state.get().player).toEqual(accepted && change !== "room" ? reply : initial)
+        expect(send.mock.calls.map(([message]) => message)).toEqual(board && change !== "room" ? [{ type: "ex-look", symbol: board.symbol }] : [])
+        expect(nextSend).not.toHaveBeenCalled()
+        client.cancel()
+      })
+
+for (const operation of ["place", "cancel", "claim"] as const)
+  it(`${operation}: disconnecting while the exchange waits leaves it closed`, async () => {
+    const { session, client, context, callbacks, send } = fixture()
+    let closed!: (event: { code: number }) => void
+    const socket = {
+      send,
+      on: (event: string, listener: (event: { code: number }) => void) => {
+        if (event === "close") closed = listener
+      },
+    } as unknown as VoidSocket<"/map/:mapId">
+    session.socket = socket
+    client.listen(socket)
+    const initial = player({ revision: 1, gold: 200 })
+    callbacks.update({ player: initial })
+    const actions = new PlayerActions(context)
+    actions.openBoard("log")
+    const pending = operation === "place" ? actions.placeOrder({ side: "buy", price: 1, qty: 1 }) : operation === "cancel" ? actions.cancelOrder("local-order") : actions.claimInbox()
+    expect(session.waiting.size).toBe(1)
+    send.mockClear()
+    closed({ code: 1006 })
+    await pending
+    expect(session.state.get().online).toBe("offline")
+    expect(session.state.get().board).toBeNull()
+    expect(session.state.get().player).toEqual(initial)
+    expect(session.state.get().busy).toBe(false)
+    expect(session.waiting.size).toBe(0)
+    expect(send).not.toHaveBeenCalled()
+  })

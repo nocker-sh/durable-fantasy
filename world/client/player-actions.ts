@@ -90,18 +90,27 @@ export class PlayerActions {
   async placeOrder(o: { side: "buy" | "sell"; price: number; qty: number; market?: boolean; slot?: number }) {
     const board = this.target.session.state.get().board
     if (!board) return
+    const socket = this.target.session.socket
     await this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "ex-place", seq, symbol: board.symbol, ...o }))
-    this.openBoard(board.symbol)
+    this.refreshBoard(socket)
   }
 
   async cancelOrder(id: string) {
+    const socket = this.target.session.socket
     await this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "ex-cancel", seq, id }))
-    this.openBoard()
+    this.refreshBoard(socket)
   }
 
   async claimInbox() {
+    const socket = this.target.session.socket
     await this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "ex-claim", seq }))
-    this.openBoard()
+    this.refreshBoard(socket)
+  }
+
+  private refreshBoard(socket: GameSession["socket"]) {
+    if (this.target.session.socket !== socket) return
+    const board = this.target.session.state.get().board
+    if (board) socket?.send({ type: "ex-look", symbol: board.symbol })
   }
 
   store(slot: number, count: number, expectedStack?: Stack) {
