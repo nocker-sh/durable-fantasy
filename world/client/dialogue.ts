@@ -80,12 +80,14 @@ export class DialogueActions {
       return
     }
     if ((choice.action === "errand-take" || choice.action === "errand-hand") && errand) {
+      if (this.target.session.state.get().busy) return
       const action = choice.action === "errand-take" ? "take" : "hand"
+      const socket = this.target.session.socket
       void this.target
         .run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "errand", seq, action, errand: errand.id, resident: dialogue.name }))
         .then((ok) => {
           const now = this.target.session.state.get().dialogue
-          if (!now || now.name !== dialogue.name) return
+          if (this.target.session.socket !== socket || now !== dialogue) return
           if (!ok) return this.closeDialogue()
           // taking one is told plainly (each resident's own voice is in what they asked); handing it over, they thank you
           const text = action === "take" ? `（引き受けた。${errandLabel(errand)}、朝の6時まで）` : errand.thanks
