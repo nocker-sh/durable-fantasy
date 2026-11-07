@@ -1,3 +1,4 @@
+import { hasFutureErrands } from "#/world/core/has-future-errands"
 import { errandOf } from "#/world/core/errand-of"
 import { todays } from "#/world/core/todays"
 import { removeItem } from "#/world/core/remove-item"
@@ -10,6 +11,7 @@ import type { PlayerState } from "#/world/core/player-types"
 
 /** 受渡しが成立した場合だけ材料・報酬・親しさと完了記録を一緒に更新する。 */
 export function handErrand(state: PlayerState, command: Extract<ServerCommand, { type: "errand-hand" }>, now: number): Transition {
+  if (hasFutureErrands(state.errands, now)) return reject("NO_ERRAND")
   const errand = errandOf(command.errand)
   const list = todays(state.errands, now)
   if (!errand || !list.some((taken) => taken.id === errand.id && !taken.done)) return reject("NO_ERRAND")
