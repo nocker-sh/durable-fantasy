@@ -1,3 +1,10 @@
+import type { PlayerRecord } from "#/world/server/player-record"
+import { BATCHES } from "#/world/core/market-batches"
+import { marketDayStart } from "#/world/core/market-day-start"
+import { MARKET_DAY_MS } from "#/world/core/market-rules"
+import type { ItemId } from "#/world/core/items/catalog"
+import type { ShopId } from "#/world/core/shop-types"
+import type { Quality } from "#/world/core/items/kinds"
 import { afterEach, expect, it, vi } from "vitest"
 import { Market } from "#/durable-objects/market"
 import { Player } from "#/durable-objects/player"
@@ -272,3 +279,74 @@ it("rejects reusing a sale request number with a different selected stack", asyn
 it("rejects undeclared and inherited shop names before resolving a stock maker", () => {
   for (const shop of ["missing", "constructor", "toString", "__proto__"]) expect(() => shopMaker(shop, "apple")).toThrow(TypeError)
 })
+
+const batches = Object.entries(BATCHES).flatMap(([shop, items]) => Object.entries(items).map(([item, batch]) => ({ shop: shop as ShopId, item: item as ItemId, batch })))
+for (const entry of batches)
+  for (const failure of ["none", "reply", "source-save"] as const)
+    it(`${entry.shop}/${entry.item}: a backward clock cannot return a refused old reservation into an already replaced shelf, failure=${failure}`, async () => {
+      const f = await fixture(0)
+      const first = marketDayStart(now) + MARKET_DAY_MS + entry.batch.at[0] * 60_000
+      vi.setSystemTime(first + 1)
+      await f.source.look(entry.shop, null)
+      const quantities = f.state().market.shelf[entry.shop]![entry.item]!
+      const q = quantities.findIndex((count) => count > 0) as Quality
+      expect(q).toBeGreaterThanOrEqual(0)
+      const id = await f.begin({ type: "buy", shop: entry.shop, item: entry.item, count: 1, q })
+      const savedPlayer = () => (f.playerStore.saved.get("__void_durable_state") as { value: PlayerRecord }).value.player
+      const playerBefore = structuredClone(savedPlayer())
+      vi.setSystemTime(first + MARKET_DAY_MS + 1)
+      await f.source.look(entry.shop, null)
+      const replaced = structuredClone(f.state().market)
+      expect(replaced.at).toBe(first + MARKET_DAY_MS + 1)
+      vi.setSystemTime(first + MARKET_DAY_MS - 1)
+      if (failure !== "none") {
+        const pending = structuredClone(f.state())
+        if (failure === "reply") f.loseNextReply()
+        else f.marketStore.failNextSave()
+        await expect(f.source.finishTrade("owner", id)).rejects.toThrow(failure === "reply" ? "Response lost" : "Storage unavailable")
+        expect(f.state()).toEqual(pending)
+        f.restart()
+        await f.source.alarm()
+      }
+      expect(await f.source.finishTrade("owner", id)).toEqual({ ok: false, reason: "NO_GOLD" })
+      expect(f.state().market).toEqual(replaced)
+      expect(savedPlayer()).toEqual(playerBefore)
+      f.restart()
+      expect(await f.source.finishTrade("owner", id)).toEqual({ ok: false, reason: "NO_GOLD" })
+      await f.source.alarm()
+      expect(f.state().market).toEqual(replaced)
+      expect(savedPlayer()).toEqual(playerBefore)
+    })
+
+for (const entry of batches)
+  it(`${entry.shop}/${entry.item}: crossing the first batch after shelf calculation cannot discard an unprocessed reservation`, async () => {
+    const f = await fixture(0)
+    const first = marketDayStart(now) + MARKET_DAY_MS + entry.batch.at[0] * 60_000
+    vi.setSystemTime(first + 1)
+    await f.source.look(entry.shop, null)
+    const quantities = f.state().market.shelf[entry.shop]![entry.item]!
+    const q = quantities.findIndex((count) => count > 0) as Quality
+    expect(q).toBeGreaterThanOrEqual(0)
+    const id = await f.begin({ type: "buy", shop: entry.shop, item: entry.item, count: 1, q })
+    const beforeBatch = first + MARKET_DAY_MS - 1
+    vi.setSystemTime(beforeBatch)
+    await f.source.look(entry.shop, null)
+    const returned = structuredClone(f.state().market)
+    returned.shelf[entry.shop]![entry.item]![q]++
+    const clock = vi.spyOn(Date, "now")
+    f.receive.mockImplementationOnce(async (key, quote) => {
+      const result = await f.recipient.receiveShop(key, quote)
+      // The actual shelf calculation sees the last millisecond of the old batch.
+      // A second clock read would cross the boundary without applying production.
+      clock.mockReturnValueOnce(beforeBatch).mockReturnValue(beforeBatch + 2)
+      return result
+    })
+    expect(await f.source.finishTrade("owner", id)).toEqual({ ok: false, reason: "NO_GOLD" })
+    expect(f.state().market).toEqual(returned)
+    clock.mockRestore()
+    // Reopening after the boundary now applies the real production and discards old leftovers.
+    vi.setSystemTime(beforeBatch + 2)
+    const produced = restock(returned, beforeBatch + 2, shopMaker)
+    await f.source.look(entry.shop, null)
+    expect(f.state().market).toEqual(produced)
+  })

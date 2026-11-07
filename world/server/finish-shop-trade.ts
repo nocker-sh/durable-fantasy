@@ -25,7 +25,7 @@ export async function finishShopTrade(props: Props): Promise<Transition> {
   if (job.quote.type === "buy" && !result.ok) {
     const q = job.quote.q ?? 1
     if (!batched(job.quote.shop, job.quote.item)) props.context.state.market = moveStock({ state: props.context.state.market, shop: job.quote.shop, item: job.quote.item, delta: job.quote.count })
-    else if (!batchReplaced({ shop: job.quote.shop, item: job.quote.item, reservedAt: job.at, now: Date.now() }))
+    else if (!batchReplaced({ shop: job.quote.shop, item: job.quote.item, reservedAt: job.at, now: props.context.state.market.at }))
       props.context.state.market = giveBack({ state: props.context.state.market, shop: job.quote.shop, item: job.quote.item, q: q, count: job.quote.count })
   }
   props.context.state.jobs[props.owner] = { ...job, phase: "done" }
