@@ -24,6 +24,8 @@ export async function handleCommission(roomCtx: Ctx, message: Message<"order" | 
   const cell = job && npcCell(map, job.craftsman, timeFor(me))
   if (!job || !cell || !near(me, cell, TALK_CELLS + 1)) return answer({ ok: false, reason: "TOO_FAR" })
   return answer(
-    await Player.get(me.owner).run(message.type === "order" ? { type: "order", commission: job.id, roll: Math.random() } : { type: "collect", index: message.index, expectedOrders: message.orders }),
+    await Player.get(me.owner).run(message.type === "order" ? { type: "order", commission: job.id, roll: Math.random() } : { type: "collect", index: message.index, expectedOrders: message.orders }, {
+      connection: ctx.connection.id,
+    }),
   )
 }

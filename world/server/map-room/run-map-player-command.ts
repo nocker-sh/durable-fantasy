@@ -11,7 +11,8 @@ type Props = Readonly<{ context: { me: Ctx["me"]; ctx: { connection: Pick<Ctx["c
 /** Shop commands keep the durable reservation-and-finish boundary; other commands remain player-local. */
 export async function runMapPlayerCommand(props: Props): Promise<Transition> {
   const command = props.message.command
-  if (command.type !== "buy" && command.type !== "sell") return Player.get(props.owner).run(command, props.keepers ? { keepers: props.keepers } : {})
+  if (command.type !== "buy" && command.type !== "sell")
+    return Player.get(props.owner).run(command, { ...(props.keepers ? { keepers: props.keepers } : {}), connection: props.context.ctx.connection.id })
   const market = Market.get(TOWN)
   const request = await market.beginTrade({
     owner: props.owner,

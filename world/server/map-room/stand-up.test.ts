@@ -14,7 +14,7 @@ function fixture() {
   const save = vi.fn(),
     send = vi.fn(async () => {})
   const me: Pick<Presence, "owner" | "sitting"> = { owner: "owner", sitting: true }
-  return { ctx: { connection: { send } }, me, save }
+  return { ctx: { connection: { id: "connection", send } }, me, save }
 }
 it("keeps posture unchanged while the player save is outstanding or failed", async () => {
   const f = fixture()
@@ -35,6 +35,7 @@ it("does not clear a seated presence after an explicit refusal", async () => {
   const f = fixture()
   run.mockResolvedValue({ ok: false, reason: "NOT_READY" })
   expect(await standUp(f)).toBe(false)
+  expect(run).toHaveBeenCalledExactlyOnceWith({ type: "stand" }, { connection: "connection" })
   expect(f.save).not.toHaveBeenCalled()
 })
 it("confirms the saved posture even if its notification fails", async () => {

@@ -56,6 +56,8 @@ A* 探索のコスト・前のセル・候補の展開は `lib/engine/grid-path-
 
 Player DO の入口は RPC の型、保存の単位、時計と相手の取得を持ち、操作ごとの組み立ては `world/server/` に置く。`run-player-command.ts`・`give-player-item.ts`・`reset-player-record.ts` がコマンドと開発用の操作を担当し、倒れたときの位置の停止は `freeze-player-location.ts` を共有する。採集・店・戦闘・受取箱の受領は各 `receive-player-*.ts`、戦闘の支払いは `pay-player-strike.ts`、注文の預かりは `hold-player-order.ts` が受領記録と公開する状態を同じ保存用の記録へ反映する。配送の照会は `read-player-delivery.ts`、受取箱の受領済み照会は `read-player-inbox-receipt.ts` に置く。
 
+部屋から届く通常コマンド・倉庫の預け入れと引取り・依頼・委託・立ち上がりは、接続番号も Player DO へ渡す。`run-player-command.ts` は、部屋が先に認めた接続でも保存先で切替・退出済みなら、回復や状態の公開・資産の変更より前に拒否する。接続の確認と操作の確定は同じ保存記録で行い、接続番号はゲーム規則の Context へ渡さない。接続を付けない内部処理の呼出しと従来の保存形式は維持する。[[world/server/map-room/storage-connection.test.ts]] は正本の倉庫番の配置と営業時間で、本物の部屋の受付と Player DO の入場・退出・保存を通す。部屋で接続を認めた後、操作が届く直前に別接続へ引き継ぐ場合と退出する場合の両方で、預け入れ・引取りと普通の素材・品質と作り手と摩耗のある道具を検査する。古い要求と再起動後の再要求、空の接続番号で全保存記録を保ち、現在の接続からは従来どおり成立することを確認する。時刻・容量・所持品と窓口の近くの位置は局所条件で、時計・保存先・クラウドの起動環境と RPC の接続先解決・配送順だけを差し替える。そこまでの移動と入手、実 WebSocket の配送や各依頼と委託の全経路、同じ選択内容へ戻った後の操作番号の重複排除や最終画面はこの検査の対象外。
+
 対面取引のプレイヤー側は `begin-player-trade.ts`・`prepare-player-trade.ts`・`finish-player-trade.ts` が受付と確定を、`advance-player-trade.ts` が再試行の予約と相手への呼出しを持つ。後者は相手を取得する関数を入口から受け取り、DO の定義へ戻る依存を作らない。操作の入力とアラームを予約する文脈の型は `player-operation-types.ts` に置き、時計は入口から渡す。
 
 プレイヤーの状態の公開順は、保存形式の版とは別の `PlayerState.revision` で表す。`world/server/publish-player.ts` が番号を進め、Player DO は返す状態もこの値にそろえる。対面取引のコーディネーターが本人の状態を変更する経路も含める。クライアントの `world/client/player-publication.ts` を、操作応答・非同期通知・入場時の初期状態と Game の状態更新で共有する。順序の規則は [[game-system#13. 永続化]] にある。

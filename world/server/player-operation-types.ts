@@ -10,4 +10,5 @@ export type PlayerTradeInput = Readonly<{ peer: string; local: TradeProposal; re
 export type PlayerTradeDecision = Readonly<{ id: string; revision: number; decision: "committed" | "aborted" }>
 export type PlayerOrderInput = Readonly<{ id: number; intent: OrderIntent }>
 export type PlayerStrikeInput = Readonly<{ source: string; id: number; art?: SkillId; life?: number }>
-export type PlayerCommandInput = Readonly<{ command: Command | ServerCommand; context: Omit<Context, "now"> }>
+export type PlayerCommandContext = Readonly<Omit<Context, "now"> & { connection?: string }>
+export type PlayerCommandInput = Readonly<{ command: Command | ServerCommand; context: Omit<Context, "now">; connection?: string }>

@@ -27,12 +27,11 @@ import { initialPlayerRecord } from "#/world/server/initial-player-record"
 import { readPlayerRecord } from "#/world/server/read-player-record"
 import { playerMigrations } from "#/world/server/player-record"
 import type { PlayerArrivalInput, PlayerWalkInput, PlayerTravelInput, PlayerJourneyInput, PlayerJourney } from "#/world/server/player-location-types"
-import type { PlayerTradeInput, PlayerTradeDecision, PlayerStrikeInput } from "#/world/server/player-operation-types"
+import type { PlayerTradeInput, PlayerTradeDecision, PlayerStrikeInput, PlayerCommandContext } from "#/world/server/player-operation-types"
 import type { GatherRequest } from "#/world/core/gather-receipt-types"
 import type { ShopQuote } from "#/world/core/shop-receipt-types"
 import type { CombatDelivery } from "#/world/core/combat-delivery-types"
 import type { InboxClaim } from "#/world/core/exchange-claim-types"
-import type { Context } from "#/world/core/apply"
 import type { Command, ServerCommand } from "#/world/core/commands"
 import type { Transition } from "#/world/core/transition"
 import type { PlayerState } from "#/world/core/player-types"
@@ -135,8 +134,10 @@ export const Player = defineDurableState({
       return runPlayerCraft({ record: context.state, request, now: Date.now() })
     },
     /** The room supplies shop context; the player's operation uses the server timestamp. */
-    run(context, command: Command | ServerCommand, ctx: Omit<Context, "now"> = {}): Transition {
-      return runPlayerCommand(context.state, { command, context: ctx }, Date.now())
+    run(context, command: Command | ServerCommand, ctx: PlayerCommandContext = {}): Transition {
+      const commandContext = { ...ctx }
+      delete commandContext.connection
+      return runPlayerCommand(context.state, { command, context: commandContext, connection: ctx.connection }, Date.now())
     },
     /** Dev-only bag changes. */
     give(context, item: ItemId, count: number): PlayerState {

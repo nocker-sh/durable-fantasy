@@ -25,7 +25,7 @@ function fixture() {
     return result
   })
   const send = vi.fn(async () => {})
-  const context = { ctx: { connection: { send } }, map: {}, me: { owner: "owner", player: { id: "player" }, route: [[10, 10]], since: 0, held: 20 * 60 } } as unknown as Ctx
+  const context = { ctx: { connection: { id: "connection", send } }, map: {}, me: { owner: "owner", player: { id: "player" }, route: [[10, 10]], since: 0, held: 20 * 60 } } as unknown as Ctx
   return {
     context,
     orders,
@@ -40,7 +40,7 @@ function fixture() {
 it("passes the displayed queue through to the authoritative command", async () => {
   const f = fixture()
   await f.collect()
-  expect(rpc.run).toHaveBeenCalledExactlyOnceWith({ type: "collect", index: 0, expectedOrders: f.orders })
+  expect(rpc.run).toHaveBeenCalledExactlyOnceWith({ type: "collect", index: 0, expectedOrders: f.orders }, { connection: "connection" })
   expect(f.state().orders).toHaveLength(1)
   expect(f.send).toHaveBeenCalledWith(expect.objectContaining({ type: "result", seq: 7, result: expect.objectContaining({ ok: true }) }))
 })
@@ -70,6 +70,6 @@ it.each(["store", "retrieve"] as const)("passes the selected %s stack into the a
   const state = player({ gold: 20, ...(action === "store" ? { bag: [stack] } : { storage: [stack] }) })
   f.change(state)
   await HANDLERS.storage!(f.context, { type: "storage", action, seq: 8, index: 0, count: 1, stack })
-  expect(rpc.run).toHaveBeenCalledExactlyOnceWith({ type: action, ...(action === "store" ? { slot: 0 } : { index: 0 }), count: 1, expectedStack: stack })
+  expect(rpc.run).toHaveBeenCalledExactlyOnceWith({ type: action, ...(action === "store" ? { slot: 0 } : { index: 0 }), count: 1, expectedStack: stack }, { connection: "connection" })
   expect(f.send).toHaveBeenCalledWith(expect.objectContaining({ result: expect.objectContaining({ ok: true }) }))
 })

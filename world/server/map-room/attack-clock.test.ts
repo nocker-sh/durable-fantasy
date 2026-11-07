@@ -48,7 +48,7 @@ it.each([0, 1000].flatMap((epoch) => ([undefined, "lunge"] as const).flatMap((ar
       save: (patch) => {
         Object.assign(me, patch)
       },
-      standUp: () => standUp(room),
+      standUp: () => standUp({ ...room, ctx: { connection: { id: "connection", send: room.ctx.connection.send } } }),
       ctx: { params: { mapId: spawn.map }, connection: { send: async () => {} }, room: { broadcast: async () => {}, getConnections: () => [] } },
     }
     const message = { type: "attack" as const, monster: spawn.id, ...(art ? { art } : {}) }
@@ -64,7 +64,7 @@ it.each([0, 1000].flatMap((epoch) => ([undefined, "lunge"] as const).flatMap((ar
       save: (patch) => {
         Object.assign(nextPresence, patch)
       },
-      standUp: () => standUp(nextRoom),
+      standUp: () => standUp({ ...nextRoom, ctx: { connection: { id: "reconnected", send: nextRoom.ctx.connection.send } } }),
     }
     await handleAttack(scenario.reconnected ? nextRoom : room, message)
     expect(reserve).toHaveBeenCalledOnce()

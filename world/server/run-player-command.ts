@@ -8,6 +8,8 @@ import type { PlayerRecord } from "#/world/server/player-record"
 import type { PlayerCommandInput } from "#/world/server/player-operation-types"
 
 export function runPlayerCommand(record: PlayerRecord, input: PlayerCommandInput, now: number): Transition {
+  // Admission in the room can expire while its RPC is queued; refuse before recovery or publication.
+  if (input.connection !== undefined && (!input.connection || record.location?.connection !== input.connection)) return { ok: false, reason: "NOT_READY" }
   if (record.trade?.status === "prepared" && input.command.type !== "set-party") return { ok: false, reason: "NOT_READY" }
   const result = apply(restoreSavedPlayer(record.player), input.command, { ...input.context, now })
   if (result.ok) {

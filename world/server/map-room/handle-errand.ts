@@ -19,6 +19,7 @@ export async function handleErrand(roomCtx: Ctx, message: Message<"errand">): Pr
   return answer(
     await Player.get(me.owner).run(
       message.action === "take" ? { type: "errand-take", errand: message.errand, from: message.resident } : { type: "errand-hand", errand: message.errand, to: message.resident },
+      { connection: ctx.connection.id },
     ),
   )
 }

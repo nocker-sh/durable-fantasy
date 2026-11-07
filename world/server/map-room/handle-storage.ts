@@ -24,6 +24,7 @@ export async function handleStorage(roomCtx: Ctx, message: Message<"storage">): 
       message.action === "store"
         ? { type: "store", slot: message.index, count: message.count, expectedStack: message.stack }
         : { type: "retrieve", index: message.index, count: message.count, expectedStack: message.stack },
+      { connection: ctx.connection.id },
     ),
   )
 }
