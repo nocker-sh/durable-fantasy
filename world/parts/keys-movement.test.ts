@@ -23,7 +23,8 @@ afterEach(() => {
 })
 
 function fixture() {
-  const viewport = new EventTarget()
+  const document = Object.assign(new EventTarget(), { hidden: false })
+  const viewport = Object.assign(new EventTarget(), { document })
   vi.stubGlobal("window", viewport)
   const map = MAPS.phanthiet
   expect(map.size).toBe(WN)
@@ -58,6 +59,8 @@ function fixture() {
   })
   const follower = new PathFollower({ speed: STEP_SPEED })
   return {
+    document,
+    keys,
     me,
     sent,
     movement,
@@ -118,6 +121,60 @@ it.each(["Meta", "Control"] as const)("%s does not cancel an unrelated click rou
   const sent = f.sent.length
   f.key(`${modifier}Left`, "keydown", modifier)
   f.key(`${modifier}Left`, "keyup")
+  expect(f.me.path).toEqual(route)
+  f.tick(120)
+  expect(f.sent).toHaveLength(sent)
+  expect(cellOf(f.me.pos)).toEqual(cellOf(target))
+})
+
+for (const code of Object.keys(MOVE_KEYS)) {
+  it(`${code}: hiding without blur stops a real held route and requires a fresh press`, () => {
+    const f = fixture()
+    f.key(code)
+    f.tick(12)
+    expect(f.me.path.length).toBeGreaterThan(1)
+    const stoppingAt = f.me.path[0]
+    f.document.hidden = true
+    f.document.dispatchEvent(new Event("visibilitychange"))
+    expect(f.me.path).toEqual([stoppingAt])
+    expect(f.sent.at(-1)).toEqual([cellOf(stoppingAt)])
+    const sent = f.sent.length
+    f.document.hidden = false
+    f.document.dispatchEvent(new Event("visibilitychange"))
+    f.key(code, "keydown", null, true)
+    f.tick(120)
+    expect(f.sent).toHaveLength(sent)
+    expect(f.me.path).toEqual([])
+    expect(f.me.pos).toEqual(stoppingAt)
+    f.key(code, "keyup")
+    f.key(code)
+    f.tick(1)
+    expect(f.sent.length).toBeGreaterThan(sent)
+  })
+
+  it(`${code}: visible notifications preserve the current held route`, () => {
+    const f = fixture()
+    f.key(code)
+    f.tick(12)
+    const route = structuredClone(f.me.path)
+    const position = structuredClone(f.me.pos)
+    const sent = f.sent.length
+    f.document.dispatchEvent(new Event("visibilitychange"))
+    expect(f.me.path).toEqual(route)
+    expect(f.sent).toHaveLength(sent)
+    f.tick(1)
+    expect(f.me.pos).not.toEqual(position)
+  })
+}
+
+it("hiding does not cancel a click route when no movement key owns it", () => {
+  const f = fixture()
+  const target = center([f.start[0] + 2, f.start[1]])
+  expect(f.movement.walkTo(target)).toBe(true)
+  const route = structuredClone(f.me.path)
+  const sent = f.sent.length
+  f.document.hidden = true
+  f.document.dispatchEvent(new Event("visibilitychange"))
   expect(f.me.path).toEqual(route)
   f.tick(120)
   expect(f.sent).toHaveLength(sent)

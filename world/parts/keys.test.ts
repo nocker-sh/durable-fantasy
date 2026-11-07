@@ -9,7 +9,8 @@ afterEach(() => {
 })
 
 function fixture() {
-  const window = new EventTarget()
+  const document = Object.assign(new EventTarget(), { hidden: false })
+  const window = Object.assign(new EventTarget(), { document })
   vi.stubGlobal("window", window)
   const state = createGameState()
   state.set({ ...state.get(), loading: null })
@@ -27,7 +28,7 @@ function fixture() {
     })
     window.dispatchEvent(event)
   }
-  return { game, keys, key, window }
+  return { game, keys, key, window, document }
 }
 
 it("combines movement keys into eight directions and cancels opposite aliases equally", () => {
@@ -106,8 +107,10 @@ it("keeps click walking and nonblocking windows independent of held-key cleanup"
   expect(game.stopWalking).not.toHaveBeenCalled()
 })
 
-it("removes the state listener when unlistened and registers once on relisten", () => {
-  const { keys, key, game } = fixture()
+it("removes state and visibility listeners when unlistened and registers once on relisten", () => {
+  const { keys, key, game, document } = fixture()
+  const added = vi.spyOn(document, "addEventListener")
+  const removed = vi.spyOn(document, "removeEventListener")
   const subscribe = vi.spyOn(game.state, "subscribe")
   const unsubscribe = vi.fn()
   subscribe.mockReturnValue(unsubscribe)
@@ -118,4 +121,7 @@ it("removes the state listener when unlistened and registers once on relisten", 
   keys.unlisten()
   expect(unsubscribe).toHaveBeenCalledTimes(2)
   expect(game.stopWalking).toHaveBeenCalledOnce()
+  const registrations = added.mock.calls.filter(([event]) => event === "visibilitychange")
+  expect(registrations).toHaveLength(2)
+  expect(removed.mock.calls.filter(([event]) => event === "visibilitychange").slice(-2)).toEqual(registrations)
 })

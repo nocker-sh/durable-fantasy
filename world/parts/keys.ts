@@ -54,6 +54,10 @@ export class Keys {
       else if (this.held.delete(event.code)) this.steer()
     }
     const blur = () => this.release()
+    const document = window.document
+    const visibility = () => {
+      if (document.hidden) this.release()
+    }
     const focus = (event: FocusEvent) => {
       if ((event.target as HTMLElement | null)?.closest?.("input, textarea, select, [contenteditable]")) this.release()
     }
@@ -64,12 +68,14 @@ export class Keys {
     window.addEventListener("keyup", up)
     window.addEventListener("blur", blur)
     window.addEventListener("focusin", focus)
+    document.addEventListener("visibilitychange", visibility)
     this.stop = () => {
       unsubscribe()
       window.removeEventListener("keydown", down)
       window.removeEventListener("keyup", up)
       window.removeEventListener("blur", blur)
       window.removeEventListener("focusin", focus)
+      document.removeEventListener("visibilitychange", visibility)
     }
   }
 
