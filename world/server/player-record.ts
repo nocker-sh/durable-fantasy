@@ -1,3 +1,4 @@
+import type { CraftReceipt } from "#/world/server/craft-request-types"
 import type { GatherReceipt } from "#/world/core/gather-receipt-types"
 import type { ShopReceipt } from "#/world/core/shop-receipt-types"
 import type { PlayerLocation } from "#/world/core/location-types"
@@ -10,6 +11,8 @@ import { restoreSavedPlayer } from "#/world/server/restore-saved-player"
 import type { PaceKind } from "#/world/core/pace-rules"
 
 export type PlayerRecord = TradeParticipant & {
+  /** Latest crafting request; absent in older records. */
+  craftReceipt?: CraftReceipt
   credential: string | null
   location: PlayerLocation | null
   exchangeReceipt: InboxClaim | null

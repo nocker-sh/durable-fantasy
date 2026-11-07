@@ -1,3 +1,5 @@
+import { runPlayerCraft } from "#/world/server/run-player-craft"
+import type { CraftRequest } from "#/world/server/craft-request-types"
 import { defineDurableState } from "void/durable"
 import { arrivePlayer } from "#/world/server/arrive-player"
 import { walkPlayer } from "#/world/server/walk-player"
@@ -128,6 +130,9 @@ export const Player = defineDurableState({
     },
     receiveInbox(context, claim: InboxClaim): Transition {
       return receivePlayerInbox(context.state, claim, Date.now())
+    },
+    craft(context, request: CraftRequest): Transition {
+      return runPlayerCraft({ record: context.state, request, now: Date.now() })
     },
     /** The room supplies shop context; the player's operation uses the server timestamp. */
     run(context, command: Command | ServerCommand, ctx: Omit<Context, "now"> = {}): Transition {
