@@ -4,17 +4,13 @@ import { apply } from "#/world/core/apply"
 import { countItem } from "#/world/core/count-item"
 import { dayOf } from "#/world/core/day-of"
 import { errandProgress } from "#/world/core/errand-progress"
-import { errandToday } from "#/world/core/errand-today"
 import type { Errand, ErrandProgress } from "#/world/core/errand-types"
 import { ERRANDS } from "#/world/core/errands"
 import { FRIEND } from "#/world/core/friendship-rules"
 import { jstMinutes } from "#/world/core/jst-minutes"
 import { loadPlayer } from "#/world/core/load-player"
 import type { PlayerState } from "#/world/core/player-types"
-import { MAPS } from "#/world/maps/index"
-import { npcCell } from "#/world/maps/npc-cell"
 import { npcsAt } from "#/world/maps/npcs-at"
-import type { MapDefinition } from "#/world/maps/types"
 import { choicesFor } from "#/world/parts/choices-for"
 import { linesFor } from "#/world/parts/lines-for"
 import type { GameState } from "#/world/state"
@@ -23,34 +19,14 @@ import { player } from "#/world/test/player"
 import { ALL_LINES } from "#/world/town/lines/index"
 import { RESIDENTS } from "#/world/town/residents"
 
-type Meeting = { map: MapDefinition; now: number; name: string }
+import { errandMeetings } from "#/world/test/errand-meetings"
+import type { ErrandMeeting as Meeting } from "#/world/test/errand-meetings"
 const DAY = 86_400_000
-const FIRST_DAY = Date.parse("2026-10-20T21:00:00Z") // The errand day starts at 06:00 in Japan.
 
 afterEach(() => {
   vi.useRealTimers()
   vi.unstubAllGlobals()
 })
-
-/** Select supported meeting fixtures from the real daily offers and resident schedules, without claiming a walking or material-acquisition route. */
-function meetings(errand: Errand): { ask: Meeting; hand: Meeting } {
-  const recipient = errand.kind === "bring" ? errand.from : errand.to
-  for (let day = 0; day < 400; day++) {
-    const start = FIRST_DAY + day * DAY
-    if (errandToday(errand.from, dayOf(start))?.id !== errand.id) continue
-    for (let step = 0; step < 95; step++) {
-      const now = start + step * 15 * 60_000
-      const map = Object.values(MAPS).find((candidate) => npcCell(candidate, errand.from, jstMinutes(now)))
-      if (!map) continue
-      for (let later = step + 1; later < 96; later++) {
-        const handAt = start + later * 15 * 60_000
-        const handMap = Object.values(MAPS).find((candidate) => npcCell(candidate, recipient, jstMinutes(handAt)))
-        if (handMap) return { ask: { map, now, name: errand.from }, hand: { map: handMap, now: handAt, name: recipient } }
-      }
-    }
-  }
-  throw new Error(`${errand.id}: no offer with both meetings before the daily deadline`)
-}
 
 function viewAt(state: PlayerState, meeting: Meeting): GameState {
   vi.setSystemTime(meeting.now)
@@ -90,7 +66,7 @@ describe("every authored errand through real commands and dialogue", () => {
     vi.useFakeTimers()
     const spoken = new Map<string, string>()
     vi.stubGlobal("localStorage", { getItem: (key: string) => spoken.get(key) ?? null, setItem: (key: string, value: string) => spoken.set(key, value) })
-    const plan = meetings(errand)
+    const plan = errandMeetings(errand)
     // Required materials and one surplus item are explicit starting assets; no progress or friendship is injected.
     const initial = player(errand.kind === "bring" ? { bag: bagWith([errand.wants.item, errand.wants.count + 1]) } : {})
     expect(initial.errands).toEqual([])
