@@ -9,6 +9,7 @@ import { GATHER_SKILL_NAME } from "#/world/core/items/kinds"
 import { ITEMS } from "#/world/core/items/catalog"
 import { LIFE_CAP } from "#/world/core/life-rules"
 import { lifeLevel } from "#/world/core/life-level"
+import { prepareCraft } from "#/world/core/prepare-craft"
 import { useGame } from "#/hooks/use-game"
 import { useGameState } from "#/hooks/use-game-state"
 import { Button } from "#/components/game/button"
@@ -48,8 +49,8 @@ export function CraftWindow() {
       <ul className="ui-scroll flex max-h-[380px] flex-col gap-1 overflow-y-auto pr-1">
         {recipes.map((r) => {
           const skill = lifeLevel(player.life[r.skill])
-          const missing = r.inputs.some((i) => countItem(player.bag, i.item) < i.count)
-          const reason = skill < r.min ? "NOT_SKILLED" : missing ? "MISSING_INPUTS" : player.gold < station.fee ? "NO_GOLD" : player.stamina < STAMINA_PER_CRAFT ? "EXHAUSTED" : null
+          const prepared = prepareCraft(player, { recipe: r.id, station: station.id })
+          const reason = prepared.ok ? null : prepared.reason
           const out = ITEMS[r.output.item]
           return (
             <li key={r.id} className="ui-well flex items-center gap-2.5 p-1.5">

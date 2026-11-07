@@ -1329,7 +1329,7 @@ React との共有の定義は `components/game/game-context.ts` に一つだけ
 
 ## ゲーム規則の一括した更新
 
-製作の材料選択は `world/core/take-craft-inputs.ts` が品質の低い順と同品質のスロット順で行い、材料が不足したら途中の所持品を返さない。`craft-command.ts` は、材料をそろえた結果へ成功・失敗、手数料と経験を適用する。採集用具の摩耗は `wear-gathering-tool.ts` が元の所持品と装備を変更せずに求め、`gather-command.ts` が収穫を入れられたときだけ採用する。配送品は `receive-items.ts` がすべて収まる場合だけ受け入れる。
+製作の準備判定は `world/core/prepare-craft.ts` を制作と作業場の表示で共有し、技能・使用料・スタミナ・材料の既存の判定順を保つ。材料選択は `world/core/take-craft-inputs.ts` が品質の低い順と同品質のスロット順で行い、材料が不足したら途中の所持品を返さない。`craft-command.ts` は、準備できた材料へ成功・失敗、手数料と経験を適用する。準備だけでは抽選・支払い・プレイヤーの所持品更新をせず、完成品の空きと重量の判定は実際の制作側に残す。採集用具の摩耗は `wear-gathering-tool.ts` が元の所持品と装備を変更せずに求め、`gather-command.ts` が収穫を入れられたときだけ採用する。配送品は `receive-items.ts` がすべて収まる場合だけ受け入れる。
 
 戦闘の支払いの受付と再送の照合は `combat-payment.ts`、支払えるかの判定は `get-strike-payment.ts` が担当する。復帰した生存番号、占有、倒れている状態とスタミナの判定順を保ち、再送で二度支払わない。会話・商売の友好と採集用具の選択も、直前の計算結果を受け取って次の値を返す。
 
