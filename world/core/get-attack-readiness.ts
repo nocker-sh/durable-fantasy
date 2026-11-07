@@ -15,7 +15,7 @@ export function getAttackReadiness(props: Props): Readiness {
   const stats = derive(props.player)
   const art = props.art ? skillOf(props.art) : null
   if (art && (!isArt(art) || art.kind === "prayer")) return { kind: "ignore" }
-  if (props.struck && props.now - props.struck < stats.attackDelay * 0.85) return { kind: "ignore" }
+  if (props.struck !== undefined && props.now - props.struck < stats.attackDelay * 0.85) return { kind: "ignore" }
   if (props.player.stamina < FIGHT_STAMINA) return { kind: "refused", reason: "EXHAUSTED" }
   return { kind: "ready", stats, art }
 }

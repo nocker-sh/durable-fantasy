@@ -28,3 +28,12 @@ it("holds an offensive skill to the same swing interval and leaves its own wait 
   expect(getAttackReadiness({ player: hunter, struck: 1000, now: 1001 })).toEqual({ kind: "ignore" })
   expect(hunter).toEqual(before)
 })
+
+it.each([undefined, "lunge"] as const)("enforces the same swing interval from a zero-based clock for %s", (art) => {
+  const hunter = player({ stamina: FIGHT_STAMINA })
+  const boundary = derive(hunter).attackDelay * 0.85
+  expect(getAttackReadiness({ player: hunter, art, now: 0 })).toMatchObject({ kind: "ready" })
+  expect(getAttackReadiness({ player: hunter, art, struck: 0, now: 0 })).toEqual({ kind: "ignore" })
+  expect(getAttackReadiness({ player: hunter, art, struck: 0, now: boundary - 1 })).toEqual({ kind: "ignore" })
+  expect(getAttackReadiness({ player: hunter, art, struck: 0, now: boundary })).toMatchObject({ kind: "ready" })
+})
