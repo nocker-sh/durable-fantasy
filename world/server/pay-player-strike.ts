@@ -11,9 +11,12 @@ export function payPlayerStrike(record: PlayerRecord, input: PlayerStrikeInput, 
     player: restoreSavedPlayer(record.player),
     previous: record.combatPayments[input.source],
     request: { id: input.id, art: input.art, life: input.life },
-    context: { now, reserved: record.trade?.status === "prepared", life: record.combatLife },
+    context: { now, reserved: record.trade?.status === "prepared", life: record.combatLife, struck: record.struck },
   })
-  if (paid.receipt) record.combatPayments[input.source] = paid.receipt
+  if (paid.receipt) {
+    record.combatPayments[input.source] = paid.receipt
+    if (paid.result.ok) record.struck = now
+  }
   if (paid.result.ok) publishPlayer(record, paid.result.state, !!input.art && !!paid.receipt)
   return paid.result.ok ? { ...paid.result, state: record.player } : paid.result
 }

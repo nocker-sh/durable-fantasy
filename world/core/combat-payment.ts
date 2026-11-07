@@ -15,7 +15,12 @@ export type CombatRequest = {
 export type CombatPayment = CombatRequest & {
   outcome: { ok: true } | { ok: false; reason: Reason }
 }
-export function payStrike(inputProps: { player: PlayerState; previous: CombatPayment | undefined; request: CombatRequest; context: { now: number; reserved: boolean; life: number } }): {
+export function payStrike(inputProps: {
+  player: PlayerState
+  previous: CombatPayment | undefined
+  request: CombatRequest
+  context: { now: number; reserved: boolean; life: number; struck?: number }
+}): {
   result: Transition
   receipt?: CombatPayment
 } {
@@ -39,6 +44,6 @@ export function payStrike(inputProps: { player: PlayerState; previous: CombatPay
     return { result: previous.outcome.ok ? { ok: true, state: player, events: [] } : previous.outcome }
   }
   const state = settle(player, derive(player), now)
-  const result = getStrikePayment({ player: state, isReserved: reserved, art, expectedLife, currentLife, now })
+  const result = getStrikePayment({ player: state, isReserved: reserved, art, expectedLife, currentLife, now, struck: context.struck })
   return { result, receipt: { id, ...(art ? { art } : {}), ...(expectedLife !== undefined ? { life: expectedLife } : {}), outcome: result.ok ? { ok: true } : result } }
 }

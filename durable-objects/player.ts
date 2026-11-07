@@ -106,7 +106,7 @@ export const Player = defineDurableState({
       return holdPlayerOrder(context.state, { id, intent }, Date.now())
     },
     readCombat(context) {
-      return { player: readPlayerRecord(context.state, Date.now()), life: context.state.combatLife }
+      return { player: readPlayerRecord(context.state, Date.now()), life: context.state.combatLife, ...(context.state.struck !== undefined ? { struck: context.state.struck } : {}) }
     },
     deliveryUpdate(context, after: number | null) {
       return readPlayerDelivery(context.state, after)

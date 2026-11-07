@@ -20,6 +20,8 @@ export type PlayerRecord = TradeParticipant & {
   shopReceipts: Record<string, ShopReceipt>
   gatherReceipts: Record<string, GatherReceipt>
   combatLife: number
+  /** Last accepted swing, shared across connections and maps; absent in older records. */
+  struck?: number
   /** when this player last asked someone or shouted (server/pace-player.ts); missing in older saves */
   paces?: Partial<Record<PaceKind, number>>
 }

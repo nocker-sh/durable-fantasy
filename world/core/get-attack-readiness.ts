@@ -1,3 +1,4 @@
+import { isAttackCoolingDown } from "#/world/core/is-attack-cooling-down"
 import { derive } from "#/world/core/derive"
 import { skillOf } from "#/world/core/skill-of"
 import { isArt } from "#/world/core/is-art"
@@ -15,7 +16,7 @@ export function getAttackReadiness(props: Props): Readiness {
   const stats = derive(props.player)
   const art = props.art ? skillOf(props.art) : null
   if (art && (!isArt(art) || art.kind === "prayer")) return { kind: "ignore" }
-  if (props.struck !== undefined && props.now - props.struck < stats.attackDelay * 0.85) return { kind: "ignore" }
+  if (isAttackCoolingDown({ delay: stats.attackDelay, struck: props.struck, now: props.now })) return { kind: "ignore" }
   if (props.player.stamina < FIGHT_STAMINA) return { kind: "refused", reason: "EXHAUSTED" }
   return { kind: "ready", stats, art }
 }

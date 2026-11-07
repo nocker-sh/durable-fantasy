@@ -14,7 +14,7 @@ type Props = Readonly<{ room: AttackRequestContext; message: Message<"attack">; 
 export async function prepareMapAttack(props: Props): Promise<PreparedMapAttack | null> {
   const now = Date.now()
   const saved = await Player.get(props.owner).readCombat()
-  const readiness = getAttackReadiness({ player: saved.player, art: props.message.art, struck: props.room.me.struck, now })
+  const readiness = getAttackReadiness({ player: saved.player, art: props.message.art, struck: saved.struck ?? props.room.me.struck, now })
   if (readiness.kind === "ignore") return null
   if (readiness.kind === "refused") {
     await notifyClient(props.room.ctx.connection.send({ type: "refused", what: "attack", monster: props.spawn.id, reason: readiness.reason }))
