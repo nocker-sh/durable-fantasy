@@ -1,9 +1,13 @@
+import { z } from "zod"
+import { playerId } from "#/world/core/identity"
 import { STORAGE } from "#/world/client/identity"
+
+const sessionResponse = z.object({ id: playerId })
 
 export async function openSession(): Promise<string> {
   const key = `${STORAGE}/player`
   const legacyId = { value: localStorage.getItem(key) }
-  if (!legacyId.value || !/^[0-9a-f-]{36}$/.test(legacyId.value)) {
+  if (!playerId.safeParse(legacyId.value).success) {
     legacyId.value = crypto.randomUUID()
     localStorage.setItem(key, legacyId.value)
   }
@@ -20,8 +24,9 @@ export async function openSession(): Promise<string> {
     signal: AbortSignal.timeout(10000),
   })
   if (!response.ok) throw new Error("Session could not be restored")
-  const idSource = (await response.json()) as { id: string },
-    id = idSource.id
+  const confirmed = sessionResponse.safeParse(await response.json())
+  if (!confirmed.success) throw new Error("Session could not be restored")
+  const id = confirmed.data.id
   localStorage.setItem(key, id)
   localStorage.removeItem(proofKey)
   return id
