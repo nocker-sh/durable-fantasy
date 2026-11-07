@@ -4,18 +4,7 @@ import { HOTBAR_SIZE } from "#/world/core/player-rules"
 import { KEPT_ON_ESC } from "#/world/state"
 import { fullyShown } from "#/world/fully-shown"
 import type { GameState, ModalId, WindowId } from "#/world/state"
-
-/** Keys that walk, and which way on screen: right is +x, up is +y. */
-const MOVE_KEYS: Record<string, [number, number]> = {
-  KeyW: [0, 1],
-  KeyS: [0, -1],
-  KeyA: [-1, 0],
-  KeyD: [1, 0],
-  ArrowUp: [0, 1],
-  ArrowDown: [0, -1],
-  ArrowLeft: [-1, 0],
-  ArrowRight: [1, 0],
-}
+import { MOVE_KEYS } from "#/world/parts/move-keys"
 
 /** What the keys can do to the game. */
 export type KeyTarget = {
@@ -61,7 +50,8 @@ export class Keys {
     this.unlisten()
     const down = (event: KeyboardEvent) => this.down(event)
     const up = (event: KeyboardEvent) => {
-      if (this.held.delete(event.code)) this.steer()
+      if (event.key === "Meta" || event.key === "Control") this.release()
+      else if (this.held.delete(event.code)) this.steer()
     }
     const blur = () => this.release()
     const focus = (event: FocusEvent) => {
@@ -98,7 +88,11 @@ export class Keys {
 
   private down(event: KeyboardEvent) {
     const g = this.game
-    if (event.isComposing || event.metaKey || event.ctrlKey) return
+    if (event.isComposing) return
+    if (event.metaKey || event.ctrlKey) {
+      this.release()
+      return
+    }
     if (import.meta.env.DEV && (event.key === "F1" || event.key === "`")) {
       g.toggleDebug()
       event.preventDefault()
