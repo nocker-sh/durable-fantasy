@@ -1,3 +1,4 @@
+import { resolveProjectSource } from "#/scripts/lib/resolve-project-source.test-support"
 import { readdirSync, readFileSync } from "node:fs"
 import { resolve, dirname, sep } from "node:path"
 import { expect, it } from "vitest"
@@ -10,7 +11,7 @@ function sources(directory: string): string[] {
 }
 
 function dependencyTarget(file: string, dependency: string): string | null {
-  if (dependency.startsWith("#/")) return resolve(dependency.slice(2))
+  if (dependency.startsWith("#/")) return resolveProjectSource(dependency.slice(2))
   if (dependency.startsWith(".")) return resolve(dirname(file), dependency)
   return null
 }
@@ -42,14 +43,14 @@ it("game engine dependencies stay inside the engine", () => {
 })
 
 it("world logic does not import UI or developer tools", () => {
-  const uiDirectories = ["components", "hooks", "dev", "pages"].map((directory) => resolve(directory) + sep)
-  for (const file of sources("world")) {
+  const uiDirectories = ["components", "hooks", "dev", "pages"].map((directory) => resolveProjectSource(directory) + sep)
+  for (const file of sources(resolveProjectSource("world"))) {
     const source = readFileSync(file, "utf8")
     const imports = [...source.matchAll(/(?:from\s*|import\s*\()['"]([^'"]+)['"]/g)].map((match) => match[1])
     for (const dependency of imports) {
-      const target = dependency.startsWith("#/") ? resolve(dependency.slice(2)) : resolve(file, "..", dependency)
+      const target = dependency.startsWith("#/") ? resolveProjectSource(dependency.slice(2)) : resolve(file, "..", dependency)
       expect(dependency !== "react" && !dependency.startsWith("react/") && !dependency.startsWith("@void/react"), `${file} imports ${dependency}`).toBe(true)
-      if (["world/core", "world/town", "world/server"].some((directory) => file.startsWith(resolve(directory) + sep)))
+      if (["world/core", "world/town", "world/server"].some((directory) => file.startsWith(resolveProjectSource(directory) + sep)))
         expect(dependency !== "three" && !dependency.startsWith("three/"), `${file} imports ${dependency}`).toBe(true)
       expect(
         uiDirectories.some((directory) => target.startsWith(directory)),
@@ -113,7 +114,7 @@ import "./side-effect.ts"
 })
 
 it("application modules have no circular runtime imports", () => {
-  const files = ["world", "lib", "components", "hooks", "dev", "pages", "routes", "middleware", "durable-objects"].flatMap(sources)
+  const files = ["world", "lib", "components", "hooks", "dev", "pages", "routes", "middleware", "durable-objects"].flatMap((directory) => sources(resolveProjectSource(directory)))
   const known = new Set(files)
   const graph = new Map<string, string[]>()
   for (const file of files) {
@@ -122,7 +123,7 @@ it("application modules have no circular runtime imports", () => {
     for (const specifier of runtimeDependencies(source)) {
       if (specifier.includes("?raw")) continue
       if (!specifier.startsWith(".") && !specifier.startsWith("#/")) continue
-      const target = specifier.startsWith("#/") ? resolve(specifier.slice(2)) : resolve(dirname(file), specifier)
+      const target = specifier.startsWith("#/") ? resolveProjectSource(specifier.slice(2)) : resolve(dirname(file), specifier)
       const resolved = [target, `${target}.ts`, `${target}.tsx`, resolve(target, "index.ts"), resolve(target, "index.tsx")].find((path) => known.has(path))
       if (resolved) dependencies.push(resolved)
     }

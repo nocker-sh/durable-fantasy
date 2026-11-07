@@ -147,6 +147,8 @@ export const NOT_TABLES: readonly string[] = [
   "LYING",
   "SIDE",
   // Drawing basis vectors, palette choices and procedural pixel stamps.
+  "FIG_DOT", // Pixel reduction factor, not a game table.
+  "TEXEL_PPU", // Shared texture pixel density, not a game table.
   "SCENE_LIGHT_PALETTES", // Rendering keyframes blended by the clock, not placed world records.
   "OUT",
   "FR",

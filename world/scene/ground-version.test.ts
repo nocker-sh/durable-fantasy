@@ -1,16 +1,17 @@
+import { fileURLToPath } from "node:url"
+import * as fingerprints from "#/lib/engine/get-source-fingerprint"
+import { resolveProjectSource } from "#/scripts/lib/resolve-project-source.test-support"
 import { existsSync, globSync, readFileSync } from "node:fs"
 import { dirname, relative, resolve } from "node:path"
-import { expect, it } from "vitest"
+import { expect, it, vi } from "vitest"
 
-it("invalidates stored ground when any local painting dependency changes", () => {
-  const versionFile = resolve("world/scene/ground-version.ts")
+it("invalidates stored ground when any local painting dependency changes", async () => {
+  const versionFile = fileURLToPath(new URL("./ground-version.ts", import.meta.url))
   const versionSource = readFileSync(versionFile, "utf8")
   const patterns = [...versionSource.matchAll(/"([^"\n]+\.ts)"/g)].map((match) => match[1])
-  for (const pattern of patterns) expect(/^(?:\.{1,2}\/|\/)/.test(pattern), pattern).toBe(true)
-  const fingerprinted = new Set(patterns.flatMap((pattern) => globSync(pattern, { cwd: dirname(versionFile) }).map((file) => resolve(dirname(versionFile), file))))
-  const pending = ["world/scene/paint-ground.ts", "world/scene/mesh-heights.ts", "world/scene/world.ts", "world/scene/set-layout.ts", "world/scene/ground-h.ts", "world/maps/layouts.ts"].map((file) =>
-    resolve(file),
-  )
+  for (const pattern of patterns) expect(/^(?:\.{1,2}\/|\/|#\/)/.test(pattern), pattern).toBe(true)
+  const fingerprinted = new Set(patterns.flatMap((pattern) => globSync(pattern.startsWith("#/") ? resolveProjectSource(pattern.slice(2)) : resolve(dirname(versionFile), pattern))))
+  const pending = ["./paint-ground.ts", "./mesh-heights.ts", "./world.ts", "./set-layout.ts", "./ground-h.ts", "../maps/layouts.ts"].map((file) => fileURLToPath(new URL(file, import.meta.url)))
   const visited = new Set<string>()
   while (pending.length) {
     const file = pending.pop()
@@ -31,10 +32,20 @@ it("invalidates stored ground when any local painting dependency changes", () =>
     const dynamicImports = [...source.matchAll(/\bimport\s*\(\s*["']([^"']+)["']/g)].map((match) => match[1])
     for (const specifier of [...staticImports, ...dynamicImports]) {
       if (!specifier.startsWith(".") && !specifier.startsWith("#/")) continue
-      const target = specifier.startsWith("#/") ? resolve(specifier.slice(2)) : resolve(dirname(file), specifier)
+      const target = specifier.startsWith("#/") ? resolveProjectSource(specifier.slice(2)) : resolve(dirname(file), specifier)
       const dependency = [`${target}.ts`, resolve(target, "index.ts")].find(existsSync)
       if (dependency) pending.push(dependency)
     }
   }
   expect(visited.size).toBeGreaterThan(2)
+  const observe = vi.spyOn(fingerprints, "getSourceFingerprint")
+  try {
+    const { GROUND_VERSION } = await import("#/world/scene/ground-version")
+    expect(observe).toHaveBeenCalledTimes(1)
+    const sources = observe.mock.calls[0][0]
+    expect(Object.values(sources).sort()).toEqual([...fingerprinted].map((file) => readFileSync(file, "utf8")).sort())
+    expect(GROUND_VERSION).toBe(observe.mock.results[0].value)
+  } finally {
+    observe.mockRestore()
+  }
 })
