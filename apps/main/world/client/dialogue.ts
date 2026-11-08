@@ -112,7 +112,7 @@ export class DialogueActions {
       return
     }
     if (choice.action === "commission") {
-      if (!keepingShop(dialogue.name, this.target.session.state.get().clock.min)) return
+      if (!keepingShop(dialogue.name, this.target.session.state.get().clock.min)) return this.offDuty(dialogue)
       this.target.update({ dialogue: null, commission: dialogue.name })
       this.syncEngaged()
       return
@@ -121,7 +121,7 @@ export class DialogueActions {
       // a seller with two pitches opens the one they are standing at now
       const min = this.target.session.state.get().clock.min
       const shop = shopOfKeeper(dialogue.name, (id) => keeperPresent(id, dialogue.name, min))
-      if (!shop || !keeperPresent(shop, dialogue.name, min)) return
+      if (!shop || !keeperPresent(shop, dialogue.name, min)) return this.offDuty(dialogue)
       const def: ShopDefinition = SHOPS[shop]
       this.target.addChat({ channel: "npc", name: dialogue.name, text: def.greetings?.[dialogue.name] ?? def.greeting })
       this.shopKeeper = dialogue.name
@@ -132,6 +132,12 @@ export class DialogueActions {
       return
     }
     this.closeDialogue()
+  }
+
+  /** The keeper's shift ended while the menu was open: say so, and offer what they can do now. */
+  private offDuty(dialogue: Dialogue) {
+    this.target.addChat({ channel: "system", text: "いまは店を開けていない。" })
+    this.target.update({ dialogue: { ...dialogue, choices: choicesFor(this.target.session.state.get(), dialogue.name) } })
   }
 
   closeDialogue() {

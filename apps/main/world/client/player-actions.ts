@@ -1,3 +1,6 @@
+import { unmet } from "#/world/core/unmet"
+import { STAT_NAME } from "#/world/core/growth-rules"
+import { statShortfallText } from "#/world/client/stat-shortfall-text"
 import { sameCommissionOrders } from "#/world/core/same-commission-orders"
 import type { Order } from "#/world/core/commission-types"
 import { sameStack } from "#/world/core/same-stack"
@@ -26,7 +29,9 @@ import type { GameContext } from "#/world/client/context"
 
 export class PlayerActions {
   constructor(
-    private readonly target: Pick<GameContext, "run" | "lookAtShop" | "getScene" | "update" | "notify"> & { readonly session: Pick<GameSession, "socket" | "state" | "engaged" | "fighting" | "art"> },
+    private readonly target: Pick<GameContext, "run" | "lookAtShop" | "getScene" | "update" | "notify" | "toggleWindow"> & {
+      readonly session: Pick<GameSession, "socket" | "state" | "engaged" | "fighting" | "art">
+    },
   ) {}
   revive() {
     this.target.session.socket?.send({ type: "revive" })
@@ -185,12 +190,21 @@ export class PlayerActions {
 
   useSlot(slot: number, stack = this.target.session.state.get().player?.bag[slot] ?? undefined) {
     if (!stack) return
-    if (ITEMS[stack.item].equip) void this.target.run({ type: "equip", slot, expectedStack: stack })
+    if (ITEMS[stack.item].equip) this.equip(slot, undefined, stack)
     else void this.target.run({ type: "use", slot, expectedStack: stack })
   }
 
   equip(slot: number, to?: Slot, expectedStack = this.target.session.state.get().player?.bag[slot] ?? undefined) {
     if (!expectedStack) return
+    const player = this.target.session.state.get().player
+    const needs = ITEMS[expectedStack.item].equip?.needs
+    const short = player && needs ? unmet(needs, player) : []
+    if (short.length) {
+      // say what is missing and open the stats window, where the points are spent; a bare refusal leaves no way on
+      this.target.notify(statShortfallText(short), "bad")
+      if (short.some((need) => need[0] in STAT_NAME) && !this.target.session.state.get().windows.includes("stats")) this.target.toggleWindow("stats")
+      return
+    }
     void this.target.run({ type: "equip", slot, to, expectedStack })
   }
 

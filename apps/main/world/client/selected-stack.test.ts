@@ -72,7 +72,7 @@ function fixture(test: Case) {
     },
     setPlayer: (state) => update({ player: state }),
   })
-  const actions = new PlayerActions({ session, update, notify, run: client.run.bind(client), lookAtShop: () => {}, getScene: () => null })
+  const actions = new PlayerActions({ session, update, notify, run: client.run.bind(client), lookAtShop: () => {}, getScene: () => null, toggleWindow: () => {} })
   const command: Command | ServerCommand =
     test.action === "store"
       ? { type: "store", slot: 0, count: 1, expectedStack: test.stack }

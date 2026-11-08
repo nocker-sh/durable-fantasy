@@ -167,7 +167,8 @@ const DEFINITIONS = {
     name: "木の棒",
     price: 8,
     icon: "staff",
-    equip: { part: "weapon", atk: 4, delay: 1700, scale: { str: "E" } },
+    // no stat bonus: on an attack of 4 the E grade adds nothing below strength 30, and a shown bonus would mislead
+    equip: { part: "weapon", atk: 4, delay: 1700 },
     weight: 20,
     description: "手頃な長さの枝。ないよりはまし。",
   }),

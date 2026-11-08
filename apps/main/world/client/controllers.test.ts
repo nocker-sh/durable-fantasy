@@ -242,9 +242,12 @@ describe("client controllers", () => {
     new DialogueActions(context).choose(0)
     expect(session.state.get().shop).toBeNull()
     expect(session.state.get().commission).toBeNull()
-    expect(session.state.get().dialogue).toEqual(dialogue)
     expect(send).not.toHaveBeenCalled()
     expect(callbacks.toggleWindow).not.toHaveBeenCalled()
+    // the conversation stays, says why nothing opened, and offers only what the keeper does at this hour
+    expect(callbacks.addChat).toHaveBeenCalledWith({ channel: "system", text: "いまは店を開けていない。" })
+    expect(session.state.get().dialogue?.name).toBe(dialogue.name)
+    expect(session.state.get().dialogue?.choices.some((choice) => choice.action === action)).toBe(false)
   })
 
   it("sends trade requests through the current socket", () => {

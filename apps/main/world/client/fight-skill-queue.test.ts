@@ -24,7 +24,7 @@ it("delivers one keypress on a later swing when network jitter made its first at
   const hunter = player({ equipment: { ...emptyEquipment(), weapon: "oak-staff" }, stats: { ...player().stats, mnd: 7, int: 9 } })
   session.state.set((s) => ({ ...s, player: hunter }))
   session.fighting = { monster: "first", at: 1000 }
-  const actions = new PlayerActions({ session, notify: vi.fn(), run: vi.fn(), lookAtShop: vi.fn(), getScene: () => null, update: vi.fn() })
+  const actions = new PlayerActions({ session, notify: vi.fn(), run: vi.fn(), lookAtShop: vi.fn(), getScene: () => null, update: vi.fn(), toggleWindow: vi.fn() })
   actions.useSkill("ember")
   vi.setSystemTime(11500)
   clock.mockReturnValue(2500)

@@ -69,7 +69,7 @@ function fixture(job: Commission) {
     },
     setPlayer: (state) => update({ player: state }),
   })
-  const actions = new PlayerActions({ session, update, notify, run: client.run.bind(client), lookAtShop() {}, getScene: () => null })
+  const actions = new PlayerActions({ session, update, notify, run: client.run.bind(client), lookAtShop() {}, getScene: () => null, toggleWindow: () => {} })
   const change = (kind: "shift" | "append" | "empty", publish: boolean) => {
     if (kind === "append") commit({ type: "order", commission: job.id, roll: 0.5 })
     else {
