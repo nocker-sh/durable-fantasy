@@ -112,7 +112,7 @@ function Worn(inputProps: { slot: SlotId }) {
         draggable={!!item}
         aria-label={`${SLOT_NAME[slot]}: ${item ? displayName(item, mark?.by) : "なし"}`}
         title={item ? undefined : SLOT_NAME[slot]}
-        onDoubleClick={() => item && game.unequip(slot)}
+        onDoubleClick={() => item && game.unequip(slot, { item, count: 1, ...mark })}
         onDragStart={(e) => item && startDrag(e, { item, worn: slot, stack: { item, count: 1, ...mark } }, game.iconUrl(item, mark?.by))}
         onDragOver={(e) => {
           if (!carriesItem(e)) return
