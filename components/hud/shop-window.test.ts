@@ -3,6 +3,10 @@ import { renderToStaticMarkup } from "react-dom/server"
 import { afterEach, expect, it, vi } from "vitest"
 import type { VoidSocket } from "void/ws"
 import { GameProvider } from "#/components/game/game-provider"
+import { ShopSellPanel } from "#/components/hud/shop-sell-panel"
+import { shopTakes } from "#/world/core/shop-takes"
+import { bagWith } from "#/world/test/bag-with"
+import type { Bag } from "#/world/core/bag-types"
 import { ShopWindow } from "#/components/hud/shop-window"
 import type { GameSession } from "#/world/client/game-session"
 import { countItem } from "#/world/core/count-item"
@@ -34,13 +38,14 @@ import { player } from "#/world/test/player"
 
 // Canvas encoding is a browser boundary; the real game, hooks, shop window and transaction rules run below.
 vi.mock("#/world/art/icons/to-url", () => ({ toUrl: () => "data:image/png;base64," }))
-const drawn = vi.hoisted(() => ({ buy: [] as (() => void)[] }))
+const drawn = vi.hoisted(() => ({ buy: [] as (() => void)[], sell: null as null | { click: () => void; disabled: boolean } }))
 vi.mock("#/components/game/button", async (original) => {
   const actual = await original<typeof import("#/components/game/button")>()
   return {
     ...actual,
     Button: (props: Parameters<typeof actual.Button>[0]) => {
       if (props.children === "買う" && props.onClick) drawn.buy.push(() => props.onClick!({} as never))
+      if (props.children === "売る" && props.onClick) drawn.sell = { click: () => props.onClick!({} as never), disabled: !!props.disabled }
       return createElement(actual.Button, props)
     },
   }
@@ -49,9 +54,10 @@ afterEach(() => {
   vi.clearAllTimers()
   vi.useRealTimers()
   drawn.buy = []
+  drawn.sell = null
 })
 
-type Props = { gold: number; stock: number; shop?: ShopId; item?: ItemId }
+type Props = { gold: number; stock: number; shop?: ShopId; item?: ItemId; bag?: Bag }
 
 function fixture(props: Props) {
   const shop = props.shop ?? "fruit"
@@ -59,7 +65,7 @@ function fixture(props: Props) {
   vi.useFakeTimers()
   const now = Date.UTC(2026, 10, 7, 12)
   vi.setSystemTime(now)
-  const record = { ...initialPlayerRecord(), player: player({ gold: props.gold, profileComplete: true }) }
+  const record = { ...initialPlayerRecord(), player: player({ gold: props.gold, profileComplete: true, ...(props.bag ? { bag: props.bag } : {}) }) }
   const initial = restock({ ...emptyMarket(now - 86400000), since: now, stock: seedStock(SHOPS) }, now, shopMaker)
   // A shop accepts sales up to three times target stock, so both a full shelf and a nearly empty one are supported states.
   const market = moveStock({ state: initial, shop: shop, item: item, delta: props.stock - stockOf(initial, shop, item) })
@@ -71,7 +77,7 @@ function fixture(props: Props) {
   })
   const offers = shopOffers(context.state, shop, null)
   const buying = shopBuying(context.state, shop, [])
-  const offer = offers.find((entry) => entry.item === item && entry.left !== 0)!
+  const offer = offers.find((entry) => entry.item === item && (props.bag || entry.left !== 0))!
   if (!offer) throw new Error(`${shop}/${item}: no native offer available`)
   const by = ITEMS[item].made ? shopMaker(shop, item) : undefined
   expect(offer.price).toBe(batched(shop, item) ? priceNow({ item, q: offer.q, by, toClose: null, isBatched: true }) : stockPrice({ state: context.state.market, shop, item, q: offer.q, by }))
@@ -85,7 +91,7 @@ function fixture(props: Props) {
     return request.ok ? finishShopTrade({ context, players, owner: "owner", id: request.id }) : request
   }
   const send = vi.fn((message: ClientMessage) => {
-    if (message.type !== "command" || message.command.type !== "buy") return
+    if (message.type !== "command" || (message.command.type !== "buy" && message.command.type !== "sell")) return
     transmitted.result = purchase(message.command, message.seq).then((result) => {
       session.waiting.get(message.seq)?.(result)
       return result
@@ -196,6 +202,57 @@ for (const change of ["shop", "connection"] as const)
     if (change === "connection") expect(f.game.state.get().player).toBe(client)
     else expect(f.game.state.get().player).toEqual(f.record.player)
     expect(f.game.state.get().shop).toBe(change === "shop" ? entry.to : entry.from)
+    expect(f.game.state.get().stock).toBe(stock)
+    expect(replacement).not.toHaveBeenCalled()
+    expect(f.send.mock.calls.filter((call) => call[0].type === "look")).toEqual([])
+  })
+
+const sales = shared.filter((entry) => shopTakes(entry.from, entry.item) && shopTakes(entry.to, entry.item))
+if (!sales.length) throw new Error("No canonical shared buyback offers")
+function sellClick(game: Game, onPick: (slot: number | null) => void = () => {}) {
+  drawn.sell = null
+  renderToStaticMarkup(createElement(GameProvider, { game, children: createElement(ShopSellPanel, { picked: 0, onPick }) }))
+  const button = drawn.sell as null | { click: () => void; disabled: boolean }
+  if (!button) throw new Error("The native sell panel did not render its button")
+  expect(button.disabled).toBe(false)
+  return button.click
+}
+it.each(sales)("$from -> $to / $item: a retired sell button cannot sell at another counter", async (entry) => {
+  const f = fixture({ shop: entry.from, item: entry.item, gold: 0, stock: 0, bag: bagWith([entry.item, 1]) })
+  const picked = vi.fn()
+  const click = sellClick(f.game, picked)
+  f.publish(entry.to)
+  const before = structuredClone(f.record.player)
+  const market = structuredClone(f.context.state)
+  click()
+  if (f.transmitted.result) await f.transmitted.result
+  expect(f.send).not.toHaveBeenCalled()
+  expect(f.record.player).toEqual(before)
+  expect(f.context.state).toEqual(market)
+  expect(picked).not.toHaveBeenCalled()
+  sellClick(f.game, picked)()
+  expect(picked).toHaveBeenCalledExactlyOnceWith(null)
+  if (!f.transmitted.result) throw new Error("The current native sale did not send")
+  expect((await f.transmitted.result).ok).toBe(true)
+  expect(countItem(f.record.player.bag, entry.item)).toBe(0)
+  expect(f.game.state.get().player).toEqual(f.record.player)
+})
+for (const change of ["shop", "connection"] as const)
+  it.each(sales)(`$from -> $to / $item: an old sale reply cannot refresh after ${change} changes`, async (entry) => {
+    const f = fixture({ shop: entry.from, item: entry.item, gold: 0, stock: 0, bag: bagWith([entry.item, 1]) })
+    sellClick(f.game)()
+    expect(f.transmitted.result).not.toBeNull()
+    const client = f.game.state.get().player
+    const replacement = vi.fn()
+    if (change === "shop") f.publish(entry.to)
+    else f.session.socket = { send: replacement } as unknown as VoidSocket<"/map/:mapId">
+    const stock = f.game.state.get().stock
+    expect((await f.transmitted.result!).ok).toBe(true)
+    await Promise.resolve()
+    await Promise.resolve()
+    expect(countItem(f.record.player.bag, entry.item)).toBe(0)
+    if (change === "connection") expect(f.game.state.get().player).toBe(client)
+    else expect(f.game.state.get().player).toEqual(f.record.player)
     expect(f.game.state.get().stock).toBe(stock)
     expect(replacement).not.toHaveBeenCalled()
     expect(f.send.mock.calls.filter((call) => call[0].type === "look")).toEqual([])

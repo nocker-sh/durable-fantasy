@@ -173,9 +173,17 @@ export class PlayerActions {
     void this.target.run({ type: p.sitting ? "stand" : "sit" })
   }
 
-  sell(slot: number, count = 1, expectedStack = this.target.session.state.get().player?.bag[slot] ?? undefined) {
+  sell(inputProps: { slot: number; count?: number; expectedStack?: Stack; shop?: ShopId }) {
+    const slot = inputProps.slot
+    const count = inputProps.count === undefined ? 1 : inputProps.count
+    const expectedStack = inputProps.expectedStack ?? this.target.session.state.get().player?.bag[slot] ?? undefined
     const shop = this.target.session.state.get().shop
-    if (shop && expectedStack) void this.target.run({ type: "sell", shop, slot, count, expectedStack }).then(() => this.target.lookAtShop())
+    if (!shop || !expectedStack || (inputProps.shop !== undefined && inputProps.shop !== shop)) return
+    const socket = this.target.session.socket
+    void this.target.run({ type: "sell", shop, slot, count, expectedStack }).then(() => {
+      if (this.target.session.socket !== socket || this.target.session.state.get().shop !== shop) return
+      this.target.lookAtShop()
+    })
   }
 
   useSlot(slot: number, stack = this.target.session.state.get().player?.bag[slot] ?? undefined) {

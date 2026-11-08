@@ -83,6 +83,7 @@ function fixture(test: Case) {
           : { type: ITEMS[test.stack.item].equip ? "equip" : "use", slot: 0, expectedStack: test.stack }
   const act = () => {
     if (test.action === "use") actions.useSlot(0, test.stack)
+    else if (test.action === "sell") actions.sell({ slot: 0, count: 1, expectedStack: test.stack })
     else actions[test.action](0, 1, test.stack)
   }
   const replace = (stack: Stack | null, publish: boolean) => {
