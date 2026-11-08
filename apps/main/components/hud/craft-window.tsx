@@ -16,6 +16,9 @@ import { Button } from "#/components/game/button"
 import { Gold } from "#/components/game/gold"
 import { Slot } from "#/components/game/slot"
 import { Window } from "#/components/game/window"
+import { Tooltip } from "#/components/game/tooltip"
+import { TooltipContent } from "#/components/game/tooltip-content"
+import { TooltipTrigger } from "#/components/game/tooltip-trigger"
 import { ItemTooltip } from "#/components/hud/item-tooltip"
 
 export function CraftWindow() {
@@ -75,9 +78,21 @@ export function CraftWindow() {
                   )}
                 </div>
               </div>
-              <Button variant="primary" size="sm" disabled={!!reason || busy} title={reason ? REASON_TEXT[reason] : undefined} onClick={() => game.craft(r.id)}>
-                作る
-              </Button>
+              {/* a disabled button takes no pointer or focus, so the reason sits on a wrapper, as in the shop (ui.md §3.20) */}
+              {reason ? (
+                <Tooltip>
+                  <TooltipTrigger render={<span tabIndex={0} />}>
+                    <Button variant="primary" size="sm" disabled>
+                      作る
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>{REASON_TEXT[reason]}</TooltipContent>
+                </Tooltip>
+              ) : (
+                <Button variant="primary" size="sm" disabled={busy} onClick={() => game.craft(r.id)}>
+                  作る
+                </Button>
+              )}
             </li>
           )
         })}
