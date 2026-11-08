@@ -177,7 +177,8 @@ const baseRoutines: Record<string, readonly Slot[]> = {
     at({ from: "23:00", where: "home", doing: "眠る" }),
   ],
   ヘレナ: [
-    at({ from: "09:30", where: "work", doing: "道具屋の昼番" }),
+    // takes the counter from Bruno when he goes to bed, so the store is never left unminded at the handover
+    at({ from: "08:00", where: "work", doing: "道具屋の昼番" }),
     at({ from: "16:00", where: "home", doing: "繕い物" }),
     at({ from: "17:00", where: P("phanthiet", "s2b"), doing: "夜市で買い物" }),
     at({ from: "18:30", where: "home", doing: "眠る" }),

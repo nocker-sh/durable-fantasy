@@ -14,7 +14,7 @@ try {
   const errors = []
   page.on("pageerror", (error) => errors.push(String(error)))
   let disabledPrefetch = false
-  await page.route("**/world/scene/ground.ts*", async (route) => {
+  await page.route("**/world/scene/prefetch-ground.ts*", async (route) => {
     const response = await route.fetch()
     const source = await response.text()
     const changed = source.replace(/function prefetchGround\(map\)\s*\{/, "$& return;")
@@ -30,7 +30,11 @@ try {
   await page.evaluate(() => {
     window.game.session.rooms.take("phanthiet", 1)
     window.game.session.rooms.standBy = () => {}
+    // this measures the scene alone: without a room, the server does not send the player back to their saved place
+    window.game.connect = async () => {}
   })
+  // the loading screen waits for the room as well; with no room, the scene being built for the map is the end point
+  const sceneReady = (map) => page.waitForFunction((map) => window.game?.scene?.ready && window.game.scene.map === map, map, { timeout: 180000 })
   // A fresh browser context has no persistent ground cache. Revisit after a different map
   // to measure the persistent cache, rather than just the current-map memory entry.
   for (const visit of ["cold", "revisit"]) {
@@ -40,7 +44,7 @@ try {
         window.__loadStart = performance.now()
         window.game.enterMap(id, null)
       }, map)
-      await waitReady()
+      await sceneReady(map)
       const result = await page.evaluate(() => ({
         map: window.game.state.get().map.id,
         observedMs: Math.round(performance.now() - window.__loadStart),
@@ -53,7 +57,7 @@ try {
   }
   if (errors.length) throw Error(errors.join("\n"))
   await mkdir("public/tmp", { recursive: true })
-  await writeFile("public/tmp/map-loading.json", JSON.stringify({ scope: "direct entry; no ground prefetch or room preconnection; local browser", results }, null, 2))
+  await writeFile("public/tmp/map-loading.json", JSON.stringify({ scope: "direct entry; no ground prefetch, room preconnection or room; local browser", results }, null, 2))
 } finally {
   await browser.close()
 }

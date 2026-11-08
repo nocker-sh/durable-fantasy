@@ -1,4 +1,4 @@
-// Development-only sword fixture; levels and stat points are earned through normal combat.
+// Development-only sword fixture (Lv 12 through the hunting fixture), then real combat.
 // Exercise the real shortcut, SP payment, rejected duplicate attack and persisted cooldown.
 import { chromium } from "playwright-core"
 import { createCharacter } from "#resources/scripts/lib/create-character"
@@ -27,59 +27,32 @@ try {
       })
   })
   await createCharacter(page)
+  // the development fixture for an unused character: Lv 12 with the sword budget (strength enough for the heavy cut).
+  // Earning those points through slimes alone takes most of an hour on the current level curve.
   await page.evaluate(async () => {
-    const res = await fetch("/api/player/give", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ id: game.debugInfo().playerId, item: "iron-sword", count: 1 }),
-    })
-    if (!res.ok) throw Error("Dev equipment grant failed")
+    const response = await fetch("/api/player/hunting-fixture", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ level: 12, build: "sword" }) })
+    if (!response.ok) throw Error(`Fixture rejected: ${response.status}`)
   })
   await page.reload()
   await waitReady(page)
-  await page.evaluate(async () => {
-    for (const [stat, min] of [
-      ["str", 11],
-      ["dex", 9],
-    ])
-      while (game.state.get().player.stats[stat] < min) {
-        if (!(await game.run({ type: "raise", stat }))) throw Error("Stat allocation refused")
-      }
-  })
   await walkToMap(page, "south-meadow")
-  await page.evaluate(async () => {
-    const slot = game.state.get().player.bag.findIndex((s) => s?.item === "iron-sword")
-    if (!(await game.run({ type: "equip", slot }))) throw Error("Equip failed")
-  })
-  while (await page.evaluate(() => game.state.get().player.statPoints < 3)) {
-    const progress = await page.evaluate(() => ({ level: game.state.get().player.level, exp: game.state.get().player.exp }))
-    const spawnIds = await page.evaluate(async () => {
-      const { SPAWNS } = await import("/world/core/monsters")
-      return SPAWNS.filter((s) => s.map === "south-meadow" && s.kind === "slime").map((s) => s.id)
-    })
-    const available = await page.waitForFunction((ids) => ids.find((id) => game.session.wild[id]?.hp > 0 && game.session.wild[id].back <= Date.now()) || false, spawnIds, { timeout: 120000 })
-    const id = await available.jsonValue()
-    await available.dispose()
-    console.log("selected", id)
-    await page.evaluate((id) => game.scene.fight(id), id)
-    await page.waitForFunction(
-      (p) => {
-        const s = game.state.get().player
-        return s.level > p.level || s.exp > p.exp
-      },
-      progress,
-      { timeout: 120000 },
-    )
-    await page.evaluate(() => game.scene.runtime.stop())
-    console.log("earned", await page.evaluate(() => ({ level: game.state.get().player.level, exp: game.state.get().player.exp, points: game.state.get().player.statPoints })))
-  }
   await page.evaluate(async () => {
     while (game.state.get().player.stats.str < 14) if (!(await game.run({ type: "raise", stat: "str" }))) throw Error("Strength refused")
     const slot = game.state.get().player.bag.findIndex((s) => s?.item === "wooden-stick")
     if (!(await game.run({ type: "equip", slot }))) throw Error("Starter weapon missing")
   })
+  // the last kill may have left every meadow slime coming back; wait for one to be up
+  await page.waitForFunction(
+    async () => {
+      const { SPAWNS } = await import("/world/core/monsters")
+      return SPAWNS.some((s) => s.map === "south-meadow" && s.kind === "slime" && game.session.wild[s.id]?.hp > 0 && game.session.wild[s.id].back <= Date.now())
+    },
+    null,
+    { timeout: 180000 },
+  )
   const target = await page.evaluate(async () => {
-    const { SPAWNS, monsterAt } = await import("/world/core/monsters")
+    const { SPAWNS } = await import("/world/core/monsters")
+    const { monsterAt } = await import("/world/core/monster-at")
     const cell = game.scene.playerCell()
     const candidates = SPAWNS.filter((s) => s.map === "south-meadow" && s.kind === "slime" && game.session.wild[s.id]?.hp > 0 && game.session.wild[s.id].back <= Date.now())
     const distance = (s) => {
@@ -100,13 +73,17 @@ try {
     if (!(await game.run({ type: "hotbar", index: 2, item: "skill:hew" }))) throw Error("Hotbar assignment refused")
   })
   const before = await page.evaluate(() => ({ sp: game.state.get().player.sp, exp: game.state.get().player.exp }))
+  // an art is held for the next swing (solo-hunting.md), so the fight goes on before its payment can be seen
   await page.keyboard.press("3")
-  await page.waitForFunction((sp) => game.state.get().player.sp === sp - 7, before.sp)
   await page.evaluate((id) => game.scene.fight(id), target)
+  // the heavy cut was paid: its cooldown started and SP went down (natural recovery may refill part of it meanwhile)
+  await page.waitForFunction((sp) => (game.state.get().player.ready.hew ?? 0) > Date.now() && game.state.get().player.sp < sp, before.sp, { timeout: 60000 })
   await page.waitForFunction((exp) => game.state.get().player.exp > exp, before.exp)
   await page.evaluate(() => game.scene.runtime.stop())
   const cooldown = await page.evaluate(() => game.state.get().player.ready.hew)
   const after = await page.evaluate(() => ({ sp: game.state.get().player.sp, exp: game.state.get().player.exp }))
+  // a blow inside the attack interval is ignored without a reply (is-attack-cooling-down.ts, next-struck.ts); let it pass
+  await page.waitForTimeout(4000)
   const refused = new Promise((resolve, reject) => {
     const timeout = setTimeout(() => reject(Error("No refusal for the defeated target")), 10000)
     onRefusal = (message) => {

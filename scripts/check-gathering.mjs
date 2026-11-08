@@ -27,13 +27,25 @@ try {
     }
   })
   await page.waitForFunction(() => window.__gatherCamera !== null)
-  await page.evaluate(() => game.scene.walkTo(30.5 / 2, 74.5 / 2))
+  // stand on a walkable cell beside the herb spot where it is now defined (the meadow layout changes over time)
+  const spot = await page.evaluate(async () => {
+    const { NODES } = await import("/world/core/gather")
+    const { MAPS } = await import("/world/maps/index")
+    const node = NODES.find((entry) => entry.id === "south-meadow-herbs-1")
+    const rows = MAPS["south-meadow"].rows
+    const around = []
+    for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) around.push([node.cell[0] + dx, node.cell[1] + dy])
+    around.sort((a, b) => Math.hypot(a[0] - node.cell[0], a[1] - node.cell[1]) - Math.hypot(b[0] - node.cell[0], b[1] - node.cell[1]))
+    return around.find((cell) => rows[cell[1]]?.[cell[0]] === ".")
+  })
+  if (!spot) throw Error("No walkable cell beside the herb spot")
+  await page.evaluate((cell) => game.scene.walkTo((cell[0] + 0.5) / 2, (cell[1] + 0.5) / 2), spot)
   await page.waitForFunction(
-    () => {
+    (cell) => {
       const at = game.scene.playerCell()
-      return at && Math.hypot(at[0] - 30, at[1] - 74) <= 1 && !game.scene.player().walking
+      return at && Math.hypot(at[0] - cell[0], at[1] - cell[1]) <= 1 && !game.scene.player().walking
     },
-    null,
+    spot,
     { timeout: 120000 },
   )
   const point = await page.evaluate(() => {
