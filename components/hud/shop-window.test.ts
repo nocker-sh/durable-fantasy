@@ -12,8 +12,14 @@ import { moveStock } from "#/world/core/move-stock"
 import { seedStock } from "#/world/core/seed-stock"
 import type { ShopCommand } from "#/world/core/shop-receipt-types"
 import { SHOPS } from "#/world/core/shops"
+import type { ShopId, ShopDefinition } from "#/world/core/shop-types"
+import type { ItemId } from "#/world/core/items/catalog"
 import { stockOf } from "#/world/core/stock-of"
 import { stockPrice } from "#/world/core/stock-price"
+import { batched } from "#/world/core/batched"
+import { priceNow } from "#/world/core/price-now"
+import { restock } from "#/world/core/restock"
+import { shopMaker } from "#/world/server/shop-maker"
 import type { Transition } from "#/world/core/transition"
 import { Game } from "#/world/game"
 import type { ClientMessage } from "#/world/protocol"
@@ -28,38 +34,54 @@ import { player } from "#/world/test/player"
 
 // Canvas encoding is a browser boundary; the real game, hooks, shop window and transaction rules run below.
 vi.mock("#/world/art/icons/to-url", () => ({ toUrl: () => "data:image/png;base64," }))
+const drawn = vi.hoisted(() => ({ buy: [] as (() => void)[] }))
+vi.mock("#/components/game/button", async (original) => {
+  const actual = await original<typeof import("#/components/game/button")>()
+  return {
+    ...actual,
+    Button: (props: Parameters<typeof actual.Button>[0]) => {
+      if (props.children === "買う" && props.onClick) drawn.buy.push(() => props.onClick!({} as never))
+      return createElement(actual.Button, props)
+    },
+  }
+})
 afterEach(() => {
   vi.clearAllTimers()
   vi.useRealTimers()
+  drawn.buy = []
 })
 
-type Props = { gold: number; stock: number }
+type Props = { gold: number; stock: number; shop?: ShopId; item?: ItemId }
 
 function fixture(props: Props) {
+  const shop = props.shop ?? "fruit"
+  const item = props.item ?? "apple"
   vi.useFakeTimers()
   const now = Date.UTC(2026, 10, 7, 12)
   vi.setSystemTime(now)
   const record = { ...initialPlayerRecord(), player: player({ gold: props.gold, profileComplete: true }) }
-  const initial = { ...emptyMarket(now), since: now, stock: seedStock(SHOPS) }
+  const initial = restock({ ...emptyMarket(now - 86400000), since: now, stock: seedStock(SHOPS) }, now, shopMaker)
   // A shop accepts sales up to three times target stock, so both a full shelf and a nearly empty one are supported states.
-  const market = moveStock({ state: initial, shop: "fruit", item: "apple", delta: props.stock - stockOf(initial, "fruit", "apple") })
+  const market = moveStock({ state: initial, shop: shop, item: item, delta: props.stock - stockOf(initial, shop, item) })
   const context: MarketContext = { state: { market, serial: 0, jobs: {} }, id: { toString: () => "market" }, setAlarm: async () => {} }
   const players: ShopPlayers = () => ({
     read: async () => record.player,
     ownsConnection: async (connection) => connection === "connection",
     receiveShop: async (source, quote) => receivePlayerShop({ record, source, quote, now }),
   })
-  const offers = shopOffers(context.state, "fruit", null)
-  const buying = shopBuying(context.state, "fruit", [])
-  const offer = offers.find((entry) => entry.item === "apple")!
-  expect(offer.price).toBe(stockPrice({ state: context.state.market, shop: "fruit", item: "apple", q: 1, by: undefined }))
+  const offers = shopOffers(context.state, shop, null)
+  const buying = shopBuying(context.state, shop, [])
+  const offer = offers.find((entry) => entry.item === item && entry.left !== 0)!
+  if (!offer) throw new Error(`${shop}/${item}: no native offer available`)
+  const by = ITEMS[item].made ? shopMaker(shop, item) : undefined
+  expect(offer.price).toBe(batched(shop, item) ? priceNow({ item, q: offer.q, by, toClose: null, isBatched: true }) : stockPrice({ state: context.state.market, shop, item, q: offer.q, by }))
   const game = new Game()
-  game.state.set((state) => ({ ...state, player: record.player, shop: "fruit", stock: { shop: "fruit", offers, ...buying }, online: "online" }))
+  game.state.set((state) => ({ ...state, player: record.player, shop: shop, stock: { shop: shop, offers, ...buying }, online: "online" }))
   const session = (game as unknown as { session: GameSession }).session
   session.others.welcome("connection", [])
   const transmitted: { result: Promise<Transition> | null } = { result: null }
   async function purchase(command: ShopCommand, seq = 1): Promise<Transition> {
-    const request = await beginShopTrade({ context, players, owner: "owner", connection: "connection", seq, command, keepers: ["オットー"], toClose: null })
+    const request = await beginShopTrade({ context, players, owner: "owner", connection: "connection", seq, command, keepers: SHOPS[command.shop].keepers, toClose: null })
     return request.ok ? finishShopTrade({ context, players, owner: "owner", id: request.id }) : request
   }
   const send = vi.fn((message: ClientMessage) => {
@@ -70,7 +92,9 @@ function fixture(props: Props) {
     })
   })
   session.socket = { send } as unknown as VoidSocket<"/map/:mapId">
-  return { game, record, context, offer, send, transmitted, purchase }
+  const publish = (nextShop: ShopId) =>
+    game.state.set((state) => ({ ...state, shop: nextShop, stock: { shop: nextShop, offers: shopOffers(context.state, nextShop, null), ...shopBuying(context.state, nextShop, []) } }))
+  return { game, record, context, offer, send, transmitted, purchase, publish, session }
 }
 
 function appleBuyButton(game: Game): string {
@@ -120,3 +144,59 @@ it("keeps market price verification authoritative when a client quote is cheaper
   expect(f.record.player).toEqual(before)
   expect(stockOf(f.context.state.market, "fruit", "apple")).toBe(1)
 })
+
+const shops: Readonly<Record<ShopId, ShopDefinition>> = SHOPS
+const shared = (Object.keys(shops) as ShopId[]).flatMap((from) =>
+  (Object.keys(shops) as ShopId[]).flatMap((to) => (from === to ? [] : shops[from].stock.filter((item) => shops[to].stock.includes(item)).map((item) => ({ from, to, item })))),
+)
+if (!shared.length) throw new Error("No canonical shared shop offers")
+function buyClick(game: Game, item: ItemId) {
+  drawn.buy = []
+  renderToStaticMarkup(createElement(GameProvider, { game, children: createElement(ShopWindow) }))
+  const offers = game.state.get().stock!.offers
+  expect(drawn.buy).toHaveLength(offers.length)
+  const index = offers.findIndex((offer) => offer.item === item && offer.left !== 0)
+  expect(index).toBeGreaterThanOrEqual(0)
+  return drawn.buy[index]
+}
+
+it.each(shared)("$from -> $to / $item: an old rendered purchase cannot buy from another shop", async (entry) => {
+  const f = fixture({ shop: entry.from, item: entry.item, gold: 100000, stock: 40 })
+  const click = buyClick(f.game, entry.item)
+  f.publish(entry.to)
+  const before = structuredClone(f.record.player)
+  const market = structuredClone(f.context.state)
+  click()
+  if (f.transmitted.result) await f.transmitted.result
+  expect(f.send).not.toHaveBeenCalled()
+  expect(f.record.player).toEqual(before)
+  expect(f.context.state).toEqual(market)
+  expect(f.game.state.get().player).toEqual(before)
+  // A freshly rendered offer still buys from the selected shop through the native transaction.
+  buyClick(f.game, entry.item)()
+  expect(f.send).toHaveBeenCalledWith(expect.objectContaining({ type: "command", command: expect.objectContaining({ type: "buy", shop: entry.to, item: entry.item }) }))
+  if (!f.transmitted.result) throw new Error("The current native offer did not send a purchase")
+  expect((await f.transmitted.result).ok).toBe(true)
+  expect(f.game.state.get().player).toEqual(f.record.player)
+})
+
+for (const change of ["shop", "connection"] as const)
+  it.each(shared)(`$from -> $to / $item: an old purchase reply cannot refresh after ${change} changes`, async (entry) => {
+    const f = fixture({ shop: entry.from, item: entry.item, gold: 100000, stock: 40 })
+    buyClick(f.game, entry.item)()
+    expect(f.transmitted.result).not.toBeNull()
+    const client = f.game.state.get().player
+    const replacement = vi.fn()
+    if (change === "shop") f.publish(entry.to)
+    else f.session.socket = { send: replacement } as unknown as VoidSocket<"/map/:mapId">
+    const stock = f.game.state.get().stock
+    expect((await f.transmitted.result!).ok).toBe(true)
+    await Promise.resolve()
+    await Promise.resolve()
+    if (change === "connection") expect(f.game.state.get().player).toBe(client)
+    else expect(f.game.state.get().player).toEqual(f.record.player)
+    expect(f.game.state.get().shop).toBe(change === "shop" ? entry.to : entry.from)
+    expect(f.game.state.get().stock).toBe(stock)
+    expect(replacement).not.toHaveBeenCalled()
+    expect(f.send.mock.calls.filter((call) => call[0].type === "look")).toEqual([])
+  })

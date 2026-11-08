@@ -142,7 +142,7 @@ function BuyRow(inputProps: { offer: Offer }) {
       size="sm"
       disabled={!!reason || busy}
       onClick={() => {
-        game.buy({ item: item, count: n, q: q, price: each })
+        game.buy({ shop: shop, item: item, count: n, q: q, price: each })
         setCount(1)
       }}
     >

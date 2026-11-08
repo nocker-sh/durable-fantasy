@@ -17,6 +17,7 @@ import { REASON_TEXT } from "#/world/core/commands"
 import type { Stat } from "#/world/core/growth-types"
 import { ITEMS } from "#/world/core/items/catalog"
 import type { ItemId } from "#/world/core/items/catalog"
+import type { ShopId } from "#/world/core/shop-types"
 import type { Slot } from "#/world/core/items/kinds"
 import type { NECK_RAMPS } from "#/world/core/player-rules"
 import type { HotbarEntry } from "#/world/core/player-types"
@@ -31,15 +32,19 @@ export class PlayerActions {
     this.target.session.socket?.send({ type: "revive" })
   }
 
-  buy(inputProps: { item: ItemId; count?: number; q?: Quality; price?: number }) {
+  buy(inputProps: { item: ItemId; count?: number; q?: Quality; price?: number; shop?: ShopId }) {
     const item = inputProps.item
     const count = inputProps.count === undefined ? 1 : inputProps.count
     const q = inputProps.q
     const price = inputProps.price
 
     const shop = this.target.session.state.get().shop
-    if (!shop) return
-    void this.target.run({ type: "buy", shop, item, count, ...(q !== undefined ? { q } : {}), ...(price !== undefined ? { price } : {}) }).then(() => this.target.lookAtShop())
+    if (!shop || (inputProps.shop !== undefined && inputProps.shop !== shop)) return
+    const socket = this.target.session.socket
+    void this.target.run({ type: "buy", shop, item, count, ...(q !== undefined ? { q } : {}), ...(price !== undefined ? { price } : {}) }).then(() => {
+      if (this.target.session.socket !== socket || this.target.session.state.get().shop !== shop) return
+      this.target.lookAtShop()
+    })
   }
 
   async gather(node: string): Promise<boolean> {
