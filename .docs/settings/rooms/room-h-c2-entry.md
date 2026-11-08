@@ -4,7 +4,7 @@
   "kind": "rooms",
   "title": "共同の作業場／1階 受渡しと共用入口",
   "status": "設計中",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "building": "building-h-c2",
@@ -175,7 +175,7 @@
 
 ## 借りる物と返す物
 
-[[building-h-c2]] の共用入口である。作業室の利用と借りた道具、使用料の受渡しを記録し、完成した品を一時的に受ける。利用料の規則は `world/core/crafting-rules.ts` を正とし、ここに別の料金を作らない。記録台の手入れを [[resident-ゴットフリート]] が担う案とする。
+[[building-h-c2]] の共用入口である。作業室の利用と借りた道具、使用料の受渡しを記録し、完成した品を一時的に受ける。利用料の規則は `apps/main/world/core/crafting-rules.ts` を正とし、ここに別の料金を作らない。記録台の手入れを [[resident-ゴットフリート]] が担う案とする。
 
 ## 共用の通路
 

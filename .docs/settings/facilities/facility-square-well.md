@@ -4,7 +4,7 @@
   "kind": "facilities",
   "title": "広場の井戸",
   "status": "設計中",
-  "source": "world/maps/index.ts",
+  "source": "apps/main/world/maps/index.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "site": {

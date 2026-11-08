@@ -1,5 +1,5 @@
 import { resolveProjectSource } from "#/scripts/lib/resolve-project-source.test-support"
-import { readdirSync, readFileSync } from "node:fs"
+import { existsSync, readdirSync, readFileSync } from "node:fs"
 import { resolve, dirname, sep } from "node:path"
 import { expect, it } from "vitest"
 
@@ -114,7 +114,10 @@ import "./side-effect.ts"
 })
 
 it("application modules have no circular runtime imports", () => {
-  const files = ["world", "lib", "components", "hooks", "dev", "pages", "routes", "middleware", "durable-objects"].flatMap((directory) => sources(resolveProjectSource(directory)))
+  const files = ["world", "lib", "components", "hooks", "dev", "pages", "routes", "middleware", "durable-objects"]
+    // Void's convention folders are optional: an app without middleware has no such folder
+    .filter((directory) => existsSync(resolveProjectSource(directory)))
+    .flatMap((directory) => sources(resolveProjectSource(directory)))
   const known = new Set(files)
   const graph = new Map<string, string[]>()
   for (const file of files) {

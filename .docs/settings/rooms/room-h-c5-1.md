@@ -4,7 +4,7 @@
   "kind": "rooms",
   "title": "ベルンハルトの家／2階 家庭の台所と食事",
   "status": "設計中",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "building": "building-h-c5",

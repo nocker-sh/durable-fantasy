@@ -4,7 +4,7 @@
   "kind": "maps",
   "title": "塩の原",
   "status": "設計中",
-  "source": "world/maps/index.ts",
+  "source": "apps/main/world/maps/index.ts",
   "design_gate": "未通過",
   "town": null,
   "map_id": "salt-flats",

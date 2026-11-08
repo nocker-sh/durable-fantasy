@@ -17,7 +17,7 @@ try {
   for (const map of maps) {
     const snapshot = await readSceneMapSnapshot({ browser, base, map, module })
     const content = serializeMapSnapshot({ map, snapshot })
-    const file = join(import.meta.dirname, "..", "world", "maps", `${map}.json`)
+    const file = join(import.meta.dirname, "..", "apps/main/world", "maps", `${map}.json`)
     const matches = !check || readFileSync(file, "utf8") === content
     if (!check) writeFileSync(file, content)
     else if (!matches) process.exitCode = 1

@@ -4,7 +4,7 @@
   "kind": "rooms",
   "title": "ラインホルトの買取所／1階 乾いた素材の倉",
   "status": "設計中",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "building": "building-buyer",

@@ -4,7 +4,7 @@
   "kind": "maps",
   "title": "南の草原",
   "status": "設計中",
-  "source": "world/maps/index.ts",
+  "source": "apps/main/world/maps/index.ts",
   "design_gate": "未通過",
   "town": null,
   "map_id": "south-meadow",
@@ -598,9 +598,9 @@
     "monster-hare"
   ],
   "movement": {
-    "definitions": "world/core/monsters.ts",
-    "routes": "world/core/get-monster-route.ts",
-    "walk_grid": "world/maps/index.ts",
+    "definitions": "apps/main/world/core/monsters.ts",
+    "routes": "apps/main/world/core/get-monster-route.ts",
+    "walk_grid": "apps/main/world/maps/index.ts",
     "time_rule": "deterministic",
     "ecology_placement": "unverified"
   }

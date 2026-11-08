@@ -4,7 +4,7 @@
   "kind": "rooms",
   "title": "町の倉庫／1階 預かりの受付",
   "status": "設計中",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "building": "building-warehouse",

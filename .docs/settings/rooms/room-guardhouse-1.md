@@ -2,7 +2,7 @@
 {
   "id": "room-guardhouse-1",
   "kind": "rooms",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "town": "town-phanthiet",
   "building": "building-guardhouse",
   "bed_capacity": 0,

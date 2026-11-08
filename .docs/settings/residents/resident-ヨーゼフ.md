@@ -4,7 +4,7 @@
   "kind": "residents",
   "title": "ヨーゼフ",
   "status": "設計中",
-  "source": "world/town/residents.ts",
+  "source": "apps/main/world/town/residents.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "household": "woodcutter",
@@ -18,9 +18,9 @@
   "relationships": [
     {
       "a": "ヨーゼフ",
-      "b": "ギュンター",
+      "b": "アルノルト",
       "kind": "取引相手",
-      "note": "炭の焼き加減に、ギュンターは文句をつけたことがない"
+      "note": "炭の焼き加減に、アルノルトは文句をつけたことがない"
     },
     {
       "a": "フランツ",
@@ -50,12 +50,12 @@
     "storage-h6-3-1"
   ],
   "routine_source": {
-    "file": "world/town/routines.ts",
+    "file": "apps/main/world/town/routines.ts",
     "export": "ROUTINES",
     "key": "ヨーゼフ"
   },
   "appearance_source": {
-    "file": "world/town/residents.ts",
+    "file": "apps/main/world/town/residents.ts",
     "export": "RESIDENT_LOOKS",
     "key": "ヨーゼフ"
   }

@@ -14,3 +14,11 @@ public/dev/
 
 # Generated temporary assets
 public/tmp/
+
+/apps/studio/.void/
+/apps/studio/.void-wrangler.jsonc
+/apps/studio/.wrangler/
+
+/apps/main/.void/
+/apps/main/.void-wrangler.jsonc
+/apps/main/.wrangler/

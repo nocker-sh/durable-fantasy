@@ -3,7 +3,7 @@
   "id": "room-leather-lower-stairs",
   "kind": "rooms",
   "title": "ルドルフの革工房／1階 店主の階段",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "town": "town-phanthiet",
   "building": "building-leather",
   "bed_capacity": 0,

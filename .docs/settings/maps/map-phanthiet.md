@@ -4,7 +4,7 @@
   "kind": "maps",
   "title": "ファンティエット ― 広場",
   "status": "設計中",
-  "source": "world/maps/index.ts",
+  "source": "apps/main/world/maps/index.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "map_id": "phanthiet",
@@ -29,7 +29,7 @@
     "building-chapel"
   ],
   "residents": [
-    "resident-ギュンター",
+    "resident-アルノルト",
     "resident-ペーター",
     "resident-ハンス",
     "resident-リーゼル",
@@ -346,6 +346,6 @@ road_plan は変更する道の参照元の添字と元の両端、付替え後�
 
 現行の描画と住民の日課には採用しない。道と屋根・荷車の待機範囲の平面の照合に加え、土地の勾配と排水・ぬかるみ、補修する人と量、荷車の実際の動作と農家・畑・牧草地・鶏小屋への一日の物流を照合する。
 
-付替えた道の幅を土地の予約へ重ねて確認したところ、牧草地へ続く道の終端は牧草地の縁にかかる。行先を残しただけで入口を照合済みにせず、`world/scene/construction/town.ts` の牧草地の柵の切れ目と路肩・入退場する身体と家畜を一緒に設計する。
+付替えた道の幅を土地の予約へ重ねて確認したところ、牧草地へ続く道の終端は牧草地の縁にかかる。行先を残しただけで入口を照合済みにせず、`apps/main/world/scene/construction/town.ts` の牧草地の柵の切れ目と路肩・入退場する身体と家畜を一緒に設計する。
 
 牧草地の所有と入口・飼育と手入れは [[facility-square-pasture]] を参照する。

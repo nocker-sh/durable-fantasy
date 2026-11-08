@@ -2,7 +2,7 @@ import { expect, it } from "vitest"
 import { auditRuntimeGraphics } from "#/scripts/lib/audit-runtime-graphics"
 import { auditRuntimeLayout } from "#/scripts/lib/audit-runtime-layout"
 import type { SettingDocument } from "#/scripts/lib/setting-document"
-const source = "world/town/interiors.ts"
+const source = "apps/main/world/town/interiors.ts"
 function fixture() {
   const pieces = [
     { floor: 0, name: "ろくろ" },
@@ -64,7 +64,7 @@ it("checks the renderer source and permits a rendered building with no remaining
 
 it("checks omitted room inventories independently of supported furniture", () => {
   const f = fixture(),
-    actual = { source: "world/town/floorplan/floor-plan.ts", rooms: [{ floor: 0, name: "燻し部屋" }] }
+    actual = { source: "apps/main/world/town/floorplan/floor-plan.ts", rooms: [{ floor: 0, name: "燻し部屋" }] }
   expect(auditRuntimeLayout(f.document, actual)).toContain("Runtime layout omissions disagree with the floor plan")
   f.document.runtime_layout_omissions = { ...actual }
   f.document.status = "設計済み"
@@ -77,7 +77,7 @@ it("checks omitted room inventories independently of supported furniture", () =>
 it("does not discard room multiplicity, floors or stale source references", () => {
   const f = fixture(),
     room = { floor: 0, name: "物置" },
-    actual = { source: "world/town/floorplan/floor-plan.ts", rooms: [room, room] }
+    actual = { source: "apps/main/world/town/floorplan/floor-plan.ts", rooms: [room, room] }
   f.document.runtime_layout_omissions = { source: actual.source, rooms: [room] }
   expect(auditRuntimeLayout(f.document, actual)).toContain("Runtime layout omissions disagree with the floor plan")
   f.document.runtime_layout_omissions = { source: actual.source, rooms: [room, { ...room, floor: 1 }] }

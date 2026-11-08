@@ -4,7 +4,7 @@
   "kind": "residents",
   "title": "ベアトリクス",
   "status": "設計中",
-  "source": "world/town/residents.ts",
+  "source": "apps/main/world/town/residents.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "household": "armorer",
@@ -17,7 +17,7 @@
   "work": "防具屋",
   "relationships": [
     {
-      "a": "ギュンター",
+      "a": "アルノルト",
       "b": "ベアトリクス",
       "kind": "仕事仲間",
       "note": "剣と鎧。共同の炉の使い方でたまに言い合う"
@@ -51,7 +51,7 @@
     "storage-armorer-3-1"
   ],
   "routine_source": {
-    "file": "world/town/routines.ts",
+    "file": "apps/main/world/town/routines.ts",
     "export": "ROUTINES",
     "key": "ベアトリクス"
   },
@@ -60,7 +60,7 @@
     "room-armorer-2"
   ],
   "appearance_source": {
-    "file": "world/town/residents.ts",
+    "file": "apps/main/world/town/residents.ts",
     "export": "RESIDENT_LOOKS",
     "key": "ベアトリクス"
   }

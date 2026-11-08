@@ -32,4 +32,4 @@ jobs:
           # Required only when Cloudflare Access protects Worker readiness.
           CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
           CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
-        run: vp exec void deploy --platform cloudflare
+        run: vp -C apps/main exec void deploy --platform cloudflare

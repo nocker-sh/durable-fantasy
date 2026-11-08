@@ -4,7 +4,7 @@
   "kind": "residents",
   "title": "フリーダ",
   "status": "設計中",
-  "source": "world/town/residents.ts",
+  "source": "apps/main/world/town/residents.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "household": "baskets",
@@ -53,7 +53,7 @@
     "storage-h-c3-5-1"
   ],
   "routine_source": {
-    "file": "world/town/routines.ts",
+    "file": "apps/main/world/town/routines.ts",
     "export": "ROUTINES",
     "key": "フリーダ"
   },
@@ -64,7 +64,7 @@
     "room-h-c3-work"
   ],
   "appearance_source": {
-    "file": "world/town/residents.ts",
+    "file": "apps/main/world/town/residents.ts",
     "export": "RESIDENT_LOOKS",
     "key": "フリーダ"
   }
@@ -99,4 +99,4 @@
 
 ## 日課にある家の手伝い
 
-`world/town/routines.ts` の「母の籠の柳を選る」を [[room-h-c3-work]] の利用者へ結ぶ。勤務時刻や授業は変更せず、補助の身体と作業範囲・負担と通学を照合する。
+`apps/main/world/town/routines.ts` の「母の籠の柳を選る」を [[room-h-c3-work]] の利用者へ結ぶ。勤務時刻や授業は変更せず、補助の身体と作業範囲・負担と通学を照合する。

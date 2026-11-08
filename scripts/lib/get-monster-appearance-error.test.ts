@@ -7,8 +7,8 @@ const appearance = {
   look: "slime",
   color: null,
   size: null,
-  shape_source: "world/core/monster-body-shapes.ts",
-  footprint_source: "world/core/get-monster-body-radius.ts",
+  shape_source: "apps/main/world/core/monster-body-shapes.ts",
+  footprint_source: "apps/main/world/core/get-monster-body-radius.ts",
   movement_clearance: "walk_grid_adopted",
 }
 it.each(Object.entries(MONSTER_KINDS))("matches %s's individual setting to its actual shape definition", (id, kind) => {

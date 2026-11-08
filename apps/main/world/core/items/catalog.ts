@@ -1,0 +1,620 @@
+import { HUNTING_GOODS } from "#/world/core/items/hunting-goods"
+import { food } from "#/world/core/items/food"
+import { dish } from "#/world/core/items/dish"
+import { medicine } from "#/world/core/items/medicine"
+import { brewedMedicine } from "#/world/core/items/brewed-medicine"
+import { tool } from "#/world/core/items/tool"
+import { material } from "#/world/core/items/material"
+import { gear } from "#/world/core/items/gear"
+import { craftedGear } from "#/world/core/items/crafted-gear"
+import type { ItemDefinition } from "#/world/core/items/types"
+import { WEAPONS } from "#/world/core/items/weapons"
+
+const DEFINITIONS = {
+  ...HUNTING_GOODS,
+  // ---------------------------------------------------------------- food (shops on the market)
+  apple: food({ name: "リンゴ", price: 3, hp: 6, icon: "apple", description: "赤くてみずみずしい。かじると甘酸っぱい。" }),
+  "green-apple": food({ name: "青リンゴ", price: 3, hp: 5, icon: "appleG", description: "すっぱいが、目がさめる。" }),
+  pear: food({ name: "洋ナシ", price: 4, hp: 7, icon: "pear", description: "とろけるように柔らかい。" }),
+  plum: food({ name: "スモモ", price: 3, hp: 5, icon: "plum", description: "皮ごと食べられる小さな実。", weight: 1 }),
+  grape: food({ name: "ぶどう", price: 6, hp: 10, icon: "grape", description: "寒さに強い小粒の房。南門の外の果樹園でとれた。" }),
+  cabbage: food({ name: "キャベツ", price: 5, hp: 8, icon: "cabbage", description: "ずっしり重い。スープにすると体が温まる。", weight: 5 }),
+  carrot: food({ name: "ニンジン", price: 2, hp: 4, icon: "carrot", description: "土の香りがする。", weight: 1 }),
+  turnip: food({ name: "カブ", price: 2, hp: 4, icon: "turnip", description: "煮るとほくほくになる。" }),
+  onion: food({ name: "タマネギ", price: 2, hp: 3, icon: "onion", description: "生でかじると涙が出る。", weight: 1 }),
+  egg: food({ name: "卵", price: 3, hp: 6, icon: "egg", description: "ウルリケの鶏が今朝産んだ。まだ温かい。", weight: 1 }),
+  trout: food({ name: "川マス", price: 8, hp: 14, icon: "trout", description: "今朝、川で釣れたばかり。", weight: 3 }),
+  herring: food({ name: "塩ニシン", price: 6, hp: 10, icon: "herring", description: "塩漬けで日持ちがする。旅の友。", weight: 2 }),
+  // ---------------------------------------------------------------- baked, cooked and poured (made by someone: §4.2.1)
+  "rye-bread": dish({ name: "黒パン", price: 6, use: { hp: 12, stamina: 14, full: 18 }, icon: "bread", description: "どっしりした黒パン。一つで半日もつ。" }),
+  roll: dish({ name: "白パン", price: 3, use: { hp: 6, stamina: 6, full: 8 }, icon: "roll", description: "小さくて柔らかい丸パン。", weight: 1 }),
+  "apple-pie": dish({ name: "りんごのパイ", price: 16, use: { hp: 18, stamina: 14, full: 16, warm: 5 }, icon: "pie", description: "土間で寝かせたりんごを詰めて焼いた。焼きたては湯気が立つ。" }),
+  "honey-cake": dish({ name: "蜜の焼き菓子", price: 12, use: { hp: 10, sp: 6, stamina: 10, full: 10 }, icon: "honeyCake", description: "農家の巣箱の蜜を練り込んだ。甘い匂いがする。", weight: 2 }),
+  cheese: { ...dish({ name: "チーズ", price: 10, use: { hp: 18, stamina: 10, full: 12 }, icon: "cheese", description: "羊の乳で作ったチーズ。" }), rarity: "fine" },
+  wine: { ...dish({ name: "ぶどう酒", price: 12, use: { sp: 6, stamina: 4, full: 4, warm: 15 }, icon: "jug", description: "醸造所で仕込んだ酒。", weight: 5 }), rarity: "fine", drink: true },
+  "hot-wine": { ...dish({ name: "温めたぶどう酒", price: 14, use: { sp: 10, stamina: 6, full: 4, warm: 40 }, icon: "cupWine", description: "香辛料と一緒に温めた。体の芯まで届く。" }), drink: true },
+  "herb-tea": { ...dish({ name: "薬草茶", price: 8, use: { sp: 8, stamina: 4, full: 2, warm: 25, focus: 10 }, icon: "cupTea", description: "苦いが、喉にいい。", weight: 1 }), drink: true },
+  "hot-milk": { ...dish({ name: "温めた羊の乳", price: 6, use: { hp: 6, stamina: 6, full: 6, warm: 20 }, icon: "cupMilk", description: "蜜をひとさじ落として。", weight: 2 }), drink: true },
+  "hot-water": { ...dish({ name: "白湯", price: 1, use: { full: 1, warm: 10 }, icon: "cupWater", description: "湯売りの桶から汲んだ。ただの湯だが、ありがたい。", weight: 1 }), drink: true },
+  "mushroom-soup": {
+    ...dish({ name: "きのこのスープ", price: 18, use: { hp: 30, stamina: 22, full: 25, warm: 25 }, icon: "soup", description: "森のきのこを煮込んだ。冷めてもうまい。", weight: 4 }),
+    rarity: "fine",
+  },
+  stew: {
+    ...dish({ name: "シチュー", price: 26, use: { hp: 40, stamina: 30, full: 35, warm: 30 }, icon: "stew", description: "根菜と羊の乳でことこと煮た。一皿で体が温まる。", weight: 4 }),
+    rarity: "fine",
+  },
+  "mushroom-stew": {
+    ...dish({ name: "きのこの煮込み", price: 24, use: { hp: 34, stamina: 26, full: 30, warm: 30 }, icon: "mushStew", description: "きのことかぶを黒パンと一緒に煮込んだ。", weight: 4 }),
+    rarity: "fine",
+  },
+  "fish-soup": dish({ name: "魚のスープ", price: 20, use: { hp: 30, stamina: 22, full: 25, warm: 25, focus: 15 }, icon: "fishSoup", description: "浜の魚の骨でだしをとった。", weight: 4 }),
+  "cabbage-soup": dish({ name: "キャベツのスープ", price: 14, use: { hp: 20, stamina: 18, full: 22, warm: 20 }, icon: "greenSoup", description: "くたくたのキャベツ。どこの家でも作る。", weight: 4 }),
+  porridge: dish({
+    name: "粥",
+    price: 2,
+    use: { hp: 2, stamina: 4, full: 5 },
+    icon: "porridge",
+    description: "麦を水で煮ただけの薄い粥。寄進の麦で炊き、礼拝堂の前で安く売られる。腹の足しにはなるが、温まらない。",
+    weight: 3,
+  }),
+  "cheese-toast": dish({ name: "チーズのせパン", price: 14, use: { hp: 22, stamina: 16, full: 18, warm: 10 }, icon: "bread", description: "炉で炙った黒パンに、とろけたチーズ。" }),
+  skewer: dish({ name: "串焼き", price: 12, use: { hp: 18, stamina: 12, full: 12, warm: 8 }, icon: "skewer", description: "炭火で焼いた川マス。焚き火の匂い。", weight: 1 }),
+  "roast-chestnuts": dish({ name: "焼き栗", price: 8, use: { hp: 6, stamina: 8, full: 8, warm: 10 }, icon: "nuts", description: "紙袋の中で、まだ熱い。", weight: 1 }),
+  "baked-potato": dish({ name: "焼き芋", price: 10, use: { hp: 12, stamina: 12, full: 15, warm: 15 }, icon: "potato", description: "灰の中で焼いた芋。手を温めてから食べる。", weight: 2 }),
+  "fried-dough": dish({ name: "揚げ菓子", price: 9, use: { hp: 8, stamina: 10, full: 10, warm: 5 }, icon: "roll", description: "揚げたてに蜜をかけた。", weight: 1 }),
+  "smoked-fish": dish({ name: "干し魚", price: 9, use: { hp: 10, stamina: 10, full: 10 }, icon: "driedFish", description: "浜の台で干すか、炉の煙でいぶした。日持ちがする。", weight: 1 }),
+  "dried-apple": dish({ name: "干しりんご", price: 6, use: { hp: 6, stamina: 6, full: 6 }, icon: "apple", description: "薄く切って干した。噛むほど甘い。", weight: 1 }),
+  pickles: dish({ name: "酢漬け", price: 5, use: { hp: 4, stamina: 6, full: 4 }, icon: "jug", description: "かぶとキャベツの酢漬け。冬の保存食。", weight: 2 }),
+  ration: dish({ name: "旅の携行食", price: 15, use: { hp: 10, stamina: 20, full: 18 }, icon: "roll", description: "固く焼いた麦と干し果実。外へ出るなら一つは持て。", weight: 1 }),
+
+  // ---------------------------------------------------------------- medicine
+  herb: medicine({ name: "薬草", price: 6, use: { hp: 15 }, icon: "herb", description: "草原に生える苦い葉。噛むと傷の痛みがひく。", rarity: "common", weight: 1 }),
+  "blue-herb": medicine({ name: "青い薬草", price: 25, use: { sp: 12 }, icon: "herbB", description: "日陰や湿った草地にまれに混じる青い葉。頭がすっと冴える。", rarity: "fine", weight: 1 }),
+  potion: { ...brewedMedicine({ name: "回復薬", price: 40, use: { hp: 60 }, icon: "potionR", description: "薬草を煮詰めた回復薬。作り手で効き目も味も違う。" }), drink: true },
+  // not the brewed potion: a spiced field draught, less healing, but it warms like a hot drink
+  "red-potion": {
+    ...medicine({ name: "赤い水薬", price: 30, use: { hp: 30 }, icon: "potionR", description: "薬草に唐辛子を加えて煮詰めた水薬。傷の治りは回復薬に劣るが、飲むと体が芯から温まる。" }),
+    use: { hp: 30, warm: 30 },
+    drink: true,
+  },
+  "orange-potion": { ...brewedMedicine({ name: "橙の水薬", price: 110, use: { hp: 150 }, icon: "potionO", description: "蜜を加えてよく効くようにした水薬。", rarity: "fine" }), drink: true },
+  "white-potion": { ...medicine({ name: "白い水薬", price: 180, use: { hp: 220 }, icon: "potionW", description: "修道士に伝わる処方。薬屋に日に一本入るかどうか。", rarity: "rare" }), drink: true },
+  "blue-potion": { ...brewedMedicine({ name: "青い水薬", price: 90, use: { sp: 40 }, icon: "potionB", description: "青い薬草から作る水薬。結晶を扱う者が好む。", rarity: "fine" }), drink: true },
+
+  // ---------------------------------------------------------------- gathering tools (economy.md §1)
+  // with the practice of a woodcutter (and the arm for it), the axe is a weapon too (game-system.md §9.3)
+  "wood-axe": tool({
+    name: "木こりの斧",
+    price: 60,
+    icon: "axe",
+    skill: "woodcutting",
+    power: 1,
+    durability: 40,
+    description: "刃こぼれしたら研ぎ直しを。木を倒し慣れた腕なら、魔物にも振るえる。",
+    weight: 18,
+    equip: {
+      part: "weapon",
+      atk: 14,
+      delay: 1800,
+      needs: { woodcutting: 4, str: 8 },
+      scale: { str: "D" },
+    },
+  }),
+  // foraging needs no tool: the sickle is worth carrying only because it brings in more (yield-of.ts)
+  sickle: tool({ name: "鎌", price: 35, icon: "sickle", skill: "foraging", power: 1.5, durability: 50, description: "草も薬草もきのこも、根を残して刈れる。手で摘むより多く採れる。", weight: 6 }),
+  "fishing-rod": tool({ name: "釣り竿", price: 45, icon: "rod", skill: "fishing", power: 1, durability: 40, description: "しなりのいい竿。", weight: 6 }),
+
+  // ---------------------------------------------------------------- gathering
+  "meadow-flower": material({ name: "野の花", price: 4, icon: "flower", description: "草原や菜園の隅に咲く小さな花。押し花にする人が多い。" }),
+  plank: material({ name: "板材", price: 6, icon: "log", description: "原木を挽いた板。柄にも棚にも竿にもなる。", rarity: "common", weight: 4 }),
+  "iron-ingot": material({ name: "鉄の延べ棒", price: 24, icon: "scrap", description: "鉄くずを炭で溶かして延べた。刃物の芯になる。", rarity: "common", weight: 5 }),
+  yarn: material({ name: "毛糸", price: 10, icon: "thread", description: "白い毛を紡いだ糸。首巻きはこれで編む。", rarity: "common", weight: 1 }),
+  log: material({ name: "原木", price: 8, icon: "log", description: "切り出したばかりの丸太。木工師が板にし、木こりが薪にする。", rarity: "common", weight: 8 }),
+  "sea-fish": food({ name: "浜の小魚", price: 5, hp: 9, icon: "herring", description: "網の小魚。焼いても汁にしてもうまい。", weight: 1 }),
+  "lamp-oil": material({
+    name: "灯り油",
+    price: 5,
+    icon: "jug",
+    description: "街灯と窓の灯りに使う油。衛兵が夕方、道具屋の奥からまとめて引き取っていく。旅の荷には要らない。",
+    rarity: "common",
+    weight: 2,
+  }),
+  firewood: material({ name: "薪", price: 4, icon: "firewood", description: "割った薪の束。かまどにも作業場の炉にも要る。", rarity: "common", weight: 4 }),
+  charcoal: material({ name: "炭", price: 6, icon: "charcoal", description: "樹海の入り口の窯で焼いた炭。鍛冶と料理の火に。", rarity: "common", weight: 2 }),
+  mushroom: material({ name: "森のきのこ", price: 5, icon: "mushroom", description: "木陰に生える茶色いきのこ。スープの具になる。" }),
+
+  "raw-hide": material({ name: "獣の皮", price: 18, icon: "hide", description: "猟師ファルクが届けた獣の皮。革職人に頼めば、丈夫な革になる。", rarity: "common", weight: 4 }),
+  "tanned-leather": material({ name: "なめし革", price: 32, icon: "leather", description: "ルドルフがなめした革。革鎧や靴の材料になる。", rarity: "common", weight: 3 }),
+
+  // ---------------------------------------------------------------- monster materials (drops)
+  jelly: material({ name: "ぷるぷるのゼリー", price: 3, icon: "jelly", description: "スライムが残す粘液のかたまり。乾くと固くなり、糊に使える。" }),
+  "blue-jelly": material({ name: "青いゼリー", price: 9, icon: "jellyB", description: "水辺のスライムが残す冷たいゼリー。薬の材料になる。", rarity: "fine" }),
+  "soft-fur": material({ name: "やわらかい冬毛", price: 8, icon: "fur", description: "野うさぎが逃げるときに残していく冬毛のかたまり。仕立て屋が喜んで買う。" }),
+  "white-fleece": material({ name: "白い毛", price: 14, icon: "furW", description: "ふわふわの白い毛。紡げば上等な糸になる。", rarity: "fine" }),
+  "sharp-fang": material({ name: "鋭い牙", price: 12, icon: "fang", description: "森の灰うさぎが残した硬い歯。根や樹皮をかじって鋭くなり、お守りに加工される。" }),
+  feather: material({ name: "羽根", price: 5, icon: "feather", description: "大きな鳥の羽根。矢羽根や帽子の飾りに使う。" }),
+  "hard-shell": material({ name: "硬い甲殻", price: 16, icon: "shell", description: "虫の魔物の甲殻。軽くて丈夫。" }),
+  "old-bone": material({ name: "古い骨", price: 6, icon: "bone", description: "何の骨かはわからない。崩れた砦のあたりでよく見つかる。" }),
+  "sticky-thread": material({ name: "粘る糸", price: 10, icon: "thread", description: "虫の魔物が吐く糸。乾くと絹のようにしなやかになる。" }),
+  "rusty-scrap": material({ name: "錆びた鉄くず", price: 7, icon: "scrap", description: "大戦の頃の何かの部品。鍛冶屋が溶かして使う。" }),
+  "old-cog": material({ name: "古い歯車", price: 30, icon: "cog", description: "戦時の機械の歯車。いまの機関にもそのまま合うことがある。", rarity: "rare", weight: 2 }),
+
+  // ---------------------------------------------------------------- crystals (magic fuel)
+  "small-crystal": {
+    name: "小さな結晶",
+    kind: "crystal",
+    rarity: "fine",
+    price: 120,
+    stack: 99,
+    weight: 1,
+    icon: "crystal",
+    description: "世界樹のふもとで掘られる石。砕くと女神の力が一瞬だけ戻り、祈りに応える。",
+  },
+  "clear-crystal": {
+    name: "澄んだ結晶",
+    kind: "crystal",
+    rarity: "rare",
+    price: 400,
+    stack: 99,
+    weight: 1,
+    icon: "crystalW",
+    description: "曇りのない大きめの結晶。触れると、遠い昔の景色がかすかに見える。",
+  },
+
+  // ---------------------------------------------------------------- weapons
+  "wooden-stick": craftedGear({
+    name: "木の棒",
+    price: 8,
+    icon: "staff",
+    equip: { part: "weapon", atk: 4, delay: 1700, scale: { str: "E" } },
+    weight: 20,
+    description: "手頃な長さの枝。ないよりはまし。",
+  }),
+  dagger: craftedGear({
+    name: "ダガー",
+    price: 65,
+    icon: "dagger",
+    equip: { part: "weapon", atk: 16, delay: 1200, needs: { dex: 7 }, scale: { dex: "C", str: "E" } },
+    weight: 40,
+    description: "刃渡りの短い小刀。軽くて扱いやすい。",
+  }),
+  "short-sword": craftedGear({
+    name: "ショートソード",
+    price: 120,
+    icon: "sword",
+    equip: { part: "weapon", atk: 22, delay: 1500, needs: { str: 8, dex: 7 }, scale: { str: "D", dex: "D" } },
+    weight: 60,
+    description: "短い刃に革巻きの柄を付けた片手剣。",
+  }),
+  "iron-sword": craftedGear({
+    name: "鉄の剣",
+    price: 320,
+    icon: "sword",
+    equip: { part: "weapon", atk: 36, delay: 1600, needs: { str: 11, dex: 9 }, scale: { str: "C", dex: "D" } },
+    weight: 80,
+    description: "よく鍛えた鉄の剣。重心がまっすぐで振りやすい。",
+    rarity: "fine",
+  }),
+  "hand-axe": {
+    ...gear({ name: "手斧", price: 90, icon: "axe", equip: { part: "weapon", atk: 20, delay: 1700, needs: { str: 9 }, scale: { str: "C" } }, weight: 70, description: "薪割りにも戦いにも使える。" }),
+    made: true,
+  },
+  "battle-axe": craftedGear({
+    name: "戦斧",
+    price: 380,
+    icon: "axe",
+    equip: { part: "weapon", atk: 48, delay: 2300, twoHanded: true, needs: { str: 16 }, scale: { str: "B" } },
+    weight: 150,
+    description: "両手で振るう大きな斧。木こりのヨーゼフも一目置く。",
+    rarity: "fine",
+  }),
+  spear: {
+    ...gear({
+      name: "槍",
+      price: 150,
+      icon: "spear",
+      equip: { part: "weapon", atk: 28, delay: 1900, twoHanded: true, needs: { str: 9, dex: 9 }, scale: { dex: "C", str: "D" } },
+      weight: 100,
+      description: "間合いの長いトネリコの槍。両手で持つ。",
+    }),
+    made: true,
+  },
+  mace: {
+    ...gear({
+      name: "メイス",
+      price: 180,
+      icon: "mace",
+      equip: { part: "weapon", atk: 26, delay: 1800, needs: { str: 12 }, scale: { str: "C" } },
+      weight: 90,
+      description: "鉄の頭をもつ打撃武器。鎧の上からでも効く。",
+      rarity: "fine",
+    }),
+    made: true,
+  },
+  "oak-staff": craftedGear({
+    name: "樫の杖",
+    price: 150,
+    icon: "staff",
+    equip: { part: "weapon", atk: 6, delay: 1700, needs: { mnd: 7 }, bonus: { maxSp: 15 } },
+    weight: 50,
+    description: "術と祈りを唱える者が持つ杖。先に小さな結晶がはまっている。",
+  }),
+  "short-bow": craftedGear({
+    name: "短弓",
+    price: 130,
+    icon: "bow",
+    equip: { part: "weapon", atk: 30, delay: 1600, twoHanded: true, needs: { dex: 10 }, scale: { dex: "C" } },
+    weight: 50,
+    description: "狩人が使う小ぶりの弓。握りに革を巻いてある。両手で引く。",
+  }),
+  ...WEAPONS,
+
+  // ---------------------------------------------------------------- armour
+  "cloth-hat": craftedGear({ name: "布の帽子", price: 30, icon: "hat", equip: { part: "head", def: 1 }, weight: 10, description: "冷たい風と小雨を防ぐ。" }),
+  "iron-helm": craftedGear({ name: "鉄兜", price: 140, icon: "helm", equip: { part: "head", def: 4, needs: { str: 7 } }, weight: 60, description: "鍛冶場で叩き出した鉄の兜。", rarity: "fine" }),
+  "traveller-coat": craftedGear({ name: "旅人の服", price: 80, icon: "tunic", equip: { part: "body", def: 3 }, weight: 30, description: "厚手の毛織りに冬毛を当てた上着。" }),
+  "leather-armor": craftedGear({ name: "革の鎧", price: 220, icon: "tunic", equip: { part: "body", def: 6 }, weight: 80, description: "なめした革を重ねた鎧。動きやすい。", rarity: "fine" }),
+  "chain-mail": craftedGear({
+    name: "鎖帷子",
+    price: 480,
+    icon: "armor",
+    equip: { part: "body", def: 10, needs: { str: 10, vit: 8 } },
+    weight: 160,
+    description: "細い鉄の輪を編んだ鎧。重いが頼もしい。",
+    rarity: "fine",
+  }),
+  "wool-cape": craftedGear({
+    name: "毛織りの外套",
+    price: 160,
+    icon: "cape",
+    equip: { part: "body", def: 4, bonus: { maxHp: 20 } },
+    weight: 30,
+    description: "白い毛を織った外套。夜の野営でも体が冷えない。",
+    rarity: "fine",
+  }),
+  "leather-boots": craftedGear({ name: "革の靴", price: 90, icon: "boots", equip: { part: "feet", def: 1 }, weight: 20, description: "長い道のりでも足が痛まない。" }),
+  "wooden-shield": craftedGear({ name: "木の盾", price: 60, icon: "shield", equip: { part: "shield", def: 3 }, weight: 50, description: "樫の板に鉄の縁を打った丸盾。" }),
+
+  // ---------------------------------------------------------------- neck wraps (for looks; the tailor sells them)
+  "wool-muffler": craftedGear({
+    name: "毛織りのマフラー",
+    price: 60,
+    icon: "muffler",
+    equip: { part: "neck", look: { neck: "muffler", neckRamp: "cRed" } },
+    weight: 3,
+    description: "厚手に織った赤いマフラー。町の人の半分はこれを巻いている。",
+  }),
+  "striped-muffler": craftedGear({
+    name: "縞のマフラー",
+    price: 90,
+    icon: "mufflerS",
+    equip: { part: "neck", look: { neck: "muffler", neckRamp: "cBlue", neckStripe: "cLinen" } },
+    weight: 3,
+    description: "青と生成りの縞。迷っても見つけてもらえるように、目立つ色で編む。",
+    rarity: "fine",
+  }),
+  "fur-stole": craftedGear({
+    name: "冬毛のストール",
+    price: 180,
+    icon: "stole",
+    equip: { part: "neck", def: 1, look: { neck: "stole", neckRamp: "cBrown" } },
+    weight: 6,
+    description: "やわらかい冬毛を寄せて肩掛けにした。夜の冷えにも負けない。",
+    rarity: "fine",
+  }),
+  "embroidered-scarf": gear({
+    name: "刺繍入りのスカーフ",
+    price: 140,
+    icon: "scarf",
+    equip: { part: "neck", look: { neck: "scarf", neckRamp: "cPlum", neckStripe: "cHoney" } },
+    weight: 2,
+    description: "金糸で家紋を刺繍した細身のスカーフ。",
+    rarity: "fine",
+  }),
+
+  // ---------------------------------------------------------------- accessories
+  charm: craftedGear({ name: "お守り", price: 120, icon: "charm", equip: { part: "accessory", def: 1 }, weight: 5, description: "町の礼拝堂で祈りを込めた木のお守り。", rarity: "rare" }),
+  "fang-charm": {
+    ...gear({
+      name: "牙のお守り",
+      price: 90,
+      icon: "charm",
+      equip: { part: "accessory", bonus: { str: 2 } },
+      weight: 3,
+      description: "鋭い牙を紐で結んだお守り。腕に力がこもる気がする。",
+      rarity: "fine",
+    }),
+    made: true,
+  },
+  "silver-ring": gear({
+    name: "銀の指輪",
+    price: 260,
+    icon: "ring",
+    equip: { part: "accessory", bonus: { dex: 2 } },
+    weight: 1,
+    description: "荷運びのルカスが、外の道ですれ違う向こうの荷車から一つずつ買ってくる銀の指輪。",
+    rarity: "fine",
+  }),
+  "prayer-necklace": craftedGear({
+    name: "祈りの首飾り",
+    price: 300,
+    icon: "necklace",
+    equip: { part: "accessory", bonus: { fth: 2, maxSp: 20 } },
+    weight: 2,
+    description: "木に祈りの言葉を刻み、結晶をはめて毛糸を通した首飾り。",
+    rarity: "rare",
+  }),
+
+  // ---------------------------------------------------------------- what only the practised bring (economy.md §2.1)
+  // Not to be had in v0.1: life skills stop at 8. Defined so the trades past it have a shape.
+  "black-oak-heart": {
+    ...material({
+      name: "黒樫の芯材",
+      price: 120,
+      icon: "log",
+      description: "樹海の奥の古い樫を倒すと、芯だけが黒く締まっている。並の斧では刃が負ける。弓と柄の最上の材。",
+      rarity: "rare",
+      weight: 6,
+    }),
+    milestone: 16,
+  },
+  "amber-resin": {
+    ...material({
+      name: "琥珀の樹脂",
+      price: 300,
+      icon: "jellyR",
+      description: "古木の洞に二百年たまった樹脂が、飴色に固まったもの。木を割らずに取り出せるのは、木を知り尽くした手だけ。",
+      rarity: "rare",
+      weight: 1,
+    }),
+    milestone: 32,
+  },
+  "world-branch": {
+    ...material({
+      name: "世界樹の落ち枝",
+      price: 1500,
+      icon: "log",
+      description: "世界樹のふもとに、まれに落ちてくる灰色の枝。手荒に扱うと灰になって崩れる。祈りがよく通る、と修道士は言う。",
+      rarity: "treasure",
+      weight: 4,
+    }),
+    milestone: 64,
+  },
+  "winter-char": {
+    ...material({ name: "冬鱒", price: 90, icon: "trout", description: "凍りかけた淵の底でじっと冬を越す、大きな鱒。めったに口を使わない。脂がのっている。", rarity: "fine", weight: 4 }),
+    milestone: 16,
+  },
+  "engine-core": {
+    ...material({
+      name: "沈んだ機関の芯",
+      price: 360,
+      icon: "cog",
+      description: "大戦の頃の機関の芯。川底の泥に埋まっていたのを、糸と根気で引き上げる。錆の下の鋼は、いまの鍛冶では作れない。",
+      rarity: "rare",
+      weight: 8,
+    }),
+    milestone: 32,
+  },
+  "elder-scale": {
+    ...material({
+      name: "淵の主の抜け鱗",
+      price: 1500,
+      icon: "shell",
+      description: "町の川の淵に住む、誰も釣り上げたことのない大魚が落とした鱗。主に気づかれずに拾える釣り人は、町に一人いるかどうか。",
+      rarity: "treasure",
+      weight: 1,
+    }),
+    milestone: 64,
+  },
+  "frost-lily": { ...material({ name: "霜の花", price: 100, icon: "flower", description: "樹海の奥で、夜明け前の一刻だけ開く白い花。日が差すと閉じてしまう。", rarity: "rare" }), milestone: 16 },
+  "crystal-moss": {
+    ...material({ name: "結晶苔", price: 320, icon: "herbB", description: "結晶の気が染みた岩にだけ生える、かすかに光る苔。剥がし方を誤ると光が消える。", rarity: "rare" }),
+    milestone: 32,
+  },
+  "root-dew": {
+    ...material({ name: "根の雫", price: 1500, icon: "crystalW", description: "世界樹の根が地表に出たところに、朝だけ結ぶ雫。女神の力がほんのわずか混じっている、と言われる。", rarity: "treasure" }),
+    milestone: 64,
+  },
+  "smoked-char": {
+    ...dish({
+      name: "冬鱒の燻し",
+      price: 160,
+      use: { hp: 60, stamina: 50, full: 30, warm: 90 },
+      icon: "driedFish",
+      description: "冬鱒を炭火でゆっくり燻した。一切れで夜通し体がもつ。",
+      weight: 2,
+      rarity: "rare",
+    }),
+    milestone: 16,
+  },
+  "feast-stew": {
+    ...dish({
+      name: "寄り合いの大鍋",
+      price: 420,
+      use: { hp: 120, stamina: 100, full: 40, warm: 180 },
+      icon: "stew",
+      description: "冬鱒と霜の花を羊の乳で煮込む、寄り合いの集まりの日の鍋。作れる人がいると、その冬は皆が集まる。",
+      weight: 6,
+      rarity: "rare",
+    }),
+    milestone: 32,
+  },
+  "festival-cake": {
+    ...dish({
+      name: "送りの日の焼き菓子",
+      price: 1800,
+      use: { hp: 200, sp: 80, stamina: 100, full: 20, warm: 360 },
+      icon: "honeyCake",
+      description: "女神を送り出した日、と伝わる祭りの菓子。根の雫を一滴落とす古い作り方は、もう数人しか知らない。",
+      weight: 2,
+      rarity: "treasure",
+    }),
+    milestone: 64,
+  },
+  "frost-potion": {
+    ...medicine({ name: "霜の花の水薬", price: 300, use: { hp: 150, sp: 60 }, icon: "potionG", description: "霜の花を青い薬草と煮詰めた。体と頭の両方に効く。", rarity: "rare" }),
+    made: true,
+    milestone: 16,
+  },
+  "moss-oil": {
+    ...medicine({ name: "結晶苔の香油", price: 700, use: { sp: 200 }, icon: "potionB", description: "結晶苔を油に浸して取った香油。嗅ぐと、結晶を砕いたときのような冴えが来る。", rarity: "rare" }),
+    made: true,
+    milestone: 32,
+  },
+  "root-elixir": {
+    ...medicine({
+      name: "根の雫の霊薬",
+      price: 3000,
+      use: { hp: 600, sp: 300 },
+      icon: "potionA",
+      description: "根の雫を結晶苔と霜の花の水薬で割った。修道士の記録に、作り方だけが残っていた。",
+      rarity: "treasure",
+    }),
+    made: true,
+    milestone: 64,
+  },
+  "black-oak-bow": {
+    ...craftedGear({
+      name: "黒樫の長弓",
+      price: 1100,
+      icon: "bow",
+      equip: { part: "weapon", atk: 40, delay: 1700, twoHanded: true, needs: { dex: 14 }, scale: { dex: "B" } },
+      weight: 60,
+      description: "黒樫の芯から削り出した長弓。弦を張ると、低く鳴る。",
+      rarity: "rare",
+    }),
+    milestone: 16,
+  },
+  "amber-staff": {
+    ...craftedGear({
+      name: "琥珀塗りの杖",
+      price: 2400,
+      icon: "staff",
+      equip: { part: "weapon", atk: 12, delay: 1600, needs: { mnd: 12 }, bonus: { maxSp: 40 } },
+      weight: 45,
+      description: "黒樫の杖に琥珀の樹脂を重ね塗りし、先に結晶をはめた。術も祈りもよく通る。",
+      rarity: "rare",
+    }),
+    milestone: 32,
+  },
+  "world-branch-staff": {
+    ...craftedGear({
+      name: "世界樹の枝の杖",
+      price: 8000,
+      icon: "staff",
+      equip: { part: "weapon", atk: 18, delay: 1500, needs: { mnd: 14, fth: 16 }, bonus: { maxSp: 80, fth: 2 } },
+      weight: 40,
+      description: "世界樹の落ち枝を崩さずに削った杖。持つと、遠い昔の祈りの声がかすかに聞こえる気がする。",
+      rarity: "treasure",
+    }),
+    milestone: 64,
+  },
+  "steel-axe": {
+    ...tool({
+      name: "鋼の斧",
+      price: 1400,
+      icon: "axe",
+      skill: "woodcutting",
+      power: 1.6,
+      durability: 120,
+      description: "黒樫の柄に、鍛え直した鋼の刃。古い樫でも刃が負けない。",
+      weight: 20,
+      equip: {
+        part: "weapon",
+        atk: 30,
+        delay: 1700,
+        needs: { woodcutting: 16, str: 14 },
+        scale: { str: "C" },
+      },
+    }),
+    rarity: "rare",
+    milestone: 16,
+  },
+  "engine-steel-sword": {
+    ...craftedGear({
+      name: "機関鋼の剣",
+      price: 3000,
+      icon: "sword",
+      equip: { part: "weapon", atk: 60, delay: 1550, needs: { str: 16, dex: 12 }, scale: { str: "C", dex: "C" } },
+      weight: 80,
+      description: "沈んだ機関の芯の鋼を打ち延べた剣。いまの炉では、この硬さは出せない。",
+      rarity: "rare",
+    }),
+    milestone: 32,
+  },
+  "reforged-blade": {
+    ...craftedGear({
+      name: "打ち直した古剣",
+      price: 9000,
+      icon: "sword",
+      equip: { part: "weapon", atk: 90, delay: 1500, needs: { str: 22, dex: 16 }, scale: { str: "B", dex: "C" } },
+      weight: 85,
+      description: "大戦の機関の鋼を、魔物と仕事のためだけに打ち直した。打つ前に結晶を砕き、人に向けないと祈るのが習わし。",
+      rarity: "treasure",
+    }),
+    milestone: 64,
+  },
+  "lined-coat": {
+    ...craftedGear({
+      name: "冬毛の裏地の外套",
+      price: 1000,
+      icon: "cape",
+      equip: { part: "body", def: 8, bonus: { maxHp: 40 } },
+      weight: 35,
+      description: "やわらかい冬毛を裏一面に縫い込んだ外套。夜明け前の霜の中でも震えない。",
+      rarity: "rare",
+    }),
+    milestone: 16,
+  },
+  "frost-shawl": {
+    ...craftedGear({
+      name: "霜の花染めの肩掛け",
+      price: 2200,
+      icon: "stole",
+      equip: { part: "neck", def: 3, bonus: { maxSp: 30 }, look: { neck: "stole", neckRamp: "cSky" } },
+      weight: 4,
+      description: "霜の花で淡い青に染め、琥珀の樹脂で色を留めた。色が抜けない。",
+      rarity: "rare",
+    }),
+    milestone: 32,
+  },
+  "woven-muffler": {
+    ...craftedGear({
+      name: "重ね織りのマフラー",
+      price: 7000,
+      icon: "muffler",
+      equip: { part: "neck", def: 5, bonus: { maxHp: 80, maxSp: 40 }, look: { neck: "muffler", neckRamp: "cCream", neckStripe: "cSky" } },
+      weight: 4,
+      description: "淵の主の鱗を細く裂いて、毛糸に織り込んだ。光の加減で、どの世界の色にも見える。",
+      rarity: "treasure",
+    }),
+    milestone: 64,
+  },
+
+  // ---------------------------------------------------------------- quest items
+  "sealed-letter": {
+    name: "封をした手紙",
+    kind: "key",
+    rarity: "common",
+    price: 0,
+    stack: 1,
+    weight: 0,
+    icon: "letter",
+    description: "蝋で封をした手紙。届け先の名前が丁寧な字で書いてある。",
+  },
+  "lost-bell": {
+    name: "小さな鈴",
+    kind: "key",
+    rarity: "common",
+    price: 0,
+    stack: 1,
+    weight: 0,
+    icon: "bell",
+    description: "羊の首に下げる鈴。振ると澄んだ音がする。",
+  },
+} satisfies Record<string, ItemDefinition>
+
+export type ItemId = keyof typeof DEFINITIONS
+
+export const ITEMS: Readonly<Record<ItemId, ItemDefinition>> = DEFINITIONS

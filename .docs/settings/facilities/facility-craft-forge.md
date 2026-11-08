@@ -4,7 +4,7 @@
   "kind": "facilities",
   "title": "職人通りの共同の炉",
   "status": "設計中",
-  "source": "world/town/craft-yard.ts",
+  "source": "apps/main/world/town/craft-yard.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "site": {
@@ -14,11 +14,11 @@
   "runtime_station": "craft-forge",
   "owner_building": "building-h-c2",
   "users": [
-    "resident-ギュンター",
+    "resident-アルノルト",
     "resident-ベアトリクス"
   ],
   "caretakers": [
-    "resident-ギュンター"
+    "resident-アルノルト"
   ],
   "purpose": "共同作業場の外で金属を加熱し鍛造する設備",
   "issues": [
@@ -28,7 +28,7 @@
   "design_dependencies": [
     "map-phanthiet-craft",
     "building-h-c2",
-    "resident-ギュンター",
+    "resident-アルノルト",
     "resident-ベアトリクス"
   ]
 }
@@ -37,7 +37,7 @@
 
 ## 用途と現行の位置
 
-金属を扱う共同の炉である。炉と金床・薪の既存の配置は `world/town/craft-yard.ts` を参照し、加工設備の識別は `world/town/stations.ts` の craft-forge、加工は `world/core/craft-command.ts`、利用料は `world/core/crafting-rules.ts` を正とする。鍛冶屋と防具屋の台詞にある利用を維持し、保守をギュンターが担う案とする。屋内の調理かまどや調合面へ熱い金属を運ぶ案にしない。
+金属を扱う共同の炉である。炉と金床・薪の既存の配置は `apps/main/world/town/craft-yard.ts` を参照し、加工設備の識別は `apps/main/world/town/stations.ts` の craft-forge、加工は `apps/main/world/core/craft-command.ts`、利用料は `apps/main/world/core/crafting-rules.ts` を正とする。鍛冶屋と防具屋の台詞にある利用を維持し、保守をアルノルトが担う案とする。屋内の調理かまどや調合面へ熱い金属を運ぶ案にしない。
 
 ## 敷地と工程
 

@@ -31,7 +31,7 @@ try {
   await page.screenshot({ path: "public/tmp/cache-fallback.png" })
   await page.reload()
   await waitReady(page)
-  if (await page.evaluate(() => game.state.get().player.name !== "エルナ" || !game.state.get().player.profileComplete)) throw Error("Character did not resume")
+  if (await page.evaluate(() => game.state.get().player.name !== "ヴェレーナ" || !game.state.get().player.profileComplete)) throw Error("Character did not resume")
   if (errors.length) throw Error(errors.join("\n"))
   console.log("Created, rendered a character frame and resumed with an unresponsive graphics cache")
 } finally {

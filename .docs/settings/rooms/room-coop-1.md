@@ -4,7 +4,7 @@
   "kind": "rooms",
   "title": "鶏小屋／1階 鶏小屋",
   "status": "設計中",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "building": "building-coop",
@@ -347,7 +347,7 @@
 
 ## 現行の鶏との対応
 
-animal_care の population_ids は `world/town/animals.ts` の個体IDを参照する。現行の鶏の数・外見・歩く範囲は同じ関数を正とし、本資料へ数値を写さない。小屋へ戻って休む提案であり、市場付近にいる鶏の帰路や時刻を実装済みとはしない。収容・止まり木と巣箱の容量、各個体の呼び名、屋外の囲いと鶏の出入口、寒さと換気・灰への対処は未設計である。
+animal_care の population_ids は `apps/main/world/town/animals.ts` の個体IDを参照する。現行の鶏の数・外見・歩く範囲は同じ関数を正とし、本資料へ数値を写さない。小屋へ戻って休む提案であり、市場付近にいる鶏の帰路や時刻を実装済みとはしない。収容・止まり木と巣箱の容量、各個体の呼び名、屋外の囲いと鶏の出入口、寒さと換気・灰への対処は未設計である。
 
 ## 帰宅先と描画
 

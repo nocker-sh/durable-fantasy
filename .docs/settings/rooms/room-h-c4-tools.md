@@ -2,7 +2,7 @@
 {
   "id": "room-h-c4-tools",
   "kind": "rooms",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "town": "town-phanthiet",
   "building": "building-h-c4",
   "bed_capacity": 0,

@@ -4,7 +4,7 @@
   "kind": "maps",
   "title": "海沿いの崖道",
   "status": "現状整理",
-  "source": "world/maps/index.ts",
+  "source": "apps/main/world/maps/index.ts",
   "design_gate": "未通過",
   "town": null,
   "map_id": "sea-cliff",

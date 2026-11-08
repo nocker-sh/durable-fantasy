@@ -10,7 +10,7 @@ const fixture = () => {
     status: "設計中",
     design_gate: "未通過",
     issues: [],
-    appearance_source: { file: "world/town/residents.ts", export: "RESIDENT_LOOKS", key: "ゾフィー" },
+    appearance_source: { file: "apps/main/world/town/residents.ts", export: "RESIDENT_LOOKS", key: "ゾフィー" },
   }
   return { doc, documents: new Map([[doc.id, doc]]), residents: [{ name: "ヴィルヘルム" }, { name: "ゾフィー" }], looks: [{ neck: "scarf" }, { neck: "stole" }] }
 }
@@ -25,9 +25,9 @@ it("rejects a missing source, copied outfit, another resident and a raw-outfit e
   const f = fixture()
   delete f.doc.appearance_source
   expect(auditResidentAppearanceSources(f)).toContain("resident-ゾフィー: missing or invalid appearance source")
-  f.doc.appearance_source = { file: "world/town/residents.ts", export: "RESIDENT_LOOKS", key: "ヴィルヘルム" }
+  f.doc.appearance_source = { file: "apps/main/world/town/residents.ts", export: "RESIDENT_LOOKS", key: "ヴィルヘルム" }
   expect(auditResidentAppearanceSources(f)).toContain("resident-ゾフィー: missing or invalid appearance source")
-  f.doc.appearance_source = { file: "world/town/residents.ts", export: "RESIDENTS", key: "ゾフィー" }
+  f.doc.appearance_source = { file: "apps/main/world/town/residents.ts", export: "RESIDENTS", key: "ゾフィー" }
   expect(auditResidentAppearanceSources(f)).toContain("resident-ゾフィー: missing or invalid appearance source")
   f.doc.appearance_source = fixture().doc.appearance_source
   f.doc.appearance = { hat: "kerchief" }

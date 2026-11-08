@@ -8,7 +8,7 @@ import { writeAuthoredPlanExport } from "#/scripts/lib/write-authored-plan-expor
 
 const root = fileURLToPath(new URL("../", import.meta.url)),
   base = resolve(root, ".docs/settings"),
-  directory = resolve(root, "world/town/floorplan/authored")
+  directory = resolve(root, "apps/main/world/town/floorplan/authored")
 const entries = readSettingIndex(JSON.parse(await readFile(resolve(base, "index.json"), "utf8")))
 const targets = getAuthoredExportTargets(process.argv.slice(2), entries)
 const prepared = await Promise.all(targets.map((buildingId) => prepareAuthoredPlanExport({ base, directory, entries, buildingId })))

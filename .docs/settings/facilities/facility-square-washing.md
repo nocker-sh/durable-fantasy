@@ -4,7 +4,7 @@
   "kind": "facilities",
   "title": "川沿いの共同洗濯場",
   "status": "設計中",
-  "source": "world/maps/index.ts",
+  "source": "apps/main/world/maps/index.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "site": {
@@ -28,8 +28,8 @@
     "resident-クララ",
     "resident-エルザ"
   ],
-  "geometry_source": "world/scene/construction/helpers/waterworks/lavoir.ts",
-  "terrain_source": "world/maps/ground/create-ground-fields.ts"
+  "geometry_source": "apps/main/world/scene/construction/helpers/waterworks/lavoir.ts",
+  "terrain_source": "apps/main/world/maps/ground/create-ground-fields.ts"
 }
 ---
 
@@ -43,10 +43,10 @@
 
 ## 東岸からの来訪と上の踊り場
 
-[[resident-アンナ]] の敷地案から既存の橋を通る経路は、洗濯場の階段の上端までとする。上端の位置と幅は `world/maps/layout.ts` の lavStairs を正とする。到着した身体が、洗濯の作業足場へ降り、籠を置いて洗えることは別の設計を要する。経路の資料を、設備の作業グリッドと階段・手摺・取水と汚水、維持の日課の代わりにしない。
+[[resident-アンナ]] の敷地案から既存の橋を通る経路は、洗濯場の階段の上端までとする。上端の位置と幅は `apps/main/world/maps/layout.ts` の lavStairs を正とする。到着した身体が、洗濯の作業足場へ降り、籠を置いて洗えることは別の設計を要する。経路の資料を、設備の作業グリッドと階段・手摺・取水と汚水、維持の日課の代わりにしない。
 
 ## 階段の描画と地形
 
-段数と踏面の描画は geometry_source、作業足場と上の地面の高さは terrain_source と `world/maps/layout.ts` を参照する。上り向きに段を作る場合も、各段の底面は最低の踏面より下に置く。上端の高さを底面の基準へ使うと下段の箱が反転するため、共通の段の計算で上下方向を区別せず成立させる。
+段数と踏面の描画は geometry_source、作業足場と上の地面の高さは terrain_source と `apps/main/world/maps/layout.ts` を参照する。上り向きに段を作る場合も、各段の底面は最低の踏面より下に置く。上端の高さを底面の基準へ使うと下段の箱が反転するため、共通の段の計算で上下方向を区別せず成立させる。
 
 この修正は階段の形の破綻を直すものであり、荷物を持つ人の昇降を確認した意味ではない。地形の補間した斜面と段の端、上と下の踊り場、手摺と濡れた石、洗濯籠の取手と重さ、すれ違う人を立体で照合する。現行の狭い足場へ三人の道具と籠を無条件に並べない。

@@ -2,7 +2,7 @@
 {
   "id": "room-h-m1-office",
   "kind": "rooms",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "town": "town-phanthiet",
   "building": "building-h-m1",
   "bed_capacity": 0,

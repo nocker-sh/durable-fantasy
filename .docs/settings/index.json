@@ -1143,9 +1143,9 @@
       "source": "world/town/houses.ts"
     },
     {
-      "id": "resident-ギュンター",
+      "id": "resident-アルノルト",
       "kind": "residents",
-      "file": "residents/resident-ギュンター.md",
+      "file": "residents/resident-アルノルト.md",
       "source": "world/town/residents.ts"
     },
     {
@@ -2895,6 +2895,24 @@
       "kind": "facilities",
       "file": "facilities/facility-square-windmill.md",
       "source": "world/scene/construction/town.ts"
+    },
+    {
+      "id": "monster-iron-sand-slime",
+      "kind": "monsters",
+      "file": "monsters/monster-iron-sand-slime.md",
+      "source": "apps/main/world/core/monsters.ts"
+    },
+    {
+      "id": "monster-resin-slime",
+      "kind": "monsters",
+      "file": "monsters/monster-resin-slime.md",
+      "source": "apps/main/world/core/monsters.ts"
+    },
+    {
+      "id": "monster-old-moss-slime",
+      "kind": "monsters",
+      "file": "monsters/monster-old-moss-slime.md",
+      "source": "apps/main/world/core/monsters.ts"
     }
   ]
 }

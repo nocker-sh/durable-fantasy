@@ -4,7 +4,7 @@
   "kind": "maps",
   "title": "樹海の奥",
   "status": "設計中",
-  "source": "world/maps/index.ts",
+  "source": "apps/main/world/maps/index.ts",
   "design_gate": "未通過",
   "town": null,
   "map_id": "deep-forest",
@@ -13,7 +13,9 @@
   "residents": [],
   "monsters": [
     "monster-moss-slime",
-    "monster-blue-slime"
+    "monster-blue-slime",
+    "monster-resin-slime",
+    "monster-old-moss-slime"
   ],
   "exits": [
     {
@@ -58,11 +60,23 @@
       "species": "monster-blue-slime",
       "feature": "木陰の湿ったくぼみ",
       "placement": null
+    },
+    {
+      "species": "monster-resin-slime",
+      "feature": "樹皮の傷が残る倒木の周囲",
+      "placement": null
+    },
+    {
+      "species": "monster-old-moss-slime",
+      "feature": "湿った根の間の奥",
+      "placement": null
     }
   ],
   "design_dependencies": [
     "monster-moss-slime",
-    "monster-blue-slime"
+    "monster-blue-slime",
+    "monster-resin-slime",
+    "monster-old-moss-slime"
   ]
 }
 ---
@@ -90,3 +104,13 @@
 宿へ持ち帰るきのこの出どころである。採る人が立つ場所と籠を置く乾いた場所を持たせ、スライムの湿った休息地とは分ける。苔スライムは採集する場所へ入ったときに出会うのであり、通り道全体を大きな体で塞ぐために置かない。大戦の跡と朽木・根の形は、通路・水の溜まり・休息場所の理由になるように配置する。
 
 生息条件は ecology_zones に記録する。placement が null の条件はまだ地形に割り当てていない。出現矩形があることだけで、その条件を満たした配置としない。
+
+
+## 樹脂スライムとの接点
+
+[[monster-resin-slime]] は樹皮の傷が残る倒木の周囲を使う。生活と行動の条件は個別資料に従い、通常の通路と入口を塞がない。新しい出現枠の採用で、生態の場所の設計を完了扱いにしない。
+
+
+## 古苔スライムとの接点
+
+[[monster-old-moss-slime]] は湿った根の間の奥を使う。生活と行動の条件は個別資料に従い、通常の通路と入口を塞がない。新しい出現枠の採用で、生態の場所の設計を完了扱いにしない。

@@ -4,7 +4,7 @@
   "kind": "rooms",
   "title": "アウグストの家／1階 灯りの修理場",
   "status": "設計中",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "building": "building-h9",
@@ -225,4 +225,4 @@
 
 ## 籠と材料の形
 
-毛糸の籠はヘートヴィヒが使う低い柳籠とする。マティアスの羊の毛を巻いた毛糸玉を収め、底と側面の編み目、口縁と糸玉を分けて描く。糸玉を床へ散らさず、灯りの修理面へ置かない。材料と用途は `world/town/lines/households/lamp.ts` に対応する。
+毛糸の籠はヘートヴィヒが使う低い柳籠とする。マティアスの羊の毛を巻いた毛糸玉を収め、底と側面の編み目、口縁と糸玉を分けて描く。糸玉を床へ散らさず、灯りの修理面へ置かない。材料と用途は `apps/main/world/town/lines/households/lamp.ts` に対応する。

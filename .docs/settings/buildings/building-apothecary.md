@@ -4,7 +4,7 @@
   "kind": "buildings",
   "title": "イルムガルトの薬屋",
   "status": "設計中",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "map": "map-phanthiet-market",
@@ -117,7 +117,7 @@
 
 ## 材料と薬、家庭の区画
 
-地上階の [[room-apothecary-1]] は完成した薬と受渡し、[[room-apothecary-2]] は材料と調合道具・計量と混合・洗い物・使用後の受けを持つ。加熱を含む加工の設備と材料・数は `world/core/recipes/alchemy.ts` を正とする。家庭の炉を仕事の加工設備へ読み替えない。
+地上階の [[room-apothecary-1]] は完成した薬と受渡し、[[room-apothecary-2]] は材料と調合道具・計量と混合・洗い物・使用後の受けを持つ。加熱を含む加工の設備と材料・数は `apps/main/world/core/recipes/alchemy.ts` を正とする。家庭の炉を仕事の加工設備へ読み替えない。
 
 [[room-apothecary-lower-stairs]] と [[room-apothecary-upper-stairs]] は [[room-apothecary-upper-hall]] へつながる。[[room-apothecary-3]] と [[room-apothecary-4]] にそれぞれ本人の寝台と衣服箱を維持し、[[room-apothecary-household]] に二人の家庭の食事を持つ。[[room-apothecary-5]] は薬草の仕事の乾燥部屋であり、寝間や衣服の物干しの代用にはしない。
 

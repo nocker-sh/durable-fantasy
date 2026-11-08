@@ -1,14 +1,14 @@
-// Every map as /dev/view draws it, for /dev/maps/<id>: outdoor maps by day, by night and from the far
+// Every map as the studio's /view draws it, for its /maps/<id> page: outdoor maps by day, by night and from the far
 // side, rooms whole and close. Writes JPEGs to public/dev/maps/<id>-<view>.jpg (kept out of git).
 // Heavy (a browser per picture): run it on a cloud machine, not on the Mac you play on.
 // With the dev server up: node scripts/shoot-maps.ts [map …]
-// BASE: the dev server (https://durable-fantasy.localhost); CHROME: a Chromium to use instead of Chrome.
+// BASE: the dev server (https://dev.durable-fantasy.localhost); CHROME: a Chromium to use instead of Chrome.
 import { mkdirSync } from "node:fs"
 import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
 import { chromium } from "playwright-core"
 
-const BASE = process.env.BASE ?? "https://durable-fantasy.localhost"
+const BASE = process.env.BASE ?? "https://dev.durable-fantasy.localhost"
 const dev = join(dirname(fileURLToPath(import.meta.url)), "..", "public", "dev", "maps")
 mkdirSync(dev, { recursive: true })
 
@@ -34,7 +34,7 @@ const browser = await chromium.launch({
 })
 // the maps, as the dev server has them
 const list = await browser.newPage({ ignoreHTTPSErrors: true })
-await list.goto(`${BASE}/dev/view?map=-&ui=0`, { waitUntil: "domcontentloaded" })
+await list.goto(`${BASE}/view?map=-&ui=0`, { waitUntil: "domcontentloaded" })
 await list.waitForFunction(() => document.body.dataset.ready === "missing", undefined, { timeout: 120_000 })
 const all: { id: string; kind: string }[] = await list.evaluate(async () => {
   const { MAPS } = await import("/world/maps/index.ts")
@@ -47,7 +47,7 @@ for (const m of maps) {
   const shots = m.kind !== "indoor" ? OUTDOOR : m.id.startsWith("phanthiet-in-h-m5") ? BIG_ROOM : INDOOR
   for (const shot of shots) {
     const page = await browser.newPage({ ignoreHTTPSErrors: true, viewport: { width: 1280, height: 800 } })
-    await page.goto(`${BASE}/dev/view?map=${m.id}&${shot.query}&blur=0&ui=0`, { waitUntil: "domcontentloaded" })
+    await page.goto(`${BASE}/view?map=${m.id}&${shot.query}&blur=0&ui=0`, { waitUntil: "domcontentloaded" })
     const ready = await page
       .waitForFunction(() => document.body.dataset.ready === "1", undefined, { timeout: 240_000 })
       .then(

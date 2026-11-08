@@ -3,7 +3,7 @@
   "id": "room-inn-drying",
   "kind": "rooms",
   "title": "ゲルダの宿／1階 室内干しの部屋",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "town": "town-phanthiet",
   "building": "building-inn",
   "bed_capacity": 0,

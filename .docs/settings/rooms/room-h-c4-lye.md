@@ -2,7 +2,7 @@
 {
   "id": "room-h-c4-lye",
   "kind": "rooms",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "town": "town-phanthiet",
   "building": "building-h-c4",
   "bed_capacity": 0,
@@ -248,4 +248,4 @@
 
 ## 元の容器と保管時の形
 
-灰汁の桶はカタリーナの仕事用とし、飲み水の容器と共用しない。木の胴とたが、外せる木蓋を持つ保管時の形を描く。細かい灰から上澄みを取る工程は `world/town/lines/households/mason.ts` に対応し、桶の表示だけで濾し場と汚水の設計を完了としない。 元の家具の形を表示へ戻す修正であり、新しい平面への切替ではない。
+灰汁の桶はカタリーナの仕事用とし、飲み水の容器と共用しない。木の胴とたが、外せる木蓋を持つ保管時の形を描く。細かい灰から上澄みを取る工程は `apps/main/world/town/lines/households/mason.ts` に対応し、桶の表示だけで濾し場と汚水の設計を完了としない。 元の家具の形を表示へ戻す修正であり、新しい平面への切替ではない。

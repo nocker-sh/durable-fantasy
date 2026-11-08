@@ -4,7 +4,7 @@
   "kind": "rooms",
   "title": "修道士の家／1階 書斎兼台所",
   "status": "設計中",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "building": "building-h10",
@@ -437,7 +437,7 @@
         "tool": {
           "name": "灰かき用の小さな鉄の掻き出し具",
           "owner": "ベネディクトとクレメンスの世帯",
-          "source": "鍛冶屋のギュンターへ古い鉄を材料として製作を頼む案",
+          "source": "鍛冶屋のアルノルトへ古い鉄を材料として製作を頼む案",
           "maintainers": [
             "resident-クレメンス"
           ],
@@ -795,7 +795,7 @@
             "id": "hearth-tool",
             "name": "灰かき用の小さな鉄の掻き出し具",
             "owner": "ベネディクトとクレメンスの世帯",
-            "source": "鍛冶屋のギュンターへ古い鉄を材料として製作を頼む案",
+            "source": "鍛冶屋のアルノルトへ古い鉄を材料として製作を頼む案",
             "kind": "tool",
             "board": 0,
             "across_m": 0,
@@ -830,7 +830,7 @@
     "resident-ベネディクト",
     "resident-クレメンス",
     "resident-マルクス",
-    "resident-ギュンター",
+    "resident-アルノルト",
     "resident-ゴットフリート"
   ],
   "household_meal": {

@@ -19,7 +19,7 @@ export function auditResidentAppearanceSources(props: Props): string[] {
       !source ||
       typeof source !== "object" ||
       !("file" in source) ||
-      source.file !== "world/town/residents.ts" ||
+      source.file !== "apps/main/world/town/residents.ts" ||
       !("export" in source) ||
       source.export !== "RESIDENT_LOOKS" ||
       !("key" in source) ||

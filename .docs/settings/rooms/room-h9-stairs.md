@@ -3,7 +3,7 @@
   "id": "room-h9-stairs",
   "kind": "rooms",
   "title": "アウグストの家／2階 階段と共用通路",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "town": "town-phanthiet",
   "building": "building-h9",
   "bed_capacity": 0,

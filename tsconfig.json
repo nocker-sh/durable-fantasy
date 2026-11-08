@@ -1,9 +1,48 @@
 {
-  "extends": "./.void/tsconfig.json",
   "compilerOptions": {
     "paths": {
       "#/*": ["./*"],
-      "void/routes": ["./.void/routes.d.ts"]
+      "#/dev/*": ["./apps/studio/dev/*"],
+      "void/routes": ["./apps/main/.void/routes.d.ts"],
+      "#/pages/*": ["./apps/main/pages/*"],
+      "#/routes/*": ["./apps/main/routes/*"],
+      "#/middleware/*": ["./apps/main/middleware/*"],
+      "#/durable-objects/*": ["./apps/main/durable-objects/*"],
+      "#/world/*": ["./apps/main/world/*"],
+      "#/components/*": ["./apps/main/components/*"],
+      "#/hooks/*": ["./apps/main/hooks/*"],
+      "#resources/world/maps/phanthiet-craft": ["./apps/main/world/maps/phanthiet-craft.json"],
+      "#resources/world/maps/phanthiet-fields": ["./apps/main/world/maps/phanthiet-fields.json"],
+      "#resources/world/maps/phanthiet-gate": ["./apps/main/world/maps/phanthiet-gate.json"],
+      "#resources/world/maps/phanthiet-market": ["./apps/main/world/maps/phanthiet-market.json"],
+      "#resources/world/maps/phanthiet": ["./apps/main/world/maps/phanthiet.json"],
+      "#resources/world/maps/south-meadow": ["./apps/main/world/maps/south-meadow.json"],
+      "#resources/world/maps/red-dunes": ["./apps/main/world/maps/red-dunes.json"],
+      "#resources/world/maps/sea-cliff": ["./apps/main/world/maps/sea-cliff.json"],
+      "#resources/world/maps/net-sheds": ["./apps/main/world/maps/net-sheds.json"],
+      "#resources/world/maps/forest-edge": ["./apps/main/world/maps/forest-edge.json"],
+      "#resources/world/maps/deep-forest": ["./apps/main/world/maps/deep-forest.json"],
+      "#resources/world/maps/quynhon-gate": ["./apps/main/world/maps/quynhon-gate.json"],
+      "#resources/world/maps/mountain-pass": ["./apps/main/world/maps/mountain-pass.json"],
+      "#resources/world/maps/hue-gate": ["./apps/main/world/maps/hue-gate.json"],
+      "#resources/world/maps/grass-highland": ["./apps/main/world/maps/grass-highland.json"],
+      "#resources/world/maps/lily-marsh": ["./apps/main/world/maps/lily-marsh.json"],
+      "#resources/world/maps/falls-valley": ["./apps/main/world/maps/falls-valley.json"],
+      "#resources/world/maps/salt-flats": ["./apps/main/world/maps/salt-flats.json"],
+      "#resources/world/scene/anims": ["./apps/main/world/scene/anims.json"],
+      "#resources/components/hud/character-creation": ["./apps/main/components/hud/character-creation.css"],
+      "#resources/dev/debug": ["./apps/studio/dev/debug.css"],
+      "#resources/components/game/game": ["./apps/main/components/game/game.css"],
+      "#resources/dev/dev": ["./apps/studio/dev/dev.css"],
+      "#resources/scripts/lib/read-runtime-module-url": ["./scripts/lib/read-runtime-module-url.mjs"],
+      "#resources/scripts/lib/wait-ready": ["./scripts/lib/wait-ready.mjs"],
+      "#resources/scripts/lib/create-character": ["./scripts/lib/create-character.mjs"],
+      "#resources/scripts/lib/walk-to-map": ["./scripts/lib/walk-to-map.mjs"],
+      "#resources/scripts/lib/configure-cpu": ["./scripts/lib/configure-cpu.mjs"],
+      "#resources/packages/fontsource/shippori-mincho/400": ["./node_modules/@fontsource/shippori-mincho/400.css"],
+      "#resources/three/gltf-loader": ["./node_modules/@types/three/examples/jsm/loaders/GLTFLoader.d.ts"],
+      "#resources/three/meshopt-decoder": ["./node_modules/@types/three/examples/jsm/libs/meshopt_decoder.module.d.ts"],
+      "#resources/three/skeleton-utils": ["./node_modules/@types/three/examples/jsm/utils/SkeletonUtils.d.ts"]
     },
     "target": "ES2022",
     "module": "ESNext",
@@ -17,5 +56,6 @@
     "noEmit": true,
     "verbatimModuleSyntax": true
   },
-  "include": ["components", "dev", "hooks", "lib", "world", "pages", "routes", "middleware", "durable-objects"]
+  "include": ["apps", "lib", "vite.config.ts", "vite.shared.ts"],
+  "exclude": ["node_modules", "**/node_modules", "**/dist", "**/.void", "**/.wrangler"]
 }

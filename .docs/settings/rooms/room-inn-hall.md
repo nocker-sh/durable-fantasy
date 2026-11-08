@@ -3,7 +3,7 @@
   "id": "room-inn-hall",
   "kind": "rooms",
   "title": "ゲルダの宿／2階 共用廊下",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "town": "town-phanthiet",
   "building": "building-inn",
   "bed_capacity": 0,

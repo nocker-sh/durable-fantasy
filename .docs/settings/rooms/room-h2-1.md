@@ -4,7 +4,7 @@
   "kind": "rooms",
   "title": "ルカスとベルタの家／1階 居間兼台所",
   "status": "設計中",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "building": "building-h2",
@@ -425,7 +425,7 @@
     "resident-ベルタ",
     "room-h2-2",
     "resident-ゴットフリート",
-    "resident-ギュンター"
+    "resident-アルノルト"
   ],
   "origin": [
     0,
@@ -457,7 +457,7 @@
     {
       "resident": "resident-ベルタ",
       "routine_source": {
-        "file": "world/town/routines.ts",
+        "file": "apps/main/world/town/routines.ts",
         "key": "ベルタ",
         "doing": "古着を繕う"
       },
@@ -475,7 +475,7 @@
       "kit": {
         "owner": "resident-ベルタ",
         "proposed_box_maker": "resident-ゴットフリート",
-        "proposed_needle_maker": "resident-ギュンター",
+        "proposed_needle_maker": "resident-アルノルト",
         "thread_source": "本人の織り仕事から分ける残り糸",
         "storage_compartment": "ベルタの蓋付き針箱",
         "box": {
@@ -517,7 +517,7 @@
                 0.035
               ],
               "makers": [
-                "resident-ギュンター",
+                "resident-アルノルト",
                 "resident-ゴットフリート"
               ]
             },
@@ -626,9 +626,9 @@ D....SS.TT....#
 
 ## 就寝中の家族と夜の繕い
 
-夜市から戻った [[resident-ベルタ]] は、一階の食卓 T と自分の椅子 B を使い、古着のほつれと縫い目を手で繕う。食器と食べ物を片付けた後だけ作業し、織機や糸車をここへ移さない。時刻は `world/town/routines.ts` のベルタの日課を正とする。上階の家族が眠る間の仕事を、寝室の織機の稼働として扱わない。
+夜市から戻った [[resident-ベルタ]] は、一階の食卓 T と自分の椅子 B を使い、古着のほつれと縫い目を手で繕う。食器と食べ物を片付けた後だけ作業し、織機や糸車をここへ移さない。時刻は `apps/main/world/town/routines.ts` のベルタの日課を正とする。上階の家族が眠る間の仕事を、寝室の織機の稼働として扱わない。
 
-針と糸はベルタの蓋付きの小さな針箱へまとめる。箱は [[resident-ゴットフリート]] へ依頼し、針は [[resident-ギュンター]] から買い、糸は自分の織り仕事から分ける案とする。作業前後に針を確認し、裁ち屑と糸端を回収して食卓を拭く。仕事をしない間の収納先は [[room-h2-2]] の P で、食材箱 F やルカスの綱の箱 R と混ぜない。卓上の布・手と灯りの占有、箱と蓋の持上げ・持替えと、P の糸と布を含む収納の総量はまだ照合していない。
+針と糸はベルタの蓋付きの小さな針箱へまとめる。箱は [[resident-ゴットフリート]] へ依頼し、針は [[resident-アルノルト]] から買い、糸は自分の織り仕事から分ける案とする。作業前後に針を確認し、裁ち屑と糸端を回収して食卓を拭く。仕事をしない間の収納先は [[room-h2-2]] の P で、食材箱 F やルカスの綱の箱 R と混ぜない。卓上の布・手と灯りの占有、箱と蓋の持上げ・持替えと、P の糸と布を含む収納の総量はまだ照合していない。
 
 
 ## 階段を延ばした後の食卓

@@ -4,7 +4,7 @@
   "kind": "rooms",
   "title": "フランツの酒場／1階 酒蔵",
   "status": "設計中",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "building": "building-tavern",

@@ -9,7 +9,7 @@ await page.addInitScript(() => {
 })
 try {
   for (const id of ["h10", "h-m5"]) {
-    await page.goto(`http://127.0.0.1:4027/dev/houses/${id}`)
+    await page.goto(`http://127.0.0.1:4027/houses/${id}`)
     await page.locator('canvas[data-ready="1"]').waitFor({ timeout: 180000 })
     await page.locator('canvas[data-ready="1"]').evaluate((c) => {
       Object.assign(c.parentElement.style, { height: "1000px", maxHeight: "none", aspectRatio: "auto" })

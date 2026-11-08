@@ -4,7 +4,7 @@
   "kind": "residents",
   "title": "ジーモン",
   "status": "設計中",
-  "source": "world/town/residents.ts",
+  "source": "apps/main/world/town/residents.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "household": "candle",
@@ -50,7 +50,7 @@
     "storage-h-m2-3-2"
   ],
   "routine_source": {
-    "file": "world/town/routines.ts",
+    "file": "apps/main/world/town/routines.ts",
     "export": "ROUTINES",
     "key": "ジーモン"
   },
@@ -58,7 +58,7 @@
     "room-h-m2-oil-store"
   ],
   "appearance_source": {
-    "file": "world/town/residents.ts",
+    "file": "apps/main/world/town/residents.ts",
     "export": "RESIDENT_LOOKS",
     "key": "ジーモン"
   }

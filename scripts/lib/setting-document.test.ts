@@ -97,8 +97,8 @@ it.each([
   { furniture: [null] },
   { furniture: [{ symbol: "A", name: "机", owner: "住民", source: "大工", rect: [1, 1, 0, 2], access: [[1, 2]] }] },
   { origin: [0.5, 0] },
-  { routine_source: { file: "world/town/routines.ts", export: "ROUTINES", key: 42 } },
-  { appearance_source: { file: "world/town/residents.ts", export: "RESIDENT_LOOKS", key: 42 } },
+  { routine_source: { file: "apps/main/world/town/routines.ts", export: "ROUTINES", key: 42 } },
+  { appearance_source: { file: "apps/main/world/town/residents.ts", export: "RESIDENT_LOOKS", key: 42 } },
   { floor_levels: [{ floor: 1, elevation_m: "high" }] },
   {
     stair_sections: [
@@ -146,19 +146,19 @@ it("checks the authored diagram against metadata instead of allowing a stale flo
 
 it("keeps unsupported source graphics distinct from design completion and rejects a false rendered status", () => {
   const doc = document()
-  doc.runtime_graphics_omissions = { source: "world/town/interiors.ts", pieces: [{ name: "ろくろ", floor: 0 }] }
+  doc.runtime_graphics_omissions = { source: "apps/main/world/town/interiors.ts", pieces: [{ name: "ろくろ", floor: 0 }] }
   const text = () => `---\n${JSON.stringify(doc)}\n---\n# ${doc.title}\n\n利用者と用途を検討する。\n`
   expect(readSetting(text()).runtime_graphics_omissions).toEqual(doc.runtime_graphics_omissions)
   doc.status = "描画照合済み"
   expect(() => readSetting(text())).toThrow("Rendered setting still has unsupported source furniture")
-  doc.runtime_graphics_omissions = { source: "world/town/interiors.ts", pieces: [] }
+  doc.runtime_graphics_omissions = { source: "apps/main/world/town/interiors.ts", pieces: [] }
   expect(readSetting(text()).status).toBe("描画照合済み")
 })
 
 it("does not call a source layout with omitted rooms visually verified", () => {
   const doc = document()
   doc.status = "描画照合済み"
-  doc.runtime_layout_omissions = { source: "world/town/floorplan/floor-plan.ts", rooms: [{ floor: 0, name: "燻し部屋" }] }
+  doc.runtime_layout_omissions = { source: "apps/main/world/town/floorplan/floor-plan.ts", rooms: [{ floor: 0, name: "燻し部屋" }] }
   expect(() => readSetting(`---\n${JSON.stringify(doc)}\n---\n# ${doc.title}\n\n配置の理由。\n`)).toThrow("Rendered setting still has unrepresented source rooms")
 })
 

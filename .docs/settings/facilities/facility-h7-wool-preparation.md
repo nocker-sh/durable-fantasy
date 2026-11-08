@@ -4,7 +4,7 @@
   "kind": "facilities",
   "title": "マティアスの羊毛の手入れ場",
   "status": "設計中",
-  "source": "world/town/residents/shepherd.ts",
+  "source": "apps/main/world/town/residents/shepherd.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "owner_building": "building-h7",
@@ -482,7 +482,7 @@ vessels は処理用水・洗い・すすぎ・手洗い・汚水のそれぞれ
 
 洗い・すすぎの内容物の占有は一回分の原毛に対する仮定であり、乾燥重量から実体積を推定した値ではない。実物の濡れた羊毛・汚れ・泡と波立ち、押さえる道具の占有を確かめ、仮定を超える場合は一回分か槽を再設計する。この余裕だけで撹拌・持上げと移替えの作業を成立済みとしない。
 
-内寸と厚みは製作の案であり、焼物の収縮・強度と接合、防水と清掃、蓋・縁・排出口、満水時の重量と床の支持、作業する手の到達は未照合である。固定した槽を満水のまま人が運べる扱いにせず、給水と搬出の容器・往復は別に設計する。幾何と水量の検査は `world/town/get-rectangular-liquid-capacity.ts` と `scripts/lib/get-wool-preparation-vessels-error.ts` が担う。
+内寸と厚みは製作の案であり、焼物の収縮・強度と接合、防水と清掃、蓋・縁・排出口、満水時の重量と床の支持、作業する手の到達は未照合である。固定した槽を満水のまま人が運べる扱いにせず、給水と搬出の容器・往復は別に設計する。幾何と水量の検査は `apps/main/world/town/get-rectangular-liquid-capacity.ts` と `scripts/lib/get-wool-preparation-vessels-error.ts` が担う。
 
 ## 原料の予算と供給する状態
 

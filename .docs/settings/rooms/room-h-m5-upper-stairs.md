@@ -4,7 +4,7 @@
   "kind": "rooms",
   "title": "町の寄り合い所／2階 記録室への階段",
   "status": "設計中",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "building": "building-h-m5",

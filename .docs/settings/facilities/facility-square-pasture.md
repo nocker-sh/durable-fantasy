@@ -4,7 +4,7 @@
   "kind": "facilities",
   "title": "農家の牧草地と入口",
   "status": "設計中",
-  "source": "world/scene/construction/town.ts",
+  "source": "apps/main/world/scene/construction/town.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "site": {
@@ -34,17 +34,17 @@
     "resident-カール",
     "resident-ヴァルター",
     "resident-ゴットフリート",
-    "resident-ギュンター",
+    "resident-アルノルト",
     "building-h5",
     "resident-アンナ"
   ],
   "entrance_review": {
     "status": "proposed",
     "scope": "existing_permanent_opening",
-    "opening_source": "world/town/get-pasture-fence.ts",
-    "rail_source": "world/scene/construction/fences.ts",
-    "stock_source": "world/town/animals.ts",
-    "radius_source": "world/town/fence-gap-radius.ts"
+    "opening_source": "apps/main/world/town/get-pasture-fence.ts",
+    "rail_source": "apps/main/world/scene/construction/fences.ts",
+    "stock_source": "apps/main/world/town/animals.ts",
+    "radius_source": "apps/main/world/town/fence-gap-radius.ts"
   },
   "stock_lock": {
     "status": "proposed",
@@ -117,7 +117,7 @@
               "role": "timber"
             },
             {
-              "resident": "resident-ギュンター",
+              "resident": "resident-アルノルト",
               "role": "iron_fittings"
             }
           ]
@@ -149,7 +149,7 @@
               "role": "timber"
             },
             {
-              "resident": "resident-ギュンター",
+              "resident": "resident-アルノルト",
               "role": "iron_fittings"
             }
           ]
@@ -557,7 +557,7 @@ D....................D
 
 内門が前室の外へ開く範囲は pasture_side に有限の矩形で予約する。前室の東の縁へ接するが、敷地へは未割当であり、実際の牧草地のどこまでも空いた草地を仮定しない。枠と板の平面の干渉だけでは、板の下端と地面・高さと荷重、押す人と引く人・羊の外形、通行と待機・掛金の操作、取っ手と身体の接続を検証済みとしない。現行の描画へは採用しない。
 
-木部は [[resident-ゴットフリート]]、蝶番と掛金・補強の金具は [[resident-ギュンター]] へ製作を頼む案とし、農家が所有してカールとヴァルターが手入れする。現物の木材・鉄と量、加工と接合・納期と費用、重さと支柱・地面の支持は未確定であり、手元に完成品があるとは扱わない。
+木部は [[resident-ゴットフリート]]、蝶番と掛金・補強の金具は [[resident-アルノルト]] へ製作を頼む案とし、農家が所有してカールとヴァルターが手入れする。現物の木材・鉄と量、加工と接合・納期と費用、重さと支柱・地面の支持は未確定であり、手元に完成品があるとは扱わない。
 
 
 ## 開き切った一方の門を通る身体の経路
@@ -601,7 +601,7 @@ stock_lock_site は局所の格子を縮めずに町へ投影する候補の原�
 
 stock_lock_site.waiting はカールが門を操作する間だけ羊が待つ位置の案であり、個体ごとの恒久的な囲いや普段の放牧範囲ではない。現行の羊を一頭も除かず、牧草地の北西を原点とするメートルの位置へ一度ずつ割り当てる。羊の頭を含む身体の円と宣言した余地を柵の内側へ収め、前室と両側の操作床・他の羊の身体から離す。中心だけを空いた点へ置いたことを収容の成立としない。
 
-身体の寸法は `world/town/sheep-shape.ts` と現行の各個体の scale、草を食べる傾きは `world/town/livestock-graze-pitch.ts` を正とする。羊の描画も同じ寸法を使う。胴だけの半径で頭・目・脚を消さず、あらゆる向きと直立から草を食べる間の傾きについて水平の占有を求める。地図のタイルと局所のメートルは別の単位として照合する。
+身体の寸法は `apps/main/world/town/sheep-shape.ts` と現行の各個体の scale、草を食べる傾きは `apps/main/world/town/livestock-graze-pitch.ts` を正とする。羊の描画も同じ寸法を使う。胴だけの半径で頭・目・脚を消さず、あらゆる向きと直立から草を食べる間の傾きについて水平の占有を求める。地図のタイルと局所のメートルは別の単位として照合する。
 
 これは全頭がその位置に静止しているという条件での平面の余地の案である。そこへ集める経路と順序、餌や道具・人の待機、羊がその場に留まる理由と観測・誘導は未設計である。arrival_status と behaviour_status、敷地の stock_motion_status は unreviewed を保つ。所在の記録で全頭が牧草地にいることと、この待機の状態を実際に確認できることは別である。確認できないまま外門を開く実装にはしない。
 

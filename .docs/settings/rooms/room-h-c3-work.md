@@ -2,7 +2,7 @@
 {
   "id": "room-h-c3-work",
   "kind": "rooms",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "town": "town-phanthiet",
   "building": "building-h-c3",
   "bed_capacity": 0,
@@ -337,4 +337,4 @@
 
 ## 籠と材料の形
 
-柳の束はエマの世帯が川べりから採った材料で、同じ向きに揃えた枝を二か所で束ねる。編みかけの籠は編み終えた底と低い側面、その先に残る縦の芯を持ち、完成品や木箱と区別する。材料と作業は `world/town/lines/households/baskets.ts` に対応する。元の家具の描画を直し、新しい平面の採用と湿し場の検証は別に残す。
+柳の束はエマの世帯が川べりから採った材料で、同じ向きに揃えた枝を二か所で束ねる。編みかけの籠は編み終えた底と低い側面、その先に残る縦の芯を持ち、完成品や木箱と区別する。材料と作業は `apps/main/world/town/lines/households/baskets.ts` に対応する。元の家具の描画を直し、新しい平面の採用と湿し場の検証は別に残す。

@@ -4,7 +4,7 @@
   "kind": "maps",
   "title": "ファンティエット ― 商店通り",
   "status": "現状整理",
-  "source": "world/maps/index.ts",
+  "source": "apps/main/world/maps/index.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "map_id": "phanthiet-market",

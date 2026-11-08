@@ -4,7 +4,7 @@
   "kind": "rooms",
   "title": "門の詰所／1階 四人の食事と休息",
   "status": "設計中",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "building": "building-guardhouse",
@@ -441,7 +441,7 @@
   },
   "meal_service": {
     "mode": "staggered",
-    "routine_source": "world/town/routines.ts"
+    "routine_source": "apps/main/world/town/routines.ts"
   }
 }
 ---

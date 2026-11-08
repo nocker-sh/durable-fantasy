@@ -6,7 +6,7 @@ import { chromium } from "playwright-core"
 import { HOUSES } from "#/world/town/houses"
 import { floorPlan } from "#/world/town/floorplan/floor-plan"
 
-const base = process.env.BASE ?? "https://durable-fantasy.localhost"
+const base = process.env.BASE ?? "https://dev.durable-fantasy.localhost"
 const out = process.argv[2] ?? "public/tmp/interiors"
 mkdirSync(out, { recursive: true })
 const browser = await chromium.launch({ channel: "chrome", args: ["--disable-http2"] })
@@ -16,7 +16,7 @@ try {
   const errors: string[] = []
   page.on("pageerror", (error) => errors.push(error.message))
   for (const house of HOUSES) {
-    await page.goto(`${base}/dev/houses/${encodeURIComponent(house.id)}`, { waitUntil: "domcontentloaded" })
+    await page.goto(`${base}/houses/${encodeURIComponent(house.id)}`, { waitUntil: "domcontentloaded" })
     const selector = page.getByLabel("室内の階")
     await selector.waitFor({ timeout: 60_000 })
     for (let floor = 0; floor < floorPlan(house.id).floors; floor++) {

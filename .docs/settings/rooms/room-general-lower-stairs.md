@@ -3,7 +3,7 @@
   "id": "room-general-lower-stairs",
   "kind": "rooms",
   "title": "ブルーノの道具屋／1階 店主の階段",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "town": "town-phanthiet",
   "building": "building-general",
   "bed_capacity": 0,

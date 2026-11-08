@@ -2,17 +2,17 @@
 {
   "id": "room-smithy-2",
   "kind": "rooms",
-  "title": "ギュンターの鍛冶場／2階 ギュンターの部屋",
+  "title": "アルノルトの鍛冶場／2階 アルノルトの部屋",
   "status": "設計中",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "building": "building-smithy",
   "floor": 1,
-  "room_name": "ギュンターの部屋",
+  "room_name": "アルノルトの部屋",
   "use": "寝",
   "occupants": [
-    "ギュンター"
+    "アルノルト"
   ],
   "bed_capacity": 1,
   "grid": {
@@ -52,8 +52,8 @@
     {
       "symbol": "B",
       "name": "個別の寝台",
-      "owner": "ギュンター",
-      "source": "町の木工所で寝台を作り、寝具は仕立屋へ頼む案。ギュンターが手入れする案",
+      "owner": "アルノルト",
+      "source": "町の木工所で寝台を作り、寝具は仕立屋へ頼む案。アルノルトが手入れする案",
       "rect": [
         1,
         1,
@@ -79,14 +79,14 @@
       ],
       "role": "bed",
       "maintainers": [
-        "resident-ギュンター"
+        "resident-アルノルト"
       ]
     },
     {
       "symbol": "L",
       "name": "個人の衣服箱",
-      "owner": "ギュンター",
-      "source": "町の木工所と鍛冶場へ用途に合う木部と金具の製作を頼む案。ギュンターが手入れする案",
+      "owner": "アルノルト",
+      "source": "町の木工所と鍛冶場へ用途に合う木部と金具の製作を頼む案。アルノルトが手入れする案",
       "rect": [
         1,
         8,
@@ -112,7 +112,7 @@
       ],
       "role": "storage",
       "maintainers": [
-        "resident-ギュンター"
+        "resident-アルノルト"
       ]
     }
   ],
@@ -123,7 +123,7 @@
   "sleeping_places": [
     {
       "id": "bed-smithy-2-1",
-      "resident": "resident-ギュンター",
+      "resident": "resident-アルノルト",
       "kind": "個別寝台",
       "grid_symbol": "B",
       "storage_status": "専用の衣服箱を配置。容量と開閉は未照合",
@@ -134,12 +134,12 @@
   "guest_capacity": 0,
   "design_dependencies": [
     "building-smithy",
-    "resident-ギュンター"
+    "resident-アルノルト"
   ],
   "personal_storage": [
     {
       "id": "storage-smithy-2-1",
-      "resident": "resident-ギュンター",
+      "resident": "resident-アルノルト",
       "contents": [
         "衣服",
         "首巻き",
@@ -154,19 +154,19 @@
     0
   ],
   "private_for": [
-    "resident-ギュンター"
+    "resident-アルノルト"
   ]
 }
 ---
-# ギュンターの鍛冶場／2階 ギュンターの部屋
+# アルノルトの鍛冶場／2階 アルノルトの部屋
 
 ## 用途と暮らし
 
-[[building-smithy]] の平面案に属する。ギュンターの寝台と衣服箱を持ち、共用階段から専用の戸で入る。熱い加工品と炭、見習いの私物を寝具の場所へ混ぜない。
+[[building-smithy]] の平面案に属する。アルノルトの寝台と衣服箱を持ち、共用階段から専用の戸で入る。熱い加工品と炭、見習いの私物を寝具の場所へ混ぜない。
 
 ## 現行との差と未解決の条件
 
-現行の描画は奥の相部屋をやめ、上階にギュンターとペーターの個室を分けた（ペーターは子どもの寝台）。地上の家庭の区画はまだ鍛冶場と分けておらず、その区画と日課は切替済みとはしない。建物の敷地、火と煙・灰と家庭の分離、戸の開閉と視線・音、衣服と寝具の手入れ、体の高さと姿勢を引き続き照合する。
+現行の描画は奥の相部屋をやめ、上階にアルノルトとペーターの個室を分けた（ペーターは子どもの寝台）。地上の家庭の区画はまだ鍛冶場と分けておらず、その区画と日課は切替済みとはしない。建物の敷地、火と煙・灰と家庭の分離、戸の開閉と視線・音、衣服と寝具の手入れ、体の高さと姿勢を引き続き照合する。
 
 ```grid
 #############
