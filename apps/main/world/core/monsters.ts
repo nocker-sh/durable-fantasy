@@ -166,7 +166,7 @@ const many = (inputProps: { map: string; kind: Spawn["kind"]; n: number; area: S
 export const SPAWNS: readonly Spawn[] = [
   // the east slimes keep to their own patch (map-south-meadow「meadow-slime-east」), apart from the blue slimes' damp hollow,
   // so a newcomer clicking the nearest slime does not walk into a fight the starting stick cannot win
-  ...many({ map: "south-meadow", kind: "slime", n: 6, area: [28, 28, 35, 36] }),
+  ...many({ map: "south-meadow", kind: "slime", n: 6, area: [28, 28, 36, 36] }),
   ...many({ map: "south-meadow", kind: "slime", n: 4, area: [8, 24, 20, 36], from: 6 }),
   ...many({ map: "south-meadow", kind: "blue-slime", n: 2, area: [35, 33, 43, 41] }),
   ...many({ map: "south-meadow", kind: "hare", n: 4, area: [28, 12, 42, 26] }),

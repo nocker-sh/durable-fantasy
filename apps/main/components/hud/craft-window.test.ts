@@ -74,7 +74,8 @@ it.each(RECIPES.filter((recipe) => recipe.min <= LIFE_CAP))("$id: real craft out
     const result = apply(scenario.state, { type: "craft", recipe: recipe.id, station: station.id, roll: 0.5 })
     expect(result.ok ? null : result.reason, scenario.label).toBe(scenario.reason)
     if (scenario.reason) {
-      expect(button, scenario.label).toContain(`title="${REASON_TEXT[scenario.reason]}"`)
+      // the reason the window gives (its tooltip and the button's accessible description) is the rule's reason
+      expect(button, scenario.label).toContain(`aria-description="${REASON_TEXT[scenario.reason]}"`)
       expect(result).toEqual({ ok: false, reason: scenario.reason })
     }
     expect(scenario.state).toEqual(before)

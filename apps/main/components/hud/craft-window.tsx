@@ -82,7 +82,7 @@ export function CraftWindow() {
               {reason ? (
                 <Tooltip>
                   <TooltipTrigger render={<span tabIndex={0} />}>
-                    <Button variant="primary" size="sm" disabled>
+                    <Button variant="primary" size="sm" disabled aria-description={REASON_TEXT[reason]}>
                       作る
                     </Button>
                   </TooltipTrigger>

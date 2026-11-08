@@ -94,7 +94,7 @@ export function CommissionWindow() {
               {reason ? (
                 <Tooltip>
                   <TooltipTrigger render={<span tabIndex={0} />}>
-                    <Button variant="primary" size="sm" disabled>
+                    <Button variant="primary" size="sm" disabled aria-description={REASON_TEXT[reason]}>
                       頼む
                     </Button>
                   </TooltipTrigger>
