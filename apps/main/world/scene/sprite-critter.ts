@@ -54,6 +54,10 @@ export class SpriteCritter implements Critter {
     this.sprite.material.map = this.frames[0]
     Object.freeze(this)
   }
+  /** Every frame texture: the scene tree reaches only the one on screen when the map is left. */
+  dispose() {
+    for (const frame of this.frames) frame.dispose()
+  }
   update(dt: number, camRight: THREE.Vector3) {
     const dx = this.state.target[0] - this.state.pos[0],
       dz = this.state.target[1] - this.state.pos[1],

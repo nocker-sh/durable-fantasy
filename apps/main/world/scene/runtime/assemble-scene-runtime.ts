@@ -89,6 +89,9 @@ export async function assembleSceneRuntime(props: SceneBuildProps & { resources:
     terrain = groundCanvasSource.terrain
   const town = createSceneTown({ scene, world })
   spawnAnimals(scene, map)
+  resources.defer(() => {
+    for (const critter of critters) critter.dispose?.()
+  })
 
   const environment = createSceneEnvironment(scene, resources)
   const peopleSource = await createScenePopulation({ scene: scene, map: map, world: world, progress: progress, tick: tick, own: (person) => resources.use(person.fig) }),

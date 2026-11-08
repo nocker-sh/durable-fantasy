@@ -31,3 +31,11 @@ it("holds the central region still and follows a turn around the same focus", ()
   expect(camera.camera.position.x).toBeGreaterThan(0)
   expect(camera.camera.position.z).toBeCloseTo(0)
 })
+
+it.each([1.5, Number.NaN, -3, 99])("keeps a usable zoom level for a level read from a query (%s)", (level) => {
+  const camera = new PixelCamera({ position: new THREE.Vector3(0, 0, 0), pitch: 0.82, pixelsPerUnit: 48, onResize: () => {}, level })
+  camera.resize(800, 600)
+  expect(Number.isInteger(camera.zoomLevel().level)).toBe(true)
+  expect(Number.isFinite(camera.distance)).toBe(true)
+  expect(camera.scale).toBeGreaterThan(0)
+})

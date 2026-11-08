@@ -27,6 +27,9 @@ export function keepPrograms(renderer: WebGLRenderer): void {
   for (const program of renderer.info.programs ?? []) {
     if (count >= KEPT_PROGRAMS) break
     if (kept.has(program)) continue
+    // shader materials are made afresh for each map and three.js renumbers their shader stages, so their programs never
+    // match again; their cache key starts with those stage numbers, where a built-in material's starts with its shader id
+    if (/^\d/.test(program.cacheKey)) continue
     kept.add(program)
     count++
     // three.js destroys a program when its last material lets go; one extra use keeps it cached

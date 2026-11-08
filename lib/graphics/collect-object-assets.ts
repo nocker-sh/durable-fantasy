@@ -10,4 +10,6 @@ export function collectObjectAssets(object: Object3D, assets: Set<Disposable>): 
     for (const material of materials) collectMaterialAssets(material, assets)
   }
   if ("shadow" in object && isDisposable(object.shadow)) assets.add(object.shadow)
+  // an InstancedMesh owns its instance-matrix and colour buffers on the GPU; only its own dispose frees them
+  if ("isInstancedMesh" in object && object.isInstancedMesh && isDisposable(object)) assets.add(object)
 }
