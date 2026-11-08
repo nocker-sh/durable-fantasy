@@ -243,7 +243,7 @@ function SellPanel(inputProps2: { picked: number | null; onPick: (slot: number |
               size="sm"
               disabled={busy || !shopTakes(shop!, stack.item)}
               onClick={() => {
-                game.sell(picked!, Math.min(count, stack.count))
+                game.sell(picked!, Math.min(count, stack.count), stack)
                 if (Math.min(count, stack.count) === stack.count) onPick(null)
               }}
             >

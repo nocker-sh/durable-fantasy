@@ -115,16 +115,20 @@ export class PlayerActions {
 
   store(slot: number, count: number, expectedStack?: Stack) {
     const stack = this.target.session.state.get().player?.bag[slot]
-    if (!stack) return
     if (expectedStack && !sameStack(stack, expectedStack)) {
       this.target.notify(REASON_TEXT.ITEM_CHANGED, "bad")
       return
     }
+    if (!stack) return
     void this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "storage", seq, action: "store", index: slot, count, stack }))
   }
 
-  retrieve(index: number, count: number) {
+  retrieve(index: number, count: number, expectedStack?: Stack) {
     const stack = this.target.session.state.get().player?.storage[index]
+    if (expectedStack && !sameStack(stack, expectedStack)) {
+      this.target.notify(REASON_TEXT.ITEM_CHANGED, "bad")
+      return
+    }
     if (!stack) return
     void this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "storage", seq, action: "retrieve", index, count, stack }))
   }
@@ -158,14 +162,12 @@ export class PlayerActions {
     void this.target.run({ type: p.sitting ? "stand" : "sit" })
   }
 
-  sell(slot: number, count = 1) {
+  sell(slot: number, count = 1, expectedStack = this.target.session.state.get().player?.bag[slot] ?? undefined) {
     const shop = this.target.session.state.get().shop
-    const expectedStack = this.target.session.state.get().player?.bag[slot]
     if (shop && expectedStack) void this.target.run({ type: "sell", shop, slot, count, expectedStack }).then(() => this.target.lookAtShop())
   }
 
-  useSlot(slot: number) {
-    const stack = this.target.session.state.get().player?.bag[slot]
+  useSlot(slot: number, stack = this.target.session.state.get().player?.bag[slot] ?? undefined) {
     if (!stack) return
     if (ITEMS[stack.item].equip) void this.target.run({ type: "equip", slot, expectedStack: stack })
     else void this.target.run({ type: "use", slot, expectedStack: stack })

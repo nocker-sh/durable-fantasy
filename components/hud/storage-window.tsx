@@ -94,9 +94,9 @@ export function StorageWindow() {
               aria-label={lot ? `${displayName(lot.item, lot.by)} ×${lot.count}` : "空き"}
               onContextMenu={(e) => {
                 e.preventDefault()
-                if (lot && !busy) game.retrieve(index, lot.count)
+                if (lot && !busy) game.retrieve(index, lot.count, lot)
               }}
-              onDoubleClick={() => lot && !busy && game.retrieve(index, lot.count)}
+              onDoubleClick={() => lot && !busy && game.retrieve(index, lot.count, lot)}
             />
           </ItemTooltip>
         ))}
@@ -106,7 +106,7 @@ export function StorageWindow() {
           <>
             <span className="min-w-0 flex-1 truncate">{displayName(selected.item, selected.by)}</span>
             <Stepper value={amount} max={selected.count} onChange={setCount} />
-            <Button variant="primary" size="sm" disabled={busy || !preview?.ok} onClick={() => picked !== null && game.retrieve(picked, amount)}>
+            <Button variant="primary" size="sm" disabled={busy || !preview?.ok} onClick={() => picked !== null && selected && game.retrieve(picked, amount, selected)}>
               引き取る
             </Button>
           </>

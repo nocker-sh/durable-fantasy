@@ -79,12 +79,12 @@ export function InventoryWindow() {
               }}
               onDragLeave={() => setOver(null)}
               onDrop={drop(index)}
-              onDoubleClick={() => game.useSlot(index)}
+              onDoubleClick={() => stack && game.useSlot(index, stack)}
               onContextMenu={(e) => {
                 e.preventDefault()
                 if (stack && trade) {
                   if (!trade.mine.locked && !trade.lots.some((l) => l.slot === index)) game.offerTrade([...trade.lots, { slot: index, count: stack.count }], trade.mine.gold)
-                } else if (stack && storage) game.store(index, stack.count)
+                } else if (stack && storage) game.store(index, stack.count, stack)
                 else if (stack && shop) window.dispatchEvent(new CustomEvent("ui:sell-pick", { detail: index }))
                 else if (stack && ITEMS[stack.item].kind !== "key") setThrowing(index)
               }}
