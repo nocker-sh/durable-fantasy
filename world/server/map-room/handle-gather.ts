@@ -5,6 +5,7 @@ import { nodeOf } from "#/world/core/node-of"
 import type { Transition } from "#/world/core/transition"
 import type { Ctx, Message } from "#/world/server/map-room/context"
 import { near } from "#/world/server/map-room/near"
+import { notifyClient } from "#/world/server/map-room/notifications"
 
 /** Reserve shared resources before the player receives the authoritative gathering result. */
 export async function handleGather(roomCtx: Ctx, message: Message<"gather">): Promise<void> {
@@ -23,7 +24,12 @@ export async function handleGather(roomCtx: Ctx, message: Message<"gather">): Pr
     result = withoutKeys(leftSource, ["left"])
   // gathering gets them up; keep the room's posture with the saved one before answering
   if (result.ok) roomCtx.save({ sitting: result.state.sitting })
-  await answer(result)
-  if (left !== undefined) await ctx.room.broadcast({ type: "nodes", left: { [node.id]: left } })
+  const delivered = await notifyClient(answer(result))
+  if (left !== undefined) {
+    const notice = { type: "nodes" as const, left: { [node.id]: left } }
+    // The broadcaster also visits the requester; a failed socket must not stop its peers.
+    if (delivered) await ctx.room.broadcast(notice)
+    else await ctx.room.broadcast(notice, [ctx.connection.id])
+  }
   return
 }
