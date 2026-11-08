@@ -44,7 +44,7 @@ export function DialogueBox() {
         {text !== "" && (
           <button
             type="button"
-            onClick={() => game.advanceDialogue()}
+            onClick={() => game.advanceDialogue(dialogue)}
             className="relative block min-h-[88px] w-full cursor-pointer px-6 pt-6 pb-4 text-left font-body text-[15px] leading-7 text-text ui-text-shadow"
           >
             {text.slice(0, shown)}
@@ -58,7 +58,7 @@ export function DialogueBox() {
               <button
                 key={choice.label}
                 type="button"
-                onClick={() => game.choose(index)}
+                onClick={() => game.choose(index, dialogue)}
                 className="group flex cursor-pointer items-center gap-2.5 px-2 py-1 text-left font-body text-sm text-text hover:bg-white/5"
               >
                 <Kbd>{String(index + 1)}</Kbd>

@@ -21,6 +21,8 @@ import { menuFor } from "#/world/parts/menu-for"
 import { fullyShown } from "#/world/fully-shown"
 import type { GameContext } from "#/world/client/context"
 
+import type { Dialogue } from "#/world/state"
+
 export class DialogueActions {
   constructor(
     private readonly target: Pick<GameContext, "addChat" | "getScene" | "update" | "run" | "toggleWindow"> & { readonly session: Pick<GameSession, "state" | "socket" | "engaged" | "partyChat"> },
@@ -45,9 +47,9 @@ export class DialogueActions {
     this.target.session.socket?.send({ type: "say", text: said, shout })
   }
 
-  advanceDialogue() {
+  advanceDialogue(expectedDialogue?: Dialogue) {
     const dialogue = this.target.session.state.get().dialogue
-    if (!dialogue) return
+    if (!dialogue || (expectedDialogue !== undefined && dialogue !== expectedDialogue)) return
     if (!fullyShown(dialogue)) {
       this.target.update({ dialogue: { ...dialogue, shownAt: 0 } })
       return
@@ -58,9 +60,10 @@ export class DialogueActions {
     }
   }
 
-  choose(index: number) {
+  choose(index: number, expectedDialogue?: Dialogue) {
     const dialogue = this.target.session.state.get().dialogue
     const choice = dialogue?.choices[index]
+    if (expectedDialogue !== undefined && dialogue !== expectedDialogue) return
     if (!dialogue || !choice || dialogue.page < dialogue.pages.length - 1 || !fullyShown(dialogue)) return
     const errand = choice.errand ? errandOf(choice.errand) : undefined
     if (choice.action === "errand-ask" && errand) {
