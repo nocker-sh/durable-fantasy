@@ -18,7 +18,17 @@ export type AttackRequestContext = Readonly<
   }
 >
 
-export type PreparedMapAttack = Readonly<{ owner: string; playerId: string; spawn: Spawn; now: number; delay: number; data: Pick<PlayerState, "party" | "level">; life: number; defense: Fighter; blow: Swing }>
+export type PreparedMapAttack = Readonly<{
+  owner: string
+  playerId: string
+  spawn: Spawn
+  now: number
+  delay: number
+  data: Pick<PlayerState, "party" | "level">
+  life: number
+  defense: Fighter
+  blow: Swing
+}>
 
 export type MapStrikePublication = Readonly<{
   room: AttackRequestContext

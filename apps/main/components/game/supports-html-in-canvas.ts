@@ -9,9 +9,6 @@ export function supportsHtmlInCanvas(): boolean {
   const canvas = document.createElement("canvas") as DrawableCanvas
   canvas.setAttribute("content", "drawable")
   return (
-    canvas.content === "drawable" &&
-    typeof canvas.updateElementGeometry === "function" &&
-    typeof canvas.getElementTransform === "function" &&
-    "drawElementImage" in CanvasRenderingContext2D.prototype
+    canvas.content === "drawable" && typeof canvas.updateElementGeometry === "function" && typeof canvas.getElementTransform === "function" && "drawElementImage" in CanvasRenderingContext2D.prototype
   )
 }

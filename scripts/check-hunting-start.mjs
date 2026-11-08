@@ -47,7 +47,16 @@ try {
   await createCharacter(page)
   const before = await page.evaluate(() => ({ gold: game.state.get().player.gold, level: game.state.get().player.level, points: game.state.get().player.statPoints }))
   await page.evaluate(async (build) => {
-    const requirements = build === "sword" ? [["str", 8], ["dex", 7]] : [["mnd", 7], ["int", 9]]
+    const requirements =
+      build === "sword"
+        ? [
+            ["str", 8],
+            ["dex", 7],
+          ]
+        : [
+            ["mnd", 7],
+            ["int", 9],
+          ]
     for (const [stat, target] of requirements) while (game.state.get().player.stats[stat] < target) if (!(await game.run({ type: "raise", stat }))) throw Error("Starting points refused")
   }, build)
   await walkToMap(page, workplace.map)
@@ -71,28 +80,42 @@ try {
   const bought = await page.evaluate(() => ({ gold: game.state.get().player.gold, bag: game.state.get().player.bag }))
   if (!(bought.gold >= 0 && bought.gold < before.gold)) throw Error("Purchase did not use original funds")
   await page.screenshot({ path: `${output}/purchase.png` })
-  await page.evaluate(async ({ weapon, skill }) => {
-    game.closeShop()
-    const slot = game.state.get().player.bag.findIndex((entry) => entry?.item === weapon)
-    if (!(await game.run({ type: "equip", slot }))) throw Error("Purchased weapon could not be equipped")
-    if (!(await game.run({ type: "hotbar", index: 3, item: "skill:" + skill }))) throw Error("Starting skill could not be bound")
-    if (game.state.get().windows.includes("inventory")) game.toggleWindow("inventory")
-  }, { weapon, skill })
+  await page.evaluate(
+    async ({ weapon, skill }) => {
+      game.closeShop()
+      const slot = game.state.get().player.bag.findIndex((entry) => entry?.item === weapon)
+      if (!(await game.run({ type: "equip", slot }))) throw Error("Purchased weapon could not be equipped")
+      if (!(await game.run({ type: "hotbar", index: 3, item: "skill:" + skill }))) throw Error("Starting skill could not be bound")
+      if (game.state.get().windows.includes("inventory")) game.toggleWindow("inventory")
+    },
+    { weapon, skill },
+  )
   await walkToMap(page, "south-meadow")
-  if (jitter) await page.evaluate((delay) => {
-    const socket = game.session.socket
-    const original = socket.send.bind(socket)
-    let delayed = false
-    socket.send = (message) => {
-      if (!delayed && message.type === "attack" && !message.art) {
-        delayed = true
-        setTimeout(() => original(message), delay)
-      } else original(message)
-    }
-  }, jitter)
+  if (jitter)
+    await page.evaluate((delay) => {
+      const socket = game.session.socket
+      const original = socket.send.bind(socket)
+      let delayed = false
+      socket.send = (message) => {
+        if (!delayed && message.type === "attack" && !message.art) {
+          delayed = true
+          setTimeout(() => original(message), delay)
+        } else original(message)
+      }
+    }, jitter)
   console.log("selecting first opponent")
   const target = await selectHuntingTarget(page, "blue-slime")
-  console.log("selected", target, await page.evaluate(() => ({ fighting: game.session.fighting, art: game.session.art, typing: game.state.get().typing, hotbar: game.state.get().player.hotbar, focus: document.activeElement?.tagName })))
+  console.log(
+    "selected",
+    target,
+    await page.evaluate(() => ({
+      fighting: game.session.fighting,
+      art: game.session.art,
+      typing: game.state.get().typing,
+      hotbar: game.state.get().player.hotbar,
+      focus: document.activeElement?.tagName,
+    })),
+  )
   await page.keyboard.press("4")
   console.log("skill key", await page.evaluate(() => ({ fighting: game.session.fighting, art: game.session.art, ready: game.state.get().player.ready, focus: document.activeElement?.tagName })))
   await page.waitForFunction((id) => game.state.get().player.ready[id] > 0, skill, { timeout: 15000 })

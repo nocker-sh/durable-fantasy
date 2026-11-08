@@ -29,7 +29,13 @@ describe("a full bag refuses before the roll", () => {
     const base = player({ name: "エルナ" })
     const inputs = bagWith(...recipe.inputs.map((input): [ItemId, number] => [input.item, input.count + 1]))
     const stacked = addItem({ bag: inputs, item: recipe.output.item, count: 1, mark: { q: 2, by: "エルナ" } })!
-    const state = { ...base, gold: station.fee * 3, stats: { ...base.stats, str: 40 }, life: { ...base.life, [recipe.skill]: lifeThresholds[recipe.min] }, bag: fill(stacked, [recipe.output.item, ...recipe.inputs.map((input) => input.item)]) }
+    const state = {
+      ...base,
+      gold: station.fee * 3,
+      stats: { ...base.stats, str: 40 },
+      life: { ...base.life, [recipe.skill]: lifeThresholds[recipe.min] },
+      bag: fill(stacked, [recipe.output.item, ...recipe.inputs.map((input) => input.item)]),
+    }
     const results = ROLLS.map((roll) => apply(state, { type: "craft", recipe: recipe.id, station: station.id, roll }))
     expect(new Set(results.map((result) => JSON.stringify(result)))).toEqual(new Set([JSON.stringify({ ok: false, reason: "BAG_FULL" })]))
   })
@@ -40,7 +46,13 @@ describe("a full bag refuses before the roll", () => {
     const open = openYields(node, lifeLevel(base.life[node.skill]))
     const kept = open[open.length - 1].item
     const stacked = addItem({ bag: emptyBag(), item: kept, count: 1, mark: ITEMS[kept].made ? { q: 1, by: "エルナ" } : undefined })!
-    const state = { ...base, bag: fill(stacked, open.map((yielded) => yielded.item)) }
+    const state = {
+      ...base,
+      bag: fill(
+        stacked,
+        open.map((yielded) => yielded.item),
+      ),
+    }
     const results = ROLLS.map((roll) => apply(state, { type: "gather", node: node.id, roll }))
     expect(new Set(results.map((result) => JSON.stringify(result)))).toEqual(new Set([JSON.stringify({ ok: false, reason: "BAG_FULL" })]))
   })

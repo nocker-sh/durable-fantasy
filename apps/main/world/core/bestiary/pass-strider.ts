@@ -21,7 +21,10 @@ export const draft: MonsterDraft = {
       { item: "sharp-fang", chance: 0.4 },
     ],
     model: {
-      id: "trex", length: 1.7, axis: "y", reach: 1.3,
+      id: "trex",
+      length: 1.7,
+      axis: "y",
+      reach: 1.3,
       palette: { hide: 0x6a5e4a, dark: 0x3e3628, accent: 0x857258, belly: 0x9a8a6a, bone: 0xd8ccb0, eye: 0x1a1420 },
       blocks: [
         { bone: "Spine_1", shape: "box", size: [0.6, 0.56, 0.7], at: [0, 0.8, 0.217], turn: [-0.3, 0, 0], paint: "hide" },

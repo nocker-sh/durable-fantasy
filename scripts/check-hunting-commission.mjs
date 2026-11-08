@@ -16,7 +16,10 @@ try {
     const response = await fetch("/api/player/hunting-fixture", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ level: 12, build: "sword" }) })
     if (!response.ok) throw Error("Fixture refused")
     // Explicit test inputs. Their acquisition is checked in ordinary battle and dependency tests.
-    for (const [item, count] of [["hardened-scrap", 4], ["charcoal", 2]]) {
+    for (const [item, count] of [
+      ["hardened-scrap", 4],
+      ["charcoal", 2],
+    ]) {
       const given = await fetch("/api/player/give", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: game.debugInfo().playerId, item, count }) })
       if (!given.ok) throw Error("Fixture material grant refused")
     }
@@ -46,7 +49,10 @@ try {
   const ordered = await page.evaluate(() => ({ gold: game.state.get().player.gold, orders: game.state.get().player.orders, bag: game.state.get().player.bag }))
   if (ordered.gold >= before.gold) throw Error("No commission payment")
   if (ordered.bag.some((slot) => slot?.item === "iron-sword" || slot?.item === "hardened-scrap")) throw Error("Commission did not consume its materials")
-  console.log("ordered with real payment; waiting for craftsman", ordered.orders.map((order) => ({ commission: order.commission, seconds: Math.ceil((order.readyAt - Date.now()) / 1000) })))
+  console.log(
+    "ordered with real payment; waiting for craftsman",
+    ordered.orders.map((order) => ({ commission: order.commission, seconds: Math.ceil((order.readyAt - Date.now()) / 1000) })),
+  )
   await page.screenshot({ path: `${output}/ordered.png` })
   await page.waitForFunction(() => game.state.get().player.orders.some((order) => order.commission === "hunting-reinforced-sword" && order.readyAt <= Date.now()), null, { timeout: 200000 })
   await page.getByRole("button", { name: "受け取る", exact: true }).click()

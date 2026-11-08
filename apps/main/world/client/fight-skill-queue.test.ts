@@ -9,7 +9,10 @@ import { emptyEquipment } from "#/world/core/empty-equipment"
 import { player } from "#/world/test/player"
 import type { VoidSocket } from "void/ws"
 
-afterEach(() => { vi.restoreAllMocks(); vi.useRealTimers() })
+afterEach(() => {
+  vi.restoreAllMocks()
+  vi.useRealTimers()
+})
 
 it("delivers one keypress on a later swing when network jitter made its first attempt too early", () => {
   vi.useFakeTimers()
@@ -37,10 +40,20 @@ it("delivers one keypress on a later swing when network jitter made its first at
   const paid = apply(hunter, { type: "art", skill: "ember" }, { now: Date.now() })
   if (!paid.ok) throw Error(paid.reason)
   const messages = new ServerMessages({
-    session, getScene: () => null, report: vi.fn(),
-    addChat: vi.fn(), avatarOf: vi.fn(), connect: vi.fn(), enterMap: vi.fn(),
-    maybeReady: vi.fn(), notify: vi.fn(), standBy: vi.fn(), toggleWindow: vi.fn(),
-    update: vi.fn(), visitTown: vi.fn(), wayBeside: vi.fn(),
+    session,
+    getScene: () => null,
+    report: vi.fn(),
+    addChat: vi.fn(),
+    avatarOf: vi.fn(),
+    connect: vi.fn(),
+    enterMap: vi.fn(),
+    maybeReady: vi.fn(),
+    notify: vi.fn(),
+    standBy: vi.fn(),
+    toggleWindow: vi.fn(),
+    update: vi.fn(),
+    visitTown: vi.fn(),
+    wayBeside: vi.fn(),
     setPlayer: (state) => session.state.set((s) => ({ ...s, player: state })),
   })
   messages.handle({ type: "result", seq: -1, result: paid })

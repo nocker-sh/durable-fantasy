@@ -20,7 +20,10 @@ export const draft: MonsterDraft = {
       { item: "hard-shell", chance: 0.3 },
     ],
     model: {
-      id: "spider", length: 1.1, axis: "x", reach: 0.66,
+      id: "spider",
+      length: 1.1,
+      axis: "x",
+      reach: 0.66,
       palette: { hide: 0x4a3e34, dark: 0x2a2420, accent: 0x6e5c40, belly: 0x5e5040, bone: 0xd8c8a0, eye: 0xc8b070 },
       blocks: [
         { bone: "legs_anchor_1_l", to: "leg_a_1_l", width: 0.03, height: 0.03, paint: "hide" },

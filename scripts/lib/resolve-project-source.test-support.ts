@@ -3,7 +3,9 @@ import { readFileSync } from "node:fs"
 
 const root = process.cwd()
 const paths: Record<string, string[]> = JSON.parse(readFileSync(resolve(root, "tsconfig.json"), "utf8")).compilerOptions.paths
-const aliases = Object.entries(paths).filter(([pattern]) => pattern.endsWith("*")).sort(([a], [b]) => b.length - a.length)
+const aliases = Object.entries(paths)
+  .filter(([pattern]) => pattern.endsWith("*"))
+  .sort(([a], [b]) => b.length - a.length)
 
 /** Resolve source files and directories using the same aliases as the application. */
 export function resolveProjectSource(path: string): string {

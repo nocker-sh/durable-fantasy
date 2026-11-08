@@ -12,7 +12,9 @@ it("a commission takes the poorest of the made things it needs, keeping the bett
   const made = job.inputs.find((input) => ITEMS[input.item].made)!
   // the best copy last in the bag, where taking from the back would reach it first
   const steps = [
-    ...job.inputs.filter((input) => input !== made).map((input) => (bag: Bag) => addItem({ bag, item: input.item, count: input.count, mark: ITEMS[input.item].made ? { q: 1, by: "アルノルト" } : undefined })),
+    ...job.inputs
+      .filter((input) => input !== made)
+      .map((input) => (bag: Bag) => addItem({ bag, item: input.item, count: input.count, mark: ITEMS[input.item].made ? { q: 1, by: "アルノルト" } : undefined })),
     (bag: Bag) => addItem({ bag, item: made.item, count: made.count, mark: { q: 0, by: "アルノルト" } }),
     (bag: Bag) => addItem({ bag, item: made.item, count: made.count, mark: { q: 3, by: "アルノルト" } }),
   ]

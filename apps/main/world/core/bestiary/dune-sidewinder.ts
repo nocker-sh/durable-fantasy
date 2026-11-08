@@ -20,7 +20,10 @@ export const draft: MonsterDraft = {
       { item: "sharp-fang", chance: 0.35 },
     ],
     model: {
-      id: "snake", length: 2, axis: "z", reach: 1,
+      id: "snake",
+      length: 2,
+      axis: "z",
+      reach: 1,
       palette: { hide: 0xa08458, dark: 0x6a5034, accent: 0x8a6a48, belly: 0xc8b490, eye: 0x1a1420 },
       blocks: [
         { bone: "tail01", to: "tail02", width: 0.085, height: 0.062, paint: "hide", grow: 0.006 },

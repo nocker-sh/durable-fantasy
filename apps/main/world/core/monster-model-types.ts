@@ -7,7 +7,14 @@ import type { FigurePaint, FigurePalette, FigureShape } from "#/world/core/monst
 export type RigSpan = { bone: string; to: string; width: number; height: number; paint: FigurePaint; grow?: number }
 
 /** A block fixed to a bone where it stands in the rest pose: `at` and `turn` as in the rest pose, y = 0 the ground, +z the face. */
-export type RigPiece = { bone: string; shape: FigureShape; size: readonly [number, number, number]; at: readonly [number, number, number]; turn?: readonly [number, number, number]; paint: FigurePaint }
+export type RigPiece = {
+  bone: string
+  shape: FigureShape
+  size: readonly [number, number, number]
+  at: readonly [number, number, number]
+  turn?: readonly [number, number, number]
+  paint: FigurePaint
+}
 
 export type RigBlock = RigSpan | RigPiece
 
