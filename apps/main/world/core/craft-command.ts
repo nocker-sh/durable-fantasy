@@ -20,7 +20,10 @@ import type { Transition } from "#/world/core/transition"
 export function craft(state: PlayerState, command: Extract<ServerCommand, { type: "craft" }>): Transition {
   const prepared = prepareCraft(state, command)
   if (!prepared.ok) return prepared
-  const { recipe, station, skill, materials } = prepared
+  const recipe = prepared.recipe,
+    station = prepared.station,
+    skill = prepared.skill,
+    materials = prepared.materials
   const cost = STAMINA_PER_CRAFT
   const out = recipe.output
   // room for whichever quality comes out, before the roll: a full bag must not refuse only the unwanted results
