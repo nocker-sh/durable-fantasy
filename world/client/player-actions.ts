@@ -1,3 +1,5 @@
+import { sameCommissionOrders } from "#/world/core/same-commission-orders"
+import type { Order } from "#/world/core/commission-types"
 import { sameStack } from "#/world/core/same-stack"
 import type { Stack } from "#/world/core/bag-types"
 import { apply } from "#/world/core/apply"
@@ -70,8 +72,12 @@ export class PlayerActions {
     void this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "order", seq, commission }))
   }
 
-  collect(index: number) {
+  collect(index: number, expectedOrders?: readonly Order[]) {
     const orders = this.target.session.state.get().player?.orders
+    if (expectedOrders && (!orders || !sameCommissionOrders(orders, expectedOrders))) {
+      this.target.notify(REASON_TEXT.ORDER_CHANGED, "bad")
+      return
+    }
     if (!orders?.[index]) return
     void this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "collect", seq, index, orders }))
   }

@@ -55,7 +55,7 @@ export function CommissionWindow() {
                     </div>
                     <div className="font-head text-[11px] text-text-dim">{ready ? "できている" : `${formatTime(jstMinutes(o.readyAt))}ごろ（あと${Math.ceil((o.readyAt - now) / 60_000)}分）`}</div>
                   </div>
-                  <Button variant="primary" size="sm" disabled={!ready || busy} onClick={() => game.collect(index)}>
+                  <Button variant="primary" size="sm" disabled={!ready || busy} onClick={() => game.collect(index, player.orders)}>
                     受け取る
                   </Button>
                 </li>
