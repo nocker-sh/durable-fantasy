@@ -95,7 +95,24 @@ export const SHOPS = {
     greetings: { ヘレナ: "いらっしゃいませ。外へ出る支度でしたら、ひと通り揃っています。" },
     // a traveller's first weapon, tools and fuel, taken in from the smithy, the woodworker and the charcoal burner, so
     // something to start with is on sale while those counters sleep through the day (economy.md「旅立ちの品」)
-    stock: ["potion", "ration", "porridge", "herb", "wooden-stick", "cloth-hat", "leather-boots", "traveller-coat", "dagger", "short-sword", "oak-staff", "wood-axe", "sickle", "fishing-rod", "firewood", "charcoal"],
+    stock: [
+      "potion",
+      "ration",
+      "porridge",
+      "herb",
+      "wooden-stick",
+      "cloth-hat",
+      "leather-boots",
+      "traveller-coat",
+      "dagger",
+      "short-sword",
+      "oak-staff",
+      "wood-axe",
+      "sickle",
+      "fishing-rod",
+      "firewood",
+      "charcoal",
+    ],
     takes: ["lamp-oil"], // the guards' oil is kept behind the counter; what a traveller still carries is taken back
     makers: { potion: "ベネディクト", porridge: "ベネディクト" }, // the monk's, sold for the chapel
   },

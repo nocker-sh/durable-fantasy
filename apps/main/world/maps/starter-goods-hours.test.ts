@@ -20,6 +20,9 @@ it.each(["dagger", "short-sword", "oak-staff", "wood-axe", "sickle", "fishing-ro
 
 it.each(["firewood", "charcoal"] as const)("%s is never out of reach for more than half an hour", (item) => {
   const missing = unsold(item)
-  const longest = missing.reduce((run, minute, index) => (index > 0 && missing[index - 1] === minute - 30 ? { now: run.now + 30, most: Math.max(run.most, run.now + 30) } : { now: 30, most: Math.max(run.most, 30) }), { now: 0, most: 0 })
+  const longest = missing.reduce(
+    (run, minute, index) => (index > 0 && missing[index - 1] === minute - 30 ? { now: run.now + 30, most: Math.max(run.most, run.now + 30) } : { now: 30, most: Math.max(run.most, 30) }),
+    { now: 0, most: 0 },
+  )
   expect(longest.most, missing.map(clock).join(" ")).toBeLessThanOrEqual(30)
 })
