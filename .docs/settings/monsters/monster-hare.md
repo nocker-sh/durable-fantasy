@@ -10,7 +10,8 @@
   "habitats": [
     "map-south-meadow",
     "map-forest-edge",
-    "map-grass-highland"
+    "map-grass-highland",
+    "map-sea-cliff"
   ],
   "appearance": {
     "look": "hare",
@@ -54,6 +55,7 @@
     "map-south-meadow",
     "map-forest-edge",
     "map-grass-highland",
+    "map-sea-cliff",
     "resident-マグダレーナ",
     "resident-ルドルフ"
   ]
@@ -105,3 +107,7 @@ soft-fur は逃げるときに茂みへ残した冬毛のかたまり。[[reside
 ## 高原の草地
 
 [[map-grass-highland]] では、道から離れた北の草地で草を食べ、低い茂みの陰で休む。出現枠は道の北側の二か所に置き、峠へ向かう道と出口を塞がない。
+
+## 海辺の崖の上
+
+[[map-sea-cliff]] では、崖の上の潮風に強い草を食べ、低い茂みの陰で休む。出現枠は道の西の草地に置き、崖の縁と人の道を塞がない。

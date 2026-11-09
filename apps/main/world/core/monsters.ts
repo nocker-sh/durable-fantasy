@@ -187,6 +187,11 @@ export const SPAWNS: readonly Spawn[] = [
   ...many({ map: "salt-flats", kind: "sand-slime", n: 2, area: [36, 40, 39, 43], from: 2 }),
   ...many({ map: "lily-marsh", kind: "blue-slime", n: 2, area: [4, 8, 7, 11] }),
   ...many({ map: "lily-marsh", kind: "blue-slime", n: 2, area: [40, 8, 43, 11], from: 2 }),
+  // the falls valley's wet rocks west of the road, and the grass on top of the sea cliff
+  ...many({ map: "falls-valley", kind: "moss-slime", n: 1, area: [8, 20, 11, 23] }),
+  ...many({ map: "falls-valley", kind: "moss-slime", n: 1, area: [12, 32, 15, 35], from: 1 }),
+  ...many({ map: "sea-cliff", kind: "hare", n: 2, area: [8, 20, 11, 23] }),
+  ...many({ map: "sea-cliff", kind: "hare", n: 2, area: [8, 40, 11, 43], from: 2 }),
   // the highland's grass north of the road, clear of the road over the pass
   ...many({ map: "grass-highland", kind: "hare", n: 2, area: [10, 7, 13, 10] }),
   ...many({ map: "grass-highland", kind: "hare", n: 2, area: [37, 7, 40, 10], from: 2 }),

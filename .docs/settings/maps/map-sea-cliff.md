@@ -11,7 +11,9 @@
   "map_kind": "field",
   "buildings": [],
   "residents": [],
-  "monsters": [],
+  "monsters": [
+    "monster-hare"
+  ],
   "exits": [
     {
       "at": [
@@ -31,7 +33,16 @@
     "生活・物流の経路と出入口のグリッド照合未完了",
     "描画と通行判定の一致確認未完了"
   ],
-  "design_dependencies": []
+  "ecology_zones": [
+    {
+      "species": "monster-hare",
+      "feature": "崖の上の潮風に強い草地と低い茂みの陰",
+      "placement": null
+    }
+  ],
+  "design_dependencies": [
+    "monster-hare"
+  ]
 }
 ---
 
@@ -52,3 +63,7 @@
 ## 配置の設計条件
 
 入口、主な通路、作業と休憩の場所を先に配列で定義する。建物の外周と扉、荷の大きさ、人がすれ違う幅を合わせ、装飾を置いてから通路を残す順序にしない。灰・雨・煙・火・水の行き先を決める。現行の通行格子は現状の記録であり、生活の成立を承認した配置図ではない。
+
+## 生き物
+
+[[monster-hare]] は道の西の草地で草を食べ、茂みの陰で休む。生息条件は ecology_zones に記録し、placement が null の間は地形への割り当てを済ませた扱いにしない。

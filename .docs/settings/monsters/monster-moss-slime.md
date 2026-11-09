@@ -8,7 +8,8 @@
   "design_gate": "未通過",
   "species": "moss-slime",
   "habitats": [
-    "map-deep-forest"
+    "map-deep-forest",
+    "map-falls-valley"
   ],
   "appearance": {
     "look": "slime",
@@ -73,6 +74,7 @@
   },
   "design_dependencies": [
     "map-deep-forest",
+    "map-falls-valley",
     "resident-ゴットフリート",
     "resident-イルムガルト"
   ]
@@ -125,3 +127,7 @@ jelly は糊に使うほか、[[resident-イルムガルト]] の薬作りでつ
 ## 中盤の装備につながる材料
 
 倒木の根元から体表へ付いた樹脂を集めて [[resident-ゴットフリート]] へ持ち込める。まれな材料を少しずつ集め、強い個体へ挑む前にも装備の補強を準備できる。加工の条件は [[economy#狩りの材料から装備を更新する経路]] に従う。
+
+## 滝の谷
+
+[[map-falls-valley]] では、滝の飛沫で湿った岩陰の苔と、流れ着いて柔らかくなった落ち葉を食べ、苔の厚い岩の間で休む。出現枠は道から離れた西の岩陰に置き、谷を通る人の道と出口を塞がない。
