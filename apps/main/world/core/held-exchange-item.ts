@@ -5,7 +5,7 @@ import type { Order, Inbox } from "#/world/core/exchange-types"
 /** Refund stored orders without treating missing marks as newly made goods.
  * Older orders may predate an item's quality or use the former numeric symbol spelling.
  */
-export function heldExchangeItem(order: Order, count: number): Inbox["items"][number] {
+export function heldExchangeItem(order: Pick<Order, "symbol" | "by">, count: number): Inbox["items"][number] {
   const parts = order.symbol.split("@"),
     item = parts[0],
     qualityText = parts[1]
