@@ -4,7 +4,8 @@ import { createMonsterBody } from "#/world/scene/create-monster-body"
 import { MONSTER_KINDS } from "#/world/core/monsters"
 import { getMonsterBodyRadius } from "#/world/core/get-monster-body-radius"
 import { SLIME_MOVING_SQUASH, SLIME_RESTING_SQUASH } from "#/world/core/monster-body-shapes"
-it.each(Object.entries(MONSTER_KINDS))("bounds every rendered vertex of %s through its squash phases", (_name, kind) => {
+// creatures built from blocks load their rig at run time; their radius comes from the model length (monster-drafts.test.ts)
+it.each(Object.entries(MONSTER_KINDS).filter((entry) => entry[1].look !== "model"))("bounds every rendered vertex of %s through its squash phases", (_name, kind) => {
   const radius = getMonsterBodyRadius({ kind })
   if (radius instanceof Error) throw radius
   const body = createMonsterBody(kind)
