@@ -1,6 +1,6 @@
 import type { DialogueChoice } from "#/world/state"
 
-const SERVICES: readonly DialogueChoice["action"][] = ["shop", "commission", "storage"]
+const SERVICES: readonly DialogueChoice["action"][] = ["shop", "lodge", "commission", "storage"]
 
 /**
  * A resident who serves you now (shop, commission, storage) opens with what you can do instead of

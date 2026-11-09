@@ -38,7 +38,7 @@ export type ChatLine = {
 
 export type DialogueChoice = {
   label: string
-  action: "shop" | "commission" | "storage" | "talk" | "close" | "errand-ask" | "errand-take" | "errand-hand"
+  action: "shop" | "lodge" | "commission" | "storage" | "talk" | "close" | "errand-ask" | "errand-take" | "errand-hand"
   /** the errand a choice is about (core/errands.ts) */
   errand?: string
 }

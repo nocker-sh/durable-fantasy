@@ -122,6 +122,10 @@ export function tell(event: GameEvent, me: string | undefined): Told {
     notify(`${name(event.item, event.by)}を${event.count}個買った（${event.cost}G）。`, "good")
     return out
   }
+  if (event.type === "lodged") {
+    notify(`宿で休んだ（${event.cost}G）。`, "good")
+    return out
+  }
   if (event.type === "sold") {
     notify(`${name(event.item)}を${event.count}個売った（${event.gain}G）。`, "good")
     return out

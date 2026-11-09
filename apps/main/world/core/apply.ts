@@ -30,6 +30,7 @@ import type { ShopContext } from "#/world/core/shop-command-types"
 import { takeErrand } from "#/world/core/take-errand"
 import { handErrand } from "#/world/core/hand-errand"
 import { greet } from "#/world/core/greet"
+import { lodge } from "#/world/core/lodge"
 import { craft } from "#/world/core/craft-command"
 import { accept } from "#/world/core/accept"
 import { reject } from "#/world/core/reject"
@@ -100,6 +101,8 @@ function applyCommand(before: PlayerState, command: Command | ServerCommand, ctx
       return takeErrand(state, command, now)
     case "errand-hand":
       return handErrand(state, command, now)
+    case "lodge":
+      return lodge(state, command.shop)
     case "greet":
       return greet(state, command.to, now)
     case "escrow-sell": {

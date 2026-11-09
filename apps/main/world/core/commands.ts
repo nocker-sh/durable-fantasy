@@ -44,6 +44,8 @@ export const commandSchema = z.discriminatedUnion("type", [
     /** the price the buyer saw; refused if it moved */ price: z.number().int().min(1).optional(),
   }),
   z.object({ type: z.literal("sell"), shop: shopId, slot: slotIndex, count, expectedStack: stackSchema.optional() }),
+  /** a night's rest at an inn (core/lodge.ts) */
+  z.object({ type: z.literal("lodge"), shop: shopId }),
   z.object({ type: z.literal("use"), slot: slotIndex, expectedStack: stackSchema.optional() }),
   z.object({ type: z.literal("use-item"), item: itemId }),
   /** throw away some of one slot (not key items) */
@@ -125,7 +127,7 @@ export type ServerCommand =
   | { type: "art"; skill: SkillId }
 
 /** Commands that are only allowed next to a particular NPC (checked by the map room). */
-export const shopOf = (command: Command): ShopId | null => (command.type === "buy" || command.type === "sell" ? command.shop : null)
+export const shopOf = (command: Command): ShopId | null => (command.type === "buy" || command.type === "sell" || command.type === "lodge" ? command.shop : null)
 
 export type Reason =
   | "NOT_SOLD_HERE"
@@ -194,6 +196,7 @@ export type Reason =
 export type GameEvent =
   | { type: "bought"; item: ItemId; count: number; cost: number; by?: string }
   | { type: "sold"; item: ItemId; count: number; gain: number }
+  | { type: "lodged"; shop: ShopId; cost: number }
   | { type: "used"; item: ItemId; hp: number; sp: number; stamina: number; warm: number; focus?: number; by?: string }
   | { type: "tired"; stamina: number }
   | { type: "gathered"; item: ItemId; count: number; skill: GatherSkill; level: number; up: boolean; broke: ItemId | null }

@@ -110,6 +110,14 @@ export class DialogueActions {
       this.target.update({ dialogue: { ...dialogue, pages, page: 0, choices: choicesFor(this.target.session.state.get(), dialogue.name), shownAt: performance.now() } })
       return
     }
+    if (choice.action === "lodge") {
+      const min = this.target.session.state.get().clock.min
+      const shop = shopOfKeeper(dialogue.name, (id) => keeperPresent(id, dialogue.name, min))
+      if (!shop || !keeperPresent(shop, dialogue.name, min)) return this.offDuty(dialogue)
+      this.closeDialogue()
+      void this.target.run({ type: "lodge", shop })
+      return
+    }
     if (choice.action === "storage") {
       this.target.update({ dialogue: null, storage: true })
       this.syncEngaged()
