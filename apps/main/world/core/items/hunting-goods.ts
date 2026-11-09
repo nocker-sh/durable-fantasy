@@ -139,7 +139,7 @@ export const HUNTING_GOODS = {
     icon: "armor",
     weight: 170,
     rarity: "fine",
-    equip: { part: "body", def: 14, level: 12, needs: { str: 12, vit: 12 } },
+    equip: { part: "body", def: 12, level: 12, needs: { str: 12, vit: 12 } },
     description: "アルノルトが鎖帷子の胸と肩に厚い鉄片の板を綴じ付けた。",
   }),
   "reinforced-helm": craftedGear({
@@ -148,7 +148,7 @@ export const HUNTING_GOODS = {
     icon: "helm",
     weight: 65,
     rarity: "fine",
-    equip: { part: "head", def: 6, level: 12, needs: { str: 9 } },
+    equip: { part: "head", def: 5, level: 12, needs: { str: 9 } },
     description: "鉄兜の額と縁を厚い鉄片で打ち重ねた。",
   }),
   "resin-shield": craftedGear({
@@ -157,7 +157,7 @@ export const HUNTING_GOODS = {
     icon: "shield",
     weight: 55,
     rarity: "fine",
-    equip: { part: "shield", def: 5, level: 12 },
+    equip: { part: "shield", def: 4, level: 12 },
     description: "ゴットフリートが木の盾の板の継ぎ目を樹脂で固め、裏に板を一枚足した。",
   }),
   "forest-draught": brewedMedicine({
