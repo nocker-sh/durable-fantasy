@@ -55,6 +55,14 @@
         "resident-イルムガルト"
       ],
       "use": "既存の素材または狩りの装備の加工に使う。加工先はレシピの定義に従う"
+    },
+    {
+      "item": "old-cog",
+      "origin": "砂に埋もれた大戦の機械のそばを動いた際に体表へ噛み込んだ歯車",
+      "users": [
+        "resident-アルノルト"
+      ],
+      "use": "鍛冶屋が買い取り、町の機関の修理に回す。買取は apps/main/world/core/shops.ts"
     }
   ],
   "population": {

@@ -111,6 +111,7 @@ export const MONSTER_KINDS: Record<string, MonsterKind> = {
       { item: "hardened-scrap", chance: 0.8 },
       { item: "rusty-scrap", chance: 0.7 },
       { item: "herb", chance: 0.3 },
+      { item: "old-cog", chance: 0.05 },
     ],
   },
   "resin-slime": {

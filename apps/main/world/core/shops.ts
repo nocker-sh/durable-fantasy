@@ -54,7 +54,7 @@ export const SHOPS = {
     keepers: ["アルノルト"],
     greeting: "腕に合うのを選びな。",
     stock: ["wood-axe", "sickle", "dagger", "short-sword", "iron-sword", "hand-axe", "battle-axe", "spear", "mace", ...IRON_WEAPONS],
-    takes: ["rusty-scrap", "iron-ingot", "charcoal", "hardened-scrap"],
+    takes: ["rusty-scrap", "iron-ingot", "charcoal", "hardened-scrap", "old-cog"],
   },
   inn: {
     name: "ゲルダの宿",
