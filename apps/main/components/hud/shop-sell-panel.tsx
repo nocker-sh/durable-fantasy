@@ -49,11 +49,13 @@ export function ShopSellPanel(props: Props) {
               count={s?.count}
               dim={!!s && !shopTakes(shop!, s.item)}
               over={picked === index}
-              disabled={!s || !shopTakes(shop!, s.item)}
+              // not disabled, so hovering or focusing it still opens the tooltip that says why the shop will not take it
+              disabled={!s}
+              aria-disabled={!!s && !shopTakes(shop!, s.item)}
               aria-label={s ? displayName(s.item, s.by) : "空き"}
               aria-description={s && !shopTakes(shop!, s.item) ? REASON_TEXT.NOT_WANTED : undefined}
-              onClick={() => onPick(index)}
-              className="disabled:cursor-default"
+              onClick={() => s && shopTakes(shop!, s.item) && onPick(index)}
+              className="disabled:cursor-default aria-disabled:cursor-default"
             />
           </ItemTooltip>
         ))}
