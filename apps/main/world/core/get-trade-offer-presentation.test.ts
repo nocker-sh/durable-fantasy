@@ -52,3 +52,8 @@ it("only checks the accepted number of lots, retaining the existing wire limit",
   expect(presentation?.shown).toHaveLength(TRADE_LOTS)
   expect(lots).toHaveLength(TRADE_LOTS + 1)
 })
+
+it("does not put a new character's starting gold up for a trade", () => {
+  expect(getTradeOfferPresentation({ bag: [], gold: 200, allowance: 200 }, { lots: [], gold: 1 })).toBeNull()
+  expect(getTradeOfferPresentation({ bag: [], gold: 230, allowance: 200 }, { lots: [], gold: 30 })).not.toBeNull()
+})
