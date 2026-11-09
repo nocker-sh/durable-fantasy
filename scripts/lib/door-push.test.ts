@@ -18,7 +18,7 @@ const push = (): DoorPush => ({
     [70, 0.15],
     [80, 0.32],
     [90, 0.5],
-  ].map(([angle_deg, v]) => ({ angle_deg, body_m: [0.52, v] })),
+  ].map((entry1) => ({ angle_deg: entry1[0], body_m: [0.52, entry1[1]] })),
 })
 function hall() {
   const load = (kind: string, id: string) => readSetting(readFileSync(new URL(`../../.docs/settings/${kind}/${id}.md`, import.meta.url), "utf8"))

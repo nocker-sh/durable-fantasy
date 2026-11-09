@@ -10,7 +10,8 @@ const manifest = { rendererVersion: SPRITE_RENDER_VERSION, frame: [80, 96], resi
 it("shares a validated manifest across concurrent map entries", async () => {
   const fetcher = vi.fn(async () => Response.json(manifest))
   vi.stubGlobal("fetch", fetcher)
-  const { spriteManifest } = await import("./assets")
+  const parts1 = await import("./assets")
+  const spriteManifest = parts1.spriteManifest
   const first = spriteManifest(),
     second = spriteManifest()
   expect(first).toBe(second)
@@ -25,7 +26,8 @@ it("continues after an unavailable or corrupt optional manifest", async () => {
       "fetch",
       vi.fn(async () => response),
     )
-    const { spriteManifest } = await import("./assets")
+    const parts2 = await import("./assets")
+    const spriteManifest = parts2.spriteManifest
     expect(await spriteManifest()).toBeNull()
   }
 })
@@ -44,7 +46,8 @@ it("bounds fetch and JSON decoding, aborts the request, and does not restart it 
     })
   })
   vi.stubGlobal("fetch", fetcher)
-  const { spriteManifest } = await import("./assets")
+  const parts3 = await import("./assets")
+  const spriteManifest = parts3.spriteManifest
   const result = spriteManifest()
   await vi.advanceTimersByTimeAsync(5000)
   expect(await result).toBeNull()
@@ -60,7 +63,8 @@ it("also bounds a request that never returns headers", async () => {
     "fetch",
     vi.fn(() => new Promise(() => {})),
   )
-  const { spriteManifest } = await import("./assets")
+  const parts4 = await import("./assets")
+  const spriteManifest = parts4.spriteManifest
   const result = spriteManifest()
   await vi.advanceTimersByTimeAsync(5000)
   expect(await result).toBeNull()
@@ -72,7 +76,8 @@ it("uses procedural images after a network rejection", async () => {
       throw new Error("offline")
     }),
   )
-  const { spriteManifest } = await import("./assets")
+  const parts5 = await import("./assets")
+  const spriteManifest = parts5.spriteManifest
   expect(await spriteManifest()).toBeNull()
 })
 

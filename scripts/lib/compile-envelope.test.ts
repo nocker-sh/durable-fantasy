@@ -16,7 +16,9 @@ const source = () => {
 it("keeps the audited leaf depth and hinge side under every site rotation", () => {
   for (let rotation = 0; rotation < 4; rotation++)
     for (const hinge of ["start", "end"] as const) {
-      const { building, rooms } = source()
+      const parts1 = source()
+      const building = parts1.building,
+        rooms = parts1.rooms
       ;(building.site_plan as { rotation_quarters: number }).rotation_quarters = rotation
       const entry = (building.entry_steps as { room: string }[])[0],
         room = rooms.get(entry.room)!

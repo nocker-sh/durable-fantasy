@@ -40,7 +40,8 @@ it("invalidates stored ground when any local painting dependency changes", async
   expect(visited.size).toBeGreaterThan(2)
   const observe = vi.spyOn(fingerprints, "getSourceFingerprint")
   try {
-    const { GROUND_VERSION } = await import("#/world/scene/ground-version")
+    const parts1 = await import("#/world/scene/ground-version")
+    const GROUND_VERSION = parts1.GROUND_VERSION
     expect(observe).toHaveBeenCalledTimes(1)
     const sources = observe.mock.calls[0][0]
     expect(Object.values(sources).sort()).toEqual([...fingerprinted].map((file) => readFileSync(file, "utf8")).sort())

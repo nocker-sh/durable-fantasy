@@ -60,13 +60,16 @@ it("introduces a resident on the first talk even when the errand taken from thei
 })
 
 it("references existing errands involving the speaker", () => {
-  for (const [name, lines] of Object.entries(ALL_LINES))
+  for (const entry1 of Object.entries(ALL_LINES)) {
+    const name = entry1[0],
+      lines = entry1[1]
     for (const line of lines) {
       if (!line.errand) continue
       const errand = errandOf(line.errand.id)
       if (!errand) throw Error(`Unknown errand: ${line.errand.id}`)
       expect([errand.from, ...(errand.kind === "deliver" ? [errand.to] : [])]).toContain(name)
     }
+  }
 })
 
 it.each(["taken", "ready", "done"] as const)("the smith responds to scrap progress: %s", (progress) => {

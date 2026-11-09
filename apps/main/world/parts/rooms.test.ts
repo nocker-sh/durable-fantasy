@@ -24,7 +24,11 @@ const channel = { channel: 2, channels: { 2: 1 } }
 
 describe("room preconnection ownership", () => {
   it("finishes a pending channel request after entry takes ownership, without opening twice", async () => {
-    const { rooms, requests, open, sockets } = fixture()
+    const parts1 = fixture()
+    const rooms = parts1.rooms,
+      requests = parts1.requests,
+      open = parts1.open,
+      sockets = parts1.sockets
     rooms.standBy("forest-edge")
     const ready = rooms.take("forest-edge", null)!
     expect(ready.socket).toBeNull()
@@ -40,7 +44,10 @@ describe("room preconnection ownership", () => {
   })
 
   it("cancels abandoned pending preconnections without cancelling a transferred one", async () => {
-    const { rooms, requests, open } = fixture()
+    const parts2 = fixture()
+    const rooms = parts2.rooms,
+      requests = parts2.requests,
+      open = parts2.open
     rooms.standBy("forest-edge")
     rooms.standBy("deep-forest")
     requests[0](channel)
@@ -54,7 +61,10 @@ describe("room preconnection ownership", () => {
   })
 
   it.each([null, 3])("closes an unused socket when entering another map or selecting channel %s", async (want) => {
-    const { rooms, requests, sockets } = fixture()
+    const parts3 = fixture()
+    const rooms = parts3.rooms,
+      requests = parts3.requests,
+      sockets = parts3.sockets
     rooms.standBy("forest-edge")
     requests[0](channel)
     await Promise.resolve()
@@ -77,7 +87,10 @@ function pendingRoom() {
 }
 
 it("opens a prefetched room taken before its channel lookup completes", async () => {
-  const { rooms, resolve, socket } = pendingRoom()
+  const parts4 = pendingRoom()
+  const rooms = parts4.rooms,
+    resolve = parts4.resolve,
+    socket = parts4.socket
   const ready = rooms.take("phanthiet-market", null)!
   resolve({ channel: 2, channels: {} })
   await ready.channel
@@ -86,7 +99,9 @@ it("opens a prefetched room taken before its channel lookup completes", async ()
 })
 
 it("does not open a cancelled prefetch after leaving the game", async () => {
-  const { rooms, resolve } = pendingRoom()
+  const parts5 = pendingRoom()
+  const rooms = parts5.rooms,
+    resolve = parts5.resolve
   rooms.close()
   resolve({ channel: 2, channels: {} })
   await Promise.resolve()

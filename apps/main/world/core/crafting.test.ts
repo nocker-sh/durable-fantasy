@@ -21,7 +21,12 @@ import { lifeExpAt } from "#/world/core/life-exp-at"
 
 const at = (skill: string, level: number) => ({ ...player().life, [skill]: lifeExpAt(level) })
 
-const bag = (...items: [ItemId, number][]): Bag => items.reduce<Bag>((b, [id, n]) => addItem({ bag: b, item: id, count: n })!, emptyBag())
+const bag = (...items: [ItemId, number][]): Bag =>
+  items.reduce<Bag>((b, entry1) => {
+    const id = entry1[0],
+      n = entry1[1]
+    return addItem({ bag: b, item: id, count: n })!
+  }, emptyBag())
 
 describe("making things", () => {
   it("cooks soup at the hearth: takes the inputs and the fee, gives the soup with your name on it", () => {

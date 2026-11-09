@@ -119,7 +119,12 @@ it("retries an unsent combat revision while bounding attempts and still refreshi
   vi.advanceTimersByTime(5000)
   await f.beat()
   expect(calls.deliveryUpdate).toHaveBeenLastCalledWith(1)
-  expect(f.send.mock.calls.filter(([message]) => message.type === "result")).toHaveLength(2)
+  expect(
+    f.send.mock.calls.filter((entry1) => {
+      const message = entry1[0]
+      return message.type === "result"
+    }),
+  ).toHaveLength(2)
 })
 
 it.each(["player", "wild"])("delivers the independent refresh and throttles retries when the %s read fails", async (failed) => {
@@ -145,8 +150,18 @@ it.each(["player", "wild"])("delivers the independent refresh and throttles retr
   expect(calls.deliveryUpdate).toHaveBeenCalledTimes(2)
   expect(calls.state).toHaveBeenCalledTimes(2)
   expect(f.me.deliveryRevision).toBe(1)
-  expect(f.send.mock.calls.filter(([message]) => message.type === "result")).toHaveLength(1)
-  expect(f.send.mock.calls.filter(([message]) => message.type === "wild")).toHaveLength(failed === "player" ? 2 : 1)
+  expect(
+    f.send.mock.calls.filter((entry2) => {
+      const message = entry2[0]
+      return message.type === "result"
+    }),
+  ).toHaveLength(1)
+  expect(
+    f.send.mock.calls.filter((entry3) => {
+      const message = entry3[0]
+      return message.type === "wild"
+    }),
+  ).toHaveLength(failed === "player" ? 2 : 1)
 })
 
 it.each(["player", "wild"])("does not wait for the slow %s read before delivering the other refresh", async (slow) => {

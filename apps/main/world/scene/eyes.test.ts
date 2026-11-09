@@ -32,7 +32,9 @@ function marks(b: PixBuf): number {
       const todo = [[x, y]]
       seen.add(y * FW + x)
       while (todo.length) {
-        const [cx, cy] = todo.pop()!
+        const pair1 = todo.pop()!
+        const cx = pair1[0],
+          cy = pair1[1]
         for (let dy = -1; dy <= 1; dy++)
           for (let dx = -1; dx <= 1; dx++) {
             const nx = cx + dx,
@@ -48,7 +50,10 @@ function marks(b: PixBuf): number {
 
 describe("the T eyes never touch", () => {
   const blinkFrame = (ANIMS.idle.blink as number[])[0]
-  for (const [i, r] of RESIDENTS.entries()) {
+  for (const entry2 of RESIDENTS.entries()) {
+    const i = entry2[0],
+      r = entry2[1]
+
     it(`${r.name}: from all eight sides, open and closed, the two bars keep a pixel between them`, () => {
       const look = RESIDENT_LOOKS[i]
       lid = getEyeLid(RAMPS[look.skin])

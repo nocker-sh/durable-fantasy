@@ -14,7 +14,10 @@ for (const name of new Set([...Object.values(SHOPS).flatMap((shop) => shop.keepe
       const times = [rollover - 1, rollover, rollover - 1, rollover, rollover + day]
       const credits = [1, 2, 2, 2, 3]
       const stamped = [rollover - 1, rollover, rollover, rollover, rollover + day]
-      for (const [index, now] of times.entries()) {
+      for (const entry1 of times.entries()) {
+        const index = entry1[0],
+          now = entry1[1]
+
         const before = structuredClone(state)
         const next = dealtWith(state, [name, name], now)
         expect(state).toEqual(before)

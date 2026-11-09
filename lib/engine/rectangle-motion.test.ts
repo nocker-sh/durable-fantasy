@@ -21,7 +21,7 @@ it("retains explicit touching and tolerance policies", () => {
 })
 it("matches continuous axis-aligned envelope overlap in both travel directions", () => {
   const relative = [-0.5, -1, 0.5, 1] as const
-  for (const [a, b] of [
+  for (const entry1 of [
     [
       [2, 2],
       [2, 6],
@@ -39,6 +39,9 @@ it("matches continuous axis-aligned envelope overlap in both travel directions",
       [2, 2],
     ],
   ] as const) {
+    const a = entry1[0],
+      b = entry1[1]
+
     const sweep = rectangleTranslationBounds(relative, a, b)
     for (let x = 0; x < 8; x += 0.5)
       for (let z = 0; z < 8; z += 0.5) {

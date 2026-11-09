@@ -11,12 +11,15 @@ it("keeps the fruit stall marker instead of entering the nearby bakery", () => {
   expect(minimapTarget({ x: x, z: z, warps: nearbyDoor })).toEqual({ x: x + 0.5, z })
 })
 it("keeps every explicit shop marker at its own coordinates", () => {
-  for (const [id, map] of Object.entries(MAPS))
+  for (const entry1 of Object.entries(MAPS)) {
+    const id = entry1[0],
+      map = entry1[1]
     for (const marker of shopMarkers(id, 720)) {
       const x = (marker.cell[0] + 0.5) / 2,
         z = (marker.cell[1] + 0.5) / 2
       expect(minimapTarget({ x: x, z: z, warps: map.warps, inputProps: { snapToWarp: false } })).toEqual({ x, z })
     }
+  }
 })
 it("selects the closest doorway rather than whichever is defined first", () => {
   const warps = [{ at: [4, 4] as const }, { at: [8, 4] as const }]

@@ -39,7 +39,10 @@ it.each(equipmentRecipes.filter((recipe) => recipe.min <= LIFE_CAP))("preserves 
   expect(original.q).toBe(2)
   const equipped = apply(saved, { type: "equip", slot: index })
   if (!equipped.ok) throw Error(equipped.reason)
-  const slot = Object.entries(equipped.state.equipment).find(([, id]) => id === recipe.output.item)![0] as Slot
+  const slot = Object.entries(equipped.state.equipment).find((entry1) => {
+    const id = entry1[1]
+    return id === recipe.output.item
+  })![0] as Slot
   const removed = apply(loadPlayer(JSON.parse(JSON.stringify(equipped.state))), { type: "unequip", slot })
   if (!removed.ok) throw Error(removed.reason)
   expect(removed.state.bag).toContainEqual(original)

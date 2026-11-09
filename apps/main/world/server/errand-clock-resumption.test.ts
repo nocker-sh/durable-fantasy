@@ -21,7 +21,10 @@ afterEach(() => {
 const day = 86_400_000
 const first = Date.parse("2026-10-20T21:00:00Z")
 const cases = ERRANDS.flatMap((errand) => [false, true].map((done) => ({ errand, done })))
-it.each(cases)("$errand.id, completed=$done: a backward rollover cannot erase a newer errand or repay it", async ({ errand, done }) => {
+it.each(cases)("$errand.id, completed=$done: a backward rollover cannot erase a newer errand or repay it", async (props1) => {
+  const errand = props1.errand,
+    done = props1.done
+
   const now = Array.from({ length: 400 }, (_, index) => first + index * day).find((at) => errandToday(errand.from, dayOf(at))?.id === errand.id && errandsOn(dayOf(at - 1)).length > 0)
   expect(now).toBeDefined()
   const older = errandsOn(dayOf(now! - 1))[0]

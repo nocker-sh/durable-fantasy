@@ -23,7 +23,9 @@ it("persists member boundaries and chat cursors across real Void state reloads",
   expect(await restart().chat("b", 0)).toEqual({ seq: 0, lines: [] })
   expect(await restart().say("a", "仲間だけ")).toBeNull()
   const writes = context.storage.put.mock.calls.length
-  const { party, chat: first } = await restart().poll({ owner: "b", status: { ...member("b"), hp: 7 }, after: 0 })
+  const parts1 = await restart().poll({ owner: "b", status: { ...member("b"), hp: 7 }, after: 0 })
+  const party = parts1.party,
+    first = parts1.chat
   expect(party.members.find((member) => member.owner === "b")?.hp).toBe(7)
   expect(context.storage.put).toHaveBeenCalledTimes(writes + 1)
   expect(first?.lines.map((line) => line.text)).toEqual(["仲間だけ"])

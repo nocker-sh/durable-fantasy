@@ -15,7 +15,11 @@ const asleep = (name: string, m: number) => {
   const s = slotAt(name, ((m % 1440) + 1440) % 1440)
   return s?.where === "home" && s.doing.includes("眠")
 }
-const all = Object.entries(ALL_LINES).flatMap(([name, lines]) => lines.map((l) => ({ name, l })))
+const all = Object.entries(ALL_LINES).flatMap((entry1) => {
+  const name = entry1[0],
+    lines = entry1[1]
+  return lines.map((l) => ({ name, l }))
+})
 
 describe("what residents say", () => {
   it("everyone has plenty to say", () => {
@@ -24,7 +28,10 @@ describe("what residents say", () => {
 
   it("no line is said twice, by anyone, and none runs long", () => {
     const seen = new Map<string, string>()
-    for (const { name, l } of all) {
+    for (const entry2 of all) {
+      const name = entry2.name,
+        l = entry2.l
+
       expect(seen.get(l.text), `${name}: ${l.text}`).toBeUndefined()
       seen.set(l.text, name)
       expect(l.text.length, l.text).toBeLessThanOrEqual(60)
@@ -32,11 +39,18 @@ describe("what residents say", () => {
   })
 
   it("keeps to the world: a town, the goddess and her monk, no strangers called travellers", () => {
-    for (const { name, l } of all) for (const bad of [/村/, /旅の人/, /旅のお方/, /神父/, /商会/, /自治会/, /銅貨/, /弁当/, /天国/]) expect(bad.test(l.text), `${name}: ${l.text}`).toBe(false)
+    for (const entry3 of all) {
+      const name = entry3.name,
+        l = entry3.l
+      for (const bad of [/村/, /旅の人/, /旅のお方/, /神父/, /商会/, /自治会/, /銅貨/, /弁当/, /天国/]) expect(bad.test(l.text), `${name}: ${l.text}`).toBe(false)
+    }
   })
 
   it("speaks of people nearby only if they know them, and of doings that are theirs", () => {
-    for (const { name, l } of all) {
+    for (const entry4 of all) {
+      const name = entry4.name,
+        l = entry4.l
+
       if (l.near)
         expect(
           RELATIONS.some((r) => (r.a === name && r.b === l.near) || (r.b === name && r.a === l.near)),
@@ -51,7 +65,10 @@ describe("what residents say", () => {
   })
 
   it("a line for a time of day is for a time they are up", () => {
-    for (const { name, l } of all) {
+    for (const entry5 of all) {
+      const name = entry5.name,
+        l = entry5.l
+
       if (!l.phase) continue
       const up = (p: Phase) => EVERY.some((m) => phase(m) === p && !asleep(name, m))
       expect(l.phase.some(up), `${name} [${l.phase}]: ${l.text}`).toBe(true)
@@ -69,7 +86,10 @@ describe("what residents say", () => {
   })
 
   it("good morning is said by someone just up, at the part of the day they get up", () => {
-    for (const { name, l } of all) {
+    for (const entry6 of all) {
+      const name = entry6.name,
+        l = entry6.l
+
       if (!/^おはよう(?!、か)/.test(l.text)) continue // a greeting of their own, not one they answer
       expect(l.phase ?? l.doing, `${name}: ${l.text} needs a time of day or a doing`).toBeDefined()
       const when = (m: number) => (l.phase ? l.phase.includes(phase(m)) : true) && (l.doing ? !!slotAt(name, m)?.doing.includes(l.doing) : true)

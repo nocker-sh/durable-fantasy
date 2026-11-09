@@ -26,12 +26,15 @@ it("plants both original shoe orientations and the actual clothed knee at fixed 
         b = `calf_${side}` as const,
         c = `foot_${side}` as const,
         d = `ball_${side}` as const
-      for (const [from, to] of [
+      for (const entry1 of [
         [a, b],
         [b, c],
         [c, d],
-      ] as const)
+      ] as const) {
+        const from = entry1[0],
+          to = entry1[1]
         expect(distance(posed.p[from], posed.p[to])).toBeCloseTo(distance(source.rest[from], source.rest[to]), 12)
+      }
       expect(posed.q[c]).toEqual(source.q[c])
       expect(posed.p[c][0]).toBe(source.p[c][0])
       expect(posed.p[c][2]).toBe(source.p[c][2])

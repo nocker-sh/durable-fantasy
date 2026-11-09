@@ -10,7 +10,9 @@ import { doorStep } from "#/world/maps/door-step"
 import type { Vector2Tuple as V2 } from "#/lib/engine/vector2-types"
 
 const segDist = (p: V2, a: V2, b: V2) => {
-  const [dx, dz] = [b[0] - a[0], b[1] - a[1]]
+  const pair1 = [b[0] - a[0], b[1] - a[1]]
+  const dx = pair1[0],
+    dz = pair1[1]
   const t = Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dz) / (dx * dx + dz * dz || 1)))
   return Math.hypot(a[0] + dx * t - p[0], a[1] + dz * t - p[1])
 }
@@ -36,16 +38,28 @@ describe("the town's day in numbers (economy.md「町の帳簿」)", () => {
   it("what is made is kept where it is made, and what is burnt where it burns (town.md「屋内マップ」)", () => {
     const pieces = (ids: readonly string[]) => HOUSES.filter((h) => ids.includes(h.household ?? "")).flatMap((h) => h.plan.furniture.map((f) => f.replace(/（.+）$/, "").replace(/×\d+$/, "")))
     const householdOf = (name: string) => HOUSEHOLDS.find((hh) => hh.members.includes(name))?.id ?? ""
-    for (const [maker, out] of Object.entries(DAILY_OUTPUT))
+    for (const entry2 of Object.entries(DAILY_OUTPUT)) {
+      const maker = entry2[0],
+        out = entry2[1]
       for (const g of Object.keys(out) as Good[]) {
         // a maker who lodges works at another maker's: the store is theirs
         const others = Object.entries(DAILY_OUTPUT)
-          .filter(([, o]) => o[g])
-          .map(([n]) => householdOf(n))
+          .filter((entry1) => {
+            const o = entry1[1]
+            return o[g]
+          })
+          .map((entry2) => {
+            const n = entry2[0]
+            return householdOf(n)
+          })
         expect(pieces([householdOf(maker)]).some((f) => STORES[g].test(f)) || pieces(others).some((f) => STORES[g].test(f)), `${maker}: ${g}`).toBe(true)
       }
+    }
     expect(pieces([householdOf(MILLER)]), MILLER).toContain("粉袋の山")
-    for (const [id, f] of Object.entries(TRADE_FIRES)) {
+    for (const entry5 of Object.entries(TRADE_FIRES)) {
+      const id = entry5[0],
+        f = entry5[1]
+
       const here = HOUSES.find((h) => h.id === id)!.plan.furniture.map((x) => x.replace(/×\d+$/, ""))
       if ((f.薪 ?? 0) >= 2)
         expect(
@@ -65,8 +79,14 @@ describe("the town's day in numbers (economy.md「町の帳簿」)", () => {
       if (h.kind === "vacant" || !h.household) continue
       const step = doorStep(h)
       const wells = Object.entries(MAPS[h.map].places)
-        .filter(([name]) => /well|Well|lavoir/.test(name))
-        .map(([, c]): V2 => [c[0] / 2, c[1] / 2])
+        .filter((entry6) => {
+          const name = entry6[0]
+          return /well|Well|lavoir/.test(name)
+        })
+        .map((entry7): V2 => {
+          const c = entry7[1]
+          return [c[0] / 2, c[1] / 2]
+        })
       const layout = layoutOf(h.map)
       let reach = Math.min(...wells.map((w) => Math.hypot(w[0] - step[0], w[1] - step[1])))
       if (layout.river[0][0] > -50) for (let i = 0; i < layout.river.length - 1; i++) reach = Math.min(reach, segDist(step, layout.river[i], layout.river[i + 1]) - layout.riverHW)

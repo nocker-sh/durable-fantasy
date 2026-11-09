@@ -9,7 +9,10 @@ it("removes intersecting openings without overlapping or losing the remaining fl
   const parts = subtractRectangles(source, cuts)
   const area = parts.reduce((sum, p) => sum + (p.x1 - p.x0) * (p.z1 - p.z0), 0)
   expect(area).toBe(80 - 8 - 6 + 2)
-  for (const [i, a] of parts.entries()) {
+  for (const entry1 of parts.entries()) {
+    const i = entry1[0],
+      a = entry1[1]
+
     expect(a.x0 >= source.x0 && a.x1 <= source.x1 && a.z0 >= source.z0 && a.z1 <= source.z1).toBe(true)
     for (const b of [...parts.slice(i + 1), ...cuts]) expect(Math.min(a.x1, b.x1) <= Math.max(a.x0, b.x0) || Math.min(a.z1, b.z1) <= Math.max(a.z0, b.z0)).toBe(true)
   }

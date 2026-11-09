@@ -35,7 +35,10 @@ function fixture() {
 }
 
 it("releases expired burst geometry and materials while retaining the shared creature texture", () => {
-  const { root, monster, texture } = fixture()
+  const parts1 = fixture()
+  const root = parts1.root,
+    monster = parts1.monster,
+    texture = parts1.texture
   const geometry = vi.spyOn(THREE.BufferGeometry.prototype, "dispose")
   const material = vi.spyOn(THREE.Material.prototype, "dispose")
   const shared = vi.spyOn(texture, "dispose")
@@ -54,7 +57,10 @@ it("releases expired burst geometry and materials while retaining the shared cre
 })
 
 it("cleans up an interrupted burst and does not retain resources over repeated fights", () => {
-  const { root, monster, texture } = fixture()
+  const parts2 = fixture()
+  const root = parts2.root,
+    monster = parts2.monster,
+    texture = parts2.texture
   const geometry = vi.spyOn(THREE.BufferGeometry.prototype, "dispose")
   const material = vi.spyOn(THREE.Material.prototype, "dispose")
   const shared = vi.spyOn(texture, "dispose")
@@ -73,7 +79,9 @@ it("cleans up an interrupted burst and does not retain resources over repeated f
 
 it("turns at the same speed at 30 and 60 fps", () => {
   const turn = (fps: number) => {
-    const { root, monster } = fixture()
+    const parts3 = fixture()
+    const root = parts3.root,
+      monster = parts3.monster
     monster.hp = 30
     monster.back = 0
     let now = 0
@@ -85,7 +93,9 @@ it("turns at the same speed at 30 and 60 fps", () => {
 })
 
 it("reuses standing terrain height and position storage while preserving animation", () => {
-  const { root, monster } = fixture()
+  const parts4 = fixture()
+  const root = parts4.root,
+    monster = parts4.monster
   monster.hp = 30
   monster.back = 0
   const motion = vi.spyOn(MonsterMotion.prototype, "at").mockReturnValue({ x: 30, z: 30, moving: false })
@@ -106,7 +116,9 @@ it("reuses standing terrain height and position storage while preserving animati
 })
 
 it("shares one ground sample among burst pieces and resamples after hidden movement", () => {
-  const { root, monster } = fixture()
+  const parts5 = fixture()
+  const root = parts5.root,
+    monster = parts5.monster
   const motion = vi.spyOn(MonsterMotion.prototype, "at").mockReturnValue({ x: 30, z: 30, moving: false })
   const height = vi.spyOn(terrainWalkHModule, "walkH").mockReturnValue(2)
   burst(monster, root, 0)
@@ -126,7 +138,8 @@ it("shares one ground sample among burst pieces and resamples after hidden movem
 })
 
 it("writes a monster HP bar only when its displayed percentage changes", () => {
-  const { monster } = fixture()
+  const parts6 = fixture()
+  const monster = parts6.monster
   const widths: string[] = []
   monster.hpBar = {
     style: {
@@ -152,7 +165,9 @@ it("writes a monster HP bar only when its displayed percentage changes", () => {
 })
 
 it("skips invisible recovery frames and resumes at the current clock position", () => {
-  const { root, monster } = fixture()
+  const parts7 = fixture()
+  const root = parts7.root,
+    monster = parts7.monster
   const motion = vi.spyOn(MonsterMotion.prototype, "at")
   const height = vi.spyOn(terrainWalkHModule, "walkH")
   for (let frame = 0; frame < 600; frame++) updateMonsters({ list: [monster], root: root, now: frame * 16 })
@@ -173,17 +188,24 @@ it("skips invisible recovery frames and resumes at the current clock position", 
 })
 
 it("tries another attack position when the first free position has no route", () => {
-  const { monster } = fixture()
+  const parts8 = fixture()
+  const monster = parts8.monster
   const walk = vi.fn().mockReturnValueOnce(false).mockReturnValueOnce(true)
   expect(approachMonster({ m: monster, from: [25, 30], reach: 1.6, tryWalk: walk })).toBe(true)
   expect(walk).toHaveBeenCalledTimes(2)
-  const [first, second] = walk.mock.calls.map(([point]) => point)
+  const pair9 = walk.mock.calls.map((entry1) => {
+    const point = entry1[0]
+    return point
+  })
+  const first = pair9[0],
+    second = pair9[1]
   expect(second).not.toEqual(first)
   for (const point of [first, second]) expect(Math.hypot(point[0] - 30, point[1] - 30)).toBeLessThan(1.6)
 })
 
 it("skips blocked positions without pathfinding and stops after the first accepted route", () => {
-  const { monster } = fixture()
+  const parts10 = fixture()
+  const monster = parts10.monster
   const free = vi.spyOn(terrainIsFreeModule, "isFree").mockReturnValueOnce(false).mockReturnValue(true)
   const walk = vi.fn(() => true)
   expect(approachMonster({ m: monster, from: [25, 30], reach: 1.6, tryWalk: walk })).toBe(true)
@@ -192,7 +214,8 @@ it("skips blocked positions without pathfinding and stops after the first accept
 })
 
 it("finishes an unsuccessful search without accepting an unreachable position", () => {
-  const { monster } = fixture()
+  const parts11 = fixture()
+  const monster = parts11.monster
   const walk = vi.fn(() => false)
   expect(approachMonster({ m: monster, from: [25, 30], reach: 1.6, tryWalk: walk })).toBe(false)
   expect(walk).toHaveBeenCalledTimes(8)

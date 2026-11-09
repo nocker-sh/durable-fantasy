@@ -230,8 +230,10 @@ it("captures the exact worn item on double-click removal", () => {
 })
 
 it("names what a weapon needs and opens the stats window instead of sending a refused equip", async () => {
-  const { addItem } = await import("#/world/core/add-item")
-  const { emptyBag } = await import("#/world/core/empty-bag")
+  const parts1 = await import("#/world/core/add-item")
+  const addItem = parts1.addItem
+  const parts2 = await import("#/world/core/empty-bag")
+  const emptyBag = parts2.emptyBag
   const session = new GameSession()
   const bag = addItem({ bag: emptyBag(), item: "short-sword", count: 1, mark: { q: 1, by: "アルノルト" } })!
   session.state.set((s) => ({ ...s, player: player({ bag, stats: { ...player().stats, str: 5, dex: 5 } }), windows: [] }))

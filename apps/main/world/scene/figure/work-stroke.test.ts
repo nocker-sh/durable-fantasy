@@ -81,10 +81,12 @@ it("renders the stored handle's four contact faces in both authored work candida
         parts = pose.body.armParts[candidate.hand],
         grip = pose.solution.grip
       expect(parts.every((p) => p.sd!(grip) > 0)).toBe(true)
-      for (const [direction, half] of [
+      for (const entry1 of [
         [profile.across, profile.halfWidth],
         [normal, profile.halfDepth],
-      ] as const)
+      ] as const) {
+        const direction = entry1[0],
+          half = entry1[1]
         for (const sign of [-1, 1]) {
           const face = add(grip, mul(direction, sign * half)),
             arm = parts[0]
@@ -93,6 +95,7 @@ it("renders the stored handle's four contact faces in both authored work candida
           expect(arm.sd!(add(grip, mul(direction, sign * (half + 0.0001))))).toBeLessThan(0)
           expect(arm.sd!(add(grip, mul(direction, sign * (half - 0.0001))))).toBeGreaterThan(0)
         }
+      }
     }
   }
 })

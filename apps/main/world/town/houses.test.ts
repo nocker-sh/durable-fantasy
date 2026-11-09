@@ -42,7 +42,10 @@ describe("households and houses hang together", () => {
   })
 
   it("each shop stands in a building on its own map, kept by someone who lives there or close by", () => {
-    for (const [id, shop] of Object.entries(SHOPS)) {
+    for (const entry1 of Object.entries(SHOPS)) {
+      const id = entry1[0],
+        shop = entry1[1]
+
       const house = HOUSES.find((h) => h.shop === id)
       if (!house) continue // market stalls on the square
       expect(house.map, id).toBe(shop.map)
@@ -64,7 +67,10 @@ describe("daily life hangs together (consistency.md)", () => {
   })
 
   it("every shopkeeper lives over the shop or in the same district; a day-shift hand may come from the next", () => {
-    for (const [id, shop] of Object.entries(SHOPS)) {
+    for (const entry2 of Object.entries(SHOPS)) {
+      const id = entry2[0],
+        shop = entry2[1]
+
       shop.keepers.forEach((name, k) => {
         const hh = HOUSEHOLDS.find((h) => h.members.includes(name))!
         // street sellers walk over from wherever they live; shopkeepers live over or by the shop

@@ -103,7 +103,9 @@ it("reserves a target before payment, including while payment is delayed", async
   await paying
   const second = f.source.beginStrike({ target: spawn.id, damage: 1, owner: "other", request: "other-request", art: "lunge" })
   release()
-  const [accepted, rejected] = await Promise.all([first, second])
+  const pair1 = await Promise.all([first, second])
+  const accepted = pair1[0],
+    rejected = pair1[1]
   expect(accepted.refused).toBe(false)
   expect(accepted.payment?.ok && accepted.payment.state.sp).toBe(16)
   expect(rejected).toEqual({ ok: false, reason: "TAKEN" })

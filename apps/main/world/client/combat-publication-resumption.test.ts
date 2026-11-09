@@ -27,7 +27,9 @@ function fixture() {
   return { record, session, notices, messages }
 }
 
-for (const [kind, monster] of Object.entries(MONSTER_KINDS))
+for (const entry1 of Object.entries(MONSTER_KINDS)) {
+  const kind = entry1[0],
+    monster = entry1[1]
   it(`${kind}: retransmitted death and revival results notify once across room welcomes`, () => {
     const f = fixture()
     // A lethal hit is a local combat condition. Damage, death, revival and publication numbers are real.
@@ -58,6 +60,7 @@ for (const [kind, monster] of Object.entries(MONSTER_KINDS))
     expect(f.notices).toHaveLength(2)
     expect(f.session.state.get().player).toEqual(revived.state)
   })
+}
 
 it("keeps unnumbered legacy results observable instead of treating all of them as duplicates", () => {
   const f = fixture()

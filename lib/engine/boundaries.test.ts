@@ -76,7 +76,9 @@ function runtimeDependencies(source: string): string[] {
   const imports = [...source.matchAll(/^import[ \t]+(?!type\b)((?:[\w$]+\s*,\s*)?(?:\{[^}]*\}|\*\s+as\s+[\w$]+)|[\w$]+)\s+from\s+["']([^"']+)["']/gm)]
   const exports = [...source.matchAll(/^export[ \t]+(?!type\b)(\{[^}]*\}|\*(?:\s+as\s+\w+)?)\s+from\s+["']([^"']+)["']/gm)]
   const dependencies = [...imports, ...exports]
-    .filter(([, clause]) => {
+    .filter((entry1) => {
+      const clause = entry1[1]
+
       return (
         !clause.trim().startsWith("{") ||
         clause
@@ -85,8 +87,14 @@ function runtimeDependencies(source: string): string[] {
           .some((part) => part.trim() && !part.trim().startsWith("type "))
       )
     })
-    .map(([, , specifier]) => specifier)
-  const sideEffects = [...source.matchAll(/^import[ \t]+["']([^"']+)["']/gm)].map(([, specifier]) => specifier)
+    .map((entry2) => {
+      const specifier = entry2[2]
+      return specifier
+    })
+  const sideEffects = [...source.matchAll(/^import[ \t]+["']([^"']+)["']/gm)].map((entry3) => {
+    const specifier = entry3[1]
+    return specifier
+  })
   return [...dependencies, ...sideEffects]
 }
 

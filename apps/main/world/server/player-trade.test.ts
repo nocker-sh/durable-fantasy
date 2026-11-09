@@ -129,7 +129,9 @@ it("cancels without changing goods and retains the revision across a debug reset
 it("serializes a prepare and a concurrent inventory command", async () => {
   const f = fixture()
   const p = f.restart()
-  const [prepared, spent] = await Promise.all([p.prepareTrade(proposal), p.run({ type: "trade-out", offer: { lots: [{ slot: 0, count: 1 }], gold: 0 } })])
+  const pair1 = await Promise.all([p.prepareTrade(proposal), p.run({ type: "trade-out", offer: { lots: [{ slot: 0, count: 1 }], gold: 0 } })])
+  const prepared = pair1[0],
+    spent = pair1[1]
   expect(prepared.ok).toBe(true)
   expect(spent).toEqual({ ok: false, reason: "NOT_READY" })
   expect((await p.read()).bag).toEqual(initialPlayer().bag)

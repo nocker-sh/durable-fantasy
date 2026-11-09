@@ -93,11 +93,14 @@ it("allows only the part of a stored lot that fits the carrying weight", () => {
 it("charges every deposit but rewards friendship only once per day, never for a rejected deposit or withdrawal", () => {
   const now = Date.UTC(2026, 0, 1, 12)
   let state = player({ gold: 100, bag: bagWith(["herb", 4]) })
-  for (const [time, friendship] of [
+  for (const entry1 of [
     [now, FRIEND.bought],
     [now + 1, FRIEND.bought],
     [now + 86_400_000, FRIEND.bought * 2],
   ]) {
+    const time = entry1[0],
+      friendship = entry1[1]
+
     const result = apply(state, { type: "store", slot: 0, count: 1, expectedStack: state.bag[0] }, { now: time })
     if (!result.ok) throw Error(result.reason)
     expect(result.state.gold).toBe(state.gold - STORE_FEE)

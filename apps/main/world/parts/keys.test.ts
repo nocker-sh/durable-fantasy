@@ -32,7 +32,9 @@ function fixture() {
 }
 
 it("combines movement keys into eight directions and cancels opposite aliases equally", () => {
-  const { key, game } = fixture()
+  const parts1 = fixture()
+  const key = parts1.key,
+    game = parts1.game
   key("KeyW")
   expect(game.hold).toHaveBeenLastCalledWith([0, 1])
   key("KeyD")
@@ -48,7 +50,9 @@ it("combines movement keys into eight directions and cancels opposite aliases eq
 })
 
 it("releases walking before opening chat and ignores repeats until a fresh press", () => {
-  const { key, game } = fixture()
+  const parts2 = fixture()
+  const key = parts2.key,
+    game = parts2.game
   key("KeyW")
   key("Enter")
   expect(game.setTyping).toHaveBeenCalledWith(true)
@@ -62,7 +66,11 @@ it("releases walking before opening chat and ignores repeats until a fresh press
 })
 
 it.each(["focusin", "blur", "unlisten"])("releases held movement on %s without stopping unrelated click walking", (type) => {
-  const { key, game, window, keys } = fixture()
+  const parts3 = fixture()
+  const key = parts3.key,
+    game = parts3.game,
+    window = parts3.window,
+    keys = parts3.keys
   const event = new Event(type)
   Object.defineProperty(event, "target", { value: { closest: () => ({}) } })
   const trigger = () => (type === "unlisten" ? keys.unlisten() : window.dispatchEvent(event))
@@ -78,7 +86,9 @@ it.each(["focusin", "blur", "unlisten"])("releases held movement on %s without s
 it.each([{ modal: "system" as const }, { typing: true }, { storage: true }, { commission: "smith" }, { loading: { map: "town", text: "loading" } }])(
   "releases movement immediately when blocking state opens: %j",
   (patch) => {
-    const { key, game } = fixture()
+    const parts4 = fixture()
+    const key = parts4.key,
+      game = parts4.game
     const initial = game.state.get()
     key("KeyW")
     key("KeyD")
@@ -97,7 +107,9 @@ it.each([{ modal: "system" as const }, { typing: true }, { storage: true }, { co
 )
 
 it("keeps click walking and nonblocking windows independent of held-key cleanup", () => {
-  const { key, game } = fixture()
+  const parts5 = fixture()
+  const key = parts5.key,
+    game = parts5.game
   game.state.set({ ...game.state.get(), storage: true })
   expect(game.stopWalking).not.toHaveBeenCalled()
   game.state.set({ ...game.state.get(), storage: false })
@@ -108,7 +120,11 @@ it("keeps click walking and nonblocking windows independent of held-key cleanup"
 })
 
 it("removes state and visibility listeners when unlistened and registers once on relisten", () => {
-  const { keys, key, game, document } = fixture()
+  const parts6 = fixture()
+  const keys = parts6.keys,
+    key = parts6.key,
+    game = parts6.game,
+    document = parts6.document
   const added = vi.spyOn(document, "addEventListener")
   const removed = vi.spyOn(document, "removeEventListener")
   const subscribe = vi.spyOn(game.state, "subscribe")
@@ -121,9 +137,19 @@ it("removes state and visibility listeners when unlistened and registers once on
   keys.unlisten()
   expect(unsubscribe).toHaveBeenCalledTimes(2)
   expect(game.stopWalking).toHaveBeenCalledOnce()
-  const registrations = added.mock.calls.filter(([event]) => event === "visibilitychange")
+  const registrations = added.mock.calls.filter((entry7) => {
+    const event = entry7[0]
+    return event === "visibilitychange"
+  })
   expect(registrations).toHaveLength(2)
-  expect(removed.mock.calls.filter(([event]) => event === "visibilitychange").slice(-2)).toEqual(registrations)
+  expect(
+    removed.mock.calls
+      .filter((entry8) => {
+        const event = entry8[0]
+        return event === "visibilitychange"
+      })
+      .slice(-2),
+  ).toEqual(registrations)
 })
 
 it("closes the front-most window the player opened on Esc, past a shop still in the stacking order", () => {
@@ -136,7 +162,9 @@ it("closes the front-most window the player opened on Esc, past a shop still in 
 })
 
 it("never uses the hotbar for a number pressed before a conversation's choices show", () => {
-  const { game, window } = fixture()
+  const parts9 = fixture()
+  const game = parts9.game,
+    window = parts9.window
   const target = game as unknown as { useHotbar: ReturnType<typeof vi.fn>; choose: ReturnType<typeof vi.fn> }
   target.useHotbar = vi.fn()
   target.choose = vi.fn()

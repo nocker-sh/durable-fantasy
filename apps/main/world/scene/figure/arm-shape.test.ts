@@ -43,10 +43,12 @@ it("opens four handle contact faces while retaining the forearm and skin classif
     raw = nativeArmSurfaces({ scale: 1, shoulder: shoulder, elbow: elbow, wrist: wrist })
   expect(shape.arm.sd(grip)).toBeGreaterThan(0)
   expect(raw.arm.sd(grip)).toBeLessThan(0)
-  for (const [direction, half] of [
+  for (const entry1 of [
     [[1, 0, 0], 0.003],
     [[0, 1, 0], 0.004],
-  ] as [V3, number][])
+  ] as [V3, number][]) {
+    const direction = entry1[0],
+      half = entry1[1]
     for (const sign of [-1, 1]) {
       const hit = { i: 0 }
       expect(shape.arm.sd(add(grip, mul(direction, sign * half)), hit)).toBeCloseTo(0, 12)
@@ -54,6 +56,7 @@ it("opens four handle contact faces while retaining the forearm and skin classif
       expect(shape.arm.sd(add(grip, mul(direction, sign * (half - 0.0001))))).toBeGreaterThan(0)
       expect(shape.arm.sd(add(grip, mul(direction, sign * (half + 0.0001))))).toBeLessThan(0)
     }
+  }
   for (const point of [elbow, lerp3(elbow, wrist, 0.5), add(wrist, [0.02, 0.01, 0])]) expect(shape.arm.sd(point) < 0).toBe(raw.arm.sd(point) < 0)
 })
 it("rejects oversized and nonorthogonal palm openings", () => {

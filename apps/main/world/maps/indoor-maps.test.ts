@@ -23,10 +23,13 @@ it("connects authored floors through reachable landings without immediate return
   expect(lower.id).not.toBe(upper.id)
   expect(lower.warps.filter((w) => w.to.map === house.map)).toHaveLength(1)
   expect(upper.warps.filter((w) => w.to.map === house.map)).toHaveLength(0)
-  for (const [from, to] of [
+  for (const entry1 of [
     [lower, upper],
     [upper, lower],
   ]) {
+    const from = entry1[0],
+      to = entry1[1]
+
     const link = from.warps.find((w) => w.to.map === to.id)!
     expect(link).toBeDefined()
     expect(walkable(from, link.at)).toBe(true)

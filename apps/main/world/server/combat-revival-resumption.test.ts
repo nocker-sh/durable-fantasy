@@ -17,7 +17,10 @@ afterEach(() => {
 
 const cases = SPAWNS.flatMap((spawn) => (MONSTER_KINDS[spawn.kind].atk > 0 ? ["death-save", "revival-save"] : ["peaceful"]).map((failure) => ({ spawn, failure })))
 
-it.each(cases)("$spawn.id / $failure: actual retaliation, refusal and saved revival preserve the committed outcome", async ({ spawn, failure }) => {
+it.each(cases)("$spawn.id / $failure: actual retaliation, refusal and saved revival preserve the committed outcome", async (props1) => {
+  const spawn = props1.spawn,
+    failure = props1.failure
+
   vi.useFakeTimers()
   vi.setSystemTime(1000)
   const random = vi.spyOn(Math, "random").mockReturnValue(0)

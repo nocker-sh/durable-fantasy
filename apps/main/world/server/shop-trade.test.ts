@@ -280,7 +280,7 @@ it("rejects undeclared and inherited shop names before resolving a stock maker",
   for (const shop of ["missing", "constructor", "toString", "__proto__"]) expect(() => shopMaker(shop, "apple")).toThrow(TypeError)
 })
 
-const batches = Object.entries(BATCHES).flatMap(([shop, items]) => Object.entries(items).map(([item, batch]) => ({ shop: shop as ShopId, item: item as ItemId, batch })))
+const batches = Object.entries(BATCHES).flatMap((shopEntry) => Object.entries(shopEntry[1]).map((itemEntry) => ({ shop: shopEntry[0] as ShopId, item: itemEntry[0] as ItemId, batch: itemEntry[1] })))
 for (const entry of batches)
   for (const failure of ["none", "reply", "source-save"] as const)
     it(`${entry.shop}/${entry.item}: a backward clock cannot return a refused old reservation into an already replaced shelf, failure=${failure}`, async () => {

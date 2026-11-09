@@ -16,7 +16,13 @@ it.each(["fang-charm", "hand-axe", "battle-axe", "spear", "mace", "short-sword"]
   const p = player({
     name: "エルナ",
     gold: 100,
-    bag: bagWith(...recipe.inputs.map(({ item, count }) => [item, count] as [typeof item, number])),
+    bag: bagWith(
+      ...recipe.inputs.map((props1) => {
+        const item = props1.item,
+          count = props1.count
+        return [item, count] as [typeof item, number]
+      }),
+    ),
     life: { ...player().life, [recipe.skill]: lifeExpAt(recipe.min + 1) },
     stats: { ...player().stats, str: 16, dex: 12 },
   })

@@ -8,7 +8,10 @@ import { shopMarkers } from "#/world/maps/shop-markers"
 
 describe("shop minimap markers", () => {
   it("keeps every shop on its district map even when closed", () => {
-    for (const [id, shop] of Object.entries(SHOPS)) {
+    for (const entry1 of Object.entries(SHOPS)) {
+      const id = entry1[0],
+        shop = entry1[1]
+
       for (const min of [0, 360, 720, 1080]) {
         const marker = shopMarkers(shop.map, min)
           .flatMap((m) => m.shops)

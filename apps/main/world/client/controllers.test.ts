@@ -55,7 +55,10 @@ afterEach(() => vi.useRealTimers())
 
 describe("client controllers", () => {
   it("settles an interrupted save immediately and does not queue a duplicate", async () => {
-    const { session, client, send } = fixture()
+    const parts1 = fixture()
+    const session = parts1.session,
+      client = parts1.client,
+      send = parts1.send
     const listeners = new Map<string, (event: { code: number }) => void>()
     const socket = {
       send,
@@ -83,7 +86,9 @@ describe("client controllers", () => {
   })
 
   it("does not open a late channel response after leaving the game", async () => {
-    const { session, client } = fixture()
+    const parts2 = fixture()
+    const session = parts2.session,
+      client = parts2.client
     let finish!: (value: { channel: number; channels: Record<number, number> }) => void
     session.rooms.askChannel = () =>
       new Promise((resolve) => {
@@ -97,7 +102,11 @@ describe("client controllers", () => {
     expect(session.rooms.open).not.toHaveBeenCalled()
   })
   it("does not send commands while disconnected or before the join snapshot", async () => {
-    const { session, client, callbacks, send } = fixture()
+    const parts3 = fixture()
+    const session = parts3.session,
+      client = parts3.client,
+      callbacks = parts3.callbacks,
+      send = parts3.send
     callbacks.update({ online: "offline" })
     expect(await client.run({ type: "use", slot: 0 })).toBe(false)
     callbacks.update({ online: "online" })
@@ -108,7 +117,10 @@ describe("client controllers", () => {
   })
 
   it("rejects invalid profiles and normalizes names before transmission", async () => {
-    const { session, client, send } = fixture()
+    const parts4 = fixture()
+    const session = parts4.session,
+      client = parts4.client,
+      send = parts4.send
     const profile = { type: "profile" as const, name: "\u202Ehidden", look: 0, neck: "muffler" as const, neckRamp: "cRed" as const }
     expect(await client.run(profile)).toBe(false)
     expect(send).not.toHaveBeenCalled()
@@ -119,7 +131,9 @@ describe("client controllers", () => {
     expect(await saved).toBe(false)
   })
   it("keeps session references live when sockets and channel selections change", () => {
-    const { session, context } = fixture()
+    const parts5 = fixture()
+    const session = parts5.session,
+      context = parts5.context
     session.socket = null
     expect(context.session.socket).toBeNull()
     context.session.wantChannel = 4
@@ -130,7 +144,11 @@ describe("client controllers", () => {
 
   it("correlates a command with its reply, applies the player and clears busy state", async () => {
     vi.useFakeTimers()
-    const { session, client, callbacks, send } = fixture()
+    const parts6 = fixture()
+    const session = parts6.session,
+      client = parts6.client,
+      callbacks = parts6.callbacks,
+      send = parts6.send
     const result = client.run({ type: "use", slot: 0 })
     expect(session.state.get().busy).toBe(true)
     expect(send).toHaveBeenCalledWith({ type: "command", seq: 1, command: { type: "use", slot: 0 } })
@@ -155,7 +173,10 @@ describe("client controllers", () => {
 
   it("times out a missing reply and leaves the client ready for another command", async () => {
     vi.useFakeTimers()
-    const { session, client, callbacks } = fixture()
+    const parts7 = fixture()
+    const session = parts7.session,
+      client = parts7.client,
+      callbacks = parts7.callbacks
     const result = client.run({ type: "use", slot: 0 })
     await vi.advanceTimersByTimeAsync(8000)
     expect(await result).toBe(false)
@@ -166,7 +187,9 @@ describe("client controllers", () => {
 
   it("releases completed command timers and rejects another command while busy", async () => {
     vi.useFakeTimers()
-    const { session, client } = fixture()
+    const parts8 = fixture()
+    const session = parts8.session,
+      client = parts8.client
     const first = client.run({ type: "use", slot: 0 })
     const second = client.run({ type: "use", slot: 1 })
     expect(await second).toBe(false)
@@ -180,7 +203,10 @@ describe("client controllers", () => {
 
   it("fails pending commands immediately on disconnect and does not buffer new commands", async () => {
     vi.useFakeTimers()
-    const { session, client, send } = fixture()
+    const parts9 = fixture()
+    const session = parts9.session,
+      client = parts9.client,
+      send = parts9.send
     const listeners = new Map<string, (event: { code: number }) => void>()
     session.socket = { send, on: (event: string, handler: (event: { code: number }) => void) => listeners.set(event, handler) } as unknown as VoidSocket<"/map/:mapId">
     client.listen(session.socket)
@@ -198,7 +224,11 @@ describe("client controllers", () => {
 
   it("cleans up when sending throws and ignores a reply from a room just left", async () => {
     vi.useFakeTimers()
-    const { session, client, send, callbacks } = fixture()
+    const parts10 = fixture()
+    const session = parts10.session,
+      client = parts10.client,
+      send = parts10.send,
+      callbacks = parts10.callbacks
     send.mockImplementationOnce(() => {
       throw new Error("closed")
     })
@@ -214,7 +244,11 @@ describe("client controllers", () => {
   })
 
   it("connects using a prefetch taken before its channel request finishes", async () => {
-    const { session, client, send, callbacks } = fixture()
+    const parts11 = fixture()
+    const session = parts11.session,
+      client = parts11.client,
+      send = parts11.send,
+      callbacks = parts11.callbacks
     let choose!: (value: { channel: number; channels: Record<number, number> }) => void
     vi.spyOn(session.rooms, "askChannel").mockReturnValue(
       new Promise((resolve) => {
@@ -240,7 +274,12 @@ describe("client controllers", () => {
   })
 
   it("opens storage from a conversation and updates the scene and server together", () => {
-    const { session, context, callbacks, send, freeze } = fixture()
+    const parts12 = fixture()
+    const session = parts12.session,
+      context = parts12.context,
+      callbacks = parts12.callbacks,
+      send = parts12.send,
+      freeze = parts12.freeze
     callbacks.update({ dialogue: { resident: 0, name: STORAGE_KEEPER, job: "倉庫", pages: ["どうぞ"], page: 0, shownAt: 0, choices: [{ label: "預ける", action: "storage" }] } })
     new DialogueActions(context).choose(0)
     expect(session.state.get().dialogue).toBeNull()
@@ -252,7 +291,11 @@ describe("client controllers", () => {
   })
 
   it.each(["shop", "commission"] as const)("does not open a stale %s choice after the keeper goes off duty", (action) => {
-    const { session, context, callbacks, send } = fixture()
+    const parts13 = fixture()
+    const session = parts13.session,
+      context = parts13.context,
+      callbacks = parts13.callbacks,
+      send = parts13.send
     const dialogue = { resident: 0, name: "ベネディクト", job: "修道士", pages: ["どうぞ"], page: 0, shownAt: -100000, choices: [{ label: "頼む", action }] }
     callbacks.update({ clock: { ...session.state.get().clock, min: 8 * 60 }, dialogue })
     new DialogueActions(context).choose(0)
@@ -267,14 +310,19 @@ describe("client controllers", () => {
   })
 
   it("sends trade requests through the current socket", () => {
-    const { context, send } = fixture()
+    const parts14 = fixture()
+    const context = parts14.context,
+      send = parts14.send
     new SocialActions(context).askTrade("other-player")
     expect(send).toHaveBeenCalledWith({ type: "trade-ask", target: "other-player" })
   })
 })
 
 it("acknowledges a successful delayed command without reverting a newer state or replaying its events", async () => {
-  const { session, client, callbacks } = fixture()
+  const parts15 = fixture()
+  const session = parts15.session,
+    client = parts15.client,
+    callbacks = parts15.callbacks
   callbacks.update({ player: player({ revision: 1, sitting: true }) })
   const pending = client.run({ type: "stand" })
   const newer = player({ revision: 3, sitting: true, gold: 5 })
@@ -289,7 +337,10 @@ it("acknowledges a successful delayed command without reverting a newer state or
 })
 
 it("resets creature publication scope when connecting to another channel", () => {
-  const { session, client, context } = fixture()
+  const parts16 = fixture()
+  const session = parts16.session,
+    client = parts16.client,
+    context = parts16.context
   session.wild = { first: { hp: 0, back: 5000, revision: 100 } }
   const socket = { on: vi.fn(() => () => {}) } as unknown as VoidSocket<"/map/:mapId">
   session.socket = socket
@@ -301,7 +352,10 @@ it("resets creature publication scope when connecting to another channel", () =>
 })
 
 it.each([0, 1390, null])("joins using the current dev clock, including midnight and a return to real time: %s", (minute) => {
-  const { session, client, send } = fixture()
+  const parts17 = fixture()
+  const session = parts17.session,
+    client = parts17.client,
+    send = parts17.send
   session.others.clear()
   session.arriveAt = [1, 2]
   session.state.set({ ...session.state.get(), clock: { min: minute ?? 720, held: minute !== null } })
@@ -316,7 +370,12 @@ for (const operation of ["place", "cancel", "claim"] as const)
   for (const accepted of [true, false])
     for (const change of ["closed", "symbol", "reopened", "unchanged", "room"] as const)
       it(`${operation}, accepted=${accepted}: a late reply preserves the ${change} exchange window`, async () => {
-        const { session, client, context, callbacks, send } = fixture()
+        const parts18 = fixture()
+        const session = parts18.session,
+          client = parts18.client,
+          context = parts18.context,
+          callbacks = parts18.callbacks,
+          send = parts18.send
         const actions = new PlayerActions(context)
         const initial = player({ revision: 1, gold: 200 })
         callbacks.update({ player: initial })
@@ -346,14 +405,24 @@ for (const operation of ["place", "cancel", "claim"] as const)
         expect(session.state.get().busy).toBe(false)
         expect(session.state.get().board).toEqual(board)
         expect(session.state.get().player).toEqual(accepted && change !== "room" ? reply : initial)
-        expect(send.mock.calls.map(([message]) => message)).toEqual(board && change !== "room" ? [{ type: "ex-look", symbol: board.symbol }] : [])
+        expect(
+          send.mock.calls.map((entry19) => {
+            const message = entry19[0]
+            return message
+          }),
+        ).toEqual(board && change !== "room" ? [{ type: "ex-look", symbol: board.symbol }] : [])
         expect(nextSend).not.toHaveBeenCalled()
         client.cancel()
       })
 
 for (const operation of ["place", "cancel", "claim"] as const)
   it(`${operation}: disconnecting while the exchange waits leaves it closed`, async () => {
-    const { session, client, context, callbacks, send } = fixture()
+    const parts20 = fixture()
+    const session = parts20.session,
+      client = parts20.client,
+      context = parts20.context,
+      callbacks = parts20.callbacks,
+      send = parts20.send
     let closed!: (event: { code: number }) => void
     const socket = {
       send,
@@ -381,7 +450,9 @@ for (const operation of ["place", "cancel", "claim"] as const)
   })
 
 it("looks at the party again when an invite comes back as not the leader, so a party that broke up shows as gone", () => {
-  const { session, context } = fixture()
+  const parts21 = fixture()
+  const session = parts21.session,
+    context = parts21.context
   const send = vi.fn()
   session.socket = { send, readyState: 1 } as unknown as VoidSocket<"/map/:mapId">
   context.getScene = () => null

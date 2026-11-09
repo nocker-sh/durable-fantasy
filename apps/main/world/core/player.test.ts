@@ -162,7 +162,10 @@ describe("items in use", () => {
 
 describe("items", () => {
   it("every item has a known icon and sensible numbers", () => {
-    for (const [id, d] of Object.entries(ITEMS)) {
+    for (const entry1 of Object.entries(ITEMS)) {
+      const id = entry1[0],
+        d = entry1[1]
+
       expect(ITEM_ICONS as readonly string[], id).toContain(d.icon)
       expect(d.stack, id).toBeGreaterThan(0)
       expect(d.weight, id).toBeGreaterThanOrEqual(0)

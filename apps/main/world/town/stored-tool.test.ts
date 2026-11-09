@@ -4,7 +4,9 @@ import { scaleShelf } from "#/world/town/scale-shelf"
 it("rests the blade on its board and joins its narrow handle without filling the envelope", () => {
   const bounds = { part: "contents" as const, x0: 0, x1: 0.18, z0: 0, z1: 0.04, y0: 0.05, y1: 1.15 },
     tool = { handleWidth: 0.02, bladeLength: 0.12 }
-  const [blade, handle] = storedToolParts(bounds, tool)
+  const pair1 = storedToolParts(bounds, tool)
+  const blade = pair1[0],
+    handle = pair1[1]
   expect(blade.y0).toBe(0.05)
   expect(handle.y0).toBe(blade.y1)
   expect(handle.y1).toBe(1.15)

@@ -13,7 +13,12 @@ import { derive } from "#/world/core/derive"
 import { loadPlayer } from "#/world/core/load-player"
 import { player } from "#/world/test/player"
 
-const bag = (...items: [ItemId, number][]): Bag => items.reduce<Bag>((b, [id, n]) => addItem({ bag: b, item: id, count: n })!, emptyBag())
+const bag = (...items: [ItemId, number][]): Bag =>
+  items.reduce<Bag>((b, entry1) => {
+    const id = entry1[0],
+      n = entry1[1]
+    return addItem({ bag: b, item: id, count: n })!
+  }, emptyBag())
 const H = 3_600_000
 
 describe("commissions", () => {

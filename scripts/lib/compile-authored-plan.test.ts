@@ -37,10 +37,14 @@ it("projects all room and furniture positions without shrinking the plan", () =>
   const toCell = (x: number, z: number) => [Math.floor((interior.x0 + x * ROOM_SCALE) * 2), Math.floor((interior.z0 + z * ROOM_SCALE) * 2)]
   // Both cells through the shared partition remain open; the neighbouring wall is solid.
   for (const z of [8.25, 8.75]) {
-    const [x, y] = toCell(2.5, z)
+    const pair1 = toCell(2.5, z)
+    const x = pair1[0],
+      y = pair1[1]
     expect(rows[y][x]).toBe(".")
   }
-  const [x, y] = toCell(2.5, 7.25)
+  const pair2 = toCell(2.5, 7.25)
+  const x = pair2[0],
+    y = pair2[1]
   expect(rows[y][x]).toBe("#")
 })
 it("rejects unspecified furniture renderers instead of choosing a similar object", () => {

@@ -16,7 +16,11 @@ afterEach(() => {
 })
 
 const cases = SPAWNS.flatMap((spawn) => [0, 1 - Number.EPSILON].flatMap((roll) => (["recipient-save", "source-save", "reply"] as const).map((failure) => ({ spawn, roll, failure }))))
-it.each(cases)("$spawn.id / $roll / $failure: saved loot is delivered once without rerolling", async ({ spawn, roll, failure }) => {
+it.each(cases)("$spawn.id / $roll / $failure: saved loot is delivered once without rerolling", async (props1) => {
+  const spawn = props1.spawn,
+    roll = props1.roll,
+    failure = props1.failure
+
   vi.useFakeTimers()
   vi.setSystemTime(1000)
   const random = vi.spyOn(Math, "random").mockReturnValue(roll)

@@ -7,11 +7,15 @@ import { STATIONS } from "#/world/town/stations"
 it("keeps every current crafting rule located at its current equipment or outdoor forge", () => {
   expect(STATIONS.map((station) => station.id)).toEqual(STATION_RULES.map((rule) => rule.id))
   const workshop = INTERIORS.find((room) => room.house.id === "h-c2" && room.floor === 0)!
-  for (const [id, kind, name] of [
+  for (const entry1 of [
     ["workshop-hearth", "hearth", "炉"],
     ["workshop-bench", "workbench", "木工台"],
     ["workshop-loom", "loom", "機織り機"],
   ]) {
+    const id = entry1[0],
+      kind = entry1[1],
+      name = entry1[2]
+
     const equipment = workshop.furniture.find((item) => item.kind === kind && item.name === name)!
     expect(STATIONS.find((station) => station.id === id)).toMatchObject({ map: workshop.id, cell: [Math.floor(equipment.x * 2), Math.floor(equipment.z * 2)] })
   }

@@ -26,8 +26,12 @@ describe("quality and makers", () => {
   it("each maker's hand shows: Gerda's warms you, the monk's leans to SP, Irmgard's is steady", () => {
     expect(effectOf("potion", 1, "ゲルダ").warm).toBeGreaterThan(0)
     expect(effectOf("potion", 1, "ベネディクト").sp).toBeGreaterThan(effectOf("potion", 1, "イルムガルト").sp)
-    const [lo, , , hi] = MAKERS["イルムガルト"].potion!.tiers
-    const [glo, , , ghi] = MAKERS["ゲルダ"].potion!.tiers
+    const pair1 = MAKERS["イルムガルト"].potion!.tiers
+    const lo = pair1[0],
+      hi = pair1[3]
+    const pair2 = MAKERS["ゲルダ"].potion!.tiers
+    const glo = pair2[0],
+      ghi = pair2[3]
     expect(lo + hi).toBeLessThan(glo + ghi) // less spread
   })
 
@@ -56,17 +60,23 @@ describe("quality and makers", () => {
   })
 
   it("every food and drink does something, and every made thing on sale has a maker who makes it", () => {
-    for (const [id, item] of Object.entries(ITEMS)) {
+    for (const entry3 of Object.entries(ITEMS)) {
+      const id = entry3[0],
+        item = entry3[1]
+
       if (item.kind !== "consumable") continue
       const e = effectOf(id as ItemId)
       expect(e.hp + e.sp + e.stamina + e.warm, id).toBeGreaterThan(0)
     }
-    for (const [shopId, shop] of Object.entries(SHOPS))
+    for (const entry4 of Object.entries(SHOPS)) {
+      const shopId = entry4[0],
+        shop = entry4[1]
       for (const id of shop.stock) {
         if (!ITEMS[id].made) continue
         const by = makerAt(shopId as keyof typeof SHOPS, id)
         expect(MAKERS[by]?.[id], `${shopId}: ${by} makes ${id}`).toBeDefined()
       }
+    }
   })
 })
 

@@ -8,11 +8,18 @@ it("keeps both roof slopes planar and upward around a penetration crossing the r
     const cut = { x0: 3.5, z0: 5.5, x1: 4.5, z1: 6.5 },
       panels = gableRoofPanels(roof, [cut])
     let area = 0
-    for (const [a, b, c, d] of panels) {
+    for (const entry1 of panels) {
+      const a = entry1[0],
+        b = entry1[1],
+        c = entry1[2],
+        d = entry1[3]
+
       area += Math.abs((b[0] - a[0]) * (d[2] - a[2]) - (b[2] - a[2]) * (d[0] - a[0]))
       expect((b[2] - a[2]) * (c[0] - a[0]) - (b[0] - a[0]) * (c[2] - a[2])).toBeGreaterThan(0)
       for (const p of [a, b, c, d]) expect(p[1]).toBeCloseTo(gableRoofHeight(roof, p[0], p[2]))
-      const [x, z] = [(a[0] + c[0]) / 2, (a[2] + c[2]) / 2]
+      const pair2 = [(a[0] + c[0]) / 2, (a[2] + c[2]) / 2]
+      const x = pair2[0],
+        z = pair2[1]
       expect(x > cut.x0 && x < cut.x1 && z > cut.z0 && z < cut.z1).toBe(false)
     }
     expect(area).toBeCloseTo(6.5 * 8.5 - 1)

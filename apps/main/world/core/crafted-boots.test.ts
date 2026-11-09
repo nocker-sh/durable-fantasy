@@ -10,7 +10,14 @@ import { player } from "#/world/test/player"
 it.each([
   { item: "leather-boots", part: "feet", leather: 2, yarn: 1, level: 2, defense: 1 },
   { item: "leather-armor", part: "body", leather: 5, yarn: 2, level: 8, defense: 6 },
-] as const)("crafts $item and retains maker and quality through equipping and saving", ({ item, part, leather, yarn, level, defense }) => {
+] as const)("crafts $item and retains maker and quality through equipping and saving", (props1) => {
+  const item = props1.item,
+    part = props1.part,
+    leather = props1.leather,
+    yarn = props1.yarn,
+    level = props1.level,
+    defense = props1.defense
+
   const base = player()
   const before = player({ name: "エルナ", gold: 100, bag: bagWith(["tanned-leather", leather], ["yarn", yarn]), life: { ...base.life, tailoring: lifeExpAt(level) } })
   const command = { type: "craft" as const, recipe: item, station: "workshop-loom", roll: 0.5 }

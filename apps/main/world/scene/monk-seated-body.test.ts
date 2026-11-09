@@ -14,12 +14,15 @@ import { seatedRoot } from "#/world/scene/seated-root"
 it("supports each monk's shoes and clears the tabletop and legs in every seated frame", () => {
   const room = readSetting(readFileSync(new URL("../../../../.docs/settings/rooms/room-h10-1.md", import.meta.url), "utf8")),
     k = room.grid!.cell_m
-  for (const [symbol, name] of [
+  for (const entry1 of [
     ["A", "ベネディクト"],
     ["E", "クレメンス"],
     ["C", "ベネディクト"],
     ["C", "クレメンス"],
   ]) {
+    const symbol = entry1[0],
+      name = entry1[1]
+
     const chair = room.furniture!.find((f) => f.symbol === symbol)!,
       table = room.furniture!.find((f) => f.seat_symbols?.includes(symbol))!
     const seat = seatDimensions(chair.seat, chair.rect[2] * k, chair.rect[3] * k),

@@ -64,7 +64,9 @@ it("rejects an actual intermediate arm intersection absent from both endpoints",
       solution = solveArmGrip({ skeleton: base.skeleton, side: f.candidate.hand, target: mid, pole: f.candidate.pole })!,
       middle = nativeArmSurfaces({ scale: 1, shoulder: shoulder, elbow: solution.elbow, wrist: solution.wrist })
     const world = (p: V3): Point3 => {
-        const [x, z] = quarterTurnPoint(p[0], p[2], base.turn)
+        const pair1 = quarterTurnPoint(p[0], p[2], base.turn)
+        const x = pair1[0],
+          z = pair1[1]
         return [x + f.candidate.body_m[0], p[1] + base.rootY, z + f.candidate.body_m[1]]
       },
       capsules = poses.flatMap((p) => {

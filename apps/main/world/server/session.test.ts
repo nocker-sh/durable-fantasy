@@ -28,7 +28,8 @@ describe("browser ownership", () => {
     const cookie = response.headers.get("set-cookie")!
     expect(cookie).toContain("HttpOnly; SameSite=Strict")
     expect(response.headers.get("cache-control")).toBe("no-store")
-    const { id } = (await response.json()) as { id: string }
+    const parts1 = (await response.json()) as { id: string }
+    const id = parts1.id
     expect(await authenticatedPlayer(request(cookie))).toBe(id)
     expect(await (await establishSession(request(cookie))).json()).toEqual({ id })
     expect(credentials.get(id)).not.toBe(sessionCookie(request(cookie))!.secret)

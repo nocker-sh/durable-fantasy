@@ -13,7 +13,9 @@ it("keeps the blade and narrow handle in an orthonormal frame for every hearth f
       point: [number, number, number] = [0, 0, 0]
     for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) point[i] += g.axes[j][i] * coordinates[j]
     projectToolFrame(g.axes, point).forEach((v, i) => expect(v).toBeCloseTo(coordinates[i], 12))
-    const [blade, handle] = g.parts
+    const pair1 = g.parts
+    const blade = pair1[0],
+      handle = pair1[1]
     expect(blade.part).toBe("blade")
     expect(handle.part).toBe("handle")
     expect(blade.bounds.x1 - blade.bounds.x0).toBeCloseTo(0.18, 12)

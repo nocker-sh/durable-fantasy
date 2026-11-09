@@ -159,7 +159,12 @@ it("retries an uncertain earlier receipt before sending the next reward to that 
   await f.source.alarm()
   expect((await f.recipient.read()).exp).toBe(f.before.exp + 2)
   await f.source.alarm()
-  expect(f.receive.mock.calls.map(([, delivery]) => delivery.id)).toEqual([1, 1, 2])
+  expect(
+    f.receive.mock.calls.map((entry1) => {
+      const delivery = entry1[1]
+      return delivery.id
+    }),
+  ).toEqual([1, 1, 2])
   expect((await f.recipient.read()).exp).toBe(f.before.exp + 5)
   expect((await f.recipient.deliveryUpdate(null)).revision).toBe(2)
 })
@@ -199,11 +204,26 @@ it("checkpoints one effect per recipient before advancing its receipt, even if t
   f.restart()
   f.sourceStore.failNextSave()
   await expect(f.source.alarm()).rejects.toThrow("Storage unavailable")
-  expect(f.receive.mock.calls.map(([, delivery]) => delivery.id)).toEqual([1])
+  expect(
+    f.receive.mock.calls.map((entry2) => {
+      const delivery = entry2[1]
+      return delivery.id
+    }),
+  ).toEqual([1])
   f.restart()
   await f.source.alarm()
-  expect(f.receive.mock.calls.map(([, delivery]) => delivery.id)).toEqual([1, 1])
+  expect(
+    f.receive.mock.calls.map((entry3) => {
+      const delivery = entry3[1]
+      return delivery.id
+    }),
+  ).toEqual([1, 1])
   await f.source.alarm()
   expect((await f.recipient.read()).exp).toBe(f.before.exp + 5)
-  expect(f.receive.mock.calls.map(([, delivery]) => delivery.id)).toEqual([1, 1, 2])
+  expect(
+    f.receive.mock.calls.map((entry4) => {
+      const delivery = entry4[1]
+      return delivery.id
+    }),
+  ).toEqual([1, 1, 2])
 })

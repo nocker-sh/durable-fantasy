@@ -15,8 +15,10 @@ function reachableFrom(map: (typeof MAPS)[string], from: Cell): Set<number> {
     seen = new Set<number>([from[1] * n + from[0]]),
     queue = [from]
   while (queue.length) {
-    const [i, j] = queue.pop()!
-    for (const [di, dj] of [
+    const pair1 = queue.pop()!
+    const i = pair1[0],
+      j = pair1[1]
+    for (const entry2 of [
       [1, 0],
       [-1, 0],
       [0, 1],
@@ -26,6 +28,9 @@ function reachableFrom(map: (typeof MAPS)[string], from: Cell): Set<number> {
       [-1, 1],
       [-1, -1],
     ]) {
+      const di = entry2[0],
+        dj = entry2[1]
+
       const c: Cell = [i + di, j + dj]
       // a slant only between two free cells, as the path finder walks
       if (!walkable(map, c) || seen.has(c[1] * n + c[0]) || (di && dj && (!walkable(map, [i + di, j]) || !walkable(map, [i, j + dj])))) continue

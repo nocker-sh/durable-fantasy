@@ -167,7 +167,12 @@ for (const stage of ["take", "hand"] as const)
     await Promise.resolve()
     await Promise.resolve()
     expect(f.session.state.get().dialogue).toEqual(dialogue)
-    expect(f.send.mock.calls.map(([message]) => message.type)).toEqual(["errand"])
+    expect(
+      f.send.mock.calls.map((entry1) => {
+        const message = entry1[0]
+        return message.type
+      }),
+    ).toEqual(["errand"])
     expect(f.session.waiting.size).toBe(1)
     f.reply(true)
     await Promise.all(f.pending)

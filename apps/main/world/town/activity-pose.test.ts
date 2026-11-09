@@ -59,12 +59,17 @@ it("does not let a caller mutate the cached projection for future schedule updat
 })
 
 it("projects the body forward into each chair direction and preserves its authored heading", () => {
-  for (const [facing, dx, dz, heading] of [
+  for (const entry1 of [
     ["n", 0, -1, Math.PI],
     ["s", 0, 1, 0],
     ["w", -1, 0, -Math.PI / 2],
     ["e", 1, 0, Math.PI / 2],
   ] as const) {
+    const facing = entry1[0],
+      dx = entry1[1],
+      dz = entry1[2],
+      heading = entry1[3]
+
     const pose = projectActivityPose(10, 20, { resident: "test", floor: 0, x: 2, z: 3, kind: "lesson", seat: { x: 2, z: 3, height: 0.36, forward: 0.08, facing } })
     expect(pose.seat).toEqual({ at: [10 + (2 + dx * 0.08) * ROOM_SCALE, 20 + (3 + dz * 0.08) * ROOM_SCALE], height: 0.36 * ROOM_SCALE, heading })
   }

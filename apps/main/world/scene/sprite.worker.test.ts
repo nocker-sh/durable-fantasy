@@ -1,5 +1,6 @@
 import { afterEach, expect, it, vi } from "vitest"
-const { renderFrame } = vi.hoisted(() => ({ renderFrame: vi.fn() }))
+const parts1 = vi.hoisted(() => ({ renderFrame: vi.fn() }))
+const renderFrame = parts1.renderFrame
 vi.mock("#/world/scene/figure/animation", () => ({ ANIMS: { idle: {} } }))
 vi.mock("#/world/scene/figure/render", () => ({ FW: 1, FH: 1 }))
 vi.mock("#/world/scene/figure/render-frame", () => ({ renderFrame }))

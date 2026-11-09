@@ -77,16 +77,20 @@ describe("everyone's day", () => {
 
   it("something is open whenever you come", () => {
     for (const m of EVERY) {
-      const open = Object.entries(SHOPS).filter(([, s]) => s.keepers.some((k) => npcCell(MAPS[workSpot(RESIDENTS.find((r) => r.name === k)!).map], k, m)))
+      const open = Object.entries(SHOPS).filter((entry1) => {
+        const s = entry1[1]
+        return s.keepers.some((k) => npcCell(MAPS[workSpot(RESIDENTS.find((r) => r.name === k)!).map], k, m))
+      })
       expect(open.length, `${Math.floor(m / 60)}:${m % 60 || "00"}`).toBeGreaterThan(0)
     }
   })
 
   it("the cheap porridge can be had at every hour, so nobody is ever stuck with no stamina", () => {
     for (const m of EVERY) {
-      const where = Object.entries(SHOPS).filter(
-        ([, s]) => (s.stock as readonly string[]).includes("porridge") && s.keepers.some((k) => npcCell(MAPS[workSpot(RESIDENTS.find((r) => r.name === k)!).map], k, m)),
-      )
+      const where = Object.entries(SHOPS).filter((entry2) => {
+        const s = entry2[1]
+        return (s.stock as readonly string[]).includes("porridge") && s.keepers.some((k) => npcCell(MAPS[workSpot(RESIDENTS.find((r) => r.name === k)!).map], k, m))
+      })
       expect(where.length, `${Math.floor(m / 60)}:${m % 60 || "00"}`).toBeGreaterThan(0)
     }
   })
@@ -99,7 +103,11 @@ describe("everyone's day", () => {
   })
 
   it("the town works in three shifts, each a fifth of the town or more (town.md「三交代」)", () => {
-    for (const [shift, names] of Object.entries(SHIFTS)) expect(names.length, shift).toBeGreaterThanOrEqual(Math.ceil(RESIDENTS.length / 5))
+    for (const entry3 of Object.entries(SHIFTS)) {
+      const shift = entry3[0],
+        names = entry3[1]
+      expect(names.length, shift).toBeGreaterThanOrEqual(Math.ceil(RESIDENTS.length / 5))
+    }
   })
 
   it("at every hour, three in ten or more are out or minding a shop, and some are always in the streets", () => {
@@ -130,10 +138,20 @@ describe("everyone's day", () => {
 })
 
 describe("street sellers", () => {
-  const sellers = Object.entries(SHOPS).filter(([, s]) => (s as { at?: unknown }).at)
+  const sellers = Object.entries(SHOPS).filter((entry4) => {
+    const s = entry4[1]
+    return (s as { at?: unknown }).at
+  })
   it("there are street sellers at many hours, each at their pitch only at their hours", () => {
     expect(sellers.length).toBeGreaterThanOrEqual(9)
-    const hoursOpen = new Set(EVERY.filter((m) => sellers.some(([id]) => shopOpen(id as keyof typeof SHOPS, m))).map((m) => Math.floor(m / 60)))
+    const hoursOpen = new Set(
+      EVERY.filter((m) =>
+        sellers.some((entry5) => {
+          const id = entry5[0]
+          return shopOpen(id as keyof typeof SHOPS, m)
+        }),
+      ).map((m) => Math.floor(m / 60)),
+    )
     expect(hoursOpen.size).toBeGreaterThanOrEqual(10)
     // the dawn market is gone by midday, the night market is not there at noon
     expect(shopOpen("dawn-market", 7 * 60)).toBe(true)
@@ -145,14 +163,22 @@ describe("street sellers", () => {
   it("two sellers never share a pitch at the same time", () => {
     for (const m of EVERY) {
       const pitches = sellers
-        .filter(([id]) => shopOpen(id as keyof typeof SHOPS, m))
-        .map(([, s]) => `${(s as { at: { map: string; place: string } }).at.map}/${(s as { at: { map: string; place: string } }).at.place}`)
+        .filter((entry6) => {
+          const id = entry6[0]
+          return shopOpen(id as keyof typeof SHOPS, m)
+        })
+        .map((entry7) => {
+          const s = entry7[1]
+          return `${(s as { at: { map: string; place: string } }).at.map}/${(s as { at: { map: string; place: string } }).at.place}`
+        })
       expect(new Set(pitches).size, `${m / 60}h`).toBe(pitches.length)
     }
   })
 
   it("what they sell comes from somewhere in town", () => {
-    for (const [id, s] of sellers)
+    for (const entry8 of sellers) {
+      const id = entry8[0],
+        s = entry8[1]
       for (const item of s.stock) {
         const made = (s as { makers?: Record<string, string> }).makers?.[item]
         if (made)
@@ -161,6 +187,7 @@ describe("street sellers", () => {
             `${id}: ${made}`,
           ).toBe(true)
       }
+    }
   })
 })
 
@@ -177,7 +204,10 @@ it("laundry workers dry indoors before their next job without closing the evenin
 })
 
 it("keeps every resident's schedule identical at all minutes and slot boundaries", () => {
-  for (const [name, slots] of Object.entries(ROUTINES)) {
+  for (const entry9 of Object.entries(ROUTINES)) {
+    const name = entry9[0],
+      slots = entry9[1]
+
     const sorted = [...slots].sort((a, b) => a.from - b.from)
     const times = [...Array.from({ length: 1440 }, (_, minute) => minute), ...slots.flatMap((slot) => [slot.from - 0.01, slot.from + 0.01])]
     for (const minute of times) {

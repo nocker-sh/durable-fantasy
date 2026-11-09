@@ -9,12 +9,15 @@ it("requires the held tool itself to reach both rear sides through the mouth", (
   expect(() => hearthToolPaths({ bounds: bounds, front: "s", spec: spec, grip: [0.5, 0.9], bladeWidth: 0.18, length: 2 })).toThrow("Invalid")
 })
 it("projects the same approach in all four directions", () => {
-  for (const [side, grip] of [
+  for (const entry1 of [
     ["s", [0.5, 1.1]],
     ["n", [0.5, -0.1]],
     ["e", [1.1, 0.5]],
     ["w", [-0.1, 0.5]],
   ] as const) {
+    const side = entry1[0],
+      grip = entry1[1]
+
     const paths = hearthToolPaths({ bounds: bounds, front: side, spec: spec, grip: grip, bladeWidth: 0.18, length: 1.1 })
     expect(paths).toHaveLength(2)
     expect(paths.every((p) => p.target[0] >= 0 && p.target[0] <= 1 && p.target[1] >= 0 && p.target[1] <= 1)).toBe(true)

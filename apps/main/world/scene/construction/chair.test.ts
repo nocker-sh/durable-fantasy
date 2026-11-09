@@ -28,12 +28,16 @@ it("keeps every classroom chair in its footprint and puts the seat at its projec
 })
 
 it("places the back opposite the facing direction for all four authored orientations", () => {
-  for (const [facing, dx, dz] of [
+  for (const entry1 of [
     ["n", 0, -1],
     ["s", 0, 1],
     ["w", -1, 0],
     ["e", 1, 0],
   ] as const) {
+    const facing = entry1[0],
+      dx = entry1[1],
+      dz = entry1[2]
+
     const gb = new GB(),
       seat = { facing, width: 0.4, depth: 0.5, height: 0.44, backHeight: 0.88, boardThickness: 0.04, legWidth: 0.04 }
     chair(gb, { kind: "chair", solid: true, x: 1, z: 2, w: 0.6, d: 0.6, seat }, 0)
