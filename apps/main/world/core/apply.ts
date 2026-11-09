@@ -2,6 +2,9 @@
 // and a refused command never changes anything. The server runs this to decide; the client runs
 // it only to grey out what would be refused.
 import { handableGold } from "#/world/core/handable-gold"
+import { dropLapsedParcels } from "#/world/core/drop-lapsed-parcels"
+import { hasFutureErrands } from "#/world/core/has-future-errands"
+import { todays } from "#/world/core/todays"
 import { exchangeReady } from "#/world/core/exchange-ready"
 import { inventorySelectionMatches } from "#/world/core/inventory-selection"
 import { firstOf } from "#/world/core/first-of"
@@ -62,9 +65,16 @@ export type Context = ShopContext & {
 }
 
 export function apply(before: PlayerState, command: Command | ServerCommand, ctx: Context = {}): Transition {
-  const result = applyCommand(before, command, ctx)
+  const result = settleAllowance(before, command, applyCommand(before, command, ctx))
+  // a letter from an errand that has lapsed goes back to its sender at the next thing done, not only at the next errand
+  if (!result.ok || !ctx.now || hasFutureErrands(result.state.errands, ctx.now)) return result
+  const bag = dropLapsedParcels(result.state.bag, todays(result.state.errands, ctx.now))
+  return bag === result.state.bag ? result : { ...result, state: { ...result.state, bag } }
+}
+
+/** Starting gold is the first spent in town, and what is left of it never exceeds what is held. */
+function settleAllowance(before: PlayerState, command: Command | ServerCommand, result: Transition): Transition {
   if (!result.ok || !before.allowance || command.type === "trade-out" || command.type === "escrow-buy") return result
-  // starting gold is the first spent in town, and what is left of it never exceeds what is held
   const spent = Math.max(0, before.gold - result.state.gold)
   const allowance = Math.max(0, Math.min(result.state.gold, before.allowance - spent))
   return allowance === before.allowance ? result : { ...result, state: { ...result.state, allowance } }
