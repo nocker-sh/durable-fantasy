@@ -195,6 +195,8 @@ export class ServerMessages {
       }
       case "party-closed": {
         this.target.notify(partyClosedText(message.reason), "bad")
+        // the party may have broken up around us (the last other member left): look again so it shows as it is now
+        if (message.reason === "NOT_LEADER" || message.reason === "CHANGED") sendToRoom(this.target.session.socket, { type: "party-look", chat: this.target.session.partyChat })
         return
       }
       case "trade-asked":

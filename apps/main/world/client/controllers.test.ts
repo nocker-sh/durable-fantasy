@@ -379,3 +379,12 @@ for (const operation of ["place", "cancel", "claim"] as const)
     expect(session.waiting.size).toBe(0)
     expect(send).not.toHaveBeenCalled()
   })
+
+it("looks at the party again when an invite comes back as not the leader, so a party that broke up shows as gone", () => {
+  const { session, context } = fixture()
+  const send = vi.fn()
+  session.socket = { send, readyState: 1 } as unknown as VoidSocket<"/map/:mapId">
+  context.getScene = () => null
+  new ServerMessages(context).handle({ type: "party-closed", reason: "NOT_LEADER" })
+  expect(send.mock.calls.map((call) => JSON.stringify(call[0]))).toContainEqual(expect.stringContaining("party-look"))
+})
