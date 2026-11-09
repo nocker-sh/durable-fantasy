@@ -571,6 +571,7 @@ export class Game {
     this.update({ player, derived: { ...derive(player), weight: carried(player) } })
     if (!player.profileComplete) this.openModal("character")
     this.scene?.setAttackDelay(derive(player).attackDelay)
+    this.scene?.setReach(derive(player).reach)
     this.scene?.setDown(player.hp <= 0)
     this.scene?.setSitting(player.sitting && player.hp > 0)
     const avatar = this.avatar(player)
@@ -604,6 +605,7 @@ export class Game {
     const player = this.state.get().player
     if (player) {
       scene.setAttackDelay(derive(player).attackDelay)
+      scene.setReach(derive(player).reach)
       scene.setDown(player.hp <= 0)
       scene.setSitting(player.sitting && player.hp > 0)
       scene.setAvatar(this.avatar(player))

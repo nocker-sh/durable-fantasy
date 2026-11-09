@@ -347,6 +347,7 @@ export async function assembleSceneRuntime(props: SceneBuildProps & { resources:
     setSitting,
     fight,
     setAttackDelay: combat.setAttackDelay,
+    setReach: combat.setReach,
     approach,
     stop,
     stopFight(id: string) {

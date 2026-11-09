@@ -20,7 +20,7 @@ type Props = Readonly<{
 
 /** 描画ごとの追跡と攻撃通知を扱う。命中と報酬はサーバーが決める。 */
 export class SceneCombat {
-  private readonly state = { attackDelay: 1500, lastSwing: 0, lastRepath: 0 }
+  private readonly state = { attackDelay: 1500, reach: MELEE_REACH, lastSwing: 0, lastRepath: 0 }
 
   constructor(private readonly props: Props) {
     Object.freeze(this)
@@ -37,19 +37,24 @@ export class SceneCombat {
     this.state.attackDelay = ms
   }
 
+  /** How far the weapon in hand strikes from (derive's reach); the room checks the same distance. */
+  readonly setReach = (reach: number): void => {
+    this.state.reach = reach
+  }
+
   readonly update = (wall: number): void => {
     const target = this.props.action.fighting ? this.props.monsters.find((m) => m.spawn.id === this.props.action.fighting) : undefined
     if (!target) return
     if (!target.body.visible) return this.props.action.endFight()
     const me = this.props.me
-    if (Math.hypot(target.pos[0] - me.pos[0], target.pos[1] - me.pos[1]) > MELEE_REACH) this.pursue(target, wall)
+    if (Math.hypot(target.pos[0] - me.pos[0], target.pos[1] - me.pos[1]) > this.state.reach) this.pursue(target, wall)
     else this.strike(target, wall)
   }
 
   private pursue(target: Target, wall: number): void {
     if (!(wall - this.state.lastRepath > 600)) return
     this.state.lastRepath = wall
-    approachMonster({ m: target, from: this.props.me.pos, reach: MELEE_REACH, tryWalk: (point) => this.props.movement.walkTo(point, true) })
+    approachMonster({ m: target, from: this.props.me.pos, reach: this.state.reach, tryWalk: (point) => this.props.movement.walkTo(point, true) })
   }
 
   private strike(target: Target, wall: number): void {

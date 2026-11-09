@@ -220,6 +220,9 @@ export class MapScene {
   setAttackDelay(ms: number) {
     this.runtime?.setAttackDelay(ms)
   }
+  setReach(reach: number) {
+    this.runtime?.setReach(reach)
+  }
   /** Go after a creature and keep striking it (as clicking it does). */
   fight(id: string) {
     this.runtime?.fight(id)

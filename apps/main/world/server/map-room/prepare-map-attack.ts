@@ -22,7 +22,7 @@ export async function prepareMapAttack(props: Props): Promise<PreparedMapAttack 
     return null
   }
   const creatures = await Wild.get(props.room.ctx.params.mapId).state(props.spawn.map)
-  if (!canReachMonster(props.room, props.spawn, { now, combat: creatures[props.spawn.id]?.combat })) return null
+  if (!canReachMonster(props.room, props.spawn, { now, combat: creatures[props.spawn.id]?.combat, reach: readiness.stats.reach })) return null
   if (!(await props.room.standUp())) {
     await notifyClient(props.room.ctx.connection.send({ type: "refused", what: "attack", monster: props.spawn.id, reason: "NOT_READY" }))
     return null

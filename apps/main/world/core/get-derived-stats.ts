@@ -1,4 +1,5 @@
 import { equipmentAttack } from "#/world/core/equipment-attack"
+import { MELEE_REACH } from "#/world/core/monsters"
 import { scaling } from "#/world/core/scaling"
 import { REGEN_HP_SHARE, REGEN_SP_SHARE, UNARMED_DELAY } from "#/world/core/stats-rules"
 import type { Equipment } from "#/world/core/items/types"
@@ -21,6 +22,7 @@ export function getDerivedStats(props: Props): Derived {
     flee: props.build.level + Math.floor(props.stats.dex / 2),
     crit: Math.floor(props.stats.dex / 4),
     attackDelay: Math.max(600, (props.weapon?.delay ?? UNARMED_DELAY) - props.stats.dex * 8),
+    reach: props.weapon?.reach ?? MELEE_REACH,
     maxWeight: 1800 + props.stats.str * 40,
     // a share of the maximum, so rest keeps pace with growth (game-system.md §3.5)
     regenHp: Math.max(1, Math.floor(maxHp * REGEN_HP_SHARE)),

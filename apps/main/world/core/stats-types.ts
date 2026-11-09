@@ -15,6 +15,8 @@ export type Derived = {
   crit: number
   /** milliseconds between auto attacks */
   attackDelay: number
+  /** how far (world units) the weapon strikes from */
+  reach: number
   /** how much can be carried */
   maxWeight: number
   /** HP and SP that come back every while (core/settle.ts) */

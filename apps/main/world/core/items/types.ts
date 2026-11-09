@@ -14,6 +14,8 @@ export type Equipment = {
   def?: number
   /** stats and maximums it adds while worn */
   bonus?: Partial<Record<Stat | "maxHp" | "maxSp", number>>
+  /** how far (world units) a weapon strikes from; melee reach when not given (core/monsters.ts MELEE_REACH) */
+  reach?: number
   /** a two-handed weapon leaves no hand for a shield */
   twoHanded?: boolean
   /** stats (as raised, not with what is worn) and life skill levels needed to wear it */
