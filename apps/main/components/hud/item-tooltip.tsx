@@ -34,6 +34,7 @@ export function ItemTooltip(inputProps: {
   children: ReactElement
   side?: "top" | "right" | "left" | "bottom"
   /** hold it open (dev previews) */ open?: boolean
+  /** why it cannot be used here (a shop that does not buy it), shown under the details */ note?: string
 }) {
   const item = inputProps.item
   const mark = inputProps.mark
@@ -193,6 +194,7 @@ export function ItemTooltip(inputProps: {
           <dt className="text-text-dim">買取の目安</dt>
           <dd className="text-right">{sellable(item) ? <Gold amount={buybackOf(sellPrice(item), { item, q, dur: mark?.dur })} /> : "売れない"}</dd>
         </dl>
+        {inputProps.note ? <p className="mt-1.5 font-head text-[11px] text-bad">{inputProps.note}</p> : null}
       </TooltipContent>
     </Tooltip>
   )

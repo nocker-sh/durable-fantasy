@@ -266,3 +266,10 @@ for (const change of ["shop", "connection"] as const)
     expect(replacement).not.toHaveBeenCalled()
     expect(f.send.mock.calls.filter((call) => call[0].type === "look")).toEqual([])
   })
+
+it("tells a screen reader why a slot the shop will not buy cannot be picked (ui.md §3.6)", () => {
+  const f = fixture({ stock: 1, gold: 0, bag: bagWith(["log", 1]) })
+  expect(shopTakes("fruit", "log")).toBe(false)
+  const html = renderToStaticMarkup(createElement(GameProvider, { game: f.game, children: createElement(ShopSellPanel, { picked: null, onPick: vi.fn() }) }))
+  expect(html).toContain(`aria-description="${REASON_TEXT.NOT_WANTED}"`)
+})

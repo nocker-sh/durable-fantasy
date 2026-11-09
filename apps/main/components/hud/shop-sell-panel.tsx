@@ -42,7 +42,7 @@ export function ShopSellPanel(props: Props) {
     <div className="flex flex-col gap-2.5">
       <div className="ui-well grid grid-cols-6 gap-1 p-1.5">
         {bag.map((s, index) => (
-          <ItemTooltip key={index} item={s?.item} mark={s} side="left">
+          <ItemTooltip key={index} item={s?.item} mark={s} side="left" note={s && !shopTakes(shop!, s.item) ? REASON_TEXT.NOT_WANTED : undefined}>
             <Slot
               icon={s ? game.iconUrl(s.item, s.by) : null}
               rarity={s ? ITEMS[s.item].rarity : undefined}
@@ -51,6 +51,7 @@ export function ShopSellPanel(props: Props) {
               over={picked === index}
               disabled={!s || !shopTakes(shop!, s.item)}
               aria-label={s ? displayName(s.item, s.by) : "空き"}
+              aria-description={s && !shopTakes(shop!, s.item) ? REASON_TEXT.NOT_WANTED : undefined}
               onClick={() => onPick(index)}
               className="disabled:cursor-default"
             />
