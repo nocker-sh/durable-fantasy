@@ -3,6 +3,7 @@
 // title bar switches between a small and a large map.
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react"
 import { shopMarkers } from "#/world/maps/shop-markers"
+import { stationMarkers } from "#/world/maps/station-markers"
 import { formatTime } from "#/world/core/format-time"
 import { phase } from "#/world/core/phase"
 import { useGame } from "#/hooks/use-game"
@@ -28,6 +29,7 @@ export function Minimap() {
   const loading = useGameState((s) => s.loading)
   const min = useGameState((s) => s.clock.min)
   const shops = useMemo(() => shopMarkers(map.id, min), [map.id, min])
+  const stations = useMemo(() => stationMarkers(map.id), [map.id])
   const background = useRef<HTMLCanvasElement | null>(null)
 
   // Rescale the ground only when the map or its display size changes.
@@ -165,12 +167,32 @@ export function Minimap() {
               </button>
             )
           })}
+        {!loading &&
+          stations.map((station) => {
+            const x = (station.cell[0] + 0.5) / 2,
+              z = (station.cell[1] + 0.5) / 2
+            const label = station.names.join("・")
+            return (
+              <button
+                key={`station-${station.cell.join(",")}`}
+                type="button"
+                title={label}
+                aria-label={label}
+                onClick={() => game.walkTo(x, z, { snapToWarp: false })}
+                className="absolute flex size-3.5 -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-white"
+                style={{ left: (x / game.mapSize) * SIZE, top: (z / game.mapSize) * SIZE }}
+              >
+                <span className="size-1.5 rounded-full border border-sp-hi bg-sp shadow-[0_0_0_1px_#0b0c15]" />
+              </button>
+            )
+          })}
         <span className="pointer-events-none absolute top-1 left-1/2 -translate-x-1/2 rounded bg-black/50 px-1 font-head text-[10px] leading-3.5 text-white">北</span>
       </div>
-      {shops.length > 0 && (
+      {(shops.length > 0 || stations.length > 0) && (
         <div className="mt-1 flex gap-3 text-[10px] text-amber-200">
-          <span>■ 営業中</span>
-          <span>□ 準備中</span>
+          {shops.length > 0 && <span>■ 営業中</span>}
+          {shops.length > 0 && <span>□ 準備中</span>}
+          {stations.length > 0 && <span className="text-sp-hi">● 作業場</span>}
         </div>
       )}
       <Clock />
