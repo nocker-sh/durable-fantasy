@@ -2,6 +2,9 @@ import type { Line } from "#/world/town/lines/line"
 
 const lines = {
   イルムガルト: [
+    { text: "ゼリーは草原のスライムからよ。三つ、忘れずに取ってきなさい。", errand: { id: "irmgard-jelly", state: "taken" } },
+    { text: "ゼリーが揃ったのね。こちらへ渡しなさい。", errand: { id: "irmgard-jelly", state: "ready" } },
+    { text: "これで回復薬が練れるわ。助かりました。", errand: { id: "irmgard-jelly", state: "done" } },
     { text: "青い薬草はまだなのね。無理に奥まで行くんじゃないわよ。", errand: { id: "irmgard-herbs", state: "taken" } },
     { text: "青い薬草、揃ったのね。渡す前に、根についた土を払ってちょうだい。", errand: { id: "irmgard-herbs", state: "ready" } },
     { text: "さっきの青い薬草、今夜の薬に使わせてもらうわ。", errand: { id: "irmgard-herbs", state: "done" } },

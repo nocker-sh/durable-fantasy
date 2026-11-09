@@ -2,6 +2,10 @@ import type { Line } from "#/world/town/lines/line"
 
 const lines = {
   ヴィルヘルム: [
+    { text: "草原の花を二本じゃ。若いの、頼んだぞ。", errand: { id: "wilhelm-flowers", state: "taken" } },
+    { text: "おお、花を摘んできてくれたか。見せておくれ。", errand: { id: "wilhelm-flowers", state: "ready" } },
+    { text: "ええ花じゃのう。窓辺に飾るとしよう。", errand: { id: "wilhelm-flowers", state: "done" } },
+    { text: "その包みは……わしの首巻きかのう。", errand: { id: "magdalena-muffler", state: "taken" } },
     { text: "ほっほっほ。若いの、まあ座りなされ。" },
     { text: "じいさまのじいさまの頃にはな、空を飛ぶ獣がおったそうじゃ。" },
     { text: "……ふぁ。どこまで話したかのう。" },

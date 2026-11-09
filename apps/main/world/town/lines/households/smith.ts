@@ -2,6 +2,10 @@ import type { Line } from "#/world/town/lines/line"
 
 const lines = {
   アルノルト: [
+    { text: "炭は三つだ。ヨーゼフの店ので構わねえ。", errand: { id: "gunter-charcoal", state: "taken" } },
+    { text: "炭が揃ったな。炉にくべるぜ、渡してくれ。", errand: { id: "gunter-charcoal", state: "ready" } },
+    { text: "これで今晩の炉はもつ。助かったぜ。", errand: { id: "gunter-charcoal", state: "done" } },
+    { text: "ヨーゼフの炭だな。待ってたぜ。", errand: { id: "josef-charcoal", state: "taken" } },
     { text: "鉄くずは三つだ。砂丘へ行くなら、武器と食い物を忘れるなよ。", errand: { id: "gunter-scrap", state: "taken" } },
     { text: "鉄くずが揃ったな。砂を落としてから炉に入れるぜ。渡してくれるか。", errand: { id: "gunter-scrap", state: "ready" } },
     { text: "あんたの鉄で鍬が直せる。カールも畑仕事に戻れるぜ。", errand: { id: "gunter-scrap", state: "done" } },
@@ -57,6 +61,9 @@ const lines = {
     { text: "用があるなら言いな。なきゃ、火の番の邪魔はするなよ。", first: true },
   ],
   ペーター: [
+    { text: "ヨーゼフさんの炭を二つです！　よろしくお願いします！", errand: { id: "peter-charcoal", state: "taken" } },
+    { text: "炭、持ってきてくれたんですね！", errand: { id: "peter-charcoal", state: "ready" } },
+    { text: "これで炉が消えずに済みます！　ありがとうございます！", errand: { id: "peter-charcoal", state: "done" } },
     { text: "ぼく、アルノルト親方の見習いです！炉の番をしてます。" },
     { text: "いつか親方みたいな剣を打ちたいんです！" },
     { text: "あちっ……あ、平気です！よくあることなので！" },

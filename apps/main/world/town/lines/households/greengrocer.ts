@@ -51,6 +51,8 @@ const lines = {
     { text: "あなた、どのへんに住んでるの？……ああ、ごめんなさい、癖なのよ。", first: true },
   ],
   グレーテ: [
+    { text: "酢漬けの瓶は酒場のフランツさんにね。割らないでよ！", errand: { id: "grete-pickles", state: "taken" } },
+    { text: "毎度！　届けてくれて助かったわ。", errand: { id: "grete-pickles", state: "done" } },
     { text: "毎度！キャベツが安いよ。" },
     { text: "安いよ、安いよ。……あんたにだけ言ってるんじゃないけどね。" },
     { text: "キャベツはカールさんの畑のだよ。甘いのはあの人の辛抱の味さ。" },

@@ -2,6 +2,9 @@ import type { Line } from "#/world/town/lines/line"
 
 const lines = {
   マグダレーナ: [
+    { text: "首巻きはヴィルヘルムさんに直接お渡しください。大事な品ですから。", errand: { id: "magdalena-muffler", state: "taken" } },
+    { text: "ヴィルヘルムさん、首に巻いてくださいましたか。よかったです。", errand: { id: "magdalena-muffler", state: "done" } },
+    { text: "マティアスさんの毛を持ってきてくださったのですね。", errand: { id: "matthias-wool", state: "taken" } },
     { text: "寸法は嘘をつきません。少し、腕を上げてくださいな。" },
     { text: "店に並べる首巻きは、この町の羊の毛だけで紡ぎます。よその糸は混ぜません。" },
     { text: "縞のマフラーは目立つ色で編みます。迷っても見つけてもらえるように。" },

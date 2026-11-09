@@ -2,6 +2,10 @@ import type { Line } from "#/world/town/lines/line"
 
 const lines = {
   フランツ: [
+    { text: "小魚は網小屋の先で釣れるだろう。四尾だ。", errand: { id: "franz-fish", state: "taken" } },
+    { text: "いい小魚だろう。それでスープが仕込める。", errand: { id: "franz-fish", state: "ready" } },
+    { text: "今夜の魚のスープは、あんたの小魚だ。", errand: { id: "franz-fish", state: "done" } },
+    { text: "グレーテの酢漬けか。肴にちょうどいいだろう。", errand: { id: "grete-pickles", state: "taken" } },
     { text: "その包み、ヤコブの干し魚だろう。匂いでわかる。", errand: { id: "jakob-fish", state: "taken" } },
     { text: "いらっしゃい。外は今日も冷えるな。" },
     { text: "温めたぶどう酒が一番だ。体の芯から温まるだろう。" },

@@ -2,6 +2,8 @@ import type { Line } from "#/world/town/lines/line"
 
 const lines = {
   ヨーゼフ: [
+    { text: "……炭は広場の鍛冶屋だ。アルノルトにな。", errand: { id: "josef-charcoal", state: "taken" } },
+    { text: "……おう。届いたか。", errand: { id: "josef-charcoal", state: "done" } },
     { text: "……おう。" },
     { text: "森は嘘をつかない。" },
     { text: "森の奥は道が細い。迷うなよ。" },

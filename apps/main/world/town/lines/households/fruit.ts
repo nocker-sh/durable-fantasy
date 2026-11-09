@@ -2,6 +2,8 @@ import type { Line } from "#/world/town/lines/line"
 
 const lines = {
   クララ: [
+    { text: "うちの人に、あはは、よろしくね。冷めないうちに。", errand: { id: "klara-lunch", state: "taken" } },
+    { text: "ちゃんと食べてた？　あはは、ありがとね。", errand: { id: "klara-lunch", state: "done" } },
     { text: "あはは、ごめんなさい、話に夢中で。" },
     { text: "まあ、なんとかなるわよ。いつもなんとかなってるもの。" },
     { text: "くしゃみが三回続くと、誰かに噂されてるの。たいていアンナよ。" },

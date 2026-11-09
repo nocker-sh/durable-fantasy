@@ -36,8 +36,8 @@ it("lets only the recipient receive a delivery and both participants remember co
 it("selects actual resident lines for the current task and excludes premature thanks", () => {
   vi.stubGlobal("localStorage", { getItem: () => '["イルムガルト"]', setItem: vi.fn() })
   const state = { ...createGameState().get(), player: player({ errands: [taken("irmgard-herbs")], bag: bagWith(["blue-herb", 2]) }) }
-  const ready = ALL_LINES["イルムガルト"].find((line) => line.errand?.state === "ready")!.text
-  const done = ALL_LINES["イルムガルト"].find((line) => line.errand?.state === "done")!.text
+  const ready = ALL_LINES["イルムガルト"].find((line) => line.errand?.id === "irmgard-herbs" && line.errand.state === "ready")!.text
+  const done = ALL_LINES["イルムガルト"].find((line) => line.errand?.id === "irmgard-herbs" && line.errand.state === "done")!.text
   expect(linesFor({ state: state, name: "イルムガルト", spokenKey: "spoken", now: now })).toContain(ready)
   expect(linesFor({ state: state, name: "イルムガルト", spokenKey: "spoken", now: now })).not.toContain(done)
   state.player = { ...state.player, errands: [taken("irmgard-herbs", true)] }

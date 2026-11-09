@@ -2,6 +2,9 @@ import type { Line } from "#/world/town/lines/line"
 
 const lines = {
   フリッツ: [
+    { text: "ゼリーは二つだぞ！　スライムを叩けば落ちるんだって！", errand: { id: "fritz-jelly", state: "taken" } },
+    { text: "それがゼリーか！　早く見せてくれよ！", errand: { id: "fritz-jelly", state: "ready" } },
+    { text: "ぷるぷるだぞ！　ディーターさんに見せてくる！", errand: { id: "fritz-jelly", state: "done" } },
     { text: "大きくなったら衛兵になるんだぞ！" },
     { text: "ミアは足が速いんだ。ずるいぞ。" },
     { text: "鬼ごっこしようぜ！　おれが鬼でもいいぞ。" },
@@ -46,6 +49,9 @@ const lines = {
     { text: "だれだ？　……町の人か。おれはフリッツだぞ！", first: true },
   ],
   ミア: [
+    { text: "花は一本だけでいいの。きれいなのがいいな。", errand: { id: "mia-flower", state: "taken" } },
+    { text: "わあ、花！　ちょうだい、ちょうだい。", errand: { id: "mia-flower", state: "ready" } },
+    { text: "母さん、喜んでくれたの。ありがとう！", errand: { id: "mia-flower", state: "done" } },
     { text: "ねえねえ、鬼ごっこしよ。わたし負けないから。" },
     { text: "フリッツったら、すぐ転ぶのよ。" },
     { text: "きゃー！見つかっちゃった。" },
@@ -140,6 +146,9 @@ const lines = {
     { text: "あら、はじめまして。うちの子たちにも、あとで紹介するわね。", first: true },
   ],
   カール: [
+    { text: "薪は四束だな。急がなくていい、夜までにな。", errand: { id: "karl-firewood", state: "taken" } },
+    { text: "薪が揃ったな。栗が焼けるな。", errand: { id: "karl-firewood", state: "ready" } },
+    { text: "今夜はこれで栗が焼ける。ありがとうな。", errand: { id: "karl-firewood", state: "done" } },
     { text: "ふう……空模様が、気になるな。" },
     { text: "この畑の麦は、風車で挽いて、町じゅうのパンになるんだ。" },
     { text: "雨が少し降ってくれるといいんだがな。" },

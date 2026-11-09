@@ -2,6 +2,9 @@ import type { Line } from "#/world/town/lines/line"
 
 const lines = {
   マルタ: [
+    { text: "薪は五束よ。ヨーゼフさんの店にもあるわ。", errand: { id: "marta-firewood", state: "taken" } },
+    { text: "薪が揃ったのね。窯の前に置いてちょうだい。", errand: { id: "marta-firewood", state: "ready" } },
+    { text: "これで明日の朝まで焼けるわ。ありがとうね。", errand: { id: "marta-firewood", state: "done" } },
     { text: "ウルリケさんの卵を預かってきたの？　籠ごと渡してちょうだい。", errand: { id: "ulrike-eggs", state: "ready" } },
     { text: "届けてくれた卵で、次のパイを仕込めるわ。ありがとうね。", errand: { id: "ulrike-eggs", state: "done" } },
     { text: "焼きたてが一番よ。冷めたらスープに浸してね。" },
@@ -57,6 +60,8 @@ const lines = {
     { text: "はじめての人には、白パンを勧めてるの。やわらかいのよ。", first: true },
   ],
   ハンス: [
+    { text: "夜番のディーターさんにだよ！　冷めないうちにね！", errand: { id: "hans-bread", state: "taken" } },
+    { text: "ディーターさん、喜んでた？　また焼くよ！", errand: { id: "hans-bread", state: "done" } },
     { text: "いらっしゃい！黒パン、白パン、焼きたてだよ！", doing: "店先でパンを売る" },
     { text: "母さんのパンは町いちばんだよ！" },
     { text: "黒パンは日持ちするよ！三日目がいちばんうまいって人もいるよ！" },

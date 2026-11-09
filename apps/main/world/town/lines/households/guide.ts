@@ -2,6 +2,8 @@ import type { Line } from "#/world/town/lines/line"
 
 const lines = {
   テオ: [
+    { text: "荷はヒルデの倉庫までだよ。南門の近くだ。", errand: { id: "theo-parcel", state: "taken" } },
+    { text: "届けてくれたんだ。助かったよ、ありがとう。", errand: { id: "theo-parcel", state: "done" } },
     { text: "迷ったら井戸を目指せ。広場の真ん中に井戸があるよ。" },
     { text: "町は広場が真ん中。西が商店通り、東が職人通り、南がここだよ。" },
     { text: "外から戻ったら、井戸の水で顔を洗うといいよ。町に帰った気がするから。" },

@@ -2,6 +2,9 @@ import type { Line } from "#/world/town/lines/line"
 
 const lines = {
   ベネディクト: [
+    { text: "薬草は四束です。草原の日当たりのよいところに生えています。", errand: { id: "benedikt-herbs", state: "taken" } },
+    { text: "薬草を集めてくださったのですね。どうぞこちらへ。", errand: { id: "benedikt-herbs", state: "ready" } },
+    { text: "これで薬湯が出せます。女神さまのお恵みを。", errand: { id: "benedikt-herbs", state: "done" } },
     { text: "女神さまが、いつかお戻りになりますように。" },
     { text: "礼拝堂の扉に鍵はありません。寒い夜は、中で休んでいってください。" },
     { text: "迷ったときは、鐘の音を頼りに戻ってきてください。" },
