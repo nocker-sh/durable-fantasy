@@ -88,6 +88,7 @@ export const NOT_TABLES: readonly string[] = [
   "WOOD_IDS",
   "STATS",
   "FRIEND",
+  "LODGING", // One price per inn, shown in the dialogue choice.
   "TIMES_OF_DAY",
   "DEFAULT_WINDOWS",
   "KEPT_ON_ESC",
