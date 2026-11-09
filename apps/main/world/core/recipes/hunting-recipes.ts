@@ -171,6 +171,42 @@ export const HUNTING_RECIPES: readonly Recipe[] = [
     output: ["root-bow", 1],
   }),
   recipe({
+    id: "reinforced-chain-mail",
+    skill: "smithing",
+    station: "forge",
+    min: 8,
+    inputs: [
+      ["chain-mail", 1],
+      ["hardened-scrap", 5],
+      ["charcoal", 2],
+    ],
+    output: ["reinforced-chain-mail", 1],
+  }),
+  recipe({
+    id: "reinforced-helm",
+    skill: "smithing",
+    station: "forge",
+    min: 8,
+    inputs: [
+      ["iron-helm", 1],
+      ["hardened-scrap", 3],
+      ["charcoal", 1],
+    ],
+    output: ["reinforced-helm", 1],
+  }),
+  recipe({
+    id: "resin-shield",
+    skill: "carpentry",
+    station: "workbench",
+    min: 8,
+    inputs: [
+      ["wooden-shield", 1],
+      ["root-resin", 3],
+      ["plank", 2],
+    ],
+    output: ["resin-shield", 1],
+  }),
+  recipe({
     id: "forest-draught",
     skill: "alchemy",
     station: "hearth",
