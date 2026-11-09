@@ -12,6 +12,7 @@
   "buildings": [],
   "residents": [],
   "monsters": [
+    "monster-dune-sidewinder",
     "monster-sand-slime",
     "monster-iron-sand-slime"
   ],
@@ -50,6 +51,11 @@
   ],
   "ecology_zones": [
     {
+      "species": "monster-dune-sidewinder",
+      "feature": "昼に潜る岩陰の砂と、夕方に獲物を探す砂の上",
+      "placement": null
+    },
+    {
       "species": "monster-sand-slime",
       "feature": "植物片と湿りが残る砂丘の風陰",
       "placement": null
@@ -61,6 +67,7 @@
     }
   ],
   "design_dependencies": [
+    "monster-dune-sidewinder",
     "monster-sand-slime",
     "monster-iron-sand-slime"
   ]

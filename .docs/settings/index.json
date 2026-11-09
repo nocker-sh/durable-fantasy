@@ -2909,6 +2909,18 @@
       "source": "apps/main/world/core/monsters.ts"
     },
     {
+      "id": "monster-forest-spider",
+      "kind": "monsters",
+      "file": "monsters/monster-forest-spider.md",
+      "source": "apps/main/world/core/monsters.ts"
+    },
+    {
+      "id": "monster-dune-sidewinder",
+      "kind": "monsters",
+      "file": "monsters/monster-dune-sidewinder.md",
+      "source": "apps/main/world/core/monsters.ts"
+    },
+    {
       "id": "monster-resin-slime",
       "kind": "monsters",
       "file": "monsters/monster-resin-slime.md",

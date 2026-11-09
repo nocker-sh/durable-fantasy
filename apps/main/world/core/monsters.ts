@@ -1,4 +1,6 @@
 import type { MonsterKind, Spawn } from "#/world/core/monster-types"
+import { draft as forestSpider } from "#/world/core/bestiary/forest-spider"
+import { draft as duneSidewinder } from "#/world/core/bestiary/dune-sidewinder"
 import { draft as passStrider } from "#/world/core/bestiary/pass-strider"
 
 export const MONSTER_KINDS: Record<string, MonsterKind> = {
@@ -156,6 +158,8 @@ export const MONSTER_KINDS: Record<string, MonsterKind> = {
   },
   // the pass's grazer, let out of the drafts (.docs/settings/monsters/monster-pass-strider.md)
   "pass-strider": passStrider.kind,
+  "dune-sidewinder": duneSidewinder.kind,
+  "forest-spider": forestSpider.kind,
 }
 
 const many = (inputProps: { map: string; kind: Spawn["kind"]; n: number; area: Spawn["area"]; from?: number }): Spawn[] => {
@@ -197,6 +201,10 @@ export const SPAWNS: readonly Spawn[] = [
   ...many({ map: "deep-forest", kind: "old-moss-slime", n: 1, area: [22, 34, 25, 37], from: 4 }),
   ...many({ map: "deep-forest", kind: "old-moss-slime", n: 1, area: [14, 38, 17, 41], from: 5 }),
   // the grassland west of the cart road over the pass, clear of the road and its exits
+  ...many({ map: "deep-forest", kind: "forest-spider", n: 1, area: [32, 8, 35, 11] }),
+  ...many({ map: "deep-forest", kind: "forest-spider", n: 1, area: [30, 36, 33, 39], from: 1 }),
+  ...many({ map: "red-dunes", kind: "dune-sidewinder", n: 1, area: [8, 30, 11, 33] }),
+  ...many({ map: "red-dunes", kind: "dune-sidewinder", n: 1, area: [38, 36, 41, 39], from: 1 }),
   ...many({ map: "mountain-pass", kind: "pass-strider", n: 1, area: [6, 26, 12, 32] }),
   ...many({ map: "mountain-pass", kind: "pass-strider", n: 1, area: [6, 36, 12, 42], from: 1 }),
 ]

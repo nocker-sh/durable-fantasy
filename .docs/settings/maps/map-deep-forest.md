@@ -12,6 +12,7 @@
   "buildings": [],
   "residents": [],
   "monsters": [
+    "monster-forest-spider",
     "monster-moss-slime",
     "monster-blue-slime",
     "monster-resin-slime",
@@ -52,6 +53,11 @@
   ],
   "ecology_zones": [
     {
+      "species": "monster-forest-spider",
+      "feature": "倒木の根元の穴と、虫の落ちる枝の下",
+      "placement": null
+    },
+    {
       "species": "monster-moss-slime",
       "feature": "苔と落ち葉のある根の間",
       "placement": null
@@ -73,6 +79,7 @@
     }
   ],
   "design_dependencies": [
+    "monster-forest-spider",
     "monster-moss-slime",
     "monster-blue-slime",
     "monster-resin-slime",
