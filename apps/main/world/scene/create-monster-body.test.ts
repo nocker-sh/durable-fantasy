@@ -23,7 +23,8 @@ function signature(body: THREE.Group) {
   return { scale: body.scale.toArray(), meshes }
 }
 
-it.each(Object.entries(MONSTER_KINDS))("preserves the live geometry, color, texture, shadows and scale of %s", (_id, kind) => {
+// creatures built from blocks load their rig at run time and are checked with the drafts (monster-drafts.test.ts)
+it.each(Object.entries(MONSTER_KINDS).filter((entry) => entry[1].look !== "model"))("preserves the live geometry, color, texture, shadows and scale of %s", (_id, kind) => {
   const expected = kind.look === "slime" ? slimeBody(kind.color ?? 0x8ac06a) : hareBody(kind.color)
   expected.scale.setScalar(kind.size ?? 1)
   expect(signature(createMonsterBody(kind))).toEqual(signature(expected))

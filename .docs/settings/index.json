@@ -2903,6 +2903,12 @@
       "source": "apps/main/world/core/monsters.ts"
     },
     {
+      "id": "monster-pass-strider",
+      "kind": "monsters",
+      "file": "monsters/monster-pass-strider.md",
+      "source": "apps/main/world/core/monsters.ts"
+    },
+    {
       "id": "monster-resin-slime",
       "kind": "monsters",
       "file": "monsters/monster-resin-slime.md",

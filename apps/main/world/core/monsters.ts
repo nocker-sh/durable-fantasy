@@ -1,4 +1,5 @@
 import type { MonsterKind, Spawn } from "#/world/core/monster-types"
+import { draft as passStrider } from "#/world/core/bestiary/pass-strider"
 
 export const MONSTER_KINDS: Record<string, MonsterKind> = {
   slime: {
@@ -153,6 +154,8 @@ export const MONSTER_KINDS: Record<string, MonsterKind> = {
       { item: "hardened-scrap", chance: 0.35 },
     ],
   },
+  // the pass's grazer, let out of the drafts (.docs/settings/monsters/monster-pass-strider.md)
+  "pass-strider": passStrider.kind,
 }
 
 const many = (inputProps: { map: string; kind: Spawn["kind"]; n: number; area: Spawn["area"]; from?: number }): Spawn[] => {
@@ -193,6 +196,9 @@ export const SPAWNS: readonly Spawn[] = [
   ...many({ map: "deep-forest", kind: "old-moss-slime", n: 1, area: [21, 29, 24, 32], from: 3 }),
   ...many({ map: "deep-forest", kind: "old-moss-slime", n: 1, area: [22, 34, 25, 37], from: 4 }),
   ...many({ map: "deep-forest", kind: "old-moss-slime", n: 1, area: [14, 38, 17, 41], from: 5 }),
+  // the grassland west of the cart road over the pass, clear of the road and its exits
+  ...many({ map: "mountain-pass", kind: "pass-strider", n: 1, area: [6, 26, 12, 32] }),
+  ...many({ map: "mountain-pass", kind: "pass-strider", n: 1, area: [6, 36, 12, 42], from: 1 }),
 ]
 
 /** How far you strike from, in tiles. */

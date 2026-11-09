@@ -11,7 +11,9 @@
   "map_kind": "field",
   "buildings": [],
   "residents": [],
-  "monsters": [],
+  "monsters": [
+    "monster-pass-strider"
+  ],
   "exits": [
     {
       "at": [
@@ -44,7 +46,16 @@
     "生活・物流の経路と出入口のグリッド照合未完了",
     "描画と通行判定の一致確認未完了"
   ],
-  "design_dependencies": []
+  "ecology_zones": [
+    {
+      "species": "monster-pass-strider",
+      "feature": "荷車の道から離れた草地と、雪解け水の溜まる岩の窪み、昼に寝る岩棚",
+      "placement": null
+    }
+  ],
+  "design_dependencies": [
+    "monster-pass-strider"
+  ]
 }
 ---
 
@@ -65,3 +76,7 @@
 ## 配置の設計条件
 
 入口、主な通路、作業と休憩の場所を先に配列で定義する。建物の外周と扉、荷の大きさ、人がすれ違う幅を合わせ、装飾を置いてから通路を残す順序にしない。灰・雨・煙・火・水の行き先を決める。現行の通行格子は現状の記録であり、生活の成立を承認した配置図ではない。
+
+## 山担ぎの草地
+
+[[monster-pass-strider]] は荷車の道から離れた草地で芽と根を食べ、岩棚で昼に寝る。出現枠は道の西の草地に置き、峠を越える人の道と出口を塞がない。生息条件は ecology_zones に記録し、placement が null の間は地形への割り当てを済ませた扱いにしない。

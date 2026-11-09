@@ -9,12 +9,13 @@ import { getMonsterBodyRadius } from "#/world/core/get-monster-body-radius"
 const entries = Object.entries(MONSTER_DRAFTS)
 
 describe("the drafted creatures", () => {
-  it("lists every file in the bestiary exactly once, under its file name", () => {
+  it("lists every file in the bestiary exactly once, under its file name, until it is let out", () => {
     const files = readdirSync(new URL("./bestiary", import.meta.url))
       .filter((f) => f.endsWith(".ts") && !f.endsWith(".test.ts"))
       .map((f) => f.slice(0, -3))
       .sort()
-    expect(Object.keys(MONSTER_DRAFTS).sort()).toEqual(files)
+    // a creature let out moves from the drafts to MONSTER_KINDS under the same name
+    expect([...Object.keys(MONSTER_DRAFTS), ...files.filter((file) => Object.hasOwn(MONSTER_KINDS, file))].sort()).toEqual(files)
     for (const draft of Object.values(MONSTER_DRAFTS)) expect(entries.filter((e) => e[1] === draft)).toHaveLength(1)
   })
 
