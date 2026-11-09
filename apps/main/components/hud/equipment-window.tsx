@@ -9,6 +9,7 @@ import { useGame } from "#/hooks/use-game"
 import { useGameState } from "#/hooks/use-game-state"
 import { Slot } from "#/components/game/slot"
 import { Window } from "#/components/game/window"
+import { Button } from "#/components/game/button"
 import { uiIconUrl } from "#/world/art/ui-icon-url"
 import type { SpriteName } from "#/world/art/pixel-art"
 import { equipmentAttack } from "#/world/core/equipment-attack"
@@ -29,6 +30,7 @@ const EMPTY: Record<SlotId, SpriteName> = { neck: "chat", head: "helm", body: "t
 
 export function EquipmentWindow() {
   const win = useWindow("equipment")
+  const game = useGame()
   const player = useGameState((s) => s.player)
   const derived = useGameState((s) => s.derived)
   const portrait = useGameState((s) => s.portrait)
@@ -59,6 +61,12 @@ export function EquipmentWindow() {
             <dd>
               {derived.def} <span className="text-text-dim">(+{gearDef})</span>
             </dd>
+          </div>
+          {/* the stats window has no rail button (ui.md §3.13): reach it from here too, marked while points wait */}
+          <div className="col-span-2 mt-2">
+            <Button size="sm" variant={player.statPoints > 0 ? "primary" : "default"} className="w-full" onClick={() => game.toggleWindow("stats")}>
+              能力{player.statPoints > 0 ? `（残り ${player.statPoints}）` : ""}
+            </Button>
           </div>
         </dl>
       }
