@@ -147,12 +147,12 @@ export function buildFields(root: THREE.Group) {
     z: 39.2,
     s: 0.75,
   })
-  for (const [x, z] of [
+  for (const spot of [
     [21.8, 20.6],
     [10, 24.2],
     [21.2, 28],
   ] as V2[])
-    lantern(root, x, z)
+    lantern(root, spot[0], spot[1])
   shrubs(
     root,
     [

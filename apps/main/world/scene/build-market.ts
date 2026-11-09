@@ -35,7 +35,12 @@ export function buildMarket(root: THREE.Group) {
     // Karl's chestnuts; Lukas's wares by day
     ["nm4", 27.8, 27.6, ["appleG", "grape"], ["cGreen", "cLinen"]], // Sophie's flowers
   ]
-  night.forEach(([place, x, z, goods, stripe], i) => {
+  night.forEach((row, i) => {
+    const place = row[0],
+      x = row[1],
+      z = row[2],
+      goods = row[3],
+      stripe = row[4]
     const s = stall({
       root: root,
       x: x,

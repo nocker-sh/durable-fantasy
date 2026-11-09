@@ -515,7 +515,7 @@ export function buildTown(root: THREE.Group) {
 
   // flowerbeds & bushes around town
   const fl = new Rng(4)
-  for (const [x, z] of [
+  for (const spot of [
     [16.6, 19.6],
     [21.8, 19.4],
     [6.6, 32.8],
@@ -528,6 +528,8 @@ export function buildTown(root: THREE.Group) {
     [20.6, 39.0],
     [26.2, 12.0],
   ] as V2[]) {
+    const x = spot[0],
+      z = spot[1]
     const r = 0.35 + fl.next() * 0.2
     if (roadD(x, z) > r + 0.35 && isFree(x, z))
       bush({
@@ -557,11 +559,11 @@ export function buildTown(root: THREE.Group) {
     [30.2, 44],
     [23.2, 5.6],
   ]
-  townTrees.forEach(([x, z], i) =>
+  townTrees.forEach((spot, i) =>
     tree({
       root: root,
-      x: x,
-      z: z,
+      x: spot[0],
+      z: spot[1],
       scale: 0.9 + tr.next() * 0.35,
       kind: i % 4 === 0 ? "autumn" : i % 3 === 0 ? "leaf2" : "leaf",
       seed: i,

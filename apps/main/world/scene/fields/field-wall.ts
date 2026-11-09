@@ -12,8 +12,10 @@ export function fieldWall(root: THREE.Group, pts: V2[], seed: number) {
   const r = new Rng(seed)
   const moss = mat(leafTex("moss", seed))
   for (let i = 0; i < pts.length - 1; i++) {
-    const [ax, az] = pts[i],
-      [bx, bz] = pts[i + 1]
+    const ax = pts[i][0],
+      az = pts[i][1],
+      bx = pts[i + 1][0],
+      bz = pts[i + 1][1]
     const len = Math.hypot(bx - ax, bz - az)
     const steps = Math.ceil(len / 0.45)
     for (let k = 0; k < steps; k++) {

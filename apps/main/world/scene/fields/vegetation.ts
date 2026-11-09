@@ -24,15 +24,15 @@ export const flowerMats = [0xe8e4d8, 0xe0cc6a, 0xa890c0, 0x8aa0c8].map((c, k) =>
         color: RAMPS.moss[2 + (y % 2)],
       })
     const head = hex(`#${c.toString(16).padStart(6, "0")}`)
-    for (const [dx, dy] of [
+    for (const step of [
       [0, 0],
       [-1, 0],
       [1, 0],
       [0, -1],
     ])
       b.set({
-        x: Math.min(23, Math.max(0, x0 + dx)),
-        y: 17 - h + dy,
+        x: Math.min(23, Math.max(0, x0 + step[0])),
+        y: 17 - h + step[1],
         color: head,
       })
   }

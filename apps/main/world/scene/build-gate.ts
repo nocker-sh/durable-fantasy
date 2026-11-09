@@ -21,10 +21,12 @@ export function buildGate(root: THREE.Group) {
   // the town wall across the south, with the gate in the middle
   const gb = new GB()
   const wallZ = 40
-  for (const [x0, x1] of [
+  for (const span of [
     [0, 21.6],
     [26.4, 48],
   ] as V2[]) {
+    const x0 = span[0],
+      x1 = span[1]
     const y = groundH((x0 + x1) / 2, wallZ)
     gb.box({
       side: M.ashlar,

@@ -37,7 +37,7 @@ export function backAlley(root: THREE.Group) {
     r: 0.26,
   })
   // rain barrels under the eaves, between the houses
-  for (const [x, z] of [
+  for (const spot of [
     [7.55, 17.9],
     [12.75, 17.9],
     [18.9, 18.2],
@@ -47,8 +47,8 @@ export function backAlley(root: THREE.Group) {
   ] as V2[])
     barrel({
       gb: gb,
-      x: x,
-      z: z,
+      x: spot[0],
+      z: spot[1],
       h: 0.55,
       r: 0.24,
     })

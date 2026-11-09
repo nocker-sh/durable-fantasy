@@ -24,7 +24,9 @@ export function keptWallTex(o: WallOpts): readonly [PixelBuffer, PixelBuffer | n
   const painted = wallTex(o)
   kept.set(key, painted)
   size.value += bytes(painted)
-  for (const [oldest, value] of kept) {
+  for (const entry of kept) {
+    const oldest = entry[0],
+      value = entry[1]
     if (size.value <= LIMIT || oldest === key) break
     kept.delete(oldest)
     size.value -= bytes(value)

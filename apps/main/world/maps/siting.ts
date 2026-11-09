@@ -12,7 +12,8 @@ export const ALLEY = 1.0
 const ROAD_GAP = 0.3
 
 const segDist = (p: V2, a: V2, b: V2) => {
-  const [dx, dz] = [b[0] - a[0], b[1] - a[1]]
+  const dx = b[0] - a[0],
+    dz = b[1] - a[1]
   const t = Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dz) / (dx * dx + dz * dz || 1)))
   return Math.hypot(a[0] + dx * t - p[0], a[1] + dz * t - p[1])
 }
@@ -46,22 +47,24 @@ export function sitingProblems(layout: Layout, houses: readonly HouseDef[], size
     ["graveyard", layout.graveyard],
     ...layout.fields.map((f, i): [string, Rect] => [`field ${i}`, f]),
     ...layout.gardens.map((g, i): [string, Rect] => [`garden ${i}`, g]),
-    ...layout.dirtPatches.map(([x0, z0, x1, z1], i): [string, Rect] => [`yard ${i}`, { x0, z0, x1, z1 }]),
+    ...layout.dirtPatches.map((patch, i): [string, Rect] => [`yard ${i}`, { x0: patch[0], z0: patch[1], x1: patch[2], z1: patch[3] }]),
   ]
-  for (const [i, h] of houses.entries()) {
+  houses.forEach((h, i) => {
     const edge = rim(h)
     if (h.x0 < 1 || h.z0 < 1 || h.x1 > size - 1 || h.z1 > size - 1) out.push(`${h.id}: off the map`)
     for (const g of houses.slice(i + 1)) if (overlaps(h, g, ALLEY - 1e-6)) out.push(`${h.id}: within an alley of ${g.id}`)
     const step = doorStep(h)
     // a lane that ends at the door may come right up to the wall
     const toDoor = (pts: readonly V2[]) => [pts[0], pts[pts.length - 1]].some((e) => Math.hypot(e[0] - step[0], e[1] - step[1]) < 1.5)
-    for (const [k, r] of layout.roads.entries()) if (!toDoor(r.pts) && edge.some((p) => lineDist(p, r.pts) < r.w + ROAD_GAP)) out.push(`${h.id}: on road ${k}`)
+    layout.roads.forEach((r, k) => {
+      if (!toDoor(r.pts) && edge.some((p) => lineDist(p, r.pts) < r.w + ROAD_GAP)) out.push(`${h.id}: on road ${k}`)
+    })
     if (!off({ x0: layout.plaza[0], z0: layout.plaza[1], x1: 0, z1: 0 }) && edge.some((p) => Math.hypot(p[0] - layout.plaza[0], p[1] - layout.plaza[1]) < layout.plazaR + 0.2))
       out.push(`${h.id}: on the square`)
     if (layout.river[0][0] > -50 && edge.some((p) => lineDist(p, layout.river) < layout.riverHW + 1)) out.push(`${h.id}: in the river`)
     // a house's own yard may come up to its wall; nothing goes under it
-    for (const [name, r] of yards) if (!off(r) && overlaps(h, r, name.startsWith("yard") ? -0.05 : 0.3)) out.push(`${h.id}: on the ${name}`)
-    if (houses.some((g) => inside(step, g)) || yards.some(([name, r]) => !name.startsWith("yard") && !off(r) && inside(step, r))) out.push(`${h.id}: door opens onto something`)
-  }
+    for (const yard of yards) if (!off(yard[1]) && overlaps(h, yard[1], yard[0].startsWith("yard") ? -0.05 : 0.3)) out.push(`${h.id}: on the ${yard[0]}`)
+    if (houses.some((g) => inside(step, g)) || yards.some((yard) => !yard[0].startsWith("yard") && !off(yard[1]) && inside(step, yard[1]))) out.push(`${h.id}: door opens onto something`)
+  })
   return out
 }

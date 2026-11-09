@@ -14,7 +14,9 @@ export function clusters(seed: number, groups: number, per: number, spread: numb
         ok: ok,
       }).map((c) => [c.x, c.z] as [number, number])
   const out: Spot[] = []
-  for (const [cx, cz] of centres) {
+  for (const centre of centres) {
+    const cx = centre[0],
+      cz = centre[1]
     const n = Math.ceil(per * (0.5 + r.next() * 0.5))
     for (let i = 0, got = 0; i < n * 4 && got < n; i++) {
       const a = r.next() * Math.PI * 2,

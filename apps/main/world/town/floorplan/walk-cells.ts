@@ -28,7 +28,9 @@ export function walkCells(W: number, D: number, blockers: readonly Rect[]) {
   const cellOf = (x: number, z: number): [number, number] => [Math.min(nx - 1, Math.max(0, Math.floor(x / CELL_M))), Math.min(nz - 1, Math.max(0, Math.floor(z / CELL_M)))]
   /** The cells one can walk to from (x, z): the start cell counts even if something stands on it. */
   const flood = (from: [number, number]) => {
-    const [si, sj] = cellOf(from[0], from[1])
+    const start = cellOf(from[0], from[1]),
+      si = start[0],
+      sj = start[1]
     const seen = new Uint8Array(nx * nz)
     const queue = [sj * nx + si]
     seen[queue[0]] = 1
@@ -36,14 +38,14 @@ export function walkCells(W: number, D: number, blockers: readonly Rect[]) {
       const k = queue[q],
         i = k % nx,
         j = Math.floor(k / nx)
-      for (const [di, dj] of [
+      for (const step of [
         [1, 0],
         [-1, 0],
         [0, 1],
         [0, -1],
       ]) {
-        const ii = i + di,
-          jj = j + dj,
+        const ii = i + step[0],
+          jj = j + step[1],
           n = jj * nx + ii
         if (ii < 0 || jj < 0 || ii >= nx || jj >= nz || seen[n] || !free[n] || crosses(i, j, ii, jj)) continue
         seen[n] = 1

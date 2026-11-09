@@ -7,7 +7,7 @@ import { row } from "#/world/scene/construction/helpers/furnishings/row"
 import { cheese } from "#/world/scene/construction/furnishings"
 export function cheeseShelf(k: Kit, wd: Wood, seed: number) {
   // wheels of cheese turned on the boards to ripen, the youngest palest, a cloth over the top row
-  const { W } = k
+  const W = k.W
   const boards = [0.04, 0.45, 0.85, 1.25]
   frame({
     k: k,

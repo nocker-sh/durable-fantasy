@@ -11,7 +11,7 @@ export function onTops(gb: GB, it: Interior, y0: number, seed: number) {
   const own = goodsOf(it)
   it.furniture.forEach((f, k) => {
     const name = f.name ?? ""
-    const kind = TOPS.find(([re]) => re.test(name))
+    const kind = TOPS.find((top) => top[0].test(name))
     if (!kind) return
     const top = topOf(name) ?? 0.9
     const s = spotOf(it, f, y0)
@@ -23,8 +23,11 @@ export function onTops(gb: GB, it: Interior, y0: number, seed: number) {
     ]
     const n = frame.W > 1.2 ? 3 : 2
     for (let i = 0; i < n; i++) {
-      const [cu, cv] = corners[i]
-      const [x, z] = frame.at(cu * frame.W, cv * frame.D)
+      const cu = corners[i][0],
+        cv = corners[i][1]
+      const at = frame.at(cu * frame.W, cv * frame.D),
+        x = at[0],
+        z = at[1]
       const pool = i === 0 && own.length ? own : kind[1]
       const what = pool[Math.floor(hash2(seed + k, i, 97) * pool.length) % pool.length]
       lying(

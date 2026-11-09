@@ -20,12 +20,14 @@ export function cowMesh(): THREE.Group {
     e.position.set(s * 0.1, 0.92, 0.905)
     g.add(h, e)
   }
-  for (const [x, z] of [
+  for (const leg of [
     [-0.22, -0.42],
     [0.22, -0.42],
     [-0.22, 0.42],
     [0.22, 0.42],
   ]) {
+    const x = leg[0],
+      z = leg[1]
     const l = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.46, 0.11), hide)
     l.position.set(x, 0.23, z)
     g.add(l)

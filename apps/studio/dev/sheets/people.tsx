@@ -137,15 +137,21 @@ const ledger = sheet<{ good: Good }>({
     { label: "ひとり一日", get: (r) => (PER_HEAD[r.good] ? `${PER_HEAD[r.good]}${UNITS[r.good]}` : "") },
     { label: "置き場", get: (r) => STORES[r.good].source.replace(/^\^\(?|\)?\$$/g, "").replace(/\|/g, "・") },
   ],
-  refs: (r) => Object.entries(DAILY_OUTPUT).flatMap(([name, o]) => (o[r.good] ? ref("npcs", name, `${o[r.good]}${UNITS[r.good]}作る`) : [])),
+  refs: (r) => Object.entries(DAILY_OUTPUT).flatMap((entry) => (entry[1][r.good] ? ref("npcs", entry[0], `${entry[1][r.good]}${UNITS[r.good]}作る`) : [])),
   more: (r) => [
     {
       title: "作る人",
       head: ["住民", "一日に"],
-      rows: Object.entries(DAILY_OUTPUT).flatMap(([name, o]) => (o[r.good] ? [[name, `${o[r.good]}${UNITS[r.good]}`]] : [])),
+      rows: Object.entries(DAILY_OUTPUT).flatMap((entry) => (entry[1][r.good] ? [[entry[0], `${entry[1][r.good]}${UNITS[r.good]}`]] : [])),
     },
     ...(r.good === "薪" || r.good === "炭"
-      ? [{ title: "炉と窯", head: ["建物", "一日に"], rows: Object.entries(TRADE_FIRES).flatMap(([id, f]) => (f[r.good as "薪" | "炭"] ? [[id, `${f[r.good as "薪" | "炭"]}${UNITS[r.good]}`]] : [])) }]
+      ? [
+          {
+            title: "炉と窯",
+            head: ["建物", "一日に"],
+            rows: Object.entries(TRADE_FIRES).flatMap((entry) => (entry[1][r.good as "薪" | "炭"] ? [[entry[0], `${entry[1][r.good as "薪" | "炭"]}${UNITS[r.good]}`]] : [])),
+          },
+        ]
       : []),
   ],
 })
