@@ -36,13 +36,17 @@ function HpSp(inputProps: { player: PlayerState; rest: Rest }) {
   const nowState = useState(() => Date.now()),
     now = nowState[0],
     setNow = nowState[1]
-  const p = settle(player, rest, serverNow({ clockOffset }, Math.max(now, Date.now())))
+  const at = serverNow({ clockOffset }, Math.max(now, Date.now()))
+  const p = settle(player, rest, at)
   const recovering = p.hp > 0 && (p.hp < rest.maxHp || p.sp < rest.maxSp)
+  // redraw when the next tick lands (settle counts from hpAt / spAt in REGEN_MS steps), so a full rest shows at once
+  const ticks = [p.hp < rest.maxHp ? p.hpAt : null, p.sp < rest.maxSp ? p.spAt : null].filter((tick): tick is number => !!tick)
+  const nextTick = ticks.length ? Math.min(...ticks) + REGEN_MS - at : REGEN_MS / 4
   useEffect(() => {
     if (!recovering) return
-    const timer = setTimeout(() => setNow(Date.now()), REGEN_MS / 4)
+    const timer = setTimeout(() => setNow(Date.now()), Math.min(REGEN_MS / 4, Math.max(50, nextTick + 30)))
     return () => clearTimeout(timer)
-  }, [recovering, now])
+  }, [recovering, now, nextTick])
   return (
     <>
       <Meter tone="hp" value={p.hp} max={rest.maxHp} aria-label="HP" className="h-[6px]" />
