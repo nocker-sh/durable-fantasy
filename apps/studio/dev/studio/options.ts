@@ -15,6 +15,7 @@ export const ITEMS: [Item, string][] = [
   ["mace", "メイス"],
   ["battleaxe", "戦斧"],
   ["halberd", "ハルバード"],
+  ["bow", "弓"],
   ["bucket", "桶"],
   ["basket", "かご"],
   ["sack", "袋"],

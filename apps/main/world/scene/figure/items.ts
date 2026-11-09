@@ -51,6 +51,20 @@ function buildHeldItem(context: ArmsContext & BodyContext) {
     push({ kind: "cap", a: base, b: topP, r: 0.02, r2: 0, m: createSolidSurfaceMaterial(iw, 0.05) })
     if (item === "spear") push({ kind: "cone", a: topP, b: add(topP, [0, 0.16, 0]), r: 0.04, r2: 0.002, m: createSolidSurfaceMaterial(ii, 0.2) })
     else push({ kind: "cap", a: topP, b: add(topP, [0, 0.03, 0.06]), r: 0.024, r2: 0, m: createSolidSurfaceMaterial(iw, 0.05) })
+  } else if (item === "bow") {
+    // short bow held upright at the grip like the staff: the stave bows out to the side, the string runs straight past the fist
+    const g: V3 = [0, 1, 0],
+      bend: V3 = [Math.sign(R.p[0]) || 1, 0, 0],
+      half = 0.42,
+      depth = 0.1,
+      steps = 8
+    const at = (t: number): V3 => add(add(R.p, mul(g, t * half)), mul(bend, depth * (1 - t * t)))
+    for (let k = 0; k < steps; k++) {
+      const t0 = -1 + (2 * k) / steps,
+        t1 = -1 + (2 * (k + 1)) / steps
+      push({ kind: "cap", a: at(t0), b: at(t1), r: Math.abs(t0 + t1) < 0.5 ? 0.026 : 0.02, r2: 0, m: createSolidSurfaceMaterial(iw, 0.1) })
+    }
+    push({ kind: "cap", a: at(-1), b: at(1), r: 0.007, r2: 0, m: createSolidSurfaceMaterial("cLinen", 0.1) })
   } else if (item === "sword") {
     // arming sword: grip through the fist, crossguard, blade
     const g = R.up

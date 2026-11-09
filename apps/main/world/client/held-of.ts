@@ -20,6 +20,7 @@ const HELD_BY_ICON: Partial<Record<ItemIcon, Item>> = {
   bill: "halberd",
   pick: "hammer",
   staff: "staff",
+  bow: "bow",
 }
 
 export const heldOf = (id: ItemId): Item => {

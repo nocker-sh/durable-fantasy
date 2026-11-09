@@ -68,4 +68,4 @@ export type Look = {
   boots?: boolean
 }
 
-export type Item = "hammer" | "bucket" | "broom" | "axe" | "hoe" | "basket" | "cloth" | "peel" | "staff" | "sack" | "spear" | "sword" | "greatsword" | "mace" | "halberd" | "battleaxe" | null
+export type Item = "hammer" | "bucket" | "broom" | "axe" | "hoe" | "basket" | "cloth" | "peel" | "staff" | "sack" | "spear" | "sword" | "greatsword" | "mace" | "halberd" | "battleaxe" | "bow" | null
