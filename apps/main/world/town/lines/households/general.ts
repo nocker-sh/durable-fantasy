@@ -2,6 +2,7 @@ import type { Line } from "#/world/town/lines/line"
 
 const lines = {
   ブルーノ: [
+    { text: "おや、門のオイゲンさんの書き付けですか。どうぞこちらへ。", errand: { id: "eugen-oil", state: "taken" } },
     { text: "旅支度ならおまかせを。……って、近所の人にもつい言っちまうんだよな。" },
     { text: "回復薬は礼拝堂のベネディクトさんのだよ。効き目は保証つきさ。" },
     { text: "携行食はおれが奥で焼いてる。味は聞かないでくれよ。" },

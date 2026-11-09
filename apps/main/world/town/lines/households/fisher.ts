@@ -53,6 +53,8 @@ const lines = {
     { text: "魚屋のヤコブのかみさんだよ。覚えといておくれ。", first: true },
   ],
   ヤコブ: [
+    { text: "へい。酒場のフランツさんに。夕方には店が開く。", errand: { id: "jakob-fish", state: "taken" } },
+    { text: "へい、届いたか。助かった。", errand: { id: "jakob-fish", state: "done" } },
     { text: "へい、らっしゃい。" },
     { text: "川のマスと、浜のニシンだ。" },
     { text: "潮の加減で、獲れる日と獲れねえ日がある。" },

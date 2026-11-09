@@ -2,6 +2,7 @@ import type { Line } from "#/world/town/lines/line"
 
 const lines = {
   フランツ: [
+    { text: "その包み、ヤコブの干し魚だろう。匂いでわかる。", errand: { id: "jakob-fish", state: "taken" } },
     { text: "いらっしゃい。外は今日も冷えるな。" },
     { text: "温めたぶどう酒が一番だ。体の芯から温まるだろう。" },
     { text: "話を聞かせてくれたら、一杯おまけしよう。どんな話でもいい。" },

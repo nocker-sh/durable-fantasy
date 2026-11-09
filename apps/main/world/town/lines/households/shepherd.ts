@@ -2,6 +2,8 @@ import type { Line } from "#/world/town/lines/line"
 
 const lines = {
   マティアス: [
+    { text: "その毛は、この子たちの冬毛なんです。仕立て屋さんに、よろしく伝えてください。", errand: { id: "matthias-wool", state: "taken" } },
+    { text: "マグダレーナさん、喜んでくれましたか。……よかった。", errand: { id: "matthias-wool", state: "done" } },
     { text: "メェ〜……あ、ぼくじゃなくて羊ですよ。" },
     { text: "この子たちは、寒いほど毛がよく伸びるんです。" },
     { text: "この子たちの毛で、町のみんなのマフラーができるんです。" },
