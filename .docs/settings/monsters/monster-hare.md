@@ -9,7 +9,8 @@
   "species": "hare",
   "habitats": [
     "map-south-meadow",
-    "map-forest-edge"
+    "map-forest-edge",
+    "map-grass-highland"
   ],
   "appearance": {
     "look": "hare",
@@ -52,6 +53,7 @@
   "design_dependencies": [
     "map-south-meadow",
     "map-forest-edge",
+    "map-grass-highland",
     "resident-マグダレーナ",
     "resident-ルドルフ"
   ]
@@ -99,3 +101,7 @@ soft-fur は逃げるときに茂みへ残した冬毛のかたまり。[[reside
 ## 草原の採食と退避の配置案
 
 草原側の場所は [[map-south-meadow#野うさぎの草地の配置案]] にある。葉を食べる面と水分を含む草、風を避ける休息と退避先を分け、現行の身体が配置内で各利用位置へ届くことを照合する。露がある日の配置で乾燥時の水分まで説明した扱いにしない。林縁側の別の生息地の配置と、実際の植生・採食・警戒と逃走の動作は未設計である。
+
+## 高原の草地
+
+[[map-grass-highland]] では、道から離れた北の草地で草を食べ、低い茂みの陰で休む。出現枠は道の北側の二か所に置き、峠へ向かう道と出口を塞がない。
