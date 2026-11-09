@@ -6,6 +6,7 @@ import { exchangeReady } from "#/world/core/exchange-ready"
 import { atOrderLimit } from "#/world/core/at-order-limit"
 import { parseSymbol } from "#/world/core/parse-symbol"
 import { symbolKey } from "#/world/core/symbol-key"
+import { handableGold } from "#/world/core/handable-gold"
 import { MAX_OPEN_ORDERS, MAX_ORDER_PRICE, TRADE_FEE } from "#/world/core/exchange-rules"
 import { ITEMS } from "#/world/core/items/catalog"
 import { QUALITIES } from "#/world/core/items/kinds"
@@ -70,7 +71,7 @@ export function ExchangeWindow() {
     fee = needsSource.fee
   // the same limit the board checks before taking anything (core/at-order-limit.ts)
   const limit = atOrderLimit(v?.mine ?? [], Date.now()) ? `掲示板に出せる注文は${MAX_OPEN_ORDERS}件まで` : null
-  const reason = limit ?? (side === "sell" ? (have < qty ? "手元に足りない" : player.gold < fee ? "出品料が足りない" : null) : player.gold < needs ? "所持金が足りない" : null)
+  const reason = limit ?? (side === "sell" ? (have < qty ? "手元に足りない" : player.gold < fee ? "出品料が足りない" : null) : handableGold(player) < needs ? "所持金が足りない" : null)
   const candles = (v?.history ?? []).slice(-14)
   const hi = Math.max(1, ...candles.map((c) => c.high)),
     lo = Math.min(hi, ...candles.map((c) => c.low))

@@ -6,6 +6,7 @@ import { Input } from "#/components/game/input"
 import { Window } from "#/components/game/window"
 import { Side } from "#/components/hud/side"
 import { useServiceWindow } from "#/components/hud/use-service-window"
+import { handableGold } from "#/world/core/handable-gold"
 import { TRADE_GOLD_MAX } from "#/world/core/trade-rules"
 
 export function TradeWindow() {
@@ -22,7 +23,7 @@ export function TradeWindow() {
     theirs = mineSource.theirs,
     lots = mineSource.lots
   // no more than is carried, nor than a side may put up (core/trade-rules.ts)
-  const g = Math.min(player.gold, TRADE_GOLD_MAX, Number(gold) || 0)
+  const g = Math.min(handableGold(player), TRADE_GOLD_MAX, Number(gold) || 0)
   return (
     <Window
       id="trade"
