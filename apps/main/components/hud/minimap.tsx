@@ -116,7 +116,9 @@ export function Minimap() {
       {...win.props}
       title={map.name}
       hotkey="Tab"
-      initial={(w) => ({ x: w - SIZE - 120, y: 12 })}
+      // top right, clear of the side buttons; on a narrow screen that would cover the status frame (268px from the left),
+      // so it starts at the left under it, where the side buttons on the right stay clear
+      initial={(w) => (w - SIZE - 120 >= 300 ? { x: w - SIZE - 120, y: 12 } : { x: 12, y: 96 })}
       bodyClassName="px-2.5 pt-1 pb-2"
       actions={
         <TitleButton
