@@ -35,7 +35,10 @@ export function StorageWindow() {
     count = countState[0],
     setCount = countState[1]
   useEffect(() => {
-    if (!open) setPicked(null)
+    if (!open) {
+      setPicked(null)
+      setCount(1)
+    }
   }, [open])
   const selected = picked === null ? null : player?.storage[picked]
   const amount = Math.min(count, selected?.count ?? 1)

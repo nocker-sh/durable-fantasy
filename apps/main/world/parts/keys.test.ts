@@ -134,3 +134,19 @@ it("closes the front-most window the player opened on Esc, past a shop still in 
   f.key("Escape")
   expect(closeWindow).toHaveBeenCalledExactlyOnceWith("skills")
 })
+
+it("never uses the hotbar for a number pressed before a conversation's choices show", () => {
+  const { game, window } = fixture()
+  const target = game as unknown as { useHotbar: ReturnType<typeof vi.fn>; choose: ReturnType<typeof vi.fn> }
+  target.useHotbar = vi.fn()
+  target.choose = vi.fn()
+  game.state.set((s) => ({
+    ...s,
+    dialogue: { resident: 0, name: "ハンス", job: "", pages: ["一枚目", "二枚目"], page: 0, choices: [{ label: "さようなら", action: "close" }], shownAt: 0 },
+  }))
+  const event = new Event("keydown")
+  Object.defineProperties(event, { code: { value: "Digit1" }, key: { value: "1" }, repeat: { value: false }, target: { value: { closest: () => null } } })
+  window.dispatchEvent(event)
+  expect(target.useHotbar).not.toHaveBeenCalled()
+  expect(target.choose).not.toHaveBeenCalled()
+})

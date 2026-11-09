@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useGame } from "#/hooks/use-game"
 import { useGameState } from "#/hooks/use-game-state"
 import { Button } from "#/components/game/button"
@@ -16,6 +16,9 @@ export function TradeWindow() {
   const goldState = useState(""),
     gold = goldState[0],
     setGold = goldState[1]
+  // a new trade starts with no gold typed in, not the amount left from the last one
+  const trading = !!trade
+  useEffect(() => setGold(""), [trading])
   const stack = useServiceWindow("trade", !!trade && !!player)
   if (!trade || !player) return null
   const mineSource = trade,

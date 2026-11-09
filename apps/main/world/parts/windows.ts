@@ -34,7 +34,11 @@ export class Windows {
 
   /** Put every window back where it started: positions, sizes and which are open. */
   reset() {
-    for (const key of Object.keys(localStorage)) if (key.startsWith("ui-window/")) localStorage.removeItem(key)
+    try {
+      for (const key of Object.keys(localStorage)) if (key.startsWith("ui-window/")) localStorage.removeItem(key)
+    } catch {
+      // the saved places could not be cleared; the windows still go back below
+    }
     // a shop or the like that is still shown keeps its place in front
     this.set((w) => [...DEFAULT_WINDOWS, ...w.filter(isServiceWindow)])
     this.state.set((s) => ({ ...s, layout: s.layout + 1 }))
@@ -62,7 +66,12 @@ export class Windows {
   private set(change: (windows: GameState["windows"]) => GameState["windows"]) {
     const windows = change(this.state.get().windows)
     // only the windows the player opens and closes are remembered (ui.md §5)
-    localStorage.setItem(this.key, JSON.stringify(windows.filter((w) => !isServiceWindow(w))))
+    // blocked or full storage must not stop the window from opening or closing
+    try {
+      localStorage.setItem(this.key, JSON.stringify(windows.filter((w) => !isServiceWindow(w))))
+    } catch {
+      // nothing to keep this time
+    }
     this.state.set((s) => ({ ...s, windows }))
   }
 }

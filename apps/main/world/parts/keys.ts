@@ -168,6 +168,11 @@ export class Keys {
         event.preventDefault()
         return
       }
+      // a number pressed before the choices show (or past them) picks nothing, and never reaches the hotbar mid-conversation
+      if (n >= 1 && n <= 9) {
+        event.preventDefault()
+        return
+      }
     }
     // WASD and the arrows walk, a cell at a time, while held; not while talking or trading
     if (event.code in MOVE_KEYS && !event.shiftKey && !event.altKey) {
