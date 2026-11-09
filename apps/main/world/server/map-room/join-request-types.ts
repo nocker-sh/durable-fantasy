@@ -7,7 +7,7 @@ export type JoinRequestContext = Readonly<
   Pick<Ctx, "me" | "save" | "key"> & {
     map: Pick<Ctx["map"], "size" | "rows" | "spawn">
     ctx: Readonly<{
-      connection: Pick<Connection, "id" | "state" | "send">
+      connection: Pick<Connection, "id" | "state" | "send" | "close">
       params: Ctx["ctx"]["params"]
       room: Pick<Ctx["ctx"]["room"], "broadcast"> & { getConnections(): Iterable<Connection> }
     }>

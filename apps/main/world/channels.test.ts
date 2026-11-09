@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { CHANNEL_CAP, CHANNEL_SLACK, WORLDS } from "#/world/channels"
+import { CHANNEL_CAP, CHANNEL_SLACK, CHANNELS, WORLDS } from "#/world/channels"
 import { chooseChannel } from "#/world/choose-channel"
 import { hometownOf } from "#/world/hometown-of"
 import { parseRoom } from "#/world/parse-room"
@@ -10,6 +10,15 @@ describe("parallel towns and channels", () => {
     expect(parseRoom(roomName({ world: 3, map: "phanthiet-market", channel: 2 }))).toEqual({ world: 3, map: "phanthiet-market", channel: 2 })
     expect(parseRoom("phanthiet")).toBeNull()
     expect(parseRoom(`${WORLDS + 1}~phanthiet~1`)).toBeNull()
+  })
+
+  it("opens a room for every channel the directory can give and for no other", () => {
+    expect(parseRoom(`3~phanthiet~${CHANNELS}`)).toEqual({ world: 3, map: "phanthiet", channel: CHANNELS })
+    expect(parseRoom(`3~phanthiet~${CHANNELS + 1}`)).toBeNull()
+    expect(parseRoom("3~phanthiet~0")).toBeNull()
+    // one channel, one room: a second spelling of the same number is not another room
+    expect(parseRoom("3~phanthiet~01")).toBeNull()
+    expect(parseRoom("03~phanthiet~1")).toBeNull()
   })
 
   it("gives everyone a hometown, the same every time, spread over the towns", () => {
@@ -30,5 +39,19 @@ describe("parallel towns and channels", () => {
     expect(chooseChannel({ 1: CHANNEL_CAP }, { friend: 1 })).toBe(1)
     expect(chooseChannel({ 1: CHANNEL_CAP + CHANNEL_SLACK }, { friend: 1 })).toBe(2)
     expect(chooseChannel({ 1: 5, 2: 5 }, { want: 2 })).toBe(2)
+  })
+
+  it("names no room past the last channel, and never chooses one", () => {
+    expect(parseRoom(roomName({ world: 1, map: "phanthiet", channel: CHANNELS }))).toEqual({ world: 1, map: "phanthiet", channel: CHANNELS })
+    expect(parseRoom("1~phanthiet~0")).toBeNull()
+    expect(parseRoom(roomName({ world: 1, map: "phanthiet", channel: CHANNELS + 1 }))).toBeNull()
+    // a channel asked for or followed past the last is passed over for one with room
+    expect(chooseChannel({ 1: 5 }, { want: CHANNELS + 1 })).toBe(1)
+    expect(chooseChannel({ 1: 5 }, { friend: CHANNELS + 1 })).toBe(1)
+    expect(chooseChannel({ 1: 5 }, { want: 1.5 })).toBe(1)
+    expect(chooseChannel({ [CHANNELS + 1]: 1 })).toBe(1)
+    // with every channel taken the last one is chosen, and its room turns the arrival away when full
+    const taken = Object.fromEntries(Array.from({ length: CHANNELS }, (_, i) => [i + 1, CHANNEL_CAP]))
+    expect(chooseChannel(taken)).toBe(CHANNELS)
   })
 })

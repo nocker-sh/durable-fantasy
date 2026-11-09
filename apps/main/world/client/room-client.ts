@@ -1,4 +1,5 @@
 import { currentPublication } from "#/world/client/player-publication"
+import { sendToRoom } from "#/world/client/send-to-room"
 import type { GameSession } from "#/world/client/game-session"
 import type { ServerMessageContext } from "#/world/client/server-context"
 import type { VoidSocket } from "void/ws"
@@ -12,21 +13,32 @@ import type { Cell } from "#/world/protocol"
 import { lap } from "#/world/lap"
 
 const COMMAND_TIMEOUT = 8000
+/** How long a join may go unanswered (no snapshot, no refusal) before it is tried again on a new socket. */
+const JOIN_TIMEOUT = 10_000
+/** The longest wait before a join is tried again: the first waits a second, each next one twice as long. */
+const JOIN_RETRY_MAX = 30_000
 
 export class RoomClient {
   private seq = 0
   private generation = 0
+  /** the current socket got through to the room, so a join went out on it */
+  private opened = false
+  private joinTimer: ReturnType<typeof setTimeout> | undefined
+  private retryTimer: ReturnType<typeof setTimeout> | undefined
 
   cancel() {
     this.generation++
+    this.stopTimers()
   }
   constructor(
     private readonly target: Pick<ServerMessageContext, "update" | "getScene" | "onServer" | "preview" | "notify" | "setPlayer" | "report"> & {
-      readonly session: Pick<GameSession, "wantChannel" | "rooms" | "state" | "socket" | "arriveAt" | "others" | "playerId" | "waiting" | "engaged" | "wild" | "warping">
+      readonly session: Pick<GameSession, "wantChannel" | "rooms" | "state" | "socket" | "arriveAt" | "others" | "playerId" | "waiting" | "engaged" | "wild" | "warping" | "joinTries">
     },
   ) {}
   async connect(id: MapId) {
     const generation = ++this.generation
+    this.stopTimers()
+    this.opened = false
     const want = this.target.session.wantChannel
     this.target.session.wantChannel = null
     // a room got ready while walking up to the way in is taken as it is
@@ -46,6 +58,7 @@ export class RoomClient {
       this.target.session.socket = socket
       this.listen(socket)
       if (ready.open) {
+        this.opened = true
         this.target.update({ online: "online" })
         this.join()
       }
@@ -81,15 +94,30 @@ export class RoomClient {
     socket.on("open", () => {
       if (this.target.session.socket !== socket) return
       lap("room: socket open")
+      this.opened = true
       this.target.update({ online: "online", connectionReplaced: false })
       this.join()
     })
     socket.on("close", (event) => {
       if (this.target.session.socket !== socket) return
+      // the room took the socket in but never let us in: the join failed there or was cut short
+      const unanswered = this.opened && !this.target.session.others.you
+      this.opened = false
+      clearTimeout(this.joinTimer)
       if (event.code === 4001) {
         socket.close()
         this.target.update({ connectionReplaced: true })
         this.target.notify("このキャラクターは別の画面で開かれた。", "bad")
+      } else if (event.code === 1007) {
+        // every message is checked against this build's schema before it leaves (send-to-room.ts), so
+        // a room refusing one runs a newer build and would refuse it again after any reconnection
+        socket.close()
+        this.target.update({ outdated: true })
+      } else if (unanswered) {
+        // not at once and for ever: a new socket, after a wait that grows with each failed join
+        socket.close()
+        this.target.session.socket = null
+        this.retry()
       }
       this.target.update({
         online: "offline",
@@ -124,12 +152,48 @@ export class RoomClient {
   join() {
     const scene = this.target.getScene()
     const at = scene?.ready ? scene.playerCell() : this.target.session.arriveAt
-    if (!this.target.session.socket || !at || this.target.session.others.you) return
+    const socket = this.target.session.socket
+    if (!socket || !at || this.target.session.others.you) return
     const clock = this.target.session.state.get().clock
-    this.target.session.socket.send({ type: "join", player: this.target.session.playerId, at, ...(import.meta.env.DEV && clock.held ? { time: clock.min } : {}) })
+    if (!sendToRoom(socket, { type: "join", player: this.target.session.playerId, at, ...(import.meta.env.DEV && clock.held ? { time: clock.min } : {}) })) return
+    // the room answers with a snapshot or a refusal; when neither comes, the join is tried again
+    if (!this.opened) return
+    clearTimeout(this.joinTimer)
+    this.joinTimer = setTimeout(() => this.unanswered(socket), JOIN_TIMEOUT)
   }
 
-  async run(command: Command, send?: (seq: number) => void): Promise<boolean> {
+  /** The join on `socket` was never answered: leave the socket and join again on a new one. */
+  private unanswered(socket: VoidSocket<"/map/:mapId">) {
+    if (this.target.session.socket !== socket || this.target.session.others.you) return
+    this.opened = false
+    this.target.session.socket = null
+    socket.close()
+    this.target.update({ online: "offline" })
+    this.retry()
+  }
+
+  /** Join again on a new socket: a second after the first failure, twice as long after each next one. */
+  private retry() {
+    const tries = ++this.target.session.joinTries
+    const generation = this.generation
+    clearTimeout(this.retryTimer)
+    this.retryTimer = setTimeout(
+      () => {
+        if (generation !== this.generation) return
+        // the channel we were in, so a party or a friend stays together
+        this.target.session.wantChannel = this.target.session.state.get().room?.channel ?? null
+        void this.connect(this.target.session.state.get().map.id)
+      },
+      Math.min(JOIN_RETRY_MAX, 1000 * 2 ** (tries - 1)),
+    )
+  }
+
+  private stopTimers() {
+    clearTimeout(this.joinTimer)
+    clearTimeout(this.retryTimer)
+  }
+
+  async run(command: Command, send?: (seq: number) => boolean): Promise<boolean> {
     if (this.target.session.state.get().busy) return false
     if (!send) {
       const parsed = commandSchema.safeParse(command)
@@ -157,8 +221,8 @@ export class RoomClient {
       const timer = setTimeout(() => finish({ ok: false, reason: "OFFLINE" }), COMMAND_TIMEOUT)
       this.target.session.waiting.set(seq, finish)
       try {
-        if (send) send(seq)
-        else socket.send({ type: "command", seq, command })
+        // a request the room's schema would refuse never leaves (send-to-room.ts): refused here at once
+        if (!(send ? send(seq) : sendToRoom(socket, { type: "command", seq, command }))) finish({ ok: false, reason: "NOT_READY" })
       } catch {
         finish({ ok: false, reason: "OFFLINE" })
       }

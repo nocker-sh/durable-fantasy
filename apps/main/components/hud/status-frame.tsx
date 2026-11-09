@@ -11,6 +11,7 @@ import type { PlayerState } from "#/world/core/player-types"
 import type { Rest } from "#/world/core/player-types"
 import { useEffect, useState } from "react"
 import { useDeadlineClock } from "#/hooks/use-deadline-clock"
+import { serverNow } from "#/world/client/server-now"
 
 export function StatusFrame() {
   const player = useGameState((s) => s.player)
@@ -26,15 +27,16 @@ export function StatusFrame() {
   )
 }
 
-/** HP and SP, coming back a little at a time while up and about (core/settle.ts). */
+/** HP and SP, coming back a little at a time while up and about (core/settle.ts), by the server's clock. */
 function HpSp(inputProps: { player: PlayerState; rest: Rest }) {
   const player = inputProps.player
   const rest = inputProps.rest
 
+  const clockOffset = useGameState((s) => s.clockOffset)
   const nowState = useState(() => Date.now()),
     now = nowState[0],
     setNow = nowState[1]
-  const p = settle(player, rest, Math.max(now, Date.now()))
+  const p = settle(player, rest, serverNow({ clockOffset }, Math.max(now, Date.now())))
   const recovering = p.hp > 0 && (p.hp < rest.maxHp || p.sp < rest.maxSp)
   useEffect(() => {
     if (!recovering) return

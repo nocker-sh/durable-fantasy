@@ -8,8 +8,9 @@ export function PartyFrame() {
   const game = useGame()
   const party = useGameState((s) => s.party)
   if (!party) return null
+  // fixed under the status (ui.md §3.12); it ends above where the system log first opens (system-log.tsx), and a long party scrolls
   return (
-    <Panel className="pointer-events-auto absolute top-[132px] left-3 flex w-[276px] flex-col gap-1.5 p-2">
+    <Panel className="pointer-events-auto absolute top-[132px] left-3 flex max-h-[max(96px,calc(50%-180px))] w-[276px] flex-col gap-1.5 p-2">
       <div className="flex items-center justify-between font-head text-xs">
         <span className="text-brass-hi">パーティ（{party.members.length}人）</span>
         <span className="flex gap-1">
@@ -21,7 +22,7 @@ export function PartyFrame() {
           </Button>
         </span>
       </div>
-      <ul className="flex flex-col gap-1">
+      <ul className="ui-scroll flex min-h-0 flex-col gap-1 overflow-y-auto pr-1">
         {party.members.map((m, i) => (
           <li key={i} className={`flex flex-col gap-0.5 ${m.away ? "opacity-50" : ""}`}>
             <div className="flex items-baseline justify-between gap-2 font-body text-[12px]">

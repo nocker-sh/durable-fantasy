@@ -3,6 +3,7 @@ import { apply } from "#/world/core/apply"
 import { commandSchema } from "#/world/core/commands"
 import { newPlayer } from "#/world/core/new-player"
 import { RENAME_GAP_MS } from "#/world/core/player-rules"
+import { RENAMED_RESIDENTS } from "#/world/core/renamed-residents"
 
 const profile = (name: string) => ({ type: "profile" as const, name, look: 1, neck: "stole" as const, neckRamp: "cBlue" as const })
 const DAY = 24 * 60 * 60_000
@@ -13,6 +14,13 @@ it("keeps resident and maker names for the residents", () => {
     expect(apply(newPlayer(), profile(name), { now: DAY })).toEqual({ ok: false, reason: "NAME_TAKEN" })
   }
   expect(commandSchema.safeParse(profile("ヴェルナ")).success).toBe(true)
+})
+
+it("keeps a renamed resident's former name, which old saves and orders still give his goods, for the resident", () => {
+  for (const name of Object.keys(RENAMED_RESIDENTS)) {
+    expect(commandSchema.safeParse(profile(name)).success).toBe(false)
+    expect(apply(newPlayer(), profile(name), { now: DAY })).toEqual({ ok: false, reason: "NAME_TAKEN" })
+  }
 })
 
 it("lets looks change any time but a name only once in a while after creation", () => {
@@ -29,6 +37,8 @@ it("lets looks change any time but a name only once in a while after creation", 
 })
 
 it("lets an old save that took a resident's name give it up at once", () => {
-  const taken = { ...newPlayer("イルムガルト"), profileComplete: true, renamedAt: DAY }
-  expect(apply(taken, profile("ヴェルナ"), { now: 2 * DAY }).ok).toBe(true)
+  for (const name of ["イルムガルト", ...Object.keys(RENAMED_RESIDENTS)]) {
+    const taken = { ...newPlayer(name), profileComplete: true, renamedAt: DAY }
+    expect(apply(taken, profile("ヴェルナ"), { now: 2 * DAY }).ok).toBe(true)
+  }
 })

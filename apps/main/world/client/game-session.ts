@@ -5,7 +5,9 @@ import type { Cell } from "#/world/protocol"
 import type { SkillId } from "#/world/core/skill-types"
 import type { WildView } from "#/world/client/wild-publication"
 import { Others } from "#/world/parts/others"
+import { Mutes } from "#/world/parts/mutes"
 import { Rooms } from "#/world/parts/rooms"
+import { STORAGE } from "#/world/client/identity"
 
 /** State owned by one live game session, shared by its client controllers. */
 export class GameSession {
@@ -14,6 +16,7 @@ export class GameSession {
   playerId = ""
   partyChat = { party: "", seq: 0 }
   readonly others = new Others()
+  readonly mutes = new Mutes({ state: this.state, key: `${STORAGE}/muted` })
   waiting = new Map<number, (result: Transition) => void>()
   arriveAt: Cell | null = null
   warpAskedAt = 0
@@ -29,5 +32,7 @@ export class GameSession {
   readonly rooms = new Rooms()
   wantChannel: number | null = null
   fullTries = 0
+  /** joins in a row that a room took in but never answered; each next try waits longer (room-client.ts) */
+  joinTries = 0
   net = { messages: 0, bytes: 0, since: performance.now() }
 }

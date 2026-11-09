@@ -91,6 +91,7 @@ export const NOT_TABLES: readonly string[] = [
   "TIMES_OF_DAY",
   "DEFAULT_WINDOWS",
   "KEPT_ON_ESC",
+  "SERVICE_WINDOWS",
   // how the scene lays out and draws
   "FIELDS",
   "CRAFT",

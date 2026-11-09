@@ -63,6 +63,24 @@ it("caps long messages and removes a departed speaker independently", () => {
   expect(local.remove).toHaveBeenCalledOnce()
 })
 
+it("takes one speaker's bubble away at once and leaves the others", () => {
+  const f = fixture()
+  f.speech.bubble("me", "mine")
+  f.speech.bubble("other", "theirs")
+  const local = f.speech.elements[0]
+  const remote = f.speech.elements[1]
+  f.speech.hush("other")
+  f.speech.hush("missing")
+  expect(remote.remove).toHaveBeenCalledOnce()
+  expect(local.remove).not.toHaveBeenCalled()
+  expect(f.speech.elements.map((e) => e.text)).toEqual(["mine"])
+  f.speech.update(200)
+  expect(f.place).toHaveBeenCalledExactlyOnceWith(f.me, local)
+  // a later line from the same speaker shows again
+  f.speech.bubble("other", "again")
+  expect(f.speech.elements.map((e) => e.text)).toEqual(["mine", "again"])
+})
+
 it("does not expose the owned collection through the layer's element list", () => {
   const f = fixture()
   f.speech.bubble("me", "hello")

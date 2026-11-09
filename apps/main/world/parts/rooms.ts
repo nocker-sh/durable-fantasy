@@ -1,8 +1,12 @@
 // Which room to be in: the parallel town (channels.ts), the channel of each map the directory
 // picks, and the next map's room opened ahead while walking up to the way into it.
 import { connect, type VoidSocket } from "void/ws"
+import { isChannel } from "#/world/is-channel"
 import { roomName } from "#/world/room-name"
 import type { MapId } from "#/world/maps/types"
+
+/** How long the directory may take to choose a channel before channel 1 is tried instead. */
+const CHANNEL_WAIT = 5000
 
 export type RoomSocket = VoidSocket<"/map/:mapId">
 export type Channel = {
@@ -35,13 +39,17 @@ export class Rooms {
     this.cancelStandby()
   }
 
-  /** Which channel of a map to go into (the directory chooses; channel 1 if it cannot be reached). */
+  /** Which channel of a map to go into (the directory chooses; channel 1 if it cannot be reached in time). */
   async askChannel(id: MapId, want: number | null = null): Promise<Channel> {
     try {
-      const r = await fetch(`/api/channel?world=${this.world}&map=${id}${want ? `&want=${want}` : ""}`)
-      if (r.ok) return (await r.json()) as Channel
+      const r = await fetch(`/api/channel?world=${this.world}&map=${id}${want ? `&want=${want}` : ""}`, { signal: AbortSignal.timeout(CHANNEL_WAIT) })
+      if (r.ok) {
+        const chosen = (await r.json()) as Channel
+        // a channel no room is named for would be turned away (404) at every reconnection
+        if (isChannel(chosen.channel)) return chosen
+      }
     } catch {
-      // the directory is unreachable
+      // the directory is unreachable or too slow
     }
     return { channel: 1, channels: {} }
   }

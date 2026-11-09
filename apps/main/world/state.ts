@@ -12,6 +12,10 @@ import type { ResidentInfo, WalkerInfo } from "#/world/scene/runtime/types"
 /** Windows the player opens and closes (ui.md §3). */
 export type WindowId = "minimap" | "chat" | "syslog" | "inventory" | "equipment" | "stats" | "worldmap" | "errands" | "skills" | "friends"
 
+/** Windows that open with a person or a place, and are not remembered (ui.md §5). */
+export type ServiceWindowId = "shop" | "craft" | "commission" | "storage" | "exchange" | "trade"
+export const SERVICE_WINDOWS: readonly ServiceWindowId[] = ["shop", "craft", "commission", "storage", "exchange", "trade"]
+
 /** Windows open at first, and after the layout is reset. */
 export const DEFAULT_WINDOWS: readonly WindowId[] = ["minimap", "chat", "syslog"]
 /** Windows Esc leaves alone: they stay open while playing. */
@@ -28,6 +32,8 @@ export type ChatLine = {
   /** said by this player */
   self?: boolean
   shout?: boolean
+  /** the room connection of the other player who said it (a mute takes their lines away) */
+  from?: string
 }
 
 export type DialogueChoice = {
@@ -72,6 +78,8 @@ export type GameState = {
   failureMessage?: string
   departed?: boolean
   connectionReplaced?: boolean
+  /** the room refused a message this build checked (1007): it runs a newer build, and only a reload helps */
+  outdated?: boolean
   map: { id: MapId; name: string; warps: readonly (readonly [number, number])[] }
   me: { x: number; z: number; walking: boolean; heading: number }
   online: "connecting" | "online" | "offline"
@@ -87,8 +95,8 @@ export type GameState = {
   derived: (Derived & { weight: number }) | null
   /** a command is on its way to the server */
   busy: boolean
-  /** open windows, front-most last */
-  windows: readonly WindowId[]
+  /** open windows, front-most last; a shop and the like is in the order while it is shown (ui.md §2.1) */
+  windows: readonly (WindowId | ServiceWindowId)[]
   /** bumped when the layout is reset, so windows forget where they were */
   layout: number
   modal: ModalId | null
@@ -104,6 +112,8 @@ export type GameState = {
   debug: boolean
   /** the time of day: minutes since midnight, Japan time, and whether it is held (?time=HH:MM) */
   clock: { min: number; held: boolean }
+  /** how far the server's clock runs ahead of this device's (ms), as the room last told us (client/server-now.ts) */
+  clockOffset: number
   /** what the open shop has now, as the server last said (the shelves are shared) */
   stock: { shop: ShopId; offers: readonly Offer[]; buys: Readonly<Record<string, number>>; held: Readonly<Record<string, number>> } | null
   /** the exchange board is open, and what it last showed (core/exchange.ts) */
@@ -114,6 +124,8 @@ export type GameState = {
   storage: boolean
   /** another player picked by name: what can be done with them */
   playerMenu: { id: string; name: string } | null
+  /** other players muted in this browser, by their room connection (parts/mutes.ts) */
+  muted: readonly string[]
   /** someone asking to trade with us */
   tradeAsk: { from: string; name: string } | null
   /** our party (core/party/), and someone asking us into theirs */

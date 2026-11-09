@@ -3,6 +3,7 @@ import { Player } from "#/durable-objects/player"
 import { ITEMS } from "#/world/core/items/catalog"
 import { ITEM_IDS } from "#/world/core/items/item-ids"
 import { MAKERS } from "#/world/core/makers"
+import { usualMaker } from "#/world/core/usual-maker"
 import { effectOf } from "#/world/core/effect-of"
 import { isMedicine } from "#/world/core/is-medicine"
 import { MEDICINE_KEY, MEDICINE_WAIT_MS } from "#/world/core/medicine-rules"
@@ -20,7 +21,8 @@ afterEach(() => {
 })
 
 for (const item of ITEM_IDS.filter((id) => ITEMS[id].use))
-  for (const by of [undefined, ...Object.keys(MAKERS).filter((maker) => MAKERS[maker][item])])
+  // a made thing saved without a maker is read as its usual maker's (mark-old-goods.ts)
+  for (const by of new Set([ITEMS[item].made ? usualMaker(item) : undefined, ...Object.keys(MAKERS).filter((maker) => MAKERS[maker][item])]))
     for (const q of ITEMS[item].made ? ([0, 1, 2, 3] as const) : [undefined])
       it(`${item}: quality=${q}, maker=${by} retains paid effects after save failure and restart`, async () => {
         vi.useFakeTimers()

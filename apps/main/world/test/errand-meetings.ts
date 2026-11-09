@@ -2,6 +2,7 @@ import { dayOf } from "#/world/core/day-of"
 import { errandToday } from "#/world/core/errand-today"
 import type { Errand } from "#/world/core/errand-types"
 import { jstMinutes } from "#/world/core/jst-minutes"
+import { canAskErrand } from "#/world/maps/can-ask-errand"
 import { MAPS } from "#/world/maps/index"
 import { npcCell } from "#/world/maps/npc-cell"
 import type { MapDefinition } from "#/world/maps/types"
@@ -19,7 +20,8 @@ export function errandMeetings(errand: Errand): { ask: ErrandMeeting; hand: Erra
     for (let step = 0; step < 95; step++) {
       const now = start + step * 15 * 60_000
       const map = Object.values(MAPS).find((candidate) => npcCell(candidate, errand.from, jstMinutes(now)))
-      if (!map) continue
+      // the asker is out and still asks it at this hour
+      if (!map || !canAskErrand(errand, jstMinutes(now))) continue
       for (let later = step + 1; later < 96; later++) {
         const handAt = start + later * 15 * 60_000
         const handMap = Object.values(MAPS).find((candidate) => npcCell(candidate, recipient, jstMinutes(handAt)))

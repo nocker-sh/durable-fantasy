@@ -1,5 +1,11 @@
-import { describe, expect, it, vi } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
+import { CHANNELS } from "#/world/channels"
 import { Rooms, type Channel, type RoomSocket } from "#/world/parts/rooms"
+
+afterEach(() => {
+  vi.useRealTimers()
+  vi.unstubAllGlobals()
+})
 
 function fixture() {
   const rooms = new Rooms()
@@ -151,5 +157,37 @@ describe("room preconnections across worlds", () => {
     expect(ready.socket).toBe(f.sockets[0])
     expect(f.sockets[0].close).not.toHaveBeenCalled()
     expect(f.open).toHaveBeenCalledExactlyOnceWith("phanthiet", 2)
+  })
+})
+
+describe("the directory's choice of channel", () => {
+  it("asks the directory only so long, then tries channel 1", async () => {
+    // the time limit runs out by hand: AbortSignal.timeout keeps its own clock
+    const limit = new AbortController()
+    const timeout = vi.spyOn(AbortSignal, "timeout").mockReturnValue(limit.signal)
+    const fetchRoom = vi.fn((_url: string, init?: RequestInit) => new Promise<Response>((_resolve, reject) => init?.signal?.addEventListener("abort", () => reject(init.signal?.reason))))
+    vi.stubGlobal("fetch", fetchRoom)
+    const asked = new Rooms().askChannel("phanthiet", 3)
+    expect(fetchRoom).toHaveBeenCalledExactlyOnceWith("/api/channel?world=1&map=phanthiet&want=3", { signal: limit.signal })
+    expect(timeout).toHaveBeenCalledExactlyOnceWith(5_000)
+    limit.abort(new DOMException("The operation timed out.", "TimeoutError"))
+    expect(await asked).toEqual({ channel: 1, channels: {} })
+    timeout.mockRestore()
+  })
+
+  it.each([0, 1.5, CHANNELS + 1, "2"])("does not take channel %s, which no room is named for", async (chosen) => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response(JSON.stringify({ channel: chosen, channels: { 1: 3 } }))),
+    )
+    expect(await new Rooms().askChannel("phanthiet")).toEqual({ channel: 1, channels: {} })
+  })
+
+  it("takes the channel the directory chose", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response(JSON.stringify({ channel: CHANNELS, channels: { [CHANNELS]: 3 } }))),
+    )
+    expect(await new Rooms().askChannel("phanthiet")).toEqual({ channel: CHANNELS, channels: { [CHANNELS]: 3 } })
   })
 })

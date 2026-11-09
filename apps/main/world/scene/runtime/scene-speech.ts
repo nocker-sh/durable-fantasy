@@ -24,6 +24,15 @@ export class SceneSpeech<T extends { id: string }, E extends { remove(): void }>
     this.entries.set(walker, { element: this.props.create(text), until: performance.now() + Math.min(8000, 4000 + text.length * 80) })
   }
 
+  /** ミュートした人の吹き出しを、期限を待たずに消す。 */
+  readonly hush = (who: string): void => {
+    const walker = who === "me" ? this.props.me : this.props.remotes.get(who)
+    const entry = walker && this.entries.get(walker)
+    if (!walker || !entry) return
+    entry.element.remove()
+    this.entries.delete(walker)
+  }
+
   readonly update = (now: number): void => {
     for (const entry of this.entries) {
       const walker = entry[0]

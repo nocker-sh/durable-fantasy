@@ -1,5 +1,6 @@
 import { pruneFinishedJobs } from "#/world/server/prune-finished-jobs"
 import { orderFailure } from "#/world/core/order-failure"
+import { atOrderLimit } from "#/world/core/at-order-limit"
 import type { OrderIntent } from "#/world/core/exchange-types"
 import { sameIntent } from "#/world/core/same-intent"
 import type { OrderJob } from "#/world/core/exchange-order-types"
@@ -24,6 +25,9 @@ export async function beginExchangeOrder(props: Props): Promise<{ ok: true; id: 
   }
   const reason = orderFailure(props.intent)
   if (reason) return { ok: false, reason }
+  // refused here, before any escrow is taken: the whole board is saved as one value (economy.md §5)
+  const mine = props.context.state.ex.orders.filter((order) => order.owner === props.owner)
+  if (!props.intent.market && atOrderLimit(mine, Date.now())) return { ok: false, reason: "TOO_MANY_LISTINGS" }
   if (previous?.phase === "pending" || !(await props.players(props.owner).ownsConnection(props.connection))) return { ok: false, reason: "NOT_READY" }
   const id = props.context.state.requests.serial + 1
   if (!Number.isSafeInteger(id)) throw new Error("Exchange order IDs exhausted")

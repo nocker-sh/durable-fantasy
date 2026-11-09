@@ -11,6 +11,7 @@ import { emptyBag } from "#/world/core/empty-bag"
 import { countItem } from "#/world/core/count-item"
 import { MAPS, TALK_CELLS } from "#/world/maps"
 import { npcCell } from "#/world/maps/npc-cell"
+import { keepersOnDuty } from "#/world/maps/keepers-on-duty"
 import { RESIDENT_WORK_SPOTS } from "#/world/maps/resident-work-spots"
 import { shopOpen } from "#/world/maps/shop-open"
 import { minutesToClose } from "#/world/maps/minutes-to-close"
@@ -56,10 +57,7 @@ function counter(shop: ShopId, item: ItemId) {
     if (!shopOpen(shop, jstMinutes(now))) continue
     const offer = shopOffers(market, shop, minutesToClose(shop, jstMinutes(now))).find((row) => row.item === item && (row.left === null || row.left > 0))
     for (const site of sites) {
-      const cells = SHOPS[shop].keepers.flatMap((name) => {
-        const cell = npcCell(site.map, name, jstMinutes(now))
-        return cell ? [cell] : []
-      })
+      const cells = keepersOnDuty(site.map, shop, jstMinutes(now)).map((keeper) => keeper.cell)
       const at = site.region.find((cell) => cells.some((npc) => cellDistance(cell, npc) <= TALK_CELLS + 1))
       if (at && offer) return { map: site.map, now, at, offer, market: structuredClone(market.market) }
     }

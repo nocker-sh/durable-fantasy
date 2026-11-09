@@ -16,6 +16,7 @@ import type { NeckKind } from "#/world/core/player-types"
 import { RAMPS } from "#/world/scene/pix"
 import { readProfileDraft } from "#/world/client/read-profile-draft"
 import { writeProfileDraft } from "#/world/client/write-profile-draft"
+import { serverNow } from "#/world/client/server-now"
 import { NECK_COLOR_LABELS } from "#/components/hud/neck-color-labels"
 import { keepDialogTabFocus } from "#/components/game/keep-dialog-tab-focus"
 
@@ -28,6 +29,7 @@ export function CharacterScreen() {
   const portraits = useGameState((s) => s.portraits)
   const busy = useGameState((s) => s.busy)
   const online = useGameState((s) => s.online)
+  const clockOffset = useGameState((s) => s.clockOffset)
   const creating = player?.profileComplete === false
   const draftState = useState(() => (creating ? readProfileDraft(localStorage) : null)),
     draft = draftState[0]
@@ -66,7 +68,7 @@ export function CharacterScreen() {
   const parsedName = profileNameSchema.safeParse(name)
   // a chosen name stays for a while (core/set-profile.ts); the field shows when it opens again
   const renameAt = creating || player.renamedAt === undefined || reservedName(player.name) ? 0 : player.renamedAt + RENAME_GAP_MS
-  const nameLocked = renameAt > Date.now()
+  const nameLocked = renameAt > serverNow({ clockOffset })
   const changed = creating || (parsedName.success && parsedName.data !== player.name) || look !== player.look || neck !== player.neck || ramp !== player.neckRamp
   const close = creating || saving ? undefined : () => game.openModal("system")
   const editor = (

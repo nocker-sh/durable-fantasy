@@ -191,7 +191,7 @@ export function ItemTooltip(inputProps: {
           <dt className="text-text-dim">重さ</dt>
           <dd className="text-right">{d.weight}</dd>
           <dt className="text-text-dim">買取の目安</dt>
-          <dd className="text-right">{sellable(item) ? <Gold amount={buybackOf(sellPrice(item), { item, q })} /> : "売れない"}</dd>
+          <dd className="text-right">{sellable(item) ? <Gold amount={buybackOf(sellPrice(item), { item, q, dur: mark?.dur })} /> : "売れない"}</dd>
         </dl>
       </TooltipContent>
     </Tooltip>

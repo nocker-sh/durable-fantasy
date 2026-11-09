@@ -5,3 +5,5 @@ export const TRADE_FEE = 0.03
 export const MAX_DAYS = 7
 export const EXCHANGE_DAY_MS = 86_400_000
 export const EXCHANGE_HISTORY_DAYS = 60
+/** resting orders one player may keep on the board at once; a market order does not rest there */
+export const MAX_OPEN_ORDERS = 20

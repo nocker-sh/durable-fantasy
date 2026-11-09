@@ -18,6 +18,7 @@ import type { Ctx } from "#/world/server/map-room/context"
 import type { Presence } from "#/world/server/map-room/presence"
 import { presence } from "#/world/server/map-room/presence"
 import { setTrade } from "#/world/server/map-room/set-trade"
+import { admittedRoom } from "#/world/server/map-room/admitted-room"
 import { authenticatedPlayer } from "#/world/server/authenticated-player"
 import { sameOrigin } from "#/world/server/same-origin"
 
@@ -54,8 +55,10 @@ export default defineRoom({
       // Creation is saved before this connection can participate in the world.
       if (me.ready === false && message.type !== "join" && !(message.type === "command" && message.command.type === "profile")) return
       const save = (patch: Partial<Presence>) => ctx.connection.setState({ ...presence(ctx.connection), ...patch } satisfies Presence)
+      // what the handlers broadcast reaches only those already let in
+      const context = { ...ctx, room: admittedRoom(ctx.room) }
       const handle = HANDLERS[message.type] as ((c: Ctx, m: typeof message) => Promise<void>) | undefined
-      await handle?.({ ctx, key, map, me, save, standUp: () => standUp({ ctx, me, save }), receivedAt }, message)
+      await handle?.({ ctx: context, key, map, me, save, standUp: () => standUp({ ctx: context, me, save }), receivedAt }, message)
     })
   },
   async onClose(ctx) {
@@ -75,7 +78,7 @@ export default defineRoom({
       if (me.player) {
         const key = parseRoom(ctx.params.mapId)
         if (key) await Directory.get(`town-${key.world}`).depart(key.map, key.channel)
-        await ctx.room.broadcast({ type: "left", id: me.player.id }, [ctx.connection.id])
+        await admittedRoom(ctx.room).broadcast({ type: "left", id: me.player.id }, [ctx.connection.id])
       }
     }
   },

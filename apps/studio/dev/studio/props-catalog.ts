@@ -224,11 +224,11 @@ export const PROPS: Prop[] = [
       critters.push(new Hare(root, [x - 1, z - 1, x + 1, z + 1], 2))
     },
   },
-  // the small things of everyday life (things.ts), every one of them
+  // the small things of everyday life (things.ts), every one of them, under a prefix: both lists have a "bench"
   ...Object.entries(THINGS).map((entry) => {
     const id = entry[0]
     const t = entry[1]
-    return { id, name: t.name, group: t.group, build: merged((gb, x, z) => t.build({ builder: gb, x: x, z: z, seed: 1, along: true })) }
+    return { id: `thing-${id}`, name: t.name, group: t.group, build: merged((gb, x, z) => t.build({ builder: gb, x: x, z: z, seed: 1, along: true })) }
   }),
 ]
 import { buildPastureFence } from "#/dev/build-pasture-fence"

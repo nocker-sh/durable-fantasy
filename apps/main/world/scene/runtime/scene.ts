@@ -168,6 +168,10 @@ export class MapScene {
   bubble(who: string, text: string) {
     this.runtime?.bubble(who, text)
   }
+  /** Take another player's bubble away at once (they were muted). */
+  hush(who: string) {
+    this.runtime?.hush(who)
+  }
   /** Put the player on a cell (if it is walkable), e.g. where they appear in town. */
   placePlayer(at: Cell) {
     this.runtime?.placePlayer(at)

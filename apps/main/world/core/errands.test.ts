@@ -4,20 +4,26 @@ import { apply } from "#/world/core/apply"
 import { countItem } from "#/world/core/count-item"
 import { RECIPES } from "#/world/core/recipes/catalog"
 import { ERRANDS } from "#/world/core/errands"
-import { MAX_ERRANDS } from "#/world/core/errand-rules"
+import { ERRAND_HAND_MARGIN, MAX_ERRANDS } from "#/world/core/errand-rules"
 import { errandToday } from "#/world/core/errand-today"
 import { errandsOn } from "#/world/core/errands-on"
 import { FRIEND } from "#/world/core/friendship-rules"
 import { friendPrice } from "#/world/core/friend-price"
 import { DAY_TURNS } from "#/world/core/clock-rules"
 import { dayOf } from "#/world/core/day-of"
+import { formatTime } from "#/world/core/format-time"
+import { jstMinutes } from "#/world/core/jst-minutes"
 import { NODES } from "#/world/core/gather"
 import { ITEMS } from "#/world/core/items/catalog"
 import { sellPrice } from "#/world/core/items/sell-price"
 import { cheapestShopPrice } from "#/world/core/cheapest-shop-price"
 import { MONSTER_KINDS } from "#/world/core/monsters"
-import { MAPS } from "#/world/maps"
+import { createGameState } from "#/world/client/initial-state"
+import { MAPS, TALK_CELLS } from "#/world/maps"
+import { cellDistance } from "#/world/maps/cell-distance"
 import { npcCell } from "#/world/maps/npc-cell"
+import type { Cell } from "#/world/maps/types"
+import { errandChoices } from "#/world/parts/errand-choices"
 import { RESIDENTS } from "#/world/town/residents"
 import { SHOPS } from "#/world/core/shops"
 import { STORAGE_KEEPER } from "#/world/core/storage/rules"
@@ -70,15 +76,46 @@ describe("errands", () => {
     }
   })
 
-  it("can be done within the day: asked while the asker is out, handed over later the same errand day", () => {
-    const out = (name: string, min: number) => Object.values(MAPS).some((m) => npcCell(m, name, min % 1440))
-    // minutes counted from when the errand day turns over
-    const steps = Array.from({ length: 96 }, (_, i) => DAY_TURNS + i * 15)
-    for (const e of ERRANDS) {
-      const hand = e.kind === "bring" ? e.from : e.to
-      const ok = steps.some((a, i) => out(e.from, a) && steps.slice(i + 1).some((b) => out(hand, b)))
-      expect(ok, e.id).toBe(true)
+  it("is asked at every minute it can still be done, and only then: the one it goes to is met a while later the same errand day, and a parcel is not asked for someone beside the asker", () => {
+    // where each resident stands, minute by minute from when the errand day turns over, as the room finds them
+    const places = new Map<string, ({ map: string; cell: Cell } | null)[]>()
+    const placesOf = (name: string) => {
+      const known = places.get(name)
+      if (known) return known
+      const day = Array.from({ length: 1440 }, (_, since) => {
+        const min = (DAY_TURNS + since) % 1440
+        const map = Object.values(MAPS).find((m) => npcCell(m, name, min))
+        return map ? { map: map.id, cell: npcCell(map, name, min)! } : null
+      })
+      places.set(name, day)
+      return day
     }
+    const base = createGameState().get()
+    const wrong: string[] = []
+    for (const e of ERRANDS) {
+      // six in the morning of a day it is drawn, when that errand day began
+      const start = dayOfErrand(e.id) - 6 * 3_600_000
+      const asker = placesOf(e.from)
+      const hand = placesOf(e.kind === "bring" ? e.from : e.to)
+      // whether the one it goes to is out at this minute of the errand day or any later one
+      const later = Array.from({ length: 1441 }, () => false)
+      for (let since = 1439; since >= 0; since--) later[since] = !!hand[since] || later[since + 1]
+      let asked = 0
+      for (let since = 0; since < 1440; since++) {
+        const here = asker[since]
+        if (!here) continue
+        const now = start + since * 60_000
+        const state = { ...base, player: player(), clock: { min: jstMinutes(now), held: false } }
+        const offered = errandChoices(state, e.from, now).some((c) => c.action === "errand-ask" && c.errand === e.id)
+        const there = e.kind === "deliver" ? hand[since] : null
+        const beside = !!there && there.map === here.map && cellDistance(there.cell, here.cell) <= TALK_CELLS
+        const doable = later[Math.min(since + ERRAND_HAND_MARGIN, 1440)] && !beside
+        if (offered !== doable) wrong.push(`${e.id} ${formatTime(jstMinutes(now))} ${offered ? "asked" : "not asked"}`)
+        if (offered) asked++
+      }
+      if (!asked) wrong.push(`${e.id} never asked`)
+    }
+    expect(wrong).toEqual([])
   })
 
   it("the same requests for everyone on a day, a fair number of them, and every errand comes up", () => {

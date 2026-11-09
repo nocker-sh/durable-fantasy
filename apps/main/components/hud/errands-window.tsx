@@ -5,6 +5,7 @@ import { errandLabel } from "#/world/core/errand-label"
 import { errandOf } from "#/world/core/errand-of"
 import { todays } from "#/world/core/todays"
 import { friendDiscount } from "#/world/core/friend-discount"
+import { serverNow } from "#/world/client/server-now"
 import { useGameState } from "#/hooks/use-game-state"
 import { Window } from "#/components/game/window"
 import { useWindow } from "#/components/hud/use-window"
@@ -12,8 +13,10 @@ import { useWindow } from "#/components/hud/use-window"
 export function ErrandsWindow() {
   const win = useWindow("errands")
   const player = useGameState((s) => s.player)
+  const clockOffset = useGameState((s) => s.clockOffset)
   if (!win.open || !player) return null
-  const today = todays(player.errands, Date.now())
+  // today is the server's day (core/day-of.ts)
+  const today = todays(player.errands, serverNow({ clockOffset }))
   const friends = Object.entries(player.friends)
     .filter((entry) => {
       const f = entry[1]

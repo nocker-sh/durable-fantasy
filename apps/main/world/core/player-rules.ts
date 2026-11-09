@@ -1,4 +1,5 @@
 import type { SavePoint } from "#/world/core/player-types"
+import type { ItemId } from "#/world/core/items/catalog"
 
 export const HOTBAR_SIZE = 10
 
@@ -13,6 +14,9 @@ export const NECK_KINDS = ["muffler", "stole", "scarf"] as const
 export const NECK_RAMPS = ["cRed", "cWine", "cMustard", "cHoney", "cGreen", "cMint", "cBlue", "cSky", "cPlum", "cBrown", "cCream", "cGray"] as const
 
 export const STARTING_GOLD = 200
+
+/** a branch picked up on the road (game-system.md §8): nobody made it, so it carries no mark */
+export const STARTING_WEAPON: ItemId = "wooden-stick"
 
 export const MAX_STAMINA = 100
 

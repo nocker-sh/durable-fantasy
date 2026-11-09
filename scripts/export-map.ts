@@ -1,4 +1,5 @@
-// Publish scene walk grids, or compare them without writing: bun scripts/export-map.ts [URL] [map …] [--check]
+// Publish scene walk grids, or compare them without writing: bun scripts/export-map.ts [studio URL] [map …] [--check]
+// Only the studio's server serves the snapshot source (apps/studio/dev/map-snapshot.ts).
 import { readFileSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import { chromium } from "playwright-core"
@@ -9,9 +10,9 @@ import { MAP_EXPORT_IDS } from "#/scripts/lib/map-export-ids"
 
 const check = process.argv.includes("--check")
 const args = process.argv.slice(2).filter((arg) => arg !== "--check")
-const base = args[0] ?? "https://durable-fantasy.localhost/"
+const base = args[0] ?? "https://dev.durable-fantasy.localhost/"
 const maps = args.length > 1 ? args.slice(1) : MAP_EXPORT_IDS
-const module = getMapSnapshotModule(join(import.meta.dirname, "..", "dev"))
+const module = getMapSnapshotModule()
 const browser = await chromium.launch()
 try {
   for (const map of maps) {

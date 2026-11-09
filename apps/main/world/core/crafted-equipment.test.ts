@@ -9,6 +9,7 @@ import { LIFE_CAP } from "#/world/core/life-rules"
 import { lifeExpAt } from "#/world/core/life-exp-at"
 import { apply } from "#/world/core/apply"
 import { loadPlayer } from "#/world/core/load-player"
+import { usualMaker } from "#/world/core/usual-maker"
 import { emptyBag } from "#/world/core/empty-bag"
 import { bagWith } from "#/world/test/bag-with"
 import { player } from "#/world/test/player"
@@ -50,13 +51,13 @@ it.each(equipmentRecipes.filter((recipe) => recipe.min <= LIFE_CAP))("preserves 
 })
 
 it.each(["prayer-necklace", "traveller-coat", "short-sword", "battle-axe", "dagger", "leather-armor", "chain-mail", "cloth-hat", "iron-helm", "leather-boots", "charm", "fur-stole"] as const)(
-  "loads existing unmarked %s without resetting the character",
+  "loads existing unmarked %s as an ordinary one by its usual maker, without resetting the character",
   (item) => {
     const p = player({ name: "エルナ", gold: 1234, bag: emptyBag().map((_, index) => (index === 0 ? { item, count: 1 } : null)) })
     const loaded = loadPlayer(JSON.parse(JSON.stringify(p)))
     expect(loaded.gold).toBe(1234)
     expect(loaded.name).toBe("エルナ")
-    expect(loaded.bag[0]).toEqual({ item, count: 1 })
+    expect(loaded.bag[0]).toEqual({ item, count: 1, q: 1, by: usualMaker(item) })
   },
 )
 

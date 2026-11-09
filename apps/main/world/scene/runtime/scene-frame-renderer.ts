@@ -52,6 +52,8 @@ type Props<P> = Readonly<{
   ashfall: Pick<Ashfall, "update"> | null
   lighting: { readonly minutes: number }
   record(now: number): void
+  /** the clock creatures move and come back by (ms) */
+  now(): number
 }>
 
 /** 世界と視点を描画前に進め、名前と戦闘・発言・灰の更新と計測を描画後へ保つ。 */
@@ -94,7 +96,7 @@ export class SceneFrameRenderer<P> {
 
   private updateOverlays(frame: SceneFrame): void {
     this.placePlayerNames()
-    const wall = Date.now()
+    const wall = this.props.now()
     updateMonsters({ list: this.props.monsters, root: this.props.town, now: wall, yaw: this.props.walkers.movement.yaw, dt: frame.dt })
     updateMonsterLabels({ monsters: this.props.monsters, me: this.props.walkers.me, action: this.props.action, place: this.props.projection.place })
     this.props.combat.update(wall)

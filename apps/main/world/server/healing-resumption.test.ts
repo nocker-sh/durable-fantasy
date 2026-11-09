@@ -6,6 +6,7 @@ import type { SkillId } from "#/world/core/skill-types"
 import { derive } from "#/world/core/derive"
 import { lifeExpAt } from "#/world/core/life-exp-at"
 import { firstAid } from "#/world/core/first-aid"
+import { markFor } from "#/world/core/mark-for"
 import { initialPlayerRecord } from "#/world/server/initial-player-record"
 import type { PlayerRecord } from "#/world/server/player-record"
 import type { PlayerState } from "#/world/core/player-types"
@@ -30,11 +31,13 @@ for (const skill of (Object.keys(SKILLS) as SkillId[]).filter((id) => id === "fi
             vi.useFakeTimers()
             vi.setSystemTime(1000)
             const base = player()
+            const mark = weapon ? markFor(weapon) : undefined
             // Owned equipment, practiced skills, herbs and injuries are local starting conditions.
             const equipped = player({
               ...base,
               stats: { ...base.stats, vit: 20, mnd: 20, fth: 20 },
               equipment: { ...base.equipment, weapon },
+              worn: mark ? { weapon: mark } : {},
               life: { ...base.life, alchemy: lifeExpAt(alchemy), woodcutting: lifeExpAt(8) },
               bag: bagWith(["herb", 3]),
               hpAt: 1000,

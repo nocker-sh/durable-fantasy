@@ -33,7 +33,9 @@ const baseRoutines: Record<string, readonly Slot[]> = {
   ],
   リーゼル: [
     at({ from: "14:30", where: "home", doing: "起きて母の手伝い" }),
-    at({ from: "16:00", where: "work", doing: "井戸の水を運ぶ" }),
+    // supper with her mother, back from the store, before she starts carrying water
+    at({ from: "16:00", where: "home", doing: "母と夕餉" }),
+    at({ from: "16:30", where: "work", doing: "井戸の水を運ぶ" }),
     at({ from: "17:00", where: P("phanthiet", "well2"), doing: "井戸端で湯を売る" }),
     at({ from: "22:00", where: "work", doing: "夜明かしの家へ水を運ぶ" }),
     at({ from: "02:30", where: "home", doing: "眠る" }),
@@ -179,7 +181,9 @@ const baseRoutines: Record<string, readonly Slot[]> = {
   ヘレナ: [
     // takes the counter from Bruno when he goes to bed, so the store is never left unminded at the handover
     at({ from: "08:00", where: "work", doing: "道具屋の昼番" }),
-    at({ from: "16:00", where: "home", doing: "繕い物" }),
+    at({ from: "16:00", where: "home", doing: "娘と夕餉" }),
+    at({ from: "16:30", where: "home", doing: "繕い物" }),
+    // what she buys at the night market is for the next day's supper
     at({ from: "17:00", where: P("phanthiet", "s2b"), doing: "夜市で買い物" }),
     at({ from: "18:30", where: "home", doing: "眠る" }),
   ],

@@ -29,7 +29,7 @@ import { Offline } from "#/components/hud/offline"
 import { Fallen } from "#/components/hud/fallen"
 import { useNoCanvasMenu } from "#/hooks/use-no-canvas-menu"
 
-const WINDOWS = ["status", "hotbar", "chat", "inventory", "equipment", "stats", "worldmap", "shop", "dialogue", "system", "character", "loading", "fallen", "offline", "failed"] as const
+const WINDOWS = ["status", "hotbar", "chat", "inventory", "equipment", "stats", "worldmap", "shop", "dialogue", "system", "character", "loading", "fallen", "offline", "outdated", "failed"] as const
 type Shown = (typeof WINDOWS)[number]
 
 /** A traveller a few days in: some gear on, a bag with a bit of everything. */
@@ -82,7 +82,8 @@ export default function UiFrame() {
       const patch: Partial<GameState> = {
         loading: shown === "loading" ? { map: "ファンティエット ― 広場", text: q.get("text") ?? "街を建てています…" } : null,
         failed: shown === "failed",
-        online: shown === "offline" ? "offline" : "online",
+        online: shown === "offline" || shown === "outdated" ? "offline" : "online",
+        outdated: shown === "outdated",
         player: shown === "fallen" ? { ...player, hp: 0 } : player,
         derived: { ...derive(player), weight: carried(player) },
         windows,
@@ -143,7 +144,7 @@ export default function UiFrame() {
           {shown === "dialogue" && <DialogueBox />}
           {(shown === "system" || shown === "character") && <SystemModals />}
           {(shown === "loading" || shown === "failed") && <Loading />}
-          {shown === "offline" && <Offline />}
+          {(shown === "offline" || shown === "outdated") && <Offline />}
           {shown === "fallen" && <Fallen />}
         </div>
       </TooltipProvider>

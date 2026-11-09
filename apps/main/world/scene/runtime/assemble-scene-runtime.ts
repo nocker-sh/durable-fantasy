@@ -66,6 +66,8 @@ export async function assembleSceneRuntime(props: SceneBuildProps & { resources:
     resources = props.resources,
     options = props.options,
     preview = !!options.preview
+  // creatures and their bursts share one clock: the server's in the game
+  const now = options.now ?? (() => Date.now())
   const lifecycle = resources.use(new SceneRuntimeLifecycle())
   const world = sceneOf(map) ?? MAP_SCENES.phanthiet
   setLayout(world.layout)
@@ -196,7 +198,7 @@ export async function assembleSceneRuntime(props: SceneBuildProps & { resources:
     remotes,
     labels: hitLabels,
     defeated: (monster) => {
-      burst(monster, town, Date.now())
+      burst(monster, town, now())
       action.endFight(monster.spawn.id)
     },
   })
@@ -305,6 +307,7 @@ export async function assembleSceneRuntime(props: SceneBuildProps & { resources:
     ashfall,
     lighting,
     record: frameLoop.record,
+    now,
   })
 
   const runtime = {
@@ -354,6 +357,7 @@ export async function assembleSceneRuntime(props: SceneBuildProps & { resources:
     setLayer,
     setAvatar,
     bubble,
+    hush: speech.hush,
     freeze,
     setWarps: (cells: readonly (readonly [number, number])[]) => warps.set(cells),
     addRemote,

@@ -21,6 +21,7 @@ import { Tooltip } from "#/components/game/tooltip"
 import { TooltipContent } from "#/components/game/tooltip-content"
 import { TooltipTrigger } from "#/components/game/tooltip-trigger"
 import { ItemTooltip } from "#/components/hud/item-tooltip"
+import { ITEMS } from "#/world/core/items/catalog"
 import type { ItemId } from "#/world/core/items/catalog"
 import { carriesItem } from "#/components/hud/carries-item"
 import { readDrag } from "#/components/hud/read-drag"
@@ -98,6 +99,7 @@ export function Hotbar() {
                       dim={!!blocked || seconds > 0}
                       keyHint={key}
                       aria-label={`ショートカット ${key}: ${SKILLS[skill].name}${seconds ? `（あと${seconds}秒）` : ""}`}
+                      aria-description={blocked ? REASON_TEXT[blocked] : undefined}
                       {...drop_}
                     >
                       {seconds > 0 && <span className="pointer-events-none absolute bottom-1 font-tiny text-xs text-white ui-text-shadow">{seconds}</span>}
@@ -123,7 +125,7 @@ export function Hotbar() {
                 count={item ? count : undefined}
                 dim={!!item && (count === 0 || wait > 0)}
                 keyHint={key}
-                aria-label={`ショートカット ${key}${wait ? `（あと${wait}秒）` : ""}`}
+                aria-label={`ショートカット ${key}${item ? `: ${ITEMS[item].name} ×${count}` : ""}${wait ? `（あと${wait}秒）` : ""}`}
                 {...drop_}
               >
                 {wait > 0 && <span className="pointer-events-none absolute bottom-1 font-tiny text-xs text-white ui-text-shadow">{wait}</span>}

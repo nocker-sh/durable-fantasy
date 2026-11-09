@@ -34,6 +34,7 @@ vi.mock("#/world/core/spawns-on", () => ({ spawnsOn: rpc.spawns }))
 afterEach(() => {
   vi.resetAllMocks()
   vi.unstubAllEnvs()
+  vi.useRealTimers()
 })
 
 function fixture() {
@@ -98,10 +99,12 @@ function fixture() {
 
 it("reads the player before reserving a channel, admits before snapshot, and excludes hidden or duplicate players", async () => {
   const request = fixture()
+  vi.setSystemTime(1_700_000_000_000)
   await request.join()
   expect(request.trace).toEqual(["save", "read", "count", "arrive", "save", "left", "snapshot", "nodes", "broadcast", "save"])
   expect(request.duplicate.close).toHaveBeenCalledExactlyOnceWith(4001, "Character opened elsewhere")
-  expect(request.self.send).toHaveBeenNthCalledWith(1, { type: "snapshot", you: "connection", me: request.data, players: [request.peer.state.player], at: [2, 3] })
+  // the server's clock goes with the snapshot, so the client counts waits by it
+  expect(request.self.send).toHaveBeenNthCalledWith(1, { type: "snapshot", you: "connection", me: request.data, players: [request.peer.state.player], at: [2, 3], now: 1_700_000_000_000 })
   expect(request.self.state).toMatchObject({ joining: false, ready: true, route: [[2, 3]] })
   expect(rpc.depart).not.toHaveBeenCalled()
 })
@@ -113,6 +116,27 @@ it("does not reserve a channel after a player read failure", async () => {
   expect(rpc.count).not.toHaveBeenCalled()
   expect(rpc.depart).not.toHaveBeenCalled()
   expect(request.self.state.joining).toBe(false)
+})
+
+it.each(["read", "count", "arrive"] as const)("closes the socket of a join whose %s failed, so the client comes in again", async (step) => {
+  const request = fixture()
+  rpc[step].mockRejectedValue(Error(`${step} failed`))
+  await expect(request.join()).rejects.toThrow(`${step} failed`)
+  // nothing answered the join: without the close the client would wait on it for good
+  expect(request.self.close).toHaveBeenCalledExactlyOnceWith(1011, "Join failed")
+  expect(request.self.send).not.toHaveBeenCalled()
+  expect(request.self.state.joining).toBe(false)
+  expect(rpc.depart).toHaveBeenCalledTimes(step === "arrive" ? 1 : 0)
+})
+
+it("does not close a socket already closing when its join fails", async () => {
+  const request = fixture()
+  rpc.read.mockImplementation(async () => {
+    request.self.state = { ...request.self.state, closed: true }
+    throw Error("Read failed")
+  })
+  await expect(request.join()).rejects.toThrow("Read failed")
+  expect(request.self.close).not.toHaveBeenCalled()
 })
 
 it("rejects a full channel without arriving or returning a reservation it did not take", async () => {
@@ -178,6 +202,7 @@ it("does not return an admitted count when the snapshot notification fails, even
   await expect(request.join()).rejects.toThrow("Snapshot failed")
   expect(rpc.depart).not.toHaveBeenCalled()
   expect(request.self.state.joining).toBe(false)
+  expect(request.self.close).not.toHaveBeenCalled()
 })
 
 it("propagates resource failure after the player snapshot without returning an admitted count", async () => {
@@ -186,6 +211,8 @@ it("propagates resource failure after the player snapshot without returning an a
   await expect(request.join()).rejects.toThrow("Resources failed")
   expect(request.self.send).toHaveBeenCalledOnce()
   expect(rpc.depart).not.toHaveBeenCalled()
+  // let in already: the socket stays
+  expect(request.self.close).not.toHaveBeenCalled()
 })
 
 it("clears the joining flag even if returning an unused count fails", async () => {

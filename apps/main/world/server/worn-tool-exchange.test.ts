@@ -71,7 +71,7 @@ for (const id of tools)
       actor = new Player.class(store.state, {})
       expect((await actor.read()).bag[0]).toEqual(worn)
       const playerBefore = structuredClone(store.saved.get("__void_durable_state"))
-      const exchangeStore = durableStorage(initialExchangeRecord(), 2)
+      const exchangeStore = durableStorage(initialExchangeRecord(), 3)
       let exchange = new Exchange.class(exchangeStore.state, {})
       const before = read<ExchangeRecord>(exchangeStore)
       const request = { owner: "owner", connection: "connection", seq: 1, name: "出品者", intent }

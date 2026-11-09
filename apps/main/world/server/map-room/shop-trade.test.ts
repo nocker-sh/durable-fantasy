@@ -18,6 +18,7 @@ import type { ServerMessage } from "#/world/protocol"
 vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }))
 const policy = vi.hoisted(() => ({ open: true }))
 vi.mock("#/world/maps/npc-cell", () => ({ npcCell: () => [0, 0] }))
+vi.mock("#/world/maps/keeper-present", () => ({ keeperPresent: () => true }))
 vi.mock("#/world/maps/shop-open", () => ({ shopOpen: () => policy.open }))
 vi.mock("#/world/maps/minutes-to-close", () => ({ minutesToClose: () => null }))
 import { HANDLERS } from "#/world/server/map-room/work"

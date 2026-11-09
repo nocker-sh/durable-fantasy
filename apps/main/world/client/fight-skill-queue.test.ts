@@ -80,6 +80,21 @@ it.each(["another-target", "expired", "cooldown"])("does not carry a queued art 
   expect(session.art).toBeNull()
 })
 
+it("carries a queued art whose wait the server has finished, though this device's clock is a minute slow", () => {
+  vi.useFakeTimers()
+  // the wait ended at 70000 by the server's clock; this device reads 60 s less than the server
+  vi.setSystemTime(15000)
+  vi.spyOn(performance, "now").mockReturnValue(2000)
+  const session = new GameSession()
+  const send = vi.fn()
+  session.socket = { send } as unknown as VoidSocket<"/map/:mapId">
+  session.art = { skill: "ember", monster: "first", at: 1000 }
+  session.state.set((s) => ({ ...s, clockOffset: 60_000, player: player({ ready: { ember: 70000 } }) }))
+  sendFightSwing(session, "first")
+  expect(send).toHaveBeenLastCalledWith({ type: "attack", monster: "first", art: "ember" })
+  expect(session.art?.skill).toBe("ember")
+})
+
 it("clears a definitively refused art without stopping normal attacks or clearing another target's reservation", () => {
   const session = new GameSession()
   session.fighting = { monster: "first", at: 1000 }

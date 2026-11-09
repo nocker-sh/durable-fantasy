@@ -20,6 +20,7 @@ import { Tooltip } from "#/components/game/tooltip"
 import { TooltipContent } from "#/components/game/tooltip-content"
 import { TooltipTrigger } from "#/components/game/tooltip-trigger"
 import { ItemTooltip } from "#/components/hud/item-tooltip"
+import { useServiceWindow } from "#/components/hud/use-service-window"
 
 export function CraftWindow() {
   const game = useGame()
@@ -27,6 +28,7 @@ export function CraftWindow() {
   const player = useGameState((s) => s.player)
   const busy = useGameState((s) => s.busy)
   const station = id ? stationOf(id) : undefined
+  const stack = useServiceWindow("craft", !!station && !!player)
   if (!station || !player) return null
   // what only the levels past the cap can make is not shown yet (economy.md §2.1)
   const recipes = RECIPES.filter((r) => r.station === station.kind && r.min <= LIFE_CAP)
@@ -34,7 +36,8 @@ export function CraftWindow() {
     <Window
       id="craft"
       title={station.name}
-      z={30}
+      z={stack.z}
+      onFocus={stack.onFocus}
       onClose={() => game.closeCraft()}
       initial={() => ({ x: 364, y: 104 })}
       className="w-[380px]"

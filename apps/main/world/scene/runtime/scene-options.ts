@@ -6,4 +6,6 @@ export type SceneOptions = {
   at?: V2
   zoom?: number
   turn?: number
+  /** the clock creatures move and come back by (ms): the server's in the game, this device's when not given */
+  now?: () => number
 }

@@ -6,6 +6,7 @@ import { pick } from "#/world/town/lines/pick"
 import type { Situation } from "#/world/town/lines/line"
 import { ALL_LINES } from "#/world/town/lines/index"
 import { slotAt } from "#/world/town/slot-at"
+import { serverNow } from "#/world/client/server-now"
 import type { GameState } from "#/world/state"
 
 type Props = {
@@ -21,7 +22,7 @@ type Props = {
  * under `spokenKey`).
  */
 export function linesFor(props: Props): string[] {
-  const now = props.now === undefined ? Date.now() : props.now
+  const now = props.now === undefined ? serverNow(props.state) : props.now
 
   const spoken = readSpokenNames(props.spokenKey)
   const situation: Situation = {

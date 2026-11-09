@@ -32,6 +32,7 @@ import { TooltipContent } from "#/components/game/tooltip-content"
 import { TooltipTrigger } from "#/components/game/tooltip-trigger"
 import { Window } from "#/components/game/window"
 import { ItemTooltip } from "#/components/hud/item-tooltip"
+import { useServiceWindow } from "#/components/hud/use-service-window"
 
 export function ShopWindow() {
   const game = useGame()
@@ -44,6 +45,7 @@ export function ShopWindow() {
   const pickedState = useState<number | null>(null),
     picked = pickedState[0],
     setPicked = pickedState[1]
+  const stack = useServiceWindow("shop", !!shop)
 
   // right-clicking in the bag picks an item to sell
   useEffect(() => {
@@ -69,7 +71,8 @@ export function ShopWindow() {
     <Window
       id="shop"
       title={SHOPS[shop].name}
-      z={30}
+      z={stack.z}
+      onFocus={stack.onFocus}
       onClose={() => game.closeShop()}
       initial={() => ({ x: 364, y: 104 })}
       className="w-[356px]"
@@ -137,6 +140,7 @@ function BuyRow(inputProps: { offer: Offer }) {
       variant="primary"
       size="sm"
       disabled={!!reason || busy}
+      aria-description={reason ? REASON_TEXT[reason] : undefined}
       onClick={() => {
         game.buy({ shop: shop, item: item, count: n, q: q, price: each })
         setCount(1)
@@ -170,9 +174,10 @@ function BuyRow(inputProps: { offer: Offer }) {
         </div>
       </div>
       <Stepper value={n} max={max} onChange={setCount} />
+      {/* a disabled button takes no pointer or focus, so the reason sits on a wrapper (ui.md §3.6) */}
       {reason ? (
         <Tooltip>
-          <TooltipTrigger render={<span />}>{buy}</TooltipTrigger>
+          <TooltipTrigger render={<span tabIndex={0} />}>{buy}</TooltipTrigger>
           <TooltipContent>{REASON_TEXT[reason]}</TooltipContent>
         </Tooltip>
       ) : (

@@ -1,6 +1,9 @@
 import { minimapTarget, type WalkTargetOptions } from "#/world/client/minimap-target"
 import { currentPublication } from "#/world/client/player-publication"
 import { sendFightSwing } from "#/world/client/send-fight-swing"
+import { sendToRoom } from "#/world/client/send-to-room"
+import { readVisitedTown } from "#/world/client/read-visited-town"
+import { writeVisitedTown } from "#/world/client/write-visited-town"
 import { loadPlayerId } from "#/world/client/load-player-id"
 import { playerAvatar } from "#/world/client/player-avatar"
 import { remoteAvatar } from "#/world/client/remote-avatar"
@@ -21,9 +24,12 @@ import { STORAGE_KEEPER } from "#/world/core/storage/rules"
 import { stationAt } from "#/world/town/stations"
 import { WORLDS } from "#/world/channels"
 import { hometownOf } from "#/world/hometown-of"
+import { isChannel } from "#/world/is-channel"
+import { moveBlockedText } from "#/world/parts/move-blocked-text"
 import { jstMinutes } from "#/world/core/jst-minutes"
 import { parseTime } from "#/world/core/parse-time"
-import { apply } from "#/world/core/apply"
+import { previewCommand } from "#/world/client/preview-command"
+import { serverNow } from "#/world/client/server-now"
 import { carried } from "#/world/core/inventory-weight"
 import type { Command, GameEvent, Reason } from "#/world/core/commands"
 import type { ItemId } from "#/world/core/items/catalog"
@@ -60,7 +66,7 @@ import { prefetchGround } from "#/world/scene/prefetch-ground"
 /** How near a way out (cells) the room beyond it is got ready. */
 const STANDBY_CELLS = 8
 
-import type { ChatLine, GameState, ModalId, Notice, Npc, WindowId } from "#/world/state"
+import type { ChatLine, GameState, ModalId, Notice, Npc, ServiceWindowId, WindowId } from "#/world/state"
 
 const CHAT_KEEP = 150
 
@@ -124,9 +130,13 @@ export class Game {
       return
     }
     if (version !== this.mountVersion) return
-    this.session.rooms.world = hometownOf(this.session.playerId)
-    this.update({ homeTown: this.session.rooms.world })
+    const home = hometownOf(this.session.playerId)
+    // reloading this tab goes back into the town it was visiting, where its saved place is; the room
+    // still checks the thread and sends us home without one (game-system.md §1.1). A new tab starts at home.
+    this.session.rooms.world = readVisitedTown(sessionStorage) ?? home
+    this.update({ homeTown: home })
     this.update({ windows: this.windows.load() })
+    this.session.mutes.load()
     this.keys.listen()
     LOOKS.forEach((preset, index) => portraitUrl(preset.look, (url) => this.update((s) => ({ portraits: { ...s.portraits, [index]: url } }))))
     // ?map=phanthiet-market&x=24&z=24&open=inventory,stats starts somewhere in particular (handy for checks)
@@ -139,19 +149,19 @@ export class Game {
     if (import.meta.env.DEV && q.get("debug") === "1") this.update({ debug: true })
     const visit = Number(q.get("world"))
     if (import.meta.env.DEV && visit >= 1 && visit <= WORLDS) this.session.rooms.world = visit
-    // the clock is Japan's; ?time=22:30 holds it at a time of day (for checks)
+    // the clock is Japan's, by the server's clock; ?time=22:30 holds it at a time of day (for checks)
     const held = parseTime(q.get("time"))
-    this.update({ clock: { min: held ?? jstMinutes(Date.now()), held: held !== null } })
+    this.update({ clock: { min: held ?? jstMinutes(serverNow(this.state.get())), held: held !== null } })
     // how the party is doing: our own room reports us, and tells us of the others
     const partyTick = window.setInterval(() => {
-      if (this.session.others.you) this.session.socket?.send({ type: "heartbeat" })
-      if (this.state.get().player?.party) this.session.socket?.send({ type: "party-look", chat: this.session.partyChat })
+      if (this.session.others.you) sendToRoom(this.session.socket, { type: "heartbeat" })
+      if (this.state.get().player?.party) sendToRoom(this.session.socket, { type: "party-look", chat: this.session.partyChat })
     }, 5_000)
     const tick = window.setInterval(() => {
       this.lookAtShop() // the shelves change as others buy and batches come out
       if (this.state.get().clock.held) return
       const before = this.state.get().clock.min
-      this.update({ clock: { min: jstMinutes(Date.now()), held: false } })
+      this.update({ clock: { min: jstMinutes(serverNow(this.state.get())), held: false } })
       this.announceBatches(before, this.state.get().clock.min)
       this.scene?.setClock(this.state.get().clock.min)
     }, 15_000)
@@ -195,11 +205,7 @@ export class Game {
 
   /** What a command would do, without sending it (for greying out buttons). */
   preview(command: Command): Reason | null {
-    const player = this.state.get().player
-    if (!player) return "OFFLINE"
-    // the same clock as the server's waits (skills and medicine), or a past wait would still hold
-    const result = apply(player, command, { now: Date.now(), price: command.type === "buy" ? command.price : undefined })
-    return result.ok ? null : result.reason
+    return previewCommand(this.state.get(), command)
   }
 
   /** The current map's walk grid (1 = blocked), for scripts/export-map.ts. */
@@ -277,8 +283,10 @@ export class Game {
   /** Move to another channel of this map (system menu), staying where we stand. */
   changeChannel(channel: number) {
     const room = this.state.get().room
-    // a trade in hand belongs to this room: leaving would end it for the other side as well
-    if (!room || room.channel === channel || this.session.engaged || this.state.get().trade) return
+    if (!room || room.channel === channel || !isChannel(channel)) return
+    // a conversation, a shop or a trade belongs to this room: leaving would end it, for the other side too
+    const blocked = moveBlockedText(this.state.get())
+    if (blocked) return this.notify(blocked, "bad")
     this.session.wantChannel = channel
     this.leaveMap()
     void this.connect(this.state.get().map.id)
@@ -325,6 +333,9 @@ export class Game {
   toggleSit = this.playerActions.toggleSit.bind(this.playerActions)
 
   closePlayerMenu = this.socialActions.closePlayerMenu.bind(this.socialActions)
+  /** Mute another player in this browser, or unmute them (ui.md §3.18). */
+  mute = this.socialActions.mute.bind(this.socialActions)
+  unmute = this.socialActions.unmute.bind(this.socialActions)
   /** Friends (core/threads.ts): swap muffler threads; follow one into a friend's town; go home. */
   askThread = this.socialActions.askThread.bind(this.socialActions)
   answerThread = this.socialActions.answerThread.bind(this.socialActions)
@@ -387,9 +398,14 @@ export class Game {
     this.windows.reset()
   }
 
-  /** Bring a window to the front. */
-  focusWindow(id: WindowId) {
+  /** Bring a window to the front; a shop and the like comes to the front when it opens, too (ui.md §5). */
+  focusWindow(id: WindowId | ServiceWindowId) {
     this.windows.focus(id)
+  }
+
+  /** A shop or the like has closed: it leaves the stacking order. */
+  unstackWindow(id: ServiceWindowId) {
+    this.windows.unstack(id)
   }
 
   openModal(modal: ModalId | null) {
@@ -420,7 +436,7 @@ export class Game {
   /** Hold the clock at a time of day, or let it follow Japan's again (null). */
   setClock(min: number | null) {
     const before = this.state.get().clock
-    const clock = { min: min ?? jstMinutes(Date.now()), held: min !== null }
+    const clock = { min: min ?? jstMinutes(serverNow(this.state.get())), held: min !== null }
     this.update({ clock })
     const changed = before.held !== clock.held || (clock.held && before.min !== clock.min)
     // Dev time is accepted at join; reconnect so server rules use the displayed time too.
@@ -484,7 +500,7 @@ export class Game {
             this.update({ failed: true })
           },
           walk: (cells) => {
-            this.session.socket?.send({ type: "move", path: cells })
+            sendToRoom(this.session.socket, { type: "move", path: cells })
             // walking towards a way out: get the room beyond it ready now, not only on arrival
             const end = cells[cells.length - 1]
             const way = end && MAPS[this.state.get().map.id].warps.find((w) => cellDistance(w.at as Cell, end) <= 2)
@@ -501,9 +517,12 @@ export class Game {
           tick: () => this.onTick(),
         },
         map: id,
+        // creatures move and come back by the server's clock (game-system.md §7.5)
+        options: { now: () => serverNow(this.state.get()) },
       })
     } else if (this.scene?.ready) this.onSceneReady()
     this.session.fullTries = 0
+    this.session.joinTries = 0
     this.session.wild = {}
     this.update({ nodes: {}, craft: null })
     void this.connect(id)
@@ -608,7 +627,16 @@ export class Game {
       window.setTimeout(() => {
         for (const next of neighbours(here)) if (next !== beside) void prefetchGround(next)
       }, 1500)
+      // the room has told us its clock: its time of day shows from the start, not at the next tick
+      const clock = this.state.get().clock
+      const min = jstMinutes(serverNow(this.state.get()))
+      if (!clock.held && clock.min !== min) {
+        this.update({ clock: { min, held: false } })
+        this.scene?.setClock(min)
+      }
       this.update({ loading: null })
+      // the town the room let us into, for a reload of this tab
+      writeVisitedTown(sessionStorage, this.session.rooms.world)
       // for screenshots: the map is drawn and joined
       document.body.dataset.ready = "1"
       this.addChat({ channel: "system", text: `${this.state.get().map.name}に着いた。` })
@@ -649,7 +677,7 @@ export class Game {
       if (i >= 0 && i !== this.session.refusedWarp) {
         this.session.warping = true
         this.session.warpAskedAt = performance.now()
-        this.session.socket?.send({ type: "warp", warp: i })
+        sendToRoom(this.session.socket, { type: "warp", warp: i })
       }
     }
     const craft = this.state.get().craft

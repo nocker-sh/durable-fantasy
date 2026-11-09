@@ -29,12 +29,21 @@ describe("eating: stamina, fullness and warmth", () => {
   })
 
   it("the road out of town tires you, more in the cold unless you are warm, and stops you when too little is left", () => {
-    const cold = apply(player({ stamina: 50 }), { type: "tire", amount: 4 }, { now: 0 })
+    const cold = apply(player({ stamina: 50 }), { type: "tire", amount: 4, homeward: false }, { now: 0 })
     expect(cold.ok && cold.state.stamina).toBe(44)
-    const warm = apply(player({ stamina: 50, warmUntil: 10 * MIN }), { type: "tire", amount: 4 }, { now: MIN })
+    const warm = apply(player({ stamina: 50, warmUntil: 10 * MIN }), { type: "tire", amount: 4, homeward: false }, { now: MIN })
     expect(warm.ok && warm.state.stamina).toBe(46)
-    expect(apply(player({ stamina: 0 }), { type: "tire", amount: 4 })).toEqual({ ok: false, reason: "EXHAUSTED" })
-    expect(apply(player({ stamina: 5 }), { type: "tire", amount: 4 }, { now: 0 })).toEqual({ ok: false, reason: "EXHAUSTED" })
+    expect(apply(player({ stamina: 0 }), { type: "tire", amount: 4, homeward: false })).toEqual({ ok: false, reason: "EXHAUSTED" })
+    expect(apply(player({ stamina: 5 }), { type: "tire", amount: 4, homeward: false }, { now: 0 })).toEqual({ ok: false, reason: "EXHAUSTED" })
+  })
+
+  it("a road nearer town tires you the same, but takes what is left rather than stopping you", () => {
+    const enough = apply(player({ stamina: 50 }), { type: "tire", amount: 4, homeward: true }, { now: 0 })
+    expect(enough.ok && enough.state.stamina).toBe(44)
+    const short = apply(player({ stamina: 5 }), { type: "tire", amount: 4, homeward: true }, { now: 0 })
+    expect(short).toEqual({ ok: true, state: player({ stamina: 0 }), events: [{ type: "tired", stamina: 0 }] })
+    const spent = apply(player({ stamina: 0 }), { type: "tire", amount: 4, homeward: true }, { now: 0 })
+    expect(spent.ok && spent.state.stamina).toBe(0)
   })
 
   it("the porridge at the chapel is always cheap enough to keep going", () => {

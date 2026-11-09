@@ -45,6 +45,20 @@ it("selects actual resident lines for the current task and excludes premature th
   expect(linesFor({ state: state, name: "イルムガルト", spokenKey: "spoken", now: now })).not.toContain(ready)
 })
 
+it("introduces a resident on the first talk even when the errand taken from their menu is spoken of first", () => {
+  const saved = new Map<string, string>()
+  vi.stubGlobal("localStorage", { getItem: (key: string) => saved.get(key) ?? null, setItem: (key: string, value: string) => saved.set(key, value) })
+  const base = createGameState().get()
+  const state = { ...base, clock: { ...base.clock, min: 22 * 60 }, player: player({ errands: [taken("irmgard-herbs")] }) }
+  const intros = ALL_LINES["イルムガルト"].filter((line) => line.first).map((line) => line.text)
+  const waiting = ALL_LINES["イルムガルト"].find((line) => line.errand?.id === "irmgard-herbs" && line.errand.state === "taken")!.text
+  const first = linesFor({ state: state, name: "イルムガルト", spokenKey: "spoken", now: now })
+  expect(first[0]).toBe(waiting)
+  expect(intros).toContain(first[1])
+  expect(JSON.parse(saved.get("spoken")!)).toEqual(["イルムガルト"])
+  expect(linesFor({ state: state, name: "イルムガルト", spokenKey: "spoken", now: now + 60_000 }).some((text) => intros.includes(text))).toBe(false)
+})
+
 it("references existing errands involving the speaker", () => {
   for (const [name, lines] of Object.entries(ALL_LINES))
     for (const line of lines) {

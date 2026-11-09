@@ -78,6 +78,23 @@ it.each(["busy", "engaged", "unknown"])("reports a skipped gathering request whe
   expect(run).not.toHaveBeenCalled()
 })
 
+it("says a craft cannot be done while talking, without asking the room", () => {
+  const session = new GameSession()
+  session.state.set((s) => ({ ...s, craft: "craft-forge" }))
+  session.engaged = "ベアトリクス"
+  const run = vi.fn()
+  const notify = vi.fn()
+  const playAction = vi.fn()
+  const actions = new PlayerActions({ session, run, notify, getScene: () => ({ playAction }) as never, lookAtShop: vi.fn(), update: vi.fn(), toggleWindow: vi.fn() })
+  actions.craft("iron-ingot")
+  expect(run).not.toHaveBeenCalled()
+  expect(playAction).not.toHaveBeenCalled()
+  expect(notify).toHaveBeenCalledExactlyOnceWith(REASON_TEXT.NOT_READY, "bad")
+  session.engaged = null
+  actions.craft("iron-ingot")
+  expect(run).toHaveBeenCalledOnce()
+})
+
 it("rejects an art with insufficient SP locally and sends it after regeneration without spending locally", () => {
   vi.useFakeTimers()
   vi.setSystemTime(1000)

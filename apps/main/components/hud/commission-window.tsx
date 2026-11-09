@@ -22,6 +22,7 @@ import { Tooltip } from "#/components/game/tooltip"
 import { TooltipContent } from "#/components/game/tooltip-content"
 import { TooltipTrigger } from "#/components/game/tooltip-trigger"
 import { ItemTooltip } from "#/components/hud/item-tooltip"
+import { useServiceWindow } from "#/components/hud/use-service-window"
 
 export function CommissionWindow() {
   const game = useGame()
@@ -34,10 +35,11 @@ export function CommissionWindow() {
     return Math.max(latest, o.readyAt)
   }, 0)
   const now = useDeadlineClock(until, 10_000)
+  const stack = useServiceWindow("commission", !!who && !!player)
   if (!who || !player) return null
   const jobs = COMMISSIONS.filter((c) => c.craftsman === who)
   return (
-    <Window id="commission" title={`${who}に頼む`} z={30} onClose={() => game.closeCommission()} initial={() => ({ x: 364, y: 104 })} className="w-[380px]">
+    <Window id="commission" title={`${who}に頼む`} z={stack.z} onFocus={stack.onFocus} onClose={() => game.closeCommission()} initial={() => ({ x: 364, y: 104 })} className="w-[380px]">
       {mine.length > 0 && (
         <div className="mb-2.5">
           <p className="mb-1 font-head text-xs text-brass-hi">頼んである物</p>

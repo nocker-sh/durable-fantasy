@@ -2,6 +2,7 @@
 import { z } from "zod"
 import { BAG_SIZE } from "#/world/core/bag-rules"
 import type { Stack } from "#/world/core/bag-types"
+import { MAX_OPEN_ORDERS } from "#/world/core/exchange-rules"
 import { STATS } from "#/world/core/growth-rules"
 import type { Stat } from "#/world/core/growth-types"
 import { SLOTS } from "#/world/core/items/kinds"
@@ -83,7 +84,8 @@ export type Command = z.infer<typeof commandSchema>
 
 /** What only the server does to a player: tire them on the road out of town (game-system.md §3.6). */
 export type ServerCommand =
-  | { type: "tire"; amount: number }
+  /** `homeward`: the road leads nearer town, so it is never refused for stamina */
+  | { type: "tire"; amount: number; homeward: boolean }
   /** a go at a gathering spot the room has taken from nature.ts; `roll` is the server's dice (0–1) */
   | { type: "gather"; node: string; roll: number }
   /** a go at a recipe at a station the room has checked the player stands by */
@@ -178,6 +180,7 @@ export type Reason =
   | "NOT_STORABLE"
   | "NOT_TRADABLE"
   | "WORN_TOOL"
+  | "TOO_MANY_LISTINGS"
   | "COOLDOWN"
   | "SP_SHORT"
   | "WALKING"
@@ -278,6 +281,7 @@ export const REASON_TEXT: Record<Reason, string> = {
   NOT_STORABLE: "それは預けられない。",
   NOT_TRADABLE: "それは渡せない。",
   WORN_TOOL: "使い減りした道具は出品できない。",
+  TOO_MANY_LISTINGS: `掲示板に出せる注文は${MAX_OPEN_ORDERS}件まで。`,
   COOLDOWN: "まだ使えない。",
   SP_SHORT: "SP が足りない。",
   WALKING: "歩きながらは座れない。",

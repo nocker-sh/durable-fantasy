@@ -10,6 +10,7 @@ import type { Bag } from "#/world/core/bag-types"
 import { ShopWindow } from "#/components/hud/shop-window"
 import type { GameSession } from "#/world/client/game-session"
 import { countItem } from "#/world/core/count-item"
+import { REASON_TEXT } from "#/world/core/commands"
 import { emptyMarket } from "#/world/core/empty-market"
 import { ITEMS } from "#/world/core/items/catalog"
 import { moveStock } from "#/world/core/move-stock"
@@ -141,6 +142,14 @@ it.each([
   expect(countItem(f.record.player.bag, "apple")).toBe(countItem(before.bag, "apple") + 1)
   expect(stockOf(f.context.state.market, "fruit", "apple")).toBe(scenario.stock - 1)
   expect(f.game.state.get().player).toEqual(f.record.player)
+})
+
+it("gives a refused purchase its reason where the keyboard and a screen reader reach it (ui.md §3.6)", () => {
+  const f = fixture({ stock: 1, gold: 3 })
+  expect(appleBuyButton(f.game)).toContain(`aria-description="${REASON_TEXT.NO_GOLD}"`)
+  const html = renderToStaticMarkup(createElement(GameProvider, { game: f.game, children: createElement(ShopWindow) }))
+  const row = [...html.matchAll(/<li\b[^>]*>([\s\S]*?)<\/li>/g)].find((match) => match[1].includes(`aria-label="${ITEMS.apple.name}"`))![1]
+  expect(row).toMatch(/<span[^>]*tabindex="0"[^>]*><button[^>]*disabled=""[^>]*>買う<\/button><\/span>/)
 })
 
 it("keeps market price verification authoritative when a client quote is cheaper than the shelf", async () => {

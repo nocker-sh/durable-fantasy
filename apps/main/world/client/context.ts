@@ -10,7 +10,8 @@ export type GameContext = {
   readonly session: GameSession
   getScene(): MapScene | null
   update(patch: Partial<GameState> | ((state: GameState) => Partial<GameState>)): void
-  run(command: Command, send?: (seq: number) => void): Promise<boolean>
+  /** `send` sends the request itself and says whether it went (send-to-room.ts); one kept back is refused at once */
+  run(command: Command, send?: (seq: number) => boolean): Promise<boolean>
   notify(text: string, tone?: Notice["tone"]): void
   addChat(line: Omit<ChatLine, "id">): void
   toggleWindow(id: WindowId): void

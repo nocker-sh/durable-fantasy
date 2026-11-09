@@ -7,6 +7,7 @@ import { displayName } from "#/world/core/display-name"
 import { useGame } from "#/hooks/use-game"
 import { useGameState } from "#/hooks/use-game-state"
 import { apply } from "#/world/core/apply"
+import { serverNow } from "#/world/client/server-now"
 import { REASON_TEXT } from "#/world/core/commands"
 import { Button } from "#/components/game/button"
 import { Stepper } from "#/components/game/stepper"
@@ -16,12 +17,14 @@ import { Window } from "#/components/game/window"
 import { ItemTooltip } from "#/components/hud/item-tooltip"
 import { carriesItem } from "#/components/hud/carries-item"
 import { readDrag } from "#/components/hud/read-drag"
+import { useServiceWindow } from "#/components/hud/use-service-window"
 
 export function StorageWindow() {
   const game = useGame()
   const open = useGameState((s) => s.storage)
   const player = useGameState((s) => s.player)
   const busy = useGameState((s) => s.busy)
+  const clockOffset = useGameState((s) => s.clockOffset)
   const overState = useState(false),
     over = overState[0],
     setOver = overState[1]
@@ -37,9 +40,10 @@ export function StorageWindow() {
   const selected = picked === null ? null : player?.storage[picked]
   const amount = Math.min(count, selected?.count ?? 1)
   const preview = useMemo(
-    () => (open && player && selected && picked !== null ? apply(player, { type: "retrieve", index: picked, count: amount, expectedStack: selected }, { now: Date.now() }) : null),
-    [open, player, selected, picked, amount],
+    () => (open && player && selected && picked !== null ? apply(player, { type: "retrieve", index: picked, count: amount, expectedStack: selected }, { now: serverNow({ clockOffset }) }) : null),
+    [open, player, selected, picked, amount, clockOffset],
   )
+  const stack = useServiceWindow("storage", open && !!player)
   if (!open || !player) return null
   const lots = player.storage
   const used = lots.filter(Boolean).length
@@ -47,7 +51,8 @@ export function StorageWindow() {
     <Window
       id="storage"
       title="町の倉庫"
-      z={30}
+      z={stack.z}
+      onFocus={stack.onFocus}
       onClose={() => game.closeStorage()}
       initial={(w) => ({ x: Math.max(12, w - 352 - 560), y: 90 })}
       className="w-[548px]"

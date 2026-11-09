@@ -4,10 +4,15 @@ import { errandToday } from "#/world/core/errand-today"
 import { todays } from "#/world/core/todays"
 import { dayOf } from "#/world/core/day-of"
 import { ITEMS } from "#/world/core/items/catalog"
+import { canAskErrand } from "#/world/maps/can-ask-errand"
+import { serverNow } from "#/world/client/server-now"
 import type { DialogueChoice, GameState } from "#/world/state"
 
-/** What a resident and we have to do with errands now: hear today's, or hand one over to them. */
-export function errandChoices(state: GameState, name: string, now = Date.now()): DialogueChoice[] {
+/**
+ * What a resident and we have to do with errands now (the server's day): hear today's while they
+ * still ask it at this hour (the clock the residents stand by, as the room checks it), or hand one over to them.
+ */
+export function errandChoices(state: GameState, name: string, now = serverNow(state)): DialogueChoice[] {
   const player = state.player
   if (!player || hasFutureErrands(player.errands, now)) return []
   const mine = todays(player.errands, now)
@@ -18,6 +23,6 @@ export function errandChoices(state: GameState, name: string, now = Date.now()):
     out.push({ label: e.kind === "bring" ? `${ITEMS[e.wants.item].name}を渡す` : `${e.parcel}を渡す`, action: "errand-hand", errand: e.id })
   }
   const asked = errandToday(name, dayOf(now))
-  if (asked && !mine.some((t) => t.id === asked.id)) out.push({ label: "頼まれごとを聞く", action: "errand-ask", errand: asked.id })
+  if (asked && !mine.some((t) => t.id === asked.id) && canAskErrand(asked, state.clock.min)) out.push({ label: "頼まれごとを聞く", action: "errand-ask", errand: asked.id })
   return out
 }

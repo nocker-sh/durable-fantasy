@@ -11,6 +11,7 @@ import { initialPlayerRecord } from "#/world/server/initial-player-record"
 import type { PlayerRecord } from "#/world/server/player-record"
 import { durableStorage } from "#/world/test/durable-storage"
 import { bagWith } from "#/world/test/bag-with"
+import { errandAskTime } from "#/world/test/errand-ask-time"
 
 vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }))
 afterEach(() => {
@@ -62,9 +63,9 @@ it.each(cases)("$errand.id, completed=$done: a backward rollover cannot erase a 
   expect(record().player.errands).toEqual([{ id: errand.id, day: dayOf(now!), done: true }])
   expect(await actor.run(hand)).toEqual({ ok: false, reason: "NO_ERRAND" })
   expect(store.saved.get("__void_durable_state")).toEqual(completed)
-  const next = Array.from({ length: 400 }, (_, index) => now! + (index + 1) * day).find((at) => errandToday(errand.from, dayOf(at))?.id === errand.id)
-  expect(next).toBeDefined()
-  vi.setSystemTime(next!)
+  // the next day it is drawn, at an hour its asker asks it
+  const next = errandAskTime(errand, now! + day)
+  vi.setSystemTime(next)
   actor = new Player.class(store.state, {})
   expect(choices(errand.from).some((choice) => choice.action === "errand-ask" && choice.errand === errand.id)).toBe(true)
   store.failNextSave()

@@ -36,8 +36,9 @@ export function Hud() {
   const departed = useGameState((s) => s.departed)
   const player = useGameState((s) => s.player)
   const replaced = useGameState((s) => s.connectionReplaced)
+  const outdated = useGameState((s) => s.outdated)
   if (departed) return <Loading />
-  if (replaced) return <Offline />
+  if (replaced || outdated) return <Offline />
   if (!player) return <Loading />
   if (!player.profileComplete) return <SystemModals />
   return (

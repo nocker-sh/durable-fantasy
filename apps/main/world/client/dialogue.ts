@@ -1,6 +1,8 @@
 import { parseChatInput } from "#/world/client/chat-input"
 import type { GameSession } from "#/world/client/game-session"
 import { STORAGE } from "#/world/client/identity"
+import { sendToRoom } from "#/world/client/send-to-room"
+import { NAME_MAX } from "#/world/core/player-rules"
 import { STORAGE_KEEPER } from "#/world/core/storage/rules"
 import { errandLabel } from "#/world/core/errand-label"
 import { errandOf } from "#/world/core/errand-of"
@@ -32,11 +34,14 @@ export class DialogueActions {
     const input = parseChatInput(text)
     if (!input) return
     if (input.kind === "whisper") {
-      this.target.session.socket?.send({ type: "whisper", to: input.to, text: input.text })
+      // no one is named longer than NAME_MAX, so no one here can hear it (game-system.md §12); the room
+      // would drop the socket on such a name
+      if (input.to.length > NAME_MAX) this.target.addChat({ channel: "system", text: "その人はこのあたりにいない。" })
+      else sendToRoom(this.target.session.socket, { type: "whisper", to: input.to, text: input.text })
       return
     }
     if (input.kind === "party") {
-      this.target.session.socket?.send({ type: "party-say", text: input.text, chat: this.target.session.partyChat })
+      sendToRoom(this.target.session.socket, { type: "party-say", text: input.text, chat: this.target.session.partyChat })
       return
     }
     const saidSource = input,
@@ -44,7 +49,7 @@ export class DialogueActions {
       shout = saidSource.shout
     this.target.getScene()?.bubble("me", said)
     this.target.addChat({ channel: "player", name: this.target.session.state.get().player?.name, text: said, self: true, shout })
-    this.target.session.socket?.send({ type: "say", text: said, shout })
+    sendToRoom(this.target.session.socket, { type: "say", text: said, shout })
   }
 
   advanceDialogue(expectedDialogue?: Dialogue) {
@@ -87,7 +92,7 @@ export class DialogueActions {
       const action = choice.action === "errand-take" ? "take" : "hand"
       const socket = this.target.session.socket
       void this.target
-        .run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "errand", seq, action, errand: errand.id, resident: dialogue.name }))
+        .run({ type: "use", slot: 0 }, (seq) => sendToRoom(this.target.session.socket, { type: "errand", seq, action, errand: errand.id, resident: dialogue.name }))
         .then((ok) => {
           const now = this.target.session.state.get().dialogue
           if (this.target.session.socket !== socket || now !== dialogue) return
@@ -160,7 +165,7 @@ export class DialogueActions {
     if (npc === this.target.session.engaged) return
     this.target.session.engaged = npc
     this.target.getScene()?.freeze(!!npc)
-    this.target.session.socket?.send({ type: "engage", npc })
+    sendToRoom(this.target.session.socket, { type: "engage", npc })
   }
 
   announceBatches(from: number, to: number) {
@@ -195,7 +200,7 @@ export class DialogueActions {
 
   lookAtShop() {
     const shop = this.target.session.state.get().shop
-    if (shop) this.target.session.socket?.send({ type: "look", shop })
+    if (shop) sendToRoom(this.target.session.socket, { type: "look", shop })
   }
 
   onReachResident(id: number) {

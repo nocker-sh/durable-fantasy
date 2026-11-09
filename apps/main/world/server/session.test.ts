@@ -34,6 +34,22 @@ describe("browser ownership", () => {
     expect(credentials.get(id)).not.toBe(sessionCookie(request(cookie))!.secret)
   })
 
+  it("sends the same credential again on each confirmed visit, so the cookie lasts from the latest one", async () => {
+    for (const from of [origin, "https://example.invalid"]) {
+      const at = (cookie?: string) => new Request(`${from}/api/session`, { method: "POST", headers: { Origin: from, ...(cookie ? { Cookie: cookie } : {}) } })
+      const issued = (await establishSession(at(), crypto.randomUUID(), "a".repeat(64))).headers.get("set-cookie")!
+      const kept = issued.split(";")[0]
+      const visit = await establishSession(at(kept))
+      expect(visit.status).toBe(200)
+      expect(visit.headers.get("set-cookie")).toBe(issued)
+      expect(visit.headers.get("cache-control")).toBe("no-store")
+      const forged = await establishSession(at(kept.slice(0, -64) + "0".repeat(64)))
+      expect(forged.status).toBe(401)
+      expect(forged.headers.get("set-cookie")).toBeNull()
+    }
+    expect(credentials.size).toBe(2)
+  })
+
   it("migrates a private legacy id once and refuses reuse of that id without its cookie", async () => {
     const id = crypto.randomUUID()
     const first = await establishSession(request(), id, "a".repeat(64))

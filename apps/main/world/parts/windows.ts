@@ -2,7 +2,8 @@
 // modal screen over everything (ui.md §3).
 import type { Store } from "#/lib/engine/store"
 import { DEFAULT_WINDOWS } from "#/world/state"
-import type { GameState, ModalId, WindowId } from "#/world/state"
+import type { GameState, ModalId, ServiceWindowId, WindowId } from "#/world/state"
+import { isServiceWindow } from "#/world/parts/is-service-window"
 
 const KNOWN: readonly WindowId[] = ["minimap", "chat", "syslog", "inventory", "equipment", "stats", "worldmap", "errands", "skills", "friends"]
 
@@ -34,24 +35,34 @@ export class Windows {
   /** Put every window back where it started: positions, sizes and which are open. */
   reset() {
     for (const key of Object.keys(localStorage)) if (key.startsWith("ui-window/")) localStorage.removeItem(key)
-    this.set(() => DEFAULT_WINDOWS)
+    // a shop or the like that is still shown keeps its place in front
+    this.set((w) => [...DEFAULT_WINDOWS, ...w.filter(isServiceWindow)])
     this.state.set((s) => ({ ...s, layout: s.layout + 1 }))
   }
 
-  /** Bring a window to the front. */
-  focus(id: WindowId) {
+  /** Bring a window to the front. A shop and the like joins the order here when it opens. */
+  focus(id: WindowId | ServiceWindowId) {
     const windowsSource = this.state.get(),
       windows = windowsSource.windows
-    if (windows[windows.length - 1] !== id && windows.includes(id)) this.state.set((s) => ({ ...s, windows: [...windows.filter((w) => w !== id), id] }))
+    if (windows[windows.length - 1] === id || (!windows.includes(id) && !isServiceWindow(id))) return
+    this.state.set((s) => ({ ...s, windows: [...windows.filter((w) => w !== id), id] }))
+  }
+
+  /** A shop or the like has closed: it leaves the order. */
+  unstack(id: ServiceWindowId) {
+    const windowsSource = this.state.get(),
+      windows = windowsSource.windows
+    if (windows.includes(id)) this.state.set((s) => ({ ...s, windows: windows.filter((w) => w !== id) }))
   }
 
   openModal(modal: ModalId | null) {
     this.state.set((s) => ({ ...s, modal }))
   }
 
-  private set(change: (windows: readonly WindowId[]) => readonly WindowId[]) {
+  private set(change: (windows: GameState["windows"]) => GameState["windows"]) {
     const windows = change(this.state.get().windows)
-    localStorage.setItem(this.key, JSON.stringify(windows))
+    // only the windows the player opens and closes are remembered (ui.md §5)
+    localStorage.setItem(this.key, JSON.stringify(windows.filter((w) => !isServiceWindow(w))))
     this.state.set((s) => ({ ...s, windows }))
   }
 }

@@ -6,6 +6,8 @@ import { emptyClaims } from "#/world/core/empty-claims"
 import type { InboxClaim } from "#/world/core/exchange-claim-types"
 import { emptyBag } from "#/world/core/empty-bag"
 import type { OrderIntent } from "#/world/core/exchange-types"
+import { MAX_OPEN_ORDERS } from "#/world/core/exchange-rules"
+import type { ExchangeRecord } from "#/world/server/exchange-record"
 import { durableStorage } from "#/world/test/durable-storage"
 import { player } from "#/world/test/player"
 
@@ -185,4 +187,28 @@ it("keeps the paid maker even if the original selling slot changes before recove
   expect((await f.source.look("potion@1", "owner")).mine[0]).toMatchObject({ by: "イルムガルト", left: 2 })
   expect((await f.recipient.read()).bag[1]).toMatchObject({ count: 1, by: "イルムガルト" })
   expect((await f.recipient.read()).gold).toBe(99)
+})
+
+it("refuses a resting order past one player's limit before taking anything, and has room again once one comes down", async () => {
+  const f = await fixture()
+  const cheap: OrderIntent = { side: "buy", symbol: "log", price: 1, qty: 1 }
+  for (let seq = 1; seq <= MAX_OPEN_ORDERS; seq++) expect((await f.source.place("owner", await f.begin(cheap, seq))).ok).toBe(true)
+  const gold = (await f.recipient.read()).gold
+  const before = structuredClone(f.exchangeStore.saved.get("__void_durable_state"))
+  f.hold.mockClear()
+  expect(await f.source.beginOrder({ owner: "owner", connection: "connection", seq: MAX_OPEN_ORDERS + 1, name: "売り手", intent: cheap })).toEqual({ ok: false, reason: "TOO_MANY_LISTINGS" })
+  expect(f.hold).not.toHaveBeenCalled()
+  expect((await f.recipient.read()).gold).toBe(gold)
+  expect(f.exchangeStore.saved.get("__void_durable_state")).toEqual(before)
+  // a market order does not stay on the board, so the limit does not hold it back
+  expect((await f.source.place("owner", await f.begin({ ...cheap, market: true }, MAX_OPEN_ORDERS + 2))).ok).toBe(true)
+  const mine = (await f.source.look("log", "owner")).mine
+  expect(mine).toHaveLength(MAX_OPEN_ORDERS)
+  expect(await f.source.cancel("owner", mine[0].id)).toBe(true)
+  expect((await f.source.place("owner", await f.begin(cheap, MAX_OPEN_ORDERS + 3))).ok).toBe(true)
+  const record = (f.exchangeStore.saved.get("__void_durable_state") as { value: ExchangeRecord }).value
+  expect(record.ex.orders).toHaveLength(MAX_OPEN_ORDERS)
+  // every gold piece is in the purse, the inbox, a resting buy order or the fees taken
+  const held = record.ex.orders.reduce((sum, order) => sum + order.price * order.left, 0)
+  expect((await f.recipient.read()).gold + (record.ex.inbox.owner?.gold ?? 0) + held + record.ex.fees).toBe(100)
 })

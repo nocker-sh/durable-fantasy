@@ -12,9 +12,11 @@ export async function handleGather(roomCtx: Ctx, message: Message<"gather">): Pr
   const ctx = roomCtx.ctx,
     key = roomCtx.key,
     me = roomCtx.me
-  if (!me.player || !me.owner || me.engaged) return
-  const node = nodeOf(message.node)
+  if (!me.player || !me.owner) return
   const answer = (result: Transition) => ctx.connection.send({ type: "result", seq: message.seq, result })
+  // no gathering while talking (game-system.md §7); answered, so the client does not wait out its timeout
+  if (me.engaged) return answer({ ok: false, reason: "NOT_READY" })
+  const node = nodeOf(message.node)
   if (!node || node.map !== key.map || !near(me, node.cell, REACH)) return answer({ ok: false, reason: "TOO_FAR" })
   const nature = Nature.get(`town-${key.world}`)
   const request = await nature.beginGather({ owner: me.owner, connection: ctx.connection.id, seq: message.seq, node: node.id })

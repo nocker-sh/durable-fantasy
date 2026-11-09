@@ -57,3 +57,12 @@ it.each(["distance", "map"])("refuses an invalid %s before reserving resources",
   expect(f.store.saved.get("__void_durable_state")).toEqual(before)
   expect(f.broadcast).not.toHaveBeenCalled()
 })
+it("answers a gathering attempt made while talking instead of leaving the client waiting", async () => {
+  const f = fixture(),
+    before = structuredClone(f.store.saved.get("__void_durable_state"))
+  f.me.engaged = "ベアトリクス"
+  await HANDLERS.gather!(f.context, { type: "gather", seq: 4, node: f.node.id })
+  expect(f.send).toHaveBeenCalledExactlyOnceWith({ type: "result", seq: 4, result: { ok: false, reason: "NOT_READY" } })
+  expect(f.store.saved.get("__void_durable_state")).toEqual(before)
+  expect(f.broadcast).not.toHaveBeenCalled()
+})

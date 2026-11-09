@@ -5,11 +5,12 @@ import { newPlayer } from "#/world/core/new-player"
 import { emptyEquipment } from "#/world/core/empty-equipment"
 import { derive } from "#/world/core/derive"
 import { renameResidents } from "#/world/core/rename-residents"
+import { markOldGoods } from "#/world/core/mark-old-goods"
 
-/** Decode current and supported older saves without replacing unreadable data, carried over resident renames. */
+/** Decode current and supported older saves without replacing unreadable data; old made goods get their mark, then resident renames carry over. */
 export function parsePlayer(saved: unknown): PlayerState | null {
   const decoded = decodePlayer(saved)
-  return decoded && renameResidents(decoded)
+  return decoded && renameResidents(markOldGoods(decoded))
 }
 
 function decodePlayer(saved: unknown): PlayerState | null {

@@ -5,6 +5,8 @@ import { RoomClient } from "#/world/client/room-client"
 
 vi.mock("void/ws", () => ({ connect: vi.fn() }))
 
+const PLAYER = "11111111-1111-4111-8111-111111111111"
+
 afterEach(() => {
   vi.unstubAllGlobals()
   vi.clearAllMocks()
@@ -29,7 +31,7 @@ it("joins the new world's channel instead of reusing a room prefetched in the pr
     return socket as unknown as ReturnType<typeof connect>
   })
   const session = new GameSession()
-  session.playerId = "player"
+  session.playerId = PLAYER
   const target: ConstructorParameters<typeof RoomClient>[0] = {
     session,
     update: (patch) => session.state.set((state) => ({ ...state, ...(typeof patch === "function" ? patch(state) : patch) })),
@@ -49,7 +51,7 @@ it("joins the new world's channel instead of reusing a room prefetched in the pr
 
   session.rooms.world = 2
   const joining = client.connect("phanthiet")
-  expect(fetchRoom).toHaveBeenLastCalledWith("/api/channel?world=2&map=phanthiet")
+  expect(fetchRoom).toHaveBeenLastCalledWith("/api/channel?world=2&map=phanthiet", { signal: expect.any(AbortSignal) })
   expect(sockets[0].close).toHaveBeenCalledOnce()
   requests[1].resolve(new Response(JSON.stringify({ channel: 3, channels: { 3: 1 } })))
   await joining
@@ -57,6 +59,8 @@ it("joins the new world's channel instead of reusing a room prefetched in the pr
   expect(session.state.get().room).toEqual({ world: 2, channel: 3, channels: { 3: 1 } })
   session.arriveAt = [20, 20]
   sockets[1].emit("open")
-  expect(sockets[1].send).toHaveBeenCalledExactlyOnceWith({ type: "join", player: "player", at: [20, 20] })
+  expect(sockets[1].send).toHaveBeenCalledExactlyOnceWith({ type: "join", player: PLAYER, at: [20, 20] })
   expect(sockets[0].send).not.toHaveBeenCalled()
+  // the join's wait for an answer ends with the map
+  client.cancel()
 })

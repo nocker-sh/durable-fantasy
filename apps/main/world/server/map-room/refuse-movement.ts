@@ -1,4 +1,6 @@
 import { Player } from "#/durable-objects/player"
+import { cellDistance } from "#/world/maps/cell-distance"
+import { CELLS_PER_SECOND } from "#/world/protocol"
 import { reachable } from "#/world/server/map-room/reachable"
 import type { MovementRequestContext } from "#/world/server/map-room/movement-request-types"
 
@@ -12,7 +14,11 @@ export async function refuseMovement(room: Props) {
   const at = reachable(me)[0]
   if (!at) return connection.send({ type: "refused", what: "move" })
   if (me.owner && (await Player.get(me.owner).walk({ connection: connection.id, route: [at] }))) {
-    room.save({ player: { ...me.player, at }, route: [at], since: Date.now() })
+    const now = Date.now()
+    // the walk back to where the route can be reached still spends the walking clock (game-system.md §2)
+    const from = me.route[0] ?? at
+    const paced = Math.max((me.paced ?? me.since) + (cellDistance(from, at) / CELLS_PER_SECOND) * 1000, now)
+    room.save({ player: { ...me.player, at }, route: [at], since: now, paced })
     await room.ctx.room.broadcast({ type: "moved", id: me.player.id, path: [at] }, [connection.id])
   }
   await connection.send({ type: "refused", what: "move", at })

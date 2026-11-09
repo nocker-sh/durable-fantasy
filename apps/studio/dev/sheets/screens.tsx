@@ -4,6 +4,7 @@ const SCREENS: { id: string; name: string; kind: string }[] = [
   { id: "loading", name: "読み込み", kind: "画面の間" },
   { id: "fallen", name: "倒れた", kind: "画面の間" },
   { id: "offline", name: "道が途切れた", kind: "画面の間" },
+  { id: "outdated", name: "新しい版", kind: "画面の間" },
   { id: "failed", name: "描けなかった", kind: "画面の間" },
   { id: "status", name: "体力の枠", kind: "常に出ている" },
   { id: "hotbar", name: "ホットバー", kind: "常に出ている" },

@@ -3,9 +3,14 @@
 import { defineDurableState } from "void/durable"
 import { CHANNEL_CAP, CHANNEL_SLACK } from "#/world/channels"
 import { chooseChannel } from "#/world/choose-channel"
+import { isChannel } from "#/world/is-channel"
+import { directoryMigrations } from "#/world/server/directory-migrations"
+import type { DirectoryRecord } from "#/world/server/directory-record-types"
 
 export const Directory = defineDurableState({
-  initialState: { counts: {} as Record<string, Record<number, number>>, seen: {} as Record<string, number> },
+  initialState: { counts: {} } as DirectoryRecord,
+  version: 1,
+  migrations: directoryMigrations,
   methods: {
     /** The channel to join on `map`: the one asked for, a friend's, the fullest with room, or a new one. */
     choose(context, input: { map: string; want?: number; friend?: number }): number {
@@ -19,18 +24,22 @@ export const Directory = defineDurableState({
     channels(context, map: string): Record<number, number> {
       return context.state.counts[map] ?? {}
     },
-    /** A player came into a channel; false when it is already over full (they are sent elsewhere). */
+    /** A player came into a channel; false when it is already over full (they are sent elsewhere), or no room can carry that channel. */
     /** `present`: how many the room itself holds besides this one, which corrects a count left by a leaving never reported. */
     arrive(context, input: { map: string; channel: number; following: boolean; present?: number }): boolean {
       const map = input.map
       const channel = input.channel
       const following = input.following
 
+      if (!isChannel(channel)) return false
       const row = (context.state.counts[map] ??= {})
       const n = input.present !== undefined && Number.isSafeInteger(input.present) && input.present >= 0 ? input.present : (row[channel] ?? 0)
-      if (n >= CHANNEL_CAP + (following ? CHANNEL_SLACK : 0)) return false
+      if (n >= CHANNEL_CAP + (following ? CHANNEL_SLACK : 0)) {
+        // the room's own count says full: keep it, or choose() sends the next one back here
+        row[channel] = n
+        return false
+      }
       row[channel] = n + 1
-      context.state.seen[`${map}~${channel}`] = Date.now()
       return true
     },
     /** A player left; an empty channel is forgotten (its room keeps nothing once empty). */

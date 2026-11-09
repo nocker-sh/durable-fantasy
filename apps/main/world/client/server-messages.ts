@@ -1,6 +1,8 @@
 import { currentCreature } from "#/world/client/current-creature"
 import { mergeWild } from "#/world/client/merge-wild"
 import { currentPublication } from "#/world/client/player-publication"
+import { sendToRoom } from "#/world/client/send-to-room"
+import { serverNow } from "#/world/client/server-now"
 import type { GameSession } from "#/world/client/game-session"
 import { REASON_TEXT, type Reason } from "#/world/core/commands"
 import { isShopId } from "#/world/core/is-shop-id"
@@ -29,6 +31,7 @@ export class ServerMessages {
         | "net"
         | "arriveAt"
         | "others"
+        | "mutes"
         | "socket"
         | "waiting"
         | "wild"
@@ -37,6 +40,7 @@ export class ServerMessages {
         | "state"
         | "engaged"
         | "fullTries"
+        | "joinTries"
         | "warping"
         | "warpAgainAt"
         | "refusedWarp"
@@ -51,7 +55,12 @@ export class ServerMessages {
     if (import.meta.env.DEV) this.target.session.net.bytes += JSON.stringify(message).length
     switch (message.type) {
       case "snapshot": {
+        // the room's clock: waits, recovery and the time of day are counted by it (game-system.md §7.5)
+        if (message.now !== undefined && Number.isFinite(message.now)) this.target.update({ clockOffset: message.now - Date.now() })
         scene?.freeze(false)
+        // let in: a later refusal or failed join starts counting again
+        this.target.session.fullTries = 0
+        this.target.session.joinTries = 0
         if (message.at) {
           this.target.session.arriveAt = message.at
           scene?.placePlayer(message.at)
@@ -66,7 +75,7 @@ export class ServerMessages {
         scene?.clearRemotes()
         for (const p of message.players) scene?.addRemote(p.id, this.target.avatarOf(p), p.at)
         if (currentPublication(this.target.session.state.get().player, message.me)) this.target.setPlayer(message.me)
-        if (this.target.session.state.get().player?.party) this.target.session.socket?.send({ type: "party-look", chat: this.target.session.partyChat })
+        if (this.target.session.state.get().player?.party) sendToRoom(this.target.session.socket, { type: "party-look", chat: this.target.session.partyChat })
         this.target.maybeReady()
         return
       }
@@ -82,6 +91,8 @@ export class ServerMessages {
       case "left": {
         const p = this.target.session.others.leave(message.id)
         scene?.removeRemote(message.id)
+        // a closed connection never comes back, so its mute is forgotten
+        this.target.session.mutes.unmute(message.id)
         if (p) this.target.addChat({ channel: "system", text: `${p.name}が去っていった。` })
         return
       }
@@ -91,21 +102,23 @@ export class ServerMessages {
         return
       }
       case "whispered": {
-        this.target.addChat({ channel: "whisper", name: message.name, text: message.text, self: !!message.sent })
+        const from = message.sent ? undefined : message.from
+        if (from && this.target.session.mutes.has(from)) return
+        this.target.addChat({ channel: "whisper", name: message.name, text: message.text, self: !!message.sent, ...(from ? { from } : {}) })
         return
       }
       case "said": {
         const p = this.target.session.others.get(message.id)
-        if (!p) return
+        if (!p || this.target.session.mutes.has(message.id)) return
         scene?.bubble(message.id, message.text)
-        this.target.addChat({ channel: "player", name: p.name, text: message.text, shout: message.shout })
+        this.target.addChat({ channel: "player", name: p.name, text: message.text, shout: message.shout, from: message.id })
         return
       }
       case "result": {
         // a result nobody asked for (the spoils of a fight): take it comes
         if (message.seq === -1) {
           const queued = this.target.session.art
-          if (message.result.ok && queued && (message.result.state.ready[queued.skill] ?? 0) > Date.now()) this.target.session.art = null
+          if (message.result.ok && queued && (message.result.state.ready[queued.skill] ?? 0) > serverNow(this.target.session.state.get())) this.target.session.art = null
           if (message.result.ok && currentPublication(this.target.session.state.get().player, message.result.state)) {
             this.target.setPlayer(message.result.state)
             const revision = message.result.state.revision ?? 0
@@ -147,6 +160,7 @@ export class ServerMessages {
         return
       }
       case "thread-asked":
+        if (this.declineMuted(message.from, "thread-answer")) return
         this.target.update({ threadAsk: { from: message.from, name: message.name } })
         return
       case "thread-closed":
@@ -163,6 +177,7 @@ export class ServerMessages {
         return
       }
       case "party-invited":
+        if (this.declineMuted(message.from, "party-answer")) return
         this.target.update({ partyAsk: { from: message.from, name: message.name } })
         return
       case "party": {
@@ -183,6 +198,7 @@ export class ServerMessages {
         return
       }
       case "trade-asked":
+        if (this.declineMuted(message.from, "trade-answer")) return
         this.target.update({ tradeAsk: { from: message.from, name: message.name } })
         return
       case "trade-view":
@@ -309,5 +325,12 @@ export class ServerMessages {
         return
       }
     }
+  }
+
+  /** ミュートした相手からの申し込みは、知らせを出さずに断る（ui.md §3.18）。 */
+  private declineMuted(from: string, answer: "trade-answer" | "party-answer" | "thread-answer"): boolean {
+    if (!this.target.session.mutes.has(from)) return false
+    this.target.session.socket?.send({ type: answer, from, yes: false })
+    return true
   }
 }

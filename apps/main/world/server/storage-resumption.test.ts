@@ -4,6 +4,7 @@ import { ITEMS } from "#/world/core/items/catalog"
 import type { ItemId } from "#/world/core/items/catalog"
 import type { Stack } from "#/world/core/bag-types"
 import { emptyBag } from "#/world/core/empty-bag"
+import { markFor } from "#/world/core/mark-for"
 import { STORE_FEE } from "#/world/core/storage/rules"
 import { initialPlayerRecord } from "#/world/server/initial-player-record"
 import { player } from "#/world/test/player"
@@ -15,7 +16,8 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-const stacks: Stack[] = (Object.keys(ITEMS) as ItemId[]).map((item) => ({ item, count: Math.min(3, ITEMS[item].stack) }))
+// made things carry the mark a save holds them with (mark-old-goods.ts)
+const stacks: Stack[] = (Object.keys(ITEMS) as ItemId[]).map((item) => ({ item, count: Math.min(3, ITEMS[item].stack), ...markFor(item) }))
 stacks.push({ item: "wood-axe", count: 1, q: 1, by: "アルノルト", dur: 3 })
 
 it.each(stacks)("$item: storage preserves goods across failed writes, restart and stale selection", async (stack) => {

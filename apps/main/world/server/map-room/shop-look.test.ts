@@ -5,6 +5,7 @@ import { mapPlayer } from "#/world/server/map-room/map-player"
 import type { Market } from "#/durable-objects/market"
 import type { Player } from "#/durable-objects/player"
 import type { npcCell } from "#/world/maps/npc-cell"
+import type { keeperPresent } from "#/world/maps/keeper-present"
 import type { Presence } from "#/world/server/map-room/presence"
 import type { ServerMessage } from "#/world/protocol"
 
@@ -17,10 +18,12 @@ const rpc = vi.hoisted(() => ({
   buying: vi.fn<MarketRpc["buying"]>(),
   read: vi.fn<PlayerRpc["read"]>(),
   npc: vi.fn<typeof npcCell>(),
+  duty: vi.fn<typeof keeperPresent>(),
 }))
 vi.mock("#/durable-objects/market", () => ({ Market: { get: rpc.market } }))
 vi.mock("#/durable-objects/player", () => ({ Player: { get: rpc.player } }))
 vi.mock("#/world/maps/npc-cell", () => ({ npcCell: rpc.npc }))
+vi.mock("#/world/maps/keeper-present", () => ({ keeperPresent: rpc.duty }))
 vi.mock("#/world/maps/minutes-to-close", () => ({ minutesToClose: () => 10 }))
 afterEach(() => vi.resetAllMocks())
 
@@ -31,6 +34,7 @@ function fixture() {
     trace.push("send")
   })
   rpc.npc.mockReturnValue([0, 0])
+  rpc.duty.mockReturnValue(true)
   rpc.look.mockImplementation(async () => {
     trace.push("look")
     return []
@@ -76,6 +80,15 @@ it.each([null, [80, 80]])("does not query storage without a reachable keeper", a
   const request = fixture()
   if (cell === null) rpc.npc.mockReturnValue(null)
   else rpc.npc.mockReturnValue([cell[0], cell[1]])
+  await handleShopLook(request.room, { type: "look", shop: "fruit" })
+  expect(rpc.market).not.toHaveBeenCalled()
+  expect(rpc.player).not.toHaveBeenCalled()
+  expect(request.send).not.toHaveBeenCalled()
+})
+
+it("does not read the shelf beside a keeper who is off duty on this map", async () => {
+  const request = fixture()
+  rpc.duty.mockReturnValue(false)
   await handleShopLook(request.room, { type: "look", shop: "fruit" })
   expect(rpc.market).not.toHaveBeenCalled()
   expect(rpc.player).not.toHaveBeenCalled()

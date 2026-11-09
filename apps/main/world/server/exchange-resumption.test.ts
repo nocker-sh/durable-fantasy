@@ -42,7 +42,7 @@ async function exercise(entry: (typeof symbols)[number], failure: Failure) {
     seller: durableStorage({ ...initialPlayerRecord(), player: initialSeller, location: { world: 1, map: "phanthiet", route: [[38, 80]], since: 1000, connection: "seller-connection" } }, 8),
     buyer: durableStorage({ ...initialPlayerRecord(), player: initialBuyer, location: { world: 1, map: "phanthiet", route: [[38, 80]], since: 1000, connection: "buyer-connection" } }, 8),
   }
-  const sourceStore = durableStorage(initialExchangeRecord(), 2)
+  const sourceStore = durableStorage(initialExchangeRecord(), 3)
   let source = new Exchange.class(sourceStore.state, {})
   let players = { seller: new Player.class(stores.seller.state, {}), buyer: new Player.class(stores.buyer.state, {}) }
   const publications = { seller: 0, buyer: 0 }

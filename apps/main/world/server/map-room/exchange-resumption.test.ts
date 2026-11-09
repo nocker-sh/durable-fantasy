@@ -56,7 +56,7 @@ for (const failure of ["reply", "source-save", "player-save"] as const)
     }
     // Starting stock, funds, strength and a nearby room position are explicit local conditions.
     const stores = { seller: makePlayer("seller"), buyer: makePlayer("buyer") }
-    const sourceStore = durableStorage(initialExchangeRecord(), 2)
+    const sourceStore = durableStorage(initialExchangeRecord(), 3)
     let source = new Exchange.class(sourceStore.state, {})
     let actors = { seller: new Player.class(stores.seller.state, {}), buyer: new Player.class(stores.buyer.state, {}) }
     const record = (owner: Owner) => (stores[owner].saved.get("__void_durable_state") as { value: PlayerRecord }).value

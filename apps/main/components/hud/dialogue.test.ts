@@ -9,14 +9,13 @@ import type { GameSession } from "#/world/client/game-session"
 import type { ClientMessage } from "#/world/protocol"
 import { ERRANDS } from "#/world/core/errands"
 import type { Errand } from "#/world/core/errand-types"
-import { errandToday } from "#/world/core/errand-today"
-import { dayOf } from "#/world/core/day-of"
 import { apply } from "#/world/core/apply"
 import { parsePlayer } from "#/world/core/parse-player"
 import { fullyShown } from "#/world/fully-shown"
 import { RESIDENTS } from "#/world/town/residents"
 import { player } from "#/world/test/player"
 import { bagWith } from "#/world/test/bag-with"
+import { errandAskTime } from "#/world/test/errand-ask-time"
 
 const drawn = vi.hoisted(() => ({ clicks: [] as (() => void)[] }))
 // Observe actual DOM callbacks without replacing the dialogue view, hooks or game logic.
@@ -61,15 +60,8 @@ afterEach(() => {
   drawn.clicks = []
 })
 
-const days = new Map(
-  ERRANDS.map((errand) => {
-    for (let day = 0; day < 400; day++) {
-      const now = Date.UTC(2026, 9, 20, 21) + day * 86400000
-      if (errandToday(errand.from, dayOf(now))?.id === errand.id) return [errand.id, now] as const
-    }
-    throw new Error(`${errand.id}: no actual daily offer found`)
-  }),
-)
+// a day each errand is drawn, at a quarter hour its asker asks it
+const days = new Map(ERRANDS.map((errand) => [errand.id, errandAskTime(errand)] as const))
 
 function start(now: number) {
   vi.useFakeTimers()

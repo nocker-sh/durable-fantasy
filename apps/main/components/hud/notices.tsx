@@ -1,11 +1,12 @@
-// Top middle (ui.md §3.15): one-line results and refusals that fade after 2.5 seconds.
+// Top middle (ui.md §3.15): one-line results and refusals that fade after 2.5 seconds. Each new line is
+// read out once; the region is there before any line, so screen readers catch the first one too.
 import { cn } from "cn"
 import { useGameState } from "#/hooks/use-game-state"
 
 export function Notices() {
   const notices = useGameState((s) => s.notices)
   return (
-    <div className="pointer-events-none absolute top-20 left-1/2 z-[80] flex -translate-x-1/2 flex-col items-center gap-1">
+    <div role="status" aria-live="polite" aria-atomic="false" className="pointer-events-none absolute top-20 left-1/2 z-[80] flex -translate-x-1/2 flex-col items-center gap-1">
       {notices.map((n) => (
         <div
           key={n.id}

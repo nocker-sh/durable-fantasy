@@ -8,6 +8,8 @@ import type { Stack } from "#/world/core/bag-types"
 import { apply } from "#/world/core/apply"
 import { derive } from "#/world/core/derive"
 import type { GameSession } from "#/world/client/game-session"
+import { sendToRoom } from "#/world/client/send-to-room"
+import { serverNow } from "#/world/client/server-now"
 import { skillOf } from "#/world/core/skill-of"
 import { skillOfKey } from "#/world/core/skill-of-key"
 import type { SkillId } from "#/world/core/skill-types"
@@ -34,7 +36,7 @@ export class PlayerActions {
     },
   ) {}
   revive() {
-    this.target.session.socket?.send({ type: "revive" })
+    sendToRoom(this.target.session.socket, { type: "revive" })
   }
 
   buy(inputProps: { item: ItemId; count?: number; q?: Quality; price?: number; shop?: ShopId }) {
@@ -63,15 +65,17 @@ export class PlayerActions {
       return false
     }
     this.target.getScene()?.playAction(spot.kind === "tree" ? "chop" : spot.kind === "fish" ? "draw" : "scrub", spot.cell)
-    return this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "gather", seq, node }))
+    return this.target.run({ type: "use", slot: 0 }, (seq) => sendToRoom(this.target.session.socket, { type: "gather", seq, node }))
   }
 
   craft(recipe: string) {
     const station = this.target.session.state.get().craft
     if (!station || this.target.session.state.get().busy) return
+    // the room turns work down while talking (game-system.md §7): say so instead of asking
+    if (this.target.session.engaged) return this.target.notify(REASON_TEXT.NOT_READY, "bad")
     const s = stationAt(station)
     if (s) this.target.getScene()?.playAction(s.kind === "forge" ? "hammer" : s.kind === "hearth" ? "knead" : "knead", s.cell)
-    void this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "craft", seq, station, recipe }))
+    void this.target.run({ type: "use", slot: 0 }, (seq) => sendToRoom(this.target.session.socket, { type: "craft", seq, station, recipe }))
   }
 
   closeCraft() {
@@ -79,7 +83,7 @@ export class PlayerActions {
   }
 
   order(commission: string) {
-    void this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "order", seq, commission }))
+    void this.target.run({ type: "use", slot: 0 }, (seq) => sendToRoom(this.target.session.socket, { type: "order", seq, commission }))
   }
 
   collect(index: number, expectedOrders?: readonly Order[]) {
@@ -89,14 +93,14 @@ export class PlayerActions {
       return
     }
     if (!orders?.[index]) return
-    void this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "collect", seq, index, orders }))
+    void this.target.run({ type: "use", slot: 0 }, (seq) => sendToRoom(this.target.session.socket, { type: "collect", seq, index, orders: [...orders] }))
   }
 
   openBoard(symbol?: string) {
     const first = this.target.session.state.get().player?.bag.find((s) => s && sellable(s.item))
     const sym = symbol ?? this.target.session.state.get().board?.symbol ?? (first ? (first.q !== undefined ? `${first.item}@${first.q}` : first.item) : "log")
     this.target.update({ board: { symbol: sym, view: this.target.session.state.get().board?.symbol === sym ? this.target.session.state.get().board!.view : null } })
-    this.target.session.socket?.send({ type: "ex-look", symbol: sym })
+    sendToRoom(this.target.session.socket, { type: "ex-look", symbol: sym })
   }
 
   closeBoard() {
@@ -107,26 +111,26 @@ export class PlayerActions {
     const board = this.target.session.state.get().board
     if (!board) return
     const socket = this.target.session.socket
-    await this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "ex-place", seq, symbol: board.symbol, ...o }))
+    await this.target.run({ type: "use", slot: 0 }, (seq) => sendToRoom(this.target.session.socket, { type: "ex-place", seq, symbol: board.symbol, ...o }))
     this.refreshBoard(socket)
   }
 
   async cancelOrder(id: string) {
     const socket = this.target.session.socket
-    await this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "ex-cancel", seq, id }))
+    await this.target.run({ type: "use", slot: 0 }, (seq) => sendToRoom(this.target.session.socket, { type: "ex-cancel", seq, id }))
     this.refreshBoard(socket)
   }
 
   async claimInbox() {
     const socket = this.target.session.socket
-    await this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "ex-claim", seq }))
+    await this.target.run({ type: "use", slot: 0 }, (seq) => sendToRoom(this.target.session.socket, { type: "ex-claim", seq }))
     this.refreshBoard(socket)
   }
 
   private refreshBoard(socket: GameSession["socket"]) {
     if (this.target.session.socket !== socket) return
     const board = this.target.session.state.get().board
-    if (board) socket?.send({ type: "ex-look", symbol: board.symbol })
+    if (board) sendToRoom(socket, { type: "ex-look", symbol: board.symbol })
   }
 
   store(slot: number, count: number, expectedStack?: Stack) {
@@ -136,7 +140,7 @@ export class PlayerActions {
       return
     }
     if (!stack) return
-    void this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "storage", seq, action: "store", index: slot, count, stack }))
+    void this.target.run({ type: "use", slot: 0 }, (seq) => sendToRoom(this.target.session.socket, { type: "storage", seq, action: "store", index: slot, count, stack }))
   }
 
   retrieve(index: number, count: number, expectedStack?: Stack) {
@@ -146,7 +150,7 @@ export class PlayerActions {
       return
     }
     if (!stack) return
-    void this.target.run({ type: "use", slot: 0 }, (seq) => this.target.session.socket?.send({ type: "storage", seq, action: "retrieve", index, count, stack }))
+    void this.target.run({ type: "use", slot: 0 }, (seq) => sendToRoom(this.target.session.socket, { type: "storage", seq, action: "retrieve", index, count, stack }))
   }
 
   useSkill(skill: SkillId) {
@@ -156,8 +160,8 @@ export class PlayerActions {
     // an art's blow goes at what we are fighting: struck within the last few seconds
     const p = this.target.session.state.get().player
     if (!p) return
-    // Preview the same recovery and cost rules; only the server commits the result.
-    const preview = apply(p, { type: "art", skill }, { now: Date.now() })
+    // Preview the same recovery and cost rules on the server's clock; only the server commits the result.
+    const preview = apply(p, { type: "art", skill }, { now: serverNow(this.target.session.state.get()) })
     if (!preview.ok) return this.target.notify(REASON_TEXT[preview.reason], "bad")
     const fighting = this.target.session.fighting
     const now = performance.now()
@@ -166,7 +170,7 @@ export class PlayerActions {
     this.target.session.art = { skill, monster: fighting.monster, at: now }
     if (now - fighting.at < derive(p).attackDelay * 0.85) return
     fighting.at = now
-    this.target.session.socket?.send({ type: "attack", monster: fighting.monster, art: skill })
+    sendToRoom(this.target.session.socket, { type: "attack", monster: fighting.monster, art: skill })
   }
 
   toggleSit() {

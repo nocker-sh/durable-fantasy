@@ -2,6 +2,7 @@ import { afterEach, expect, it, vi } from "vitest"
 import { Player } from "#/durable-objects/player"
 import { MAPS } from "#/world/maps"
 import { isOpen } from "#/world/maps/is-open"
+import { leadsTowardTown } from "#/world/maps/leads-toward-town"
 import { handleWarp } from "#/world/server/map-room/handle-warp"
 import { mapPlayer } from "#/world/server/map-room/map-player"
 import { initialPlayerRecord } from "#/world/server/initial-player-record"
@@ -51,8 +52,19 @@ for (const road of roads)
         actor = new Player.class(shortStore.state, {})
         const shortBefore = structuredClone(shortStore.saved.get("__void_durable_state"))
         await handleWarp(context, message)
-        expect(send).toHaveBeenCalledExactlyOnceWith({ type: "refused", what: "warp", reason: "EXHAUSTED" })
-        expect(shortStore.saved.get("__void_durable_state")).toEqual(shortBefore)
+        if (leadsTowardTown(road.map, road.warp.to.map)) {
+          // a road nearer town takes what is left rather than leaving them out there
+          expect(send).toHaveBeenCalledExactlyOnceWith({ type: "warped", map: road.warp.to.map, at: road.warp.to.at })
+          expect((shortStore.saved.get("__void_durable_state") as { value: PlayerRecord }).value).toEqual({
+            ...initial,
+            player: { ...initial.player, stamina: 0, revision: initial.player.revision + 1 },
+            deliveryRevision: initial.deliveryRevision + 1,
+            location: { ...initial.location, map: road.warp.to.map, route: [road.warp.to.at], connection: null },
+          })
+        } else {
+          expect(send).toHaveBeenCalledExactlyOnceWith({ type: "refused", what: "warp", reason: "EXHAUSTED" })
+          expect(shortStore.saved.get("__void_durable_state")).toEqual(shortBefore)
+        }
         actor = new Player.class(store.state, {})
         send.mockClear()
       }

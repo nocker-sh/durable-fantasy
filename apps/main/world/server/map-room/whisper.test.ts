@@ -20,10 +20,10 @@ function fixture() {
   return { context, self, friend, other }
 }
 
-it("reaches only the named player in the channel and echoes it back to the speaker", async () => {
+it("reaches only the named player in the channel with the speaker's connection, and echoes it back to the speaker", async () => {
   const f = fixture()
   await handleWhisper(f.context, { type: "whisper", to: "ヴェルナ", text: "あとで" })
-  expect(f.friend.send).toHaveBeenCalledExactlyOnceWith({ type: "whispered", name: "ハンナ", text: "あとで" })
+  expect(f.friend.send).toHaveBeenCalledExactlyOnceWith({ type: "whispered", from: "self", name: "ハンナ", text: "あとで" })
   expect(f.other.send).not.toHaveBeenCalled()
   expect(f.self.send).toHaveBeenCalledExactlyOnceWith({ type: "whispered", name: "ヴェルナ", text: "あとで", sent: true })
 })

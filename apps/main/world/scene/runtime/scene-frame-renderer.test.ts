@@ -96,13 +96,16 @@ function fixture() {
     ashfall: { update: log("ash") },
     lighting: { minutes: 720 },
     record: log("record"),
+    now: vi.fn(() => 2000),
   }
   return { props, events, me, remote, remotes }
 }
 
 it("keeps drawing between world updates and overlays and reads each clock at its existing phase", () => {
   const f = fixture()
-  vi.spyOn(Date, "now").mockImplementation(() => {
+  // creatures follow the clock the scene was given (the server's), not this device's
+  vi.spyOn(Date, "now").mockReturnValue(999)
+  f.props.now.mockImplementation(() => {
     f.events.push("wall")
     return 2000
   })

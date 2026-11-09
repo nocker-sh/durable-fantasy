@@ -16,6 +16,8 @@ export type Presence = {
   /** the path being walked (or the cell stood on) and when it started */
   route: Cell[]
   since: number
+  /** walking clock (world/pace-path.ts): the earliest the last accepted path's start could be reached; `since` until the first move */
+  paced?: number
   /** recent chat times, for the rate limit */
   said: number[]
   /** the NPC being talked to (or shopped with); the player cannot move meanwhile */

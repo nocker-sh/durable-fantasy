@@ -1,4 +1,4 @@
-import { DEFAULT_NAME, STARTING_GOLD, HOTBAR_SIZE, TOWN_SPAWN } from "#/world/core/player-rules"
+import { DEFAULT_NAME, STARTING_GOLD, STARTING_WEAPON, HOTBAR_SIZE, TOWN_SPAWN } from "#/world/core/player-rules"
 import type { PlayerState } from "#/world/core/player-types"
 import { STARTING_POINTS } from "#/world/core/growth-rules"
 import { startingStats } from "#/world/core/starting-stats"
@@ -29,7 +29,7 @@ export function newPlayer(name = DEFAULT_NAME, look = 0): PlayerState {
     gold: STARTING_GOLD,
     bag: addItem({ bag: emptyBag(), item: "rye-bread", count: 2 }) ?? emptyBag(),
     // a branch picked up on the way: better than nothing against a slime
-    equipment: { ...emptyEquipment(), weapon: "wooden-stick" },
+    equipment: { ...emptyEquipment(), weapon: STARTING_WEAPON },
     hotbar: ["rye-bread", ...Array.from({ length: HOTBAR_SIZE - 1 }, () => null)],
     savePoint: TOWN_SPAWN,
   }

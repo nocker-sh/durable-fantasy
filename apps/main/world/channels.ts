@@ -8,6 +8,8 @@ export const WORLDS = 8
 /** Players in one channel of one map, and the room left for those joining a party or a friend. */
 export const CHANNEL_CAP = 32
 export const CHANNEL_SLACK = 4
+/** The highest channel number of a map: a room name carries it in three digits (parse-room.ts). */
+export const CHANNELS = 999
 
 export type RoomKey = {
   world: number

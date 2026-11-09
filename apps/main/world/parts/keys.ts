@@ -5,6 +5,7 @@ import { KEPT_ON_ESC } from "#/world/state"
 import { fullyShown } from "#/world/fully-shown"
 import type { GameState, ModalId, WindowId } from "#/world/state"
 import { MOVE_KEYS } from "#/world/parts/move-keys"
+import { isServiceWindow } from "#/world/parts/is-service-window"
 
 /** What the keys can do to the game. */
 export type KeyTarget = {
@@ -109,6 +110,8 @@ export class Keys {
     const s = g.state.get()
     if (event.key === "Escape") {
       event.preventDefault()
+      // the front-most of the windows the player opens and closes; a shop and the like closes by its own step
+      const closable = s.windows.filter((w): w is WindowId => !isServiceWindow(w) && !KEPT_ON_ESC.includes(w))
       if (inField) target!.blur()
       if (s.typing) g.setTyping(false)
       else if (s.modal) g.openModal(null)
@@ -123,7 +126,7 @@ export class Keys {
       else if (s.commission) g.closeCommission()
       else if (s.storage) g.closeStorage()
       else if (s.board) g.closeBoard()
-      else if (s.windows.some((w) => !KEPT_ON_ESC.includes(w))) g.closeWindow(s.windows.filter((w) => !KEPT_ON_ESC.includes(w)).at(-1)!)
+      else if (closable.length) g.closeWindow(closable[closable.length - 1])
       else if (s.me.walking) g.stopWalking()
       else g.openModal("system")
       return

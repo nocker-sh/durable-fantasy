@@ -21,6 +21,8 @@ export function Window(inputProps: {
   size?: { initial: [number, number]; min: [number, number] }
   /** a lighter, see-through ground (the chat) */
   tone?: "solid" | "soft"
+  /** while set, a folded window opens out and stays open (the chat while typing) */
+  unfold?: boolean
   /** extra buttons in the title bar */
   actions?: ReactNode
   className?: string
@@ -38,6 +40,7 @@ export function Window(inputProps: {
   const size = inputProps.size
   const toneValue = inputProps.tone
   const tone = toneValue === undefined ? "solid" : toneValue
+  const unfold = !!inputProps.unfold
   const actions = inputProps.actions
   const className = inputProps.className
   const bodyClassName = inputProps.bodyClassName
@@ -87,14 +90,22 @@ export function Window(inputProps: {
     window.addEventListener("pointerup", up)
   }
 
+  // asked to open out: the body shows at once, and the opened fold is saved as ＋ would save it
+  useEffect(() => {
+    if (!unfold || !layout?.folded) return
+    const next = { ...layout, folded: false }
+    setLayout(next)
+    localStorage.setItem(key, JSON.stringify(next))
+  }, [unfold, layout, key])
+
+  const folded = !!layout?.folded && !unfold
   const fold = () => {
     if (!layout) return
-    const next = { ...layout, folded: !layout.folded }
+    const next = { ...layout, folded: !folded }
     setLayout(next)
     save(next)
   }
 
-  const folded = !!layout?.folded
   return (
     <section
       ref={ref}

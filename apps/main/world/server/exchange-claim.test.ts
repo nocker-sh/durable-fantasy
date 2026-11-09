@@ -13,7 +13,7 @@ import { player } from "#/world/test/player"
 vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }))
 afterEach(() => vi.restoreAllMocks())
 
-const goods: Inbox = { gold: 7, items: [{ item: "potion", count: 1, q: 1 }] }
+const goods: Inbox = { gold: 7, items: [{ item: "potion", count: 1, q: 1, by: "イルムガルト" }] }
 async function fixture(full = false) {
   const p = player({ gold: 10, bag: full ? emptyBag().map(() => ({ item: "log" as const, count: 99 })) : emptyBag() })
   const recipientStore = storage({ player: p, credential: "test-credential", location: null, trade: null, tradeJob: null }, 2)
@@ -57,7 +57,7 @@ it("migrates existing data without changing inventory, identity, or inbox conten
   expect(await f.recipient.authenticate("test-credential")).toBe(true)
   expect((await f.source.look("log", "owner")).inbox).toEqual(goods)
   expect(f.recipientStore.saved.get("__void_durable_state")).toMatchObject({ version: 8, value: { exchangeReceipt: null, trade: null, tradeJob: null } })
-  expect(f.exchangeStore.saved.get("__void_durable_state")).toMatchObject({ version: 2, value: { delivery: { claimSerial: 0, claims: {} } } })
+  expect(f.exchangeStore.saved.get("__void_durable_state")).toMatchObject({ version: 3, value: { delivery: { claimSerial: 0, claims: {} } } })
 })
 
 it("does not remove the inbox if reserving it cannot be saved", async () => {

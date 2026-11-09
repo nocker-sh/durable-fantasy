@@ -5,6 +5,8 @@ import { Button } from "#/components/game/button"
 import { Input } from "#/components/game/input"
 import { Window } from "#/components/game/window"
 import { Side } from "#/components/hud/side"
+import { useServiceWindow } from "#/components/hud/use-service-window"
+import { TRADE_GOLD_MAX } from "#/world/core/trade-rules"
 
 export function TradeWindow() {
   const game = useGame()
@@ -13,14 +15,24 @@ export function TradeWindow() {
   const goldState = useState(""),
     gold = goldState[0],
     setGold = goldState[1]
+  const stack = useServiceWindow("trade", !!trade && !!player)
   if (!trade || !player) return null
   const mineSource = trade,
     mine = mineSource.mine,
     theirs = mineSource.theirs,
     lots = mineSource.lots
-  const g = Math.min(player.gold, Number(gold) || 0)
+  // no more than is carried, nor than a side may put up (core/trade-rules.ts)
+  const g = Math.min(player.gold, TRADE_GOLD_MAX, Number(gold) || 0)
   return (
-    <Window id="trade" title={`${trade.name}との取引`} z={35} onClose={() => game.cancelTrade()} initial={(w) => ({ x: Math.max(12, w / 2 - 260), y: 110 })} className="w-[520px]">
+    <Window
+      id="trade"
+      title={`${trade.name}との取引`}
+      z={stack.z}
+      onFocus={stack.onFocus}
+      onClose={() => game.cancelTrade()}
+      initial={(w) => ({ x: Math.max(12, w / 2 - 260), y: 110 })}
+      className="w-[520px]"
+    >
       <div className="flex gap-3">
         <Side
           title="あなたが出すもの"

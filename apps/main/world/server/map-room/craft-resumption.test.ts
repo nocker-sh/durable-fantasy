@@ -83,6 +83,16 @@ it.each([false, true])("a repeated craft request cannot pay or produce twice aft
   expect(f.send.mock.calls.at(-1)![0]).toEqual({ type: "result", seq: f.message.seq, result: { ...first.result, events: [] } })
 })
 
+it("answers a craft asked for while talking instead of leaving the client waiting", async () => {
+  const f = fixture()
+  const before = structuredClone(f.store.saved.get("__void_durable_state"))
+  f.context.me.engaged = "ベアトリクス"
+  await handleCraft(f.context, f.message)
+  expect(f.send).toHaveBeenCalledExactlyOnceWith({ type: "result", seq: f.message.seq, result: { ok: false, reason: "NOT_READY" } })
+  expect(f.store.saved.get("__void_durable_state")).toEqual(before)
+  expect(Math.random).not.toHaveBeenCalled()
+})
+
 it("a failed craft save can retry on the same live actor without consuming twice", async () => {
   const f = fixture()
   const initial = structuredClone(f.store.saved.get("__void_durable_state"))

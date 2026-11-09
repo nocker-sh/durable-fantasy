@@ -2,10 +2,12 @@ import { afterEach, expect, it, vi } from "vitest"
 import { Player } from "#/durable-objects/player"
 import { ERRANDS } from "#/world/core/errands"
 import type { Errand } from "#/world/core/errand-types"
+import { DAY_TURNS } from "#/world/core/clock-rules"
 import { dayOf } from "#/world/core/day-of"
 import { countItem } from "#/world/core/count-item"
 import { FRIEND } from "#/world/core/friendship-rules"
 import { jstMinutes } from "#/world/core/jst-minutes"
+import { canAskErrand } from "#/world/maps/can-ask-errand"
 import { MAPS, TALK_CELLS } from "#/world/maps/index"
 import { npcCell } from "#/world/maps/npc-cell"
 import { cellDistance } from "#/world/maps/cell-distance"
@@ -166,6 +168,33 @@ it.each(ERRANDS.flatMap((errand) => [false, true].map((restart) => ({ errand, re
     expect(f.snapshot()).toEqual(paid)
   },
 )
+
+// the first minute of each planned ask's errand day at which the asker is at their place but no longer asks it
+const unasked = ERRANDS.flatMap((errand) => {
+  const ask = plans.get(errand.id)!.ask
+  const start = ask.now - ((jstMinutes(ask.now) - DAY_TURNS + 1440) % 1440) * 60_000
+  for (let since = 0; since < 1440; since++) {
+    const now = start + since * 60_000
+    const map = Object.values(MAPS).find((candidate) => npcCell(candidate, errand.from, jstMinutes(now)))
+    if (map && !canAskErrand(errand, jstMinutes(now))) return [{ errand, meeting: { map, now, name: errand.from } }]
+  }
+  return []
+})
+
+it("finds hours the asker is out but no longer asks, for a muffler Wilhelm cannot get tonight and parcels for someone beside the asker", () => {
+  expect(unasked.map((entry) => `${entry.errand.id} ${jstMinutes(entry.meeting.now)}`)).toEqual(
+    expect.arrayContaining(["magdalena-muffler 1230", "jakob-fish 360", "matthias-wool 1020", "theo-parcel 930"]),
+  )
+})
+
+it.each(unasked)("$errand.id: the room refuses to take it at an hour the asker no longer asks it, and saves nothing", async (scenario) => {
+  const f = fixture(scenario.errand)
+  const late = await f.room(scenario.meeting)
+  const before = f.snapshot()
+  await late.request("take")
+  expect(late.reply()).toEqual({ ok: false, reason: "NO_ERRAND" })
+  expect(f.snapshot()).toEqual(before)
+})
 
 it.each(ERRANDS.filter((errand) => errand.kind === "bring"))("$id: one missing material cannot be handed over, including after a restart", async (errand) => {
   if (errand.kind !== "bring") throw new Error("Missing-material cases require a bring errand")

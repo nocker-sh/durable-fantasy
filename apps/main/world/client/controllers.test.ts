@@ -11,10 +11,13 @@ import { createSessionContext } from "#/world/client/create-session-context"
 import { DialogueActions } from "#/world/client/dialogue"
 import { SocialActions } from "#/world/client/social"
 import { STORAGE_KEEPER } from "#/world/core/storage/rules"
+import { REASON_TEXT } from "#/world/core/commands"
 import { remoteAvatar } from "#/world/client/remote-avatar"
 
 function fixture() {
   const session = new GameSession()
+  // the room only takes a join from a player id it can read (core/identity.ts)
+  session.playerId = "11111111-1111-4111-8111-111111111111"
   session.state.set({ ...session.state.get(), online: "online" })
   const send = vi.fn()
   session.socket = { send } as unknown as VoidSocket<"/map/:mapId">
@@ -139,6 +142,17 @@ describe("client controllers", () => {
     expect(session.state.get().busy).toBe(false)
   })
 
+  it("refuses at once a request the room's schema would refuse, instead of waiting it out", async () => {
+    vi.useFakeTimers()
+    const f = fixture()
+    const sent = f.client.run({ type: "use", slot: 0 }, () => false)
+    expect(await sent).toBe(false)
+    expect(f.callbacks.notify).toHaveBeenCalledExactlyOnceWith(REASON_TEXT.NOT_READY, "bad")
+    expect(f.session.waiting.size).toBe(0)
+    expect(f.session.state.get().busy).toBe(false)
+    expect(vi.getTimerCount()).toBe(0)
+  })
+
   it("times out a missing reply and leaves the client ready for another command", async () => {
     vi.useFakeTimers()
     const { session, client, callbacks } = fixture()
@@ -221,6 +235,8 @@ describe("client controllers", () => {
     expect(session.state.get().online).toBe("online")
     expect(send).toHaveBeenCalledWith(expect.objectContaining({ type: "join", at: [1, 2] }))
     expect(callbacks.onServer).not.toHaveBeenCalled()
+    // the join's wait for an answer ends with the map
+    client.cancel()
   })
 
   it("opens storage from a conversation and updates the scene and server together", () => {

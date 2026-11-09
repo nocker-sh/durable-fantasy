@@ -27,6 +27,7 @@ import type { Stack } from "#/world/core/bag-types"
 import { SKILL_IDS } from "#/world/core/skill-ids"
 import { PARTY_MAX } from "#/world/core/party/rules"
 import { NAME_MAX } from "#/world/core/player-rules"
+import { TRADE_GOLD_MAX, TRADE_LOTS } from "#/world/core/trade-rules"
 
 /** A party as its members see it. */
 export type PartyView = {
@@ -55,6 +56,9 @@ export const HEARING_CELLS = 20
 
 /** Cells walked per second (2.4 tiles). */
 export const CELLS_PER_SECOND = 4.8
+
+/** How far (ms) the start of a new path may run ahead of walking speed: the screen walks before the room hears of it, and late moves arrive bunched (pace-path.ts). */
+export const MOVE_LEAD_MS = 1000
 
 const coordinate = z
   .number()
@@ -163,8 +167,8 @@ export const clientMessage = z.discriminatedUnion("type", [
   z.object({ type: z.literal("trade-answer"), from: z.string().max(64), yes: z.boolean() }),
   z.object({
     type: z.literal("trade-offer"),
-    lots: z.array(z.object({ slot: z.number().int().min(0).max(23), count: z.number().int().min(1).max(99) })).max(8),
-    gold: z.number().int().min(0).max(10_000_000),
+    lots: z.array(z.object({ slot: z.number().int().min(0).max(23), count: z.number().int().min(1).max(99) })).max(TRADE_LOTS),
+    gold: z.number().int().min(0).max(TRADE_GOLD_MAX),
   }),
   z.object({ type: z.literal("trade-lock") }),
   z.object({ type: z.literal("trade-go") }),
@@ -211,14 +215,22 @@ export type ClientMessage = z.infer<typeof clientMessage>
 
 export const serverMessage = z.discriminatedUnion("type", [
   /** Sent when a player joins: their connection id, their data and everyone else on the map. */
-  z.object({ type: z.literal("snapshot"), you: z.string(), me: z.custom<PlayerState>(() => true), players: z.array(mapPlayer), at: cellSchema.optional() }),
+  z.object({
+    type: z.literal("snapshot"),
+    you: z.string(),
+    me: z.custom<PlayerState>(() => true),
+    players: z.array(mapPlayer),
+    at: cellSchema.optional(),
+    /** the server's clock as it was sent (ms): the client counts waits and the time of day by it */
+    now: z.number().finite().optional(),
+  }),
   /** Someone entered the map or changed their name, looks or weapon. */
   z.object({ type: z.literal("joined"), player: mapPlayer }),
   z.object({ type: z.literal("left"), id: z.string() }),
   z.object({ type: z.literal("moved"), id: z.string(), path: z.array(cellSchema) }),
   z.object({ type: z.literal("said"), id: z.string(), text: z.string(), shout: z.boolean() }),
-  /** a whisper: from `name`, or (sent) our own to `name` as delivered */
-  z.object({ type: z.literal("whispered"), name: z.string(), text: z.string(), sent: z.boolean().optional() }),
+  /** a whisper: from `name` on connection `from` (what a mute matches), or (sent) our own to `name` as delivered */
+  z.object({ type: z.literal("whispered"), from: z.string().optional(), name: z.string(), text: z.string(), sent: z.boolean().optional() }),
   z.object({ type: z.literal("result"), seq: z.number(), result: z.custom<Transition>(() => true) }),
   /** The warp was allowed: leave this room and join `map` at `at`. */
   z.object({ type: z.literal("warped"), map: z.string(), at: cellSchema, /** the world they are still in, when a crossing was refused */ world: z.number().int().min(1).optional() }),

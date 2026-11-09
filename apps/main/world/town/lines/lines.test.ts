@@ -85,4 +85,23 @@ describe("what residents say", () => {
     const top = ALL_LINES["エルザ"].find((l) => l.text === pages[0])!
     expect(fit(top, s)).toBeGreaterThan(0)
   })
+
+  it("a first meeting is always introduced, first or right after a better-fitting errand line, since it is said only once", () => {
+    const missed: string[] = []
+    for (const entry of Object.entries(ALL_LINES)) {
+      const name = entry[0]
+      const lines = entry[1]
+      const intros = new Set(lines.filter((l) => l.first).map((l) => l.text))
+      if (!intros.size) continue
+      // no errand, then each errand state this resident has a line for
+      for (const errand of [undefined, ...lines.flatMap((l) => (l.errand ? [l.errand] : []))]) {
+        const s: Situation = { phase: "夜", doing: "", nearby: new Set(), friend: 0, event: null, firstTime: true, errands: errand ? { [errand.id]: errand.state } : {} }
+        for (let seed = 0; seed < 40; seed++) {
+          const pages = pick({ lines: lines, s: s, pages: 3, seed: seed })
+          if (!intros.has(pages[0]) && !intros.has(pages[1])) missed.push(`${name} ${errand ? `${errand.id}/${errand.state}` : "no errand"} seed ${seed}: ${pages.join(" / ")}`)
+        }
+      }
+    }
+    expect(missed).toEqual([])
+  })
 })

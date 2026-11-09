@@ -78,7 +78,7 @@ async function fixture(sameName = true) {
       sent.push(clientMessage.parse(message))
     },
   } as unknown as VoidSocket<"/map/:mapId">
-  const actions = new SocialActions({ session, update: vi.fn(), notify: vi.fn(), enterMap: vi.fn(), addChat: vi.fn() })
+  const actions = new SocialActions({ session, update: vi.fn(), notify: vi.fn(), enterMap: vi.fn(), addChat: vi.fn(), getScene: () => null })
   const leavingPlayer = { ...newPlayer("Twin"), party: "group" }
   const leavingStore = durableStorage({ ...initialPlayerRecord(), player: leavingPlayer }, 8)
   const leavingActor = new Player.class(leavingStore.state, {})

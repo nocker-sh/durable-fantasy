@@ -7,6 +7,9 @@
 @import "@fontsource/dotgothic16/latin-400.css";
 @import "@fontsource/silkscreen/latin-400.css";
 
+/* the studio builds this sheet too (/ui/frame), and its server scans only apps/studio */
+@source "..";
+
 @theme {
   /* one plain gothic face for everything: headings, numbers, conversation */
   --font-head: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Meiryo", sans-serif;

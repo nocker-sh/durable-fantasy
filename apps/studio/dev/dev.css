@@ -3,6 +3,9 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/figtree";
 
+/* the kit the studio is built with lies in apps/main, outside apps/studio, the only folder the studio's server scans */
+@source "../../main/components/ui";
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

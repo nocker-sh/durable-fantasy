@@ -22,7 +22,7 @@ function fixture() {
     const event = new Event(type)
     Object.defineProperties(event, {
       code: { value: code },
-      key: { value: code === "Enter" ? "Enter" : code.replace("Key", "").toLowerCase() },
+      key: { value: code === "Enter" || code === "Escape" ? code : code.replace("Key", "").toLowerCase() },
       repeat: { value: repeat },
       target: { value: { closest: () => null } },
     })
@@ -124,4 +124,13 @@ it("removes state and visibility listeners when unlistened and registers once on
   const registrations = added.mock.calls.filter(([event]) => event === "visibilitychange")
   expect(registrations).toHaveLength(2)
   expect(removed.mock.calls.filter(([event]) => event === "visibilitychange").slice(-2)).toEqual(registrations)
+})
+
+it("closes the front-most window the player opened on Esc, past a shop still in the stacking order", () => {
+  const f = fixture()
+  const closeWindow = vi.fn()
+  Object.assign(f.game, { closeWindow })
+  f.game.state.set({ ...f.game.state.get(), windows: ["minimap", "chat", "syslog", "skills", "shop"] })
+  f.key("Escape")
+  expect(closeWindow).toHaveBeenCalledExactlyOnceWith("skills")
 })

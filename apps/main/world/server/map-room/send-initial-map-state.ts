@@ -12,7 +12,8 @@ export async function sendInitialMapState(props: Props): Promise<void> {
   const players = getInitialMapPlayers(props.room, props.owner)
   const pending = readInitialMapResources(props.room)
   const connection = props.room.ctx.connection
-  await connection.send({ type: "snapshot", you: props.player.id, me: props.data, players, at: props.at })
+  // the client counts waits and the time of day by this clock, not its own (game-system.md §7.5)
+  await connection.send({ type: "snapshot", you: props.player.id, me: props.data, players, at: props.at, now: Date.now() })
   const resources = await pending
   if (!resources.ok) throw resources.error
   if (presence(connection).closed) return

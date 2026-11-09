@@ -5,7 +5,12 @@ import { useGameState } from "#/hooks/use-game-state"
 import { Button } from "#/components/game/button"
 import { Kbd } from "#/components/game/kbd"
 import { Modal } from "#/components/game/modal"
+import { Tooltip } from "#/components/game/tooltip"
+import { TooltipContent } from "#/components/game/tooltip-content"
+import { TooltipTrigger } from "#/components/game/tooltip-trigger"
 import { CHANNEL_CAP } from "#/world/channels"
+import { isChannel } from "#/world/is-channel"
+import { moveBlockedText } from "#/world/parts/move-blocked-text"
 
 import { CharacterScreen } from "#/components/hud/character-screen"
 
@@ -51,19 +56,22 @@ function Channels() {
   const game = useGame()
   const room = useGameState((s) => s.room)
   const map = useGameState((s) => s.map)
+  const blocked = useGameState(moveBlockedText)
   useEffect(() => {
     void game.refreshChannels()
   }, [game])
   if (!room) return null
-  const listed = [...new Set([...Object.keys(room.channels).map(Number), room.channel])].sort((a, b) => a - b)
+  const listed = [...new Set([...Object.keys(room.channels).map(Number), room.channel])].filter(isChannel).sort((a, b) => a - b)
   const next = listed.length ? Math.max(...listed) + 1 : 2
+  // past the last channel there is no room to open
+  const shown = isChannel(next) ? [...listed, next] : listed
   return (
     <Modal title="チャンネル" onClose={() => game.openModal("system")} className="w-72">
       <p className="mb-2 font-body text-xs text-text-dim">
         町 {room.world} の「{map.name}」。一つのチャンネルには {CHANNEL_CAP} 人まで。
       </p>
       <ul className="flex flex-col gap-1">
-        {[...listed, next].map((ch) => {
+        {shown.map((ch) => {
           const n = room.channels[ch] ?? 0
           const here = ch === room.channel
           return (
@@ -72,6 +80,16 @@ function Channels() {
               <span className="flex-1 text-text-dim">{ch === next && !n ? "新しく開く" : `${n} / ${CHANNEL_CAP} 人`}</span>
               {here ? (
                 <span className="text-me">ここ</span>
+              ) : blocked ? (
+                // a disabled button takes no pointer or focus, so the reason sits on a wrapper (ui.md §3.20)
+                <Tooltip>
+                  <TooltipTrigger render={<span tabIndex={0} />}>
+                    <Button size="sm" disabled aria-description={blocked}>
+                      移る
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>{blocked}</TooltipContent>
+                </Tooltip>
               ) : (
                 <Button
                   size="sm"
@@ -88,6 +106,9 @@ function Channels() {
           )
         })}
       </ul>
+      <div className="mt-4 flex justify-end">
+        <Button onClick={() => game.openModal("system")}>戻る</Button>
+      </div>
     </Modal>
   )
 }

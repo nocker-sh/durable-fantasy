@@ -2,7 +2,7 @@ import { Button } from "#/components/ui/button"
 import { DevPage } from "#/dev/catalog"
 import { SHOPS } from "#/world/core/shops"
 
-const WINDOWS = ["status", "hotbar", "chat", "inventory", "equipment", "stats", "worldmap", "shop", "dialogue", "system", "character", "loading", "fallen", "offline", "failed"] as const
+const WINDOWS = ["status", "hotbar", "chat", "inventory", "equipment", "stats", "worldmap", "shop", "dialogue", "system", "character", "loading", "fallen", "offline", "outdated", "failed"] as const
 
 /** The game's windows one at a time, with a fixed state: /ui?window=shop&shop=smithy. */
 export default function UiPage() {

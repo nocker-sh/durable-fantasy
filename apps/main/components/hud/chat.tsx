@@ -22,6 +22,7 @@ export function Chat() {
     log = logSource.log,
     onScroll = logSource.onScroll
 
+  // Enter starts typing: a closed chat opens, a folded one opens out (unfold below), and the field takes the caret
   useEffect(() => {
     if (typing && !win.open) game.toggleWindow("chat")
     if (typing) input.current?.focus()
@@ -43,6 +44,7 @@ export function Chat() {
       {...win.props}
       title="チャット"
       hotkey="Alt+C"
+      unfold={typing}
       size={{ initial: [340, 210], min: [260, 140] }}
       initial={(w, h) => ({ x: w - 340 - 64, y: h - 210 - 76 })}
       bodyClassName="flex flex-col p-0"

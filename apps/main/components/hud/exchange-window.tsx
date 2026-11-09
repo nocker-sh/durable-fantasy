@@ -3,9 +3,10 @@
 import { useState } from "react"
 import { escrowFor } from "#/world/core/escrow-for"
 import { exchangeReady } from "#/world/core/exchange-ready"
+import { atOrderLimit } from "#/world/core/at-order-limit"
 import { parseSymbol } from "#/world/core/parse-symbol"
 import { symbolKey } from "#/world/core/symbol-key"
-import { TRADE_FEE } from "#/world/core/exchange-rules"
+import { MAX_OPEN_ORDERS, MAX_ORDER_PRICE, TRADE_FEE } from "#/world/core/exchange-rules"
 import { ITEMS } from "#/world/core/items/catalog"
 import { QUALITIES } from "#/world/core/items/kinds"
 import { sellable } from "#/world/core/items/sellable"
@@ -19,6 +20,7 @@ import { Input } from "#/components/game/input"
 import { Slot } from "#/components/game/slot"
 import { Stepper } from "#/components/game/stepper"
 import { Window } from "#/components/game/window"
+import { useServiceWindow } from "#/components/hud/use-service-window"
 
 /** Everything that can be traded: plain things as they are, made things by quality. */
 const SYMBOLS = (Object.keys(ITEMS) as ItemId[])
@@ -28,6 +30,12 @@ const SYMBOLS = (Object.keys(ITEMS) as ItemId[])
 const label = (key: string) => {
   const s = parseSymbol(key)
   return s ? `${ITEMS[s.item].name}${s.q !== undefined ? `（${QUALITIES[s.q]}）` : ""}` : key
+}
+
+/** The digits typed for a price, held at MAX_ORDER_PRICE: the room would drop the socket on a higher one. */
+const typedPrice = (typed: string) => {
+  const digits = typed.replace(/\D/g, "")
+  return digits && String(Math.min(MAX_ORDER_PRICE, Number(digits)))
 }
 
 export function ExchangeWindow() {
@@ -47,6 +55,7 @@ export function ExchangeWindow() {
   const filterState = useState(""),
     filter = filterState[0],
     setFilter = filterState[1]
+  const stack = useServiceWindow("exchange", !!board && !!player)
   if (!board || !player) return null
   const sym = parseSymbol(board.symbol)
   const v = board.view
@@ -59,13 +68,15 @@ export function ExchangeWindow() {
   const needsSource = escrowFor(side, p, qty),
     needs = needsSource.gold,
     fee = needsSource.fee
-  const reason = side === "sell" ? (have < qty ? "手元に足りない" : player.gold < fee ? "出品料が足りない" : null) : player.gold < needs ? "所持金が足りない" : null
+  // the same limit the board checks before taking anything (core/at-order-limit.ts)
+  const limit = atOrderLimit(v?.mine ?? [], Date.now()) ? `掲示板に出せる注文は${MAX_OPEN_ORDERS}件まで` : null
+  const reason = limit ?? (side === "sell" ? (have < qty ? "手元に足りない" : player.gold < fee ? "出品料が足りない" : null) : player.gold < needs ? "所持金が足りない" : null)
   const candles = (v?.history ?? []).slice(-14)
   const hi = Math.max(1, ...candles.map((c) => c.high)),
     lo = Math.min(hi, ...candles.map((c) => c.low))
   const list = SYMBOLS.filter((k) => !filter || label(k).includes(filter)).slice(0, 60)
   return (
-    <Window id="exchange" title="取引の掲示板" z={30} onClose={() => game.closeBoard()} initial={(w) => ({ x: Math.max(12, w / 2 - 330), y: 90 })} className="w-[660px]">
+    <Window id="exchange" title="取引の掲示板" z={stack.z} onFocus={stack.onFocus} onClose={() => game.closeBoard()} initial={(w) => ({ x: Math.max(12, w / 2 - 330), y: 90 })} className="w-[660px]">
       <div className="flex gap-3">
         {/* what to look at */}
         <div className="flex w-40 shrink-0 flex-col gap-1.5">
@@ -145,7 +156,7 @@ export function ExchangeWindow() {
             </Button>
           </div>
           <label className="flex items-center gap-1.5 text-text-dim">
-            一つ <Input value={price} placeholder={String(p)} onChange={(e) => setPrice(e.target.value.replace(/\D/g, ""))} className="h-7 w-20 text-xs" />G
+            一つ <Input value={price} placeholder={String(p)} onChange={(e) => setPrice(typedPrice(e.target.value))} className="h-7 w-20 text-xs" />G
           </label>
           <div className="flex items-center gap-1.5 text-text-dim">
             数 <Stepper value={qty} max={side === "sell" ? Math.max(1, have) : 99} onChange={setQty} />

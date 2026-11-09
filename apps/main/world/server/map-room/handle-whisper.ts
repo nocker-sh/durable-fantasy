@@ -18,6 +18,6 @@ export async function handleWhisper(room: Props, message: Message<"whisper">) {
     return connection.id !== room.ctx.connection.id && !other.closed && other.ready !== false && other.owner !== me.owner && other.player?.name === message.to
   })
   if (!recipients.length) return room.ctx.connection.send({ type: "refused", what: "whisper", reason: "NOT_HERE" })
-  for (const recipient of recipients) await notifyClient(recipient.send({ type: "whispered", name: me.player.name, text: message.text }))
+  for (const recipient of recipients) await notifyClient(recipient.send({ type: "whispered", from: me.player.id, name: me.player.name, text: message.text }))
   await room.ctx.connection.send({ type: "whispered", name: message.to, text: message.text, sent: true })
 }

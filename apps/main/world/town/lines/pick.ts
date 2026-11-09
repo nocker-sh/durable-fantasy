@@ -10,7 +10,9 @@ type Props = {
 
 /**
  * What to say this time: up to `pages` lines, the most fitting first, then others that fit, each
- * conversation a little different (`seed`), never the same line twice in one go.
+ * conversation a little different (`seed`), never the same line twice in one go. On a first
+ * meeting a first-meeting line follows when a better-fitting line (an errand's) comes first, since
+ * it cannot be said again.
  */
 export function pick(props: Props): string[] {
   const pages = props.pages === undefined ? 3 : props.pages
@@ -23,6 +25,7 @@ export function pick(props: Props): string[] {
   }
   scored.sort((a, b) => b.f - a.f || rand(a.i) - rand(b.i))
   const best = scored.filter((x) => x.f > 0).slice(0, 1)
-  const rest = scored.filter((x) => !best.includes(x)).sort((a, b) => rand(a.i) - rand(b.i))
-  return [...best, ...rest].slice(0, pages).map((x) => x.l.text)
+  const intro = props.s.firstTime && !best.some((x) => x.l.first) ? scored.filter((x) => x.l.first).slice(0, 1) : []
+  const rest = scored.filter((x) => !best.includes(x) && !intro.includes(x)).sort((a, b) => rand(a.i) - rand(b.i))
+  return [...best, ...intro, ...rest].slice(0, pages).map((x) => x.l.text)
 }

@@ -19,6 +19,7 @@ export function SystemLog() {
       {...win.props}
       title="システムログ"
       size={{ initial: [340, 170], min: [240, 100] }}
+      // the party frame ends above this first place (party-frame.tsx)
       initial={(_, h) => ({ x: 16, y: Math.round(h / 2 - 40) })}
       bodyClassName="flex flex-col p-0"
     >

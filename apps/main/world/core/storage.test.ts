@@ -1,5 +1,6 @@
 import { emptyEquipment } from "#/world/core/empty-equipment"
 import { loadPlayer } from "#/world/core/load-player"
+import { usualMaker } from "#/world/core/usual-maker"
 import { describe, expect, it } from "vitest"
 import { apply } from "#/world/core/apply"
 import { addItem } from "#/world/core/add-item"
@@ -52,16 +53,18 @@ describe("the town warehouse", () => {
   })
 })
 
-it("keeps an old unmarked stole unchanged through storage and save reload", () => {
+it("moves an old unmarked stole into storage as it is, and marks it only when the save is read", () => {
   const original = { item: "fur-stole", count: 1 } as const
   const start = player({ gold: 20, bag: [original, ...emptyBag(23)] })
   const stored = apply(start, { type: "store", slot: 0, count: 1, expectedStack: start.bag[0] }, { now: 1 })
   if (!stored.ok) throw Error(stored.reason)
   expect(stored.state.storage[0]).toEqual(original)
   const saved = loadPlayer(JSON.parse(JSON.stringify(stored.state)))
+  const marked = { ...original, q: 1, by: usualMaker("fur-stole") }
+  expect(saved.storage[0]).toEqual(marked)
   const taken = apply(saved, { type: "retrieve", index: 0, count: 1, expectedStack: saved.storage[0] }, { now: 2 })
   if (!taken.ok) throw Error(taken.reason)
-  expect(taken.state.bag[0]).toEqual(original)
+  expect(taken.state.bag[0]).toEqual(marked)
   expect(taken.state.storage[0]).toBeNull()
 })
 

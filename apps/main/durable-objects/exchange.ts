@@ -17,7 +17,7 @@ const players = (owner: string): ExchangePlayer => Player.get(owner)
 
 export const Exchange = defineDurableState({
   initialState: initialExchangeRecord,
-  version: 2,
+  version: 3,
   migrations: exchangeMigrations,
   methods: {
     beginOrder(context, input: { owner: string; connection: string; seq: number; name: string; intent: OrderIntent }) {
