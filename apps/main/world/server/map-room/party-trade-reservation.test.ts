@@ -36,7 +36,7 @@ async function fixture() {
   vi.useFakeTimers()
   vi.setSystemTime(100_000)
   const players = ["host", "guest"].map((id) => {
-    const initial = { ...newPlayer(id === "host" ? "Host" : "Guest"), gold: 100, bag: bagWith(["herb", 3]) }
+    const initial = { ...newPlayer(id === "host" ? "Host" : "Guest"), gold: 100, allowance: 0, bag: bagWith(["herb", 3]) }
     const store = durableStorage({ ...initialPlayerRecord(), player: initial }, 8)
     const actor = new Player.class(store.state, {})
     const connection = {

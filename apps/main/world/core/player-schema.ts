@@ -107,6 +107,7 @@ const common = {
   friends: z.record(z.string().max(20), count.max(100)).default({}),
   errands: z.array(z.object({ id: z.string().max(40), day: z.string().max(10), done: z.boolean() })).default([]),
   boughtOn: z.record(z.string().max(20), z.string().max(10)).default({}),
+  allowance: count.optional(),
   bag: bagSchema,
   party: z.string().max(64).nullable().default(null),
   threads: z.array(z.object({ key: z.string().max(32), name: nameSchema, town: count.min(1).max(99), at: count })).default([]),

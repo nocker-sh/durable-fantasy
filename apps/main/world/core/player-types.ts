@@ -62,6 +62,8 @@ export type PlayerState = {
   readonly errands: readonly Taken[]
   /** the day they last bought from each resident (friendship from buying comes once a day) */
   readonly boughtOn: Readonly<Record<string, string>>
+  /** starting gold not yet spent in town: it pays shops and craftsmen but is not handed to other players (economy.md 原則 4) */
+  readonly allowance?: number
   readonly bag: Bag
   /** what is left with the town warehouse (core/storage/rules.ts) */
   readonly storage: Bag

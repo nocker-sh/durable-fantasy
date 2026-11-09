@@ -13,7 +13,7 @@ import { emptyStorage } from "#/world/core/storage/empty-storage"
 export function newPlayer(name = DEFAULT_NAME, look = 0): PlayerState {
   const base: Pick<
     PlayerState,
-    "version" | "revision" | "name" | "profileComplete" | "look" | "neck" | "neckRamp" | "level" | "exp" | "statPoints" | "stats" | "gold" | "bag" | "equipment" | "hotbar" | "savePoint"
+    "version" | "revision" | "name" | "profileComplete" | "look" | "neck" | "neckRamp" | "level" | "exp" | "statPoints" | "stats" | "gold" | "allowance" | "bag" | "equipment" | "hotbar" | "savePoint"
   > = {
     version: 3,
     revision: 0,
@@ -27,6 +27,7 @@ export function newPlayer(name = DEFAULT_NAME, look = 0): PlayerState {
     statPoints: STARTING_POINTS,
     stats: startingStats(),
     gold: STARTING_GOLD,
+    allowance: STARTING_GOLD,
     bag: addItem({ bag: emptyBag(), item: "rye-bread", count: 2 }) ?? emptyBag(),
     // a branch picked up on the way: better than nothing against a slime
     equipment: { ...emptyEquipment(), weapon: STARTING_WEAPON },

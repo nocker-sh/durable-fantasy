@@ -1,6 +1,7 @@
 // Run one command against a player's data. Pure: the same input always gives the same result,
 // and a refused command never changes anything. The server runs this to decide; the client runs
 // it only to grey out what would be refused.
+import { handableGold } from "#/world/core/handable-gold"
 import { exchangeReady } from "#/world/core/exchange-ready"
 import { inventorySelectionMatches } from "#/world/core/inventory-selection"
 import { firstOf } from "#/world/core/first-of"
@@ -60,6 +61,15 @@ export type Context = ShopContext & {
 }
 
 export function apply(before: PlayerState, command: Command | ServerCommand, ctx: Context = {}): Transition {
+  const result = applyCommand(before, command, ctx)
+  if (!result.ok || !before.allowance || command.type === "trade-out" || command.type === "escrow-buy") return result
+  // starting gold is the first spent in town, and what is left of it never exceeds what is held
+  const spent = Math.max(0, before.gold - result.state.gold)
+  const allowance = Math.max(0, Math.min(result.state.gold, before.allowance - spent))
+  return allowance === before.allowance ? result : { ...result, state: { ...result.state, allowance } }
+}
+
+function applyCommand(before: PlayerState, command: Command | ServerCommand, ctx: Context): Transition {
   const now = ctx.now ?? 0
   // HP that has come back since it was last counted (the server knows the time; a preview does not)
   const state = ctx.now ? settleHp(before, derive(before), now) : before
@@ -103,7 +113,7 @@ export function apply(before: PlayerState, command: Command | ServerCommand, ctx
       return accept({ ...state, bag, gold: state.gold - command.fee }, { type: "escrowed", item: slot.item, ...(slot.q !== undefined ? { q: slot.q, by: slot.by } : {}), gold: command.fee })
     }
     case "escrow-buy": {
-      if (state.gold < command.gold) return reject("NO_GOLD")
+      if (handableGold(state) < command.gold) return reject("NO_GOLD")
       return accept({ ...state, gold: state.gold - command.gold }, { type: "escrowed", item: null, gold: command.gold })
     }
     case "receive":
