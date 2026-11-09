@@ -2,6 +2,7 @@ import { TALK_CELLS } from "#/world/maps"
 import { npcCell } from "#/world/maps/npc-cell"
 import { timeFor } from "#/world/server/map-room/time-for"
 import { near } from "#/world/server/map-room/near"
+import { paceTo } from "#/world/server/map-room/pace-to"
 import { reachable } from "#/world/server/map-room/reachable"
 import type { Cell } from "#/world/protocol"
 import type { Ctx, Message } from "#/world/server/map-room/context"
@@ -18,5 +19,6 @@ export async function handleEngage(room: Props, message: Message<"engage">) {
   const reached = reachable(me).at(-1)
   if (!reached) return room.ctx.connection.send({ type: "refused", what: "engage" })
   const here: Cell = [reached[0], reached[1]]
-  room.save({ engaged: message.npc, route: [here], since: Date.now(), player: { ...me.player, at: here } })
+  const now = Date.now()
+  room.save({ engaged: message.npc, route: [here], since: now, paced: paceTo(me, here, now), player: { ...me.player, at: here } })
 }

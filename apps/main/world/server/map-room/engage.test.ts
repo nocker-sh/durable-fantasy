@@ -36,7 +36,7 @@ it("stops at the current reachable cell before beginning a nearby conversation",
   vi.setSystemTime(1000)
   const request = fixture()
   await handleEngage(request.room, { type: "engage", npc: "resident" })
-  expect(request.save).toHaveBeenCalledExactlyOnceWith({ engaged: "resident", route: [[10, 10]], since: 1000, player: { ...request.me.player, at: [10, 10] } })
+  expect(request.save).toHaveBeenCalledExactlyOnceWith({ engaged: "resident", route: [[10, 10]], since: 1000, paced: 1000, player: { ...request.me.player, at: [10, 10] } })
 })
 
 it.each([null, [80, 80]])("rejects an absent or distant resident", async (cell) => {
