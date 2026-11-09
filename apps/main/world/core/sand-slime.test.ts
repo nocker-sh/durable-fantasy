@@ -20,8 +20,8 @@ it("provides a dune opponent between blue and moss slimes", () => {
   expect(sand.atk).toBeGreaterThan(MONSTER_KINDS["blue-slime"].atk)
   expect(sand.atk).toBeLessThan(MONSTER_KINDS["moss-slime"].atk)
 })
-it.each(spawns)("keeps $id on walkable dune ground throughout the day", (spawn) => {
-  expect(spawn.map).toBe("red-dunes")
+it.each(spawns)("keeps $id on walkable dry ground throughout the day", (spawn) => {
+  expect(["red-dunes", "salt-flats"]).toContain(spawn.map)
   const free = (x: number, z: number) => walkable(MAPS[spawn.map], [Math.floor(x * 2), Math.floor(z * 2)])
   for (let time = 0; time < 86400000; time += 7311) {
     const at = monsterAt(spawn, time, free)

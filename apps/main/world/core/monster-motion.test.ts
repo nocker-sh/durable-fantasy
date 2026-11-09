@@ -5,7 +5,8 @@ import { monsterAt } from "#/world/core/monster-at"
 import { MAPS } from "#/world/maps"
 import { walkable } from "#/world/maps/walkable"
 
-it("matches authoritative positions across movement, resting and clock jumps", () => {
+// walks every creature through a whole day, so it grows with each spawn
+it("matches authoritative positions across movement, resting and clock jumps", { timeout: 60_000 }, () => {
   for (const spawn of SPAWNS) {
     const free = (x: number, z: number) => walkable(MAPS[spawn.map], [Math.floor(x * 2), Math.floor(z * 2)])
     const motion = new MonsterMotion({ spawn: spawn, free: free })

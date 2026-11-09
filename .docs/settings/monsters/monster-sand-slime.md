@@ -8,7 +8,8 @@
   "design_gate": "未通過",
   "species": "sand-slime",
   "habitats": [
-    "map-red-dunes"
+    "map-red-dunes",
+    "map-salt-flats"
   ],
   "appearance": {
     "look": "slime",
@@ -66,6 +67,7 @@
   },
   "design_dependencies": [
     "map-red-dunes",
+    "map-salt-flats",
     "resident-ラインホルト",
     "resident-アルノルト",
     "resident-ゴットフリート",
@@ -118,3 +120,7 @@ jelly は糊に使うほか、[[resident-イルムガルト]] の薬作りでつ
 ## 中盤の装備につながる材料
 
 砂丘の残骸のそばで体表へ付いた厚い鉄片を集めて [[resident-アルノルト]] へ持ち込める。まれな材料を少しずつ集め、強い個体へ挑む前にも装備の補強を準備できる。加工の条件は [[economy#狩りの材料から装備を更新する経路]] に従う。
+
+## 塩の平原
+
+[[map-salt-flats]] では、塩の殻の割れ目に溜まる湿りと、風で吹き寄せられた枯れ草を頼りに暮らす。出現枠は道から離れた南の二か所に置き、塩を運ぶ人の道と出口を塞がない。

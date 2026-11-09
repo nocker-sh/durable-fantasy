@@ -11,7 +11,9 @@
   "map_kind": "field",
   "buildings": [],
   "residents": [],
-  "monsters": [],
+  "monsters": [
+    "monster-blue-slime"
+  ],
   "exits": [
     {
       "at": [
@@ -45,7 +47,16 @@
     "描画と通行判定の一致確認未完了",
     "資源の使い道(提案)を町の資料と照合して確定する"
   ],
-  "design_dependencies": []
+  "ecology_zones": [
+    {
+      "species": "monster-blue-slime",
+      "feature": "道から離れた岸の湿ったくぼみと水際の草",
+      "placement": null
+    }
+  ],
+  "design_dependencies": [
+    "monster-blue-slime"
+  ]
 }
 ---
 
@@ -72,3 +83,7 @@
 ## 配置の設計条件
 
 入口、主な通路、作業と休憩の場所を先に配列で定義する。灰・雨・煙・火・水の行き先を決める。現行の通行格子は現状の記録であり、生活の成立を承認した配置図ではない。
+
+## 生き物
+
+[[monster-blue-slime]] は道の東西の岸の湿ったくぼみで休む。生息条件は ecology_zones に記録し、placement が null の間は地形への割り当てを済ませた扱いにしない。

@@ -182,6 +182,11 @@ export const SPAWNS: readonly Spawn[] = [
   ...many({ map: "red-dunes", kind: "sand-slime", n: 2, area: [32, 14, 35, 17], from: 2 }),
   ...many({ map: "forest-edge", kind: "blue-slime", n: 3, area: [36, 30, 39, 33] }),
   ...many({ map: "forest-edge", kind: "hare", n: 2, area: [9, 15, 12, 18] }),
+  // the salt flats south of the salt road, and the marsh banks either side of its road
+  ...many({ map: "salt-flats", kind: "sand-slime", n: 2, area: [12, 36, 15, 39] }),
+  ...many({ map: "salt-flats", kind: "sand-slime", n: 2, area: [36, 40, 39, 43], from: 2 }),
+  ...many({ map: "lily-marsh", kind: "blue-slime", n: 2, area: [4, 8, 7, 11] }),
+  ...many({ map: "lily-marsh", kind: "blue-slime", n: 2, area: [40, 8, 43, 11], from: 2 }),
   // the highland's grass north of the road, clear of the road over the pass
   ...many({ map: "grass-highland", kind: "hare", n: 2, area: [10, 7, 13, 10] }),
   ...many({ map: "grass-highland", kind: "hare", n: 2, area: [37, 7, 40, 10], from: 2 }),

@@ -44,7 +44,8 @@ describe("the creatures outside town", () => {
     }
   })
 
-  it("places forest creatures in clear territories and keeps their movement off blocked cells", () => {
+  // walks every creature through a whole day, so it grows with each spawn
+  it("places forest creatures in clear territories and keeps their movement off blocked cells", { timeout: 60_000 }, () => {
     expect(new Set(SPAWNS.map((s) => s.id)).size).toBe(SPAWNS.length)
     const forest = SPAWNS.filter((s) => s.map === "forest-edge" || s.map === "deep-forest")
     expect(new Set(forest.map((s) => s.map)).size).toBe(2)

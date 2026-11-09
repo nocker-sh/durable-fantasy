@@ -10,7 +10,8 @@
   "habitats": [
     "map-south-meadow",
     "map-forest-edge",
-    "map-deep-forest"
+    "map-deep-forest",
+    "map-lily-marsh"
   ],
   "appearance": {
     "look": "slime",
@@ -61,6 +62,7 @@
     "map-south-meadow",
     "map-forest-edge",
     "map-deep-forest",
+    "map-lily-marsh",
     "resident-イルムガルト",
     "resident-ゴットフリート"
   ]
@@ -114,3 +116,7 @@ jelly は糊に使うほか、[[resident-イルムガルト]] の薬作りでつ
 ## 草原の湿った地面の案
 
 [[map-south-meadow#青いスライムの湿った窪地の配置案]] へ餌・水分・休息と退避の面を割り当てる案を持つ。ここは池を実装済みとする場所ではなく、湿った土と草を利用する案である。水の収支、乾燥期と灰、行動と描画の照合は残っており、この位置の到達性だけで生息地を設計済みにしない。
+
+## 百合の沼
+
+[[map-lily-marsh]] では、道から離れた岸の湿ったくぼみで休み、水際の草を食べる。出現枠は南北に通る道の東西の岸に置き、人の通り道と出口を塞がない。
