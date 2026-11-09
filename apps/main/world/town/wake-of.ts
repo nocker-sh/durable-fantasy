@@ -13,7 +13,10 @@ export function wakeOf(name: string): number {
     if (!asleep(name, m) || asleep(name, m - 15)) continue
     let len = 0
     while (len < 1440 && asleep(name, m + len)) len += 15
-    if (len > best) [best, wake] = [len, (m + len) % 1440]
+    if (len > best) {
+      best = len
+      wake = (m + len) % 1440
+    }
   }
   return wake
 }

@@ -2,7 +2,7 @@ import { waitReady } from "#resources/scripts/lib/wait-ready"
 
 export async function walkToMap(page, destination) {
   const route = await page.evaluate(async (destination) => {
-    const { MAPS } = await import("/world/maps/index")
+    const MAPS = (await import("/world/maps/index")).MAPS
     const start = game.state.get().map.id
     const queue = [[start]]
     const seen = new Set([start])
@@ -20,7 +20,7 @@ export async function walkToMap(page, destination) {
   }, destination)
   for (const next of route) {
     await page.evaluate(async (next) => {
-      const { MAPS } = await import("/world/maps/index")
+      const MAPS = (await import("/world/maps/index")).MAPS
       const at = game.scene.playerCell()
       const exits = MAPS[game.state.get().map.id].warps.filter((w) => w.to.map === next)
       exits.sort((a, b) => Math.hypot(a.at[0] - at[0], a.at[1] - at[1]) - Math.hypot(b.at[0] - at[0], b.at[1] - at[1]))

@@ -1,7 +1,7 @@
 /** Inspect the live renderer, walk through the normal movement API, then select the creature with a real canvas click. */
 export async function selectHuntingTarget(page, kind) {
   const target = await page.evaluate((kind) => {
-    const available = Object.entries(game.session.wild).find(([id, health]) => id.includes("-" + kind + "-") && health.hp > 0 && health.back <= Date.now() && !health.combat)
+    const available = Object.entries(game.session.wild).find((entry) => entry[0].includes("-" + kind + "-") && entry[1].hp > 0 && entry[1].back <= Date.now() && !entry[1].combat)
     if (!available) throw Error("No available opponent")
     const renderer = game.scene.runtime.renderer
     const original = renderer.render
