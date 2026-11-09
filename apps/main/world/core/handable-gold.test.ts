@@ -1,4 +1,5 @@
 import { expect, it } from "vitest"
+import { handableGold } from "#/world/core/handable-gold"
 import { apply } from "#/world/core/apply"
 import { newPlayer } from "#/world/core/new-player"
 import { STARTING_GOLD } from "#/world/core/player-rules"
@@ -23,4 +24,17 @@ it("spends the starting gold first in town, freeing what is earned later", () =>
   expect(bought.state.allowance).toBe(bought.state.gold)
   const paid = { ...bought.state, gold: bought.state.gold + 20 }
   expect(apply(paid, { type: "trade-out", offer: { lots: [], gold: 20 } }).ok).toBe(true)
+})
+
+it("lets a refund through the inbox stay handable without the starting gold growing back", () => {
+  // earned 50 on top of the starting gold, put it up for a buy order, then got it back
+  const earned = { ...newPlayer(), gold: STARTING_GOLD + 50 }
+  const escrowed = apply(earned, { type: "escrow-buy", gold: 50 })
+  expect(escrowed.ok).toBe(true)
+  if (!escrowed.ok) return
+  const refunded = apply(escrowed.state, { type: "receive", gold: 50, items: [] })
+  expect(refunded.ok).toBe(true)
+  if (!refunded.ok) return
+  expect(refunded.state.allowance).toBe(STARTING_GOLD)
+  expect(handableGold(refunded.state)).toBe(50)
 })
