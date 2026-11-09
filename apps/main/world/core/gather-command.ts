@@ -1,3 +1,6 @@
+import { todays } from "#/world/core/todays"
+import { errandOf } from "#/world/core/errand-of"
+import { countItem } from "#/world/core/count-item"
 import { wearGatheringTool } from "#/world/core/wear-gathering-tool"
 // Gathering transition after the dispatcher's recovery and fallen-player checks.
 // Node distance and shared stock are checked by the map room before this command.
@@ -43,10 +46,26 @@ export function gather(state: PlayerState, command: Extract<ServerCommand, { typ
   const added = addItem({ bag: wornTool.bag, item: got.item, count: got.count, mark: made })
   if (!added) return reject("BAG_FULL")
   if (overWeight(state, { ...state, bag: added, equipment: wornTool.equipment })) return reject("TOO_HEAVY")
+  // a lost thing someone asked after turns up on its map, once, while the errand is open
+  const sought = todays(state.errands, now)
+    .filter((taken) => !taken.done)
+    .map((taken) => errandOf(taken.id))
+    .find((errand) => errand?.kind === "bring" && errand.find?.map === node.map && countItem(added, errand.wants.item) === 0)
+  const foundItem = sought?.kind === "bring" ? sought.wants.item : undefined
+  const withFound = foundItem ? (addItem({ bag: added, item: foundItem, count: 1 }) ?? added) : added
   // each thing gathered counts: the spots refill on the clock, so a go that brings more must teach more
   const grown = gainLife(state.life, node.skill, GATHER_EXP * got.count)
   return accept(
-    { ...state, bag: added, equipment: wornTool.equipment, worn: wornTool.worn, stamina: state.stamina - cost, life: grown.life, sitting: false },
-    { type: "gathered", item: got.item, count: got.count, skill: node.skill, level: grown.level, up: grown.up, broke: wornTool.broke },
+    { ...state, bag: withFound, equipment: wornTool.equipment, worn: wornTool.worn, stamina: state.stamina - cost, life: grown.life, sitting: false },
+    {
+      type: "gathered",
+      item: got.item,
+      count: got.count,
+      skill: node.skill,
+      level: grown.level,
+      up: grown.up,
+      broke: wornTool.broke,
+      ...(foundItem && withFound !== added ? { found: foundItem } : {}),
+    },
   )
 }

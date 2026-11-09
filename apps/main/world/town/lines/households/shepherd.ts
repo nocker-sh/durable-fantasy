@@ -2,6 +2,9 @@ import type { Line } from "#/world/town/lines/line"
 
 const lines = {
   マティアス: [
+    { text: "鈴は南の草原のどこかに……。草を分けるときに、見つかるかもしれません。", errand: { id: "matthias-bell", state: "taken" } },
+    { text: "その音……この子の鈴です。渡してもらえますか。", errand: { id: "matthias-bell", state: "ready" } },
+    { text: "鈴が戻って、この子も落ち着いたみたいです。ありがとうございます。", errand: { id: "matthias-bell", state: "done" } },
     { text: "その毛は、この子たちの冬毛なんです。仕立て屋さんに、よろしく伝えてください。", errand: { id: "matthias-wool", state: "taken" } },
     { text: "マグダレーナさん、喜んでくれましたか。……よかった。", errand: { id: "matthias-wool", state: "done" } },
     { text: "メェ〜……あ、ぼくじゃなくて羊ですよ。" },

@@ -173,6 +173,17 @@ export const ERRANDS: readonly Errand[] = [
     ask: "門の灯りの油が切れかけている。この注文の書き付けを、道具屋のブルーノに渡してくれ。番の間は門を離れられんのでな。",
     thanks: "油の注文ですね。毎度どうも。明日の夕方までに揃えておきますよ。",
   }),
+  // the bell is only ever found while he has asked after it, so it never sits in a bag with nowhere to go
+  {
+    id: "matthias-bell",
+    from: "マティアス",
+    kind: "bring",
+    wants: { item: "lost-bell", count: 1 },
+    find: { map: "south-meadow" },
+    gold: 12,
+    ask: "羊の鈴をひとつ、草原で落としてしまって……。南の草原で草を分けるとき、気にかけてもらえませんか。",
+    thanks: "ああ、この音です。この子の鈴です。ありがとうございます。",
+  },
   deliverErrand({
     id: "matthias-wool",
     from: "マティアス",

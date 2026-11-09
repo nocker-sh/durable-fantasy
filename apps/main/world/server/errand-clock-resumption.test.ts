@@ -1,3 +1,4 @@
+import { addItem } from "#/world/core/add-item"
 import { afterEach, expect, it, vi } from "vitest"
 import { Player } from "#/durable-objects/player"
 import { ERRANDS } from "#/world/core/errands"
@@ -34,7 +35,7 @@ it.each(cases)("$errand.id, completed=$done: a backward rollover cannot erase a 
   const initial = initialPlayerRecord()
   initial.player = {
     ...initial.player,
-    bag: bagWith(...[errand, older].flatMap((entry) => (entry.kind === "bring" ? [[entry.wants.item, entry.wants.count * 3] as Parameters<typeof bagWith>[number]] : []))),
+    bag: bagWith(...[errand, older].flatMap((entry) => (entry.kind === "bring" ? [[entry.wants.item, entry.wants.count * (entry.find ? 1 : 3)] as Parameters<typeof bagWith>[number]] : []))),
   }
   const store = durableStorage(initial, 8)
   const record = () => (store.saved.get("__void_durable_state") as { value: PlayerRecord }).value
@@ -76,9 +77,15 @@ it.each(cases)("$errand.id, completed=$done: a backward rollover cannot erase a 
   expect(store.saved.get("__void_durable_state")).toEqual(completed)
   actor = new Player.class(store.state, {})
   expect((await actor.run(take)).ok).toBe(true)
+  if (errand.kind === "bring" && errand.find) {
+    // a lost thing has to be found again for the second day's errand, as gathering on its map would turn it up
+    const saved = store.saved.get("__void_durable_state") as { value: PlayerRecord }
+    saved.value.player = { ...saved.value.player, bag: addItem({ bag: saved.value.player.bag, item: errand.wants.item, count: 1 })! }
+    actor = new Player.class(store.state, {})
+  }
   expect((await actor.run(hand)).ok).toBe(true)
   expect(record().player.gold).toBe(initial.player.gold + errand.gold * 2)
-  if (errand.kind === "bring") expect(countItem(record().player.bag, errand.wants.item)).toBe(countItem(initial.player.bag, errand.wants.item) - errand.wants.count * 2)
+  if (errand.kind === "bring") expect(countItem(record().player.bag, errand.wants.item)).toBe(errand.find ? 0 : countItem(initial.player.bag, errand.wants.item) - errand.wants.count * 2)
 })
 
 it("cannot collect a paid delivery twice by taking yesterday's request between identical daily offers", async () => {

@@ -22,7 +22,7 @@ export function takeErrand(state: PlayerState, command: Extract<ServerCommand, {
 
   const errands = [...list, { id: errand.id, day: dayOf(now), done: false }]
   // a letter to deliver is put in the bag, after any left from errands that have lapsed
-  const cleared = dropLapsedParcels(state.bag, list)
+  const cleared = dropLapsedParcels(state.bag, errands)
   const bag = errand.kind === "deliver" && errand.carry ? addItem({ bag: cleared, item: errand.carry, count: 1 }) : cleared
   if (!bag) return reject("BAG_FULL")
   return accept({ ...state, bag: bag, errands: errands }, { type: "errand-taken", errand: errand.id })

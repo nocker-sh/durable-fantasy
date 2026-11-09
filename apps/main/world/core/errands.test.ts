@@ -4,6 +4,7 @@ import { apply } from "#/world/core/apply"
 import { countItem } from "#/world/core/count-item"
 import { RECIPES } from "#/world/core/recipes/catalog"
 import { ERRANDS } from "#/world/core/errands"
+import type { Errand } from "#/world/core/errand-types"
 import { ERRAND_HAND_MARGIN, MAX_ERRANDS } from "#/world/core/errand-rules"
 import { errandToday } from "#/world/core/errand-today"
 import { errandsOn } from "#/world/core/errands-on"
@@ -51,6 +52,8 @@ describe("errands", () => {
       ...RECIPES.map((r) => r.output.item),
       ...Object.values(MONSTER_KINDS).flatMap((k) => k.drops.map((d) => d.item)),
       ...Object.values(SHOPS).flatMap((s) => s.stock as readonly string[]),
+      // a lost thing is turned up while gathering on its map, during the errand only
+      ...ERRANDS.flatMap((e) => (e.kind === "bring" && e.find ? [e.wants.item] : [])),
     ])
     for (const e of ERRANDS) {
       expect(names.has(e.from), e.id).toBe(true)
@@ -61,7 +64,8 @@ describe("errands", () => {
   })
 
   it("buying the things to hand over never pays; gathering them pays more than selling them to a shop", () => {
-    for (const e of ERRANDS.filter((x) => x.kind === "bring")) {
+    // a lost thing can be neither bought nor sold, so its pay is set on its own
+    for (const e of ERRANDS.filter((x): x is Extract<Errand, { kind: "bring" }> => x.kind === "bring" && !x.find)) {
       // below the least any shop ever asks (closing discount, a full shelf, a friend's discount)
       const value = (cheapestShopPrice(e.wants.item) ?? ITEMS[e.wants.item].price) * e.wants.count
       expect(e.gold, e.id).toBeLessThan(value)

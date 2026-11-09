@@ -49,7 +49,8 @@ function fixture(errand: Errand, short = false) {
   const plan = plans.get(errand.id)!
   vi.setSystemTime(plan.ask.now)
   const initial = initialPlayerRecord()
-  const count = errand.kind === "bring" ? errand.wants.count + (short ? -1 : 1) : 0
+  // a lost thing is held only while it is sought, so no spare of it is carried
+  const count = errand.kind === "bring" ? errand.wants.count + (short ? -1 : errand.find ? 0 : 1) : 0
   initial.player = { ...initial.player, profileComplete: true, ...(errand.kind === "bring" ? { bag: count > 0 ? bagWith([errand.wants.item, count]) : bagWith() } : {}) }
   initial.location = { world: 1, map: plan.ask.map.id, route: [[...standing(plan.ask)]], since: plan.ask.now, connection: "initial" }
   const store = durableStorage(initial, 8)
@@ -161,7 +162,7 @@ it.each(ERRANDS.flatMap((errand) => [false, true].map((restart) => ({ errand, re
     expect(done.gold).toBe(f.initial.player.gold + errand.gold)
     expect(done.errands).toEqual([{ id: errand.id, day: dayOf(f.plan.hand.now), done: true }])
     expect(done.friends).toEqual(errand.kind === "bring" ? { [errand.from]: FRIEND.bring } : { [errand.from]: FRIEND.deliver, [errand.to]: FRIEND.received })
-    if (errand.kind === "bring") expect(done.bag).toEqual(bagWith([errand.wants.item, 1]))
+    if (errand.kind === "bring") expect(done.bag).toEqual(errand.find ? bagWith() : bagWith([errand.wants.item, 1]))
     else expect(done.bag).toEqual(f.initial.player.bag)
     const paid = f.snapshot()
     f.restart()

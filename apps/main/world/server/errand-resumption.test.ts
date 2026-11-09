@@ -24,7 +24,7 @@ it.each(ERRANDS)("$id: acceptance and handover remain atomic across failed write
   vi.setSystemTime(now!)
   const initial = initialPlayerRecord()
   // Initial materials and a daily-offer time are local conditions, not a walking or gathering route.
-  if (errand.kind === "bring") initial.player = { ...initial.player, bag: bagWith([errand.wants.item, errand.wants.count + 1]) }
+  if (errand.kind === "bring") initial.player = { ...initial.player, bag: bagWith([errand.wants.item, errand.wants.count + (errand.find ? 0 : 1)]) }
   const store = durableStorage(initial, 8)
   let actor = new Player.class(store.state, {})
   const original = structuredClone(store.saved.get("__void_durable_state"))
@@ -54,7 +54,7 @@ it.each(ERRANDS)("$id: acceptance and handover remain atomic across failed write
   expect(handed.state.gold).toBe(initial.player.gold + errand.gold)
   expect(handed.state.errands).toEqual([{ id: errand.id, day: dayOf(now!), done: true }])
   expect(handed.state.friends).toEqual(errand.kind === "bring" ? { [errand.from]: FRIEND.bring } : { [errand.from]: FRIEND.deliver, [errand.to]: FRIEND.received })
-  if (errand.kind === "bring") expect(countItem(handed.state.bag, errand.wants.item)).toBe(1)
+  if (errand.kind === "bring") expect(countItem(handed.state.bag, errand.wants.item)).toBe(errand.find ? 0 : 1)
   else expect(handed.state.bag).toEqual(initial.player.bag)
   const paid = structuredClone(store.saved.get("__void_durable_state"))
   actor = new Player.class(store.state, {})

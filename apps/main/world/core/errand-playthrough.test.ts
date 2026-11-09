@@ -69,7 +69,8 @@ describe("every authored errand through real commands and dialogue", () => {
     vi.stubGlobal("localStorage", { getItem: (key: string) => spoken.get(key) ?? null, setItem: (key: string, value: string) => spoken.set(key, value) })
     const plan = errandMeetings(errand)
     // Required materials and one surplus item are explicit starting assets; no progress or friendship is injected.
-    const initial = player(errand.kind === "bring" ? { bag: bagWith([errand.wants.item, errand.wants.count + 1]) } : {})
+    // a lost thing is held only while it is sought, so no spare of it is carried
+    const initial = player(errand.kind === "bring" ? { bag: bagWith([errand.wants.item, errand.wants.count + (errand.find ? 0 : 1)]) } : {})
     expect(initial.errands).toEqual([])
     expect(initial.friends).toEqual({})
     const offered = choicesFor(viewAt(initial, plan.ask), errand.from)
@@ -115,10 +116,11 @@ describe("every authored errand through real commands and dialogue", () => {
     expect(done.state.friends).toEqual(expectedFriends)
     expect(done.events).toEqual([{ type: "errand-done", errand: errand.id, gold: errand.gold, friends: expectedFriends }])
     expect(done.state.errands).toEqual([{ id: errand.id, day: dayOf(plan.hand.now), done: true }])
-    if (errand.kind === "bring") {
+    if (errand.kind === "bring" && !errand.find) {
       expect(countItem(done.state.bag, errand.wants.item)).toBe(1)
       expect(done.state.bag).toEqual(bagWith([errand.wants.item, 1]))
-    } else expect(done.state.bag).toEqual(initial.bag)
+    } else if (errand.kind === "bring") expect(countItem(done.state.bag, errand.wants.item)).toBe(0)
+    else expect(done.state.bag).toEqual(initial.bag)
     checkDialogue(done.state, plan.hand, { errand, phase: "done" })
     expect(errandProgress(done.state, errand.from, plan.hand.now)[errand.id]).toBe("done")
 

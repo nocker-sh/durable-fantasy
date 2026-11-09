@@ -199,7 +199,7 @@ export type GameEvent =
   | { type: "lodged"; shop: ShopId; cost: number }
   | { type: "used"; item: ItemId; hp: number; sp: number; stamina: number; warm: number; focus?: number; by?: string }
   | { type: "tired"; stamina: number }
-  | { type: "gathered"; item: ItemId; count: number; skill: GatherSkill; level: number; up: boolean; broke: ItemId | null }
+  | { type: "gathered"; item: ItemId; count: number; skill: GatherSkill; level: number; up: boolean; broke: ItemId | null; found?: ItemId }
   | { type: "ordered"; commission: string; readyAt: number }
   | { type: "escrowed"; item: ItemId | null; q?: Quality; by?: string; gold: number }
   | { type: "received"; gold: number; items: number }

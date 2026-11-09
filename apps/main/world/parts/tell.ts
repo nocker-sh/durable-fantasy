@@ -113,6 +113,7 @@ export function tell(event: GameEvent, me: string | undefined): Told {
   if (event.type === "gathered") {
     notify(`${name(event.item)}を${event.count}個手に入れた。${lifeUp(event)}`, "good")
     if (event.broke) notify(`${name(event.broke)}が壊れた。`, "bad")
+    if (event.found) notify(`${name(event.found)}を見つけた。`, "good")
     return out
   }
   if (event.type === "tired") {
