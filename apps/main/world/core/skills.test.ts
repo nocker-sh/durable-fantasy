@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest"
+import { ITEMS } from "#/world/core/items/catalog"
+import type { ItemId } from "#/world/core/items/catalog"
 import { apply } from "#/world/core/apply"
 import { countItem } from "#/world/core/count-item"
 import { startingStats } from "#/world/core/starting-stats"
@@ -95,4 +97,10 @@ it("indexes every weapon art in definition order and shares immutable lists", ()
   }
   expect(artsOf(null)).toEqual([])
   expect(artsOf("herb")).toBe(artsOf(null))
+})
+
+it("gives every weapon but the branch picked up on the way at least one art", () => {
+  const covered = new Set(Object.values(SKILLS).flatMap((skill) => ("weapons" in skill ? (skill.weapons as readonly string[]) : [])))
+  const weapons = (Object.keys(ITEMS) as ItemId[]).filter((item) => ITEMS[item].equip?.part === "weapon" && item !== "wooden-stick")
+  expect(weapons.filter((weapon) => !covered.has(weapon))).toEqual([])
 })

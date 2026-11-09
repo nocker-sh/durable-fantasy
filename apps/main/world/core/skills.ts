@@ -52,7 +52,7 @@ export const SKILLS = {
     name: "振り下ろし",
     sp: 6,
     cooldown: 8000,
-    weapons: ["hand-axe", "battle-axe"],
+    weapons: ["hand-axe", "steel-hand-axe", "engine-hand-axe", "battle-axe"],
     needs: { str: 10 },
     power: 1.9,
     text: "斧の重みを乗せ、一体を深く斬りつける。",
