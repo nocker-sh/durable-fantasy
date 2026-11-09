@@ -22,7 +22,7 @@ describe("parties", () => {
     expect(two.members).toHaveLength(0)
   })
 
-  it("experience: each one's own, or shared evenly among those within fifteen levels", () => {
+  it("experience: each one's own, or shared evenly among those within a few levels of the highest", () => {
     expect(shareOut({ exp: 9, mode: "own", killer: { owner: "a", level: 1 }, near: [{ owner: "b", level: 1 }] })).toEqual([{ owner: "a", exp: 9 }])
     expect(
       shareOut({
@@ -35,8 +35,20 @@ describe("parties", () => {
         ],
       }),
     ).toEqual([
+      { owner: "a", exp: 0 },
+      { owner: "c", exp: 9 },
+    ])
+    expect(shareOut({ exp: 9, mode: "even", killer: { owner: "a", level: 1 }, near: [{ owner: "b", level: 3 }] })).toEqual([
       { owner: "a", exp: 5 },
       { owner: "b", exp: 4 },
+    ])
+  })
+
+  it("does not let a low member's last blow take a strong creature's reward past the higher member", () => {
+    const shares = shareOut({ exp: 400, mode: "even", killer: { owner: "low", level: 1 }, near: [{ owner: "high", level: 20 }] })
+    expect(shares).toEqual([
+      { owner: "low", exp: 0 },
+      { owner: "high", exp: 400 },
     ])
   })
 
@@ -79,7 +91,9 @@ describe("parties", () => {
         { owner: "far", level: 10 + SHARE_LEVELS + 1 },
       ],
     })
-    expect(shares.map((x) => x.owner)).toEqual(["a", "near"])
+    // measured from the highest member, the killer is too far below to share
+    expect(shares.map((x) => x.owner)).toEqual(["a", "near", "far"])
+    expect(shares[0].exp).toBe(0)
   })
 
   it("sends nothing to members whose share rounds down to nothing", () => {
