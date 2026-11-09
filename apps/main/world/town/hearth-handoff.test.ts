@@ -4,7 +4,9 @@ import { rectangleFace } from "#/lib/engine/rectangle-face"
 it("contains the complete pitch of all tool corners, including the intermediate extremum", () => {
   for (const front of ["n", "s", "e", "w"] as const) {
     const box = handoffRotationEnvelope({ front: front, width: 0.18, thickness: 0.2, length: 1.1, gripFromBlade: 1, from: "work_vertical", to: "work_horizontal" }),
-      [nx, nz] = rectangleFace({ x: 0, z: 0, width: 1, depth: 1, side: front }).outward
+      pair1 = rectangleFace({ x: 0, z: 0, width: 1, depth: 1, side: front }).outward,
+      nx = pair1[0],
+      nz = pair1[1]
     for (let angle = 0; angle <= 90; angle++)
       for (const along of [-1, 0.1])
         for (const depth of [-0.1, 0.1])
@@ -29,7 +31,9 @@ it("includes intermediate extrema when tilting a tool with a short handle tail",
   const tilt = (80 * Math.PI) / 180
   for (const front of ["n", "s", "e", "w"] as const) {
     const box = handoffRotationEnvelope({ front: front, width: 0.18, thickness: 0.008, length: 1.001, gripFromBlade: 1, from: "work_horizontal", to: "work_sloped", tilt: tilt }),
-      [nx, nz] = rectangleFace({ x: 0, z: 0, width: 1, depth: 1, side: front }).outward
+      pair2 = rectangleFace({ x: 0, z: 0, width: 1, depth: 1, side: front }).outward,
+      nx = pair2[0],
+      nz = pair2[1]
     for (let angle = 0; angle <= 80; angle++)
       for (const along of [-1, 0.001])
         for (const depth of [-0.004, 0.004])

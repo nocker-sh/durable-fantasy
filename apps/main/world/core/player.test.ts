@@ -1,6 +1,7 @@
 import { ITEMS } from "#/world/core/items/catalog"
 import { ITEM_ICONS } from "#/world/core/items/icons"
 import { describe, expect, it } from "vitest"
+import { withoutKeys } from "#/lib/engine/without-keys"
 import { apply } from "#/world/core/apply"
 import { countItem } from "#/world/core/count-item"
 import { MAX_LEVEL } from "#/world/core/growth-rules"
@@ -212,7 +213,7 @@ describe("saves", () => {
   })
 
   it("moves a save with a job forward: level retained within the cap, stats begun again with the points, proficiency as levels", () => {
-    const { life: _life, worn: _worn, stats: _stats, ...now } = newPlayer()
+    const now = withoutKeys(newPlayer(), ["life", "worn", "stats"])
     const v2 = {
       ...now,
       version: 2,

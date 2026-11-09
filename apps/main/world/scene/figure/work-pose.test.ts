@@ -15,7 +15,9 @@ it("aligns the actual native hand attachment to the grip and tool axis in every 
     for (const hand of ["l", "r"] as const) {
       const candidate: WorkPoseCandidate = { animation: "scrub", frame: 0, body_m: [5, 2], facing, hand, pole: [-1, 0, 1] },
         turn = facing === "s" ? 0 : facing === "w" ? 1 : facing === "n" ? 2 : 3
-      const [dx, dz] = quarterTurnPoint(hand === "r" ? -0.25 : 0.25, 0.35, turn),
+      const pair1 = quarterTurnPoint(hand === "r" ? -0.25 : 0.25, 0.35, turn),
+        dx = pair1[0],
+        dz = pair1[1],
         target: [number, number, number] = [5 + dx, 0.4, 2 + dz],
         axis: [number, number, number] = [0.3, 0.4, 0.5]
       const pose = nativeWorkPose({ look: look, pose: candidate, target: target, gripAxis: axis }),
@@ -23,8 +25,12 @@ it("aligns the actual native hand attachment to the grip and tool axis in every 
         clothes = buildClothes(context),
         arms = buildArms({ ...context, ...clothes }),
         attachment = arms.hands[hand === "r" ? "R" : "L"]
-      const [px, pz] = quarterTurnPoint(attachment.p[0], attachment.p[2], pose.turn),
-        [ax, az] = quarterTurnPoint(attachment.up[0], attachment.up[2], pose.turn),
+      const pair2 = quarterTurnPoint(attachment.p[0], attachment.p[2], pose.turn),
+        px = pair2[0],
+        pz = pair2[1],
+        pair3 = quarterTurnPoint(attachment.up[0], attachment.up[2], pose.turn),
+        ax = pair3[0],
+        az = pair3[1],
         length = Math.hypot(...axis)
       expect(distance([5 + px, attachment.p[1] + pose.rootY, 2 + pz], target)).toBeLessThan(1e-12)
       expect(

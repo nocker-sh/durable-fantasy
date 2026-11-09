@@ -23,8 +23,12 @@ it("cuts the exterior wall at each compiled window and keeps solid wall below it
   const shell = root.getObjectByName("building-envelope")!
   for (const w of site.windows) {
     expect(root.getObjectByName(`window:${w.id}`)).toBeDefined()
-    const [x, z] = w.point,
-      [nx, nz] = w.outward
+    const pair1 = w.point,
+      x = pair1[0],
+      z = pair1[1],
+      pair2 = w.outward,
+      nx = pair2[0],
+      nz = pair2[1]
     const ray = new THREE.Raycaster(new THREE.Vector3(x + nx * 0.1, site.floorY + w.sill + w.height / 2, z + nz * 0.1), new THREE.Vector3(-nx, 0, -nz))
     expect(ray.intersectObject(shell, true).filter((hit) => hit.distance < 0.2)).toHaveLength(0)
     ray.ray.origin.y = site.floorY + w.sill - 0.05
@@ -45,8 +49,12 @@ it.each([0, 1])("shares openings and declared hanging lights on indoor floor %s"
   const floorY = new THREE.Box3().setFromObject(root.getObjectByName("interior-floor")!).max.y
   for (const w of it.windows ?? []) {
     const wall = cutaways.find((c) => c.floor === floor && c.normal[0] === w.outward[0] && c.normal[1] === w.outward[1])!
-    const [x, z] = w.point,
-      [nx, nz] = w.outward
+    const pair3 = w.point,
+      x = pair3[0],
+      z = pair3[1],
+      pair4 = w.outward,
+      nx = pair4[0],
+      nz = pair4[1]
     const ray = new THREE.Raycaster(new THREE.Vector3(x + nx * 0.1, floorY + w.sill + w.height / 2, z + nz * 0.1), new THREE.Vector3(-nx, 0, -nz))
     expect(ray.intersectObject(wall.obj, true)).toHaveLength(0)
     const pane = root.getObjectByName(`window:${w.id}`)!

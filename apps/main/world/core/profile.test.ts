@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest"
+import { withoutKeys } from "#/lib/engine/without-keys"
 import { commandSchema } from "#/world/core/commands"
 import { apply } from "#/world/core/apply"
 import { loadPlayer } from "#/world/core/load-player"
@@ -17,7 +18,7 @@ describe("character creation", () => {
   })
 
   it("does not force existing saves through creation or change their belongings", () => {
-    const { profileComplete: _, ...legacy } = newPlayer("既存の名前", 2)
+    const legacy = withoutKeys(newPlayer("既存の名前", 2), ["profileComplete"])
     expect(loadPlayer(legacy)).toMatchObject({ ...legacy, profileComplete: true })
   })
 

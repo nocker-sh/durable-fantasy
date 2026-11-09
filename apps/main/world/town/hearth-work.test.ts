@@ -16,7 +16,9 @@ it("fits the tilted blade's outer corners to both the floor and rear contact pla
 it("moves the grip with the blade for parallel strokes and keeps all four orientations clear", () => {
   for (const front of ["n", "s", "e", "w"] as const) {
     const face = rectangleFace({ x: 0.5, z: 0.5, width: 1, depth: 1, side: front }),
-      [nx, nz] = face.outward,
+      pair1 = face.outward,
+      nx = pair1[0],
+      nz = pair1[1],
       grip = [face.point[0] + nx * 0.1, face.point[1] + nz * 0.1] as const
     const work = hearthSpatialStrokes({ bounds: bounds, front: front, spec: spec, grip: grip, height: 0.35, width: 0.18, thickness: 0.008, length: 1.1 })
     expect(work.strokes).toHaveLength(2)

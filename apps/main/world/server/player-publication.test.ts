@@ -1,4 +1,5 @@
 import { afterEach, expect, it, vi } from "vitest"
+import { withoutKeys } from "#/lib/engine/without-keys"
 import { Player } from "#/durable-objects/player"
 import { player } from "#/world/test/player"
 import { bagWith } from "#/world/test/bag-with"
@@ -47,7 +48,7 @@ it("numbers read, command, receipt, grant and reset publications in their persis
 })
 it("starts a supported unnumbered save at the initial publication without losing its data", async () => {
   const base = player({ hpAt: 1000, spAt: 1000 })
-  const { revision: _revision, ...old } = base
+  const old = withoutKeys(base, ["revision"])
   const f = fixture(old as PlayerState)
   expect(await f.actor.read()).toEqual({ ...base, revision: 1 })
 })

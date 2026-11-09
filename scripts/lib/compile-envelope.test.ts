@@ -32,14 +32,18 @@ it("keeps the audited leaf depth and hinge side under every site rotation", () =
     }
 })
 it("rejects an unsupported paired entrance instead of drawing a single panel", () => {
-  const { building, rooms } = source(),
+  const parts1 = source(),
+    building = parts1.building,
+    rooms = parts1.rooms,
     entry = (building.entry_steps as { room: string }[])[0]
   ;(rooms.get(entry.room)!.door_leaves as { paired?: boolean }[])[0].paired = true
   expect(() => compileEnvelope(building, rooms, plan)).toThrow("Paired exterior door rendering is not supported")
 })
 
 it("requires authored vertical clearances and rejects a leaf with no remaining height", () => {
-  const { building, rooms } = source(),
+  const parts2 = source(),
+    building = parts2.building,
+    rooms = parts2.rooms,
     entry = (building.entry_steps as { room: string }[])[0]
   const leaf = (rooms.get(entry.room)!.door_leaves as { vertical_clearance_m?: { bottom: number; top: number } }[])[0]
   delete leaf.vertical_clearance_m

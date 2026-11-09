@@ -21,8 +21,12 @@ it("uses the site dimensions, roof elevation, supported flue and entry stair", (
   expect(bounds.min.x).toBeCloseTo(site.bounds[0] - site.overhang)
   expect(bounds.max.x).toBeCloseTo(site.bounds[2] + site.overhang)
   expect(bounds.max.y).toBeCloseTo(site.chimneys[0].top)
-  const [x, z] = site.door.point,
-    [nx, nz] = site.door.outward
+  const pair1 = site.door.point,
+    x = pair1[0],
+    z = pair1[1],
+    pair2 = site.door.outward,
+    nx = pair2[0],
+    nz = pair2[1]
   const ray = new THREE.Raycaster(new THREE.Vector3(x + nx * 0.1, site.floorY + site.door.height - 0.02, z + nz * 0.1), new THREE.Vector3(-nx, 0, -nz))
   const shell = mesh.getObjectByName("building-envelope")!
   expect(ray.intersectObject(shell, true).filter((hit) => hit.distance < 0.2)).toHaveLength(0)
@@ -43,8 +47,12 @@ it("recesses the exterior leaf to the interior wall face and preserves the clear
     mesh = authoredBuilding(root, site, () => 0)
   root.updateMatrixWorld(true)
   expect(site.door.recess * TILE_M).toBeCloseTo(proposal.cellM)
-  const [x, z] = site.door.point,
-    [nx, nz] = site.door.outward,
+  const pair3 = site.door.point,
+    x = pair3[0],
+    z = pair3[1],
+    pair4 = site.door.outward,
+    nx = pair4[0],
+    nz = pair4[1],
     tx = -nz,
     tz = nx
   const rayAt = (u: number) => new THREE.Raycaster(new THREE.Vector3(x + tx * u + nx, site.floorY + site.door.height * 0.4, z + tz * u + nz), new THREE.Vector3(-nx, 0, -nz))
@@ -81,7 +89,11 @@ it("leaves the chimney duct open through both the roof and the outlet", () => {
     const mesh = authoredBuilding(root, site, () => 0)
     root.updateMatrixWorld(true)
     const chimney = site.chimneys[0],
-      [x0, z0, x1, z1] = chimney.rect
+      pair5 = chimney.rect,
+      x0 = pair5[0],
+      z0 = pair5[1],
+      x1 = pair5[2],
+      z1 = pair5[3]
     const cast = (x: number, z: number) => new THREE.Raycaster(new THREE.Vector3(x, chimney.top + 1, z), new THREE.Vector3(0, -1, 0)).intersectObject(mesh.getObjectByName("building-envelope")!, true)
     const centre = cast((x0 + x1) / 2, (z0 + z1) / 2)
     expect(centre.filter((hit) => hit.point.y > site.eaveY + 1e-6)).toHaveLength(0)

@@ -48,10 +48,11 @@ it("projects each entrance direction into a matching wall opening, walk grid and
       grid = interiorRows(room)
     expect(grid[room.door[1]][room.door[0]], side).toBe(".")
     expect(grid[room.arrive[1]][room.arrive[0]], side).toBe(".")
-    const {
-      point: [x, z],
-      outward: [nx, nz],
-    } = room.entrance!
+    const entrance = room.entrance!,
+      x = entrance.point[0],
+      z = entrance.point[1],
+      nx = entrance.outward[0],
+      nz = entrance.outward[1]
     expect(room.arrive).toEqual([room.door[0] - nx * 2, room.door[1] - nz * 2])
     setLayout(INDOOR)
     const root = new THREE.Group()

@@ -18,11 +18,16 @@ it("draws the same receiver hollow on the floor with its own lid resting separat
     receiver = op.ash_receiver!,
     rack = room.furniture!.find((f) => f.symbol === receiver.storage.furniture)!,
     k = room.grid!.cell_m,
-    [x, z, w, d] = rack.rect.map((n) => n * k),
+    pair1 = rack.rect.map((n) => n * k),
+    x = pair1[0],
+    z = pair1[1],
+    w = pair1[2],
+    d = pair1[3],
     shelf = shelfDimensions(rack.shelf, w, d),
     item = shelf.items![0],
     motion = storageRetrieval({ x: x + w / 2, z: z + d / 2, width: w, depth: d, shelf: shelf, index: 0 }),
-    { plan } = ashLidRestPlan({ room: room, building: building, documents: documents, rack: rack, shelf: shelf, item: item, motion: motion, rest: receiver.lid_rest }),
+    parts2 = ashLidRestPlan({ room: room, building: building, documents: documents, rack: rack, shelf: shelf, item: item, motion: motion, rest: receiver.lid_rest }),
+    plan = parts2.plan,
     state = storageLidState(plan, 3),
     gb = new GB()
   drawStorageBoxParts(gb, state, "iron")

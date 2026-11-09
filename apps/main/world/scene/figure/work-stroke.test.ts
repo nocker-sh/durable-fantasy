@@ -16,7 +16,11 @@ function fixture(id: string) {
     f = room.furniture!.find((f) => f.hearth_maintenance)!,
     op = f.hearth_maintenance!,
     k = room.grid!.cell_m,
-    [x, z, w, d] = f.rect.map((v) => v * k),
+    pair1 = f.rect.map((v) => v * k),
+    x = pair1[0],
+    z = pair1[1],
+    w = pair1[2],
+    d = pair1[3],
     work = hearthSpatialStrokes({
       bounds: { x0: x, z0: z, x1: x + w, z1: z + d },
       front: f.hearth_front!,
@@ -44,7 +48,9 @@ function fixture(id: string) {
 it("keeps both feet, the planted knee and every body joint except the working arm fixed", () => {
   for (const id of ["h-m5", "h10"]) {
     const f = fixture(id),
-      [a, b] = f.check(),
+      pair2 = f.check(),
+      a = pair2[0],
+      b = pair2[1],
       hand = f.op.work_pose_candidate!.hand
     expect(a.footing).toEqual(b.footing)
     expect(a.rootY).toBe(b.rootY)

@@ -24,7 +24,11 @@ function fixture(id: string) {
     f = room.furniture!.find((f) => f.hearth_maintenance)!,
     op = f.hearth_maintenance!,
     k = room.grid!.cell_m,
-    [x, z, w, d] = f.rect.map((v) => v * k),
+    pair1 = f.rect.map((v) => v * k),
+    x = pair1[0],
+    z = pair1[1],
+    w = pair1[2],
+    d = pair1[3],
     work = hearthSpatialStrokes({
       bounds: { x0: x, z0: z, x1: x + w, z1: z + d },
       front: f.hearth_front!,

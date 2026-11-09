@@ -1,4 +1,5 @@
 import { expect, it } from "vitest"
+import { withoutKeys } from "#/lib/engine/without-keys"
 import { GameSession } from "#/world/client/game-session"
 import { ServerMessages } from "#/world/client/server-messages"
 import { initialPlayerRecord } from "#/world/server/initial-player-record"
@@ -66,7 +67,7 @@ it("keeps unnumbered legacy results observable instead of treating all of them a
   const f = fixture()
   const fallen = runPlayerCommand(f.record, { command: { type: "hurt", amount: f.record.player.hp + 1, by: Object.values(MONSTER_KINDS)[0].name }, context: {} }, 1000)
   if (!fallen.ok) throw new Error(fallen.reason)
-  const { revision: _revision, ...legacy } = fallen.state
+  const legacy = withoutKeys(fallen.state, ["revision"])
   const result = { ...fallen, state: legacy as PlayerState }
   f.messages.handle({ type: "result", seq: -1, result })
   f.messages.handle({ type: "result", seq: -1, result })

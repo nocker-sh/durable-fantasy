@@ -24,7 +24,9 @@ it("faces the hearth mouth and firelight toward each authored operating side", (
       root.updateMatrixWorld(true)
       const floor = groundH(room.x0 + 1, room.z0 + 1) + 0.02,
         face = rectangleFace({ x: piece.x, z: piece.z, width: piece.w, depth: piece.d, side: front }),
-        [nx, nz] = face.outward
+        pair1 = face.outward,
+        nx = pair1[0],
+        nz = pair1[1]
       const masonry = root.getObjectByName("hearth")!,
         ray = new THREE.Raycaster(new THREE.Vector3(face.point[0] + nx, floor + 0.5, face.point[1] + nz), new THREE.Vector3(-nx, 0, -nz))
       const hit = ray.intersectObject(masonry, true)[0]

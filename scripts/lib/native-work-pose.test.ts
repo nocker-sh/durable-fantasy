@@ -39,10 +39,12 @@ it("refuses furniture and walls intersecting the native body in both rooms", () 
   for (const id of ["h10", "h-m5"]) {
     const f = fixture(id),
       k = f.room.grid!.cell_m,
-      [x, z] = f.op.work_pose_candidate!.body_m
-    const pair1 = id === "h10" ? [-0.3, 0] : [0, 0.3]
-    const dx = pair1[0],
-      dz = pair1[1]
+      body = f.op.work_pose_candidate!.body_m,
+      x = body[0],
+      z = body[1]
+    const offset = id === "h10" ? [-0.3, 0] : [0, 0.3]
+    const dx = offset[0],
+      dz = offset[1]
     const obstruction = { ...f.room.furniture!.find((p) => !p.hearth_maintenance)!, symbol: "test-obstruction", rect: [(x + dx - 0.15) / k, (z + dz - 0.15) / k, 0.3 / k, 0.3 / k] }
     f.room.furniture!.push(obstruction)
     expect(

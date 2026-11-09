@@ -1,4 +1,5 @@
 import { afterEach, expect, it, vi } from "vitest"
+import { withoutKeys } from "#/lib/engine/without-keys"
 import { Wild } from "#/durable-objects/wild"
 import { Player } from "#/durable-objects/player"
 import { initialPlayerRecord } from "#/world/server/initial-player-record"
@@ -79,7 +80,7 @@ it("rolls back an unsaved snapshot number and recovers an unsaved hit without pu
 })
 it.each([0, 1, 2, 3])("preserves existing wild data while migrating publication envelope %s", async (version) => {
   const initial = initialWildRecord()
-  const { revision: _revision, ...legacy } = initial
+  const legacy = withoutKeys(initial, ["revision"])
   const value = version === 0 ? { wild: initial.wild } : version === 1 ? { wild: initial.wild, serial: 0, jobs: {} } : version === 2 ? legacy : { ...initial, revision: 7 }
   const store = durableStorage(value, version)
   const actor = new Wild.class(store.state, {})

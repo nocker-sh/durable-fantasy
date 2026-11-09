@@ -1,4 +1,5 @@
 import { expect, it, vi } from "vitest"
+import { withoutKeys } from "#/lib/engine/without-keys"
 import { currentPublication } from "#/world/client/player-publication"
 import { ServerMessages } from "#/world/client/server-messages"
 import { GameSession } from "#/world/client/game-session"
@@ -38,7 +39,7 @@ it.each([-1, NaN, Infinity, 1.5, Number.MAX_SAFE_INTEGER + 1])("refuses invalid 
   expect(currentPublication(null, player({ revision }))).toBe(false)
 })
 it("treats missing legacy counters as the initial publication, never as newer data", () => {
-  const { revision: _revision, ...legacy } = player()
+  const legacy = withoutKeys(player(), ["revision"])
   const old = legacy as ReturnType<typeof player>
   expect(currentPublication(null, old)).toBe(true)
   expect(currentPublication(player({ revision: 1 }), old)).toBe(false)

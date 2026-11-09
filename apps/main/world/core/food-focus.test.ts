@@ -1,4 +1,5 @@
 import { expect, it } from "vitest"
+import { withoutKeys } from "#/lib/engine/without-keys"
 import { apply } from "#/world/core/apply"
 import { addItem } from "#/world/core/add-item"
 import { emptyBag } from "#/world/core/empty-bag"
@@ -38,6 +39,6 @@ it("food grants focus, preserves a longer existing duration, and starts a fresh 
 it("loads old saves without granting focus and retains active effects in new saves", () => {
   const p = player({ focusAt: 1000, focusUntil: 60000 })
   expect(loadPlayer(p)).toMatchObject({ focusAt: 1000, focusUntil: 60000 })
-  const { focusAt: _, focusUntil: __, ...old } = p
+  const old = withoutKeys(p, ["focusAt", "focusUntil"])
   expect(loadPlayer(old)).toMatchObject({ focusAt: 0, focusUntil: 0 })
 })
