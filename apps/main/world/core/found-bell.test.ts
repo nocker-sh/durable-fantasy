@@ -4,6 +4,8 @@ import { countItem } from "#/world/core/count-item"
 import { dayOf } from "#/world/core/day-of"
 import { NODES } from "#/world/core/gather"
 import { player } from "#/world/test/player"
+import { errandLabel } from "#/world/core/errand-label"
+import { ERRANDS } from "#/world/core/errands"
 
 const now = Date.parse("2026-11-09T05:00:00Z")
 const meadow = NODES.find((node) => node.map === "south-meadow" && !node.needsTool)!
@@ -25,4 +27,8 @@ it("finds no bell without the errand, or on another map", () => {
   if (plain.ok) expect(countItem(plain.state.bag, "lost-bell")).toBe(0)
   const away = apply(seeking, { type: "gather", node: elsewhere.id, roll: 0.5 }, { now })
   if (away.ok) expect(countItem(away.state.bag, "lost-bell")).toBe(0)
+})
+
+it("names where the lost thing is to be looked for in the errand list", () => {
+  expect(errandLabel(ERRANDS.find((errand) => errand.id === "matthias-bell")!)).toBe("南の草原で小さな鈴を探してマティアスへ")
 })

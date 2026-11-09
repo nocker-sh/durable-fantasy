@@ -179,7 +179,7 @@ export const ERRANDS: readonly Errand[] = [
     from: "マティアス",
     kind: "bring",
     wants: { item: "lost-bell", count: 1 },
-    find: { map: "south-meadow" },
+    find: { map: "south-meadow", place: "南の草原" },
     gold: 12,
     ask: "羊の鈴をひとつ、草原で落としてしまって……。南の草原で草を分けるとき、気にかけてもらえませんか。",
     thanks: "ああ、この音です。この子の鈴です。ありがとうございます。",
