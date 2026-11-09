@@ -5,6 +5,8 @@ export default defineConfig({
   head: {
     title: "Durable Fantasy",
     htmlAttrs: { lang: "ja" },
+    // phones lay the page out at their own width; without this they use 980px and the HUD falls off the right edge
+    meta: [{ name: "viewport", content: "width=device-width, initial-scale=1" }],
     link: [{ rel: "icon", type: "image/svg+xml", href: "/favicon.svg" }],
   },
   worker: {
