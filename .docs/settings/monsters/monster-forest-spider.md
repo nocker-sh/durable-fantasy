@@ -36,17 +36,17 @@
       "item": "sticky-thread",
       "origin": "巣の袋から引き出した糸",
       "users": [
-        "resident-ラインホルト"
+        "resident-マグダレーナ"
       ],
-      "use": "買取屋が引き取る。仕立ての使い道は未設計"
+      "use": "仕立て屋が買い取り、乾かして刺繍の糸にする。買取は apps/main/world/core/shops.ts"
     },
     {
       "item": "hard-shell",
       "origin": "脱皮で落ちた背の硬い板",
       "users": [
-        "resident-ラインホルト"
+        "resident-ルドルフ"
       ],
-      "use": "買取屋が引き取る。加工の使い道は未設計"
+      "use": "革工房が買い取り、軽い当て板として革の装備に縫い付ける。買取は apps/main/world/core/shops.ts"
     }
   ],
   "population": {
@@ -56,7 +56,8 @@
   },
   "design_dependencies": [
     "map-deep-forest",
-    "resident-ラインホルト"
+    "resident-マグダレーナ",
+    "resident-ルドルフ"
   ]
 }
 ---

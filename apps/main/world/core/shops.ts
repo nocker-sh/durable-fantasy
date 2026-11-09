@@ -124,7 +124,7 @@ export const SHOPS = {
     greeting: "寒さに負けない服を仕立てていますよ。",
     greetings: { ロッテ: "いらっしゃい！　この色、似合うと思うな！" },
     stock: ["white-fleece", "wool-muffler", "striped-muffler", "embroidered-scarf", "fur-stole", "traveller-coat", "wool-cape", "cloth-hat", "silver-ring"],
-    takes: ["yarn", "soft-fur", "feather"],
+    takes: ["yarn", "soft-fur", "feather", "sticky-thread"],
   },
   crystal: {
     name: "コンスタンティンの結晶屋",
@@ -171,7 +171,7 @@ export const SHOPS = {
     keepers: ["ルドルフ"],
     greeting: "革は手間をかけた分だけ応えるぞ。",
     stock: ["raw-hide", "tanned-leather", "leather-armor", "leather-boots", "fang-charm"],
-    takes: ["soft-fur", "sharp-fang"],
+    takes: ["soft-fur", "sharp-fang", "hard-shell"],
     rates: { material: 1.1 },
   },
   // ---------------------------------------------------------------- street sellers, at their hours (economy.md §4.6)
