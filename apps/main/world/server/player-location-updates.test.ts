@@ -38,9 +38,10 @@ it("redirects a mismatched map without changing the saved route or owner", () =>
   expect(arrivePlayer(record, { world: 2, map: "phanthiet", connection: "replacement" }, 1250)).toEqual({ map: "south-meadow", at: [11, 10], accepted: false })
   expect(record).toEqual(before)
 })
-it("keeps a player out in the wild in their own world instead of crossing to another town", () => {
-  const record = fixture(),
-    before = structuredClone(record)
+it("keeps a player out in the wild in the world they followed a thread to instead of crossing to another town", () => {
+  const record = fixture()
+  record.player = { ...record.player!, threads: [{ key: "k", name: "Hans", town: 2, at: 0 }] }
+  const before = structuredClone(record)
   expect(arrivePlayer(record, { world: 3, map: TOWN_SPAWN.map, connection: "replacement" }, 1250)).toEqual({ map: "south-meadow", at: [11, 10], world: 2, accepted: false })
   expect(record).toEqual(before)
 })

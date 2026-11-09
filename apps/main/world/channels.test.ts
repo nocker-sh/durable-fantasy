@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { CHANNEL_CAP, CHANNEL_SLACK, CHANNELS, WORLDS } from "#/world/channels"
+import { CHANNEL_CAP, CHANNEL_SLACK, CHANNELS, OPEN_TOWNS, WORLDS } from "#/world/channels"
 import { chooseChannel } from "#/world/choose-channel"
 import { hometownOf } from "#/world/hometown-of"
 import { parseRoom } from "#/world/parse-room"
@@ -21,10 +21,11 @@ describe("parallel towns and channels", () => {
     expect(parseRoom("03~phanthiet~1")).toBeNull()
   })
 
-  it("gives everyone a hometown, the same every time, spread over the towns", () => {
+  it("gives everyone a hometown, the same every time, spread over the open towns", () => {
     expect(hometownOf("abc")).toBe(hometownOf("abc"))
     const towns = new Set(Array.from({ length: 200 }, (_, i) => hometownOf(`player-${i}`)))
-    expect(towns.size).toBe(WORLDS)
+    expect(towns.size).toBe(OPEN_TOWNS)
+    expect(OPEN_TOWNS).toBeLessThanOrEqual(WORLDS)
   })
 
   it("fills a channel up to its cap before opening another, and opens the lowest free one", () => {
