@@ -4,7 +4,7 @@
   "kind": "residents",
   "title": "ヴィルヘルム",
   "status": "設計中",
-  "source": "world/town/residents.ts",
+  "source": "apps/main/world/town/residents.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "household": "elder",
@@ -52,12 +52,12 @@
     "storage-h1-3-1"
   ],
   "routine_source": {
-    "file": "world/town/routines.ts",
+    "file": "apps/main/world/town/routines.ts",
     "export": "ROUTINES",
     "key": "ヴィルヘルム"
   },
   "appearance_source": {
-    "file": "world/town/residents.ts",
+    "file": "apps/main/world/town/residents.ts",
     "export": "RESIDENT_LOOKS",
     "key": "ヴィルヘルム"
   }
@@ -68,9 +68,9 @@
 
 ## 暮らしの立場
 
-ゾフィーの祖父で、[[building-h1]] で孫と二人で暮らす。隠居し、[[building-h-m4]] を地図描きのフェルディナントへ貸す。世帯の生活は貸家の賃料を基盤とし、昔話を語ること自体を有償の仕事にしない。借り手から地図の写しを受け取る関係は `world/town/people.ts` にある。
+ゾフィーの祖父で、[[building-h1]] で孫と二人で暮らす。隠居し、[[building-h-m4]] を地図描きのフェルディナントへ貸す。世帯の生活は貸家の賃料を基盤とし、昔話を語ること自体を有償の仕事にしない。借り手から地図の写しを受け取る関係は `apps/main/world/town/people.ts` にある。
 
-孫が扱う花は売り物として尊重する。自分の部屋に飾る花は `world/core/errands.ts` の依頼で別に求める。ベネディクトへ昔の話を聞かせる関係も、町に残る話を伝える交流であり、大戦を本人が経験した設定にはしない。
+孫が扱う花は売り物として尊重する。自分の部屋に飾る花は `apps/main/world/core/errands.ts` の依頼で別に求める。ベネディクトへ昔の話を聞かせる関係も、町に残る話を伝える交流であり、大戦を本人が経験した設定にはしない。
 
 ## 人柄と話し方
 

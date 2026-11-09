@@ -4,7 +4,7 @@
   "kind": "facilities",
   "title": "ハインリヒの裏の陶器窯",
   "status": "設計中",
-  "source": "world/town/houses/craft.ts",
+  "source": "apps/main/world/town/houses/craft.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "site": {

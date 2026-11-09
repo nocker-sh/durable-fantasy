@@ -3,7 +3,7 @@
   "id": "room-farmhouse-stairs",
   "kind": "rooms",
   "title": "カールとウルリケの家／2階 階段と共用通路",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "town": "town-phanthiet",
   "building": "building-farmhouse",
   "bed_capacity": 0,

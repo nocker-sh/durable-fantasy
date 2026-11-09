@@ -5,7 +5,7 @@ type V3 = [number, number, number]
 it("bounds joint displacement along curved joint paths over a target segment", () => {
   const root: V3 = [0, 0, 0],
     pole: V3 = [0, 1, 1]
-  for (const [a, b] of [
+  for (const entry1 of [
     [
       [0.15, 0.1, 0.1],
       [0.25, 0.1, -0.05],
@@ -19,6 +19,9 @@ it("bounds joint displacement along curved joint paths over a target segment", (
       [0.11, 0.11, 0.11],
     ],
   ] as [V3, V3][]) {
+    const a = entry1[0],
+      b = entry1[1]
+
     const bound = twoBoneJointSpeedBound({ root: root, from: a, to: b, upper: 0.2, lower: 0.2, pole: pole })!
     expect(bound).toBeGreaterThan(0)
     let previous = solveTwoBone({ root: root, target: a, upper: 0.2, lower: 0.2, pole: pole })!.joint

@@ -4,7 +4,7 @@
   "kind": "residents",
   "title": "マグダレーナ",
   "status": "設計中",
-  "source": "world/town/residents.ts",
+  "source": "apps/main/world/town/residents.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "household": "tailor",
@@ -72,7 +72,7 @@
     "storage-tailor-3-1"
   ],
   "routine_source": {
-    "file": "world/town/routines.ts",
+    "file": "apps/main/world/town/routines.ts",
     "export": "ROUTINES",
     "key": "マグダレーナ"
   },
@@ -84,7 +84,7 @@
     "room-h-c2-entry"
   ],
   "appearance_source": {
-    "file": "world/town/residents.ts",
+    "file": "apps/main/world/town/residents.ts",
     "export": "RESIDENT_LOOKS",
     "key": "マグダレーナ"
   },

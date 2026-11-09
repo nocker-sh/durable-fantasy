@@ -4,7 +4,7 @@
   "kind": "buildings",
   "title": "共同の作業場",
   "status": "設計中",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "map": "map-phanthiet-craft",
@@ -110,7 +110,7 @@
 
 ## 仕事と共同利用
 
-木工・機織りと糸紡ぎ・かまどと調合を別の作業室へ分ける。利用者は住人にせず、材料を持ち込んで共用設備を借りる。使用料は `world/core/crafting-rules.ts`、加工の規則は `world/core/craft-command.ts` を正とする。ゴットフリートが木工と軽い工具の保守、マグダレーナが繊維の設備、イルムガルトがかまどと調合面の保守を担う案とする。現在の各人の勤務と往復を変えず、負担と交代は未照合とする。
+木工・機織りと糸紡ぎ・かまどと調合を別の作業室へ分ける。利用者は住人にせず、材料を持ち込んで共用設備を借りる。使用料は `apps/main/world/core/crafting-rules.ts`、加工の規則は `apps/main/world/core/craft-command.ts` を正とする。ゴットフリートが木工と軽い工具の保守、マグダレーナが繊維の設備、イルムガルトがかまどと調合面の保守を担う案とする。現在の各人の勤務と往復を変えず、負担と交代は未照合とする。
 
 ## 火と材料を混ぜない
 

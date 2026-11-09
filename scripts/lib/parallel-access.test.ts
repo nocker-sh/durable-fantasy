@@ -51,7 +51,8 @@ it("leaves missing or overlapping operation errors to the operating-area audit",
 })
 
 it("keeps the inn's compact kitchen usable while all three declared workers stand at their stations", async () => {
-  const { readFileSync } = await import("node:fs")
+  const parts1 = await import("node:fs")
+  const readFileSync = parts1.readFileSync
   const doc = readSetting(readFileSync(new URL("../../.docs/settings/rooms/room-inn-2.md", import.meta.url), "utf8"))
   expect(auditParallelAccess(doc)).toEqual([])
   const pantry = doc.furniture!.find((f) => f.symbol === "N")!

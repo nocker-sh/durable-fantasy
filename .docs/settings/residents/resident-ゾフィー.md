@@ -4,7 +4,7 @@
   "kind": "residents",
   "title": "ゾフィー",
   "status": "設計中",
-  "source": "world/town/residents.ts",
+  "source": "apps/main/world/town/residents.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "household": "elder",
@@ -48,12 +48,12 @@
     "storage-h1-4-1"
   ],
   "routine_source": {
-    "file": "world/town/routines.ts",
+    "file": "apps/main/world/town/routines.ts",
     "export": "ROUTINES",
     "key": "ゾフィー"
   },
   "appearance_source": {
-    "file": "world/town/residents.ts",
+    "file": "apps/main/world/town/residents.ts",
     "export": "RESIDENT_LOOKS",
     "key": "ゾフィー"
   },
@@ -71,7 +71,7 @@
 
 ヴィルヘルムの孫で、[[building-h1]] で祖父と二人で暮らす。本人は庭仕事と夜市の花売りを行う。世帯の暮らしの基盤は祖父の貸家の賃料であり、花の売上だけで二人の生活を説明しない。貸主と借り手の関係は [[building-h-m4]] にある。
 
-売り物の花と家に飾る花を分ける。祖父が自分の部屋の花を依頼する設定は `world/core/errands.ts` にあり、本人の売り物を無断で家の飾りへ回さない。
+売り物の花と家に飾る花を分ける。祖父が自分の部屋の花を依頼する設定は `apps/main/world/core/errands.ts` にあり、本人の売り物を無断で家の飾りへ回さない。
 
 ## 人柄と話し方
 
@@ -81,7 +81,7 @@
 
 日課の時刻と場所は routine_source が指すコードを正とする。家で祖父の世話をした後に菜園へ出て、家へ戻ってから [[map-phanthiet-market]] の花の売り場へ向かい、帰宅して眠る。祖父はその間に外のベンチや宿へ出るため、二人が終日同じ室内にいる設定にはしない。
 
-売り場と品物は `world/core/shops.ts` の flowers が定義する。菜園の隅に咲く花を扱うが、本人が使う畝と採花の範囲・水・花を運ぶ容器は未設計であり、[[building-h1]] に専用の庭が配置済みとは扱わない。花を摘み、選び、夜市へ運ぶ工程と季節による供給は日課の表示だけでは成立しない。
+売り場と品物は `apps/main/world/core/shops.ts` の flowers が定義する。菜園の隅に咲く花を扱うが、本人が使う畝と採花の範囲・水・花を運ぶ容器は未設計であり、[[building-h1]] に専用の庭が配置済みとは扱わない。花を摘み、選び、夜市へ運ぶ工程と季節による供給は日課の表示だけでは成立しない。
 
 食事と支度は [[room-h1-1]]・[[room-h1-2]]、就寝は [[room-h1-4]] に結ぶ。家の水は [[facility-square-well]] から本人が台所の壺で運ぶ案とする。容器・量と仮の荷重は [[room-h1-2#飲用水を汲んで保管する一つの容器]] にあり、井戸の受渡しと往復、鍬を置く場所、消費を満たす回数と身体・日課への採用は未照合である。庭仕事の手袋や道具を食器と同じ棚へ戻さず、作業後の汚れを落としてから食事の支度を行う動線を設計する。
 

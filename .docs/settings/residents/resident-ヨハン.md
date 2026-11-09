@@ -4,7 +4,7 @@
   "kind": "residents",
   "title": "ヨハン",
   "status": "設計中",
-  "source": "world/town/residents.ts",
+  "source": "apps/main/world/town/residents.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "household": "tinker",
@@ -59,7 +59,7 @@
     "storage-h-g2-4-1"
   ],
   "routine_source": {
-    "file": "world/town/routines.ts",
+    "file": "apps/main/world/town/routines.ts",
     "export": "ROUTINES",
     "key": "ヨハン"
   },
@@ -70,7 +70,7 @@
     "room-h-m5-1"
   ],
   "appearance_source": {
-    "file": "world/town/residents.ts",
+    "file": "apps/main/world/town/residents.ts",
     "export": "RESIDENT_LOOKS",
     "key": "ヨハン"
   }
@@ -105,4 +105,4 @@
 
 ## 家の仕事の手伝い
 
-`world/town/routines.ts` にある手伝いを [[room-h-g2-repair]] の利用者へ反映する。熱や道具の操作範囲、作業の負担と通学との往復は未照合である。
+`apps/main/world/town/routines.ts` にある手伝いを [[room-h-g2-repair]] の利用者へ反映する。熱や道具の操作範囲、作業の負担と通学との往復は未照合である。

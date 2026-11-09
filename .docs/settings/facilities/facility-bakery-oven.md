@@ -4,7 +4,7 @@
   "kind": "facilities",
   "title": "パン屋の屋外窯",
   "status": "設計中",
-  "source": "world/maps/index.ts",
+  "source": "apps/main/world/maps/index.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "site": {
@@ -16,7 +16,7 @@
       13.6,
       22.6
     ],
-    "geometry_source": "world/scene/construction/town.ts と workshops.ts の窯・周辺の通行を塞ぐ範囲"
+    "geometry_source": "apps/main/world/scene/construction/town.ts と workshops.ts の窯・周辺の通行を塞ぐ範囲"
   },
   "users": [
     "resident-マルタ",

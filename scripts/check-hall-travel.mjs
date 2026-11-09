@@ -45,9 +45,10 @@ try {
   await page.goto(`${base}/?time=21:30`)
   await page.getByRole("dialog", { name: "キャラクターを作る" }).waitFor({ timeout: 180000 })
   await page.waitForFunction(() => window.game?.state.get().loading === null, null, { timeout: 180000 })
-  await page.getByRole("textbox", { name: "名前", exact: true }).fill("エルナ")
+  await page.getByRole("textbox", { name: "名前", exact: true }).fill("ヴェレーナ")
   await page.getByRole("button", { name: "はじめる", exact: true }).click()
-  await page.getByRole("button", { name: "町を歩く", exact: true }).click({ timeout: 60000 })
+  // after creation the player simply stands in town (ui.md「初回作成」)
+  await page.waitForFunction(() => game.state.get().player?.profileComplete === true && !game.state.get().modal, null, { timeout: 180000 })
   await mkdir("public/tmp/checks", { recursive: true })
   for (const target of destinations) {
     lastTarget = target

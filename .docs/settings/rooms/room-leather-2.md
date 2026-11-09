@@ -4,7 +4,7 @@
   "kind": "rooms",
   "title": "ルドルフの革工房／1階 なめし場",
   "status": "設計中",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "building": "building-leather",

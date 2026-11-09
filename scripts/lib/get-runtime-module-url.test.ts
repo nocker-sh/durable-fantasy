@@ -16,6 +16,13 @@ it("rejects ambiguous versions and sibling filenames", () => {
   expect(() => getRuntimeModuleUrl({ path: "/world/scene/is", resources: [url] })).toThrow("found 0")
 })
 
+it("finds a game module the studio loaded by its absolute path", () => {
+  const studio = "https://dev.durable-fantasy.localhost/@fs/Users/me/durable-fantasy/apps/main/world/scene/world.ts?t=7"
+  expect(getRuntimeModuleUrl({ path: "/world/scene/world", resources: [studio, `${studio}&raw`] })).toBe(studio)
+  expect(() => getRuntimeModuleUrl({ path: "/world/scene/world", resources: ["https://dev.durable-fantasy.localhost/@fs/Users/me/durable-fantasy/lib/world/scene/world.ts"] })).toThrow("found 0")
+  expect(() => getRuntimeModuleUrl({ path: "/world/scene/world", resources: [studio, "https://dev.durable-fantasy.localhost/world/scene/world.ts"] })).toThrow("found 2")
+})
+
 it("distinguishes executable source from raw text used for cache versioning", () => {
   const url = "http://localhost:4027/world/scene/world.ts"
   expect(getRuntimeModuleUrl({ path: "/world/scene/world", resources: [url, `${url}?raw`] })).toBe(url)

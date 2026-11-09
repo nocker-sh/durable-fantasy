@@ -3,7 +3,7 @@
   "id": "room-h9-kitchen",
   "kind": "rooms",
   "title": "アウグストの家／1階 台所と食卓",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "town": "town-phanthiet",
   "building": "building-h9",
   "bed_capacity": 0,

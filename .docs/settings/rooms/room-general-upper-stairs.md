@@ -3,7 +3,7 @@
   "id": "room-general-upper-stairs",
   "kind": "rooms",
   "title": "ブルーノの道具屋／2階 共用通路と階段",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "town": "town-phanthiet",
   "building": "building-general",
   "bed_capacity": 0,

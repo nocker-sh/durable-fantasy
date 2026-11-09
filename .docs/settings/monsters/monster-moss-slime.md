@@ -4,18 +4,19 @@
   "kind": "monsters",
   "title": "苔スライム",
   "status": "設計中",
-  "source": "world/core/monsters.ts",
+  "source": "apps/main/world/core/monsters.ts",
   "design_gate": "未通過",
   "species": "moss-slime",
   "habitats": [
-    "map-deep-forest"
+    "map-deep-forest",
+    "map-falls-valley"
   ],
   "appearance": {
     "look": "slime",
     "color": 6520382,
     "size": 1.35,
-    "shape_source": "world/core/monster-body-shapes.ts",
-    "footprint_source": "world/core/get-monster-body-radius.ts",
+    "shape_source": "apps/main/world/core/monster-body-shapes.ts",
+    "footprint_source": "apps/main/world/core/get-monster-body-radius.ts",
     "movement_clearance": "walk_grid_adopted"
   },
   "issues": [
@@ -56,6 +57,14 @@
         "resident-イルムガルト"
       ],
       "use": "薬草として選別する"
+    },
+    {
+      "item": "root-resin",
+      "origin": "倒木の根元から体表へ付いた樹脂",
+      "users": [
+        "resident-ゴットフリート"
+      ],
+      "use": "狩りの中盤の装備を加工する材料"
     }
   ],
   "population": {
@@ -65,6 +74,7 @@
   },
   "design_dependencies": [
     "map-deep-forest",
+    "map-falls-valley",
     "resident-ゴットフリート",
     "resident-イルムガルト"
   ]
@@ -93,7 +103,7 @@ blue-jelly は体表の湿った部分に残る青い粘液。[[resident-イル�
 
 herb は根元を動く際に体表へ付いた薬草。[[resident-イルムガルト]]が受け取り、薬草として選別する。
 
-入手の確率と戦闘数値は world/core/monsters.ts が正であり、この資料で調整値を重複管理しない。材料が落ちるという結果だけで、体内に結晶があると推論しない。
+入手の確率と戦闘数値は apps/main/world/core/monsters.ts が正であり、この資料で調整値を重複管理しない。材料が落ちるという結果だけで、体内に結晶があると推論しない。
 
 ## 姿と行動
 
@@ -107,8 +117,17 @@ herb は根元を動く際に体表へ付いた薬草。[[resident-イルムガ�
 
 ## 加工先の照合
 
-jelly は糊に使うほか、[[resident-イルムガルト]] の薬作りでつなぎとして使う。実際の加工は `world/core/recipes/alchemy.ts` に従う。
+jelly は糊に使うほか、[[resident-イルムガルト]] の薬作りでつなぎとして使う。実際の加工は `apps/main/world/core/recipes/alchemy.ts` に従う。
 
 ## 身体の大きさと通行
 
-身体の寸法は `world/core/monster-body-shapes.ts` と描画で共有し、種類の拡大率から身体を覆う範囲を `world/core/get-monster-body-radius.ts` で求める。スライムは横への伸縮、うさぎは耳・尻尾と向きを変えた外形も含める。休憩地点と移動の各区間でこの囲いを通行格子へ照合し、`movement_clearance` は `walk_grid_adopted` とする。これは格子上の障害物との照合であり、実際の地形や描画する障害物、生態の場所の設計の完了とは区別する。
+身体の寸法は `apps/main/world/core/monster-body-shapes.ts` と描画で共有し、種類の拡大率から身体を覆う範囲を `apps/main/world/core/get-monster-body-radius.ts` で求める。スライムは横への伸縮、うさぎは耳・尻尾と向きを変えた外形も含める。休憩地点と移動の各区間でこの囲いを通行格子へ照合し、`movement_clearance` は `walk_grid_adopted` とする。これは格子上の障害物との照合であり、実際の地形や描画する障害物、生態の場所の設計の完了とは区別する。
+
+
+## 中盤の装備につながる材料
+
+倒木の根元から体表へ付いた樹脂を集めて [[resident-ゴットフリート]] へ持ち込める。まれな材料を少しずつ集め、強い個体へ挑む前にも装備の補強を準備できる。加工の条件は [[economy#狩りの材料から装備を更新する経路]] に従う。
+
+## 滝の谷
+
+[[map-falls-valley]] では、滝の飛沫で湿った岩陰の苔と、流れ着いて柔らかくなった落ち葉を食べ、苔の厚い岩の間で休む。出現枠は道から離れた西の岩陰に置き、谷を通る人の道と出口を塞がない。

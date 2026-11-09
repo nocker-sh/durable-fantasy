@@ -4,7 +4,7 @@
   "kind": "facilities",
   "title": "農家の製粉用風車",
   "status": "設計中",
-  "source": "world/scene/construction/town.ts",
+  "source": "apps/main/world/scene/construction/town.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "site": {
@@ -12,8 +12,8 @@
     "status": "proposed"
   },
   "runtime_reference": {
-    "placement_source": "world/scene/construction/town.ts",
-    "renderer": "world/scene/construction/windmill.ts",
+    "placement_source": "apps/main/world/scene/construction/town.ts",
+    "renderer": "apps/main/world/scene/construction/windmill.ts",
     "scope": "existing_exterior_only"
   },
   "owner": "farm",
@@ -436,7 +436,7 @@ R と F の容器は蓋を持つ別の組とし、麦と粉を同じ箱で入れ
 
 ## 現行の羽根の全回転を囲う平面の照合
 
-羽根の寸法は `world/scene/construction/windmill-rotor-shape.ts` を描画と検査で共用する。梁の厚みと布の面の張出しを含め、それぞれの矩形の最も遠い角から全回転の囲いを求める。止まった一方向や粗い角度の標本だけで羽根を囲ったことにしない。
+羽根の寸法は `apps/main/world/scene/construction/windmill-rotor-shape.ts` を描画と検査で共用する。梁の厚みと布の面の張出しを含め、それぞれの矩形の最も遠い角から全回転の囲いを求める。止まった一方向や粗い角度の標本だけで羽根を囲ったことにしない。
 
 回転中心は T の予約の中心へ結び、共通の町のメートル換算を使う。rotor_review の余白も含む床への投影を囲いの内側へ収め、境界セルを羽根と兼用しない。前の幅ではこの条件が不足したため、作業場の予約を拡幅した。
 

@@ -12,7 +12,18 @@ const document = readSetting(readFileSync(new URL("../../.docs/settings/maps/map
 const zones = ecologyZonesSchema.parse(document.ecology_zones)
 const placement = zones.find((zone) => zone.species === "monster-blue-slime")?.placement
 if (!placement) throw new Error("Missing authored meadow habitat proposal")
-const props = { spawns: SPAWNS, document, map: MAPS["south-meadow"], kinds: new Map(Object.entries(MONSTER_KINDS).map(([id, kind]) => [`monster-${id}`, kind])) }
+const props = {
+  spawns: SPAWNS,
+  document,
+  map: MAPS["south-meadow"],
+  kinds: new Map(
+    Object.entries(MONSTER_KINDS).map((entry1) => {
+      const id = entry1[0],
+        kind = entry1[1]
+      return [`monster-${id}`, kind]
+    }),
+  ),
+}
 const site = placement.sites[0]
 const candidate = { site, map: props.map, kind: MONSTER_KINDS["blue-slime"] }
 it("checks the authored ground and full-body approaches without promoting the proposal", () => {

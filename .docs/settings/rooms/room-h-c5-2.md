@@ -4,7 +4,7 @@
   "kind": "rooms",
   "title": "ベルンハルトの家／1階 冷めた灰の受取りと分別・出荷",
   "status": "設計中",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "building": "building-h-c5",
@@ -361,4 +361,4 @@
 
 ## 元の容器と保管時の形
 
-元の灰の袋は冷めた灰の保管用とし、布の膨らんだ胴と縛った口を描く。熱い灰や煙を出す袋として扱わない。ベルンハルトが掃き、モニカが用途に分けて売る関係は `world/town/lines/households/sweep.ts` に対応する。由来ごとの受入確認と粉塵対策は引き続き設計する。 元の家具の形を表示へ戻す修正であり、新しい平面への切替ではない。
+元の灰の袋は冷めた灰の保管用とし、布の膨らんだ胴と縛った口を描く。熱い灰や煙を出す袋として扱わない。ベルンハルトが掃き、モニカが用途に分けて売る関係は `apps/main/world/town/lines/households/sweep.ts` に対応する。由来ごとの受入確認と粉塵対策は引き続き設計する。 元の家具の形を表示へ戻す修正であり、新しい平面への切替ではない。

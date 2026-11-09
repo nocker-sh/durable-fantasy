@@ -4,7 +4,7 @@
   "kind": "residents",
   "title": "エーリヒ",
   "status": "設計中",
-  "source": "world/town/residents.ts",
+  "source": "apps/main/world/town/residents.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "household": "scribe",
@@ -56,7 +56,7 @@
     "storage-h-m1-2-1"
   ],
   "routine_source": {
-    "file": "world/town/routines.ts",
+    "file": "apps/main/world/town/routines.ts",
     "export": "ROUTINES",
     "key": "エーリヒ"
   },
@@ -68,7 +68,7 @@
     "room-h-m5-upper-stairs"
   ],
   "appearance_source": {
-    "file": "world/town/residents.ts",
+    "file": "apps/main/world/town/residents.ts",
     "export": "RESIDENT_LOOKS",
     "key": "エーリヒ"
   }

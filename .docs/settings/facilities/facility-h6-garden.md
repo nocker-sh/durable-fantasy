@@ -4,7 +4,7 @@
   "kind": "facilities",
   "title": "ヨーゼフの家庭菜園",
   "status": "設計中",
-  "source": "world/maps/layout.ts",
+  "source": "apps/main/world/maps/layout.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "owner_building": "building-h6",
@@ -60,7 +60,7 @@
 
 ## 元の庭と敷地案
 
-`ground_feature` は `world/maps/layout.ts` の庭の配列の同じ対象を示す。庭を削って家を置いたことにせず、元の地上面積を保って家庭の庭として確保する。建物・道路・川・設備と経路の占有を平面で照合する。現行の地面と描画はこの案へまだ切り替えない。
+`ground_feature` は `apps/main/world/maps/layout.ts` の庭の配列の同じ対象を示す。庭を削って家を置いたことにせず、元の地上面積を保って家庭の庭として確保する。建物・道路・川・設備と経路の占有を平面で照合する。現行の地面と描画はこの案へまだ切り替えない。
 
 ## 生活設備と分けて照合すること
 

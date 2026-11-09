@@ -4,7 +4,7 @@
   "kind": "residents",
   "title": "オットー",
   "status": "設計中",
-  "source": "world/town/residents.ts",
+  "source": "apps/main/world/town/residents.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "household": "fruit",
@@ -55,7 +55,7 @@
     "storage-h8-3-1"
   ],
   "routine_source": {
-    "file": "world/town/routines.ts",
+    "file": "apps/main/world/town/routines.ts",
     "export": "ROUTINES",
     "key": "オットー"
   },
@@ -65,7 +65,7 @@
     "basis": "一回一容器を両手で運び、ほかの荷を持たない家庭内作業の設計上限。実能力と日課は未照合。"
   },
   "appearance_source": {
-    "file": "world/town/residents.ts",
+    "file": "apps/main/world/town/residents.ts",
     "export": "RESIDENT_LOOKS",
     "key": "オットー"
   }

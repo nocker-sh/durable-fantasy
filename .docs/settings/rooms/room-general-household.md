@@ -3,7 +3,7 @@
   "id": "room-general-household",
   "kind": "rooms",
   "title": "ブルーノの道具屋／2階 台所と食事",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "town": "town-phanthiet",
   "building": "building-general",
   "bed_capacity": 0,

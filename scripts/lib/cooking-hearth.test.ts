@@ -18,7 +18,7 @@ const fixture = () => {
   const building = read("buildings", "building-h1"),
     documents = new Map<string, SettingDocument>()
   for (const id of ["room-h1-1", "room-h1-2", "room-h1-3", "room-h1-4", "room-h1-stairs", "room-h1-landing"]) documents.set(id, read("rooms", id))
-  documents.set("resident-ギュンター", read("residents", "resident-ギュンター"))
+  documents.set("resident-アルノルト", read("residents", "resident-アルノルト"))
   documents.set(building.id, building)
   const room = documents.get("room-h1-2"),
     upper = documents.get("room-h1-landing"),
@@ -65,7 +65,7 @@ it("keeps the upper shaft attached to the real firebox and the maker registered"
   shaft.rect = [1, 1, 1, 1]
   expect(getCookingHearthDefinition(f)).toEqual(new Error("Upper flue is not supported by its hearth"))
   const valid = fixture()
-  valid.documents.delete("resident-ギュンター")
+  valid.documents.delete("resident-アルノルト")
   expect(auditCookingHearth(valid.room, valid.documents)).toContain("O: Cooking plate has no registered maker prerequisite")
   valid.room.design_gate = "通過"
   expect(auditCookingHearth(valid.room, valid.documents)).toContain("O: Cooking heat and daily operations remain unverified")

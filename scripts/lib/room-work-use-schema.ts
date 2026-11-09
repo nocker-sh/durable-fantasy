@@ -6,7 +6,7 @@ const text = z.string().trim().min(1)
 export const roomWorkUseSchema = z
   .object({
     resident: text,
-    routine_source: z.object({ file: z.literal("world/town/routines.ts"), key: text, doing: text }),
+    routine_source: z.object({ file: z.literal("apps/main/world/town/routines.ts"), key: text, doing: text }),
     furniture: text,
     seat_symbol: text,
     mode: text,

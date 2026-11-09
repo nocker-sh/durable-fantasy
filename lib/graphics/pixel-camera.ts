@@ -38,7 +38,8 @@ export class PixelCamera {
     this.zooms = zooms
 
     this.focus = position.clone()
-    this.level = Math.min(zooms.length - 1, Math.max(0, level))
+    // a level from a query string may be fractional or not a number; zooms[level] must exist
+    this.level = Math.min(zooms.length - 1, Math.max(0, Math.round(level) || 0))
   }
   resize = (width = this.width, height = this.height) => {
     this.width = Math.max(1, width)

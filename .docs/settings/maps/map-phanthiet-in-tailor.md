@@ -4,7 +4,7 @@
   "kind": "maps",
   "title": "ファンティエット ― マグダレーナの仕立て屋",
   "status": "現状整理",
-  "source": "world/maps/index.ts",
+  "source": "apps/main/world/maps/index.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "map_id": "phanthiet-in-tailor",

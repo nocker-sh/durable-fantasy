@@ -17,7 +17,11 @@ function fixture() {
   const documents = new Map((building.rooms as string[]).map((id) => [id, id === room.id ? room : read("rooms", id)]))
   const lidPlan = () => {
     const k = room.grid!.cell_m,
-      [x, z, w, d] = rack.rect.map((n) => n * k),
+      pair1 = rack.rect.map((n) => n * k),
+      x = pair1[0],
+      z = pair1[1],
+      w = pair1[2],
+      d = pair1[3],
       shelf = shelfDimensions(rack.shelf, w, d),
       item = shelf.items![0],
       motion = storageRetrieval({ x: x + w / 2, z: z + d / 2, width: w, depth: d, shelf: shelf, index: 0 })
@@ -91,9 +95,14 @@ it("keeps the former short lid lift unresolved instead of passing through the sh
 
 it("removes the withdrawn receiver from its old storage volume instead of leaving a duplicate", () => {
   const f = fixture(),
-    { section } = f.lidPlan(),
+    parts2 = f.lidPlan(),
+    section = parts2.section,
     k = f.room.grid!.cell_m,
-    [x, z, w, d] = f.rack.rect.map((n) => n * k),
+    pair3 = f.rack.rect.map((n) => n * k),
+    x = pair3[0],
+    z = pair3[1],
+    w = pair3[2],
+    d = pair3[3],
     shelf = shelfDimensions(f.rack.shelf, w, d),
     motion = storageRetrieval({ x: x + w / 2, z: z + d / 2, width: w, depth: d, shelf: shelf, index: 0 }),
     p = motion.from,

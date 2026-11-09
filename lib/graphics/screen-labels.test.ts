@@ -25,7 +25,10 @@ function label() {
 
 it("avoids repeated style writes for stationary labels over 600 frames", () => {
   const labels = new ScreenLabels()
-  const { element, display, transform } = label()
+  const parts1 = label()
+  const element = parts1.element,
+    display = parts1.display,
+    transform = parts1.transform
   for (let frame = 0; frame < 600; frame++) labels.place({ element: element, visible: true, x: 120, y: 80 })
   expect(display).not.toHaveBeenCalled()
   expect(transform).toHaveBeenCalledTimes(1)
@@ -34,7 +37,10 @@ it("avoids repeated style writes for stationary labels over 600 frames", () => {
 
 it("hides once and positions a returning label at its new location", () => {
   const labels = new ScreenLabels()
-  const { element, display, transform } = label()
+  const parts2 = label()
+  const element = parts2.element,
+    display = parts2.display,
+    transform = parts2.transform
   labels.place({ element: element, visible: true, x: 20, y: 30 })
   for (let frame = 0; frame < 600; frame++) labels.place({ element: element, visible: false })
   expect(display).toHaveBeenCalledTimes(1)

@@ -10,7 +10,7 @@ function fixture() {
     status: "設計中",
     design_gate: "未通過",
     issues: [],
-    routine_source: { file: "world/town/routines.ts", export: "ROUTINES", key: "アンナ" },
+    routine_source: { file: "apps/main/world/town/routines.ts", export: "ROUTINES", key: "アンナ" },
   }
   const routines = { アンナ: [{ from: 0, where: "home", doing: "眠る" }], クララ: [{ from: 0, where: "home", doing: "眠る" }] }
   return { doc, documents: new Map([[doc.id, doc]]), routines }
@@ -33,12 +33,12 @@ it("requires an explicit source rather than silently filling in the resident's n
 })
 it("does not resolve a different resident's valid schedule", () => {
   const f = fixture()
-  f.doc.routine_source = { file: "world/town/routines.ts", export: "ROUTINES", key: "クララ" }
+  f.doc.routine_source = { file: "apps/main/world/town/routines.ts", export: "ROUTINES", key: "クララ" }
   expect(auditResidentRoutineSources(f.documents, f.routines)).toContain("resident-アンナ: routine source belongs to another resident")
 })
 it("rejects renamed or missing exports instead of executing arbitrary source paths", () => {
   const f = fixture()
-  f.doc.routine_source = { file: "world/town/routines.ts", export: "SCHEDULES", key: "アンナ" }
+  f.doc.routine_source = { file: "apps/main/world/town/routines.ts", export: "SCHEDULES", key: "アンナ" }
   expect(auditResidentRoutineSources(f.documents, f.routines)).toContain("resident-アンナ: missing or invalid routine source")
 })
 it("requires a real nonempty runtime definition", () => {

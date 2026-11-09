@@ -6,7 +6,7 @@ function fixture() {
   const read = (path: string) => readSetting(readFileSync(new URL(`../../.docs/settings/${path}.md`, import.meta.url), "utf8"))
   const room = read("rooms/room-smithy-1"),
     building = read("buildings/building-smithy"),
-    handler = read("residents/resident-ギュンター")
+    handler = read("residents/resident-アルノルト")
   return { room, building, handler, documents: new Map([room, building, handler].map((d) => [d.id, d])) }
 }
 it("keeps the authored forge, hot cooling, finished goods and fuel distinct", () => {

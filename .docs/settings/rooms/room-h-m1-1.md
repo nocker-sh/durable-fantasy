@@ -4,7 +4,7 @@
   "kind": "rooms",
   "title": "エーリヒの家／1階 家庭の台所と戸口の茶売り",
   "status": "設計中",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "building": "building-h-m1",

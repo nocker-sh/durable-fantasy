@@ -2,13 +2,13 @@
 {
   "id": "room-smithy-upper-stairs",
   "kind": "rooms",
-  "title": "ギュンターの鍛冶場／2階 共用階段",
-  "source": "world/town/houses.ts",
+  "title": "アルノルトの鍛冶場／2階 共用階段",
+  "source": "apps/main/world/town/houses.ts",
   "town": "town-phanthiet",
   "building": "building-smithy",
   "bed_capacity": 0,
   "occupants": [
-    "ギュンター",
+    "アルノルト",
     "ペーター"
   ],
   "status": "設計中",
@@ -65,8 +65,8 @@
     {
       "symbol": "S",
       "name": "共用の直階段",
-      "owner": "ギュンターの世帯",
-      "source": "町の木工所と鍛冶場へ用途に合う木部と金具の製作を頼む案。ギュンターが手入れする案",
+      "owner": "アルノルトの世帯",
+      "source": "町の木工所と鍛冶場へ用途に合う木部と金具の製作を頼む案。アルノルトが手入れする案",
       "rect": [
         1,
         1,
@@ -91,7 +91,7 @@
         }
       ],
       "maintainers": [
-        "resident-ギュンター"
+        "resident-アルノルト"
       ]
     }
   ],
@@ -101,7 +101,7 @@
   ],
   "design_dependencies": [
     "building-smithy",
-    "resident-ギュンター"
+    "resident-アルノルト"
   ],
   "grid": {
     "cell_m": 0.5,
@@ -133,7 +133,7 @@
   }
 }
 ---
-# ギュンターの鍛冶場／2階 共用階段
+# アルノルトの鍛冶場／2階 共用階段
 
 ## 用途と暮らし
 

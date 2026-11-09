@@ -2,7 +2,7 @@
 {
   "id": "room-buyer-household",
   "kind": "rooms",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "town": "town-phanthiet",
   "building": "building-buyer",
   "bed_capacity": 0,

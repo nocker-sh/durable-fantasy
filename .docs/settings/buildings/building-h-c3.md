@@ -4,7 +4,7 @@
   "kind": "buildings",
   "title": "エマの家",
   "status": "設計中",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "map": "map-phanthiet-craft",
@@ -51,7 +51,7 @@
     "resident-フリーダ"
   ],
   "runtime_graphics_omissions": {
-    "source": "world/town/interiors.ts",
+    "source": "apps/main/world/town/interiors.ts",
     "pieces": []
   },
   "floor_levels": [

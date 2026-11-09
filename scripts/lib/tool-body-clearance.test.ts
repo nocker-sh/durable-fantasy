@@ -22,7 +22,11 @@ function fixture(id: string) {
     f = room.furniture!.find((f) => f.hearth_maintenance)!,
     op = f.hearth_maintenance!,
     k = room.grid!.cell_m,
-    [x, z, w, d] = f.rect.map((v) => v * k),
+    pair1 = f.rect.map((v) => v * k),
+    x = pair1[0],
+    z = pair1[1],
+    w = pair1[2],
+    d = pair1[3],
     work = hearthSpatialStrokes({
       bounds: { x0: x, z0: z, x1: x + w, z1: z + d },
       front: f.hearth_front!,
@@ -61,7 +65,9 @@ it("rejects the actual handle intersection with the former opposite-arm pose", (
     local = [handle.x1 - 0.0005, handle.top - 0.0005, handle.z1 - 0.0005],
     world = f.grips[1].map((v, i) => v + f.tool.axes.reduce((sum, axis, j) => sum + axis[i] * local[j], 0)),
     inverse = ((4 - base.turn) % 4) as 0 | 1 | 2 | 3,
-    [x, z] = quarterTurnPoint(world[0] - f.candidate.body_m[0], world[2] - f.candidate.body_m[1], inverse),
+    pair2 = quarterTurnPoint(world[0] - f.candidate.body_m[0], world[2] - f.candidate.body_m[1], inverse),
+    x = pair2[0],
+    z = pair2[1],
     point: V3 = [x, world[1] - base.rootY, z]
   expect(base.body.armParts.l.some((p) => p.sd!(point) < 0)).toBe(true)
   expect(f.check).toThrow("fixed-body clearance remains unresolved")
@@ -136,7 +142,9 @@ it.each(["h10", "h-m5"])("rejects actual contact between the working forearm and
   if (id === "h-m5") f.candidate.body_m = [5.15, 1.9]
   const original = f.pose(),
     elbow = add(original.solution.elbow, mul(norm(sub(original.skeleton.p.upperarm_l, original.solution.elbow)), 0.04)),
-    [x, z] = quarterTurnPoint(elbow[0], elbow[2], original.turn)
+    pair3 = quarterTurnPoint(elbow[0], elbow[2], original.turn),
+    x = pair3[0],
+    z = pair3[1]
   f.candidate.off_hand = { palm_m: [x + f.candidate.body_m[0], elbow[1] + original.rootY, z + f.candidate.body_m[1]], pole: [1, 0, 1] }
   const pose = f.pose(),
     point = pose.solution.elbow

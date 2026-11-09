@@ -4,7 +4,7 @@
   "kind": "residents",
   "title": "ペーター",
   "status": "設計中",
-  "source": "world/town/residents.ts",
+  "source": "apps/main/world/town/residents.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "household": "smith",
@@ -17,7 +17,7 @@
   "work": "鍛冶見習い",
   "relationships": [
     {
-      "a": "ギュンター",
+      "a": "アルノルト",
       "b": "ペーター",
       "kind": "師弟",
       "note": "親方は厳しいが、見習いの火傷にはすぐ薬を塗ってやる"
@@ -50,7 +50,7 @@
     "storage-smithy-2-2"
   ],
   "routine_source": {
-    "file": "world/town/routines.ts",
+    "file": "apps/main/world/town/routines.ts",
     "export": "ROUTINES",
     "key": "ペーター"
   },
@@ -58,7 +58,7 @@
     "room-smithy-1"
   ],
   "appearance_source": {
-    "file": "world/town/residents.ts",
+    "file": "apps/main/world/town/residents.ts",
     "export": "RESIDENT_LOOKS",
     "key": "ペーター"
   }
@@ -68,7 +68,7 @@
 
 ## 暮らしの立場
 
-ペーターは鍛冶見習い。鍛冶屋のギュンターと見習いに属し、ギュンターという世帯構成で暮らす。仕事と収入のつながりは鍛冶。炭はゼヴェリンの窯のものをヴァルトラウトが届け、足りない分はヨーゼフの店で買う。鉄はラインホルトが買い取る古い鉄くずと鍋から。大物を打つときだけ職人通りの共同の炉を借りる。
+ペーターは鍛冶見習い。鍛冶屋のアルノルトと見習いに属し、アルノルトという世帯構成で暮らす。仕事と収入のつながりは鍛冶。炭はゼヴェリンの窯のものをヴァルトラウトが届け、足りない分はヨーゼフの店で買う。鉄はラインホルトが買い取る古い鉄くずと鍋から。大物を打つときだけ職人通りの共同の炉を借りる。
 
 ## 人柄と話し方
 

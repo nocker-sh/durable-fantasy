@@ -4,14 +4,16 @@
   "kind": "maps",
   "title": "塩の原",
   "status": "設計中",
-  "source": "world/maps/index.ts",
+  "source": "apps/main/world/maps/index.ts",
   "design_gate": "未通過",
   "town": null,
   "map_id": "salt-flats",
   "map_kind": "field",
   "buildings": [],
   "residents": [],
-  "monsters": [],
+  "monsters": [
+    "monster-sand-slime"
+  ],
   "exits": [
     {
       "at": [
@@ -32,7 +34,16 @@
     "描画と通行判定の一致確認未完了",
     "資源の使い道(提案)を町の資料と照合して確定する"
   ],
-  "design_dependencies": []
+  "ecology_zones": [
+    {
+      "species": "monster-sand-slime",
+      "feature": "塩の殻の割れ目に残る湿りと、吹き寄せられた枯れ草",
+      "placement": null
+    }
+  ],
+  "design_dependencies": [
+    "monster-sand-slime"
+  ]
 }
 ---
 
@@ -59,3 +70,7 @@
 ## 配置の設計条件
 
 入口、主な通路、作業と休憩の場所を先に配列で定義する。灰・雨・煙・火・水の行き先を決める。現行の通行格子は現状の記録であり、生活の成立を承認した配置図ではない。
+
+## 生き物
+
+[[monster-sand-slime]] は道から離れた南の割れ目で暮らす。生息条件は ecology_zones に記録し、placement が null の間は地形への割り当てを済ませた扱いにしない。

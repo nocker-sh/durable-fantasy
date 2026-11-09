@@ -4,7 +4,7 @@
   "kind": "rooms",
   "title": "ゲルダの宿／2階 ゼップの部屋",
   "status": "設計中",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "building": "building-inn",

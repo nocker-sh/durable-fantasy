@@ -178,8 +178,8 @@ for (const house of HOUSES) {
   const doc = documents.get(`building-${house.id}`)
   if (!doc) continue
   const pieces = Array.from({ length: floorPlan(house.id).floors }, (_, floor) => interiorPlan(house, floor).unrenderedFurniture.map((piece) => ({ floor, name: piece.name }))).flat()
-  for (const problem of auditRuntimeGraphics(doc, { source: "world/town/interiors.ts", pieces })) failures.push(`${doc.id}: ${problem}`)
-  for (const problem of auditRuntimeLayout(doc, { source: "world/town/floorplan/floor-plan.ts", rooms: floorPlan(house.id).unrepresentedRooms })) failures.push(`${doc.id}: ${problem}`)
+  for (const problem of auditRuntimeGraphics(doc, { source: "apps/main/world/town/interiors.ts", pieces })) failures.push(`${doc.id}: ${problem}`)
+  for (const problem of auditRuntimeLayout(doc, { source: "apps/main/world/town/floorplan/floor-plan.ts", rooms: floorPlan(house.id).unrepresentedRooms })) failures.push(`${doc.id}: ${problem}`)
 }
 const settingIdPrefixes = Object.values(SETTING_PREFIXES).map((prefix) => `${prefix}-`)
 function references(value: unknown): string[] {

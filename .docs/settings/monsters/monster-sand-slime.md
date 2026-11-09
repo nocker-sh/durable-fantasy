@@ -4,18 +4,19 @@
   "kind": "monsters",
   "title": "砂スライム",
   "status": "設計中",
-  "source": "world/core/monsters.ts",
+  "source": "apps/main/world/core/monsters.ts",
   "design_gate": "未通過",
   "species": "sand-slime",
   "habitats": [
-    "map-red-dunes"
+    "map-red-dunes",
+    "map-salt-flats"
   ],
   "appearance": {
     "look": "slime",
     "color": 11966320,
     "size": 1.15,
-    "shape_source": "world/core/monster-body-shapes.ts",
-    "footprint_source": "world/core/get-monster-body-radius.ts",
+    "shape_source": "apps/main/world/core/monster-body-shapes.ts",
+    "footprint_source": "apps/main/world/core/get-monster-body-radius.ts",
     "movement_clearance": "walk_grid_adopted"
   },
   "issues": [
@@ -37,7 +38,7 @@
       "origin": "残骸のそばを動いた際に体表へ付着した古い鉄片",
       "users": [
         "resident-ラインホルト",
-        "resident-ギュンター"
+        "resident-アルノルト"
       ],
       "use": "買い取り後に選別し、鍛冶の材料へ回す"
     },
@@ -49,6 +50,14 @@
         "resident-イルムガルト"
       ],
       "use": "糊と、薬をまとめるつなぎの材料。加工の消費と効果はコードで決める"
+    },
+    {
+      "item": "hardened-scrap",
+      "origin": "砂丘の残骸のそばで体表へ付いた厚い鉄片",
+      "users": [
+        "resident-アルノルト"
+      ],
+      "use": "狩りの中盤の装備を加工する材料"
     }
   ],
   "population": {
@@ -58,8 +67,9 @@
   },
   "design_dependencies": [
     "map-red-dunes",
+    "map-salt-flats",
     "resident-ラインホルト",
-    "resident-ギュンター",
+    "resident-アルノルト",
     "resident-ゴットフリート",
     "resident-イルムガルト"
   ]
@@ -82,11 +92,11 @@
 
 ## 材料の出どころ
 
-rusty-scrap は残骸のそばを動いた際に体表へ付着した古い鉄片。[[resident-ラインホルト]]、[[resident-ギュンター]]が受け取り、買い取り後に選別し、鍛冶の材料へ回す。
+rusty-scrap は残骸のそばを動いた際に体表へ付着した古い鉄片。[[resident-ラインホルト]]、[[resident-アルノルト]]が受け取り、買い取り後に選別し、鍛冶の材料へ回す。
 
 jelly は砂と分かれて残った粘液。[[resident-ゴットフリート]]が受け取り、混ざり物を分けて糊の材料にする。
 
-入手の確率と戦闘数値は world/core/monsters.ts が正であり、この資料で調整値を重複管理しない。材料が落ちるという結果だけで、体内に結晶があると推論しない。
+入手の確率と戦闘数値は apps/main/world/core/monsters.ts が正であり、この資料で調整値を重複管理しない。材料が落ちるという結果だけで、体内に結晶があると推論しない。
 
 ## 姿と行動
 
@@ -100,8 +110,17 @@ jelly は砂と分かれて残った粘液。[[resident-ゴットフリート]]�
 
 ## 加工先の照合
 
-jelly は糊に使うほか、[[resident-イルムガルト]] の薬作りでつなぎとして使う。実際の加工は `world/core/recipes/alchemy.ts` に従う。
+jelly は糊に使うほか、[[resident-イルムガルト]] の薬作りでつなぎとして使う。実際の加工は `apps/main/world/core/recipes/alchemy.ts` に従う。
 
 ## 身体の大きさと通行
 
-身体の寸法は `world/core/monster-body-shapes.ts` と描画で共有し、種類の拡大率から身体を覆う範囲を `world/core/get-monster-body-radius.ts` で求める。スライムは横への伸縮、うさぎは耳・尻尾と向きを変えた外形も含める。休憩地点と移動の各区間でこの囲いを通行格子へ照合し、`movement_clearance` は `walk_grid_adopted` とする。これは格子上の障害物との照合であり、実際の地形や描画する障害物、生態の場所の設計の完了とは区別する。
+身体の寸法は `apps/main/world/core/monster-body-shapes.ts` と描画で共有し、種類の拡大率から身体を覆う範囲を `apps/main/world/core/get-monster-body-radius.ts` で求める。スライムは横への伸縮、うさぎは耳・尻尾と向きを変えた外形も含める。休憩地点と移動の各区間でこの囲いを通行格子へ照合し、`movement_clearance` は `walk_grid_adopted` とする。これは格子上の障害物との照合であり、実際の地形や描画する障害物、生態の場所の設計の完了とは区別する。
+
+
+## 中盤の装備につながる材料
+
+砂丘の残骸のそばで体表へ付いた厚い鉄片を集めて [[resident-アルノルト]] へ持ち込める。まれな材料を少しずつ集め、強い個体へ挑む前にも装備の補強を準備できる。加工の条件は [[economy#狩りの材料から装備を更新する経路]] に従う。
+
+## 塩の平原
+
+[[map-salt-flats]] では、塩の殻の割れ目に溜まる湿りと、風で吹き寄せられた枯れ草を頼りに暮らす。出現枠は道から離れた南の二か所に置き、塩を運ぶ人の道と出口を塞がない。

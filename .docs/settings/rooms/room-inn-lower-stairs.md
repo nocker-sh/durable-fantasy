@@ -3,7 +3,7 @@
   "id": "room-inn-lower-stairs",
   "kind": "rooms",
   "title": "ゲルダの宿／1階 階段と寝具の受渡し",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "town": "town-phanthiet",
   "building": "building-inn",
   "bed_capacity": 0,

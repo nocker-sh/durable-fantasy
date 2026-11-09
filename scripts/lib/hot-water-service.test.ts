@@ -48,7 +48,7 @@ const fixture = () => {
     const room = readSetting(readFileSync(new URL(`../../.docs/settings/rooms/${id}.md`, import.meta.url), "utf8"))
     documents.set(room.id, room)
   }
-  for (const name of ["ギュンター", "ゾフィー"]) {
+  for (const name of ["アルノルト", "ゾフィー"]) {
     const resident = readSetting(readFileSync(new URL(`../../.docs/settings/residents/resident-${name}.md`, import.meta.url), "utf8"))
     documents.set(resident.id, resident)
   }

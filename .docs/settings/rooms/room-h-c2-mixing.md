@@ -4,7 +4,7 @@
   "kind": "rooms",
   "title": "共同の作業場／1階 かまどと調合",
   "status": "設計中",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "building": "building-h-c2",
@@ -182,7 +182,7 @@
 
 ## かまどと調合の区画
 
-[[building-h-c2]] の共用かまどと調合台を持つ。[[resident-イルムガルト]] が器と作業面を手入れする案であり、本人の薬屋の勤務とは別に所要時間を照合する。材料は各レシピの定義、加工の規則は `world/core/craft-command.ts`を参照する。
+[[building-h-c2]] の共用かまどと調合台を持つ。[[resident-イルムガルト]] が器と作業面を手入れする案であり、本人の薬屋の勤務とは別に所要時間を照合する。材料は各レシピの定義、加工の規則は `apps/main/world/core/craft-command.ts`を参照する。
 
 ## 調理と調合の切替
 

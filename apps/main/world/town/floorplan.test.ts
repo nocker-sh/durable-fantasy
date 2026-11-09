@@ -1,0 +1,169 @@
+import { getFurnitureKind } from "#/world/town/get-furniture-kind"
+import { describe, expect, it } from "vitest"
+import { HOUSES } from "#/world/town/houses"
+import { enterable } from "#/world/town/enterable"
+import { floorPlan } from "#/world/town/floorplan/floor-plan"
+import { planOf } from "#/world/town/floorplan/plan-of"
+import type { FloorPlan, Rect } from "#/world/town/floorplan/types"
+
+const kind = (piece: FloorPlan["pieces"][number]) => piece.kind ?? getFurnitureKind(piece.name)
+
+const PLANS = HOUSES.map((h) => ({ h, p: planOf(h) }))
+const lived = PLANS.filter((props1) => {
+  const h = props1.h
+  return h.plan.hearth && h.kind !== "vacant"
+})
+const overlap = (a: Rect, b: Rect) => a.x0 < b.x1 - 1e-6 && b.x0 < a.x1 - 1e-6 && a.z0 < b.z1 - 1e-6 && b.z0 < a.z1 - 1e-6
+const touchesWall = (r: Rect, p: FloorPlan) => r.x0 < 0.3 || r.z0 < 0.3 || r.x1 > p.W - 0.3 || r.z1 > p.D - 0.3
+
+/** Cells (20 cm) on a floor someone of the household can stand in: clear of walls, partitions and solid furniture by 20 cm (the flap and curtain kept for them are open to them). */
+function walkGrid(p: FloorPlan, floor: number) {
+  const C = 0.2,
+    nx = Math.ceil(p.W / C),
+    nz = Math.ceil(p.D / C)
+  const free = new Uint8Array(nx * nz)
+  const blockers: Rect[] = [...p.pieces.filter((x) => x.floor === floor && x.solid), ...p.dividers.filter((d) => d.floor === floor && !d.staff)]
+  for (let j = 0; j < nz; j++)
+    for (let i = 0; i < nx; i++) {
+      const x = (i + 0.5) * C,
+        z = (j + 0.5) * C,
+        m = 0.18
+      const me = { x0: x - m, z0: z - m, x1: x + m, z1: z + m }
+      free[j * nx + i] = x > m && z > m && x < p.W - m && z < p.D - m && !blockers.some((b) => overlap(me, b)) ? 1 : 0
+    }
+  const cellOf = (x: number, z: number) => [Math.min(nx - 1, Math.max(0, Math.floor(x / C))), Math.min(nz - 1, Math.max(0, Math.floor(z / C)))]
+  /** Can one walk from (x, z) to within `reach` of the rect? */
+  const reach = (from: [number, number], to: Rect, within = 0.6) => {
+    const pair2 = cellOf(from[0], from[1])
+    const si = pair2[0],
+      sj = pair2[1]
+    const seen = new Uint8Array(nx * nz),
+      queue = [sj * nx + si]
+    seen[queue[0]] = 1
+    while (queue.length) {
+      const k = queue.shift()!,
+        i = k % nx,
+        j = Math.floor(k / nx)
+      const x = (i + 0.5) * C,
+        z = (j + 0.5) * C
+      if (x > to.x0 - within && x < to.x1 + within && z > to.z0 - within && z < to.z1 + within) return true
+      for (const entry3 of [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+      ]) {
+        const di = entry3[0],
+          dj = entry3[1]
+
+        const ii = i + di,
+          jj = j + dj,
+          q = jj * nx + ii
+        if (ii < 0 || jj < 0 || ii >= nx || jj >= nz || seen[q] || !free[q]) continue
+        seen[q] = 1
+        queue.push(q)
+      }
+    }
+    return false
+  }
+  return { reach }
+}
+
+describe("every building can really be lived in (town.md「世帯と建物」)", () => {
+  it("everything in each plan finds a place, inside the walls, and nothing solid stands on anything else", () => {
+    for (const entry4 of PLANS) {
+      const h = entry4.h,
+        p = entry4.p
+
+      expect(p.unplaced, h.name).toEqual([])
+      const solid = p.pieces.filter((x) => x.solid)
+      for (const x of p.pieces) expect(x.x0 >= -1e-6 && x.z0 >= -1e-6 && x.x1 <= p.W + 1e-6 && x.z1 <= p.D + 1e-6, `${h.name}: ${x.name} outside`).toBe(true)
+      for (let a = 0; a < solid.length; a++)
+        for (let b = a + 1; b < solid.length; b++) if (solid[a].floor === solid[b].floor) expect(overlap(solid[a], solid[b]), `${h.name}: ${solid[a].name} on ${solid[b].name}`).toBe(false)
+      for (const x of solid) for (const d of p.dividers) if (d.floor === x.floor) expect(overlap(x, d), `${h.name}: ${x.name} in a partition`).toBe(false)
+    }
+  })
+
+  it("a home turns round its hearth: a table stands out in the room, not along a wall, and close by the fire", () => {
+    for (const entry5 of lived) {
+      const h = entry5.h,
+        p = entry5.p
+
+      const fire = p.pieces.find((x) => x.floor === 0 && kind(x) === "hearth")!
+      expect(fire, `${h.name}: hearth`).toBeDefined()
+      const tables = p.pieces.filter((x) => x.floor === 0 && (kind(x) === "table" || kind(x) === "workbench"))
+      expect(
+        tables.some((t) => !touchesWall(t, p)),
+        `${h.name}: a table free of the walls`,
+      ).toBe(true)
+      const gap = (a: Rect, b: Rect) => Math.hypot(Math.max(0, a.x0 - b.x1, b.x0 - a.x1), Math.max(0, a.z0 - b.z1, b.z0 - a.z1))
+      expect(Math.min(...tables.map((t) => gap(t, fire))), `${h.name}: a table by the fire`).toBeLessThanOrEqual(1.8)
+    }
+  })
+
+  it("the way through the house is clear: from the door to the fire, the table and the stair", () => {
+    for (const entry6 of lived) {
+      const h = entry6.h,
+        p = entry6.p
+
+      const g = walkGrid(p, 0)
+      const door: [number, number] = p.entrance ? [p.entrance.point[0] - p.entrance.outward[0] * 0.3, p.entrance.point[1] - p.entrance.outward[1] * 0.3] : [p.door, p.D - 0.3]
+      for (const x of p.pieces.filter((q) => q.floor === 0 && ["hearth", "table", "stair"].includes(kind(q) ?? ""))) expect(g.reach(door, x), `${h.name}: door to ${x.name}`).toBe(true)
+    }
+  })
+
+  it("floors are neither bare nor crammed: furniture covers between an eighth and two thirds of each lived-in floor", () => {
+    for (const entry7 of lived) {
+      const h = entry7.h,
+        p = entry7.p
+      for (let f = 0; f < p.floors; f++) {
+        const used = p.pieces.filter((x) => x.floor === f && x.solid).reduce((a, x) => a + (x.x1 - x.x0) * (x.z1 - x.z0), 0) / (p.W * p.D)
+        const slept = h.plan.rooms.some((r) => r.floor === f && (r.beds ?? 0) > 0)
+        expect(used, `${h.name} floor ${f + 1}`).toBeGreaterThanOrEqual(f === 0 ? 0.12 : slept ? 0.04 : 0)
+        expect(used, `${h.name} floor ${f + 1}`).toBeLessThanOrEqual(0.66)
+      }
+    }
+  })
+
+  it("in a building you walk into, the ground floor is for work and they sleep upstairs, up a stair", () => {
+    for (const entry8 of PLANS.filter((x) => enterable(x.h))) {
+      const h = entry8.h,
+        p = entry8.p
+
+      expect(p.floors, h.name).toBeGreaterThanOrEqual(2)
+      expect(
+        p.pieces.some((x) => x.floor === 0 && kind(x) === "stair"),
+        `${h.name}: stair`,
+      ).toBe(true)
+      expect(
+        p.pieces.filter((x) => x.floor === 0 && /寝台|衣装箱/.test(x.name)).map((x) => x.name),
+        h.name,
+      ).toEqual([])
+    }
+  })
+
+  it("every room has a use, and every household leaves traces of its life about", () => {
+    for (const entry9 of PLANS) {
+      const h = entry9.h,
+        p = entry9.p
+
+      for (const r of p.rooms) expect(r.use, `${h.name}: ${r.name}`).toBeTruthy()
+      if (h.household || enterable(h)) expect(p.pieces.filter((x) => x.on).length, h.name).toBeGreaterThanOrEqual(2)
+    }
+  })
+})
+
+it("reports an unknown building without caching a fabricated plan", () => {
+  for (let attempt = 0; attempt < 2; attempt++) expect(() => floorPlan("unknown-building")).toThrow("Unknown building: unknown-building")
+  const house = HOUSES[0]
+  expect(floorPlan(house.id).id).toBe(house.id)
+  expect(floorPlan(house.id)).toBe(floorPlan(house.id))
+})
+
+it("draws a declared smoking room as its own room off the room they live in, not merged into it", () => {
+  const house = HOUSES.find((h) => h.id === "h-g4")!,
+    plan = planOf(house)
+  expect(house.plan.rooms.some((room) => room.name === "燻し部屋")).toBe(true)
+  expect(plan.rooms.some((room) => room.floor === 0 && room.name === "燻し部屋")).toBe(true)
+  expect(plan.unrepresentedRooms).not.toContainEqual({ floor: 0, name: "燻し部屋" })
+})

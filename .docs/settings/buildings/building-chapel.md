@@ -4,7 +4,7 @@
   "kind": "buildings",
   "title": "広場の礼拝堂",
   "status": "設計中",
-  "source": "world/town/chapel.ts",
+  "source": "apps/main/world/town/chapel.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "map": "map-phanthiet",
@@ -64,7 +64,7 @@
 
 ## 現行の外観と入口
 
-現行の描画は本堂と西の鐘塔を持つ。外形と位置、入口は `world/town/chapel.ts` の CHAPEL を参照し、描画と配置検査が同じ定義を使う。本堂だけの矩形に鐘塔を押し込まず、屋根・基壇・控え壁・塔の張出しも別の占有として検査する。南の戸口の前で修道士に会えるが、内部へ入れるゲームの部屋はまだ実装されていない。
+現行の描画は本堂と西の鐘塔を持つ。外形と位置、入口は `apps/main/world/town/chapel.ts` の CHAPEL を参照し、描画と配置検査が同じ定義を使う。本堂だけの矩形に鐘塔を押し込まず、屋根・基壇・控え壁・塔の張出しも別の占有として検査する。南の戸口の前で修道士に会えるが、内部へ入れるゲームの部屋はまだ実装されていない。
 
 ## 本堂と鐘塔の設計条件
 

@@ -1,4 +1,6 @@
 {
-  "name": "durable-fantasy",
-  "script": "dev"
+  "apps": {
+    "apps/main": { "name": "durable-fantasy" },
+    "apps/studio": { "name": "dev.durable-fantasy" }
+  }
 }

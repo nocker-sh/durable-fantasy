@@ -112,7 +112,12 @@ it.each([
   { door: [2, 7], width: 8, height: 8, inward: [0, -1] },
   { door: [0, 2], width: 8, height: 8, inward: [1, 0] },
   { door: [7, 2], width: 8, height: 8, inward: [-1, 0] },
-])("keeps paired hinges on opposite jambs for boundary $door", ({ door, width, height, inward }) => {
+])("keeps paired hinges on opposite jambs for boundary $door", (props1) => {
+  const door = props1.door,
+    width = props1.width,
+    height = props1.height,
+    inward = props1.inward
+
   const f = fixture()
   f.document.grid = { cell_m: 0.5, rows: Array.from({ length: height }, () => ".".repeat(width)) }
   f.document.connections = [{ kind: "door", door, width_cells: 4, target: "map-town" }]

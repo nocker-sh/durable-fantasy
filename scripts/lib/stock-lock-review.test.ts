@@ -10,7 +10,7 @@ function fixture() {
     facility = readSetting(text),
     operator = readSetting(readFileSync(".docs/settings/residents/resident-カール.md", "utf8"))
   const documents = new Map([facility, operator].map((document) => [document.id, document]))
-  for (const name of ["ゴットフリート", "ギュンター"]) {
+  for (const name of ["ゴットフリート", "アルノルト"]) {
     const maker = readSetting(readFileSync(`.docs/settings/residents/resident-${name}.md`, "utf8"))
     documents.set(maker.id, maker)
   }
@@ -65,7 +65,7 @@ it("does not approve a completed facility from a proposed symbolic sequence", ()
 
 it("requires both fabrication roles and local makers named in the facility's dependencies", () => {
   const source = fixture()
-  source.documents.delete("resident-ギュンター")
+  source.documents.delete("resident-アルノルト")
   expect(getStockLockReviewError(source.facility, source.documents)?.message).toContain("local maker dependency")
   const missingRole = fixture()
   missingRole.plan.gates[0].leaf.makers[1].role = "timber"

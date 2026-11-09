@@ -4,7 +4,7 @@
   "kind": "residents",
   "title": "モニカ",
   "status": "設計中",
-  "source": "world/town/residents.ts",
+  "source": "apps/main/world/town/residents.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "household": "sweep",
@@ -63,7 +63,7 @@
     "storage-h-c5-3-2"
   ],
   "routine_source": {
-    "file": "world/town/routines.ts",
+    "file": "apps/main/world/town/routines.ts",
     "export": "ROUTINES",
     "key": "モニカ"
   },
@@ -71,7 +71,7 @@
     "room-h-c5-2"
   ],
   "appearance_source": {
-    "file": "world/town/residents.ts",
+    "file": "apps/main/world/town/residents.ts",
     "export": "RESIDENT_LOOKS",
     "key": "モニカ"
   }

@@ -4,7 +4,7 @@
   "kind": "maps",
   "title": "赤い砂丘",
   "status": "設計中",
-  "source": "world/maps/index.ts",
+  "source": "apps/main/world/maps/index.ts",
   "design_gate": "未通過",
   "town": null,
   "map_id": "red-dunes",
@@ -12,7 +12,9 @@
   "buildings": [],
   "residents": [],
   "monsters": [
-    "monster-sand-slime"
+    "monster-dune-sidewinder",
+    "monster-sand-slime",
+    "monster-iron-sand-slime"
   ],
   "exits": [
     {
@@ -49,13 +51,25 @@
   ],
   "ecology_zones": [
     {
+      "species": "monster-dune-sidewinder",
+      "feature": "昼に潜る岩陰の砂と、夕方に獲物を探す砂の上",
+      "placement": null
+    },
+    {
       "species": "monster-sand-slime",
       "feature": "植物片と湿りが残る砂丘の風陰",
+      "placement": null
+    },
+    {
+      "species": "monster-iron-sand-slime",
+      "feature": "砂が堅く締まった残骸の外側",
       "placement": null
     }
   ],
   "design_dependencies": [
-    "monster-sand-slime"
+    "monster-dune-sidewinder",
+    "monster-sand-slime",
+    "monster-iron-sand-slime"
   ]
 }
 ---
@@ -83,3 +97,8 @@
 砂に埋もれた大戦の残骸を調べる人が、風陰の窪みへ入ることで砂スライムと出会う。古い鉄片は残骸に由来し、砂や生き物が金属を生産する設定にはしない。砂だけの画面に出現枠を載せるのではなく、食べ物・湿り・休息の根拠となる地形を設計する。残骸の鋭い割れ目を人や生き物の通常の通路にしない。
 
 生息条件は ecology_zones に記録する。placement が null の条件はまだ地形に割り当てていない。出現矩形があることだけで、その条件を満たした配置としない。
+
+
+## 鉄砂スライムとの接点
+
+[[monster-iron-sand-slime]] は砂が堅く締まった残骸の外側を使う。生活と行動の条件は個別資料に従い、通常の通路と入口を塞がない。新しい出現枠の採用で、生態の場所の設計を完了扱いにしない。

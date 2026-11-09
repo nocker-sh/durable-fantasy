@@ -1,0 +1,297 @@
+// Commands a player can send to change their own data, and why one can be refused.
+import { z } from "zod"
+import { BAG_SIZE } from "#/world/core/bag-rules"
+import type { Stack } from "#/world/core/bag-types"
+import { MAX_OPEN_ORDERS } from "#/world/core/exchange-rules"
+import { STATS } from "#/world/core/growth-rules"
+import type { Stat } from "#/world/core/growth-types"
+import { SLOTS } from "#/world/core/items/kinds"
+import type { CraftSkill, GatherSkill, Quality, Slot } from "#/world/core/items/kinds"
+import type { ItemId } from "#/world/core/items/catalog"
+import { stackSchema } from "#/world/core/player-schema"
+import { HOTBAR_SIZE } from "#/world/core/player-rules"
+import { LOOK_COUNT } from "#/world/core/player-rules"
+import { NECK_KINDS } from "#/world/core/player-rules"
+import { NECK_RAMPS } from "#/world/core/player-rules"
+import { hotbarEntry } from "#/world/core/player-schema"
+import { itemId } from "#/world/core/player-schema"
+import { profileNameSchema } from "#/world/core/player-schema"
+import { isShopId } from "#/world/core/is-shop-id"
+import type { ShopId } from "#/world/core/shop-types"
+import { LIFE_SKILLS } from "#/world/core/life-rules"
+import { SKILL_IDS } from "#/world/core/skill-ids"
+import type { SkillId } from "#/world/core/skill-types"
+import type { Order } from "#/world/core/commission-types"
+import type { Thread } from "#/world/core/threads"
+
+const shopId = z.custom<ShopId>((value) => typeof value === "string" && isShopId(value), "unknown shop")
+const slotIndex = z
+  .number()
+  .int()
+  .min(0)
+  .max(BAG_SIZE - 1)
+const equipSlot = z.enum(SLOTS)
+const count = z.number().int().min(1).max(99)
+
+export const commandSchema = z.discriminatedUnion("type", [
+  /** made things: which quality (the maker is the shop's) */
+  z.object({
+    type: z.literal("buy"),
+    shop: shopId,
+    item: itemId,
+    count,
+    q: z.literal([0, 1, 2, 3] as const).optional(),
+    /** the price the buyer saw; refused if it moved */ price: z.number().int().min(1).optional(),
+  }),
+  z.object({ type: z.literal("sell"), shop: shopId, slot: slotIndex, count, expectedStack: stackSchema.optional() }),
+  /** a night's rest at an inn (core/lodge.ts) */
+  z.object({ type: z.literal("lodge"), shop: shopId }),
+  z.object({ type: z.literal("use"), slot: slotIndex, expectedStack: stackSchema.optional() }),
+  z.object({ type: z.literal("use-item"), item: itemId }),
+  /** throw away some of one slot (not key items) */
+  z.object({ type: z.literal("discard"), slot: slotIndex, count, expectedStack: stackSchema.optional() }),
+  z.object({ type: z.literal("move"), from: slotIndex, to: slotIndex, expectedStack: stackSchema.optional(), expectedTarget: stackSchema.nullable().optional() }),
+  /** wear the item in a bag slot; `to` picks one of two accessory slots */
+  z.object({ type: z.literal("equip"), slot: slotIndex, to: equipSlot.optional(), expectedStack: stackSchema.optional() }),
+  z.object({ type: z.literal("unequip"), slot: equipSlot, expectedStack: stackSchema.optional() }),
+  z.object({ type: z.literal("raise"), stat: z.enum(STATS) }),
+  z.object({ type: z.literal("forget-life"), skill: z.enum(LIFE_SKILLS), exp: z.number().int().nonnegative() }),
+  /** skills (core/skills.ts): first aid or a prayer on yourself, sit down to rest, get up */
+  z.object({ type: z.literal("cast"), skill: z.enum(SKILL_IDS) }),
+  z.object({ type: z.literal("sit") }),
+  z.object({ type: z.literal("stand") }),
+  z.object({
+    type: z.literal("hotbar"),
+    index: z
+      .number()
+      .int()
+      .min(0)
+      .max(HOTBAR_SIZE - 1),
+    item: hotbarEntry.nullable(),
+  }),
+  z.object({
+    type: z.literal("profile"),
+    name: profileNameSchema,
+    look: z
+      .number()
+      .int()
+      .min(0)
+      .max(LOOK_COUNT - 1),
+    neck: z.enum(NECK_KINDS),
+    neckRamp: z.enum(NECK_RAMPS),
+  }),
+])
+
+export type Command = z.infer<typeof commandSchema>
+
+/** What only the server does to a player: tire them on the road out of town (game-system.md §3.6). */
+export type ServerCommand =
+  /** `homeward`: the road leads nearer town, so it is never refused for stamina */
+  | { type: "tire"; amount: number; homeward: boolean }
+  /** a go at a gathering spot the room has taken from nature.ts; `roll` is the server's dice (0–1) */
+  | { type: "gather"; node: string; roll: number }
+  /** a go at a recipe at a station the room has checked the player stands by */
+  | { type: "craft"; recipe: string; station: string; roll: number }
+  /** leave work with a craftsman the room has checked is at their counter */
+  | { type: "order"; commission: string; roll: number }
+  | { type: "collect"; index: number; expectedOrders: readonly Order[] }
+  /** the exchange holds goods or gold while an order is up (core/exchange.ts) */
+  | { type: "escrow-sell"; slot: number; qty: number; fee: number }
+  | { type: "escrow-buy"; gold: number }
+  | { type: "receive"; gold: number; items: readonly { item: ItemId; count: number; q?: Quality; by?: string }[] }
+  /** a creature beaten: experience and what it left (game-system.md §8) */
+  | { type: "loot"; monster: string; exp: number; items: readonly ItemId[] }
+  /** take on today's errand from the resident the room has checked we are talking to (core/errands.ts) */
+  | { type: "errand-take"; errand: string; from: string }
+  /** hand an errand over to the resident the room has checked we are talking to */
+  | { type: "errand-hand"; errand: string; to: string }
+  /** begin talking to a resident the room has checked we stand beside (core/greet.ts) */
+  | { type: "greet"; to: string }
+  /** a creature struck back (game-system.md §8); at 0 HP they fall */
+  | { type: "hurt"; amount: number; by: string }
+  /** fallen, they come to in town: half HP, a little experience lost */
+  | { type: "revive" }
+  /** leave a lot with the warehouse, or take one back (the room has checked the keeper is at her counter) */
+  | { type: "store"; slot: number; count: number; expectedStack: Stack | null }
+  | { type: "retrieve"; index: number; count: number; expectedStack: Stack | null }
+  /** a face-to-face trade (core/check-trade.ts): the room takes what one side put up, then hands over the other's */
+  | { type: "trade-out"; offer: { lots: readonly { slot: number; count: number }[]; gold: number } }
+  | { type: "trade-in"; stacks: readonly Stack[]; gold: number }
+  /** join or leave a party (core/party.ts) */
+  | { type: "set-party"; party: string | null }
+  /** a thread swapped with a friend (core/threads.ts) */
+  | { type: "thread"; thread: Thread }
+  /** a share of a creature a party member beat */
+  | { type: "share"; exp: number; monster: string }
+  /** pay for an art's blow (SP and the wait) before the room rolls it (game-system.md §9.3) */
+  | { type: "art"; skill: SkillId }
+
+/** Commands that are only allowed next to a particular NPC (checked by the map room). */
+export const shopOf = (command: Command): ShopId | null => (command.type === "buy" || command.type === "sell" || command.type === "lodge" ? command.shop : null)
+
+export type Reason =
+  | "NOT_SOLD_HERE"
+  | "NOT_SELLABLE"
+  | "NO_GOLD"
+  | "BAG_FULL"
+  | "TOO_HEAVY"
+  | "EMPTY_SLOT"
+  | "NOT_ENOUGH"
+  | "NOT_USABLE"
+  | "HP_FULL"
+  | "SP_FULL"
+  | "NOT_EQUIPPABLE"
+  | "STAT_TOO_LOW"
+  | "LEVEL_TOO_LOW"
+  | "SKILL_TOO_LOW"
+  | "NO_WEAPON"
+  | "NO_HERB"
+  | "ROAD_CLOSED"
+  | "TWO_HANDED"
+  | "NOTHING_EQUIPPED"
+  | "NOT_OWNED"
+  | "LIFE_CHANGED"
+  | "LIFE_EQUIPPED"
+  | "NO_LIFE_EXP"
+  | "NO_POINTS"
+  | "STAT_MAX"
+  | "TOO_FAR"
+  | "OFFLINE"
+  | "TOO_FULL"
+  | "NOTHING_TO_GAIN"
+  | "CLOSED"
+  | "SOLD_OUT"
+  | "PRICE_CHANGED"
+  | "EXHAUSTED"
+  | "NO_TOOL"
+  | "SPENT"
+  | "WRONG_STATION"
+  | "NOT_SKILLED"
+  | "MISSING_INPUTS"
+  | "ITEM_CHANGED"
+  | "ORDER_CHANGED"
+  | "TOO_MANY_ORDERS"
+  | "NOT_READY"
+  | "NOT_DONE"
+  | "NOT_WANTED"
+  | "NO_ERRAND"
+  | "TOO_MANY_ERRANDS"
+  | "FALLEN"
+  | "NOT_FALLEN"
+  | "TAKEN"
+  | "TARGET_GONE"
+  | "STORAGE_FULL"
+  | "NOT_STORABLE"
+  | "NOT_TRADABLE"
+  | "WORN_TOOL"
+  | "TOO_MANY_LISTINGS"
+  | "COOLDOWN"
+  | "SP_SHORT"
+  | "WALKING"
+  | "MEDICINE_WAIT"
+  | "NAME_TAKEN"
+  | "NOT_DISCARDABLE"
+  | "RENAME_WAIT"
+
+export type GameEvent =
+  | { type: "bought"; item: ItemId; count: number; cost: number; by?: string }
+  | { type: "sold"; item: ItemId; count: number; gain: number }
+  | { type: "lodged"; shop: ShopId; cost: number }
+  | { type: "used"; item: ItemId; hp: number; sp: number; stamina: number; warm: number; focus?: number; by?: string }
+  | { type: "tired"; stamina: number }
+  | { type: "gathered"; item: ItemId; count: number; skill: GatherSkill; level: number; up: boolean; broke: ItemId | null; found?: ItemId }
+  | { type: "ordered"; commission: string; readyAt: number }
+  | { type: "escrowed"; item: ItemId | null; q?: Quality; by?: string; gold: number }
+  | { type: "received"; gold: number; items: number }
+  | { type: "looted"; monster: string; exp: number; items: readonly ItemId[]; left?: readonly ItemId[]; level: number; gained: number }
+  | { type: "collected"; item: ItemId; count: number; q: Quality | null; by: string }
+  | { type: "crafted"; item: ItemId; count: number; q: Quality | null; skill: CraftSkill; level: number; up: boolean; fee: number }
+  | { type: "spoiled"; recipe: string; skill: CraftSkill; level: number; up: boolean; fee: number }
+  | { type: "equipped"; item: ItemId; slot: Slot }
+  | { type: "unequipped"; item: ItemId; slot: Slot }
+  | { type: "raised"; stat: Stat; value: number }
+  | { type: "renamed"; name: string }
+  | { type: "rearranged" }
+  | { type: "discarded"; item: ItemId; count: number; by?: string }
+  | { type: "errand-taken"; errand: string }
+  | { type: "hurt"; amount: number; by: string; hp: number }
+  | { type: "fell"; by: string }
+  | { type: "revived"; hp: number; lost: number }
+  | { type: "stored"; item: ItemId; count: number; fee: number; by?: string }
+  | { type: "retrieved"; item: ItemId; count: number; by?: string }
+  | { type: "traded-out"; stacks: Stack[]; gold: number }
+  | { type: "traded-in"; stacks: Stack[]; gold: number }
+  | { type: "partied"; party: string | null }
+  | { type: "threaded"; name: string }
+  | { type: "cast"; skill: SkillId; hp: number }
+  | { type: "art"; skill: SkillId }
+  | { type: "sat" }
+  | { type: "stood" }
+  | { type: "shared"; monster: string; exp: number; level: number; gained: number }
+  | { type: "errand-done"; errand: string; gold: number; friends: Readonly<Record<string, number>> }
+
+/** Text the UI shows for a refusal. */
+export const REASON_TEXT: Record<Reason, string> = {
+  NOT_SOLD_HERE: "この店では扱っていない。",
+  NOT_SELLABLE: "それは売れない。",
+  NO_GOLD: "所持金が足りない。",
+  BAG_FULL: "持ち物がいっぱいで入らない。",
+  TOO_HEAVY: "重くてこれ以上持てない。",
+  EMPTY_SLOT: "そこには何もない。",
+  NOT_ENOUGH: "そんなに持っていない。",
+  NOT_USABLE: "それは使えない。",
+  HP_FULL: "HP は満ちている。",
+  SP_FULL: "SP は満ちている。",
+  NOT_EQUIPPABLE: "それは装備できない。",
+  STAT_TOO_LOW: "能力が足りない。",
+  LEVEL_TOO_LOW: "Lv が足りない。",
+  SKILL_TOO_LOW: "生活スキルの腕が足りない。",
+  NO_WEAPON: "その技に合う武器を手にしていない。",
+  NO_HERB: "薬草を持っていない。",
+  ROAD_CLOSED: "この先はまだ通れない。",
+  TWO_HANDED: "両手武器を持っているので盾は持てない。",
+  NOTHING_EQUIPPED: "何も装備していない。",
+  NOT_OWNED: "それを持っていない。",
+  NO_POINTS: "能力ポイントが足りない。",
+  STAT_MAX: "これ以上は上げられない。",
+  TOO_FAR: "遠すぎる。",
+  LIFE_CHANGED: "生活スキルの経験が変わった。",
+  LIFE_EQUIPPED: "このスキルが要る装備を身につけている。",
+  NO_LIFE_EXP: "まだ忘れる経験がない。",
+  OFFLINE: "接続が切れている。",
+  TOO_FULL: "もうお腹いっぱいだ。",
+  NOTHING_TO_GAIN: "いまは食べても飲んでも変わらない。",
+  CLOSED: "いまは店番がいない。",
+  SOLD_OUT: "売り切れだ。",
+  PRICE_CHANGED: "値段が変わった。",
+  EXHAUSTED: "くたくたで、これ以上は進めない。",
+  NO_TOOL: "道具がない。",
+  SPENT: "取り尽くされている。",
+  WRONG_STATION: "ここでは作れない。",
+  NOT_SKILLED: "まだ腕が足りない。",
+  MISSING_INPUTS: "材料が足りない。",
+  TOO_MANY_ORDERS: "頼めるのは三つまで。",
+  NOT_READY: "今は手が離せない。",
+  NOT_DONE: "まだできていない。",
+  ORDER_CHANGED: "品物が変わった。",
+  ITEM_CHANGED: "品物が変わった。",
+  NOT_WANTED: "今は買い取ってもらえない。",
+  NO_ERRAND: "今日はもう頼まれていない。",
+  TOO_MANY_ERRANDS: "頼まれごとは一度に三つまで。",
+  FALLEN: "倒れていて動けない。",
+  NOT_FALLEN: "倒れてはいない。",
+  TAKEN: "ほかの人が戦っている。",
+  TARGET_GONE: "相手はもういない。",
+  STORAGE_FULL: "倉庫に空きがない。",
+  NOT_STORABLE: "それは預けられない。",
+  NOT_TRADABLE: "それは渡せない。",
+  WORN_TOOL: "使い減りした道具は出品できない。",
+  TOO_MANY_LISTINGS: `掲示板に出せる注文は${MAX_OPEN_ORDERS}件まで。`,
+  COOLDOWN: "まだ使えない。",
+  SP_SHORT: "SP が足りない。",
+  WALKING: "歩きながらは座れない。",
+  MEDICINE_WAIT: "まだ次の薬は使えない。",
+  NAME_TAKEN: "その名前は使えない。",
+  NOT_DISCARDABLE: "それは捨てられない。",
+  RENAME_WAIT: "名前はまだ変えられない。",
+}

@@ -3,7 +3,7 @@
   "id": "room-tavern-drying",
   "kind": "rooms",
   "title": "フランツの酒場／2階 室内干しと寝具の手入れ",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "town": "town-phanthiet",
   "building": "building-tavern",
   "bed_capacity": 0,

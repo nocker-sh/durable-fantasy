@@ -4,7 +4,7 @@
   "kind": "residents",
   "title": "アンナ",
   "status": "設計中",
-  "source": "world/town/residents.ts",
+  "source": "apps/main/world/town/residents.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "household": "greengrocer",
@@ -54,7 +54,7 @@
     "storage-h5-2-2"
   ],
   "routine_source": {
-    "file": "world/town/routines.ts",
+    "file": "apps/main/world/town/routines.ts",
     "export": "ROUTINES",
     "key": "アンナ"
   },
@@ -131,7 +131,7 @@
     }
   ],
   "appearance_source": {
-    "file": "world/town/residents.ts",
+    "file": "apps/main/world/town/residents.ts",
     "export": "RESIDENT_LOOKS",
     "key": "アンナ"
   }
@@ -174,7 +174,7 @@
 
 ## 洗濯場へ向かう平面経路
 
-outdoor_journeys は [[building-h5]] の提案した北の戸から東の道へ出て、既存の橋を通り、西岸の洗濯場の上の踊り場へ向かう。終点は `world/maps/layout.ts` の lavStairs の上端の中央を参照し、川辺の作業位置まで降り終わったと扱わない。戸口の位置は家の敷地案と一致させ、道と橋・川の幅、家と庭・畑・牧草地・豚の囲いを身体幅で照合する。
+outdoor_journeys は [[building-h5]] の提案した北の戸から東の道へ出て、既存の橋を通り、西岸の洗濯場の上の踊り場へ向かう。終点は `apps/main/world/maps/layout.ts` の lavStairs の上端の中央を参照し、川辺の作業位置まで降り終わったと扱わない。戸口の位置は家の敷地案と一致させ、道と橋・川の幅、家と庭・畑・牧草地・豚の囲いを身体幅で照合する。
 
 この幅は身体の平面の設計値であり、洗濯籠と濡れ物の量・重量を含めた運搬の証明ではない。降りる階段、足場の濡れと灯り、橋の手摺と荷物・すれ違い、帰宅と室内干し、休憩と一日の日課は未照合である。時刻と実装済みの行動は routine_source を引き続き正とする。
 

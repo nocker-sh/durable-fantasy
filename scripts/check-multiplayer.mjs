@@ -24,9 +24,10 @@ try {
     if (failure) throw Error(`Player ${i + 1} failed to start; see local diagnostics`)
     await page.getByRole("dialog", { name: "キャラクターを作る" }).waitFor({ timeout: 180000 })
     await ready(page)
-    await page.getByRole("textbox", { name: "名前", exact: true }).fill(i ? "フリッツ" : "エルナ")
+    await page.getByRole("textbox", { name: "名前", exact: true }).fill(i ? "イレーネ" : "ヴェレーナ")
     await page.getByRole("button", { name: "はじめる" }).click()
-    await page.getByRole("button", { name: "町を歩く", exact: true }).click()
+    // after creation the player simply stands in town (ui.md「初回作成」)
+    await page.waitForFunction(() => game.state.get().player?.profileComplete === true && !game.state.get().modal, null, { timeout: 180000 })
     console.log(`player ${i + 1} created`)
   }
   const [host, guest] = pages
@@ -35,8 +36,8 @@ try {
   await ready(guest)
   await guest.evaluate((channel) => game.changeChannel(channel), room.channel)
   await ready(guest)
-  await host.waitForFunction(() => game.state.get().players.some((p) => p.name === "フリッツ"))
-  await guest.waitForFunction(() => game.state.get().players.some((p) => p.name === "エルナ"))
+  await host.waitForFunction(() => game.state.get().players.some((p) => p.name === "イレーネ"))
+  await guest.waitForFunction(() => game.state.get().players.some((p) => p.name === "ヴェレーナ"))
   await host.keyboard.press("Enter")
   await host.locator("input").filter({ visible: true }).last().fill("一緒に町を歩こう")
   await host.keyboard.press("Enter")
@@ -56,13 +57,17 @@ try {
   const inventories = await Promise.all(
     pages.map((page) => page.evaluate(() => ({ gold: game.state.get().player.gold, bread: game.state.get().player.bag.reduce((n, s) => n + (s?.item === "rye-bread" ? s.count : 0), 0) }))),
   )
-  await host.evaluate(() => game.askTrade(game.state.get().players.find((p) => p.name === "フリッツ").id))
+  await host.evaluate(() => game.askTrade(game.state.get().players.find((p) => p.name === "イレーネ").id))
   await guest.waitForFunction(() => game.state.get().tradeAsk !== null)
   await guest.evaluate(() => game.answerTrade(true))
   await Promise.all(pages.map((page) => page.waitForFunction(() => game.state.get().trade !== null)))
-  await host.evaluate(() => game.offerTrade([{ slot: game.state.get().player.bag.findIndex((s) => s?.item === "rye-bread"), count: 1 }], 10))
-  await guest.evaluate(() => game.offerTrade([], 3))
-  await host.waitForFunction(() => game.state.get().trade?.mine.gold === 10 && game.state.get().trade?.theirs.gold === 3)
+  // a new character's starting gold is not handed to another player (economy.md 原則 4, core/handable-gold.ts)
+  await host.evaluate(() => game.offerTrade([], 10))
+  await host.waitForTimeout(1500)
+  if ((await host.evaluate(() => game.state.get().trade?.mine.gold)) !== 0) throw Error("Starting gold was offered in a trade")
+  await host.evaluate(() => game.offerTrade([{ slot: game.state.get().player.bag.findIndex((s) => s?.item === "rye-bread"), count: 1 }], 0))
+  await guest.evaluate(() => game.offerTrade([], 0))
+  await host.waitForFunction(() => game.state.get().trade?.mine.stacks.some((s) => s.item === "rye-bread" && s.count === 1))
   await guest.waitForFunction(() => game.state.get().trade?.theirs.stacks.some((s) => s.item === "rye-bread" && s.count === 1))
   await Promise.all(pages.map((page) => page.evaluate(() => game.lockTrade())))
   await Promise.all(pages.map((page) => page.waitForFunction(() => game.state.get().trade?.mine.locked && game.state.get().trade?.theirs.locked)))
@@ -77,7 +82,7 @@ try {
     ),
   )
   for (const [i, page] of pages.entries()) {
-    const expected = { gold: inventories[i].gold + (i ? 7 : -7), bread: inventories[i].bread + (i ? 1 : -1) }
+    const expected = { gold: inventories[i].gold, bread: inventories[i].bread + (i ? 1 : -1) }
     const exchanged = (expected) => {
       const s = game.state.get()
       return s.trade === null && s.player.gold === expected.gold && s.player.bag.reduce((n, item) => n + (item?.item === "rye-bread" ? item.count : 0), 0) === expected.bread
@@ -87,14 +92,14 @@ try {
     await ready(page)
     await page.waitForFunction(exchanged, expected)
   }
-  console.log("trade exchanged one bread and net seven gold, persisted after reload")
+  console.log("starting gold was kept out of the trade; one bread changed hands and persisted after reload")
   await guest.evaluate((world) => game.visitTown(world), room.world)
   await ready(guest)
   await guest.evaluate((channel) => game.changeChannel(channel), room.channel)
   await ready(guest)
-  await host.waitForFunction(() => game.state.get().players.some((p) => p.name === "フリッツ"))
-  await guest.waitForFunction(() => game.state.get().players.some((p) => p.name === "エルナ"))
-  await host.evaluate(() => game.inviteParty(game.state.get().players.find((p) => p.name === "フリッツ").id))
+  await host.waitForFunction(() => game.state.get().players.some((p) => p.name === "イレーネ"))
+  await guest.waitForFunction(() => game.state.get().players.some((p) => p.name === "ヴェレーナ"))
+  await host.evaluate(() => game.inviteParty(game.state.get().players.find((p) => p.name === "イレーネ").id))
   await guest.waitForFunction(() => game.state.get().partyAsk !== null)
   await guest.evaluate(() => game.answerParty(true))
   await host.waitForFunction(() => game.state.get().party?.members.length === 2)
@@ -111,12 +116,12 @@ try {
     ),
   )
   if (!parties[0].id || parties[0].id !== parties[1].id) throw Error("Players joined different parties")
-  for (const party of parties) if (JSON.stringify(party.names) !== JSON.stringify(["エルナ", "フリッツ"])) throw Error("Party membership differs")
+  for (const party of parties) if (JSON.stringify(party.names) !== JSON.stringify(["ヴェレーナ", "イレーネ"].sort())) throw Error("Party membership differs")
   console.log("party invitation and acceptance passed")
   await guest.evaluate(() => game.leaveParty())
   await guest.waitForFunction(() => game.state.get().party === null)
   await contexts[1].close()
-  await host.waitForFunction(() => !game.state.get().players.some((p) => p.name === "フリッツ"))
+  await host.waitForFunction(() => !game.state.get().players.some((p) => p.name === "イレーネ"))
   console.log("disconnect removed the remote player")
   if (errors.length) throw Error(errors.join("\n"))
 } catch (error) {

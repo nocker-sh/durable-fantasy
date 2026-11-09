@@ -3,7 +3,7 @@
   "id": "room-leather-household",
   "kind": "rooms",
   "title": "ルドルフの革工房／2階 台所と食事",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "town": "town-phanthiet",
   "building": "building-leather",
   "bed_capacity": 0,

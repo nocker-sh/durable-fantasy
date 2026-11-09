@@ -2,7 +2,7 @@
 {
   "id": "room-h-g5-drying",
   "kind": "rooms",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "town": "town-phanthiet",
   "building": "building-h-g5",
   "bed_capacity": 0,

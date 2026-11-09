@@ -1,0 +1,79 @@
+import { describe, expect, it } from "vitest"
+import { apply } from "#/world/core/apply"
+import { addItem } from "#/world/core/add-item"
+import { emptyBag } from "#/world/core/empty-bag"
+import { effectOf } from "#/world/core/effect-of"
+import { priceOf } from "#/world/core/price-of"
+import { DIGEST_MS } from "#/world/core/player-rules"
+import { fullNow } from "#/world/core/full-now"
+import { player } from "#/world/test/player"
+
+const MIN = 60_000
+
+describe("eating: stamina, fullness and warmth", () => {
+  it("food gives stamina back, fills you up and warms you for a while", () => {
+    const p = player({ stamina: 20, bag: addItem({ bag: emptyBag(), item: "stew", count: 1, mark: { q: 1, by: "ゲルダ" } })! })
+    const r = apply(p, { type: "use", slot: 0 }, { now: 1000 })
+    expect(r.ok).toBe(true)
+    if (!r.ok) return
+    expect(r.state.stamina).toBe(20 + effectOf("stew", 1, "ゲルダ").stamina)
+    expect(fullNow(r.state, 1000)).toBe(35)
+    expect(r.state.warmUntil).toBe(1000 + effectOf("stew", 1, "ゲルダ").warm * MIN)
+  })
+
+  it("you cannot eat past full, and fullness wears off with time", () => {
+    const p = player({ stamina: 0, full: 90, fullAt: 0, bag: addItem({ bag: emptyBag(), item: "stew", count: 2 })! })
+    expect(apply(p, { type: "use", slot: 0 }, { now: 0 })).toEqual({ ok: false, reason: "TOO_FULL" })
+    expect(fullNow(p, 30 * DIGEST_MS)).toBe(60)
+    expect(apply(p, { type: "use", slot: 0 }, { now: 30 * DIGEST_MS }).ok).toBe(true)
+  })
+
+  it("the road out of town tires you, more in the cold unless you are warm, and stops you when too little is left", () => {
+    const cold = apply(player({ stamina: 50 }), { type: "tire", amount: 4, homeward: false }, { now: 0 })
+    expect(cold.ok && cold.state.stamina).toBe(44)
+    const warm = apply(player({ stamina: 50, warmUntil: 10 * MIN }), { type: "tire", amount: 4, homeward: false }, { now: MIN })
+    expect(warm.ok && warm.state.stamina).toBe(46)
+    expect(apply(player({ stamina: 0 }), { type: "tire", amount: 4, homeward: false })).toEqual({ ok: false, reason: "EXHAUSTED" })
+    expect(apply(player({ stamina: 5 }), { type: "tire", amount: 4, homeward: false }, { now: 0 })).toEqual({ ok: false, reason: "EXHAUSTED" })
+  })
+
+  it("a road nearer town tires you the same, but takes what is left rather than stopping you", () => {
+    const enough = apply(player({ stamina: 50 }), { type: "tire", amount: 4, homeward: true }, { now: 0 })
+    expect(enough.ok && enough.state.stamina).toBe(44)
+    const short = apply(player({ stamina: 5 }), { type: "tire", amount: 4, homeward: true }, { now: 0 })
+    expect(short).toEqual({ ok: true, state: player({ stamina: 0 }), events: [{ type: "tired", stamina: 0 }] })
+    const spent = apply(player({ stamina: 0 }), { type: "tire", amount: 4, homeward: true }, { now: 0 })
+    expect(spent.ok && spent.state.stamina).toBe(0)
+  })
+
+  it("the porridge at the chapel is always cheap enough to keep going", () => {
+    expect(priceOf("porridge", 0, "ベネディクト")).toBeLessThanOrEqual(2)
+    expect(effectOf("porridge", 0, "ベネディクト").stamina).toBeGreaterThan(0)
+  })
+
+  it("the porridge only keeps you going: gold for gold it does less than ordinary bread", () => {
+    const per = (item: "porridge" | "rye-bread", key: "stamina" | "full" | "hp") => effectOf(item, 1)[key] / priceOf(item, 1)
+    for (const key of ["stamina", "full", "hp"] as const) expect(per("porridge", key), key).toBeLessThan(per("rye-bread", key))
+    expect(effectOf("porridge", 1).warm).toBe(0)
+  })
+})
+
+describe("digestion keeps its pace through a meal", () => {
+  it("eating does not restart the three minutes already under way", () => {
+    const at = 3 * 60_000 - 1
+    const p = player({ full: 10, fullAt: 0, bag: addItem({ bag: emptyBag(), item: "apple", count: 1 })! })
+    const eaten = apply(p, { type: "use", slot: 0 }, { now: at })
+    if (!eaten.ok) throw new Error(eaten.reason)
+    const added = eaten.state.full - 10
+    expect(fullNow(eaten.state, at)).toBe(10 + added)
+    // a moment later, at 3:00, the first three minutes since the last count are over
+    expect(fullNow(eaten.state, 3 * 60_000)).toBe(10 + added - 1)
+  })
+
+  it("an empty stomach starts counting from the meal", () => {
+    const p = player({ full: 0, fullAt: 0, bag: addItem({ bag: emptyBag(), item: "apple", count: 1 })! })
+    const eaten = apply(p, { type: "use", slot: 0 }, { now: 10 * 60_000 })
+    if (!eaten.ok) throw new Error(eaten.reason)
+    expect(eaten.state.fullAt).toBe(10 * 60_000)
+  })
+})

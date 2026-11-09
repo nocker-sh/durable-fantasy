@@ -12,13 +12,24 @@ it("handles points, parallel overlaps and separated endpoints symmetrically", ()
     [[0, 0, 0], [2, 0, 0], [1, 0, 0], [3, 0, 0], 0],
     [[1, 1, 0], [1, 1, 0], [0, 0, 0], [2, 0, 0], 1],
   ] as const
-  for (const [a, b, c, d, expected] of cases)
-    for (const [p, q, r, s] of [
+  for (const entry1 of cases) {
+    const a = entry1[0],
+      b = entry1[1],
+      c = entry1[2],
+      d = entry1[3],
+      expected = entry1[4]
+    for (const entry1 of [
       [a, b, c, d],
       [c, d, a, b],
       [b, a, d, c],
-    ])
+    ]) {
+      const p = entry1[0],
+        q = entry1[1],
+        r = entry1[2],
+        s = entry1[3]
       expect(distance({ firstStart: p, firstEnd: q, secondStart: r, secondEnd: s })).toBeCloseTo(expected, 12)
+    }
+  }
 })
 
 it("retains interior intersections for almost parallel directions", () => {

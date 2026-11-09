@@ -1,4 +1,4 @@
-// Every /dev page, at 1280 and 768 px wide, must fit its width: nothing scrolls sideways (the page,
+// Every studio page, at 1280 and 768 px wide, must fit its width: nothing scrolls sideways (the page,
 // the frame, or any box inside), and nothing pokes out past the frame; and the sidebars stay put
 // when the page is scrolled to the bottom. Pages are found from the
 // sidebar and each list's first row. Run with the dev server up: bun scripts/dev-overflow.ts
@@ -6,7 +6,7 @@ import { openDevPage } from "#/scripts/lib/open-dev-page"
 import { monitorPageLoad } from "#/scripts/lib/monitor-page-load"
 import { chromium, type Page } from "playwright-core"
 
-const BASE = process.env.BASE ?? "https://durable-fantasy.localhost"
+const BASE = process.env.BASE ?? "https://dev.durable-fantasy.localhost"
 const browser = await chromium.launch()
 const page = await browser.newPage({ ignoreHTTPSErrors: true })
 
@@ -22,13 +22,13 @@ try {
   const urls: string[] = []
   if (process.env.DEV_PAGE) {
     const pathname = new URL(process.env.DEV_PAGE, BASE).pathname
-    if ((process.env.DEV_PAGE !== "/dev" && !process.env.DEV_PAGE.startsWith("/dev/")) || (pathname !== "/dev" && !pathname.startsWith("/dev/")))
-      throw new Error("DEV_PAGE must be a local dev page path")
+    if (!process.env.DEV_PAGE.startsWith("/") || process.env.DEV_PAGE.startsWith("//") || new URL(process.env.DEV_PAGE, BASE).origin !== new URL(BASE).origin || !pathname.startsWith("/"))
+      throw new Error("DEV_PAGE must be a local studio page path")
     urls.push(process.env.DEV_PAGE)
   } else {
-    await open(page, "/dev")
+    await open(page, "/")
     const lists: string[] = await page.$$eval('[data-sidebar="menu-button"]', (as) => as.map((a) => a.getAttribute("href")!).filter(Boolean))
-    urls.push("/dev", "/dev/studio", "/dev/ui", "/dev/eyes", ...lists)
+    urls.push("/", "/studio", "/ui", "/eyes", ...lists)
     for (const list of lists) {
       await open(page, list)
       const first = await page.$$eval("tbody a", (links) => links[0]?.getAttribute("href") ?? null)

@@ -98,10 +98,10 @@ it("does not use a bed, shelf or fire as a dining surface by attaching chairs to
 
 it("ties staggered meals to every resident's routine without assuming everyone eats at once", () => {
   const f = fixture()
-  f.room.meal_service = { mode: "staggered", routine_source: "world/town/routines.ts" }
+  f.room.meal_service = { mode: "staggered", routine_source: "apps/main/world/town/routines.ts" }
   expect(f.audit()).toContain("room-dining: Staggered meal has no matching resident routine source: resident-a")
   expect(f.audit()).toContain("room-dining: Staggered meal has no matching resident routine source: resident-b")
-  for (const id of ["resident-a", "resident-b"]) f.documents.get(id)!.routine_source = { file: "world/town/routines.ts" }
+  for (const id of ["resident-a", "resident-b"]) f.documents.get(id)!.routine_source = { file: "apps/main/world/town/routines.ts" }
   expect(f.audit()).toEqual([])
   f.documents.get("resident-b")!.routine_source = { file: "old-routine.ts" }
   expect(f.audit()).toContain("room-dining: Staggered meal has no matching resident routine source: resident-b")

@@ -3,7 +3,7 @@
   "id": "room-tavern-lower-stairs",
   "kind": "rooms",
   "title": "フランツの酒場／1階 共用階段",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "town": "town-phanthiet",
   "building": "building-tavern",
   "bed_capacity": 0,

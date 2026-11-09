@@ -9,7 +9,7 @@ const piece = (symbol: string) => ({ symbol, name: symbol, owner: "Berta", sourc
 function fixture() {
   const use = {
     resident: "resident-b",
-    routine_source: { file: "world/town/routines.ts", key: "Berta", doing: "repair" },
+    routine_source: { file: "apps/main/world/town/routines.ts", key: "Berta", doing: "repair" },
     furniture: "T",
     seat_symbol: "B",
     mode: "quiet-repair",

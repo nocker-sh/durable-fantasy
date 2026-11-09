@@ -69,7 +69,7 @@ it("rejects an overflowing rotated point without clamping it into the frame", ()
 })
 it("rejects incomplete runtime coordinates despite their static tuple type", () => {
   const source = { origin: [0, 0, 0] satisfies [number, number, number], width: 8, depth: 6, quarterTurns: 0 }
-  for (const origin of [[], [0, 0], new Array<number>(3), null, {}]) {
+  for (const origin of [[], [0, 0], Array.from<number>({ length: 3 }), null, {}]) {
     Object.assign(source, { origin })
     expect(() => new SpatialFrame(source)).toThrow(RangeError)
   }

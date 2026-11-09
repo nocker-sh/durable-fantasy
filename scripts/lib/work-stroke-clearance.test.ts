@@ -24,7 +24,11 @@ function fixture(id: string) {
     f = room.furniture!.find((f) => f.hearth_maintenance)!,
     op = f.hearth_maintenance!,
     k = room.grid!.cell_m,
-    [x, z, w, d] = f.rect.map((v) => v * k),
+    pair1 = f.rect.map((v) => v * k),
+    x = pair1[0],
+    z = pair1[1],
+    w = pair1[2],
+    d = pair1[3],
     work = hearthSpatialStrokes({
       bounds: { x0: x, z0: z, x1: x + w, z1: z + d },
       front: f.hearth_front!,
@@ -64,7 +68,9 @@ it("rejects an actual intermediate arm intersection absent from both endpoints",
       solution = solveArmGrip({ skeleton: base.skeleton, side: f.candidate.hand, target: mid, pole: f.candidate.pole })!,
       middle = nativeArmSurfaces({ scale: 1, shoulder: shoulder, elbow: solution.elbow, wrist: solution.wrist })
     const world = (p: V3): Point3 => {
-        const [x, z] = quarterTurnPoint(p[0], p[2], base.turn)
+        const pair1 = quarterTurnPoint(p[0], p[2], base.turn)
+        const x = pair1[0],
+          z = pair1[1]
         return [x + f.candidate.body_m[0], p[1] + base.rootY, z + f.candidate.body_m[1]]
       },
       capsules = poses.flatMap((p) => {

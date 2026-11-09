@@ -2,7 +2,7 @@
 {
   "id": "room-h-g2-repair",
   "kind": "rooms",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "town": "town-phanthiet",
   "building": "building-h-g2",
   "bed_capacity": 0,
@@ -284,4 +284,4 @@
 
 ## 元の容器と保管時の形
 
-鋳掛けの道具箱はクルトの手道具を運び保管する木箱とする。蓋とたが・留め金、握りのある持ち手を描き、熱い鍋と溶けた錫を載せる面にはしない。作業の用途は `world/town/lines/households/tinker.ts` に対応し、工具の内訳と熱源の照合は別に残す。 元の家具の形を表示へ戻す修正であり、新しい平面への切替ではない。
+鋳掛けの道具箱はクルトの手道具を運び保管する木箱とする。蓋とたが・留め金、握りのある持ち手を描き、熱い鍋と溶けた錫を載せる面にはしない。作業の用途は `apps/main/world/town/lines/households/tinker.ts` に対応し、工具の内訳と熱源の照合は別に残す。 元の家具の形を表示へ戻す修正であり、新しい平面への切替ではない。

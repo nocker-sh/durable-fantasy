@@ -4,75 +4,77 @@
 
 ## 操作が流れる順
 
-複数の品の収納は `world/core/put-stacks.ts` が提示順に組み立て、全品が入る場合だけ新しい袋を返す。取引所からの受領と対面取引はこの処理を共有する。重量の制限、所持金の反映、操作ごとの通知は `receive-items.ts` と `trade-in.ts` に残し（受取りの重量は採集・製作・依頼の受取りと同じく `over-weight.ts` で判定する）、袋の操作にプレイヤーの状態や通信を持ち込まない。
+複数の品の収納は `apps/main/world/core/put-stacks.ts` が提示順に組み立て、全品が入る場合だけ新しい袋を返す。取引所からの受領と対面取引はこの処理を共有する。重量の制限、所持金の反映、操作ごとの通知は `receive-items.ts` と `trade-in.ts` に残し（受取りの重量は採集・製作・依頼の受取りと同じく `over-weight.ts` で判定する）、袋の操作にプレイヤーの状態や通信を持ち込まない。
 
-店での売買は `world/core/buy.ts` と `sell.ts`、頼まれごとの受注と完了は `world/core/take-errand.ts` と `hand-errand.ts` が扱う。`apply.ts` は共通の回復・行動不能の確認を済ませてから各操作へ振り分ける。頼まれごとは種類に応じて材料、または届け先と荷物を必須とする型にし、処理側で欠落を補わない。購入前の品揃え・品質と価格の確認は `get-shop-purchase.ts` が受け持ち、所持金・重量・収納を確認してから品と代金・一日ごとの親しさを一緒に確定する。
+店での売買は `apps/main/world/core/buy.ts` と `sell.ts`、頼まれごとの受注と完了は `apps/main/world/core/take-errand.ts` と `hand-errand.ts` が扱う。`apply.ts` は共通の回復・行動不能の確認を済ませてから各操作へ振り分ける。頼まれごとは種類に応じて材料、または届け先と荷物を必須とする型にし、処理側で欠落を補わない。購入前の品揃え・品質と価格の確認は `get-shop-purchase.ts` が受け持ち、所持金・重量・収納を確認してから品と代金・一日ごとの親しさを一緒に確定する。
 
-倉庫の預け入れ・引き取りは `world/core/storage/store.ts` と `retrieve.ts` が扱い、共通の回復・行動不能の判定後に呼ぶ。料金、品質を保った移し替え、空き枠・重量の判定をここにまとめる。店と倉庫の一日一回の親しさ更新は `commerce-friendship.ts` を共用する。親しさの定数は `friendship-rules.ts`、増加は `befriend.ts`、値引き率と価格への適用は `friend-discount.ts` と `friend-price.ts`、頼まれごとと親しさ更新の日付は `day-of.ts` が定義し、売買や製作から頼まれごとの定義表を参照しない。
+倉庫の預け入れ・引き取りは `apps/main/world/core/storage/store.ts` と `retrieve.ts` が扱い、共通の回復・行動不能の判定後に呼ぶ。料金、品質を保った移し替え、空き枠・重量の判定をここにまとめる。店と倉庫の一日一回の親しさ更新は `commerce-friendship.ts` を共用する。親しさの定数は `friendship-rules.ts`、増加は `befriend.ts`、値引き率と価格への適用は `friend-discount.ts` と `friend-price.ts`、頼まれごとと親しさ更新の日付は `day-of.ts` が定義し、売買や製作から頼まれごとの定義表を参照しない。
 
-攻撃技・魔法・祈りの効果の型は `world/core/skill-types.ts` で種類ごとに分け、定義表は `skills.ts` に置く。`art-swing.ts` の攻撃計算は物理技と魔法の効果だけを受け取り、必要な倍率・能力値の指定漏れを既定値で補わない。祈りと応急手当の回復は `cast.ts`、攻撃技の消費は `pay-art.ts` が扱い、`get-skill-unavailable-reason.ts` で武器・習熟・待ち時間・SP の判定順を共有する。討伐報酬・経験値分配・被弾・復活は `loot.ts`・`share.ts`・`hurt.ts`・`revive.ts` に置き、討伐者と分配を受ける仲間の成長と回復は `grow-combat-player.ts` を使う。共通の自然回復と行動不能の確認は引き続き `apply.ts` が先に行う。
+攻撃技・魔法・祈りの効果の型は `apps/main/world/core/skill-types.ts` で種類ごとに分け、定義表は `skills.ts` に置く。`art-swing.ts` の攻撃計算は物理技と魔法の効果だけを受け取り、必要な倍率・能力値の指定漏れを既定値で補わない。祈りと応急手当の回復は `cast.ts`、攻撃技の消費は `pay-art.ts` が扱い、`get-skill-unavailable-reason.ts` で武器・習熟・待ち時間・SP の判定順を共有する。討伐報酬・経験値分配・被弾・復活は `loot.ts`・`share.ts`・`hurt.ts`・`revive.ts` に置き、討伐者と分配を受ける仲間の成長と回復は `grow-combat-player.ts` を使う。共通の自然回復と行動不能の確認は引き続き `apply.ts` が先に行う。
 
-店全体の営業と、会話相手本人の店番は `world/maps/keeper-present.ts` の `keeperPresent` を共用して判定する。交代相手が営業していても、休んでいる本人には買い物や製作依頼を出さない。会話の選択時にも現在の店番を確認する。
+店全体の営業と、会話相手本人の店番は `apps/main/world/maps/keeper-present.ts` の `keeperPresent` を共用して判定する。交代相手が営業していても、休んでいる本人には買い物や製作依頼を出さない。会話の選択時にも現在の店番を確認する。
 
-採集道具の選択は `world/core/gathering-tool.ts` で行い、袋と装備中の使用可能な道具を品質込みの性能で比べる。同じ性能なら装備中を優先する。選んだ道具の所在を型で区別し、採集成功時だけその道具の耐久を減らす。
+採集道具の選択は `apps/main/world/core/gathering-tool.ts` で行い、袋と装備中の使用可能な道具を品質込みの性能で比べる。同じ性能なら装備中を優先する。選んだ道具の所在を型で区別し、採集成功時だけその道具の耐久を減らす。
 
-製作依頼の受注と受け取りは `world/core/commission/order.ts` と `collect.ts` の状態遷移で扱う。`apply.ts` は共通の回復・行動不能判定を済ませてから呼び出す。材料や所持金が不足した受注、持ち物が満杯の受け取りでは、依頼・材料・代金を変更しない。
+製作依頼の受注と受け取りは `apps/main/world/core/commission/order.ts` と `collect.ts` の状態遷移で扱う。`apply.ts` は共通の回復・行動不能判定を済ませてから呼び出す。材料や所持金が不足した受注、持ち物が満杯の受け取りでは、依頼・材料・代金を変更しない。
 
-ブラウザでは `world/game.ts` の Game がゲーム全体を持つ。Game は three.js の場面、キー入力、部屋との接続、プレイヤーのデータを持ち、画面に出すものを一つの値（`world/state.ts`）にまとめる。React の部品（`components/`）は、`components/game/game-provider.tsx` で同じ Game の参照を共有し、`hooks/use-game.ts` と `use-game-state.ts` を通して操作と購読を行う。ゲームの状態を React 側で持ち直さない。セッションの状態と、接続・サーバー通知・会話・生産や装備操作・交流の処理は `world/client/` が受け持つ。各処理は `world/client/game-session.ts` の同じ GameSession を参照し、`create-session-context.ts` から必要な操作だけを渡される。`world/parts/` はキー入力、開いている窓、部屋の先読み、会話の選択肢、出来事の知らせなどを受け持つ。
+ブラウザでは `apps/main/world/game.ts` の Game がゲーム全体を持つ。Game は three.js の場面、キー入力、部屋との接続、プレイヤーのデータを持ち、画面に出すものを一つの値（`apps/main/world/state.ts`）にまとめる。React の部品（`apps/main/components/`）は、`apps/main/components/game/game-provider.tsx` で同じ Game の参照を共有し、`apps/main/hooks/use-game.ts` と `use-game-state.ts` を通して操作と購読を行う。ゲームの状態を React 側で持ち直さない。セッションの状態と、接続・サーバー通知・会話・生産や装備操作・交流の処理は `apps/main/world/client/` が受け持つ。各処理は `apps/main/world/client/game-session.ts` の同じ GameSession を参照し、`create-session-context.ts` から必要な操作だけを渡される。`apps/main/world/parts/` はキー入力、開いている窓、部屋の先読み、会話の選択肢、出来事の知らせなどを受け持つ。
 
-製作依頼の残り時間は、表示中の職人に未完成の注文がある間だけ更新する。閉じた窓、注文のない窓、すべて完成した窓にはタイマーを残さない。期限の更新には `hooks/use-deadline-clock.ts` を使い、長い製作待ちは低い頻度で更新しつつ最後の期限では完成表示へ切り替える。
+製作依頼の残り時間は、表示中の職人に未完成の注文がある間だけ更新する。閉じた窓、注文のない窓、すべて完成した窓にはタイマーを残さない。期限の更新には `apps/main/hooks/use-deadline-clock.ts` を使い、長い製作待ちは低い頻度で更新しつつ最後の期限では完成表示へ切り替える。
+
+クライアントでサーバーの時刻と比べる処理は、端末の `Date.now()` を直接使わず `apps/main/world/client/server-now.ts` を通す。`send-initial-map-state.ts` が初期通知にサーバーの時刻を添え、`server-messages.ts` が端末の時計との差を状態の `clockOffset` に置く。操作の事前確認（`preview-command.ts`）、`use-deadline-clock.ts`、Game の時刻、場面の生き物の時計（`SceneOptions.now`）は同じ差を使う。規則は [[game-system#7.5 時刻と昼夜]] にある。
 
 プレイヤーの経路移動は実際の経過時間から距離を計算し、マスの境界で余った距離も次の区間に使う（`lib/engine/path-follower.ts`）。速度の設定は生成時に固定し、`advance-path-waypoint.ts` が一区間の位置と距離の消費を扱う。各更新の残距離・通過した点数・向きは呼出し内だけに保持し、呼出し元の座標と経路の配列を更新する。低い描画頻度でもサーバーと同じ歩行速度を保ち、停止中に経過した時間も現在の経路の終点まで反映する。演出の時間刻みの上限は移動距離に使わない。
 
-経路探索の候補の優先順位は `lib/engine/min-priority-queue.ts` が管理する。ヒープの作業配列を外へ渡さず、探索のたびに独立したキューを作る。格子の設定は名前付きの入力で渡し、大きさ・解像度と短縮時の余白は生成時に固定する。障害物の配列の中身は最新の値を読む。短縮時の余白は `world/scene/path.ts` が渡し、エンジンでゲームの値を決めない。モンスターは身体の余白を通行格子側で検査してセル経路を要求するため、短縮時の余白を追加しない。
+経路探索の候補の優先順位は `lib/engine/min-priority-queue.ts` が管理する。ヒープの作業配列を外へ渡さず、探索のたびに独立したキューを作る。格子の設定は名前付きの入力で渡し、大きさ・解像度と短縮時の余白は生成時に固定する。障害物の配列の中身は最新の値を読む。短縮時の余白は `apps/main/world/scene/path.ts` が渡し、エンジンでゲームの値を決めない。モンスターは身体の余白を通行格子側で検査してセル経路を要求するため、短縮時の余白を追加しない。
 
 A* 探索のコスト・前のセル・候補の展開は `lib/engine/grid-path-search.ts` に分ける。探索ごとに独立した作業配列を作り、障害物の更新を読み、同じ優先度の候補の順も維持する。`lib/engine/grid-pathfinder.ts` は端点の補正と探索・経路の短縮を組み立てる。設定の検査は `assert-pathfinder-grid.ts`、設定の共有型は `grid-pathfinder-types.ts` に置く。経路探索と曲線の平面座標は `vector2-types.ts` の `Vector2Tuple` を直接参照し、処理のクラスを型だけの依存元にしない。塞がれた端点の補正は `lib/engine/get-nearby-free-grid-cell.ts` が持ち、候補の範囲と周回・行の順を保つ。前のセルへの参照からの経路点の復元は `lib/engine/get-grid-waypoints.ts` が担い、開始点へ届かない参照や循環から部分的な経路を作らない。
 
-地面の形と配置の共有型は `world/maps/layout-types.ts`、地形の機能がないことを表す定数は `empty-layout-features.ts` に置く。中央の広場と周囲の地区の配置は `layout.ts` の `SQUARE_LAYOUT` が持つ。河川の座標列は一度だけ生成し、共同洗濯場の基準位置も同じ点列から求める。`lib/engine/get-nearest-polyline-x.ts` は行に最も近い標本の x 座標を返し、標本の間の補間とは区別する。各地区と野外の地面は `world/maps/layouts/` に一つずつ置き、`ground-layouts.ts` は野外の定義の対応と外縁を加えた配置だけを組み立てる。共通の空き地の初期値は `ground-layout-bases.ts`、土道の補間は `get-dirt-road.ts`、海岸・砂丘・崖・峠はそれぞれの地形関数を使う。`with-rimmed-layout.ts` は元の地形に閉じた外縁の高さを加え、`get-ground-rim-height.ts` は同じ位置のノイズを各辺で共有する。
+地面の形と配置の共有型は `apps/main/world/maps/layout-types.ts`、地形の機能がないことを表す定数は `empty-layout-features.ts` に置く。中央の広場と周囲の地区の配置は `layout.ts` の `SQUARE_LAYOUT` が持つ。河川の座標列は一度だけ生成し、共同洗濯場の基準位置も同じ点列から求める。`lib/engine/get-nearest-polyline-x.ts` は行に最も近い標本の x 座標を返し、標本の間の補間とは区別する。各地区と野外の地面は `apps/main/world/maps/layouts/` に一つずつ置き、`ground-layouts.ts` は野外の定義の対応と外縁を加えた配置だけを組み立てる。共通の空き地の初期値は `ground-layout-bases.ts`、土道の補間は `get-dirt-road.ts`、海岸・砂丘・崖・峠はそれぞれの地形関数を使う。`with-rimmed-layout.ts` は元の地形に閉じた外縁の高さを加え、`get-ground-rim-height.ts` は同じ位置のノイズを各辺で共有する。
 
-マップの公開定義は `world/maps/index.ts`、組み立ての入口は `create-maps.ts` に置く。屋外の初期定義は `outdoor-map-definitions.ts`、定義の生成は `create-outdoor-map.ts`、共通の素材の参照先は `map-asset-rules.ts` が持つ。JSON の読込みは `read-map-grid.ts` が未知の値から行い、`map-grid-schema.ts` で正確な二成分の整数の座標を検証する。行の正方形の形とセルの種類は `assert-map-walk-grid.ts` を読込みと通行領域の探索で共有する。名前付きの場所は範囲内とし、家具や設備の中心も指すため歩けるセルだけには限定しない。
+マップの公開定義は `apps/main/world/maps/index.ts`、組み立ての入口は `create-maps.ts` に置く。屋外の初期定義は `outdoor-map-definitions.ts`、定義の生成は `create-outdoor-map.ts`、共通の素材の参照先は `map-asset-rules.ts` が持つ。JSON の読込みは `read-map-grid.ts` が未知の値から行い、`map-grid-schema.ts` で正確な二成分の整数の座標を検証する。行の正方形の形とセルの種類は `assert-map-walk-grid.ts` を読込みと通行領域の探索で共有する。名前付きの場所は範囲内とし、家具や設備の中心も指すため歩けるセルだけには限定しない。
 
 室内の表示名は `get-indoor-map-name.ts`、街側の地上階の戸は `with-indoor-map-doors.ts`、住民の初期配置は `get-map-residents.ts` が担当する。住民は同じ勤務先の定義と確定した地図から一度だけ配置する。名前付きの座標を引く `get-spot-cell.ts` は、その表自身のキーだけを読み、オブジェクトの継承属性を座標として返さない。組み立てたマップの変更可能な定義と素材の設定は別の組み立てや初期定義と共有しない。
 
-屋外マップの接続の組み立ては `world/maps/connect-outdoor-maps.ts` が、入力の地図を変更しない作業用の定義で行う。`get-largest-walkable-region.ts` が地図ごとの最大の通行領域を選び、各領域の探索は `get-walkable-region.ts` が担当する。領域は組み立てごとに一度求め、地図 ID だけで別のグリッドへ使い回さない。`get-outdoor-crossings.ts` が升目の開いた辺を列挙し、`get-outdoor-crossing.ts` が `get-road-ends.ts` の道の端に近い候補を選ぶ。出入口と到着点は `get-crossing-cells.ts`、各点の通行と所属領域の照合は `is-crossing-passable.ts`、境界からの距離は `crossing-rules.ts` が持つ。
+屋外マップの接続の組み立ては `apps/main/world/maps/connect-outdoor-maps.ts` が、入力の地図を変更しない作業用の定義で行う。`get-largest-walkable-region.ts` が地図ごとの最大の通行領域を選び、各領域の探索は `get-walkable-region.ts` が担当する。領域は組み立てごとに一度求め、地図 ID だけで別のグリッドへ使い回さない。`get-outdoor-crossings.ts` が升目の開いた辺を列挙し、`get-outdoor-crossing.ts` が `get-road-ends.ts` の道の端に近い候補を選ぶ。出入口と到着点は `get-crossing-cells.ts`、各点の通行と所属領域の照合は `is-crossing-passable.ts`、境界からの距離は `crossing-rules.ts` が持つ。
 
 町からの接続数は `get-outdoor-map-distances.ts`、野外の出現位置は `get-outdoor-spawn.ts` が求める。候補と辺の順、同じ大きさの通行領域を選ぶ順は保持する。辺の型や通行領域とセルの組を型の強制変換で通さず、各セルの所属する地図の幅で索引を求める。欠けた地図や帰りの接続を仮の位置で補わない。屋外の地図の大きさと並びの仕様は [[town#世界の升目]] に従う。
 
-`world/maps/layouts.ts` は地図の選択と町の踏み跡を加えた配置の保持を担当する。地図名は `Map` で照会し、継承したプロパティを地図として使わない。戸口の壁ごとの座標と外向きは `get-house-door-approach.ts`、描画用の踏み跡は `get-house-door-trail.ts`、道路上の最近点は `get-nearest-road-point.ts` が持つ。線分への射影は `lib/engine/get-nearest-segment-point.ts` を使う。踏み跡は通行判定を変えない。地面の保存識別子には地図選択・踏み跡の計算・家と戸口の定義も含め、参照の検査は地図選択からの依存も辿る。識別子の組立ては `lib/engine/get-source-fingerprint.ts`、文字列のハッシュは `get-string-hash.ts` に分ける。既存の保存形式に合わせてパス順の内容を結合し、文字列は UTF-16 の各符号単位を順に処理する。参照するファイルはアプリの別名定義から解決し、ライブラリの場所をゲーム側の階層数から逆算しない。検査では依存先の網羅に加え、実際に識別子へ渡った全ソースを正本のファイル内容と照合する。
+`apps/main/world/maps/layouts.ts` は地図の選択と町の踏み跡を加えた配置の保持を担当する。地図名は `Map` で照会し、継承したプロパティを地図として使わない。戸口の壁ごとの座標と外向きは `get-house-door-approach.ts`、描画用の踏み跡は `get-house-door-trail.ts`、道路上の最近点は `get-nearest-road-point.ts` が持つ。線分への射影は `lib/engine/get-nearest-segment-point.ts` を使う。踏み跡は通行判定を変えない。地面の保存識別子には地図選択・踏み跡の計算・家と戸口の定義も含め、参照の検査は地図選択からの依存も辿る。識別子の組立ては `lib/engine/get-source-fingerprint.ts`、文字列のハッシュは `get-string-hash.ts` に分ける。既存の保存形式に合わせてパス順の内容を結合し、文字列は UTF-16 の各符号単位を順に処理する。参照するファイルはアプリの別名定義から解決し、ライブラリの場所をゲーム側の階層数から逆算しない。検査では依存先の網羅に加え、実際に識別子へ渡った全ソースを正本のファイル内容と照合する。
 
-地面の高さは `world/maps/ground/get-ground-height.ts` が基礎、広場、台地と階段、川、共同洗濯場、野外の地形の順で組み立てる。各段は同じ場所と地面定義の読取り専用の文脈を受け取り、高さを返す。階段は台地や洗い場の高さより後に適用する。野外の地形の混合では道路の線分からの距離を使い、地形の関数へ渡す道路距離は生成中の道路の標本から読む。これらの二つの距離と、地面の格子を作る順序は混同しない。格子の生成は `create-ground-fields.ts` が場面の共有状態を読まず、渡された配置と所有する配列で行を先に、各行の列を後に走査し、`sample-ground-field-cell.ts` が川・道路・踏み跡・路面の種類を高さより先に書く。道路の形状は `get-ground-road-paths.ts` が固定し、揺らぎを含む距離と勝った路面の種類は `get-road-field-sample.ts` が組で返す。道がなければ既存の未配置の値を返し、道路用のノイズは計算しない。踏み跡の距離は `get-trail-field-distance.ts` が持つ。これらの計算と共有する型・寸法は `world/maps/ground/` に置く。矩形内の判定は `lib/engine/in-rect.ts` で共有する。描画側の `compute-fields.ts` は生成済みの値を既存の配列へ写し、場面が保持する標本の参照を維持する。
+地面の高さは `apps/main/world/maps/ground/get-ground-height.ts` が基礎、広場、台地と階段、川、共同洗濯場、野外の地形の順で組み立てる。各段は同じ場所と地面定義の読取り専用の文脈を受け取り、高さを返す。階段は台地や洗い場の高さより後に適用する。野外の地形の混合では道路の線分からの距離を使い、地形の関数へ渡す道路距離は生成中の道路の標本から読む。これらの二つの距離と、地面の格子を作る順序は混同しない。格子の生成は `create-ground-fields.ts` が場面の共有状態を読まず、渡された配置と所有する配列で行を先に、各行の列を後に走査し、`sample-ground-field-cell.ts` が川・道路・踏み跡・路面の種類を高さより先に書く。道路の形状は `get-ground-road-paths.ts` が固定し、揺らぎを含む距離と勝った路面の種類は `get-road-field-sample.ts` が組で返す。道がなければ既存の未配置の値を返し、道路用のノイズは計算しない。踏み跡の距離は `get-trail-field-distance.ts` が持つ。これらの計算と共有する型・寸法は `apps/main/world/maps/ground/` に置く。矩形内の判定は `lib/engine/in-rect.ts` で共有する。描画側の `compute-fields.ts` は生成済みの値を既存の配列へ写し、場面が保持する標本の参照を維持する。
 
-歩行面の高さは `world/maps/ground/get-walk-height.ts` が地面・橋・登録した床面から求める。橋の上でも床面の候補を打ち切らない。橋の両岸と弧の高さは `get-bridge-deck-height.ts` に揃え、その橋の中央を通る線で地形を読む。`world/scene/walk-h.ts` と `bridge-deck-h.ts` は選択中の描画の地形と面を渡す入口にする。屋外の入口の段は `world/town/get-outdoor-walk-surfaces.ts`、室内の床と開口は `get-interior-walk-surfaces.ts` から取得し、メッシュを作らずに同じ面を読める。これらの矩形と高さは従来のマップの表示単位であり、実寸への換算とは分ける。
+歩行面の高さは `apps/main/world/maps/ground/get-walk-height.ts` が地面・橋・登録した床面から求める。橋の上でも床面の候補を打ち切らない。橋の両岸と弧の高さは `get-bridge-deck-height.ts` に揃え、その橋の中央を通る線で地形を読む。`apps/main/world/scene/walk-h.ts` と `bridge-deck-h.ts` は選択中の描画の地形と面を渡す入口にする。屋外の入口の段は `apps/main/world/town/get-outdoor-walk-surfaces.ts`、室内の床と開口は `get-interior-walk-surfaces.ts` から取得し、メッシュを作らずに同じ面を読める。これらの矩形と高さは従来のマップの表示単位であり、実寸への換算とは分ける。
 
-`create-map-walk-sampler.ts` は実在するマップの地形と床面を所有し、選択中の描画に触れず高さを読む。室内の表示用の床の基準は `world/town/get-interior-floor-height.ts` を描画と共有する。配列や面の可変な参照は返さず、別の地図の生成や元の段の後からの変更に依存しない。`get-map-cell-world-point.ts` が歩けるセルの中心とこの高さを共通座標へ接続する。表示の床の除去、実寸への換算と未配置の扱いは [[spatial-model#階層を通した実寸の変換]] に従う。
+`create-map-walk-sampler.ts` は実在するマップの地形と床面を所有し、選択中の描画に触れず高さを読む。室内の表示用の床の基準は `apps/main/world/town/get-interior-floor-height.ts` を描画と共有する。配列や面の可変な参照は返さず、別の地図の生成や元の段の後からの変更に依存しない。`get-map-cell-world-point.ts` が歩けるセルの中心とこの高さを共通座標へ接続する。表示の床の除去、実寸への換算と未配置の扱いは [[spatial-model#階層を通した実寸の変換]] に従う。
 
 経路の短縮は `lib/engine/get-shortened-path.ts` に分け、見通しの判定を探索側から渡す。見通しを単調と仮定せず遠い候補から調べ、短縮できない区間では元の隣接点を残す。
 
 キーを押し続けた移動では、既存の経路をそのフレームの経過時間だけ進めてから、次の経路を作って送信する。新しく送った経路に直前のフレームの待ち時間を使うと、サーバーが経路を受け取るより先に進みすぎるため、入力と移動更新の順序を保つ。
 
-生き物の出現定義は `world/core/monsters.ts` に置き、`spawn-of.ts` と `spawns-on.ts` が読み込み時に ID とマップの索引を作る。戦闘の対象検索は前者、マップ入場・復活確認・描画の生成は後者を共有する。マップ内の全 HP を読むときに各個体を全定義から探し直さず、定義順を保った読み取り専用の一覧を使う。未知のマップには空の一覧を返し、問い合わせのたびに索引を増やさない。
+生き物の出現定義は `apps/main/world/core/monsters.ts` に置き、`spawn-of.ts` と `spawns-on.ts` が読み込み時に ID とマップの索引を作る。戦闘の対象検索は前者、マップ入場・復活確認・描画の生成は後者を共有する。マップ内の全 HP を読むときに各個体を全定義から探し直さず、定義順を保った読み取り専用の一覧を使う。未知のマップには空の一覧を返し、問い合わせのたびに索引を増やさない。
 
-移動先に着いて行う会話・採集と、戦闘の追跡は `world/scene/runtime/action-target.ts` の `PendingAction` が一つだけ保持する。新しい行動は前の予約を置き換える。到着した会話・採集は通知前に取り出して消費し、通知中に設定された次の行動を同じ到着で実行しない。戦闘は短い追跡経路の到着では消費せず、停止・別の行動・対象の戦闘終了で解除する。 敵への接近は、攻撃範囲内の空きマスへ実際に経路を引けることまで確かめる。最初の候補が到達不能なら周囲の別候補を試し、経路が受理された時点で探索を止める。
+移動先に着いて行う会話・採集と、戦闘の追跡は `apps/main/world/scene/runtime/action-target.ts` の `PendingAction` が一つだけ保持する。新しい行動は前の予約を置き換える。到着した会話・採集は通知前に取り出して消費し、通知中に設定された次の行動を同じ到着で実行しない。戦闘は短い追跡経路の到着では消費せず、停止・別の行動・対象の戦闘終了で解除する。 敵への接近は、攻撃範囲内の空きマスへ実際に経路を引けることまで確かめる。最初の候補が到達不能なら周囲の別候補を試し、経路が受理された時点で探索を止める。
 
-Player DO の入口は RPC の型、保存の単位、時計と相手の取得を持ち、操作ごとの組み立ては `world/server/` に置く。`run-player-command.ts`・`give-player-item.ts`・`reset-player-record.ts` がコマンドと開発用の操作を担当し、倒れたときの位置の停止は `freeze-player-location.ts` を共有する。採集・店・戦闘・受取箱の受領は各 `receive-player-*.ts`、戦闘の支払いは `pay-player-strike.ts`、注文の預かりは `hold-player-order.ts` が受領記録と公開する状態を同じ保存用の記録へ反映する。配送の照会は `read-player-delivery.ts`、受取箱の受領済み照会は `read-player-inbox-receipt.ts` に置く。
+Player DO の入口は RPC の型、保存の単位、時計と相手の取得を持ち、操作ごとの組み立ては `apps/main/world/server/` に置く。`run-player-command.ts`・`give-player-item.ts`・`reset-player-record.ts` がコマンドと開発用の操作を担当し、倒れたときの位置の停止は `freeze-player-location.ts` を共有する。採集・店・戦闘・受取箱の受領は各 `receive-player-*.ts`、戦闘の支払いは `pay-player-strike.ts`、注文の預かりは `hold-player-order.ts` が受領記録と公開する状態を同じ保存用の記録へ反映する。配送の照会は `read-player-delivery.ts`、受取箱の受領済み照会は `read-player-inbox-receipt.ts` に置く。
 
 部屋から届く通常コマンド・倉庫の預け入れと引取り・依頼・委託・立ち上がりは、接続番号も Player DO へ渡す。`run-player-command.ts` は、部屋が先に認めた接続でも保存先で切替・退出済みなら、回復や状態の公開・資産の変更より前に拒否する。接続の確認と操作の確定は同じ保存記録で行い、接続番号はゲーム規則の Context へ渡さない。接続を付けない内部処理の呼出しと従来の保存形式は維持する。[[world/server/map-room/storage-connection.test.ts]] は正本の倉庫番の配置と営業時間で、本物の部屋の受付と Player DO の入場・退出・保存を通す。部屋で接続を認めた後、操作が届く直前に別接続へ引き継ぐ場合と退出する場合の両方で、預け入れ・引取りと普通の素材・品質と作り手と摩耗のある道具を検査する。古い要求と再起動後の再要求、空の接続番号で全保存記録を保ち、現在の接続からは従来どおり成立することを確認する。時刻・容量・所持品と窓口の近くの位置は局所条件で、時計・保存先・クラウドの起動環境と RPC の接続先解決・配送順だけを差し替える。そこまでの移動と入手、実 WebSocket の配送や各依頼と委託の全経路、同じ選択内容へ戻った後の操作番号の重複排除や最終画面はこの検査の対象外。
 
 対面取引のプレイヤー側は `begin-player-trade.ts`・`prepare-player-trade.ts`・`finish-player-trade.ts` が受付と確定を、`advance-player-trade.ts` が再試行の予約と相手への呼出しを持つ。後者は相手を取得する関数を入口から受け取り、DO の定義へ戻る依存を作らない。操作の入力とアラームを予約する文脈の型は `player-operation-types.ts` に置き、時計は入口から渡す。
 
-プレイヤーの状態の公開順は、保存形式の版とは別の `PlayerState.revision` で表す。`world/server/publish-player.ts` が番号を進め、Player DO は返す状態もこの値にそろえる。対面取引のコーディネーターが本人の状態を変更する経路も含める。クライアントの `world/client/player-publication.ts` を、操作応答・非同期通知・入場時の初期状態と Game の状態更新で共有する。順序の規則は [[game-system#13. 永続化]] にある。
+プレイヤーの状態の公開順は、保存形式の版とは別の `PlayerState.revision` で表す。`apps/main/world/server/publish-player.ts` が番号を進め、Player DO は返す状態もこの値にそろえる。対面取引のコーディネーターが本人の状態を変更する経路も含める。クライアントの `apps/main/world/client/player-publication.ts` を、操作応答・非同期通知・入場時の初期状態と Game の状態更新で共有する。順序の規則は [[game-system#13. 永続化]] にある。
 
-ブラウザはマップの部屋と WebSocket でつながる。送り合うメッセージの形は `world/protocol.ts` にあり、サーバーは受け取ったメッセージを zod で確かめる。部屋の入口は `routes/map/[mapId].ws.ts` で、メッセージの種類ごとの処理は `world/server/map-room/` にある。戦闘の対応表は `combat.ts`、受付は `handle-attack.ts`、分配候補の接続の取得と結果通知は `combat-audience.ts` と `notify-combat.ts` が受け持つ。攻撃要求と命中は `world/server/begin-strike.ts` と `advance-strike.ts` が二段階の RPC で保存し、通常攻撃と戦技の受付を `world/core/combat-payment.ts` の受領記録で固定し、戦技の消費を重複させない。受付は予約時の世代・HP・スタミナも確認し、未払いの古い要求を復活後の状態で受け直さない。未完了の要求は Wild DO のアラームで再送する。保存形式と移行は `world/server/wild-record.ts` にあり、同じ対象と同じ攻撃者には未完了の要求を重ねない。討伐の落とし物と分配先、反撃の抽選は `world/server/combat-plan.ts` が予約時に決める。命中と配送要求を一緒に保存し、別の RPC か次のアラームが受取人ごとのキューを配送する。`world/core/receive-combat.ts` が返す受領記録は結果と同じ保存単位に置き、受領確認が失われた場合も先の ID から順に送り直す。復活でプレイヤーの世代を進め、以前の世代への反撃は新しい HP に適用しない。ブラウザは命中通知で描画とセッションの敵 HP・復活時刻を更新し、倒れた対象が自分の戦闘対象なら解除する。描画がまだない場合も状態を保持する。敵がいるマップでは既存の接続確認に合わせて `heartbeat.ts` がサーバーの現在の HP と復活時刻を読み直し、接続中のブラウザへ返す。命中の確定と `Wild.snapshot` は `world/server/advance-wild-revision.ts` と `publish-wild.ts` の同じ公開順を使い、番号を HP と同じ保存単位に置く。`world/client/merge-wild.ts` が敵ごとに状態をマージし、`RoomClient` が接続の切り替え時に比較対象を空にする。番号の意味と古い応答の扱いは [[game-system#8. 戦闘]] にある。接続ごとに更新間隔を制限し、敵のいない町では生き物を問い合わせず、未参加の接続ではいずれの問い合わせもしない。Player DO の状態変更の配送更新番号も確認し、通常操作の応答が失われた場合やアラームが届けた結果を現在のマップへ反映する。読み出しだけではこの番号を進めず、全状態の公開順とは区別する。番号が変わったときだけ状態を送るため、町へ移動した後の結果も復元しつつ、同じ持ち物や演出を繰り返し配信しない。定期同期の再送は [[game-system#8. 戦闘]] に従い、`heartbeat.ts` がプレイヤー・生き物・採集資源の同期を個別に進め、`notifications.ts` が送信の成否を返す。復活はこの応答で反映し、ブラウザの時刻だけでは HP を戻さない。攻撃の拒否通知には対象の識別子を付け、描画側は現在追っている対象が一致する場合だけ停止する。前の討伐に対する遅い拒否で、次の敵への移動や別の行動を取り消さない。報酬の配送は討伐が確定したときだけ行い、分配の計算は `world/core/party/share-out.ts` に置く。戦闘の演出・結果通知の失敗で、報酬や反撃の保存を中断しない。通知の失敗は内容を含めず記録し、再接続では保存済みの状態を読み直す。保存や DO 間の呼び出しの失敗は通知の失敗として握りつぶさない。
+ブラウザはマップの部屋と WebSocket でつながる。送り合うメッセージの形は `apps/main/world/protocol.ts` にあり、サーバーは受け取ったメッセージを zod で確かめる。形の合わないメッセージを受けた部屋は接続を 1007 で閉じるので、ブラウザは送る前に同じ形を `apps/main/world/client/send-to-room.ts` で確かめ、通らないものは送らずにその場で断る。そのため 1007 で閉じられたときは部屋が新しい版で動いているとみなし、`room-client.ts` はつなぎ直さずに読み込み直しを求める。部屋の入口は `routes/map/[mapId].ws.ts` で、メッセージの種類ごとの処理は `apps/main/world/server/map-room/` にある。戦闘の対応表は `combat.ts`、受付は `handle-attack.ts`、分配候補の接続の取得と結果通知は `combat-audience.ts` と `notify-combat.ts` が受け持つ。攻撃要求と命中は `apps/main/world/server/begin-strike.ts` と `advance-strike.ts` が二段階の RPC で保存し、通常攻撃と戦技の受付を `apps/main/world/core/combat-payment.ts` の受領記録で固定し、戦技の消費を重複させない。受付は予約時の世代・HP・スタミナも確認し、未払いの古い要求を復活後の状態で受け直さない。未完了の要求は Wild DO のアラームで再送する。保存形式と移行は `apps/main/world/server/wild-record.ts` にあり、同じ対象と同じ攻撃者には未完了の要求を重ねない。討伐の落とし物と分配先、反撃の抽選は `apps/main/world/server/combat-plan.ts` が予約時に決める。命中と配送要求を一緒に保存し、別の RPC か次のアラームが受取人ごとのキューを配送する。`apps/main/world/core/receive-combat.ts` が返す受領記録は結果と同じ保存単位に置き、受領確認が失われた場合も先の ID から順に送り直す。復活でプレイヤーの世代を進め、以前の世代への反撃は新しい HP に適用しない。ブラウザは命中通知で描画とセッションの敵 HP・復活時刻を更新し、倒れた対象が自分の戦闘対象なら解除する。描画がまだない場合も状態を保持する。敵がいるマップでは既存の接続確認に合わせて `heartbeat.ts` がサーバーの現在の HP と復活時刻を読み直し、接続中のブラウザへ返す。命中の確定と `Wild.snapshot` は `apps/main/world/server/advance-wild-revision.ts` と `publish-wild.ts` の同じ公開順を使い、番号を HP と同じ保存単位に置く。`apps/main/world/client/merge-wild.ts` が敵ごとに状態をマージし、`RoomClient` が接続の切り替え時に比較対象を空にする。番号の意味と古い応答の扱いは [[game-system#8. 戦闘]] にある。接続ごとに更新間隔を制限し、敵のいない町では生き物を問い合わせず、未参加の接続ではいずれの問い合わせもしない。Player DO の状態変更の配送更新番号も確認し、通常操作の応答が失われた場合やアラームが届けた結果を現在のマップへ反映する。読み出しだけではこの番号を進めず、全状態の公開順とは区別する。番号が変わったときだけ状態を送るため、町へ移動した後の結果も復元しつつ、同じ持ち物や演出を繰り返し配信しない。定期同期の再送は [[game-system#8. 戦闘]] に従い、`heartbeat.ts` がプレイヤー・生き物・採集資源の同期を個別に進め、`notifications.ts` が送信の成否を返す。復活はこの応答で反映し、ブラウザの時刻だけでは HP を戻さない。攻撃の拒否通知には対象の識別子を付け、描画側は現在追っている対象が一致する場合だけ停止する。前の討伐に対する遅い拒否で、次の敵への移動や別の行動を取り消さない。報酬の配送は討伐が確定したときだけ行い、分配の計算は `apps/main/world/core/party/share-out.ts` に置く。戦闘の演出・結果通知の失敗で、報酬や反撃の保存を中断しない。通知の失敗は内容を含めず記録し、再接続では保存済みの状態を読み直す。保存や DO 間の呼び出しの失敗は通知の失敗として握りつぶさない。
 
-通常コマンドの入力は `world/server/map-room/player-command-types.ts` に置き、地図の識別子、本人の状態と保存、接続への結果送信と周囲への通知だけを要求する。`world/server/map-room/work.ts` は操作とハンドラーの対応だけを持ち、プレイヤーのコマンド、採集、加工、加工依頼の注文と受取り、倉庫、頼まれごとはそれぞれの `handle-*.ts` が受け付ける。`get-command-shop-access.ts` は店の営業と実際に店番をしている人への距離を順に確かめ、`run-map-player-command.ts` は売買の予約と確定を市場へ、それ以外をプレイヤーへ渡す。確定した座り状態は結果の通知より前に保存し、公開する姿と準備状態は `publish-command-player.ts` が接続状態へ反映してから周囲へ通知する。通知が失われても確定した状態は戻さない。位置の照会は読取り専用のセルを受け、マップの座標を可変の型へ強制変換しない。
+通常コマンドの入力は `apps/main/world/server/map-room/player-command-types.ts` に置き、地図の識別子、本人の状態と保存、接続への結果送信と周囲への通知だけを要求する。`apps/main/world/server/map-room/work.ts` は操作とハンドラーの対応だけを持ち、プレイヤーのコマンド、採集、加工、加工依頼の注文と受取り、倉庫、頼まれごとはそれぞれの `handle-*.ts` が受け付ける。`get-command-shop-access.ts` は店の営業と実際に店番をしている人への距離を順に確かめ、`run-map-player-command.ts` は売買の予約と確定を市場へ、それ以外をプレイヤーへ渡す。確定した座り状態は結果の通知より前に保存し、公開する姿と準備状態は `publish-command-player.ts` が接続状態へ反映してから周囲へ通知する。通知が失われても確定した状態は戻さない。位置の照会は読取り専用のセルを受け、マップの座標を可変の型へ強制変換しない。
 
 部屋は位置にかかわる確認をする。歩いた道がそのマップの歩けるマスを通っているか、店主や扉に十分近いか、などである。確認が済むと、部屋はそのプレイヤーの Durable Object に規則の実行を頼み、結果を本人に返す。
 
-入場の対応表は `world/server/map-room/moving.ts`、受付は `handle-join.ts` に置く。`reserve-map-admission.ts` は本人の保存状態を先に読み、定員を予約して本番の訪問権限を確認する。`arrive-map-player.ts` は保存先へ到着を頼み、途中で切断した場合は接続の所有を外し、別の行先を返された場合はその行先を通知する。`admit-map-connection.ts` は到着を認められた場合だけ接続の経路と姿を保存する。到着処理から戻る間の切断も保存直前に確認し、所有を解放する。接続へ反映する姿・経路・準備状態は純粋な `get-map-admission-presence.ts` が保存済みの状態から作る。予約を取ったかと入場済みかは別に保持し、`finish-map-admission.ts` は入場しなかった定員だけを返す。返却が失敗しても入場中のフラグは外し、失敗自体は呼出し元へ返す。
+入場の対応表は `apps/main/world/server/map-room/moving.ts`、受付は `handle-join.ts` に置く。`reserve-map-admission.ts` は本人の保存状態を先に読み、定員を予約して本番の訪問権限を確認する。`arrive-map-player.ts` は保存先へ到着を頼み、途中で切断した場合は接続の所有を外し、別の行先を返された場合はその行先を通知する。`admit-map-connection.ts` は到着を認められた場合だけ接続の経路と姿を保存する。到着処理から戻る間の切断も保存直前に確認し、所有を解放する。接続へ反映する姿・経路・準備状態は純粋な `get-map-admission-presence.ts` が保存済みの状態から作る。予約を取ったかと入場済みかは別に保持し、`finish-map-admission.ts` は入場しなかった定員だけを返す。返却が失敗しても入場中のフラグは外し、失敗自体は呼出し元へ返す。入場前に失敗した受付は何も返していないので、`handle-join.ts` が接続を 1011 で閉じ、ブラウザが新しい接続で入り直す（[[game-system#1.1 並行する町とチャンネル]]）。
 
 初期通知は `send-initial-map-state.ts` が本人の状態、採集資源、生き物、周囲への入場通知の順に送る。`get-initial-map-players.ts` は同じ本人の古い接続を閉じ、本人と未確定の姿を初期一覧へ含めない。`read-initial-map-resources.ts` は初期通知と並行して資源と生き物を読み、読取りの例外も結果として受け止める。本人への初期通知が成功した後に読取りの失敗を呼出し元へ返すため、通知が先に失敗しても並行処理の拒否が未処理の Promise として残らない。入場済みの人数は初期通知の失敗では戻さず、接続の退出処理に任せる。
 
-戦闘の受付は接続と対象のマップを確認し、`prepare-map-attack.ts` が保存済みの能力、到達範囲、立ち上がりを確認する。純粋な `world/core/get-attack-readiness.ts` は生存・技の種類・通常攻撃の間隔・スタミナの順を保持し、技固有の待ち時間と支払は保存先へ任せる。受付と配送の入力は `attack-types.ts` に置き、マップの地形、接続の読取りと送信、周囲への通知など実際に使う範囲だけを型で受け取る。到達範囲は `can-reach-monster.ts`、通常攻撃と技の命中計算の組立ては `world/core/get-attack-blow.ts` が受け持つ。乱数は立ち上がりの受入れ後だけ消費する。
+戦闘の受付は接続と対象のマップを確認し、`prepare-map-attack.ts` が保存済みの能力、到達範囲、立ち上がりを確認する。純粋な `apps/main/world/core/get-attack-readiness.ts` は生存・技の種類・通常攻撃の間隔・スタミナの順を保持し、技固有の待ち時間と支払は保存先へ任せる。受付と配送の入力は `attack-types.ts` に置き、マップの地形、接続の読取りと送信、周囲への通知など実際に使う範囲だけを型で受け取る。到達範囲は `can-reach-monster.ts`、通常攻撃と技の命中計算の組立ては `apps/main/world/core/get-attack-blow.ts` が受け持つ。乱数は立ち上がりの受入れ後だけ消費する。
 
 攻撃時刻は未記録と数値のゼロを区別する。`attack-clock.test.ts` はゼロから始めた時計と通常の時計で、実際の Player・Wild の保存処理へ攻撃を送り、同じ時刻の再攻撃で予約・支払・獲物の状態を重ねて更新しないことを確認する。地図と敵は実データを使い、開始時の身体・装備・位置を局所条件にする。そこまでの成長・装備入手・歩行経路や描画、時刻が変化する全ての条件はこの検査の対象外。
 
@@ -80,39 +82,39 @@ Player DO の入口は RPC の型、保存の単位、時計と相手の取得�
 
 定期同期の対応表は `heartbeat.ts`、受付は `handle-heartbeat.ts` に置く。純粋な `get-map-refresh-plan.ts` がマップ内の対象と前回の試行時刻から必要な同期を選び、受付は保存先を読む前に試行時刻を保存する。本人の配送更新は `refresh-map-player.ts`、生き物と採集資源は `refresh-map-wild.ts`・`refresh-map-nature.ts` が受け持つ。三つの処理は並行して通知まで進み、一つの保存先の遅延や失敗でほかの同期を止めない。全ての終了を待ってから保存先の失敗を呼出し元へ返す。本人への通知が失われた場合は配送の公開番号を進めず、次の試行で再送する。本人の状態が変わっていない場合は番号だけを保持する。入力の型は `heartbeat-types.ts` に置き、部屋全体や描画用のマップを要求しない。
 
-経路移動の受付は `world/server/map-room/handle-move.ts`、拒否した経路の補正は `refuse-movement.ts` に置く。受信した時刻で到達範囲と次の経路を検査し、立ち上がりや保存を待った時間を開始時刻へ加えない。保存先が現在の到達地点への補正を受け付けた場合だけ、接続の経路と姿を更新し、周囲へ通知する。最後に本人へ拒否を返す。位置がなければ座標を仮定せず、補正の保存・周囲への通知をせずに拒否する。`world/valid-path.ts` は空の経路を先に断り、開始地点、隣接と地形の検査を行う。受付の型は `movement-request-types.ts` に置き、地形検査の `walkable.ts` は大きさと歩行面だけを受け取る。
+経路移動の受付は `apps/main/world/server/map-room/handle-move.ts`、拒否した経路の補正は `refuse-movement.ts` に置く。受信した時刻で到達範囲と次の経路を検査し、立ち上がりや保存を待った時間を開始時刻へ加えない。保存先が現在の到達地点への補正を受け付けた場合だけ、接続の経路と姿を更新し、周囲へ通知する。最後に本人へ拒否を返す。位置がなければ座標を仮定せず、補正の保存・周囲への通知をせずに拒否する。`apps/main/world/valid-path.ts` は空の経路を先に断り、開始地点、隣接と地形の検査を行う。受付の型は `movement-request-types.ts` に置き、地形検査の `walkable.ts` は大きさと歩行面だけを受け取る。
 
-住民との会話の受付は `world/server/map-room/handle-engage.ts` に置く。開始時は住民の位置と距離を確認し、本人の到達地点で経路と公開する姿を停止させる。会話を終えるときは位置を必要とせず、会話相手だけを外す。店の品揃えと買取価格の照会は `handle-shop-look.ts` が受け持ち、実際の店番の位置を確認してから品揃え、本人の持ち物、買取価格を順に読む。買取対象の種類は `world/core/get-carried-sellable-item-ids.ts` が持ち物の最初の順で重複を外し、取引できない品を除く。`npc-cell.ts` がマップから使うのは識別子だけで、照会の引数に描画や地形の値を要求しない。
+住民との会話の受付は `apps/main/world/server/map-room/handle-engage.ts` に置く。開始時は住民の位置と距離を確認し、本人の到達地点で経路と公開する姿を停止させる。会話を終えるときは位置を必要とせず、会話相手だけを外す。店の品揃えと買取価格の照会は `handle-shop-look.ts` が受け持ち、実際の店番の位置を確認してから品揃え、本人の持ち物、買取価格を順に読む。買取対象の種類は `apps/main/world/core/get-carried-sellable-item-ids.ts` が持ち物の最初の順で重複を外し、取引できない品を除く。`npc-cell.ts` がマップから使うのは識別子だけで、照会の引数に描画や地形の値を要求しない。
 
-マップを渡る受付は `world/server/map-room/handle-warp.ts` に置く。接続の参加・操作状態と出口への距離、行先の開通を確認し、`travel-stamina.ts` が決める野外へ出る疲労と移動を、保存先の `journey`（`world/server/journey-player.ts`）で一度に確定する。保存先が移動を受け付けた場合だけ行先を通知し、疲労で断られたときはその理由を返す。`at-warp.ts` はマップの読取り専用の座標を受け、通信へ渡す座標は要素を写して可変の型への強制変換を避ける。帰還は `handle-revive.ts` が回復結果を通知した後に接続の戦闘不能と座り状態を外し、保存された帰還先を通知する。回復結果の通知失敗は帰還の通知を止めない。
+マップを渡る受付は `apps/main/world/server/map-room/handle-warp.ts` に置く。接続の参加・操作状態と出口への距離、行先の開通を確認し、`travel-stamina.ts` が決める野外へ出る疲労と移動を、保存先の `journey`（`apps/main/world/server/journey-player.ts`）で一度に確定する。町へ近づく道かどうかは、部屋の申告ではなく保存先が保存済みの位置から `apps/main/world/maps/leads-toward-town.ts` で決める。保存先が移動を受け付けた場合だけ行先を通知し、疲労で断られたときはその理由を返す。`at-warp.ts` はマップの読取り専用の座標を受け、通信へ渡す座標は要素を写して可変の型への強制変換を避ける。帰還は `handle-revive.ts` が回復結果を通知した後に接続の戦闘不能と座り状態を外し、保存された帰還先を通知する。回復結果の通知失敗は帰還の通知を止めない。
 
-食事・薬の回復、満腹と時間付き効果は `world/core/consume-command.ts` にまとめる。効果がないなどの拒否条件を確認してから持ち物を減らし、所持品から使う操作とショートカットから使う操作で同じ規則を通す。戦技・祈り・応急手当は `world/core/cast.ts` と `pay-art.ts` で共通の条件確認を通す。回復量と薬草の確保は `get-cast-recovery.ts` に分け、HP が満タンでないことを確かめてから呼ぶ。コマンドの結果の型は `transition.ts` にあり、`accept.ts` と `reject.ts` から同じ形式で返す。技の種類ごとに威力や回復の定義を型で必須にする。
+食事・薬の回復、満腹と時間付き効果は `apps/main/world/core/consume-command.ts` にまとめる。効果がないなどの拒否条件を確認してから持ち物を減らし、所持品から使う操作とショートカットから使う操作で同じ規則を通す。戦技・祈り・応急手当は `apps/main/world/core/cast.ts` と `pay-art.ts` で共通の条件確認を通す。回復量と薬草の確保は `get-cast-recovery.ts` に分け、HP が満タンでないことを確かめてから呼ぶ。コマンドの結果の型は `transition.ts` にあり、`accept.ts` と `reject.ts` から同じ形式で返す。技の種類ごとに威力や回復の定義を型で必須にする。
 
-規則そのものは `world/core/` の純粋な関数で、状態とコマンドを受け取り、受け入れて新しい状態と出来事を返すか、理由を付けて断る。同じ関数をブラウザでも使い、押せないボタンを灰色にする。結果を決めるのはいつもサーバーである。
+規則そのものは `apps/main/world/core/` の純粋な関数で、状態とコマンドを受け取り、受け入れて新しい状態と出来事を返すか、理由を付けて断る。同じ関数をブラウザでも使い、押せないボタンを灰色にする。結果を決めるのはいつもサーバーである。
 
-取引所の DO は RPC とアラームの入口だけを持つ。受付・預かり・登録・受け取り・回復の手順は `world/server/begin-exchange-order.ts`・`advance-exchange-order.ts`・`deliver-exchange-inbox.ts`・`recover-exchange.ts`、保存全体の型と版の移行は `world/server/exchange-record.ts` に置く。コーディネーターは Void や Player DO の実装を参照せず、必要な RPC だけを持つ相手を引数で受け取る。各処理の成功後の保存と、例外時の状態の巻き戻しは Void が受け持つ。
+取引所の DO は RPC とアラームの入口だけを持つ。受付・預かり・登録・受け取り・回復の手順は `apps/main/world/server/begin-exchange-order.ts`・`advance-exchange-order.ts`・`deliver-exchange-inbox.ts`・`recover-exchange.ts`、保存全体の型と版の移行は `apps/main/world/server/exchange-record.ts` に置く。コーディネーターは Void や Player DO の実装を参照せず、必要な RPC だけを持つ相手を引数で受け取る。各処理の成功後の保存と、例外時の状態の巻き戻しは Void が受け持つ。
 
-部屋の取引所の対応は `world/server/map-room/exchange.ts` に置き、`handle-exchange-request.ts` が参加状態、掲示板との距離、銘柄を確認してから保存先の参照を得る。注文は `place-exchange-order.ts`、取消は `cancel-exchange-order.ts`、受取りは `claim-exchange-inbox.ts` が受け持つ。注文は予約、登録、本人への結果、板の読取りと通知の順に進め、拒否や結果送信の失敗後に板を読まない。取消は成立後にプレイヤーを読み、受取りは予約の ID を配送へ渡す。板の送信は `send-exchange-board.ts` に共通化し、各処理へは必要な RPC と送信だけを持つ文脈を渡す。
+部屋の取引所の対応は `apps/main/world/server/map-room/exchange.ts` に置き、`handle-exchange-request.ts` が参加状態、掲示板との距離、銘柄を確認してから保存先の参照を得る。注文は `place-exchange-order.ts`、取消は `cancel-exchange-order.ts`、受取りは `claim-exchange-inbox.ts` が受け持つ。注文は予約、登録、本人への結果、板の読取りと通知の順に進め、拒否や結果送信の失敗後に板を読まない。取消は成立後にプレイヤーを読み、受取りは予約の ID を配送へ渡す。板の送信は `send-exchange-board.ts` に共通化し、各処理へは必要な RPC と送信だけを持つ文脈を渡す。
 
-取引所の注文は `world/core/hold-order.ts` で受領済みの要求を先に照合し、新しい内容の検証と引落しの組立てを `get-order-escrow-command.ts` へ渡す。要求の内容比較は `same-intent.ts`、要求と預かり記録の型は `exchange-order-types.ts`、要求領域の初期化は `empty-requests.ts` が持つ。部屋は接続と操作番号で要求を識別し、取引所へ受付を頼む。取引所は接続の所有権を再確認し、要求を保存してから Player DO の預かりを呼ぶ。プレイヤーは預かり記録と持ち物・代金を同時に保存し、取引所は登録と完了記録を同時に保存する。接続ごとの古い要求を拒否し、未完了の要求を新しい要求で上書きしない。履歴全件ではなく、取引所とプレイヤーそれぞれで一人につき最後の要求を保持する。受取箱の配送も含め、DO 間の呼び出しは取引所からプレイヤーへ向け、相互に待つ経路を作らない。
+取引所の注文は `apps/main/world/core/hold-order.ts` で受領済みの要求を先に照合し、新しい内容の検証と引落しの組立てを `get-order-escrow-command.ts` へ渡す。要求の内容比較は `same-intent.ts`、要求と預かり記録の型は `exchange-order-types.ts`、要求領域の初期化は `empty-requests.ts` が持つ。部屋は接続と操作番号で要求を識別し、取引所へ受付を頼む。取引所は接続の所有権を再確認し、要求を保存してから Player DO の預かりを呼ぶ。プレイヤーは預かり記録と持ち物・代金を同時に保存し、取引所は登録と完了記録を同時に保存する。接続ごとの古い要求を拒否し、未完了の要求を新しい要求で上書きしない。履歴全件ではなく、取引所とプレイヤーそれぞれで一人につき最後の要求を保持する。受取箱の配送も含め、DO 間の呼び出しは取引所からプレイヤーへ向け、相互に待つ経路を作らない。
 
-取引所の受取箱は `world/core/reserve-inbox.ts` と `finish-inbox.ts` で予約と完了を分け、`receive-inbox.ts` がプレイヤーへの受領を扱う。予約・受領の型は `exchange-claim-types.ts`、初期化は `empty-claims.ts` に置く。取引所は予約を保存してから Player DO の受け取りを呼び、Player DO は品物と受領記録を同じ保存単位へ反映する。取引所の保存や応答が失われた場合も同じ予約を再送する。受領済みの再送は、後から対面取引が保留された場合も重ねて品物を戻さない。未受領の品物は対面取引の保留中に持ち物へ加えない。取引所のアラームは一度の処理量を制限し、失敗した受取人を後ろへ回す。プレイヤーと取引所の状態移行は、それぞれの既存データを保って受領記録と予約領域を追加する。
+取引所の受取箱は `apps/main/world/core/reserve-inbox.ts` と `finish-inbox.ts` で予約と完了を分け、`receive-inbox.ts` がプレイヤーへの受領を扱う。予約・受領の型は `exchange-claim-types.ts`、初期化は `empty-claims.ts` に置く。取引所は予約を保存してから Player DO の受け取りを呼び、Player DO は品物と受領記録を同じ保存単位へ反映する。取引所の保存や応答が失われた場合も同じ予約を再送する。受領済みの再送は、後から対面取引が保留された場合も重ねて品物を戻さない。未受領の品物は対面取引の保留中に持ち物へ加えない。取引所のアラームは一度の処理量を制限し、失敗した受取人を後ろへ回す。プレイヤーと取引所の状態移行は、それぞれの既存データを保って受領記録と予約領域を追加する。
 
 ## Durable Objects
 
-プレイヤーの保存全体の型と版の移行は `world/server/player-record.ts`、初期値は `initial-player-record.ts`、厳密な復元は `restore-saved-player.ts` に置く。ゲーム状態の対応形式を判定する `world/core/parse-player.ts` と分け、DO の通常操作は補助ローダーの新品への代用を使わない。Void は操作より先に移行結果を保存するため、版の移行時にもプレイヤーデータを確認する。読めないデータでは例外を返し、データの値を例外やログへ含めない。
+プレイヤーの保存全体の型と版の移行は `apps/main/world/server/player-record.ts`、初期値は `initial-player-record.ts`、厳密な復元は `restore-saved-player.ts` に置く。ゲーム状態の対応形式を判定する `apps/main/world/core/parse-player.ts` と分け、DO の通常操作は補助ローダーの新品への代用を使わない。Void は操作より先に移行結果を保存するため、版の移行時にもプレイヤーデータを確認する。読めないデータでは例外を返し、データの値を例外やログへ含めない。
 
 Durable Object の入口は `durable-objects/` にあり、どれも Void の規約に従う。プレイヤー一人ごとの `player`、町ごとの `directory` と `nature`、全部の町で一つの `market` と `exchange`、生き物の具合を持つ `wild`、パーティごとの `party` がある。どれをいくつ持つかは世界観と対応させてある（[[world#世界の作りと Durable Objects]]）。マップの部屋は誰もいなくなると何も持たずに閉じ、続けて残すべきものは `player` などほかの Durable Object に置く。
 
 ## 定義表
 
-住民、世帯と建物、日課、台詞、店、アイテム、レシピ、マップは TypeScript の定義表にあり、状態は ID だけを持って定義表から引く。住民の日課は定義を読み込むときに一度だけ時刻順に並べ、営業・会話・表示の判定で再利用する（`lib/engine/cyclic-schedule.ts`）。日課の場所・活動・区間の型は `world/town/routine-types.ts` に置き、定義表や室の割当て処理を型の参照先にしない。日課の文字列の時刻は `world/town/create-routine-slot.ts` が `world/core/parse-time.ts` で検証し、不正な定義は読み込み時に拒否する。境界の時刻は有限かつ重複なしとし、不正な照会時刻も拒否する。境界は生成時に写して固定し、呼出し元の配列や返した予定の変更で選択時刻がずれないようにする。返す予定そのものは元の参照を保ち、予定の全情報を複製した不変値であるとは扱わない。周期の長さと時刻の単位は呼出し側が持ち、エンジンへ一日の長さを埋め込まない。授業と記録の場所の割当ては `world/town/with-routine-activity-spot.ts` が担い、定義表から渡された室の中で住民・活動・役割と階が一致する場所を使う。対応がなければ元の予定を保ち、別の役割や階の場所を借りない。住民と町の表は `world/town/`、ルールにかかわる表は `world/core/`、マップは `world/maps/` にある。住民と台詞は世帯単位、建物は地区単位でファイルを分ける。製作の設備と消費量は `world/core/crafting-rules.ts`、設備の型は `crafting-types.ts`、設備の参照は `station-of.ts` に置く。レシピの表は `world/core/recipes/`、一覧の統合は `recipes/catalog.ts`、ID の索引は `recipe-of.ts` が持つ。失敗率と品質の計算は `fail-chance.ts`・`crafted-quality.ts`・`quality-weight.ts` に分ける。コマンドの共通検証は `world/core/apply.ts`、製作時の材料・品質・費用・経験値の処理は `world/core/craft-command.ts` に置く。採集の道具選択・耐久消費・成果の受け取りは `world/core/gather-command.ts` にまとめる。装備の着脱は `world/core/equip.ts` と `unequip.ts`、能力値の上限の反映は `settle-stats.ts` が扱う。条件・外す枠と収納の検証は `get-equipment-selection.ts`・`get-equipment-displacements.ts`・`get-returned-equipment.ts`、印の引継ぎと削除は `worn-of.ts`・`without-worn-slot.ts` に分ける。取引の持ち物・所持金の出入りは `world/core/trade-out.ts` と `trade-in.ts`、持ち物と装備の合計重量は `world/core/inventory-weight.ts` にまとめる。取引の保留と確定は `world/core/prepare-trade.ts` と `finish-trade.ts` が扱い、出入りの規則を共通の入口から呼ぶ。承認と拒否の結果型は `world/core/transition.ts` で共有する。職種ごとの現行レシピと将来の節目のレシピを元の順でまとめ、ID からの参照には一度だけ作る索引を使う。住民の一覧順は焼き出したスプライトの番号に対応するため、定義の置き場所を変えても順は変えない。外見の補完は `world/town/create-resident-looks.ts`、頭装備の表示は `world/town/wearable.ts` が担う。指定済みの髪と首巻きを保ち、未指定の前髪は性別ごとの未指定者の順、首巻きは全住民の順で選ぶ。マップの歩けるマスと住民の立つ場所は、描画の側の地形から `scripts/export-map.ts` で `world/maps/<マップ>.json` に書き出し、サーバーはこの JSON だけで確かめる。場面を組み立てなくてよいようにするためである。地形や建物を変えたら書き出し直す。 書き出しはプレイヤーの画面へ入らない専用のブラウザ文書から `dev/map-snapshot.ts` で地形・建物と採集物の同じ場面生成を呼び、開発用モジュールは実在するソースのファイル名で読み込む。スナップショットの識別子・寸法・通行ビットを検証してから定まった形式へ変換し、比較だけの場合はファイルを変更しない。生成処理との比較と、実際の描画ランタイムのグリッドとの比較を別々に行う。
+住民、世帯と建物、日課、台詞、店、アイテム、レシピ、マップは TypeScript の定義表にあり、状態は ID だけを持って定義表から引く。住民の日課は定義を読み込むときに一度だけ時刻順に並べ、営業・会話・表示の判定で再利用する（`lib/engine/cyclic-schedule.ts`）。日課の場所・活動・区間の型は `apps/main/world/town/routine-types.ts` に置き、定義表や室の割当て処理を型の参照先にしない。日課の文字列の時刻は `apps/main/world/town/create-routine-slot.ts` が `apps/main/world/core/parse-time.ts` で検証し、不正な定義は読み込み時に拒否する。境界の時刻は有限かつ重複なしとし、不正な照会時刻も拒否する。境界は生成時に写して固定し、呼出し元の配列や返した予定の変更で選択時刻がずれないようにする。返す予定そのものは元の参照を保ち、予定の全情報を複製した不変値であるとは扱わない。周期の長さと時刻の単位は呼出し側が持ち、エンジンへ一日の長さを埋め込まない。授業と記録の場所の割当ては `apps/main/world/town/with-routine-activity-spot.ts` が担い、定義表から渡された室の中で住民・活動・役割と階が一致する場所を使う。対応がなければ元の予定を保ち、別の役割や階の場所を借りない。住民と町の表は `apps/main/world/town/`、ルールにかかわる表は `apps/main/world/core/`、マップは `apps/main/world/maps/` にある。住民と台詞は世帯単位、建物は地区単位でファイルを分ける。製作の設備と消費量は `apps/main/world/core/crafting-rules.ts`、設備の型は `crafting-types.ts`、設備の参照は `station-of.ts` に置く。レシピの表は `apps/main/world/core/recipes/`、一覧の統合は `recipes/catalog.ts`、ID の索引は `recipe-of.ts` が持つ。失敗率と品質の計算は `fail-chance.ts`・`crafted-quality.ts`・`quality-weight.ts` に分ける。コマンドの共通検証は `apps/main/world/core/apply.ts`、製作時の材料・品質・費用・経験値の処理は `apps/main/world/core/craft-command.ts` に置く。採集の道具選択・耐久消費・成果の受け取りは `apps/main/world/core/gather-command.ts` にまとめる。装備の着脱は `apps/main/world/core/equip.ts` と `unequip.ts`、能力値の上限の反映は `settle-stats.ts` が扱う。条件・外す枠と収納の検証は `get-equipment-selection.ts`・`get-equipment-displacements.ts`・`get-returned-equipment.ts`、印の引継ぎと削除は `worn-of.ts`・`without-worn-slot.ts` に分ける。取引の持ち物・所持金の出入りは `apps/main/world/core/trade-out.ts` と `trade-in.ts`、持ち物と装備の合計重量は `apps/main/world/core/inventory-weight.ts` にまとめる。取引の保留と確定は `apps/main/world/core/prepare-trade.ts` と `finish-trade.ts` が扱い、出入りの規則を共通の入口から呼ぶ。承認と拒否の結果型は `apps/main/world/core/transition.ts` で共有する。職種ごとの現行レシピと将来の節目のレシピを元の順でまとめ、ID からの参照には一度だけ作る索引を使う。住民の一覧順は焼き出したスプライトの番号に対応するため、定義の置き場所を変えても順は変えない。外見の補完は `apps/main/world/town/create-resident-looks.ts`、頭装備の表示は `apps/main/world/town/wearable.ts` が担う。指定済みの髪と首巻きを保ち、未指定の前髪は性別ごとの未指定者の順、首巻きは全住民の順で選ぶ。マップの歩けるマスと住民の立つ場所は、描画の側の地形から `scripts/export-map.ts` で `apps/main/world/maps/<マップ>.json` に書き出し、サーバーはこの JSON だけで確かめる。場面を組み立てなくてよいようにするためである。地形や建物を変えたら書き出し直す。 書き出しはプレイヤーの画面へ入らない専用のブラウザ文書から `apps/studio/dev/map-snapshot.ts` で地形・建物と採集物の同じ場面生成を呼び、開発用モジュールは実在するソースのファイル名で読み込む。スナップショットの識別子・寸法・通行ビットを検証してから定まった形式へ変換し、比較だけの場合はファイルを変更しない。生成処理との比較と、実際の描画ランタイムのグリッドとの比較を別々に行う。どちらも開発アプリのサーバーに対して行う。ゲームのサーバーは `/dev/` の開発用モジュールも `/view` も配信しないためである。開発アプリが絶対パス（`/@fs/…/apps/main/…`）で読み込んだゲームのモジュールも、ゲームでのパスで照合する（`scripts/lib/get-runtime-module-url.ts`）。
 
 ## 描画
 
 `create-monster-body.ts` は種類の定義から形・色・拡大率を一緒に組み立てる。実ゲームの `monsters.ts` と開発画面の生き物の詳細は同じ処理を使い、検査用の表示だけ通常種の色や固定の倍率へ戻さない。水平の囲いの検査もこの実際の生成物の頂点へ照合する。
 
-プレイヤーと他の接続者の地面の高さは、人物ごとに座標が変わったときだけ求める（`lib/engine/position-sample.ts`、`world/scene/runtime/walkers.ts`）。配置済みの高さをカメラ追従・遮蔽の照準・名札と吹き出しでも使う。マップごとに人物と保持値を作り直し、外見の変更後も同じ座標の高さを新しい姿へ適用する。地形が途中で変わる場合は保持値を作り直す必要がある。
+プレイヤーと他の接続者の地面の高さは、人物ごとに座標が変わったときだけ求める（`lib/engine/position-sample.ts`、`apps/main/world/scene/runtime/walkers.ts`）。配置済みの高さをカメラ追従・遮蔽の照準・名札と吹き出しでも使う。マップごとに人物と保持値を作り直し、外見の変更後も同じ座標の高さを新しい姿へ適用する。地形が途中で変わる場合は保持値を作り直す必要がある。
 
 破棄したマップの描画から届く進捗や失敗は現在の画面へ送らず、遅れて完成した描画は解放する。MapScene の接続状態はインスタンス内部に保持し、本体の参照を固定する。描画の接続や開始に失敗した場合も、接続済みの資源を回収して現在の画面へ失敗を返す。終了処理は `release-scene-attachment.ts` が描画と通知を止めてから監視・描画面・資源・表示層を回収し、一つの失敗で残りを飛ばさない。
 
@@ -120,13 +122,13 @@ Durable Object の入口は `durable-objects/` にあり、どれも Void の規
 
 ランタイム自身の描画中の状態と通知先は `scene-runtime-lifecycle.ts` が保持する。資源を直接解放するときも、先にこの接続を閉じる。公開する状態の読み書きは同じ接続へ渡し、破棄後の再開や再接続を受け付けない。組み立て中の各操作はこの接続を参照し、未完成の公開ランタイムを参照しない。
 
-地面の画像は並行で準備できるが、共有の地形と灯り・描画物の登録を変更する組み立ては `world/scene/runtime/scene-build-queue.ts` で直列化する。待機中に離れたマップは組み立てず、作成中に離れたマップは完成後に解放してから次へ進む。非同期の解放も完了まで待ち、解放が失敗した場合はキャンセルの理由と両方を残す。失敗した一件で後続の構築を停止しない。
+地面の画像は並行で準備できるが、共有の地形と灯り・描画物の登録を変更する組み立ては `apps/main/world/scene/runtime/scene-build-queue.ts` で直列化する。待機中に離れたマップは組み立てず、作成中に離れたマップは完成後に解放してから次へ進む。非同期の解放も完了まで待ち、解放が失敗した場合はキャンセルの理由と両方を残す。失敗した一件で後続の構築を停止しない。
 
 描画資源は作成の都度 `lib/engine/cleanup-stack.ts` へ登録する。非同期の組み立ては `with-cleanup.ts` が囲み、途中の失敗でも取得と逆順に解放する。住民も一人ずつ登録する。共有する資源は一度だけ解放し、シェーダーだけが参照するテクスチャや影の描画先は `lib/graphics/dispose-object-tree.ts` で回収する。解放に失敗した資源があっても残りを処理し、元の作成エラーを失わない。収集は `collect-object-assets.ts`・`collect-material-assets.ts`・`collect-texture-assets.ts` に分け、幾何・材質・影の資源は実際に解放可能かを確認する。共有参照の重複排除と解放順、失敗の集約はツリー全体で維持する。
 
 `create-scene-runtime.ts` は地面の並行準備と共有状態を触る構築の直列化を組み立て、`assemble-scene-runtime.ts` がマップの描画と操作を接続する。`create-scene-town.ts` は町の構築と静的メッシュの統合を扱い、動く物や遮蔽の単位を統合から保護する。
 
-描画器とシーンの根の生成は `world/scene/runtime/create-scene-renderer.ts`・`create-scene-root.ts` に置き、取得時の解放登録と逆順の回収を維持する。カメラの生成は `create-scene-camera.ts`、表示寸法と描画面・後処理の画素数の同期は `resize-scene-viewport.ts`、移動先の輪とカーソルの生成は `create-walk-markers.ts` が担う。
+描画器とシーンの根の生成は `apps/main/world/scene/runtime/create-scene-renderer.ts`・`create-scene-root.ts` に置き、取得時の解放登録と逆順の回収を維持する。カメラの生成は `create-scene-camera.ts`、表示寸法と描画面・後処理の画素数の同期は `resize-scene-viewport.ts`、移動先の輪とカーソルの生成は `create-walk-markers.ts` が担う。
 
 環境は `create-scene-environment.ts` が環境光・太陽と照準・煙の順に根へ追加する。`create-scene-sun.ts` は影を先に所有へ登録してからカメラと解像度を設定する。`create-scene-smoke.ts` は元の画素のテクスチャ、幾何、材質を順に取得し、全てを所有してから根へ追加する。煙突がない場合も資源の回収手順は同じにする。煙の二色と透明な縁は `create-smoke-pixels.ts`、煙突の順と寿命の位相・横流れの初期値は `create-smoke-puffs.ts` に置く。粒は煙突の元の位置を共有し、更新中に位置を複製し直さない。
 
@@ -136,7 +138,7 @@ Durable Object の入口は `durable-objects/` にあり、どれも Void の規
 
 住民の組み立ては `create-scene-population.ts`、このマップへ一日のどこかで来る人の選択は `create-map-residents.ts`、外見の事前生成との照合と人物の取得は `create-resident-actor.ts` が担う。人物を取得したら次の人物より先に所有へ登録する。`scene-population.ts` の ScenePopulation は人物・住民表の番号・仕事場を一組で保持し、番号の抜けを詰めずに会話の対象へ戻す。公開する人物と番号の配列は読み取り専用とし、人物の状態は描画と日課が更新する。
 
-日課の場所の規則は引き続き `world/town/spot-at.ts`、活動の姿勢は `activity-pose.ts` が持つ。ScenePopulation は各人物の場所を一度引き、店先と人物をその対応から同期する。描画する地点への変換は `get-scene-spot-position.ts`、席・位置と向きの更新は `update-scheduled-resident.ts`、店の札と屋台の品・覆いは `update-scheduled-shop-fronts.ts` に置く。店の営業判定と、そのマップの名前付き地点にいる売り手の判定は混ぜない。
+日課の場所の規則は引き続き `apps/main/world/town/spot-at.ts`、活動の姿勢は `activity-pose.ts` が持つ。ScenePopulation は各人物の場所を一度引き、店先と人物をその対応から同期する。描画する地点への変換は `get-scene-spot-position.ts`、席・位置と向きの更新は `update-scheduled-resident.ts`、店の札と屋台の品・覆いは `update-scheduled-shop-fronts.ts` に置く。店の営業判定と、そのマップの名前付き地点にいる売り手の判定は混ぜない。
 
 時刻と照明の接続は `scene-lighting.ts` の SceneLighting が持ち、空と環境光、日課、家の灯り、人物と板絵の色・太陽と水面の順に同期する。日課を反映してから部屋の使用を判定する。三つの色の定義は `scene-light-palettes.ts`、色空間を保つ混合は `mix-scene-light.ts`、一日の曲線との接続は `get-scene-light.ts` に置く。空と霧は `update-scene-sky.ts`、屋内外の環境光と窓の明るさは `update-scene-ambient-light.ts`、色と太陽・水面の同期は `update-scene-light-tint.ts` が担う。
 
@@ -178,15 +180,15 @@ Durable Object の入口は `durable-objects/` にあり、どれも Void の規
 
 カメラと人物の間の遮蔽物は `scene-occlusion.ts` の SceneOcclusion が確認する。透過可能な物は目標の不透明度へ補間し、透過しない建物はそのまま保って人物の透視表示へ判定を渡す。プレビューでは物の透過と透視を行わない。材質の更新は `lib/graphics/set-object-opacity.ts` が単一・複数の材質を型で確かめて適用する。
 
-マップの描画の入口は `world/scene/runtime/scene.ts` の MapScene で、地形・住民配置・照明・歩行者・入力は `world/scene/runtime/` に分ける。建物・野外・小物・テクスチャはそれぞれ `construction/`・`fields/`・`props/`・`textures/` に、人物の体・服・髪・装備・描画は `figure/` に分ける。描画は `world/scene/` が受け持ち、ゲームに依存しない部品は `lib/graphics/` と `lib/engine/` にある。
+マップの描画の入口は `apps/main/world/scene/runtime/scene.ts` の MapScene で、地形・住民配置・照明・歩行者・入力は `apps/main/world/scene/runtime/` に分ける。建物・野外・小物・テクスチャはそれぞれ `construction/`・`fields/`・`props/`・`textures/` に、人物の体・服・髪・装備・描画は `figure/` に分ける。描画は `apps/main/world/scene/` が受け持ち、ゲームに依存しない部品は `lib/graphics/` と `lib/engine/` にある。
 
 世界のドットの大きさは一つにそろえる。基準は地面の絵の 1 単位 32 画素（`textures/palette.ts` の PPU と TEXEL_PPU）で、地面より細かいドットも粗いドットも置かない。浮いて見えるためである。建物の面（屋根・藁屋根・漆喰・石積み・板壁・破風・礼拝堂の石・共有の石と木）、品物や吊るし物の絵、地面に置く絵、洗濯物は、この大きさかそれより細かく描き、最後に `lib/graphics/downsample-dithered.ts` で平均して基準の大きさまで縮め、4×4 の網点を足して各色 5 ビットに丸める（初期の 3D 機のテクスチャの質感）。切り抜きの絵は不透明な画素だけで平均し、縁を黒ずませない。絵を板に貼るときは `textures/dot-texture.ts` を通す。描くときは `textures/tone-map.ts` の ToneMap に、画素ごとのランプと小数の明るさと、瓦・板・石のどれに属するかを書き、明るさを半段ずらした短い筆跡を同じ部材の中に重ねる。汚れは減らさない。苔、地衣、染み、雨だれ、上がってくる湿気の線、ひび、割れたり色の違う瓦、釘の錆を描く。光は左上から当てる。繰り返す材質は `seamless-noise.ts` で継ぎ目を消す。上向きの面に積もる灰（`dust.ts`）も同じ 1 単位 32 画素の升で、薄い膜・斑・吹きだまりの三段にする。
 
-画面そのものも世界のドットで描く。カメラ（`runtime/create-scene-camera.ts`）は 1 単位 `FIG_PPU / FIG_DOT` 画素（約 33.75）の解像度で描き、それを整数倍（2・4・6・8 倍、開発の見渡しは 1・2・4 倍）に拡大して見せる。こうすると形の縁も、箱で組んだ机や樽に貼った細かい材質（ミップマップで粗い段が選ばれる）も、自然に同じドットになる。人は 1 単位 67.5 画素で描いたまま、世界に立たせる直前に `figure/shrink-sprite.ts` で `FIG_DOT`（2）分の一に縮める。縮め方は `lib/graphics/downsample-pixel-art.ts` で、平均はしない（輪郭が灰色になり、目が顔から消えるため）。新しい画素は元の絵にある色だけを使う。平らな所に一つだけある暗い画素（目・ボタン）を残し、それ以外は一番多い色、同数なら明るい方（前髪の下の顔を肌のまま残す）。輪郭は選ぶ対象から外し、縮めた形の周りに 1 画素で描き直す。立ち絵（`world/art/portrait-url.ts`）は細かいまま使う。焼いた画像も細かいまま焼き、読み込んだ時に同じように縮める（焼き直しは要らない）。鶏や猫の絵も `dot-texture.ts` を通す。看板の字はこのドットでは読めない（未決）。
+画面そのものも世界のドットで描く。カメラ（`runtime/create-scene-camera.ts`）は 1 単位 `FIG_PPU / FIG_DOT` 画素（約 33.75）の解像度で描き、それを整数倍（2・4・6・8 倍、開発の見渡しは 1・2・4 倍）に拡大して見せる。こうすると形の縁も、箱で組んだ机や樽に貼った細かい材質（ミップマップで粗い段が選ばれる）も、自然に同じドットになる。人は 1 単位 67.5 画素で描いたまま、世界に立たせる直前に `figure/shrink-sprite.ts` で `FIG_DOT`（2）分の一に縮める。縮め方は `lib/graphics/downsample-pixel-art.ts` で、平均はしない（輪郭が灰色になり、目が顔から消えるため）。新しい画素は元の絵にある色だけを使う。平らな所に一つだけある暗い画素（目・ボタン）を残し、それ以外は一番多い色、同数なら明るい方（前髪の下の顔を肌のまま残す）。輪郭は選ぶ対象から外し、縮めた形の周りに 1 画素で描き直す。立ち絵（`apps/main/world/art/portrait-url.ts`）は細かいまま使う。焼いた画像も細かいまま焼き、読み込んだ時に同じように縮める（焼き直しは要らない）。鶏や猫の絵も `dot-texture.ts` を通す。看板の字はこのドットでは読めない（未決）。
 
 地形の高さ・道・川の計算は、選んだマップのデータが必要になった時点で行う。Worker の読み込み時に未使用の初期マップを計算せず、保存済みの地形があればそれを使う。道・川・踏み跡までの距離は、地形生成の開始時に線分を `lib/engine/polyline.ts` のインスタンスへ写し、線分の方向と長さを各地点で計算し直さない。
 
-地面の絵は重いので、いくつかの Web Worker で帯に分けて描き、描いた絵はブラウザの IndexedDB に残して次からはそれを使う。残した絵は描くコードそのものを鍵にしているので、コードを変えれば描き直される。この鍵は `world/scene/ground-version.ts` にまとめ、Workerの起動と帯の受信を扱う処理から分ける。ノイズと補間の実装も鍵に含める。地面を描く入口から辿れるローカルの実装の参照と、鍵に含める TypeScript のファイルの対応を `ground-version.test.ts` で照合する。
+地面の絵は重いので、いくつかの Web Worker で帯に分けて描き、描いた絵はブラウザの IndexedDB に残して次からはそれを使う。残した絵は描くコードそのものを鍵にしているので、コードを変えれば描き直される。この鍵は `apps/main/world/scene/ground-version.ts` にまとめ、Workerの起動と帯の受信を扱う処理から分ける。ノイズと補間の実装も鍵に含める。地面を描く入口から辿れるローカルの実装の参照と、鍵に含める TypeScript のファイルの対応を `ground-version.test.ts` で照合する。
 
 地面を描く Worker は起動・転送・実行・応答の復号の失敗を扱い、応答の帯位置と画素数を依頼と照合する。失敗した帯は現在入場するマップだけ通常の描画で補い、先読みでは中断する。全体が失敗したら残りの Worker とイベントを解放し、遅れて届く応答で破棄済みの地面を書き換えない。
 
@@ -196,9 +198,9 @@ Durable Object の入口は `durable-objects/` にあり、どれも Void の規
 
 住民の姿はドット絵のスプライトで、`scripts/bake-sprites.ts` で前もって八方向の動きを `public/tmp/sprites/` に焼いておく。この生成物は Git に含めない。配信時は `public/.assetsignore` で `tmp/` の診断ログ・スクリーンショット等を除外し、ゲームで読む `tmp/sprites/` だけを残す。
 
-焼いていない組み合わせ（プレイヤーの見た目など）は、スプライト用の Worker がその場で描く。焼き出し済み画像の一覧は `world/scene/runtime/assets.ts` でページ内の一つの要求にまとめ、受信とJSONの読取りに待機上限を置く。届かない場合や形式が不正な場合は要求を中止し、そのページでは通常の生成へ進む。一覧の形は `world/scene/sprite-manifest-schema.ts` と `is-sprite-manifest.ts` で検査し、住民への適用時には名前・見た目・画像寸法を照合する。コマ数が現在の定義と異なるアニメーションも通常の生成を使う。保存用 PNG の生成が失敗しても描画済みのフレームは表示する。フレームの描画に失敗した場合は Worker の使用枠を戻して別のフレームへ進み、同じフレームの再要求には待ち時間を設ける。Worker 自体の起動・通信・実行が失敗した場合は、その Worker を停止し、待ち時間をおいて処理枠を補充する。重複した失敗通知で処理枠を増やさず、停止した Worker に届くキャッシュ結果や描画結果は表示せずに解放する。失敗記録の保持件数と待ち時間は `world/scene/sprite-pool.ts` が定義する。`world/scene/anims.json` は生成されたモーションデータであり、実装ファイルと同じ理由では分割しない。地面の灰は不透明な画素として先に判定し、灰で隠れる草や石は計算しない。灰は物ごとに板を足さず、材質のシェーダーで空を向いた面に積もらせる。
+焼いていない組み合わせ（プレイヤーの見た目など）は、スプライト用の Worker がその場で描く。焼き出し済み画像の一覧は `apps/main/world/scene/runtime/assets.ts` でページ内の一つの要求にまとめ、受信とJSONの読取りに待機上限を置く。届かない場合や形式が不正な場合は要求を中止し、そのページでは通常の生成へ進む。一覧の形は `apps/main/world/scene/sprite-manifest-schema.ts` と `is-sprite-manifest.ts` で検査し、住民への適用時には名前・見た目・画像寸法を照合する。コマ数が現在の定義と異なるアニメーションも通常の生成を使う。保存用 PNG の生成が失敗しても描画済みのフレームは表示する。フレームの描画に失敗した場合は Worker の使用枠を戻して別のフレームへ進み、同じフレームの再要求には待ち時間を設ける。Worker 自体の起動・通信・実行が失敗した場合は、その Worker を停止し、待ち時間をおいて処理枠を補充する。重複した失敗通知で処理枠を増やさず、停止した Worker に届くキャッシュ結果や描画結果は表示せずに解放する。失敗記録の保持件数と待ち時間は `apps/main/world/scene/sprite-pool.ts` が定義する。`apps/main/world/scene/anims.json` は生成されたモーションデータであり、実装ファイルと同じ理由では分割しない。地面の灰は不透明な画素として先に判定し、灰で隠れる草や石は計算しない。灰は物ごとに板を足さず、材質のシェーダーで空を向いた面に積もらせる。
 
-絵付きの吊り看板の木地は `world/scene/textures/create-sign-texture.ts` が作り、絵柄は `textures/signs/sign-painters.ts` から種類ごとの描画関数へ渡す。共通の木地と個別の絵柄を分け、未定義の種類は木地を返す。色と重なる描画の順は各関数に残し、種類の追加でほかの絵柄の条件分岐を増やさない。整数の描画範囲は `lib/engine/get-integer-range.ts` が開始を含み終わりを含まない順序で作る。
+絵付きの吊り看板の木地は `apps/main/world/scene/textures/create-sign-texture.ts` が作り、絵柄は `textures/signs/sign-painters.ts` から種類ごとの描画関数へ渡す。共通の木地と個別の絵柄を分け、未定義の種類は木地を返す。色と重なる描画の順は各関数に残し、種類の追加でほかの絵柄の条件分岐を増やさない。整数の描画範囲は `lib/engine/get-integer-range.ts` が開始を含み終わりを含まない順序で作る。
 
 マップ入場の計測は `bun scripts/check-map-loading.mjs` で行う。新しいブラウザで地面の先読みと部屋の先行接続を止め、初回入場と別のマップを経由した再訪を比べる。結果は Git 対象外の `public/tmp/map-loading.json` に書く。これは実際の接続と描画の準備を含むが、出口を踏んでサーバーが移動を許可するまでの時間は含まない。
 
@@ -206,11 +208,11 @@ Durable Object の入口は `durable-objects/` にあり、どれも Void の規
 
 町の実行時性能は `bun scripts/check-runtime-performance.mjs` で確認する。ゲームの描画 FPS と別に、ブラウザのアニメーションフレーム通知の間隔を記録する。間隔の中央値・上位の値・最大値と長い停止の割合を残し、平均だけでは見えない引っかかりを調べる。この通知の回数をゲームの描画回数として扱わない。新規キャラを実際に作成し、接続中の町で通常速度と CPU 制限時の描画速度、メインスレッドの稼働時間、持ち物を開く応答と移動を調べる。出力は Git 対象外の `public/tmp/runtime-performance.json` に保存する。操作時間には自動操作の通信時間も含む。開発サーバー上の単独接続での測定であり、遅い GPU・少ないメモリ・多数のプレイヤーを再現したものではない。
 
-描画は低い性能の機械でも動くことを優先し、設定画面は置かない。動かない物は、材質が同じで、いちばん近い「動く親」（薄くなる家、消える屋台、揺れる木の冠など）が同じもの同士を一つのメッシュにまとめて描く（`lib/graphics/merge-static.ts`）。物の数も見た目も変えず、GPU に出す命令の数だけを減らす。結合の入口は `merge-static.ts` に置く。`get-static-batch-groups.ts` が結合の条件・制御する親・属性の組を照合し、`merge-static-batch-groups.ts` がその親の座標へ形状をまとめる。空になった親の掃除は `remove-empty-static-parents.ts` に分け、根と制御する親を残す。互換な頂点属性の連結は `concat-buffer-geometries.ts`、頂点番号の移し替えは `get-concatenated-geometry-index.ts` が担う。`create-attribute-array.ts` は元の数値配列の型を保ち、正規化された色を別の表現へ変えない。動く物は作るときに登録し、動かない物の変換行列は毎フレーム計算し直さない。煙突の煙は同じテクスチャを使う板を一括描画し、カメラからの距離順に並べる。共有する描画済み画像は容量と件数に上限を設け、最近使っていないものからデコード済みデータを解放する（`lib/graphics/bitmap-cache.ts`、上限は `world/scene/sprite-pool.ts`）。人物の表示用キャンバスへコピーしてから共有キャッシュに渡すため、追い出しても表示中の姿は消えない。再び必要になった画像は保存済みデータから読み直すか、Worker で再生成する。材質キャッシュは元画像を弱参照で保持し、使わなくなったマップの画像を引き留めない。破棄した材質はキャッシュから外し、再訪時に作り直す。人物ごとの表示用キャンバスにも保持数の上限を設け、表示中のテクスチャを避けて古い動作・方向から解放する。解放後に届く描画結果は破棄する。人物の描画要求は同じフレームを重複登録せず、マップを離れるときと姿を交換するときに、その人物のテクスチャを解放する。生き物の表示位置はサーバーと同じ時刻の計算を使い、描画側だけ直近の休憩地点を保持して毎フレームの地形判定を減らす。保持する地点は固定数とし、地形が固定されたマップごとに作り直す（`world/core/monster-motion.ts` の `MonsterMotion`）。倒されて復活を待つ生き物は、破片演出が終わった後の位置計算を止める。サーバーが復活を通知した時点の時刻から位置を計算し、待機中のフレームを再生しない。生き物の描画用の地面の高さは、位置が変わったときに計算し直す。静止中と破片の間で同じ高さを共有し、座標配列も再利用する。高さの保持はマップごとに作る描画オブジェクトに閉じる（`world/scene/monsters.ts`）。灰の粒の揺れは `lib/engine/phase-oscillator.ts` で固定の位相を事前計算し、時刻の三角関数を粒どうしで共有する。粒数と元の運動式は保つ。うさぎの形状は同じ材質と影の設定の部品を本体の下でまとめ、移動・選択の輪郭・部品ごとの影を保ちながら描画命令を減らす。統合後の不要な元形状は直ちに解放する。戦闘の破片演出は、終了時と再発生時に古い形状と材質を解放し、生き物と共有するテクスチャは残す。影は毎フレームではなく、決まった間隔と太陽が動いたときにだけ描き直し、描画は 60fps を上限にする。ブラウザのフレーム時刻を使い、微小な時刻の丸めで描画を飛ばさず、高リフレッシュレートの画面でも過剰に描画しない（`lib/engine/frame-limiter.ts`、影の間隔は `world/scene/runtime/scene-shadow-updates.ts`、描画上限は `scene-frame-loop.ts`）。
+描画は低い性能の機械でも動くことを優先し、設定画面は置かない。動かない物は、材質が同じで、いちばん近い「動く親」（薄くなる家、消える屋台、揺れる木の冠など）が同じもの同士を一つのメッシュにまとめて描く（`lib/graphics/merge-static.ts`）。物の数も見た目も変えず、GPU に出す命令の数だけを減らす。結合の入口は `merge-static.ts` に置く。`get-static-batch-groups.ts` が結合の条件・制御する親・属性の組を照合し、`merge-static-batch-groups.ts` がその親の座標へ形状をまとめる。空になった親の掃除は `remove-empty-static-parents.ts` に分け、根と制御する親を残す。互換な頂点属性の連結は `concat-buffer-geometries.ts`、頂点番号の移し替えは `get-concatenated-geometry-index.ts` が担う。`create-attribute-array.ts` は元の数値配列の型を保ち、正規化された色を別の表現へ変えない。動く物は作るときに登録し、動かない物の変換行列は毎フレーム計算し直さない。煙突の煙は同じテクスチャを使う板を一括描画し、カメラからの距離順に並べる。共有する描画済み画像は容量と件数に上限を設け、最近使っていないものからデコード済みデータを解放する（`lib/graphics/bitmap-cache.ts`、上限は `apps/main/world/scene/sprite-pool.ts`）。人物の表示用キャンバスへコピーしてから共有キャッシュに渡すため、追い出しても表示中の姿は消えない。再び必要になった画像は保存済みデータから読み直すか、Worker で再生成する。材質キャッシュは元画像を弱参照で保持し、使わなくなったマップの画像を引き留めない。破棄した材質はキャッシュから外し、再訪時に作り直す。人物ごとの表示用キャンバスにも保持数の上限を設け、表示中のテクスチャを避けて古い動作・方向から解放する。解放後に届く描画結果は破棄する。人物の描画要求は同じフレームを重複登録せず、マップを離れるときと姿を交換するときに、その人物のテクスチャを解放する。生き物の表示位置はサーバーと同じ時刻の計算を使い、描画側だけ直近の休憩地点を保持して毎フレームの地形判定を減らす。保持する地点は固定数とし、地形が固定されたマップごとに作り直す（`apps/main/world/core/monster-motion.ts` の `MonsterMotion`）。倒されて復活を待つ生き物は、破片演出が終わった後の位置計算を止める。サーバーが復活を通知した時点の時刻から位置を計算し、待機中のフレームを再生しない。生き物の描画用の地面の高さは、位置が変わったときに計算し直す。静止中と破片の間で同じ高さを共有し、座標配列も再利用する。高さの保持はマップごとに作る描画オブジェクトに閉じる（`apps/main/world/scene/monsters.ts`）。灰の粒の揺れは `lib/engine/phase-oscillator.ts` で固定の位相を事前計算し、時刻の三角関数を粒どうしで共有する。粒数と元の運動式は保つ。うさぎの形状は同じ材質と影の設定の部品を本体の下でまとめ、移動・選択の輪郭・部品ごとの影を保ちながら描画命令を減らす。統合後の不要な元形状は直ちに解放する。戦闘の破片演出は、終了時と再発生時に古い形状と材質を解放し、生き物と共有するテクスチャは残す。影は毎フレームではなく、決まった間隔と太陽が動いたときにだけ描き直し、描画は 60fps を上限にする。ブラウザのフレーム時刻を使い、微小な時刻の丸めで描画を飛ばさず、高リフレッシュレートの画面でも過剰に描画しない（`lib/engine/frame-limiter.ts`、影の間隔は `apps/main/world/scene/runtime/scene-shadow-updates.ts`、描画上限は `scene-frame-loop.ts`）。
 
-靴の描画と接地は `world/scene/figure/get-shoe-capsule.ts` の同じ踵・爪先と半径の計算を使う。`get-native-footwear.ts` は外見の既存の寸法と靴の選び方を身体の文脈から取り、両足の形状を返す。足の目標と歩行の骨長・靴の区間の準備、後退と両手の届き方の準備では、この形状から接地を求める。身体全体と衣服・前腕の離隔や姿勢の分岐の証明は従来の全身の形状を使い、各区間の対象と境界を保つ。
+靴の描画と接地は `apps/main/world/scene/figure/get-shoe-capsule.ts` の同じ踵・爪先と半径の計算を使う。`get-native-footwear.ts` は外見の既存の寸法と靴の選び方を身体の文脈から取り、両足の形状を返す。足の目標と歩行の骨長・靴の区間の準備、後退と両手の届き方の準備では、この形状から接地を求める。身体全体と衣服・前腕の離隔や姿勢の分岐の証明は従来の全身の形状を使い、各区間の対象と境界を保つ。
 
-人物は `world/scene/actor.ts` と `world/scene/figure/figure.ts`、町の動物の生成は `world/scene/spawn-animals.ts`、スプライトとメッシュの行動はそれぞれ `sprite-critter.ts` と `mesh-critter.ts` に分ける。住民と町の動物の地面の高さは `lib/engine/position-sample.ts` で直前の座標と結果を保持し、歩行や配置換えで座標が変わったときに求め直す。立ち止まっている間も姿勢や向きの更新は続ける。住民と生き物の名前表示には、配置に使った地面の高さを渡し、画面投影で地形を重ねて調べない。保持する値の寿命はマップ内の描画オブジェクトに合わせる。
+人物は `apps/main/world/scene/actor.ts` と `apps/main/world/scene/figure/figure.ts`、町の動物の生成は `apps/main/world/scene/spawn-animals.ts`、スプライトとメッシュの行動はそれぞれ `sprite-critter.ts` と `mesh-critter.ts` に分ける。住民と町の動物の地面の高さは `lib/engine/position-sample.ts` で直前の座標と結果を保持し、歩行や配置換えで座標が変わったときに求め直す。立ち止まっている間も姿勢や向きの更新は続ける。住民と生き物の名前表示には、配置に使った地面の高さを渡し、画面投影で地形を重ねて調べない。保持する値の寿命はマップ内の描画オブジェクトに合わせる。
 
 名前・体力表示・吹き出しの画面位置は `lib/graphics/screen-labels.ts` が保持し、ピクセル位置と表示状態が変わったときだけ DOM のスタイルを書き換える。非表示中は位置を書き換えず、再表示時に現在の位置へ更新する。住民名のホバー装飾も対象の切替時だけ更新する。
 
@@ -218,11 +220,13 @@ Durable Object の入口は `durable-objects/` にあり、どれも Void の規
 
 ## 開発用の道具
 
-`/dev` のページ（`pages/dev/` と `dev/`）では、定義表を一覧し、住民や物を一つずつ見て、描画を試せる。建物詳細は間取りから各階の室内を組み立て、階と昼夜を切り替えて表示する。回転表示とサムネイルの撮影距離は `dev/place-preview-camera.ts` が画面比率と外形から求め、`lib/graphics/get-perspective-box-distance.ts` が外形の八頂点を水平・垂直の視野と手前の面へ収める。`get-camera-facing-bounds.ts` は支点のある小物の画像がカメラへ向く回転も外形へ含め、固定した板の囲いだけで切らない。民家の表示用データはゲームの入場可能マップには登録しない。サムネイルは画像へ変換した直後に、回転表示は閉じるときに、使ったGPUリソースを解放する。共有している形状・材質・テクスチャは重複して解放しない（`lib/graphics/scene-resources.ts`）。サムネイルの保存キーには表示サイズも含める。小物と生き物の一覧のサムネイルは、画面に入った対象から生成する。一覧の行と画像の寸法は維持し、見えない場面を初回にまとめて組み立てない。目の比較は `dev/get-eye-portrait.ts` が必要な最初の静止画だけを描き、元の切出しの画素を維持する。ゲームの画面には開発用のものを出さず、開発用のパネルは開発中のビルドにだけ出す（[[ui#1. 原則]]）。
+開発アプリのページ（`apps/studio/pages/` と `apps/studio/dev/`）では、定義表を一覧し、住民や物を一つずつ見て、描画を試せる。開発アプリはゲームと別のホスト（開発中は `dev.durable-fantasy.localhost`）で開き、ページはホスト直下に置く。`/` が定義表の入口で、`/<表>`・`/<表>/<ID>`・`/view`・`/ui`・`/studio`・`/eyes` と続く。`/dev` の接頭辞は使わない。ゲームのビルドには開発用のページを含めない。本番でミドルウェアが塞いでも、ページのコードは配信されてしまうためである。サイドバーの定義表は `apps/studio/dev/sheets/registry.ts` に一度ずつ登録する。`/<表>/<ID>` が一行を指すように、一つの表の中で行のキーを重複させない。建物詳細は間取りから各階の室内を組み立て、階と昼夜を切り替えて表示する。回転表示とサムネイルの撮影距離は `apps/studio/dev/place-preview-camera.ts` が画面比率と外形から求め、`lib/graphics/get-perspective-box-distance.ts` が外形の八頂点を水平・垂直の視野と手前の面へ収める。`get-camera-facing-bounds.ts` は支点のある小物の画像がカメラへ向く回転も外形へ含め、固定した板の囲いだけで切らない。民家の表示用データはゲームの入場可能マップには登録しない。サムネイルは画像へ変換した直後に、回転表示は閉じるときに、使ったGPUリソースを解放する。共有している形状・材質・テクスチャは重複して解放しない（`lib/graphics/scene-resources.ts`）。サムネイルの保存キーには表示サイズも含める。小物と生き物の一覧のサムネイルは、画面に入った対象から生成する。一覧の行と画像の寸法は維持し、見えない場面を初回にまとめて組み立てない。目の比較は `apps/studio/dev/get-eye-portrait.ts` が必要な最初の静止画だけを描き、元の切出しの画素を維持する。ゲームの画面には開発用のものを出さず、開発用のパネルは開発中のビルドにだけ出す（[[ui#1. 原則]]）。
 
-開発用の動的一覧と詳細は、`pages/dev/[sheet].server.ts` と `[sheet]/[id].server.ts` でブラウザ描画を指定する。`dev/catalog.tsx` の DevPage が準備する Canvas と画面の準備完了の通知を使い、URL の引数はブラウザのページのコンテキストから読む。テクスチャ一覧は看板の描画関数の対応表も読み、種類が増えたら同じ生成処理による実物を表示する。
+開発用の動的一覧と詳細は、`apps/studio/pages/[sheet].server.ts` と `apps/studio/pages/[sheet]/[id].server.ts` でブラウザ描画を指定する。`apps/studio/dev/catalog.tsx` の DevPage が準備する Canvas と画面の準備完了の通知を使い、URL の引数はブラウザのページのコンテキストから読む。テクスチャ一覧は看板の描画関数の対応表も読み、種類が増えたら同じ生成処理による実物を表示する。
 
-`scripts/` のスクリプトは bun で動かす。マップの書き出し、スプライトの焼き込み、屋外のマップと屋内の写真撮り、`/dev` の全ページがはみ出していないかの確認、経済の試算がある。写真を撮るものは開発サーバーを動かした状態で使う。開発画面の検査は最初の HTTP 失敗、資源の取得失敗と画面の例外を再試行で置き換えない。ページの準備完了と画面内の画像・フォントを同じ期限で待つ。スタジオの準備完了は最初の人物画像を描いた時点で通知する。`scripts/dev-overflow.ts` の既定は一覧・各種の先頭詳細と専用ページを二つの幅で調べる検査であり、`DEV_PAGE` を指定した場合はその一画面だけの検査として件数を表示する。
+Tailwind の入口の CSS（`apps/main/components/game/game.css`、`apps/studio/dev/dev.css`・`debug.css`）は、組み立てるアプリの Vite の root だけを自動で走査する。別のアプリのフォルダーにある部品の class は入口の CSS に `@source` で書き、どちらのアプリが組み立てても同じ規則が出るようにする。デバッグパネルの CSS は開発中のゲームのページで `game.css` の後に読み込まれるので、両方にある規則と `:root` の値を変えない。パネル固有の書体と角の大きさは `.dev-debug` の中に置く。
+
+`scripts/` のスクリプトは bun で動かす。マップの書き出し、スプライトの焼き込み、屋外のマップと屋内の写真撮り、開発アプリの全ページがはみ出していないかの確認、経済の試算がある。写真を撮るものは開発サーバーを動かした状態で使う。開発画面の検査は最初の HTTP 失敗、資源の取得失敗と画面の例外を再試行で置き換えない。ページの準備完了と画面内の画像・フォントを同じ期限で待つ。スタジオの準備完了は最初の人物画像を描いた時点で通知する。`scripts/dev-overflow.ts` の既定は一覧・各種の先頭詳細と専用ページを二つの幅で調べる検査であり、`DEV_PAGE` を指定した場合はその一画面だけの検査として件数を表示する。
 
 ## テスト
 
@@ -230,27 +234,29 @@ Durable Object の入口は `durable-objects/` にあり、どれも Void の規
 
 初回戦闘と採集のブラウザ検証は `CPU_SLOWDOWN=4` で CPU 制限付きにもできる。キャラクター作成前から再読込後まで同じ制限を適用し、結果にも倍率を記録する。既存の操作・保存の検査と待機期限を維持する。GPU の遅さやメモリ不足を再現する設定ではない。
 
-テストは実装と同じディレクトリに `*.test.ts` で置き、`vp run test` で動かす。規則のテストは `world/core/` の関数を直接呼ぶ。町の暮らしの整合（寝床の数、日課、通れる道、軒先の物の置き場など）もテストで確かめ、テストにできないものは [[consistency]] のチェックリストで確かめる。`lib/engine/` には、依存の向きと実行時の import に循環がないことを確かめるテストがある。型だけの依存は `import type`・`export type` で明示し、実行時の依存に含めない。
+テストは実装と同じディレクトリに `*.test.ts` で置き、`vp run test` で動かす。規則のテストは `apps/main/world/core/` の関数を直接呼ぶ。町の暮らしの整合（寝床の数、日課、通れる道、軒先の物の置き場など）もテストで確かめ、テストにできないものは [[consistency]] のチェックリストで確かめる。`lib/engine/` には、依存の向きと実行時の import に循環がないことを確かめるテストがある。型だけの依存は `import type`・`export type` で明示し、実行時の依存に含めない。
 
-HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは行動不能で停止する。満腹・温まり・集中の表示も、すべて尽きたらタイマーを止める。プレイヤーの状態が更新されたらその場で表示を計算し直し、回復や効果が生じたら再開する（`components/hud/status-frame.tsx`）。
+HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは行動不能で停止する。満腹・温まり・集中の表示も、すべて尽きたらタイマーを止める。プレイヤーの状態が更新されたらその場で表示を計算し直し、回復や効果が生じたら再開する（`apps/main/components/hud/status-frame.tsx`）。
 
 ## ブラウザの所有権と復帰
 
-`routes/api/session.ts` は `world/server/establish-session.ts` を呼び、ブラウザの所有権を Cookie とプレイヤーの Durable Object で照合する。マップ接続は認証済みの所有者を接続状態へ置く。プロフィールの入力規則は `world/core/player-schema.ts`、復帰位置の計算は `world/core/location-at.ts` にあり、描画や UI を参照しない。作成途中の入力は `world/client/profile-draft.ts` が扱う。プレイヤーの保存先でも HP がない間の歩行とマップ移動を拒否する。倒れたときは、その時刻までに歩いた位置へ経路を止め、HP と同じ状態保存で確定する。再接続後に残りの経路を歩き終えた扱いにせず、復活で HP が戻った後に町への移動を受け付ける。保存・移行の約束は [[game-system#13. 永続化]] を参照する。
+`routes/api/session.ts` は `apps/main/world/server/establish-session.ts` を呼び、ブラウザの所有権を Cookie とプレイヤーの Durable Object で照合する。マップ接続は認証済みの所有者を接続状態へ置く。プロフィールの入力規則は `apps/main/world/core/player-schema.ts`、復帰位置の計算は `apps/main/world/core/location-at.ts` にあり、描画や UI を参照しない。作成途中の入力は `apps/main/world/client/profile-draft.ts` が扱う。プレイヤーの保存先でも HP がない間の歩行とマップ移動を拒否する。倒れたときは、その時刻までに歩いた位置へ経路を止め、HP と同じ状態保存で確定する。再接続後に残りの経路を歩き終えた扱いにせず、復活で HP が戻った後に町への移動を受け付ける。保存・移行の約束は [[game-system#13. 永続化]] を参照する。
 
-パーティの会話の型は `world/core/party-chat-types.ts`、保持と連投の上限は `party-chat-rules.ts`、送受信は `send-party-chat.ts` と `read-party-chat.ts`、加入と脱退の履歴境界は `join-party-chat.ts` と `leave-party-chat.ts` に置く。永続状態は既存の `party` DO、接続への配信は `world/server/map-room/deliver-party-chat.ts` と `send-party-chat.ts` が受け持つ。仲間の HP・居場所の報告と受信可能な会話の取得は `poll` でまとめ、同じ所属状態から返す。定期確認ごとにパーティの保存を繰り返さず、一つの処理で確定する。送信時にはプレイヤーの保存済み所属とパーティの名簿を確認する。受信時も名簿と加入時点の発言番号を確認し、所有者の内部識別子を配信内容から除く。ブラウザは `GameSession` の受信位置をマップ移動後も保ち、同じ発言と脱退済みパーティの遅い応答を表示しない。保持件数と履歴の範囲は [[game-system#12. チャット]] にある。
+パーティの会話の型は `apps/main/world/core/party-chat-types.ts`、保持と連投の上限は `party-chat-rules.ts`、送受信は `send-party-chat.ts` と `read-party-chat.ts`、加入と脱退の履歴境界は `join-party-chat.ts` と `leave-party-chat.ts` に置く。永続状態は既存の `party` DO、接続への配信は `apps/main/world/server/map-room/deliver-party-chat.ts` と `send-party-chat.ts` が受け持つ。仲間の HP・居場所の報告と受信可能な会話の取得は `poll` でまとめ、同じ所属状態から返す。定期確認ごとにパーティの保存を繰り返さず、一つの処理で確定する。送信時にはプレイヤーの保存済み所属とパーティの名簿を確認する。受信時も名簿と加入時点の発言番号を確認し、所有者の内部識別子を配信内容から除く。ブラウザは `GameSession` の受信位置をマップ移動後も保ち、同じ発言と脱退済みパーティの遅い応答を表示しない。保持件数と履歴の範囲は [[game-system#12. チャット]] にある。
 
-武器が持つ戦技・術・祈りの一覧は `world/core/skills.ts` の定義から `arts-of.ts` が読み込み時に索引を作る。画面とアイテム説明は定義順の変更不可な一覧を共有し、取得のたびに全技を走査しない。定義の参照は `skill-of.ts`、現在の技の識別は `is-skill-id.ts` と `skill-ids.ts`、ショートカットの書式は `skill-key.ts` と `skill-of-key.ts` が担当する。使用条件は `art-blocked.ts` が武器から先に判定し、必要な能力値と生活スキルを定義順で調べる。応急手当の回復量は `first-aid.ts` に置く。
+武器が持つ戦技・術・祈りの一覧は `apps/main/world/core/skills.ts` の定義から `arts-of.ts` が読み込み時に索引を作る。画面とアイテム説明は定義順の変更不可な一覧を共有し、取得のたびに全技を走査しない。定義の参照は `skill-of.ts`、現在の技の識別は `is-skill-id.ts` と `skill-ids.ts`、ショートカットの書式は `skill-key.ts` と `skill-of-key.ts` が担当する。使用条件は `art-blocked.ts` が武器から先に判定し、必要な能力値と生活スキルを定義順で調べる。応急手当の回復量は `first-aid.ts` に置く。
 
-店の在庫の型は `world/core/market-types.ts`、定時の品出し表は `market-batches.ts` に置く。通常在庫の初期化は `seed-stock.ts`、参照は `stock-of.ts`、増減は `move-stock.ts` が担当する。価格と買取上限の担当は [[economy#4.1 在庫で動く価格]] に従う。通常在庫の時間経過は `restock-stock.ts` と `hour-of-stock.ts`、棚と需要で共通の決定的な揺れは `market-hash.ts` に置く。全体の更新は `restock.ts` が入口となり、`get-market-happenings.ts` と `get-batch-happenings.ts` が品出しと住民の購入を時刻順に組み立てる。`apply-market-happening.ts` が更新用に複製した棚へ反映し、品質の割当は `split-batch.ts` と `batch-quality.ts`、住民が買う品質の順序は `consume-batch.ts` が受け持つ。出来事の型は品出しと購入で分け、品出しにだけ必要な初回の印を購入へ持ち込まない。
+店の在庫の型は `apps/main/world/core/market-types.ts`、定時の品出し表は `market-batches.ts` に置く。通常在庫の初期化は `seed-stock.ts`、参照は `stock-of.ts`、増減は `move-stock.ts` が担当する。価格と買取上限の担当は [[economy#4.1 在庫で動く価格]] に従う。通常在庫の時間経過は `restock-stock.ts` と `hour-of-stock.ts`、棚と需要で共通の決定的な揺れは `market-hash.ts` に置く。全体の更新は `restock.ts` が入口となり、`get-market-happenings.ts` と `get-batch-happenings.ts` が品出しと住民の購入を時刻順に組み立てる。`apply-market-happening.ts` が更新用に複製した棚へ反映し、品質の割当は `split-batch.ts` と `batch-quality.ts`、住民が買う品質の順序は `consume-batch.ts` が受け持つ。出来事の型は品出しと購入で分け、品出しにだけ必要な初回の印を購入へ持ち込まない。
 
 購入時の価格差と残量の確認は `take.ts`、断られた予約の返却は `give-back.ts`、返却可能な品出し回の判定は `batch-replaced.ts` が受け持つ。値引きは `price-now.ts`、次回の品出しは `next-batch.ts` に置き、品出し日と返却可能な回の計算は `market-day-start.ts` を共有する。
 
-店の在庫表示は `world/server/shop-offers.ts` と `shop-buying.ts`、売買の永続的な予約と再送は `begin-shop-trade.ts`・`finish-shop-trade.ts`・`recover-shop-trades.ts`、保存形式は `market-record-types.ts`、旧形式の移行は `migrate-market-record.ts` と `market-migrations.ts` に置く。新規状態だけを `initial-market-record.ts` から作る。Player DO の受領判定は `world/core/receive-shop.ts` を使う。確定と補償の規則は [[economy#4.4 作り置きの店と焼き上がり]] に従う。
+店の在庫表示は `apps/main/world/server/shop-offers.ts` と `shop-buying.ts`、売買の永続的な予約と再送は `begin-shop-trade.ts`・`finish-shop-trade.ts`・`recover-shop-trades.ts`、保存形式は `market-record-types.ts`、旧形式の移行は `migrate-market-record.ts` と `market-migrations.ts` に置く。新規状態だけを `initial-market-record.ts` から作る。Player DO の受領判定は `apps/main/world/core/receive-shop.ts` を使う。確定と補償の規則は [[economy#4.4 作り置きの店と焼き上がり]] に従う。
 
-採集資源の予約と再送は `world/server/begin-gather.ts`・`finish-gather.ts`・`recover-gathering.ts`、保存形式は `nature-record-types.ts`、旧形式の移行は `migrate-nature-record.ts` と `nature-migrations.ts`、新規状態は `initial-nature-record.ts`、受領記録は `world/core/receive-gather.ts` に置く。`durable-objects/nature.ts` は入口だけを持つ。接続の定期同期は資源の残量も読み直し、遅延した採集の確定・返却と自然回復を、部屋への入り直しを必要とせず反映する。規則は [[economy#1. 採集]] に従う。
+採集資源の予約と再送は `apps/main/world/server/begin-gather.ts`・`finish-gather.ts`・`recover-gathering.ts`、保存形式は `nature-record-types.ts`、旧形式の移行は `migrate-nature-record.ts` と `nature-migrations.ts`、新規状態は `initial-nature-record.ts`、受領記録は `apps/main/world/core/receive-gather.ts` に置く。`durable-objects/nature.ts` は入口だけを持つ。接続の定期同期は資源の残量も読み直し、遅延した採集の確定・返却と自然回復を、部屋への入り直しを必要とせず反映する。規則は [[economy#1. 採集]] に従う。
 
-移動と攻撃前の起立は `world/server/map-room/stand-up.ts` で確認する。Player DO の保存が成功するまで接続側の座り状態を解除せず、拒否された場合は移動や攻撃の予約へ進まない。通知の失敗と保存の失敗を区別し、確定した起立を通知の失敗で取り消さない。
+市場・取引所・自然・野生の DO は、要求の記録をプレイヤーごとに持ち、同じ接続からの古い番号の再送を断るのに使う。状態全体を一つの値として保存し直すので、記録を残し続けると遊んだことのある人数に比例して保存が重くなり、上限を超えるとその DO の操作が全部失敗する。新しい要求を受け付けるたびに、決着から一時間を過ぎた記録を `apps/main/world/server/prune-finished-jobs.ts` で消す。決着していない記録は消さない。再送は失われた応答の再試行として数秒のうちに来るので、一時間あれば重複して実行しない。取引所の板は一人が置ける注文の数を抑え、空になった受取箱は残さない（[[economy#5. 取引所]]）。受け取られないままの受取箱と値動きの記録は、まだ同じ一つの値に残る。討伐の配送は受取人ごとの待ち行列が持つので、討伐の記録を消しても届け物は残る。倒れたままの人や取引の保留中の人に断られた届け物は、最初の数回はアラームごとに送り直し、その後は間隔を倍々に延ばして上限まで待つ（`apps/main/world/server/next-delivery-retry.ts`）。受取人が次に攻撃しようとしたときは、待たずにその場で届け直す（`begin-strike.ts`）。町のチャンネルの人数は、部屋が人を迎えるたびに、その部屋が実際に抱える人数（`map-room/count-seated.ts`）で `directory` の数を合わせ直す。切断の後始末が走らなかった席が残って、誰も入れないチャンネルになるのを防ぐためである。
+
+移動と攻撃前の起立は `apps/main/world/server/map-room/stand-up.ts` で確認する。Player DO の保存が成功するまで接続側の座り状態を解除せず、拒否された場合は移動や攻撃の予約へ進まない。通知の失敗と保存の失敗を区別し、確定した起立を通知の失敗で取り消さない。
 
 通常操作の保存成功後は、通知の成否にかかわらず接続の座り状態とプロフィールを更新する。プロフィールの反映は `publish-command-player.ts` が受け持ち、最初の準備完了または公開する姿の変更がある場合だけ周囲へ知らせる。定期同期でも Player DO の座り状態を接続へ反映する。状態の保存に失敗した場合には接続の状態を先へ進めない。
 
@@ -259,39 +265,39 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 ## 製作依頼の受取対象
 
-加工依頼の定義表は `world/core/commissions.ts`、定義の組立ては `define-commission.ts`、参照は `commission-of.ts` に置く。注文スキーマの `commission-order-schema.ts` と一覧比較の `same-commission-orders.ts` を保存形式・通信・コマンドで共有する。関連する型は `commission-types.ts`、上限と既定の抽選の値は `commission-rules.ts`、職人ごとの品質の抽選は `commission-quality.ts` が担当する。ブラウザは選択時の一覧を送信時まで保持し、マップの部屋が一覧を照合して職人と距離を調べる。`world/core/commission/collect.ts` は同じ一覧を更新直前にも照合する。公開順の番号は読出しや回復でも進むため、注文の選択の一致には使わない。規則は [[economy#3. 加工の依頼]] に従う。
+加工依頼の定義表は `apps/main/world/core/commissions.ts`、定義の組立ては `define-commission.ts`、参照は `commission-of.ts` に置く。注文スキーマの `commission-order-schema.ts` と一覧比較の `same-commission-orders.ts` を保存形式・通信・コマンドで共有する。関連する型は `commission-types.ts`、上限と既定の抽選の値は `commission-rules.ts`、職人ごとの品質の抽選は `commission-quality.ts` が担当する。ブラウザは選択時の一覧を送信時まで保持し、マップの部屋が一覧を照合して職人と距離を調べる。`apps/main/world/core/commission/collect.ts` は同じ一覧を更新直前にも照合する。公開順の番号は読出しや回復でも進むため、注文の選択の一致には使わない。規則は [[economy#3. 加工の依頼]] に従う。
 
 
 ## 倉庫の選択対象
 
-`world/client/player-actions.ts` は預ける持ち物または引き取る倉庫の一枠を送信時まで保持する。通信は保存と同じ `stackSchema` を使い、`world/core/storage/store.ts` と `retrieve.ts` が更新直前に `same-stack.ts` の `sameStack` で照合する。取引の複数品の比較もこの一品の比較を使い、品質・作り手・耐久の比較漏れを別々に直す構造にしない。規則は [[game-system#5. 持ち物・装備・倉庫]] に従う。
+`apps/main/world/client/player-actions.ts` は預ける持ち物または引き取る倉庫の一枠を送信時まで保持する。通信は保存と同じ `stackSchema` を使い、`apps/main/world/core/storage/store.ts` と `retrieve.ts` が更新直前に `same-stack.ts` の `sameStack` で照合する。取引の複数品の比較もこの一品の比較を使い、品質・作り手・耐久の比較漏れを別々に直す構造にしない。規則は [[game-system#5. 持ち物・装備・倉庫]] に従う。
 
 
 ## ドラッグした品の保持
 
-`components/hud/drag.ts` は保存と同じ品のスキーマを持つドラッグ情報を検証し、開始時の一枠を保持する。持ち物と装備の窓はその一枠を操作へ渡し、`world/core/inventory-selection.ts` が規則の実行直前に比較する。通常のクリックによる使用・装備・取り外し・売却も同じ比較を通す。売却では市場の予約前にも照合し、`same-shop-command.ts` の要求の一致へ選択した品を含める。並べ替えは送り先も照合し、倉庫へのドロップは開始時の品と現在の持ち物を確認してから倉庫の規則へ進む。ショートカットへの登録は物を移す操作ではなく、品またはスキルへの参照を保持する。
+`apps/main/components/hud/drag.ts` は保存と同じ品のスキーマを持つドラッグ情報を検証し、開始時の一枠を保持する。持ち物と装備の窓はその一枠を操作へ渡し、`apps/main/world/core/inventory-selection.ts` が規則の実行直前に比較する。通常のクリックによる使用・装備・取り外し・売却も同じ比較を通す。売却では市場の予約前にも照合し、`same-shop-command.ts` の要求の一致へ選択した品を含める。並べ替えは送り先も照合し、倉庫へのドロップは開始時の品と現在の持ち物を確認してから倉庫の規則へ進む。ショートカットへの登録は物を移す操作ではなく、品またはスキルへの参照を保持する。
 
 ## 定義表の外にあった礼拝堂
 
-礼拝堂の外形と入口は `world/town/chapel.ts` の CHAPEL に持ち、`world/scene/construction/chapel.ts` が描く。本堂と鐘塔の外周、屋根・基壇・控え壁の張出しは chapelFootprints が返し、個別設定の配置検査が使う。世帯の家を並べる HOUSES へ礼拝堂を住居として追加せず、[[building-chapel]] で用途と内部設計を管理する。共通定義の建物資料が欠けたら資料検査を失敗させる。
+礼拝堂の外形と入口は `apps/main/world/town/chapel.ts` の CHAPEL に持ち、`apps/main/world/scene/construction/chapel.ts` が描く。本堂と鐘塔の外周、屋根・基壇・控え壁の張出しは chapelFootprints が返し、個別設定の配置検査が使う。世帯の家を並べる HOUSES へ礼拝堂を住居として追加せず、[[building-chapel]] で用途と内部設計を管理する。共通定義の建物資料が欠けたら資料検査を失敗させる。
 
 屋外の仕事への経路検査は `scripts/lib/resident-journeys.ts` が、住民と自宅・仕事場の対応、正確な戸口・到着場所・幅・出発方向を照合する。地面の到着場所は検査の入口で共通定義から渡し、検査の中へ町の名前や固定座標を埋め込まない。身体の占有と橋・川の計算は `scripts/lib/audit-outdoor-journey.ts` が受け持つ。資料の到着地点が、洗濯場の階段を下りた作業位置を表すとは限らない。
 
-町の鶏・猫・豚・羊の個体IDと所属マップ・描画の初期定義は `world/town/animals.ts` に持つ。Three.js に依存せず、設定資料の飼育割当と `world/scene/spawn-animals.ts` の生成が同じ定義を使う。描画物には animalId を付ける。現在の移動と外見を保つための分離であり、飼育室への帰宅や就寝の行動を実装した意味にはしない。
+町の鶏・猫・豚・羊の個体IDと所属マップ・描画の初期定義は `apps/main/world/town/animals.ts` に持つ。Three.js に依存せず、設定資料の飼育割当と `apps/main/world/scene/spawn-animals.ts` の生成が同じ定義を使う。描画物には animalId を付ける。現在の移動と外見を保つための分離であり、飼育室への帰宅や就寝の行動を実装した意味にはしない。
 
 マップへの動物の配置は、個体定義をマップIDで絞って行う。描画のマップ定義に動物の有無のフラグを重ねて持たず、屋内や別の地区に広場の個体を複写しない。個体のないマップでは、描画物の作成と動物用の地形の参照を行わない。
 
 ## 元の部屋と家具の診断
 
-`world/town/floorplan/room-inventory.ts` は元の部屋と生成した区画を照合し、`FloorPlan.unrepresentedRooms` へ対応しない部屋を残す。`world/town/interiors.ts` は形状を扱えない元の家具を位置と寸法付きの `unrenderedFurniture` へ残す。どちらも描画と通行の形状に混ぜず、診断のために空の区画や代替の家具を描かない。
+`apps/main/world/town/floorplan/room-inventory.ts` は元の部屋と生成した区画を照合し、`FloorPlan.unrepresentedRooms` へ対応しない部屋を残す。`apps/main/world/town/interiors.ts` は形状を扱えない元の家具を位置と寸法付きの `unrenderedFurniture` へ残す。どちらも描画と通行の形状に混ぜず、診断のために空の区画や代替の家具を描かない。
 
 `scripts/check-settings.ts` が全棟・全階の現行の定義から診断を集め、`scripts/lib/runtime-graphics.ts` で個別資料の記録と照合する。設計と描画の照合の扱いは `.docs/settings/README.md` に従う。
 
-授業の参加者は `world/town/routine-activities.ts` が日課の活動タグとマップから読み取る。設定検査の `scripts/lib/classrooms.ts` が先生の仕事、学ぶ人の部屋参照、卓と椅子の割当と座る身体の間隔を照合する。日課の表示文言から役割を推測せず、実行時の場所と時刻は既存の日課に従う。
+授業の参加者は `apps/main/world/town/routine-activities.ts` が日課の活動タグとマップから読み取る。設定検査の `scripts/lib/classrooms.ts` が先生の仕事、学ぶ人の部屋参照、卓と椅子の割当と座る身体の間隔を照合する。日課の表示文言から役割を推測せず、実行時の場所と時刻は既存の日課に従う。
 
-加工設備の配置は `world/town/equipment-place.ts` と `locate-stations.ts` が規則と位置を結ぶ。共同作業場の地上階と設備の存在を確認し、加工規則に対応する場所がない場合やIDが重複する場合は定義エラーにする。設備を黙って位置なしの状態へ変換しない。
+加工設備の配置は `apps/main/world/town/equipment-place.ts` と `locate-stations.ts` が規則と位置を結ぶ。共同作業場の地上階と設備の存在を確認し、加工規則に対応する場所がない場合やIDが重複する場合は定義エラーにする。設備を黙って位置なしの状態へ変換しない。
 
-職人通りの共同炉と金床・薪の既存の配置は `world/town/craft-yard.ts` で共有し、描画と加工判定が別々の座標を持たない。屋内の加工設備は描画の種類だけでなく元の家具名で結び、同じ種類の台を並べ替えても別の作業面を参照しない。設備資料の runtime_station は `scripts/lib/runtime-stations.ts` が実行時の設備とマップへ照合する。
+職人通りの共同炉と金床・薪の既存の配置は `apps/main/world/town/craft-yard.ts` で共有し、描画と加工判定が別々の座標を持たない。屋内の加工設備は描画の種類だけでなく元の家具名で結び、同じ種類の台を並べ替えても別の作業面を参照しない。設備資料の runtime_station は `scripts/lib/runtime-stations.ts` が実行時の設備とマップへ照合する。
 
 `lib/engine/scalar-field-range.ts` は双線形の補間の格子線と照会矩形の端から最小・最大を求める。補間と同じ座標の切詰めを `ScalarField.gridCoordinate` で使い、四隅だけでは見落とす内部の起伏も含める。`ScalarField` は所有側が管理する標本の読取りビューであり、名前付きの入力から寸法と解像度を固定する。配列そのものは公開せず、範囲の検査は `sampleCount` で標本数を確認する。描画が所有する配列の内容の更新はビューへ反映し、入力の設定オブジェクトの後からの変更は反映しない。設定検査は `create-ground-fields.ts` で現行の地形を地区ごとに直接生成し、独立した配列を床の基礎と入口の外階段へ渡す。描画の地区を切り替えたり共有配列を初期化したりしない。実行時の地面や建物をこの検査で変更しない。
 
@@ -301,25 +307,25 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 `scripts/lib/door-push.ts` は外から戸を押して入る身体と戸板の連続した動きを扱う。区間の移動量と回転量から距離の変化の上限を求め、接触しないことと取っ手へ届くことを区間全体で証明する。記録した姿勢だけの点検に置き換えない。床と踊り場の和集合、壁と枠・家具と使用面、開いた戸を保持して室内側の閉める位置へ移る区間も照合する。実行時の操作や描画はこの資料検査から変更しない。
 
-室内の糸車は機織り機と別の描画種類として持ち、`world/scene/construction/spinning-wheel.ts` で動輪・スポークと糸巻き・伝動紐・踏み板を組む。元の家具の座標と占有は維持する。室内の窓と枠は所属する壁の切下げに合わせて隠し、壁が戻ってから表示する。切下げの途中で窓だけが浮く状態を作らない。
+室内の糸車は機織り機と別の描画種類として持ち、`apps/main/world/scene/construction/spinning-wheel.ts` で動輪・スポークと糸巻き・伝動紐・踏み板を組む。元の家具の座標と占有は維持する。室内の窓と枠は所属する壁の切下げに合わせて隠し、壁が戻ってから表示する。切下げの途中で窓だけが浮く状態を作らない。
 
-荷車の無荷の駐車状態は `world/town/parked-cart-shape.ts` に荷台・車輪と軸・柄と支持の同じ定義を持つ。`get-parked-cart-fit.ts` は矩形の長い辺へ前後軸を向け、全体を均等な倍率で収める。`world/scene/construction/parked-cart.ts` は `parked-cart-frame.ts` と `parked-cart-wheel.ts` を組み、名前を持つ部材の静的な接触を検査できるようにする。スポークはインスタンスでまとめ、車輪と軸・柄の形を木箱や積荷で代用しない。資料は [[room-barn-2#空の荷車の駐車した形]] にある。
+荷車の無荷の駐車状態は `apps/main/world/town/parked-cart-shape.ts` に荷台・車輪と軸・柄と支持の同じ定義を持つ。`get-parked-cart-fit.ts` は矩形の長い辺へ前後軸を向け、全体を均等な倍率で収める。`apps/main/world/scene/construction/parked-cart.ts` は `parked-cart-frame.ts` と `parked-cart-wheel.ts` を組み、名前を持つ部材の静的な接触を検査できるようにする。スポークはインスタンスでまとめ、車輪と軸・柄の形を木箱や積荷で代用しない。資料は [[room-barn-2#空の荷車の駐車した形]] にある。
 
-飲用水甕は `world/town/water-jar-shape.ts` の胴と蓋の同じ輪郭を `world/scene/construction/water-jar.ts` が回転体へする。内側と口縁を持つ陶器の胴、口縁へ接する取り外す蓋を描き、元の占有と床の高さを保つ。資料は [[room-h4-1#飲用水甕の閉じた外形]] にある。個別の水甕の検査表示も同じ描画を使う。
+飲用水甕は `apps/main/world/town/water-jar-shape.ts` の胴と蓋の同じ輪郭を `apps/main/world/scene/construction/water-jar.ts` が回転体へする。内側と口縁を持つ陶器の胴、口縁へ接する取り外す蓋を描き、元の占有と床の高さを保つ。資料は [[room-h4-1#飲用水甕の閉じた外形]] にある。個別の水甕の検査表示も同じ描画を使う。
 
-茶の壺・灯り油の壺・釉の甕は用途の異なる描画種類を持ち、`world/scene/construction/ceramic-vessel.ts` で閉じた器の輪郭を作る。茶の壺の持ち手、油壺の細口と栓・紐、釉の甕の広い蓋を分け、家具の元の占有の中へ収める。土色は既存の色の帯から取り、夜は室内の灯りに従う。
+茶の壺・灯り油の壺・釉の甕は用途の異なる描画種類を持ち、`apps/main/world/scene/construction/ceramic-vessel.ts` で閉じた器の輪郭を作る。茶の壺の持ち手、油壺の細口と栓・紐、釉の甕の広い蓋を分け、家具の元の占有の中へ収める。土色は既存の色の帯から取り、夜は室内の灯りに従う。
 
-ろくろは `world/scene/construction/potters-wheel.ts`、砥石と支持台・水受けは `world/scene/construction/whetstone.ts` で描く。ろくろは下の足で回す円盤と上の成形面・縦軸を分け、支持台へ円盤が埋まらないようにする。砥石は住民の台詞にある荒・中・仕上げを表し、支持台の長辺へ合わせる。`world/town/get-interior-piece.ts` は元の家具を表示用の寸法へ変換した結果を受け取り、描画できる形と未対応の記録のどちらでも名前と寸法・障害物の情報を保持する。
+ろくろは `apps/main/world/scene/construction/potters-wheel.ts`、砥石と支持台・水受けは `apps/main/world/scene/construction/whetstone.ts` で描く。ろくろは下の足で回す円盤と上の成形面・縦軸を分け、支持台へ円盤が埋まらないようにする。砥石は住民の台詞にある荒・中・仕上げを表し、支持台の長辺へ合わせる。`apps/main/world/town/get-interior-piece.ts` は元の家具を表示用の寸法へ変換した結果を受け取り、描画できる形と未対応の記録のどちらでも名前と寸法・障害物の情報を保持する。
 
-籠と柳の材料は `world/scene/construction/basketry.ts`、仕事用の鍋・桶・袋・道具箱は `world/scene/construction/workshop-container.ts` に形を分ける。`world/scene/interior.ts` の家具の分岐は `FurnitureKind` の全種類を扱う。表面の生活の跡は支持面の高さが決まる後段へ明示的に回し、新しい家具の種類に描画処理がない場合は型検査で拒否する。元の全階で未対応の家具がないことは `workshop-container.test.ts` で検査し、新しい未対応の名前の記録を保持する検査とは分ける。
+籠と柳の材料は `apps/main/world/scene/construction/basketry.ts`、仕事用の鍋・桶・袋・道具箱は `apps/main/world/scene/construction/workshop-container.ts` に形を分ける。`apps/main/world/scene/interior.ts` の家具の分岐は `FurnitureKind` の全種類を扱う。表面の生活の跡は支持面の高さが決まる後段へ明示的に回し、新しい家具の種類に描画処理がない場合は型検査で拒否する。元の全階で未対応の家具がないことは `workshop-container.test.ts` で検査し、新しい未対応の名前の記録を保持する検査とは分ける。
 
 ## 資料の平面と描画への投影
 
-`world/town/floorplan/authored-floor-plan.ts` は個別の部屋のグリッドと配置を実寸の `FloorPlan` へ変換する純粋な処理である。入力の共有型は `authored-types.ts` に置き、全体の寸法の検査は `assert-authored-plan-dimensions.ts`、外壁に収まる開口の検査と外壁面への投影は `get-authored-entrance.ts` と `get-authored-entrance-opening.ts` に分ける。部屋と家具の検査・投影は `get-authored-room-projection.ts` と個別の検査・矩形変換に分ける。被覆と壁の索引は階・行・列の数値で保持し、被覆の検査後に `get-authored-wall-dividers.ts` が階・行・列の順で壁の区間を投影する。部屋の原点と家具の矩形を同じ倍率で移し、壁の連続したセルをまとめ、戸のセルを埋めない。部屋の境界どうしが同じ壁または戸を共有することだけを許し、内部の重複、未被覆の床、範囲外の家具は拒否する。共有可能なセルの条件は `can-share-room-cell.ts` に置き、資料の `FloorOccupancy` と実行用の投影が同じ判定を使う。家具の名前から似た形を推測せず、資料の `runtime_kind` と `runtime_solid` を使う。種類の定義は `world/town/furniture-kinds.ts`、明示した種類の検査は `parse-furniture-kind.ts` に分ける。既存の名前の判定は `get-furniture-kind.ts` に順序を持つ規則として残し、資料の明示した種類の代わりにはしない。
+`apps/main/world/town/floorplan/authored-floor-plan.ts` は個別の部屋のグリッドと配置を実寸の `FloorPlan` へ変換する純粋な処理である。入力の共有型は `authored-types.ts` に置き、全体の寸法の検査は `assert-authored-plan-dimensions.ts`、外壁に収まる開口の検査と外壁面への投影は `get-authored-entrance.ts` と `get-authored-entrance-opening.ts` に分ける。部屋と家具の検査・投影は `get-authored-room-projection.ts` と個別の検査・矩形変換に分ける。被覆と壁の索引は階・行・列の数値で保持し、被覆の検査後に `get-authored-wall-dividers.ts` が階・行・列の順で壁の区間を投影する。部屋の原点と家具の矩形を同じ倍率で移し、壁の連続したセルをまとめ、戸のセルを埋めない。部屋の境界どうしが同じ壁または戸を共有することだけを許し、内部の重複、未被覆の床、範囲外の家具は拒否する。共有可能なセルの条件は `can-share-room-cell.ts` に置き、資料の `FloorOccupancy` と実行用の投影が同じ判定を使う。家具の名前から似た形を推測せず、資料の `runtime_kind` と `runtime_solid` を使う。種類の定義は `apps/main/world/town/furniture-kinds.ts`、明示した種類の検査は `parse-furniture-kind.ts` に分ける。既存の名前の判定は `get-furniture-kind.ts` に順序を持つ規則として残し、資料の明示した種類の代わりにはしない。
 
 `scale-room-piece-dimensions.ts` は配置の座標変換と分けて、家具の実寸の付属情報を室内の倍率へ一度だけ変換する。椅子と足掛けは `scale-seat.ts`、卓の天板・脚と膝の空間は `scale-work-surface.ts` を使う。炉・棚・寝台も各部品の変換を使い、向き・階・グリッドの矩形は元の配置に保つ。描画の位置を決める変換で実寸を重ねて掛けない。
 
-`scripts/export-authored-plans.ts` は建物資料の ID を選び、`world/town/floorplan/authored/` へ型検査可能な配置データを書き出す。`get-authored-export-targets.ts` は索引の建物と出力のファイル名に使える ID だけを選び、対象と索引の重複を拒否する。`read-authored-plan-documents.ts` は建物の全室と参照先の屋外マップを解決し、`read-indexed-setting.ts` が索引の正規のパスと読取り後の ID・種別を照合する。参照の接頭辞からファイルを推測しない。
+`scripts/export-authored-plans.ts` は建物資料の ID を選び、`apps/main/world/town/floorplan/authored/` へ型検査可能な配置データを書き出す。`get-authored-export-targets.ts` は索引の建物と出力のファイル名に使える ID だけを選び、対象と索引の重複を拒否する。`read-authored-plan-documents.ts` は建物の全室と参照先の屋外マップを解決し、`read-indexed-setting.ts` が索引の正規のパスと読取り後の ID・種別を照合する。参照の接頭辞からファイルを推測しない。
 
 書出しの整形は `run-local-vp.ts` を通してプロジェクトの Vite+ を起動し、PATH 上のグローバル CLI に依存しない。`write-authored-plan-export.ts` は LF と CRLF だけの差では保存し直さず、既存の内容と更新時刻を保つ。実際の内容変更は保存する。資料検査のパス境界は `get-setting-document-path.ts` が OS のパス規則で確認し、基点そのものや配下から外れるパスを拒否する。実ファイルのリンクは引き続き一覧の走査で拒否する。
 
@@ -331,15 +337,15 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 資料から配置データへの変換は `scripts/lib/compile-authored-plan.ts` が組み立てる。建物の構造と文書 ID の索引、部屋の入力、家具、外への入口、階段の断面をそれぞれ検証して変換する。部屋名や寸法を文字列・数値へ読み替えて補完せず、重複した文書 ID は参照の前に拒否する。実行用の出力は設計状態にかかわらず実際に出力する各室の階段接続を覆う断面と既知の開口・手すり寸法を要求する。設計途中の資料を保持できることと、実行用の配置を出せることは別の条件である。
 
-資料案の階段は `world/town/floorplan/stair-geometry.ts` が段数・床高・踏面・踊り場から一つの階段を計算し、上下階の描画と通行判定で共有する。`world/scene/construction/authored-stair.ts` は上階では同じ階段を下へ降ろし、上向きに複製しない。上階の床は `lib/engine/rectangle-subtraction.ts` で開口を除いた矩形へ分解して描き、上の踊り場の床板を二重に描かない。資料案の縦横は同じ室内倍率で投影し、階高と床厚も資料の差から得る。既存の自動間取りの描画寸法は維持する。
+資料案の階段は `apps/main/world/town/floorplan/stair-geometry.ts` が段数・床高・踏面・踊り場から一つの階段を計算し、上下階の描画と通行判定で共有する。`apps/main/world/scene/construction/authored-stair.ts` は上階では同じ階段を下へ降ろし、上向きに複製しない。上階の床は `lib/engine/rectangle-subtraction.ts` で開口を除いた矩形へ分解して描き、上の踊り場の床板を二重に描かない。資料案の縦横は同じ室内倍率で投影し、階高と床厚も資料の差から得る。既存の自動間取りの描画寸法は維持する。
 
 家具と間仕切りの室内投影は `get-interior-furniture-projection.ts` が対象の階の元の順序で組み立てる。中心と幅・奥行への変換は `project-interior-piece-placement.ts` に置き、家具の付属寸法の換算と分ける。描画未対応の家具も名前と占有を保持し、間仕切りの種類は型付きの対応表から選ぶ。
 
-`world/town/interior-plan.ts` の入口の投影は `get-interior-entrance.ts` が描画の点と通行・到着のセルを一緒に求める。壁の内側のセルを選ぶ丸めは `get-interior-door-coordinate.ts` に置く。階段の実寸から表示への換算は `project-interior-stair-section.ts`、階ごとの床開口と通行を塞ぐ範囲は `get-interior-stair-projection.ts` が扱う。矩形の移動と倍率は煙道と階段で `project-interior-rectangle.ts` を共用し、表示倍率を世界の実寸へ戻さない。
+`apps/main/world/town/interior-plan.ts` の入口の投影は `get-interior-entrance.ts` が描画の点と通行・到着のセルを一緒に求める。壁の内側のセルを選ぶ丸めは `get-interior-door-coordinate.ts` に置く。階段の実寸から表示への換算は `project-interior-stair-section.ts`、階ごとの床開口と通行を塞ぐ範囲は `get-interior-stair-projection.ts` が扱う。矩形の移動と倍率は煙道と階段で `project-interior-rectangle.ts` を共用し、表示倍率を世界の実寸へ戻さない。
 
 窓・灯り・煙道の室内投影は `get-interior-fixture-projection.ts` が対象の階を選び、各 `project-interior-*` の処理へ渡す。窓は外向きの方向と壁上の点を同じ方位から求め、壁厚が未定や正の有限値でない場合、投影結果が非有限になる場合を拒否する。灯りの位置と高さ、煙道の壁厚と床の支持も表示倍率で一度だけ換算する。
 
-室内マップは `world/maps/indoor-maps.ts` で組み立てる。現在の町の地上階もこの処理を使い、採用する資料案の上階を追加したときは別のマップIDを持たせる。上階へ街の戸を複製しない。階段の接続は `world/town/interior-stair-links.ts` が同じ断面の上下の踊り場から求める。階とマップの登録を `get-interior-stair-registry.ts` で一意に解決し、乗り口の選択と安全な到着点の探索を分ける。同じ索引に保持した歩行グリッドを階段判定と `world/maps/create-indoor-map.ts` のマップ生成へ渡し、別々に作り直さない。到着点はマップごとに最初の接続を索引にし、各室の生成のたびに全リンクを探索しない。上階の到着点の存在を確認してから描画名や住民の生成を呼ぶ。
+室内マップは `apps/main/world/maps/indoor-maps.ts` で組み立てる。現在の町の地上階もこの処理を使い、採用する資料案の上階を追加したときは別のマップIDを持たせる。上階へ街の戸を複製しない。階段の接続は `apps/main/world/town/interior-stair-links.ts` が同じ断面の上下の踊り場から求める。階とマップの登録を `get-interior-stair-registry.ts` で一意に解決し、乗り口の選択と安全な到着点の探索を分ける。同じ索引に保持した歩行グリッドを階段判定と `apps/main/world/maps/create-indoor-map.ts` のマップ生成へ渡し、別々に作り直さない。到着点はマップごとに最初の接続を索引にし、各室の生成のたびに全リンクを探索しない。上階の到着点の存在を確認してから描画名や住民の生成を呼ぶ。
 
 既知の室内の親空間の情報は `get-interior-map-space.ts` からマップ定義へ渡す。同じ階の資料の部屋 ID と平面領域は `get-authored-room-space.ts` から親空間の情報に保持し、全マップの登録時に `assert-map-room-spaces.ts` で包含と重なりを検査する。別マップの室内領域は `get-map-room-footprints.ts` と `get-map-space-transform.ts` で親の階層を通して最上位の空間へ投影し、`assert-map-room-separation.ts` が同じ根と完成床高の平面の重複を検査する。明示された階の天井と完成床の差は同じ登録の部屋へ渡し、`get-map-room-volumes.ts` で共通基準へ投影した体積の重複を `assert-map-room-volume-separation.ts` が検査する。外観の基準系の照合時には `assert-authored-room-envelope.ts` が既知の屋根下面への包含も確認し、描画と同じ屋根の高さの計算へ接続する。床材の形と厚みは `get-interior-floor-space.ts` が描画の `flue-floor.ts` と共有し、同じ空間の登録へ渡す。`get-map-floor-volumes.ts` が実寸へ投影した床材を、`assert-map-floor-separation.ts` で室の使用空間と床材どうしへ照合する。単位と未照合の扱いは [[spatial-model#室内マップの親空間]] に従う。
 
@@ -363,13 +369,13 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 `assert-finite-envelope.ts` は計算後の全数値も確認し、有限の入力同士の計算で非有限値が生じた場合は、その項目の位置を示して書出しを拒否する。
 
-`get-envelope-window-projection.ts` は窓を敷地の原点と基礎高さを含む同じ座標系へ投影し、対応する階の高さが一意に定まらない場合は拒否する。`compile-envelope-window.ts` は投影した位置と向きから描画へ渡す窓の寸法を組み立てる。既存の描画へ渡す窓台の高さは、基礎からの相対高さとして保持する。`world/scene/construction/authored-building.ts` はこの寸法で建造し、室内表示の拡大倍率を屋外へ持ち込まない。煙突を乱数で増やさず、屋根材は元の建物の材質へ合わせる。寄り合い所の町の外観も同じ寸法で建造する。
+`get-envelope-window-projection.ts` は窓を敷地の原点と基礎高さを含む同じ座標系へ投影し、対応する階の高さが一意に定まらない場合は拒否する。`compile-envelope-window.ts` は投影した位置と向きから描画へ渡す窓の寸法を組み立てる。既存の描画へ渡す窓台の高さは、基礎からの相対高さとして保持する。`apps/main/world/scene/construction/authored-building.ts` はこの寸法で建造し、室内表示の拡大倍率を屋外へ持ち込まない。煙突を乱数で増やさず、屋根材は元の建物の材質へ合わせる。寄り合い所の町の外観も同じ寸法で建造する。
 
-窓と吊り灯りは各室の `windows` と `lamps` に持ち、`scripts/lib/room-fixtures.ts` が壁・天井・家具との位置を確認する。窓は階と外壁上の位置・開口幅・腰高・高さ・枠を、灯りは平面位置・本体の上下と天井への吊りを持つ。`world/town/room-fixtures.ts` の形で室内と外観へ投影し、`world/scene/construction/room-fixtures.ts` が共通の窓枠を描く。
+窓と吊り灯りは各室の `windows` と `lamps` に持ち、`scripts/lib/room-fixtures.ts` が壁・天井・家具との位置を確認する。窓は階と外壁上の位置・開口幅・腰高・高さ・枠を、灯りは平面位置・本体の上下と天井への吊りを持つ。`apps/main/world/town/room-fixtures.ts` の形で室内と外観へ投影し、`apps/main/world/scene/construction/room-fixtures.ts` が共通の窓枠を描く。
 
 窓の位置には実際に壁の開口を切る。腰壁は残すため、窓を追加しても通行できる外壁セルにはしない。壁の透過表示ではその壁に属する窓枠とガラスも一緒に隠す。資料案の灯りは指定した器具だけを描き、自動で部屋の中央へもう一つ足さない。寄り合い所は各階の住民の予定に合わせて窓と吊り灯りを点灯する。予定の位置は資料の活動位置から投影し、時間と行動文は `routines.ts` の定義を保持する。活動の視線は `activity-pose.ts` が同じ室内の原点と倍率で投影する。着席した生徒は椅子の北向きを保ち、先生は生徒のいる範囲、記録担当は使用する卓へ向く。会話用の立ち位置を家具の内部へ移さない。
 
-資料の椅子は家具ごとの `seat` に物理寸法を持つ。書出しで占有格子との大小、座面と板厚・背もたれ・脚の関係を検査し、`interiorPlan` が室内倍率を一度だけ掛ける。`world/scene/construction/chair.ts` は投影後の寸法で脚・座面・背もたれを作る。通行の使用面と着席した身体の位置は別に扱う。
+資料の椅子は家具ごとの `seat` に物理寸法を持つ。書出しで占有格子との大小、座面と板厚・背もたれ・脚の関係を検査し、`interiorPlan` が室内倍率を一度だけ掛ける。`apps/main/world/scene/construction/chair.ts` は投影後の寸法で脚・座面・背もたれを作る。通行の使用面と着席した身体の位置は別に扱う。
 
 資料の卓は `work_surface` に天板高と厚さ、脚の幅と引込み、座面上に必要な膝の空間を持つ。資料検査と書出しは同じ寸法の読み取りを使い、座面から天板下面までの離隔を照合する。書出しは部屋の通常の配置検査も通し、検査を経ずに不整合な配置を描画へ渡さない。投影後は `work-table.ts` が室内の床を基準に描き、卓の上の物も同じ天板高を参照する。
 
@@ -379,25 +385,25 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 活動中の身体と向きは `activityPose` が同じ日課の一回の参照からまとめて返す。資料の室内座標は起動時にマップ・人物・活動の索引へ投影し、予定更新のたびに全室を走査しない。参照先のマップと日課の実際の場所が一致しない場合は適用しない。返す配列は呼出しごとに分け、描画側が変更しても索引の座標を壊さない。同じ階の人物と活動に複数の位置が指定された資料は書出し時に拒否する。
 
-足掛けの板と二本の支持材は `world/town/foot-rest.ts` が同じ立体の区画へ分ける。室内描画と資料検査はこの区画を共有し、板の平面だけで干渉を判断しない。板が支持材へ届かない幅の資料は、寸法の読み取りで拒否する。`scripts/lib/audit-foot-rest.ts` が割り当てた卓とその脚を照合し、不正な卓の寸法や支持材だけの衝突も検査結果へ返す。
+足掛けの板と二本の支持材は `apps/main/world/town/foot-rest.ts` が同じ立体の区画へ分ける。室内描画と資料検査はこの区画を共有し、板の平面だけで干渉を判断しない。板が支持材へ届かない幅の資料は、寸法の読み取りで拒否する。`scripts/lib/audit-foot-rest.ts` が割り当てた卓とその脚を照合し、不正な卓の寸法や支持材だけの衝突も検査結果へ返す。
 
-卓の天板と四本の脚は `world/town/work-table.ts` の区画を共有する。室内の組立て、足掛けとの干渉検査、着席した膝の検査で脚の位置を個別に計算し直さない。区画は呼出し側の座標と単位、床の高さを受け取り、脚を床から天板下面までつなぐ。
+卓の天板と四本の脚は `apps/main/world/town/work-table.ts` の区画を共有する。室内の組立て、足掛けとの干渉検査、着席した膝の検査で脚の位置を個別に計算し直さない。区画は呼出し側の座標と単位、床の高さを受け取り、脚を床から天板下面までつなぐ。
 
 入口の開口高は `scripts/lib/entry-opening-height.ts` の `entryOpeningHeight` で読み、立って通れる高さと地上階の天井への納まりを通常の資料検査と書出しで共有する。外観へは検証済みの平面の開口高を渡す。敷地の回転方向のゼロ成分は `siteTransform` で正規化し、外観の各所で補正し直さない。
 
 戸板、押して入る身体と室内側で開閉する身体、家具の使用面は `scripts/lib/door-axes.ts` の `doorAxes` から同じ閉じた向きと内向きを得る。鏡映した戸や壁の向きによって、それぞれ別の軸を選び直さない。
 
-外観の入口戸は `scripts/lib/compile-envelope.ts` が `roomDoorSwing` の閉位置と蝶番を敷地座標へ投影する。壁面の開口中心は階段との接続に使い、戸板は壁厚分だけ室内側へ置く。`world/scene/construction/authored-building.ts` は枠の内端を開閉検査と同じ通り幅に置き、壁面から戸板までの見込みを枠と開口上面でつなぐ。
+外観の入口戸は `scripts/lib/compile-envelope.ts` が `roomDoorSwing` の閉位置と蝶番を敷地座標へ投影する。壁面の開口中心は階段との接続に使い、戸板は壁厚分だけ室内側へ置く。`apps/main/world/scene/construction/authored-building.ts` は枠の内端を開閉検査と同じ通り幅に置き、壁面から戸板までの見込みを枠と開口上面でつなぐ。
 
 資料から作る平面の入口は `AuthoredPlan.entrySide` と開口セルの中心を持ち、`authoredFloorPlan` が外壁面上の二次元の点と外向きへ変換する。`interiorPlan` は同じ点と向きから戸口セルと内向きの到着セルを求め、`interiorRows` と室内の外壁開口も同じ入口を使う。戸口セルの中心は壁面より必ず内側に置く。外壁の角をまたぐ幅や、グリッドの戸口セルと一致しない入口は拒否する。既存の自動配置の平面が持つ南壁の入口は変更しない。
 
-入口戸の縦の断面は `world/town/door-leaf-section.ts` が完成床からの下端と上端を求める。資料検査と外観の書出しが同じ関数を使い、描画は書き出した上下端を使う。開口高を戸板の高さへ流用せず、床と開口上端の隙間は資料で明示する。
+入口戸の縦の断面は `apps/main/world/town/door-leaf-section.ts` が完成床からの下端と上端を求める。資料検査と外観の書出しが同じ関数を使い、描画は書き出した上下端を使う。開口高を戸板の高さへ流用せず、床と開口上端の隙間は資料で明示する。
 
 戸板に付く部品の突出を含む厚みは `doorMovingThickness` が求める。室内の戸板回転、押して入る身体、閉め始めるまでの移動、開いた戸の通り幅はこの厚みを使う。外観の補強材と取っ手は同じ突出寸法を使い、板厚へ独自の倍率を掛けない。
 
 戸の握る位置は `doorHandleAlong` が蝶番からの距離として読み、開閉の到達距離と外観の取っ手へ渡す。押して入る経路の連続検査では、身体と板全体の距離と、身体から握る位置までの距離を分ける。戸板の先端を握る位置へ置き換えない。
 
-寸法を持つ寝台は `world/town/bed-parts.ts` の `bedParts` が脚・枠・床板・寝具・頭側の板へ分ける。`scripts/lib/bed-dimensions.ts` が資料を読み、資料検査と書出しが同じ部材区画の成立を確かめる。`interiorPlan` は寝台の全寸法を室内の縮尺へ一度だけ変換し、室内描画がその区画を使う。既存の寸法未設計の寝台は別に残し、新しい家の採用と混同しない。
+寸法を持つ寝台は `apps/main/world/town/bed-parts.ts` の `bedParts` が脚・枠・床板・寝具・頭側の板へ分ける。`scripts/lib/bed-dimensions.ts` が資料を読み、資料検査と書出しが同じ部材区画の成立を確かめる。`interiorPlan` は寝台の全寸法を室内の縮尺へ一度だけ変換し、室内描画がその区画を使う。既存の寸法未設計の寝台は別に残し、新しい家の採用と混同しない。
 
 椅子の facing は座面の幅・奥行きと別に保持し、`seatRect` が部材を座面の中心まわりに四方向へ投影する。背もたれと足掛けは同じ向きを使う。資料検査は明示した向きが割り当てた卓へ向くことと、座面の上の膝の空間を確認する。回転した椅子の幅と奥行きを、元の部材寸法を書き換えて表さない。
 
@@ -405,91 +411,91 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 点と矩形、線分と矩形、線分同士の距離は `lib/engine/point-rect-distance.ts`・`segment-rect-distance.ts`・`segment-segment-distance.ts` に分ける。矩形と線分の境界の規則は `segment-intersects-rect.ts` に置く。敷地・道路・戸・運搬経路と身体の照合が共通の計算を使い、建物の資料検査を幾何計算の入口にしない。
 
-棚の側板・背板と棚板は `world/town/shelf.ts` の `shelfParts` が同じ区画へ分け、`shelfBays` が棚板の厚みを引いた保管内寸を返す。`shelfItemParts` は棚板上面へ資料の物を載せ、内寸を越す物や重なる物を拒否する。資料の読み取りと検査・書出し、室内の縮尺変換と描画は同じ寸法を使う。四方向の点の回転は `lib/engine/quarter-turn-point.ts`、矩形の回転は `quarter-turn-rect.ts` が受け持ち、椅子と収納・卓上で共用する。矩形は囲いと回転数・任意の原点を名前付きの入力で受け、座標と回転を位置引数で混ぜない。
+棚の側板・背板と棚板は `apps/main/world/town/shelf.ts` の `shelfParts` が同じ区画へ分け、`shelfBays` が棚板の厚みを引いた保管内寸を返す。`shelfItemParts` は棚板上面へ資料の物を載せ、内寸を越す物や重なる物を拒否する。資料の読み取りと検査・書出し、室内の縮尺変換と描画は同じ寸法を使う。四方向の点の回転は `lib/engine/quarter-turn-point.ts`、矩形の回転は `quarter-turn-rect.ts` が受け持ち、椅子と収納・卓上で共用する。矩形は囲いと回転数・任意の原点を名前付きの入力で受け、座標と回転を位置引数で混ぜない。
 
-収納の引出しと身体の後退は `world/town/storage-retrieval.ts` が棚の正面に合わせて同時の直線経路へ投影する。`scripts/lib/storage-retrieval.ts` は相対運動を線分と矩形の距離で照合し、途中を飛ばさず身体と動く物の干渉を検査する。手が届く距離は相対位置の端点で最大となるため両端を照合する。使用面への収まりと壁・家具、同じ段のほかの物との干渉も確かめる。小箱の使用内寸は `storageBoxInterior` が壁・底・被せ蓋の厚みを除いて求める。
+収納の引出しと身体の後退は `apps/main/world/town/storage-retrieval.ts` が棚の正面に合わせて同時の直線経路へ投影する。`scripts/lib/storage-retrieval.ts` は相対運動を線分と矩形の距離で照合し、途中を飛ばさず身体と動く物の干渉を検査する。手が届く距離は相対位置の端点で最大となるため両端を照合する。使用面への収まりと壁・家具、同じ段のほかの物との干渉も確かめる。小箱の使用内寸は `storageBoxInterior` が壁・底・被せ蓋の厚みを除いて求める。
 
-小箱の内寸は `world/town/storage-box-interior.ts`、底・側板・蓋の部材は `storage-box-parts.ts` が受け持つ。関連型は `storage-box-types.ts` にまとめ、蓋の取っ手の寸法判定と部材は `get-storage-lid-handle-error.ts`・`get-storage-lid-handle-parts.ts` で共用する。底・側板・取り外す平蓋の区画から、閉じた状態と蓋を上げた状態を描く。内部を塞ぐ一枚の塊を描く方法は使わず、保管容量と同じ空洞と内面を維持する。`world/scene/construction/storage-box.ts` が部材の内外と蓋の裏面を描く。
+小箱の内寸は `apps/main/world/town/storage-box-interior.ts`、底・側板・蓋の部材は `storage-box-parts.ts` が受け持つ。関連型は `storage-box-types.ts` にまとめ、蓋の取っ手の寸法判定と部材は `get-storage-lid-handle-error.ts`・`get-storage-lid-handle-parts.ts` で共用する。底・側板・取り外す平蓋の区画から、閉じた状態と蓋を上げた状態を描く。内部を塞ぐ一枚の塊を描く方法は使わず、保管容量と同じ空洞と内面を維持する。`apps/main/world/scene/construction/storage-box.ts` が部材の内外と蓋の裏面を描く。
 
 箱の蓋の移動先は、全資料を読み込んだ後に建物の該当階の天井へ照合する。読み込み順のために建物が未参照の状態で検査を済ませず、書出しでも同じ建物の断面を渡す。設計ゲートを通す箱に蓋の動きや照合できる天井がない場合は拒否する。
 
 炉の正面は資料の `hearth_front` を書出しと縮尺変換で保持し、焚口と火の照明を同じ面へ向ける。矩形の面と法線は `lib/engine/rectangle-face.ts` が求め、使用位置の照合と描画で共有する。煙道は上下階の全室の家具へ離隔を照合し、寝台や別室の木製部材も除外しない。
 
-煙道の床貫通は `world/town/flue-floor.ts` が木床と石縁を重ならない区画へ分ける。階段の穴を両方の材料から除き、石縁も建物の外へはみ出させない。上階の床厚を通す石縁の幅は資料の `floor_collar_m` を実行時の `floorCollar` へ渡し、屋内の拡大率を一度だけ適用する。
+煙道の床貫通は `apps/main/world/town/flue-floor.ts` が木床と石縁を重ならない区画へ分ける。階段の穴を両方の材料から除き、石縁も建物の外へはみ出させない。上階の床厚を通す石縁の幅は資料の `floor_collar_m` を実行時の `floorCollar` へ渡し、屋内の拡大率を一度だけ適用する。
 
-石縁の支持は `world/town/flue-corbel.ts` が段積みの部材へ分ける。床の上階から見ると床裏を上端に、下階から見ると天井を上端に置き、同じ断面を使う。支持の深さは縮尺変換し、段数は変えない。資料の書出しは張出しと深さ、段数、下階の立位高さを照合し、支持のない煙道を通さない。
+石縁の支持は `apps/main/world/town/flue-corbel.ts` が段積みの部材へ分ける。床の上階から見ると床裏を上端に、下階から見ると天井を上端に置き、同じ断面を使う。支持の深さは縮尺変換し、段数は変えない。資料の書出しは張出しと深さ、段数、下階の立位高さを照合し、支持のない煙道を通さない。
 
-煙道の肉厚と内寸は `world/town/flue-walls.ts` が外形から求め、内装の立上りと屋根上の煙突が同じ四方の石積みを描く。空洞へ上面の板を張らない。屋根の高さは `lib/engine/gable-roof-height.ts`、棟で分ける面は `gable-roof-panels.ts` が求め、資料の屋根高さの検査と外装が同じ勾配を使う。`get-gable-roof-halves.ts` が軒の張出しと棟の分割を持ち、関連する屋根と面の型は `gable-roof-types.ts` に置く。屋根面は煙突の外形を切り欠き、煙道を横切らない。
+煙道の肉厚と内寸は `apps/main/world/town/flue-walls.ts` が外形から求め、内装の立上りと屋根上の煙突が同じ四方の石積みを描く。空洞へ上面の板を張らない。屋根の高さは `lib/engine/gable-roof-height.ts`、棟で分ける面は `gable-roof-panels.ts` が求め、資料の屋根高さの検査と外装が同じ勾配を使う。`get-gable-roof-halves.ts` が軒の張出しと棟の分割を持ち、関連する屋根と面の型は `gable-roof-types.ts` に置く。屋根面は煙突の外形を切り欠き、煙道を横切らない。
 
-炉の火室と喉部は `world/town/hearth.ts` が寸法と正面から求め、煙道の内寸全体が火室へ接続することを確かめる。`lib/engine/cuboid-subtraction.ts` が石積みの立体から火室と喉部の空間を除く。資料検査と描画は同じ部材を使い、黒い面を外に貼って焚口を表す方法を設計済みの炉へ使わない。
+炉の火室と喉部は `apps/main/world/town/hearth.ts` が寸法と正面から求め、煙道の内寸全体が火室へ接続することを確かめる。`lib/engine/cuboid-subtraction.ts` が石積みの立体から火室と喉部の空間を除く。資料検査と描画は同じ部材を使い、黒い面を外に貼って焚口を表す方法を設計済みの炉へ使わない。
 
 炉の手入れの平面は `scripts/lib/hearth-maintenance.ts` が部屋資料の身体と使用面、家具・焚口・火室へ照合する。火室は描画と同じ `hearthChamber` から求め、手の到達距離は戸や収納と同じ定数を使う。部屋のグリッド検査から呼び、書出し時にも同じ条件を保つ。
 
-手入れ道具の挿入線は `world/town/hearth-tool.ts` が炉の正面と握り位置から奥の左右へ投影する。部屋検査は手が握りへ届くことと、道具が焚口を通ることを別々に照合する。道具の長さへ腕の長さを足して不足を隠さない。
+手入れ道具の挿入線は `apps/main/world/town/hearth-tool.ts` が炉の正面と握り位置から奥の左右へ投影する。部屋検査は手が握りへ届くことと、道具が焚口を通ることを別々に照合する。道具の長さへ腕の長さを足して不足を隠さない。
 
-棚の `tool` は `world/town/stored-tool.ts` が棚板へ載る刃と細い柄の部材へ分ける。棚の内寸・向きと縮尺、取り出す経路は既存の棚と共有する。手入れ道具の参照は同じ部屋の棚と収納物へ解決し、使う寸法と保管する外形がずれた場合は拒否する。
+棚の `tool` は `apps/main/world/town/stored-tool.ts` が棚板へ載る刃と細い柄の部材へ分ける。棚の内寸・向きと縮尺、取り出す経路は既存の棚と共有する。手入れ道具の参照は同じ部屋の棚と収納物へ解決し、使う寸法と保管する外形がずれた場合は拒否する。
 
 炉の道具の運搬は `scripts/lib/hearth-carry.ts` が棚の引出し結果から相対外形を求める。平行移動中は障害物を道具の半幅ずつ拡張し、中心の線分を照合する。回転時は身体を止め、最も遠い角の半径を含む円を照合する。書出しと全資料の検査へ同じ建物の天井断面を渡す。
 
 固定した向きの矩形の経路の外形は `lib/engine/rectangle-translation-bounds.ts`、連続した衝突は `rectangle-translation-hits.ts`、回転半径は `rectangle-turn-radius.ts` に置き、荷物と炉の道具の運搬が共用する。移動経路の外接矩形と、実際の連続した通過範囲の交差を区別する。線分と矩形の交差は `segmentIntersectsRect` にまとめ、距離の計算も同じ交差判定から始める。境界接触と許容差は呼び出し側が明示し、既存の検査条件を保つ。
 
-持ち替えの道具の相対外形と回転中の保守的な外形は `world/town/handoff-envelope.ts` と `handoff-rotation-envelope.ts` が求める。`scripts/lib/hearth-handoff.ts` は棚からの引出しと運搬の終点を初期姿勢へ投影し、握りを基準に部屋の三次元の部材へ照合する。固定した向きの移動は `lib/engine/cuboid-translation-hits.ts` が各軸の交差区間を照合し、途中を飛ばさない。身体の幅と平面の手の到達距離は既存の設計条件を保持する。
+持ち替えの道具の相対外形と回転中の保守的な外形は `apps/main/world/town/handoff-envelope.ts` と `handoff-rotation-envelope.ts` が求める。`scripts/lib/hearth-handoff.ts` は棚からの引出しと運搬の終点を初期姿勢へ投影し、握りを基準に部屋の三次元の部材へ照合する。固定した向きの移動は `lib/engine/cuboid-translation-hits.ts` が各軸の交差区間を照合し、途中を飛ばさない。身体の幅と平面の手の到達距離は既存の設計条件を保持する。
 
-腕の握りの位置と長さは `world/scene/figure/arm-grip-point.ts`・`arm-grip-lengths.ts`・`solve-arm-grip.ts` が実際の骨格と掌のアンカーから求め、native の腕の組み立てと共有する。`lib/engine/solve-two-bone.ts` は二本の固定長の節から中間関節を求め、到達範囲の外を未解決として返す。高さを固定する解は `solve-two-bone-at-height.ts`、区間全体の到達は `two-bone-segment-reach.ts`、関節の速度の上限は `two-bone-joint-speed-bound.ts` に分ける。手首の回転や身体の姿勢・干渉は、この関節位置の解だけで解決した扱いにしない。
+腕の握りの位置と長さは `apps/main/world/scene/figure/arm-grip-point.ts`・`arm-grip-lengths.ts`・`solve-arm-grip.ts` が実際の骨格と掌のアンカーから求め、native の腕の組み立てと共有する。`lib/engine/solve-two-bone.ts` は二本の固定長の節から中間関節を求め、到達範囲の外を未解決として返す。高さを固定する解は `solve-two-bone-at-height.ts`、区間全体の到達は `two-bone-segment-reach.ts`、関節の速度の上限は `two-bone-joint-speed-bound.ts` に分ける。手首の回転や身体の姿勢・干渉は、この関節位置の解だけで解決した扱いにしない。
 
-作業時の傾きと刃の接触面は `world/town/hearth-work-tilt.ts` と `hearth-spatial-strokes.ts` が求める。床と奥壁へ当たる厚みを含む条件から傾きと握る長さを解き、持ち替えの末端も同じ外形を使う。作業の左右の握りを平面の到達条件へ、道具の全外形を家具へ照合する。
+作業時の傾きと刃の接触面は `apps/main/world/town/hearth-work-tilt.ts` と `hearth-spatial-strokes.ts` が求める。床と奥壁へ当たる厚みを含む条件から傾きと握る長さを解き、持ち替えの末端も同じ外形を使う。作業の左右の握りを平面の到達条件へ、道具の全外形を家具へ照合する。
 
-作業姿勢の候補は `world/scene/figure/native-work-pose.ts` が既存の足形を床へ接地し、固定長の腕へ握りを解く。`scripts/lib/native-work-pose.ts` は実際の身体形状の保守的な境界を室内へ照合する。炉・煙道と支持部・壁・開いた戸・ほかの家具は `scripts/lib/hearth-room-section.ts` が同じ部屋座標の断面へまとめ、持ち替えの検査と共有する。境界が重なる場合は未解決として残す。`lib/graphics/ray/primitive-bounds.ts` と `cylinder-bounds.ts` は描画形状の境界を扱い、ゲームの配置には依存しない。明示した骨格の描画は `renderSkeletonFrame` を既存の描画処理と共有する。 握りの軸は `hearthSpatialStrokes` が道具の傾きから求め、作業姿勢は身体の向きへ変換して手の取付軸を合わせる。ベクトルの回転は `lib/engine/qrot.ts`、回転の合成は `qmul.ts`、方向間の最小回転は `qfrom-to.ts` に置く。共通の型は `quaternion-types.ts` が持つ。手の表面は既存の形状のままであり、取付軸の一致を指や手首の可動域の照合済みとは扱わない。
+作業姿勢の候補は `apps/main/world/scene/figure/native-work-pose.ts` が既存の足形を床へ接地し、固定長の腕へ握りを解く。`scripts/lib/native-work-pose.ts` は実際の身体形状の保守的な境界を室内へ照合する。炉・煙道と支持部・壁・開いた戸・ほかの家具は `scripts/lib/hearth-room-section.ts` が同じ部屋座標の断面へまとめ、持ち替えの検査と共有する。境界が重なる場合は未解決として残す。`lib/graphics/ray/primitive-bounds.ts` と `cylinder-bounds.ts` は描画形状の境界を扱い、ゲームの配置には依存しない。明示した骨格の描画は `renderSkeletonFrame` を既存の描画処理と共有する。 握りの軸は `hearthSpatialStrokes` が道具の傾きから求め、作業姿勢は身体の向きへ変換して手の取付軸を合わせる。ベクトルの回転は `lib/engine/qrot.ts`、回転の合成は `qmul.ts`、方向間の最小回転は `qfrom-to.ts` に置く。共通の型は `quaternion-types.ts` が持つ。手の表面は既存の形状のままであり、取付軸の一致を指や手首の可動域の照合済みとは扱わない。
 
 身体と室内部材の境界の距離は `lib/engine/segment-cuboid-distance.ts` が面の交点で線分を区切り、`get-segment-cuboid-interval-minimum.ts` が各区間の端点と二次式の停留点を照合する。接触ぎりぎりの距離を点のサンプリングで代用しない。保守的な直方体の交差は `lib/engine/cuboid-translation-hits.ts` に置く。作業の支持を固定した候補の検査では、中央と両端を静止形状として照合する。連続した動作の囲いは静止した端の境界とは分けて扱う。
 
-左右の靴形状は `world/scene/figure/legs.ts` が描画と同じ端点と半径で返し、`buildBody` が明示して渡す。`world/scene/figure/footing.ts` はその形状から床へ置く高さと各靴の最下点・隙間を求める。作業姿勢は図形の並び順から足を選ばず、資料の接地指定もこの結果へ照合する。
+左右の靴形状は `apps/main/world/scene/figure/legs.ts` が描画と同じ端点と半径で返し、`buildBody` が明示して渡す。`apps/main/world/scene/figure/footing.ts` はその形状から床へ置く高さと各靴の最下点・隙間を求める。作業姿勢は図形の並び順から足を選ばず、資料の接地指定もこの結果へ照合する。
 
-膝の衣服の半径も `world/scene/figure/legs.ts` が同じ脚の曲面の節から返す。`world/scene/figure/kneeling.ts` は指定された腰の下降から両靴を床へ置き、一方の膝を衣服の表面で床へ合わせる。`solveTwoBoneAtHeight` は指定した関節高さで二つの球を水平な円へ切り、円の交点から固定長の節を解く。靴の向きは維持し、脚の回転を新しい関節位置へ合わせてから作業の腕を解く。
+膝の衣服の半径も `apps/main/world/scene/figure/legs.ts` が同じ脚の曲面の節から返す。`apps/main/world/scene/figure/kneeling.ts` は指定された腰の下降から両靴を床へ置き、一方の膝を衣服の表面で床へ合わせる。`solveTwoBoneAtHeight` は指定した関節高さで二つの球を水平な円へ切り、円の交点から固定長の節を解く。靴の向きは維持し、脚の回転を新しい関節位置へ合わせてから作業の腕を解く。
 
-支持を固定した作業範囲は `world/scene/figure/work-stroke.ts` が両端の姿勢を求める。`twoBoneSegmentReach` は肩から握りの線分への最短距離と両端の最大距離から、二本の節の外側と内側の到達条件を全区間で照合する。室内検査は中央と両端の形状を照合し、室内への連続した離隔は `world/scene/figure/work-stroke-clearance.ts` が照合する。
+支持を固定した作業範囲は `apps/main/world/scene/figure/work-stroke.ts` が両端の姿勢を求める。`twoBoneSegmentReach` は肩から握りの線分への最短距離と両端の最大距離から、二本の節の外側と内側の到達条件を全区間で照合する。室内検査は中央と両端の形状を照合し、室内への連続した離隔は `apps/main/world/scene/figure/work-stroke-clearance.ts` が照合する。
 
-`world/scene/figure/arm-shape.ts` の係数から `native-arm-surfaces.ts` が腕と袖口の形状を作り、描画と検査で共有する。移動量の上限は `native-arm-motion-speed.ts` が同じ係数から求める。`twoBoneJointSpeedBound` は固定した肩と曲げる方向に対し、握りの直線区間で肘が動く速さの上限を求める。曲げる平面の特異点や伸び切る区間は未解決を返す。室内検査は中点の形状へその移動量を加えた保守的な囲いで区間全体を証明し、重なる区間は細分化する。有限の姿勢の標本だけでは成功にしない。身体自身との接触はこの室内検査の対象外として残す。
+`apps/main/world/scene/figure/arm-shape.ts` の係数から `native-arm-surfaces.ts` が腕と袖口の形状を作り、描画と検査で共有する。移動量の上限は `native-arm-motion-speed.ts` が同じ係数から求める。`twoBoneJointSpeedBound` は固定した肩と曲げる方向に対し、握りの直線区間で肘が動く速さの上限を求める。曲げる平面の特異点や伸び切る区間は未解決を返す。室内検査は中点の形状へその移動量を加えた保守的な囲いで区間全体を証明し、重なる区間は細分化する。有限の姿勢の標本だけでは成功にしない。身体自身との接触はこの室内検査の対象外として残す。
 
-`world/town/working-tool.ts` は棚の道具と同じ刃・柄を、握りを原点とする直交座標へ組み直す。`world/scene/figure/tool-fixed-body-clearance.ts` はその座標へ身体を投影し、道具の全移動と固定した身体の境界を照合する。腕の形状は `buildArms` が左右を明示し、`buildBody` が返す。作業する腕は別の動く形状として扱い、反対の腕は固定した身体の検査へ含める。丸い錐体の連続にはカプセルの囲い、胴体の断面の連続には区間ごとの箱の囲いを描画の定義から受け取る。
+`apps/main/world/town/working-tool.ts` は棚の道具と同じ刃・柄を、握りを原点とする直交座標へ組み直す。`apps/main/world/scene/figure/tool-fixed-body-clearance.ts` はその座標へ身体を投影し、道具の全移動と固定した身体の境界を照合する。腕の形状は `buildArms` が左右を明示し、`buildBody` が返す。作業する腕は別の動く形状として扱い、反対の腕は固定した身体の検査へ含める。丸い錐体の連続にはカプセルの囲い、胴体の断面の連続には区間ごとの箱の囲いを描画の定義から受け取る。
 
 袖口は `nativeArmSurfaces` が前腕の軸に垂直な手首の平面で切る。丸い端の前方への張出しを除き、掌の握る位置を衣服で覆わない。室内の離隔検査は切る前の保守的な囲いを引き続き使えるため、見た目を直すために検査の範囲を弱めない。
 
-`world/scene/figure/working-arm-tool-clearance.ts` は刃と握る腕・手の全体、柄と上腕の離隔を、区間内の相対移動量を含む囲いで照合する。柄の全体が動く手首の平面より掌側にあることも前腕の方向の変化を含めて照合する。掌の内部の球は `nativeArmSurfaces` が描画と同じ位置と半径から返し、柄の握る断面を収める条件へ使う。道具の座標への射影は `projectToolFrame` を固定した身体の検査と共有する。掌の内部へ収まることと、握る指の接触面の設計は分ける。
+`apps/main/world/scene/figure/working-arm-tool-clearance.ts` は刃と握る腕・手の全体、柄と上腕の離隔を、区間内の相対移動量を含む囲いで照合する。柄の全体が動く手首の平面より掌側にあることも前腕の方向の変化を含めて照合する。掌の内部の球は `nativeArmSurfaces` が描画と同じ位置と半径から返し、柄の握る断面を収める条件へ使う。道具の座標への射影は `projectToolFrame` を固定した身体の検査と共有する。掌の内部へ収まることと、握る指の接触面の設計は分ける。
 
-作業候補の柄の断面は `world/town/working-tool.ts` が収納した道具から取り出し、`work-pose.ts` が骨格の任意の `handGrips` へ渡す。`arm-shape.ts` が描画と同じ掌から開口を引き、元の保守的な境界と素材分類を保持する。通常の骨格はこの追加情報を持たない。形状の条件は [[town#作業姿勢の掌と柄の接触]] に従う。
+作業候補の柄の断面は `apps/main/world/town/working-tool.ts` が収納した道具から取り出し、`work-pose.ts` が骨格の任意の `handGrips` へ渡す。`arm-shape.ts` が描画と同じ掌から開口を引き、元の保守的な境界と素材分類を保持する。通常の骨格はこの追加情報を持たない。形状の条件は [[town#作業姿勢の掌と柄の接触]] に従う。
 
-`world/scene/figure/forearm-body-clearance.ts` は作業する前腕・掌・袖口と固定した全身の離隔を照合する。区間の被覆は `certify-linear-interval.ts`、中点の移動の上限は `can-clear-work-forearm-interval.ts` に分け、既存の例外を返す呼出し境界を維持する。カプセルと断面の囲いで解決しない場合は `lib/engine/field-separation.ts` で符号の変化の上限を使い空間を細分化する。衣服の開いた裾の変化の上限は形状を作る `context.ts` が持ち、襟と首巻きも元の形状の囲いを渡す。判定の条件と上腕の残件は [[town#作業する前腕と身体の離隔]] に従う。
+`apps/main/world/scene/figure/forearm-body-clearance.ts` は作業する前腕・掌・袖口と固定した全身の離隔を照合する。区間の被覆は `certify-linear-interval.ts`、中点の移動の上限は `can-clear-work-forearm-interval.ts` に分け、既存の例外を返す呼出し境界を維持する。カプセルと断面の囲いで解決しない場合は `lib/engine/field-separation.ts` で符号の変化の上限を使い空間を細分化する。衣服の開いた裾の変化の上限は形状を作る `context.ts` が持ち、襟と首巻きも元の形状の囲いを渡す。判定の条件と上腕の残件は [[town#作業する前腕と身体の離隔]] に従う。
 
 灰の受け容器の資料は `scripts/lib/ash-receiver.ts` が収納物へ結び、鉄の箱と蓋、実際の内側の容量、引出しと戸口の手前までの経路を照合する。`box_material` は `shelf-dimensions.ts` から `ShelfItem.boxMaterial` へ渡し、`scaleShelf` が寸法だけを縮尺へ変換し、`storage-box.ts` が木と鉄を既存の素材で描く。形状の底・側面・蓋は材質を変えても共有する。条件と未確認の工程は [[town#炉の灰の受け容器]] にある。
 
-`world/town/storage-carry.ts` は身体と荷物の相対位置を保つ平面の移動と、その場の向き替えを照合する。手入れの道具と灰箱が同じ処理を使い、壁・家具・開いた戸の囲いは `scripts/lib/room-carry-obstacles.ts` が組み立てる。同じファイルの `roomEnvelopeObstacles` は壁と開いた戸だけを返し、炉の作業断面と灰箱の蓋の立体検査も共有する。対応する開口を持たない戸や、必要な枚数の戸板を組み立てられない資料は、障害物を省かず拒否する。収納物との接続、行先、立体の高さと用途の条件はそれぞれの検査が持つ。平面の通過を身体の動き、荷重や屋外の処理までの証明にしない。
+`apps/main/world/town/storage-carry.ts` は身体と荷物の相対位置を保つ平面の移動と、その場の向き替えを照合する。手入れの道具と灰箱が同じ処理を使い、壁・家具・開いた戸の囲いは `scripts/lib/room-carry-obstacles.ts` が組み立てる。同じファイルの `roomEnvelopeObstacles` は壁と開いた戸だけを返し、炉の作業断面と灰箱の蓋の立体検査も共有する。対応する開口を持たない戸や、必要な枚数の戸板を組み立てられない資料は、障害物を省かず拒否する。収納物との接続、行先、立体の高さと用途の条件はそれぞれの検査が持つ。平面の通過を身体の動き、荷重や屋外の処理までの証明にしない。
 
 箱の `lid_handle` は `shelf-dimensions.ts` が `ShelfItem.lidHandle` へ変換する。収納物の `height` は持ち手を含む外形の高さとし、`storageBoxInterior` が持ち手の高さを引いて箱本体の内寸を求める。`shelfLidHandle` は棚の向きから持ち手の軸を決め、`storageBoxParts` が蓋と一緒に動く三つの部材を返す。規則は [[town#灰箱の蓋の持ち手]] にある。
 
-`world/town/storage-lid-plan.ts` は箱を床へ下ろす区間と、蓋・持ち手だけを動かす三つの区間を組み立てる。同じ部材配列から表示する状態と全区間の移動検査を求める。`scripts/lib/ash-lid-rest-plan.ts` は元の収納物を棚から取り除いた状態を作り、棚の部材と残る収納物、壁、開いた戸、炉の石積み、灯りと生活の小物へ照合する。形状が未定義の家具と小物は全高の囲いを空ける。支持面と未照合の操作は [[town#灰箱の蓋の置き場所]] に従う。
+`apps/main/world/town/storage-lid-plan.ts` は箱を床へ下ろす区間と、蓋・持ち手だけを動かす三つの区間を組み立てる。同じ部材配列から表示する状態と全区間の移動検査を求める。`scripts/lib/ash-lid-rest-plan.ts` は元の収納物を棚から取り除いた状態を作り、棚の部材と残る収納物、壁、開いた戸、炉の石積み、灯りと生活の小物へ照合する。形状が未定義の家具と小物は全高の囲いを空ける。支持面と未照合の操作は [[town#灰箱の蓋の置き場所]] に従う。
 
 基礎と各階の厚み・高さは `assertAuthoredFloorLevels` を資料の変換と実行時の平面の組立てで共有する。資料の変換は、重い配置と動作の照合より先にこの構造を検査する。基礎がない資料を最後まで組み立ててから拒否する処理を避け、条件とテストの時間制限は保持する。
 
-`world/town/certify-storage-translation.ts` は収納物の部材の直線移動を、部屋の断面と障害物へ全区間で照合する。箱を運ぶ高さへ持ち上げる区間と、蓋を外して置く区間が同じ処理を使う。灰箱の持上げには `storageLidState` が返す床上の閉鎖状態を渡し、別の高さから箱を作り直さない。`getStorageClosureError` は収納から引き出した部材を下ろした状態と、蓋を戻す状態の部材が一致することを確認する。各区間の衝突がなくても、その間に部材の位置が飛ぶ経路は拒否する。灰箱の運搬は部屋の立体の障害物のうち身体と箱の高さに入るものも平面の経路と向き替えへ加え、床の家具だけが空くことを通過条件にしない。設計の条件は [[town#炉の灰の受け容器]] に従う。
+`apps/main/world/town/certify-storage-translation.ts` は収納物の部材の直線移動を、部屋の断面と障害物へ全区間で照合する。箱を運ぶ高さへ持ち上げる区間と、蓋を外して置く区間が同じ処理を使う。灰箱の持上げには `storageLidState` が返す床上の閉鎖状態を渡し、別の高さから箱を作り直さない。`getStorageClosureError` は収納から引き出した部材を下ろした状態と、蓋を戻す状態の部材が一致することを確認する。各区間の衝突がなくても、その間に部材の位置が飛ぶ経路は拒否する。灰箱の運搬は部屋の立体の障害物のうち身体と箱の高さに入るものも平面の経路と向き替えへ加え、床の家具だけが空くことを通過条件にしない。設計の条件は [[town#炉の灰の受け容器]] に従う。
 
 ルートの `#/*` 参照は `package.json` と `tsconfig.json` で同じ対象へ向ける。後者は設定検査を実行する Bun でも参照を解決するために持ち、Void が生成する `void/routes` の型も残す。
 
 `scripts/lib/get-ash-receiving-parts.ts` は収納の箱と受け位置のメタデータから蓋を外した同じ部材を組み立てる。部屋への配置と、実際の骨格の身体・道具の静止位置と連続する左右の作業の検査が、この形状を障害物として共有する。入力の形と未確認の方法は `ash-receiving-schema.ts` が検査する。灰の移載の設計条件は [[town#炉の横の灰の受け位置]] に従う。
 
-`world/town/get-upright-storage-offsets.ts` は空箱の持上げ、身体の位置に沿う水平移動、手前の位置での下降を一続きの変位へ変換する。`get-storage-path-error.ts` はその全区間と、蓋の各区間で実物の部材を照合する。`scripts/lib/get-ash-approach-error.ts` は身体の幅と頭上の余裕も加えて照合する。灰箱の検査では専用棚に置いた蓋を障害物として残す。範囲と未確認の工程は [[town#空の灰箱を炉の手前へ運ぶ]] に従う。
+`apps/main/world/town/get-upright-storage-offsets.ts` は空箱の持上げ、身体の位置に沿う水平移動、手前の位置での下降を一続きの変位へ変換する。`get-storage-path-error.ts` はその全区間と、蓋の各区間で実物の部材を照合する。`scripts/lib/get-ash-approach-error.ts` は身体の幅と頭上の余裕も加えて照合する。灰箱の検査では専用棚に置いた蓋を障害物として残す。範囲と未確認の工程は [[town#空の灰箱を炉の手前へ運ぶ]] に従う。
 
 `get-box-side-grips.ts` は箱の実物の手前の角と描画する掌の半径から左右の目標を求め、`solve-bimanual-grip.ts` は左右の肩と元の骨の長さを保って関節を解く。`scripts/lib/get-native-box-grip-candidate.ts` は立位の接地と座標の変換を組み立て、`get-box-core-clearance-error.ts` が両腕を除く身体の保守的な囲いと箱を照合する。資料の候補は灰箱の設定検査へ接続する。未照合の接触と動作は [[town#空の灰箱を両手で持つ姿勢]] に従う。
 
 `get-box-arm-clearance-error.ts` は `nativeArmSurfaces` の上腕・前腕と切断前の袖口のカプセルを箱へ照合する。`to-carrier-local-point.ts` と `to-carrier-world-point.ts` は同じ接地した身体の原点を使い、両腕の解と室内の箱を同じ座標で扱う。掌と指の接触はこの離隔へ含めず、[[town#灰箱を持つ腕と袖口の離隔]] に従う。
 
-野外の生き物の時刻からの位置は `world/core/monster-at.ts` が求める。基点と休憩地点は `get-monster-home.ts`・`get-monster-rest.ts`、位相は `get-monster-motion-hash.ts` をサーバーと描画で共有する。経路は `get-monster-route.ts` が組み立てる。`lib/engine/get-grid-segment-cells.ts` が線分の通るセルと角の隣接セルを列挙し、塞がれた経路だけ `GridPathfinder` の格子経路へ迂回する。`get-monster-route-position.ts` が経路の距離と時刻から位置を求める。`MonsterMotion` は休憩地点に加えて隣接する固定数の経路だけを保持し、毎フレームの通行判定を増やさない。移動の条件は [[game-system#野外の生き物の移動の足場]] に従う。
+野外の生き物の時刻からの位置は `apps/main/world/core/monster-at.ts` が求める。基点と休憩地点は `get-monster-home.ts`・`get-monster-rest.ts`、位相は `get-monster-motion-hash.ts` をサーバーと描画で共有する。経路は `get-monster-route.ts` が組み立てる。`lib/engine/get-grid-segment-cells.ts` が線分の通るセルと角の隣接セルを列挙し、塞がれた経路だけ `GridPathfinder` の格子経路へ迂回する。`get-monster-route-position.ts` が経路の距離と時刻から位置を求める。`MonsterMotion` は休憩地点に加えて隣接する固定数の経路だけを保持し、毎フレームの通行判定を増やさない。移動の条件は [[game-system#野外の生き物の移動の足場]] に従う。
 
-モンスターの身体の寸法は `world/core/monster-body-shapes.ts` が持ち、描画のメッシュと伸縮の式が同じ値を読む。`get-monster-body-radius.ts` は各種の拡大率と変形を含む水平の囲いを求める。`lib/engine/get-swept-grid-clearance-error.ts` は移動する円と塞がれたセルの矩形の距離を全区間で検査する。`create-monster-navigation-free.ts` が身体の囲いと探索地点への接続を検査し、休憩地点と格子経路へ採用する。探索の格子と元の通行格子は分け、迂回経路の各区間を `get-monster-segment-error.ts` で元の通行格子へ照合する。直線の全身の通過が証明できた場合、その証明には両端の休憩地点の身体も含まれるため、同じ区間と端点の検査を重ねず経路を返す。直線が不成立なら休憩地点を個別に確認して迂回し、別の照会へ証明結果を持ち越して地形の変更を隠さない。
+モンスターの身体の寸法は `apps/main/world/core/monster-body-shapes.ts` が持ち、描画のメッシュと伸縮の式が同じ値を読む。`get-monster-body-radius.ts` は各種の拡大率と変形を含む水平の囲いを求める。`lib/engine/get-swept-grid-clearance-error.ts` は移動する円と塞がれたセルの矩形の距離を全区間で検査する。`create-monster-navigation-free.ts` が身体の囲いと探索地点への接続を検査し、休憩地点と格子経路へ採用する。探索の格子と元の通行格子は分け、迂回経路の各区間を `get-monster-segment-error.ts` で元の通行格子へ照合する。直線の全身の通過が証明できた場合、その証明には両端の休憩地点の身体も含まれるため、同じ区間と端点の検査を重ねず経路を返す。直線が不成立なら休憩地点を個別に確認して迂回し、別の照会へ証明結果を持ち越して地形の変更を隠さない。
 
 野外の設定資料の生息面は `scripts/lib/ecology-zone-schema.ts` が構造を定め、`audit-ecology-zones.ts` が実行時の登録種との網羅を照合する。格子と現在の通行地形、各面の矩形と利用位置、身体の囲いでの経路を別の検査へ分ける。これらは資料の検査であり、実行時の資源配置や採食の動作を生成しない。配置案と未配置の条件は設計ゲートを通過させない。
 
-`get-ecology-territory-errors.ts` は種ごとの各出現範囲に生息面の利用位置があるかを照合する。同じ矩形を共有する個体は一度だけ検査し、位置の網羅を個体ごとの行動・利用時間や経路の完成と区別する。対象種と範囲は `world/core/monsters.ts` の出現定義から渡し、検査用の種一覧を別に管理しない。
+`get-ecology-territory-errors.ts` は種ごとの各出現範囲に生息面の利用位置があるかを照合する。同じ矩形を共有する個体は一度だけ検査し、位置の網羅を個体ごとの行動・利用時間や経路の完成と区別する。対象種と範囲は `apps/main/world/core/monsters.ts` の出現定義から渡し、検査用の種一覧を別に管理しない。
 
 生息面の `placement.sites` は、それぞれ独立した格子と資源・利用位置、水分収支と未照合条件を持つ。`get-ecology-placement-errors.ts` が区画 ID の重複を検査し、`get-ecology-site-errors.ts` が区画内の地形と利用位置・経路を照合する。`get-ecology-site-territories.ts` は区画の格子が登録された出現範囲へ収まるかを判定する。種が同じでも離れた区画の間に経路を補わず、未設計の土地を挟む別々の生活場所として扱う。
 
@@ -499,7 +505,7 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 `solve-held-box-pose.ts` は入力した姿勢を保って両手の目標を解き、身体と腕の箱への離隔を検査する。立位の `getNativeBoxGripCandidate` は既存の idle を渡す。`get-ash-gait-error.ts` は資料が指す運搬アニメの全描画姿勢を渡し、各姿勢の身体と箱の経路を検査する。元の骨の長さと脚の動きを維持し、姿勢間の接地や速度、移動方向、荷重をこの照合から推定しない。
 
-`world/town/get-carry-step-direction.ts` は経路の変位を身体の向きへ戻し、前進・後退・左右の横移動を判定する。`scripts/lib/get-ash-step-plan-error.ts` は各区間の記録と照合し、前進の再生を後退へ、前進・逆順の再生を横移動へ流用する入力を拒否する。未割当の区間は資料に null として残し、各描画姿勢の空間の検査と、方向に合う実際の足運びを区別する。
+`apps/main/world/town/get-carry-step-direction.ts` は経路の変位を身体の向きへ戻し、前進・後退・左右の横移動を判定する。`scripts/lib/get-ash-step-plan-error.ts` は各区間の記録と照合し、前進の再生を後退へ、前進・逆順の再生を横移動へ流用する入力を拒否する。未割当の区間は資料に null として残し、各描画姿勢の空間の検査と、方向に合う実際の足運びを区別する。
 
 `get-carry-gait-frame.ts` は同じ周期のフレーム番号を前進・逆順へ対応させ、負の時刻や周期の境界でも有効な番号を返す。`get-held-box-gait-pose.ts` は対応する元の運搬姿勢を取り、箱への両手の到達を解く。資料の動作と再生方向は対で検証し、検査は前進と逆順の全姿勢で室内の経路を照合する。フレームの順序を変える処理から、移動速度・接地や荷重まで正しいと推定しない。
 
@@ -511,9 +517,9 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 `get-padded-frame-layout.ts` は画素の倍率を変えず透明な描画範囲と原点を一緒に広げる。`get-padded-pose-frame.ts` は手続き的な姿勢の画像と足元の原点を対で返す。通常の固定フレームと素材の配置は維持し、余白を使う姿勢だけがこの経路を選ぶ。
 
-収納の資料の入力は `shelf-frame-schema.ts` と `shelf-item-schema.ts` で形と単位名の対応を定義する。`get-shelf-item.ts` は不正な収納物を Error で返し、既存の検査の入口 `shelfDimensions` だけが例外へ変換する。物の収まり、箱の内寸と取り出す経路は同じ `world/town/` の計算で照合し、入力の文字列を数へ強制変換しない。
+収納の資料の入力は `shelf-frame-schema.ts` と `shelf-item-schema.ts` で形と単位名の対応を定義する。`get-shelf-item.ts` は不正な収納物を Error で返し、既存の検査の入口 `shelfDimensions` だけが例外へ変換する。物の収まり、箱の内寸と取り出す経路は同じ `apps/main/world/town/` の計算で照合し、入力の文字列を数へ強制変換しない。
 
-`world/town/get-cloth-drying-layout.ts` は物干しの横棒に掛ける布の保守的な囲いと受け皿の平面を求める。設定の `cloth-drying-schema.ts` が実寸の入力を検証し、`audit-cloth-drying.ts` が室内物干しの検査へ組み込む。`get-cloth-storage-error.ts` は同じ部屋の棚を解決し、乾いた全枚数の折り畳んだ寸法を照合する。物干しの枠の占有と、布の立体・収納、乾燥能力を分けて扱う。
+`apps/main/world/town/get-cloth-drying-layout.ts` は物干しの横棒に掛ける布の保守的な囲いと受け皿の平面を求める。設定の `cloth-drying-schema.ts` が実寸の入力を検証し、`audit-cloth-drying.ts` が室内物干しの検査へ組み込む。`get-cloth-storage-error.ts` は同じ部屋の棚を解決し、乾いた全枚数の折り畳んだ寸法を照合する。物干しの枠の占有と、布の立体・収納、乾燥能力を分けて扱う。
 
 `lib/engine/get-box-layout-error.ts` は容器の内側へ置く固体の囲いの収まり、重なりと必要な間隔を検査する。`get-dish-drying-layout.ts` が受け皿と格子、水切りの器の配置へ使い、`get-dish-storage-error.ts` が同じ器の外形を箱の内寸へ使う。`audit-dish-drying.ts` は入力スキーマと部屋の家具への参照を解決して設定の全体検査へ接続する。中空の器の入れ子と物の支持は、この囲いの検査から推定しない。
 
@@ -559,7 +565,7 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 ## 椅子の実物の部材の共有
 
-`world/town/get-chair-sections.ts` は座面、脚、背もたれと足置きの回転した部材を返す。`world/scene/construction/chair.ts` はこの部材へ既存の素材と表面の細かさを割り当てて描く。寸法のない既存の椅子の脚の内寄せと背の厚み、背のない揺り椅子の扱いも呼出し側で明示し、共用によって元の形を変えない。
+`apps/main/world/town/get-chair-sections.ts` は座面、脚、背もたれと足置きの回転した部材を返す。`apps/main/world/scene/construction/chair.ts` はこの部材へ既存の素材と表面の細かさを割り当てて描く。寸法のない既存の椅子の脚の内寄せと背の厚み、背のない揺り椅子の扱いも呼出し側で明示し、共用によって元の形を変えない。
 
 `get-dining-seat-geometry.ts` は同じ関数から椅子の部材を得る。`get-native-dining-chair-error.ts` は各元の着席フレームと、指定された両手の開始姿勢を `get-seated-chair-frame-error.ts` へ渡す。`get-native-dining-seat-error.ts` が元の姿勢を、`get-diner-arm-preparation-error.ts` が資料の開始姿勢を照合する。枠への離隔は前腕だけでなく全描画部材を対象とし、四本の脚がない入力を拒否する。座面の支持はこの検査へ混ぜない。
 
@@ -568,7 +574,7 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 ## 着席した男性の裾の形状
 
-`world/scene/figure/get-folded-garment-geometry.ts` は腰と膝から、腰の区間と腿に沿う区間を組み立てる。`get-tunic-geometry.ts` と `build-coat-tails.ts` が同じ形状を使い、上着は開口と裏地・縁の材質を追加する。椅子の寸法で衣服を切り取らない。立位と膝をつく形状は従来の描画へ渡す。
+`apps/main/world/scene/figure/get-folded-garment-geometry.ts` は腰と膝から、腰の区間と腿に沿う区間を組み立てる。`get-tunic-geometry.ts` と `build-coat-tails.ts` が同じ形状を使い、上着は開口と裏地・縁の材質を追加する。椅子の寸法で衣服を切り取らない。立位と膝をつく形状は従来の描画へ渡す。
 
 `lib/graphics/ray/get-elliptical-frustum-field.ts` は断面を圧縮した中実または中空の面と保守的な変化の上限を返す。`get-union-field-primitive.ts` は各面の有効範囲を保持して一つの描画部材へまとめる。材質の進行と裏地の判定は形状の離隔の上限と分ける。
 
@@ -577,7 +583,7 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 ## 支持面へ沿う腿の衣服
 
-`world/scene/figure/get-supported-thigh-field.ts` は腿の下面を身体の支持高さへ沿わせ、下腿は元の曲面を保つ。`create-leg-limb.ts` は座り姿勢のズボンだけにこれを使い、`build-leg.ts` が片脚の膝・靴・ズボンの部材を取得する。`legs.ts` は左脚、右脚の順に取得し、左右が揃った結果と `trouserParts` を返す。立位と膝をつく形状は元の描画を保つ。
+`apps/main/world/scene/figure/get-supported-thigh-field.ts` は腿の下面を身体の支持高さへ沿わせ、下腿は元の曲面を保つ。`create-leg-limb.ts` は座り姿勢のズボンだけにこれを使い、`build-leg.ts` が片脚の膝・靴・ズボンの部材を取得する。`legs.ts` は左脚、右脚の順に取得し、左右が揃った結果と `trouserParts` を返す。立位と膝をつく形状は元の描画を保つ。
 
 形状は下面を支える腿と、切らない下腿のそれぞれの保守的な囲いも返す。`can-rest-garment-on-seat.ts` は同じ囲いで座面の内部への侵入を拒否し、支持面への接触は離隔を広げずに認める。`get-seated-garment-seat-error.ts` が男性の胴衣・上着の裾と同じ実際の座面へ照合する。身体の支持力の証明とは区別する。
 
@@ -605,14 +611,14 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 `water-landing-schema.ts` は受取り・一人分の待機・退出の配列と格子を持つ。`get-water-collection-landing-error.ts` が格子と区画の一致、順序ごとの通行幅、元の地面の照合を組み立てる。`get-water-landing-grid-error.ts` は範囲と使用面、`get-water-landing-flow-error.ts` は他の段階の利用者を避ける経路の幅を確認する。
 
-`get-water-landing-ground-error.ts` は同じ床の全範囲を現行の通行格子へ投影し、`lib/engine/get-grid-rectangle-clearance-error.ts` で途中も含む全セルを調べる。井戸の衝突半径は `world/town/well-dimensions.ts` を既存の描画と共用し、二つの値を別々に調整しない。屋内の壁や家具の格子と同一視せず、この受取り床から井戸の敷地全体を自動で埋めたり現行の地面を変更したりしない。
+`get-water-landing-ground-error.ts` は同じ床の全範囲を現行の通行格子へ投影し、`lib/engine/get-grid-rectangle-clearance-error.ts` で途中も含む全セルを調べる。井戸の衝突半径は `apps/main/world/town/well-dimensions.ts` を既存の描画と共用し、二つの値を別々に調整しない。屋内の壁や家具の格子と同一視せず、この受取り床から井戸の敷地全体を自動で埋めたり現行の地面を変更したりしない。
 
 
 ## 受取り床へ立つ住民の水平な範囲
 
-`world/scene/get-standing-footprint-error.ts` は buildBody が返す全ての実際の描画部材の保守的な囲いを、同じ向きと縮尺で床へ移す。中心の点だけで通さず、髪や衣服・手足を含む全範囲を確認する。屋外の FIG と FIG_PPU は `world/scene/figure/display-scale.ts` を描画と照合で共用し、actors.ts の公開する名前は維持する。
+`apps/main/world/scene/get-standing-footprint-error.ts` は buildBody が返す全ての実際の描画部材の保守的な囲いを、同じ向きと縮尺で床へ移す。中心の点だけで通さず、髪や衣服・手足を含む全範囲を確認する。屋外の FIG と FIG_PPU は `apps/main/world/scene/figure/display-scale.ts` を描画と照合で共用し、actors.ts の公開する名前は維持する。
 
-`water-landing-body-schema.ts` が対象住民と空手のクリップ、区画ごとの位置と向きを持つ。`get-water-landing-body-error.ts` が登録された本人と全区画の割当を解決し、`get-water-standing-placement-error.ts` が各クリップの全フレームを照合する。井戸の名前付きの描画の立ち位置は `world/town/get-well-place.ts` を町の描画と資料の照合で共用する。歩行セルへの丸めとは分け、同じ位置を二つの定義へ写さない。
+`water-landing-body-schema.ts` が対象住民と空手のクリップ、区画ごとの位置と向きを持つ。`get-water-landing-body-error.ts` が登録された本人と全区画の割当を解決し、`get-water-standing-placement-error.ts` が各クリップの全フレームを照合する。井戸の名前付きの描画の立ち位置は `apps/main/world/town/get-well-place.ts` を町の描画と資料の照合で共用する。歩行セルへの丸めとは分け、同じ位置を二つの定義へ写さない。
 
 
 ## 同じ部材から作る飲用水の壺と静的な把持
@@ -887,19 +893,19 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 ## 枕の側布の裁断面
 
-`world/town/get-seamed-box-textile-panels.ts` は詰物を含む直方体の外包から六面と各辺の縫い代を求める純粋な計算であり、実際の布の変形や縫製を証明しない。`scripts/lib/get-pillow-cover-cutting-review.ts` は本人の寝台と枕から寸法を取り、`get-pillow-cover-layout-boxes.ts` で使用中と替えの面の固有 ID を照合してから、原布内の配置と隙間・外縁を検査する。通常の寝具の検査からも呼び、側布の面を失った案を参照検査の成功へ隠さない。
+`apps/main/world/town/get-seamed-box-textile-panels.ts` は詰物を含む直方体の外包から六面と各辺の縫い代を求める純粋な計算であり、実際の布の変形や縫製を証明しない。`scripts/lib/get-pillow-cover-cutting-review.ts` は本人の寝台と枕から寸法を取り、`get-pillow-cover-layout-boxes.ts` で使用中と替えの面の固有 ID を照合してから、原布内の配置と隙間・外縁を検査する。通常の寝具の検査からも呼び、側布の面を失った案を参照検査の成功へ隠さない。
 
 
 ## 収納上面の寝具の外包
 
-`world/town/get-cabinet-top-package-placement.ts` は収納上面への直接支持と外縁・天井・室内の障害物への離隔を扱い、掛布と枕の側布で共用する。`scripts/lib/get-front-access-top-storage.ts` は両方の外包を同じ面で照合し、`get-front-access-handle-plan.ts` の topObjects へ渡す。この同じ配列を戸と付属品の全移動、棚内の取出し、姿勢と全移動の障害物へ使う。
+`apps/main/world/town/get-cabinet-top-package-placement.ts` は収納上面への直接支持と外縁・天井・室内の障害物への離隔を扱い、掛布と枕の側布で共用する。`scripts/lib/get-front-access-top-storage.ts` は両方の外包を同じ面で照合し、`get-front-access-handle-plan.ts` の topObjects へ渡す。この同じ配列を戸と付属品の全移動、棚内の取出し、姿勢と全移動の障害物へ使う。
 
 `get-storage-spare-pillow-cover-definition.ts` は本人の裁断案の替えの六片と原布を解決し、仮の布厚による体積を名目外包が失わないことを確認する。`get-covered-textile-box.ts` は保護する木箱の板と蓋を引いた内寸と側布の候補の外包を照合し、閉じた箱の実物の部材を返す。`get-north-hinged-lid-envelope.ts` は蓋の厚みを含む閉状態から垂直までの全回転の囲いを求め、配置の検査が室内と掛布へ照合する。蓋の途中の高さの極大も含み、端点の検査では代用しない。体積と名目外包の検査は、縫った側布が実際に折って収まる証明や蝶番・接合と開閉する身体の成立とは区別する。これらの外包を通常の私室へ自動描画せず、設計の未成立を保持する。
 
 
 ## 寝具の原料の有限の予算
 
-`world/town/get-required-textile-input-mass.ts` は一グラム単位の必要量を歩留りから切り上げ、途中の整数の積を失わないよう計算する。`get-textile-material-budget.ts` は原毛・準備した羊毛・糸・原布・裁断片と各差分を同じ収支へ結ぶ。`scripts/lib/get-sleeping-textile-material-budget.ts` は既に照合した裁断片の面積を使い、補助軸を物理的な厚みや材料量へ混ぜない。
+`apps/main/world/town/get-required-textile-input-mass.ts` は一グラム単位の必要量を歩留りから切り上げ、途中の整数の積を失わないよう計算する。`get-textile-material-budget.ts` は原毛・準備した羊毛・糸・原布・裁断片と各差分を同じ収支へ結ぶ。`scripts/lib/get-sleeping-textile-material-budget.ts` は既に照合した裁断片の面積を使い、補助軸を物理的な厚みや材料量へ混ぜない。
 
 `textile-material-budget-schema.ts` と `textile-wool-lots-schema.ts` は未計測の条件と有限の予算案を表す。`get-textile-wool-allocation-error.ts` は受取人の原布と羊毛の工程から同じ予算の割当へ進み、`get-textile-wool-lot-review.ts` と `get-wool-lot-allocation-budget.ts` は供給者側の全ての割当から原布へ戻って必要量を合算する。`audit-textile-wool-lots.ts` を通常の工程の検査へ結び、各原布の単独の成功で全体の超過を隠さない。供給者の受取人と部屋は `get-textile-design-prerequisites.ts` から設計の前提にも含める。実在庫への採用と実物の工程の成立はこの収支から導かない。
 
@@ -908,7 +914,7 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 `wool-preparation-schema.ts` と `wool-preparation-stations.ts` は、原毛と処理用水・洗い・すすぎ・手洗い・屋根内の乾燥・清潔な保管・汚水の一時保管を別の家具と使用面へ結ぶ。`get-wool-preparation-operator-error.ts` と `get-wool-preparation-facility-review.ts` は持ち主と担当・水の受取りの利用者を照合し、家庭菜園・飲用水の受取り・動物の世話へ兼用した区画を拒む。原料予算から処理場へ進む参照と、`audit-wool-preparation.ts` から原料予算へ戻る参照を通常の設定検査へ結ぶ。処理場の担当・受水する設備・持ち主も設計の前提へ含め、局所の配置だけで供給のつながりを省略しない。
 
-`world/town/get-wool-preparation-water-budget.ts` は、一回の洗い・すすぎの各入替えと手洗いの予約を合計し、給水と汚水の一時保管の両方の余裕を同時に確認する。蒸発や浸透を処理能力に数えず、手入れの間隔を増やす場合も全量を予約する。これは量の案の検査であり、槽の実際の内寸と給排水の道具、敷地・構造・換気と身体、汚水の最終処理と連続した製作を証明しない。
+`apps/main/world/town/get-wool-preparation-water-budget.ts` は、一回の洗い・すすぎの各入替えと手洗いの予約を合計し、給水と汚水の一時保管の両方の余裕を同時に確認する。蒸発や浸透を処理能力に数えず、手入れの間隔を増やす場合も全量を予約する。これは量の案の検査であり、槽の実際の内寸と給排水の道具、敷地・構造・換気と身体、汚水の最終処理と連続した製作を証明しない。
 
 
 ## 羊毛の処理用の槽の容量と外形
@@ -930,7 +936,7 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 `get-grid-segment-coverage.ts` が全区間を覆うセルか上限による拒否を返す。元の `get-grid-segment-cells.ts` は同じ被覆からセルを返し、不正入力では従来どおり例外を投げる。生き物の半径のない区間は返る Error を受け取り、空のセル列を通過の証明にはしない。地形の関数が投げる予期しない例外はこの処理で捕捉しない。
 
-`get-monster-grid-layout.ts` は有限な領域と倍率、開始と終端の格子座標の表現範囲、探索するセル数を照合する。`get-monster-grid-route.ts` の正方形の配列と `get-monster-fallback-home.ts` の長方形の走査で共有し、実際の格子の形に対して確保と地形の照会より先に検査する。休憩地点は全セルの配列を作らず、元の行順で調べる。探索上限は `world/core/monster-motion-rules.ts` にあり、現行の経路と元の格子の被覆・身体の判定は変えない。
+`get-monster-grid-layout.ts` は有限な領域と倍率、開始と終端の格子座標の表現範囲、探索するセル数を照合する。`get-monster-grid-route.ts` の正方形の配列と `get-monster-fallback-home.ts` の長方形の走査で共有し、実際の格子の形に対して確保と地形の照会より先に検査する。休憩地点は全セルの配列を作らず、元の行順で調べる。探索上限は `apps/main/world/core/monster-motion-rules.ts` にあり、現行の経路と元の格子の被覆・身体の判定は変えない。
 
 
 ## 未配置の都市の区画案
@@ -978,17 +984,17 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 ## 未実装の住民の時間予約と場所
 
-`world/town/resident-day-plan-schema.ts` は勤務日の予約を定義し、`get-resident-day-budget.ts` は時間の連続と一巡・場所を変える移動・夜中の接続を純粋に照合する。`scripts/lib/get-proposed-resident-day-error.ts` はその結果と勤務日に必要な行為を確かめ、`get-proposed-day-place-error.ts` と `get-proposed-day-room-error.ts` で区画の用途と室の利用権・寝間と職場・飲用水の収納を結ぶ。`get-proposed-resident-travel-error.ts` は室を端に持つ移動の列を照合し、`get-proposed-room-route-error.ts` は途中の室の利用権と同じ建物への所属を確かめて既存の `auditBuildingLayout` へ渡す。`get-room-route-connection-error.ts` はその平面の対応と経路の順序・屋外へ出る室を結ぶ。資料の規約は `.docs/settings/README.md` の「未実装の住民の一日の時間の予約」にある。実行時の日課と位置は変更しない。
+`apps/main/world/town/resident-day-plan-schema.ts` は勤務日の予約を定義し、`get-resident-day-budget.ts` は時間の連続と一巡・場所を変える移動・夜中の接続を純粋に照合する。`scripts/lib/get-proposed-resident-day-error.ts` はその結果と勤務日に必要な行為を確かめ、`get-proposed-day-place-error.ts` と `get-proposed-day-room-error.ts` で区画の用途と室の利用権・寝間と職場・飲用水の収納を結ぶ。`get-proposed-resident-travel-error.ts` は室を端に持つ移動の列を照合し、`get-proposed-room-route-error.ts` は途中の室の利用権と同じ建物への所属を確かめて既存の `auditBuildingLayout` へ渡す。`get-room-route-connection-error.ts` はその平面の対応と経路の順序・屋外へ出る室を結ぶ。資料の規約は `.docs/settings/README.md` の「未実装の住民の一日の時間の予約」にある。実行時の日課と位置は変更しない。
 
 
 ## 食器洗いの水の予約と名目上の容器
 
 `dishwater-capture-schema.ts` は勤務日の片付けと洗い鉢・水切り・専用の排水容器を結ぶ。`get-dishwater-operator-error.ts` は担当と家具の所有・手入れ、室と勤務日の整合を照合する。`get-dishwater-capture-error.ts` は通常の資料検査から呼び、未知の排水先を補わずに容量の予約と未通過のゲートを守る。
 
-`rectangular-liquid-vessel-schema.ts` は原毛の槽と食器の容器の名目上の形を共有する。`get-furniture-liquid-capacity.ts` は純粋な `world/town/get-rectangular-liquid-capacity.ts` の容量と外形を家具の占有へ照合し、`get-dishwater-room-budget.ts` は洗い鉢と受槽の容量を同じ家具へ照合する。`get-dishwater-equipment-error.ts` は飲用・洗浄・乾燥・排水の置場を区分する。`get-dishwater-capture-budget.ts` は開始時の排水を消さず、一度の水と全回数の保管を別に確かめる。実際の在庫や排水の状態を更新する処理ではない。最初の案と残件は [[room-hue-ludwig-1#食器を洗い排水を保管する案]] にある。
+`rectangular-liquid-vessel-schema.ts` は原毛の槽と食器の容器の名目上の形を共有する。`get-furniture-liquid-capacity.ts` は純粋な `apps/main/world/town/get-rectangular-liquid-capacity.ts` の容量と外形を家具の占有へ照合し、`get-dishwater-room-budget.ts` は洗い鉢と受槽の容量を同じ家具へ照合する。`get-dishwater-equipment-error.ts` は飲用・洗浄・乾燥・排水の置場を区分する。`get-dishwater-capture-budget.ts` は開始時の排水を消さず、一度の水と全回数の保管を別に確かめる。実際の在庫や排水の状態を更新する処理ではない。最初の案と残件は [[room-hue-ludwig-1#食器を洗い排水を保管する案]] にある。
 
 
-同じ食事室の開始残量と補給・使用の予約は `kitchen-water-cycle-schema.ts` が持つ。`get-kitchen-water-plan-review.ts` は同じ持ち主と容器・食器の排水の予約を結び、`get-kitchen-water-cycle-error.ts` が検査を組み立てる。`get-kitchen-water-bindings-error.ts` と `get-kitchen-water-event-error.ts` が勤務日の全ての該当作業と汲水・移し替えの完了時刻を照合する。`world/town/get-water-stock-cycle.ts` は `advance-water-stock.ts` で時刻順に残量を追い、補給前の使用・あふれ・同時刻の曖昧な順序と翌朝への残量の断絶を拒む。当日の終了時刻と翌日の開始時刻も同じ時点として照合し、両方へ別々の水の操作を予約しない。実在庫と供給を発生させず、手洗いと洗濯や排水の搬出まで成立したとは扱わない。対象の予約と残件は [[room-hue-ludwig-1#食事と食器に回す水の残量の案]] にある。
+同じ食事室の開始残量と補給・使用の予約は `kitchen-water-cycle-schema.ts` が持つ。`get-kitchen-water-plan-review.ts` は同じ持ち主と容器・食器の排水の予約を結び、`get-kitchen-water-cycle-error.ts` が検査を組み立てる。`get-kitchen-water-bindings-error.ts` と `get-kitchen-water-event-error.ts` が勤務日の全ての該当作業と汲水・移し替えの完了時刻を照合する。`apps/main/world/town/get-water-stock-cycle.ts` は `advance-water-stock.ts` で時刻順に残量を追い、補給前の使用・あふれ・同時刻の曖昧な順序と翌朝への残量の断絶を拒む。当日の終了時刻と翌日の開始時刻も同じ時点として照合し、両方へ別々の水の操作を予約しない。実在庫と供給を発生させず、手洗いと洗濯や排水の搬出まで成立したとは扱わない。対象の予約と残件は [[room-hue-ludwig-1#食事と食器に回す水の残量の案]] にある。
 
 
 ## 身体の経路の掃引と設定資料
@@ -1002,7 +1008,7 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 ## 二重門の所在と連続した操作の分離
 
-`world/town/` の stock-lock は門と個体・操作者の所在の遷移を検査する。`scripts/lib/get-stock-lock-visit-phases.ts` は同じ記録を身体の歩行・手元操作・押引きの連続した動作列へ結び、記録の重複や省略と位置の飛躍を拒む。幾何の検査は同じ戸板と枠・身体の定義を使う。家畜の観測と誘導の成立や実行時の操作を、この資料の動作列から推定しない。規約は [[README#二重門の操作位置をつなぐ動作列]] にある。
+`apps/main/world/town/` の stock-lock は門と個体・操作者の所在の遷移を検査する。`scripts/lib/get-stock-lock-visit-phases.ts` は同じ記録を身体の歩行・手元操作・押引きの連続した動作列へ結び、記録の重複や省略と位置の飛躍を拒む。幾何の検査は同じ戸板と枠・身体の定義を使う。家畜の観測と誘導の成立や実行時の操作を、この資料の動作列から推定しない。規約は [[README#二重門の操作位置をつなぐ動作列]] にある。
 
 
 ## 二重門の敷地と全体の障害物
@@ -1014,14 +1020,14 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 ## 羊の描画と静止した待機の占有
 
-`world/town/sheep-shape.ts` は現行の羊の胴・頭・目・脚を持ち、`sheep-mesh.ts` は同じ順序と材質で描画する。傾きも `livestock-graze-pitch.ts` を実行時と照合で共有する。`get-sheep-body-radius.ts` は純粋な数値の部品を `lib/engine/get-yaw-pitch-box-radius.ts` へ渡し、任意の向きと草を食べるまでの傾きを覆う円を求める。Three.js の XYZ の回転では向きを変えてから傾く順序を扱い、表示した角度の点だけで全区間を代用しない。Float32 の頂点の丸めに対する外側の余地を含める。
+`apps/main/world/town/sheep-shape.ts` は現行の羊の胴・頭・目・脚を持ち、`sheep-mesh.ts` は同じ順序と材質で描画する。傾きも `livestock-graze-pitch.ts` を実行時と照合で共有する。`get-sheep-body-radius.ts` は純粋な数値の部品を `lib/engine/get-yaw-pitch-box-radius.ts` へ渡し、任意の向きと草を食べるまでの傾きを覆う円を求める。Three.js の XYZ の回転では向きを変えてから傾く順序を扱い、表示した角度の点だけで全区間を代用しない。Float32 の頂点の丸めに対する外側の余地を含める。
 
 `get-stock-lock-waiting-circles.ts` は実際の地図の全個体と縮尺を配置へ結び、`get-stock-lock-waiting-error.ts` は前室と両側の床・柵と他の個体への離隔を検査する。通常の移動範囲は変更せず、静止した配置の照合と実際の集合・維持を区別する。資料の条件は [[README#二重門を使う間の羊の静止した待機]] にある。
 
 
 ## マップ定義と所在・営業の参照
 
-`world/maps/index.ts` は地上と屋内の地図を組み立てた定義を持つ。通行は `walkable.ts`、座標の距離は `cell-distance.ts` にあり、定義表の読み込みを必要としない。セルとマップの型は同じディレクトリの `types.ts` に置く。
+`apps/main/world/maps/index.ts` は地上と屋内の地図を組み立てた定義を持つ。通行は `walkable.ts`、座標の距離は `cell-distance.ts` にあり、定義表の読み込みを必要としない。セルとマップの型は同じディレクトリの `types.ts` に置く。
 
 名前付きの場所・直接のセル・タイルの指定の解決は `get-spot-cell.ts` にまとめる。地図を構築するときはその地図の場所の表を渡し、通常の参照では `cell-of-spot.ts` が定義表から場所を渡す。構築処理から定義表を読む参照関数へ逆依存させない。
 
@@ -1030,18 +1036,18 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 ## 共有状態と品物の操作の分割
 
-パーティの上限と分配の規則の定数は `world/core/party/rules.ts`、保存する名簿の型は同じ場所の `types.ts` にある。加入・離脱・報告と経験値の分配は各関数のファイルを直接読む。状態を持つ Durable Object と、保存や通信を含まない規則を分ける。
+パーティの上限と分配の規則の定数は `apps/main/world/core/party/rules.ts`、保存する名簿の型は同じ場所の `types.ts` にある。加入・離脱・報告と経験値の分配は各関数のファイルを直接読む。状態を持つ Durable Object と、保存や通信を含まない規則を分ける。
 
-採集資源の状態の型は `world/core/nature/types.ts` にあり、残量の参照・採取・返却は `left-at.ts`・`take-one.ts`・`give-one.ts` が扱う。回復した残量と次の回復の基点は `get-recovered-node.ts` が一緒に求め、各操作で時計の解釈を分けない。遅延した回復と返却の規則は既存の予約処理から呼び、入口に計算を戻さない。採集の予約と配送は引き続き既存のコーディネーターに置く。
+採集資源の状態の型は `apps/main/world/core/nature/types.ts` にあり、残量の参照・採取・返却は `left-at.ts`・`take-one.ts`・`give-one.ts` が扱う。回復した残量と次の回復の基点は `get-recovered-node.ts` が一緒に求め、各操作で時計の解釈を分けない。遅延した回復と返却の規則は既存の予約処理から呼び、入口に計算を戻さない。採集の予約と配送は引き続き既存のコーディネーターに置く。
 
 
 ## 世界の升目と現在地の参照
 
-`world/maps/grid.ts` は升目と壁・方角の定義だけを持ち、`square-of.ts`・`square-at.ts`・`across.ts` が同じ表を読む。ワールドマップの点・未公開の都市は `world-map.ts` にあり、座標を別の表示用一覧に複製しない。道の参照は `world-roads.ts` がマップの実際の接続を読む。
+`apps/main/world/maps/grid.ts` は升目と壁・方角の定義だけを持ち、`square-of.ts`・`square-at.ts`・`across.ts` が同じ表を読む。ワールドマップの点・未公開の都市は `world-map.ts` にあり、座標を別の表示用一覧に複製しない。道の参照は `world-roads.ts` がマップの実際の接続を読む。
 
 `world-node-of.ts` は屋外の点を直接返し、屋内なら扉と階段の接続を辿って建物のある通りを示す。最初の接続先が別の階や循環した枝でも、地上への別の接続を調べる。見つからない場所を隣の屋外マップへ置き換えず、既に調べた場所を再び辿らない。地図上の印と下部の屋内の名前は [[ui#3.3 ワールドマップ（開閉・M）— §1]] に従う。
 
-倉庫の定義は `world/core/storage/rules.ts`、空の持ち物の生成は `empty-storage.ts`、預け入れと引き取りは同じフォルダの各操作に置く。入口のファイルと同名フォルダのどちらを解決するかへ依存せず、利用側は定義元を明示して読む。
+倉庫の定義は `apps/main/world/core/storage/rules.ts`、空の持ち物の生成は `empty-storage.ts`、預け入れと引き取りは同じフォルダの各操作に置く。入口のファイルと同名フォルダのどちらを解決するかへ依存せず、利用側は定義元を明示して読む。
 
 
 ## 補間と回転の計算の参照
@@ -1081,7 +1087,7 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 
 `vector3-types.ts` の Vector3 と ReadonlyMatrix3 は読み取る入力の形である。Vector3Tuple と Matrix3 は、演算の新しい配列や描画の組立てを所有する側が扱う形とする。演算の結果は新しく作り、入力や内部に保持した可変の配列を返さない。描画の既存の所有者へ渡すためだけの配列の複製は増やさない。正規化のゼロの扱いと補間の計算順序は、従来の描画と関節の計算を保つ。
 
-人物の描画版は `world/scene/sprite-render-version.ts` に持ち、保存画像の鍵と事前生成の人物画像の資料で共用する。地面のソースの指紋とは別の仕組みであり、人物の描画結果を変更したときに版を更新する。事前生成の画像は資料の rendererVersion が現在の版と一致する場合だけ使い、版がない旧資料も含め、一致しなければ通常の生成へ戻す。構造が正しい資料であることと現在の描画に適合することを区別する。
+人物の描画版は `apps/main/world/scene/sprite-render-version.ts` に持ち、保存画像の鍵と事前生成の人物画像の資料で共用する。地面のソースの指紋とは別の仕組みであり、人物の描画結果を変更したときに版を更新する。事前生成の画像は資料の rendererVersion が現在の版と一致する場合だけ使い、版がない旧資料も含め、一致しなければ通常の生成へ戻す。構造が正しい資料であることと現在の描画に適合することを区別する。
 
 
 ## 材質・輪郭と画像の境界
@@ -1105,7 +1111,7 @@ HP・SP の表示は回復が残る間だけ定期更新し、満タンまたは
 正射影の光線との交点と表面の法線は `lib/graphics/ray/get-*-ray-intersection.ts` と `get-*-surface-normal.ts` に形状ごとに置き、人物の描画は定義元を直接読む。円錐の座標系は `create-cone-frame.ts` が組み立て、`get-cone-frame.ts` が共用を管理する。座標系は図形の外の弱い参照のキャッシュで保持し、両端の座標の編集・差替えに追従する。座標系とその軸は凍結し、上面の法線は独立した配列を返す。クリップ・SDF の照会の順序を保つ。配置の離隔の証明と、画素を描くための交点を同じ安全判定として扱わない。
 
 
-注湯の姿勢の検査は `scripts/lib/get-hot-water-station-solids.ts` の同じ天板・脚・杯の囲いを、身体と保持した鍋の両方に使う。`get-hot-water-pot-space-error.ts` が剛体変換を揃え、`world/scene/figure/get-pouring-pot-obstacle-error.ts` が胴と片口の全外形と全ての架け柄を照合する。姿勢の入力型は hot-water-frame-types にまとめ、検査同士の型を得るためだけに呼出し元へ戻る参照を作らない。
+注湯の姿勢の検査は `scripts/lib/get-hot-water-station-solids.ts` の同じ天板・脚・杯の囲いを、身体と保持した鍋の両方に使う。`get-hot-water-pot-space-error.ts` が剛体変換を揃え、`apps/main/world/scene/figure/get-pouring-pot-obstacle-error.ts` が胴と片口の全外形と全ての架け柄を照合する。姿勢の入力型は hot-water-frame-types にまとめ、検査同士の型を得るためだけに呼出し元へ戻る参照を作らない。
 
 
 円錐の交点は `get-cone-local-ray.ts` で光線を座標系へ投影し、`get-cone-side-intersection.ts` と `get-cone-top-intersection.ts` の候補から手前を選ぶ。側面の二根の順序、接線と高さの境界、正の半径と光線の距離の条件を保持する。底面を新しく閉じず、配置の中実の離隔の形状と描画の面を混同しない。投影後の値は一回の照会だけで使い、図形や光線へ途中の値を書き戻さない。
@@ -1143,7 +1149,7 @@ WebP の符号化は非同期の子プロセスで行い、その間もブラウ
 モンスターの経路の正方形の障害物格子は `create-monster-navigation-grid.ts` が所有する。実際に確保する格子の寸法と予算を `get-monster-grid-layout.ts` で検証してから、新しいバッファを行順に埋める。長方形の領域の外側の余白は障害物にし、地形へ問い合わせない。毎回の通行判定とその順序を保ち、地形の結果をキャッシュしない。`get-monster-grid-route.ts` はこの格子で経路を探し、同じ座標へ戻す。
 
 
-React との共有の定義は `components/game/game-context.ts` に一つだけ置く。Provider は参照を渡し、`use-game.ts` は必須の参照、`use-game-state.ts` は外部ストアのセレクターによる購読を受け持つ。`use-player-if-any.ts` はゲームを持たない開発用の道具表示でも呼べる。状態の型は `world/state.ts` の定義元から読み、接続の集約ファイルによる再公開を残さない。
+React との共有の定義は `apps/main/components/game/game-context.ts` に一つだけ置く。Provider は参照を渡し、`use-game.ts` は必須の参照、`use-game-state.ts` は外部ストアのセレクターによる購読を受け持つ。`use-player-if-any.ts` はゲームを持たない開発用の道具表示でも呼べる。状態の型は `apps/main/world/state.ts` の定義元から読み、接続の集約ファイルによる再公開を残さない。
 
 
 注湯の器の空間の検査は `get-hot-water-pot-space-error.ts` が床と台・杯を受け持つ。床への食込みは、器の姿勢に共通の `get-posed-pot-bottom.ts` の全体の下端で拒否し、台や杯の囲いを迂回しても通過させない。部屋の床を基準とした座標を使い、身体と握り・姿勢の到達の検査と混同しない。
@@ -1155,16 +1161,16 @@ React との共有の定義は `components/game/game-context.ts` に一つだけ
 器の部屋への収まりは `get-pouring-pot-world-bounds.ts` が胴・片口と全ての柄の半径を部屋の座標で囲み、`get-hot-water-pot-grid-error.ts` が床への投影の全範囲を占有格子へ照合する。壁・範囲外と他の家具の占有を拒む。例外は当該の作業台のセルだけとし、`get-hot-water-pot-station-error.ts` が天板・脚と杯の立体を引き続き照合する。`get-hot-water-pot-space-error.ts` は床・格子・作業台の検査をまとめる。投影の占有の照合と、実際の壁と家具の立体の設計・描画の照合は区別する。
 
 
-炉の形は `world/town/hearth-chamber.ts` が火室、`hearth-parts.ts` が同じ火室と煙道を除いた石材、`scale-hearth.ts` が部屋の縮尺への変換を持つ。描画・煙道の接続・設定の断面検査はそれぞれの定義元から直接参照し、火室と石材へ渡す座標・向き・寸法・底の高さを名前付きの入力でそろえる。関連型は `hearth-types.ts` に置く。
+炉の形は `apps/main/world/town/hearth-chamber.ts` が火室、`hearth-parts.ts` が同じ火室と煙道を除いた石材、`scale-hearth.ts` が部屋の縮尺への変換を持つ。描画・煙道の接続・設定の断面検査はそれぞれの定義元から直接参照し、火室と石材へ渡す座標・向き・寸法・底の高さを名前付きの入力でそろえる。関連型は `hearth-types.ts` に置く。
 
 
-町と室内の描画、野外、開発用の素材一覧は `world/scene/construction/` の部材・素材・登録処理を定義元から直接参照する。描画全体や、野外の部材・人物・テクスチャ・生活小物を再公開する経由モジュールは置かない。人物は `figure/look.ts`・`animation.ts`・`render.ts`・`sheets.ts`、地図の実行時は `runtime/`、間取りは `world/town/floorplan/floor-plan.ts` を定義元として参照する。光源・窓・店とアニメーションなどの登録状態は同じ `registry.ts` の実体を共有し、参照経路ごとに作り直さない。
+町と室内の描画、野外、開発用の素材一覧は `apps/main/world/scene/construction/` の部材・素材・登録処理を定義元から直接参照する。描画全体や、野外の部材・人物・テクスチャ・生活小物を再公開する経由モジュールは置かない。人物は `figure/look.ts`・`animation.ts`・`render.ts`・`sheets.ts`、地図の実行時は `runtime/`、間取りは `apps/main/world/town/floorplan/floor-plan.ts` を定義元として参照する。光源・窓・店とアニメーションなどの登録状態は同じ `registry.ts` の実体を共有し、参照経路ごとに作り直さない。
 
 
-アイテムの実体は `world/core/items/catalog.ts`、種類と品質・装備欄は `items/kinds.ts`、関連型とアイコン名は `items/types.ts`・`items/icons.ts` に置く。ID の判定、買取の基準価格、売却の可否、装備欄の解決はそれぞれ `is-item-id.ts`・`sell-price.ts`・`sellable.ts`・`slots-for.ts` が持つ。呼出し元は各定義元を直接参照する。店の作り手・親しさと品質別の買取価格は `maker-at.ts`・`shop-friend.ts`・`sells-for.ts`、サーバーが確認した価格と店番の入力型は `shop-command-types.ts`、持物の重量は `inventory-weight.ts`、状態遷移の型は `transition.ts` を直接参照し、`apply.ts` のコマンド実行を経由した再公開に依存しない。
+アイテムの実体は `apps/main/world/core/items/catalog.ts`、種類と品質・装備欄は `items/kinds.ts`、関連型とアイコン名は `items/types.ts`・`items/icons.ts` に置く。ID の判定、買取の基準価格、売却の可否、装備欄の解決はそれぞれ `is-item-id.ts`・`sell-price.ts`・`sellable.ts`・`slots-for.ts` が持つ。呼出し元は各定義元を直接参照する。店の作り手・親しさと品質別の買取価格は `maker-at.ts`・`shop-friend.ts`・`sells-for.ts`、サーバーが確認した価格と店番の入力型は `shop-command-types.ts`、持物の重量は `inventory-weight.ts`、状態遷移の型は `transition.ts` を直接参照し、`apply.ts` のコマンド実行を経由した再公開に依存しない。
 
 
-状態の型と公開定数は `world/state.ts`、乱数は `lib/engine/random.ts`、描画の形状構築は `lib/graphics/geometry-builder.ts`、地形の定義は `world/maps/layout.ts` から直接参照する。`world/game.ts` はゲームの組み立て、`world/scene/pix.ts` はゲームの色と画素、`gfx.ts` は画素スプライトの描画を持ち、これらの定義を経由して再公開しない。開発用のパネルは `dev/debug-panel.tsx` の読み込み時だけ固有の CSS と診断用の設定を有効にする。
+状態の型と公開定数は `apps/main/world/state.ts`、乱数は `lib/engine/random.ts`、描画の形状構築は `lib/graphics/geometry-builder.ts`、地形の定義は `apps/main/world/maps/layout.ts` から直接参照する。`apps/main/world/game.ts` はゲームの組み立て、`apps/main/world/scene/pix.ts` はゲームの色と画素、`gfx.ts` は画素スプライトの描画を持ち、これらの定義を経由して再公開しない。開発用のパネルは `apps/studio/dev/debug-panel.tsx` の読み込み時だけ固有の CSS と診断用の設定を有効にする。
 
 
 都市の供給一覧は `scripts/lib/town-supply-systems-schema.ts` で形を読み、`get-town-supply-reference-errors.ts` が参照先の役割と所属・設計ゲートを照合する。`audit-town-supply-systems.ts` が一覧内の ID と未解決の仕事を確認し、`scripts/check-settings.ts` へ接続する。原料から製粉とパンの仕事の対応は [[facility-square-windmill]] と [[town-phanthiet]] に持ち、数量や描画の回転から稼働を推定しない。
@@ -1173,76 +1179,76 @@ React との共有の定義は `components/game/game-context.ts` に一つだけ
 未配置の風車の作業場は `scripts/lib/windmill-yard-schema.ts` で役割と門へ入る条件を読む。`get-windmill-yard-boundary-errors.ts` は囲いと連続した門の開口、`get-windmill-yard-zone-errors.ts` は機械と食品の保管・使用面の分離を照合する。`audit-windmill-yard.ts` が既存の占有・到達性・使用面と通路幅の検査も呼び、平面の通過を設備の設計完了にしない。
 
 
-風車の羽根は `world/scene/construction/windmill-rotor-shape.ts` の梁と布・軸の寸法を描画と設定検査で共用する。`get-windmill-rotor-sweep.ts` は矩形の最も遠い角を使って全回転の囲いを求め、`scripts/lib/get-windmill-yard-rotor-error.ts` が機械の予約から原点を取り、共通のメートル換算と余白を含めて囲いの内側へ照合する。現行の町の配置を、未配置の作業場へ自動で移す処理は持たない。
+風車の羽根は `apps/main/world/scene/construction/windmill-rotor-shape.ts` の梁と布・軸の寸法を描画と設定検査で共用する。`get-windmill-rotor-sweep.ts` は矩形の最も遠い角を使って全回転の囲いを求め、`scripts/lib/get-windmill-yard-rotor-error.ts` が機械の予約から原点を取り、共通のメートル換算と余白を含めて囲いの内側へ照合する。現行の町の配置を、未配置の作業場へ自動で移す処理は持たない。
 
 
 風車の敷地候補の収集は `scripts/lib/get-windmill-yard-site-reviews.ts` が資料ごとの所属マップへ結び、個別の照合は `get-windmill-yard-site-review.ts` が `windmill-yard-site-schema.ts` から読み、格子を `get-windmill-yard-site-geometry.ts` で外の座標へ投影する。`get-windmill-field-partition.ts` が現行の一つの畑から交差する部分と残る全域・面積を求め、`get-windmill-field-reservations.ts` が元の予約の一致を確認して残る農地へ置き換える。`get-windmill-site-reservations.ts` は入力を変えず新しい予約の Map を作り、候補の順序で畑を分ける。割当てを拒んだ候補も占有を隠さず、別の干渉の検査へ残す。`scripts/check-settings.ts` は結果を他の設備と同じ占有へ登録し、経路と配置へ渡す。`get-windmill-yard-site-errors.ts` は自分の占有だけを除いて、共通の屋外の予約の検査へ渡す。実行時の地形・畑・歩行格子と在庫はこの設計検査から変更しない。
 
 
-ゲームの時刻は `world/core/jst-minutes.ts` が日本の分へ変換し、`parse-time.ts`・`format-time.ts` が入力と表示、`within.ts` が日付をまたぐ営業や日課の範囲を受け持つ。明るさ・朝夕の色・時間帯の名前は `daylight.ts`・`dusk.ts`・`phase.ts` が同じ時刻からそれぞれ求める。頼まれごとと親しさの一日の判定は `day-of.ts`、その境界の定義は `clock-rules.ts` へ結び、表示の時間帯の名前と混同しない。各呼出し元は定義元から直接参照する。
+ゲームの時刻は `apps/main/world/core/jst-minutes.ts` が日本の分へ変換し、`parse-time.ts`・`format-time.ts` が入力と表示、`within.ts` が日付をまたぐ営業や日課の範囲を受け持つ。明るさ・朝夕の色・時間帯の名前は `daylight.ts`・`dusk.ts`・`phase.ts` が同じ時刻からそれぞれ求める。頼まれごとと親しさの一日の判定は `day-of.ts`、その境界の定義は `clock-rules.ts` へ結び、表示の時間帯の名前と混同しない。各呼出し元は定義元から直接参照する。
 
 
-ショップのタブは `components/game/tabs.tsx` が状態と操作の入口、`tabs-list.tsx`・`tabs-trigger.tsx`・`tabs-content.tsx` がそれぞれの部品を持つ。各呼出し元は定義元から参照し、既存の Base UI の選択・フォーカスとキーボード操作を保つ。共通クラスは引数の className と同じ順で結合し、渡された属性・ref・操作を残して描画へ渡す。
+ショップのタブは `apps/main/components/game/tabs.tsx` が状態と操作の入口、`tabs-list.tsx`・`tabs-trigger.tsx`・`tabs-content.tsx` がそれぞれの部品を持つ。各呼出し元は定義元から参照し、既存の Base UI の選択・フォーカスとキーボード操作を保つ。共通クラスは引数の className と同じ順で結合し、渡された属性・ref・操作を残して描画へ渡す。
 
-ツールチップは `components/game/tooltip.tsx` が表示状態の入口、`tooltip-provider.tsx` が共通の表示待ち時間、`tooltip-trigger.tsx` が対象、`tooltip-content.tsx` が説明のパネルを持つ。呼出し元は定義元を直接参照する。配置の属性は Positioner に渡し、Popup の属性と分ける。既存の初期値・属性・表示クラスを保つ。
+ツールチップは `apps/main/components/game/tooltip.tsx` が表示状態の入口、`tooltip-provider.tsx` が共通の表示待ち時間、`tooltip-trigger.tsx` が対象、`tooltip-content.tsx` が説明のパネルを持つ。呼出し元は定義元を直接参照する。配置の属性は Positioner に渡し、Popup の属性と分ける。既存の初期値・属性・表示クラスを保つ。
 
-成長の定数は `world/core/growth-rules.ts`、関連型は `growth-types.ts` に置く。必要経験値・能力値の消費ポイント・到達時の獲得ポイント・初期能力値・経験値の加算は、それぞれ `exp-to-next.ts`・`stat-cost.ts`・`points-for-level.ts`・`starting-stats.ts`・`gain-exp.ts` が持つ。呼出し元は定義元を参照し、初期能力値は型キャストを使わず全能力を明示する。経験値の加算は入力を変更せず、従来の上限と端数処理を保つ。
+成長の定数は `apps/main/world/core/growth-rules.ts`、関連型は `growth-types.ts` に置く。必要経験値・能力値の消費ポイント・到達時の獲得ポイント・初期能力値・経験値の加算は、それぞれ `exp-to-next.ts`・`stat-cost.ts`・`points-for-level.ts`・`starting-stats.ts`・`gain-exp.ts` が持つ。呼出し元は定義元を参照し、初期能力値は型キャストを使わず全能力を明示する。経験値の加算は入力を変更せず、従来の上限と端数処理を保つ。
 
-生活スキルの上限・節目と表示文言は `world/core/life-rules.ts`、経験値の型は `life-types.ts` が持つ。経験値のしきい値は `life-thresholds.ts` が一度だけ組み立て、読取り専用の列として `life-exp-at.ts` と `life-level.ts` が共用する。加算と合計上限は `gain-life.ts` と `life-total.ts`、初期値と旧保存の変換は `empty-life.ts` と `life-from-proficiency.ts`、忘却は `forgotten-life-exp.ts` に分ける。製作経験・採集量・品質への習熟・次の節目は各定義元から参照し、一覧と保存の能力順は維持する。
+生活スキルの上限・節目と表示文言は `apps/main/world/core/life-rules.ts`、経験値の型は `life-types.ts` が持つ。経験値のしきい値は `life-thresholds.ts` が一度だけ組み立て、読取り専用の列として `life-exp-at.ts` と `life-level.ts` が共用する。加算と合計上限は `gain-life.ts` と `life-total.ts`、初期値と旧保存の変換は `empty-life.ts` と `life-from-proficiency.ts`、忘却は `forgotten-life-exp.ts` に分ける。製作経験・採集量・品質への習熟・次の節目は各定義元から参照し、一覧と保存の能力順は維持する。
 
-持ち物の型は `world/core/bag-types.ts`、枠数は `bag-rules.ts` が持つ。照合・積み重ね・追加・削除・枠の移動はそれぞれ定義元の一関数から呼ぶ。追加と削除の入力は持ち物・品・個数・任意の印を名前で渡す。新品への印と耐久値の付与は `stack-with-mark.ts`、既存の品の受渡しは `put-stack.ts` と分け、消耗した道具の耐久値を新品へ戻さない。
+持ち物の型は `apps/main/world/core/bag-types.ts`、枠数は `bag-rules.ts` が持つ。照合・積み重ね・追加・削除・枠の移動はそれぞれ定義元の一関数から呼ぶ。追加と削除の入力は持ち物・品・個数・任意の印を名前で渡す。新品への印と耐久値の付与は `stack-with-mark.ts`、既存の品の受渡しは `put-stack.ts` と分け、消耗した道具の耐久値を新品へ戻さない。
 
-作り手の癖の表は `world/core/makers.ts`、型は `maker-types.ts` が持つ。標準の作り手・癖の参照・品名・使用効果・価格・流通する品質は `usual-maker.ts`・`trait-of.ts`・`display-name.ts`・`effect-of.ts`・`price-of.ts`・`qualities-of.ts` に分ける。各利用箇所は定義元を参照し、表の並び順と既定の作り手・品質・価格の丸めを保つ。
+作り手の癖の表は `apps/main/world/core/makers.ts`、型は `maker-types.ts` が持つ。標準の作り手・癖の参照・品名・使用効果・価格・流通する品質は `usual-maker.ts`・`trait-of.ts`・`display-name.ts`・`effect-of.ts`・`price-of.ts`・`qualities-of.ts` に分ける。各利用箇所は定義元を参照し、表の並び順と既定の作り手・品質・価格の丸めを保つ。
 
-取引で出す枠の検証と取出しは `world/core/get-trade-out-goods.ts` が持つ。重複する枠・空の枠・取引できない品・不足する個数を断り、入力の持ち物を変更しない。所持金の検証は `trade-out.ts` で先に行い、失敗理由の順序と受渡しの記録を保つ。受取りも全品の格納と重量の検証を終えてから確定する。
+取引で出す枠の検証と取出しは `apps/main/world/core/get-trade-out-goods.ts` が持つ。重複する枠・空の枠・取引できない品・不足する個数を断り、入力の持ち物を変更しない。所持金の検証は `trade-out.ts` で先に行い、失敗理由の順序と受渡しの記録を保つ。受取りも全品の格納と重量の検証を終えてから確定する。
 
-取引の提案と保存記録の型は `world/core/trade-transaction-types.ts` に置く。提案と品列の比較は `same-proposal.ts` と `same-stacks.ts`、保留は `prepare-trade.ts`、確定と取消は `finish-trade.ts` が持つ。保留・確定の入力は名前で渡し、同じ版の再試行で既存の記録を返すこと、古い要求と異なる内容を断ること、確定時に持ち物と所持金だけを反映することを保つ。
+取引の提案と保存記録の型は `apps/main/world/core/trade-transaction-types.ts` に置く。提案と品列の比較は `same-proposal.ts` と `same-stacks.ts`、保留は `prepare-trade.ts`、確定と取消は `finish-trade.ts` が持つ。保留・確定の入力は名前で渡し、同じ版の再試行で既存の記録を返すこと、古い要求と異なる内容を断ること、確定時に持ち物と所持金だけを反映することを保つ。
 
-取引全体の事前検証は `world/core/check-trade.ts` に参加者・各自の提示と時刻を名前で渡す。距離と枠数は `trade-rules.ts`、提示の型は `trade-types.ts`、初期提示は `empty-offer.ts` が持つ。`taken-of.ts` は共通の GameEvent の判別された受渡しイベントから品列を読み、type の文字だけで別のイベントを受渡しの形と仮定しない。双方の送付と受取の順序を保ち、元の状態を変更しない。
+取引全体の事前検証は `apps/main/world/core/check-trade.ts` に参加者・各自の提示と時刻を名前で渡す。距離と枠数は `trade-rules.ts`、提示の型は `trade-types.ts`、初期提示は `empty-offer.ts` が持つ。`taken-of.ts` は共通の GameEvent の判別された受渡しイベントから品列を読み、type の文字だけで別のイベントを受渡しの形と仮定しない。双方の送付と受取の順序を保ち、元の状態を変更しない。
 
-周囲への発言と叫び声の対応表は `world/server/map-room/chat.ts`、受付は `handle-speech.ts` に置く。連投の試行は `world/core/get-speech-attempt.ts` が受理できるかと保存する履歴を返し、拒否した試行も保存してから配信を判断する。`can-receive-speech.ts` は各送信の直前に受信者を調べ、本人、未参加、終了した接続を除く。通常の発言は発言者の位置が分かる場合だけ距離を調べ、位置がなければ配信しない。叫び声は位置の有無によらず部屋全体を対象にする。通知の失敗は既存の通知処理で受け止め、次の対象への配信を続ける。
+周囲への発言と叫び声の対応表は `apps/main/world/server/map-room/chat.ts`、受付は `handle-speech.ts` に置く。連投の試行は `apps/main/world/core/get-speech-attempt.ts` が受理できるかと保存する履歴を返し、拒否した試行も保存してから配信を判断する。`can-receive-speech.ts` は各送信の直前に受信者を調べ、本人、未参加、終了した接続を除く。通常の発言は発言者の位置が分かる場合だけ距離を調べ、位置がなければ配信しない。叫び声は位置の有無によらず部屋全体を対象にする。通知の失敗は既存の通知処理で受け止め、次の対象への配信を続ける。
 
-糸の交換の対応表は `world/server/map-room/threads.ts`、申込みは `handle-thread-ask.ts`、返答は `handle-thread-answer.ts` に置く。申込み先の到達位置がない場合は距離の拒否を返し、保存・通知へ進まない。有効な返答では申込みを消費し、一つの時刻で双方の糸を作る。返答者への保存と結果送信、申込者への保存と結果送信の順を保つ。接続には識別子、送信、状態参照と更新だけを要求し、糸の生成は `world/core/thread-of.ts` に任せる。
+糸の交換の対応表は `apps/main/world/server/map-room/threads.ts`、申込みは `handle-thread-ask.ts`、返答は `handle-thread-answer.ts` に置く。申込み先の到達位置がない場合は距離の拒否を返し、保存・通知へ進まない。有効な返答では申込みを消費し、一つの時刻で双方の糸を作る。返答者への保存と結果送信、申込者への保存と結果送信の順を保つ。接続には識別子、送信、状態参照と更新だけを要求し、糸の生成は `apps/main/world/core/thread-of.ts` に任せる。
 
-パーティの招待は `world/server/map-room/handle-party-invite.ts`、脱退は `handle-party-leave.ts`、分配変更は `handle-party-mode.ts` が受け持つ。`get-party-invitation-rejection.ts` は既存のパーティのリーダーかどうかを満員より先に判定する。招待は接続の招待先を保存してから相手へ通知し、その場で所属を変えない。脱退はパーティの保存先、接続の所属、本人の保存状態の順に更新してから表示を外す。分配の変更権限は保存先に任せる。これらの受付は必要な状態参照・送信・接続の更新だけを引数の型へ表す。
+パーティの招待は `apps/main/world/server/map-room/handle-party-invite.ts`、脱退は `handle-party-leave.ts`、分配変更は `handle-party-mode.ts` が受け持つ。`get-party-invitation-rejection.ts` は既存のパーティのリーダーかどうかを満員より先に判定する。招待は接続の招待先を保存してから相手へ通知し、その場で所属を変えない。脱退はパーティの保存先、接続の所属、本人の保存状態の順に更新してから表示を外す。分配の変更権限は保存先に任せる。これらの受付は必要な状態参照・送信・接続の更新だけを引数の型へ表す。
 
-パーティの対応表は `world/server/map-room/party.ts`、招待への返答は `handle-party-answer.ts` に置く。有効な招待を消費してから辞退と既存の所属を調べ、新規の場合は `initialize-party.ts` で招待者を先に登録する。返答者の登録は `join-party-member.ts` が受け持ち、名簿が拒否した場合は本人の所属を保存せず満員を返す。名簿への追加、本人への保存結果の送信、接続の所属の反映を元の順に進める。`read-party-member.ts` は加入時の本人の保存状態から名簿用の値を作る。加入先の参照は `party-join-types.ts` の必要な RPC だけで渡す。
+パーティの対応表は `apps/main/world/server/map-room/party.ts`、招待への返答は `handle-party-answer.ts` に置く。有効な招待を消費してから辞退と既存の所属を調べ、新規の場合は `initialize-party.ts` で招待者を先に登録する。返答者の登録は `join-party-member.ts` が受け持ち、名簿が拒否した場合は本人の所属を保存せず満員を返す。名簿への追加、本人への保存結果の送信、接続の所属の反映を元の順に進める。`read-party-member.ts` は加入時の本人の保存状態から名簿用の値を作る。加入先の参照は `party-join-types.ts` の必要な RPC だけで渡す。
 
-パーティの定期確認は `world/server/map-room/handle-party-look.ts` が一度の照会で名簿と会話を受け取る。同じパーティの会話番号だけを引き継ぎ、名簿から本人が消えていれば `clear-party-membership.ts` で接続の所属、本人の保存状態、表示の順に後始末する。通常の脱退もパーティの保存先から離れた後に同じ処理を使う。照会が失敗しただけでは所属を消さない。表示を送ってから会話を送り、会話は本人の保存済み所属が接続の所属と一致するときだけ送る。`send-party-chat.ts` は接続の状態参照と送信だけに依存する。
+パーティの定期確認は `apps/main/world/server/map-room/handle-party-look.ts` が一度の照会で名簿と会話を受け取る。同じパーティの会話番号だけを引き継ぎ、名簿から本人が消えていれば `clear-party-membership.ts` で接続の所属、本人の保存状態、表示の順に後始末する。通常の脱退もパーティの保存先から離れた後に同じ処理を使う。照会が失敗しただけでは所属を消さない。表示を送ってから会話を送り、会話は本人の保存済み所属が接続の所属と一致するときだけ送る。`send-party-chat.ts` は接続の状態参照と送信だけに依存する。
 
-パーティ会話の対応表は `world/server/map-room/party-chat.ts`、受付は `handle-party-speech.ts` に置く。本人の保存済み所属と接続の所属を先に照合し、不一致なら名簿の発言受付や履歴の取得へ進まない。保存先が発言を拒否した場合も履歴を取らず拒否だけを通知する。受理後の履歴取得は `deliver-party-chat.ts`、接続の終了の確認と公開用の項目への変換は `send-party-chat.ts` が受け持つ。各処理は `party-chat-types.ts` の状態参照と送信だけを持つ接続を受け取る。
+パーティ会話の対応表は `apps/main/world/server/map-room/party-chat.ts`、受付は `handle-party-speech.ts` に置く。本人の保存済み所属と接続の所属を先に照合し、不一致なら名簿の発言受付や履歴の取得へ進まない。保存先が発言を拒否した場合も履歴を取らず拒否だけを通知する。受理後の履歴取得は `deliver-party-chat.ts`、接続の終了の確認と公開用の項目への変換は `send-party-chat.ts` が受け持つ。各処理は `party-chat-types.ts` の状態参照と送信だけを持つ接続を受け取る。
 
-対面取引の対応表は `world/server/map-room/trade.ts`、決定と交換の受付は `handle-trade-confirmation.ts` に置く。`get-trade-confirmation-participants.ts` が現在の双方の取引と所有者を照合し、双方の確定を通信前に予約する。`settle-map-trade.ts` は事前検査、保存先での進行、状態通知、終了を順に呼ぶ。保存状態の読取りと検査は `prepare-trade-settlement.ts`、提示の品列と各参加者の版から提案を作る処理は `get-trade-proposals.ts` が持つ。`advance-trade-settlement.ts` は所有者順で担当を一つ決め、登録後の進行を保存境界ごとに呼ぶ。予約開始前の例外と開始後の応答喪失を区別し、保存済みの処理は逆送付で補償せずアラームの回復に任せる。確定後の状態通知は `publish-settled-trade.ts`、同じ取引だけの終了と通知は `close-settled-trade.ts` に置く。必要な RPC の型は `trade-settlement-types.ts` で限定する。
+対面取引の対応表は `apps/main/world/server/map-room/trade.ts`、決定と交換の受付は `handle-trade-confirmation.ts` に置く。`get-trade-confirmation-participants.ts` が現在の双方の取引と所有者を照合し、双方の確定を通信前に予約する。`settle-map-trade.ts` は事前検査、保存先での進行、状態通知、終了を順に呼ぶ。保存状態の読取りと検査は `prepare-trade-settlement.ts`、提示の品列と各参加者の版から提案を作る処理は `get-trade-proposals.ts` が持つ。`advance-trade-settlement.ts` は所有者順で担当を一つ決め、登録後の進行を保存境界ごとに呼ぶ。予約開始前の例外と開始後の応答喪失を区別し、保存済みの処理は逆送付で補償せずアラームの回復に任せる。確定後の状態通知は `publish-settled-trade.ts`、同じ取引だけの終了と通知は `close-settled-trade.ts` に置く。必要な RPC の型は `trade-settlement-types.ts` で限定する。
 
-対面取引の招待は `world/server/map-room/handle-trade-ask.ts`、取消は `handle-trade-cancel.ts` が扱う。招待先の到達位置がない場合は距離の拒否として扱い、招待を保存・送信しない。招待の受付は必要な接続の識別子と送信、相手の状態参照だけを受け取り、参加状態の読取りも接続全体を要求しない。`same-trade.ts` で相手と共有の取引識別子を照合し、同じ相手との次の取引を古い処理が閉じない。取消と確定後の終了通知で同じ照合を使い、確定処理を始めた取引は取消操作で外さない。
+対面取引の招待は `apps/main/world/server/map-room/handle-trade-ask.ts`、取消は `handle-trade-cancel.ts` が扱う。招待先の到達位置がない場合は距離の拒否として扱い、招待を保存・送信しない。招待の受付は必要な接続の識別子と送信、相手の状態参照だけを受け取り、参加状態の読取りも接続全体を要求しない。`same-trade.ts` で相手と共有の取引識別子を照合し、同じ相手との次の取引を古い処理が閉じない。取消と確定後の終了通知で同じ照合を使い、確定処理を始めた取引は取消操作で外さない。
 
-対面取引の招待への返答は `world/server/map-room/handle-trade-answer.ts` が受け持つ。返答時の辞退・参加状態・距離の判定は純粋な `get-trade-answer.ts` に置き、辞退、参加状態、距離の順で理由を決める。受入れた場合は同じ時刻で確認した双方の停止地点を返し、受付は位置を計算し直さず保存する。停止地点は元の経路から写す。`reject-trade-invitation.ts` は招待者の招待を外し、返答者が別に始めた取引を取消通知で閉じない。受諾時だけ共有の識別子を作って双方の取引を開く。`create-open-trade-side.ts` は参加者ごとに独立した提示と承認の初期状態を作る。入力は `trade-answer-types.ts` に置き、必要な接続の読取り・保存・送信だけを要求する。
+対面取引の招待への返答は `apps/main/world/server/map-room/handle-trade-answer.ts` が受け持つ。返答時の辞退・参加状態・距離の判定は純粋な `get-trade-answer.ts` に置き、辞退、参加状態、距離の順で理由を決める。受入れた場合は同じ時刻で確認した双方の停止地点を返し、受付は位置を計算し直さず保存する。停止地点は元の経路から写す。`reject-trade-invitation.ts` は招待者の招待を外し、返答者が別に始めた取引を取消通知で閉じない。受諾時だけ共有の識別子を作って双方の取引を開く。`create-open-trade-side.ts` は参加者ごとに独立した提示と承認の初期状態を作る。入力は `trade-answer-types.ts` に置き、必要な接続の読取り・保存・送信だけを要求する。
 
-対面取引の提示の受付は `world/server/map-room/handle-trade-offer.ts` が持つ。持ち物を読む前に提示の版を進め、読取り後に `get-current-trade-offer.ts` で双方の接続、取引識別子、相手、提示の版と状態を照合する。一致した双方の取引を得てから表示用の品を作り、両方の承認を外す。相手だけが決定済みでも新しい提示を受け付けるが、本人の決定後や双方の確定処理中は変更しない。
+対面取引の提示の受付は `apps/main/world/server/map-room/handle-trade-offer.ts` が持つ。持ち物を読む前に提示の版を進め、読取り後に `get-current-trade-offer.ts` で双方の接続、取引識別子、相手、提示の版と状態を照合する。一致した双方の取引を得てから表示用の品を作り、両方の承認を外す。相手だけが決定済みでも新しい提示を受け付けるが、本人の決定後や双方の確定処理中は変更しない。
 
-対面取引の表示メッセージは `world/server/map-room/get-trade-view.ts` が参加者ごとの向きで作る。操作に使う提示枠の配列は本人の分だけを写し、相手の枠番号を送らない。`show-trade.ts` は双方の提示と姿があることを確認してから順に送る。最初の送信失敗では次の送信へ進まず、呼出し元へ失敗を返す。確定後の状態通知で使う全件の送信結果待ちとは区別する。
+対面取引の表示メッセージは `apps/main/world/server/map-room/get-trade-view.ts` が参加者ごとの向きで作る。操作に使う提示枠の配列は本人の分だけを写し、相手の枠番号を送らない。`show-trade.ts` は双方の提示と姿があることを確認してから順に送る。最初の送信失敗では次の送信へ進まず、呼出し元へ失敗を返す。確定後の状態通知で使う全件の送信結果待ちとは区別する。
 
-対面取引の提示品の写しは `world/core/get-trade-offer-presentation.ts` が作る。持ち物・所持金と提示を受け取り、枠数の上限、空の枠、個数不足、取引できない品、重複する枠、所持金不足を検査する。この段階では品物を予約せず、通信の後に同じ取引かを確認する処理は部屋に残す。確定時の保存先での再検証も省かない。
+対面取引の提示品の写しは `apps/main/world/core/get-trade-offer-presentation.ts` が作る。持ち物・所持金と提示を受け取り、枠数の上限、空の枠、個数不足、取引できない品、重複する枠、所持金不足を検査する。この段階では品物を予約せず、通信の後に同じ取引かを確認する処理は部屋に残す。確定時の保存先での再検証も省かない。
 
 風車の敷地に添える接続路は `scripts/lib/get-windmill-road-approach.ts` が南の実寸の開口と既存の道の終端から求める。作業場と接続路の全幅を一緒に農地から差し引き、全ての残存片と面積を保持する。接続路の各区間も他の計画から見える予約へ登録し、最初の区間の自分の開口と最後の区間の接続先の道だけを対応する干渉の例外とする。地形・搬送する身体・収量を検証済みにせず、未採用の案として検査する。
 
-戦闘計算の型は `world/core/combat-types.ts`、損失を免除するレベルは `combat-rules.ts` が持つ。命中率・通常攻撃・戦技と術・戦闘不能時の経験値の損失は `hit-chance.ts`・`swing.ts`・`art-swing.ts`・`death-penalty.ts` に分ける。戦技の入力は名前で渡し、会心時に回避の乱数を消費しないことと、術では威力の乱数だけを使うことを含め、判定と乱数の消費順を維持する。
+戦闘計算の型は `apps/main/world/core/combat-types.ts`、損失を免除するレベルは `combat-rules.ts` が持つ。命中率・通常攻撃・戦技と術・戦闘不能時の経験値の損失は `hit-chance.ts`・`swing.ts`・`art-swing.ts`・`death-penalty.ts` に分ける。戦技の入力は名前で渡し、会心時に回避の乱数を消費しないことと、術では威力の乱数だけを使うことを含め、判定と乱数の消費順を維持する。
 
-能力値の計算は `world/core/derive.ts` が装備補正・補正済み能力値・防御の集計を組み立て、`get-derived-stats.ts` が共有の式を持つ。関連型は `stats-types.ts` に置く。品質による基礎性能は `equipment-attack.ts` と `equipment-defense.ts`、能力補正は `scaling.ts`、補正前の条件の値と不足判定は `standing.ts` と `unmet.ts` が持つ。条件の定義順を保ち、未知の名前を型キャストで通したり無視したりせず不正な定義として検出する。
+能力値の計算は `apps/main/world/core/derive.ts` が装備補正・補正済み能力値・防御の集計を組み立て、`get-derived-stats.ts` が共有の式を持つ。関連型は `stats-types.ts` に置く。品質による基礎性能は `equipment-attack.ts` と `equipment-defense.ts`、能力補正は `scaling.ts`、補正前の条件の値と不足判定は `standing.ts` と `unmet.ts` が持つ。条件の定義順を保ち、未知の名前を型キャストで通したり無視したりせず不正な定義として検出する。
 
-プレイヤー状態の型は `world/core/player-types.ts`、初期値と時間・外見の定数は `player-rules.ts`、保存とプロフィールの検証は `player-schema.ts` に置く。初期化は `new-player.ts`、厳密な復元は `parse-player.ts`、新品への代用を明示した互換入口は `load-player.ts` が持つ。旧保存の変換は `from-v2.ts`・`get-v2-player-base.ts`・`to-legacy-hotbar-entry.ts` に分け、旧装備を袋へ返せるかと旧ショートカットを照合する。自然回復は `settle.ts` と `recover-vital.ts`、満腹と温まりは `full-now.ts` と `warm-now.ts`、装備した首巻きの表示は `worn-neck.ts` が持つ。保存形式と既定値の順序・回復時刻の境界を保ち、読めない保存を新品へ置き換えない入口は維持する。
+プレイヤー状態の型は `apps/main/world/core/player-types.ts`、初期値と時間・外見の定数は `player-rules.ts`、保存とプロフィールの検証は `player-schema.ts` に置く。初期化は `new-player.ts`、厳密な復元は `parse-player.ts`、新品への代用を明示した互換入口は `load-player.ts` が持つ。旧保存の変換は `from-v2.ts`・`get-v2-player-base.ts`・`to-legacy-hotbar-entry.ts` に分け、旧装備を袋へ返せるかと旧ショートカットを照合する。印のない古い作られる物への印の補充は、どの版から読んだ状態にも `parse-player.ts` が `mark-old-goods.ts` で行う。自然回復は `settle.ts` と `recover-vital.ts`、満腹と温まりは `full-now.ts` と `warm-now.ts`、装備した首巻きの表示は `worn-neck.ts` が持つ。保存形式と既定値の順序・回復時刻の境界を保ち、読めない保存を新品へ置き換えない入口は維持する。
 
-頼まれごとの定義表は `world/core/errands.ts`、型は `errand-types.ts`、受注数と日ごとの上限は `errand-rules.ts` に置く。材料と届け先の必須項目は `bring-errand.ts` と `deliver-errand.ts` が持つ。日替わりの選定は `get-errand-requests.ts` と `hash-errand-day.ts` が担当し、保持する結果は直近の一日分に限る。`errand-today.ts` と `errands-on.ts` は同じ選定を読み、一覧は住民の定義順を維持する。受注の期限・名前・会話の進行条件は `todays.ts`・`errand-label.ts`・`errand-progress.ts` と `get-errand-phase.ts` が持ち、材料が揃ったことを完了と取り違えない。
+頼まれごとの定義表は `apps/main/world/core/errands.ts`、型は `errand-types.ts`、受注数と日ごとの上限は `errand-rules.ts` に置く。材料と届け先の必須項目は `bring-errand.ts` と `deliver-errand.ts` が持つ。日替わりの選定は `get-errand-requests.ts` と `hash-errand-day.ts` が担当し、保持する結果は直近の一日分に限る。`errand-today.ts` と `errands-on.ts` は同じ選定を読み、一覧は住民の定義順を維持する。受注の期限・名前・会話の進行条件は `todays.ts`・`errand-label.ts`・`errand-progress.ts` と `get-errand-phase.ts` が持ち、材料が揃ったことを完了と取り違えない。その時刻に住民が頼むかどうかは住民の予定と位置で決まるので `apps/main/world/maps/can-ask-errand.ts` に置き、会話の選択肢（`errand-choices.ts`）と部屋の受注（`handle-errand.ts`）が同じ時計の分で呼ぶ。`take-errand.ts` は時刻の判定を持たない。
 
-依頼完了時の親しさは `world/core/get-errand-friendship.ts` が持込みと配達で分ける。配達の依頼元と受取人の増加は順に反映し、変更された相手だけを完了イベントへ載せる。材料が不足する場合や期限切れ・完了済みの場合は、報酬や親しさを更新しない。
+依頼完了時の親しさは `apps/main/world/core/get-errand-friendship.ts` が持込みと配達で分ける。配達の依頼元と受取人の増加は順に反映し、変更された相手だけを完了イベントへ載せる。材料が不足する場合や期限切れ・完了済みの場合は、報酬や親しさを更新しない。
 
-戦闘の通知と受領記録の型は `world/core/combat-delivery-types.ts`、内容の比較は `same-combat-command.ts`、重複と世代・取引の予約を確認した受領は `receive-combat.ts` が持つ。受領の入力は名前で渡し、既読の再送では新しい受領記録やイベントを作らない。保存入口も結果と受領記録を分割代入せず、同じ応答の属性として扱う。
+戦闘の通知と受領記録の型は `apps/main/world/core/combat-delivery-types.ts`、内容の比較は `same-combat-command.ts`、重複と世代・取引の予約を確認した受領は `receive-combat.ts` が持つ。受領の入力は名前で渡し、既読の再送では新しい受領記録やイベントを作らない。保存入口も結果と受領記録を分割代入せず、同じ応答の属性として扱う。
 
-売買の見積りと受領記録の型は `world/core/shop-receipt-types.ts`、要求と見積りの比較は `same-shop-command.ts` と `same-shop-quote.ts`、現在の予約・品を確認する適用は `get-shop-quote-result.ts` に置く。`receive-shop.ts` は保存済みの結果を先に読み、廃止された品の古い受領も再実行せずに再送へ返す。新しい見積りはコマンドと単価を検証し、成功と拒否の両方を記録する。
+売買の見積りと受領記録の型は `apps/main/world/core/shop-receipt-types.ts`、要求と見積りの比較は `same-shop-command.ts` と `same-shop-quote.ts`、現在の予約・品を確認する適用は `get-shop-quote-result.ts` に置く。`receive-shop.ts` は保存済みの結果を先に読み、廃止された品の古い受領も再実行せずに再送へ返す。新しい見積りはコマンドと単価を検証し、成功と拒否の両方を記録する。
 
-採集の要求と受領記録の型は `world/core/gather-receipt-types.ts`、受領の判定と適用は `receive-gather.ts` が持つ。入力は状態・直前の受領・要求・時刻と予約を名前で渡す。同じ ID と抽選の再送は現在の場所の定義を読み直す前に記録済みの成功・拒否を返し、新しい抽選では場所と乱数の範囲を検証する。保存入口は結果と受領記録を同じ応答の属性から読む。
+採集の要求と受領記録の型は `apps/main/world/core/gather-receipt-types.ts`、受領の判定と適用は `receive-gather.ts` が持つ。入力は状態・直前の受領・要求・時刻と予約を名前で渡す。同じ ID と抽選の再送は現在の場所の定義を読み直す前に記録済みの成功・拒否を返し、新しい抽選では場所と乱数の範囲を検証する。保存入口は結果と受領記録を同じ応答の属性から読む。
 
-採集場所の表は `world/core/gather.ts`、型は `gather-types.ts`、距離と基本の消費は `gather-rules.ts` に置く。木・きのこ・薬草・花・釣り場の生成は `tree-node.ts`・`mushroom-node.ts`・`herb-node.ts`・`flower-node.ts`・`fish-node.ts` が持つ。場所の参照は `node-of.ts`、成果の重みと習熟・道具の追加分は `yield-of.ts` が扱う。座標と定義順、節目で開く物・重み・回復量と時刻、抽選値の使い方は保つ。
+採集場所の表は `apps/main/world/core/gather.ts`、型は `gather-types.ts`、距離と基本の消費は `gather-rules.ts` に置く。木・きのこ・薬草・花・釣り場の生成は `tree-node.ts`・`mushroom-node.ts`・`herb-node.ts`・`flower-node.ts`・`fish-node.ts` が持つ。場所の参照は `node-of.ts`、成果の重みと習熟・道具の追加分は `yield-of.ts` が扱う。座標と定義順、節目で開く物・重み・回復量と時刻、抽選値の使い方は保つ。
 
 風車の敷地と接続路の検査用地形の測定は `scripts/lib/get-windmill-site-terrain.ts` が担当する。`lib/engine/scalar-field-range.ts` を使い、格子内部の極値と切られた境界を含む標高の範囲を共通の縮尺でメートルへ換算する。入力の領域と地形を変更せず、地形の保持範囲外は拒否する。道路の配置案を反映した地形を使い、実行時の元の道に対応する地形とは区別する。設定検査の `--terrain-report` は測定だけを出力し、設計ゲートと未照合状態を変更しない。
 
@@ -1256,10 +1262,10 @@ React との共有の定義は `components/game/game-context.ts` に一つだけ
 風車の接続路の施工面の予約は `scripts/lib/get-windmill-approach-surface.ts` が水平な曲がり角の西端と道路の継目から求める。最初の区間との重なりは水平に保ち、それより西を道の全幅の横断形状へなじませる。`get-windmill-approach-surface-height.ts` は道路側の端では元の地形の高さを返し、中間は横断位置ごとの線形の配分で求める。継目の標高の全範囲から最大の縦断勾配を照合し、中心線だけで全幅を通過させない。これは設定の未採用の施工面であり、地形・歩行格子は変更しない。
 
 
-店の定義表は `world/core/shops.ts`、関連する型は `shop-types.ts`、種別の表示名は `shop-kind-names.ts` が持つ。ID の判定は `is-shop-id.ts`、店番から店を選ぶ処理は `shop-of-keeper.ts`、買い取りの種類別の倍率と切捨ては `shop-buys.ts` から直接参照する。店番の店は営業中を先に探し、見つからなければ元の定義順の最初の店を返す。型の強制変換と再公開でこれらの処理を定義表へ戻さない。
+店の定義表は `apps/main/world/core/shops.ts`、関連する型は `shop-types.ts`、種別の表示名は `shop-kind-names.ts` が持つ。ID の判定は `is-shop-id.ts`、店番から店を選ぶ処理は `shop-of-keeper.ts`、買い取りの種類別の倍率と切捨ては `shop-buys.ts` から直接参照する。店番の店は営業中を先に探し、見つからなければ元の定義順の最初の店を返す。型の強制変換と再公開でこれらの処理を定義表へ戻さない。
 
 
-水瓶を持つ一姿勢の身体との離隔は、`world/scene/figure/create-native-body-frame.ts` で解いた姿勢の人体形状を一度だけ作り、前腕・瓶・取っ手の各検査で共用する。`get-native-body.ts` は look と skeleton の参照が異なる準備済みの形状を拒否し、単独の検査では従来どおり形状を作る。共有は一回の同期した検査の中に閉じ、人物やフレームをまたぐキャッシュにはしない。姿勢・動作の全フレームと離隔の検査条件は保持する。 静止した受取りと後退の各標本でも、同じ解いた姿勢から作る人体を棚と床の検査で共用する。床の照合では瓶の形状も従来どおり追加する。握りの有無が異なる持上げ区間の人体を、この共有へ混ぜない。
+水瓶を持つ一姿勢の身体との離隔は、`apps/main/world/scene/figure/create-native-body-frame.ts` で解いた姿勢の人体形状を一度だけ作り、前腕・瓶・取っ手の各検査で共用する。`get-native-body.ts` は look と skeleton の参照が異なる準備済みの形状を拒否し、単独の検査では従来どおり形状を作る。共有は一回の同期した検査の中に閉じ、人物やフレームをまたぐキャッシュにはしない。姿勢・動作の全フレームと離隔の検査条件は保持する。 静止した受取りと後退の各標本でも、同じ解いた姿勢から作る人体を棚と床の検査で共用する。床の照合では瓶の形状も従来どおり追加する。握りの有無が異なる持上げ区間の人体を、この共有へ混ぜない。
 
 手足と髪の距離場の囲いは `lib/graphics/ray/get-limb-envelope.ts` が関節の球を一度走査して求める。球の中心・半径と軸方向の範囲の式、距離場と細分する判定は変更しない。境界を作るだけの一時配列を減らすことと、判定の対象や精度を減らすことを区別する。
 
@@ -1267,71 +1273,71 @@ React との共有の定義は `components/game/game-context.ts` に一つだけ
 棚の検証は `scripts/lib/create-front-access-plan-frame.ts` で一回の呼出しに閉じた固定計画の読取りを用意する。`get-front-access-handle-plan.ts` は同じ部屋・建物・収納のときだけ共有し、実際の組立ては `calculate-front-access-handle-plan.ts` が最初に必要になった位置で一度行う。最初の検査の順序は保ち、手・足・全身の各標本と区間の検査は毎回行う。入力を変えた次の検証や別の所有者には計画を持ち越さない。
 
 
-取引所の型は `world/core/exchange-types.ts`、上限・期間と手数料の率は `exchange-rules.ts` に置く。新しい銘柄の読取りは `parse-symbol.ts`、表記への変換は `symbol-key.ts`、新しい注文の拒否理由は `order-failure.ts`、預かる額は `escrow-for.ts`、初期状態は `empty-exchange.ts` が持つ。新規の銘柄の表記を厳しく検証することと、保存済み注文の返却時に旧表記を読み戻すことは別の契約にし、後者へ現在の取引可否を押し付けない。品質の数値の判定は `is-quality.ts` を使い、強制変換で型を与えない。
+取引所の型は `apps/main/world/core/exchange-types.ts`、上限・期間と手数料の率は `exchange-rules.ts` に置く。新しい銘柄の読取りは `parse-symbol.ts`、表記への変換は `symbol-key.ts`、新しい注文の拒否理由は `order-failure.ts`、預かる額は `escrow-for.ts`、初期状態は `empty-exchange.ts` が持つ。新規の銘柄の表記を厳しく検証することと、保存済み注文の返却時に旧表記を読み戻すことは別の契約にし、後者へ現在の取引可否を押し付けない。品質の数値の判定は `is-quality.ts` を使い、強制変換で型を与えない。
 
 
-取引所の約定の入口は `world/core/place.ts` に置き、`create-exchange-placement.ts` が呼出し元の状態を複製して一回の約定用の状態を作る。`get-matching-orders.ts` は相手注文を価格・時刻で選び、同順位では元の順序を保つ。`fill-exchange-order.ts` は一件の数量・予算・手数料と配送を反映し、`finish-exchange-order.ts` が残りの注文と返金を確定する。取消は `cancel.ts`、期限切れは `expire.ts` に分ける。取消と期限切れは `give-back-order.ts` から返却し、保存済みの印を `held-exchange-item.ts` で復元する。`credit-exchange-inbox.ts` と `record-exchange-fill.ts` は約定・取消が作った作業用の複製だけを更新し、呼出し元の状態は変更しない。日別の記録は `get-exchange-day.ts` で同じ日付の境界を使う。板の問い合わせは `book.ts` と `get-book-side.ts` が価格別の数量と両側の順序をまとめる。
+取引所の約定の入口は `apps/main/world/core/place.ts` に置き、`create-exchange-placement.ts` が呼出し元の状態を複製して一回の約定用の状態を作る。`get-matching-orders.ts` は相手注文を価格・時刻で選び、同順位では元の順序を保つ。`fill-exchange-order.ts` は一件の数量・予算・手数料と配送を反映し、`finish-exchange-order.ts` が残りの注文と返金を確定する。取消は `cancel.ts`、期限切れは `expire.ts` に分ける。取消と期限切れは `give-back-order.ts` から返却し、保存済みの印を `held-exchange-item.ts` で復元する。`credit-exchange-inbox.ts` と `record-exchange-fill.ts` は約定・取消が作った作業用の複製だけを更新し、呼出し元の状態は変更しない。日別の記録は `get-exchange-day.ts` で同じ日付の境界を使う。板の問い合わせは `book.ts` と `get-book-side.ts` が価格別の数量と両側の順序をまとめる。
 
 
 ## 復帰位置と糸の訪問権限
 
-保存する経路と接続の型は `world/core/location-types.ts` に置く。`location-at.ts` は歩き終えた経路区間だけを経過時間から求め、`town-location.ts` は世界を移ったときの新しい町の経路を作る。入室・歩行・マップ移動・切断・復活の位置更新は `world/server/arrive-player.ts`・`walk-player.ts`・`travel-player.ts`・`leave-player.ts`・`revive-player-at-home.ts` に分け、入力の型を `player-location-types.ts` に置く。各処理は受け取った時刻と保存中の接続・生存状態を使い、Player DO の入口が同じ RPC と保存単位で呼ぶ。切断の進捗と保存時刻には同じ時刻を使う。復活先の経路は戻る場所の読み取り専用のセルと参照を共有しない。
+保存する経路と接続の型は `apps/main/world/core/location-types.ts` に置く。`location-at.ts` は歩き終えた経路区間だけを経過時間から求め、`town-location.ts` は世界を移ったときの新しい町の経路を作る。入室・歩行・マップ移動・切断・復活の位置更新は `apps/main/world/server/arrive-player.ts`・`walk-player.ts`・`travel-player.ts`・`leave-player.ts`・`revive-player-at-home.ts` に分け、入力の型を `player-location-types.ts` に置く。各処理は受け取った時刻と保存中の接続・生存状態を使い、Player DO の入口が同じ RPC と保存単位で呼ぶ。切断の進捗と保存時刻には同じ時刻を使う。復活先の経路は戻る場所の読み取り専用のセルと参照を共有しない。
 
-糸の型と保持上限は `world/core/threads.ts`、保存済みの公開識別子の計算は `thread-key.ts`、相手の糸の生成は `thread-of.ts` に置く。`keep.ts` が同じ相手の置換と古い糸の除外を行い、`may-visit.ts` が自分の町と保持した糸の町への訪問を判定する。識別子の計算順序を分離で変えず、保存済みの糸を別の相手として扱わない。
+糸の型と保持上限は `apps/main/world/core/threads.ts`、保存済みの公開識別子の計算は `thread-key.ts`、相手の糸の生成は `thread-of.ts` に置く。`keep.ts` が同じ相手の置換と古い糸の除外を行い、`may-visit.ts` が自分の町と保持した糸の町への訪問を判定する。識別子の計算順序を分離で変えず、保存済みの糸を別の相手として扱わない。
 
 
 ## 生き物の傷と戦闘の占有
 
-マップのチャンネル内の生き物の状態と公開値の型は `world/core/wild/types.ts` に置く。`empty-wild.ts` が初期状態を作り、`about.ts` は復帰時刻、`fighting.ts` は戦闘相手の占有期限を判定する。`hp-of.ts` は不在・回復中と、戦闘が途切れたときの全快を同じ状態と時刻から求める。
+マップのチャンネル内の生き物の状態と公開値の型は `apps/main/world/core/wild/types.ts` に置く。`empty-wild.ts` が初期状態を作り、`about.ts` は復帰時刻、`fighting.ts` は戦闘相手の占有期限を判定する。`hp-of.ts` は不在・回復中と、戦闘が途切れたときの全快を同じ状態と時刻から求める。
 
-`hit.ts` が占有と復帰時刻を確かめてから命中を反映する。外れでも占有を始め、別の相手の占有中は元の状態を返して拒む。討伐時には傷と占有を外し、定義された復帰時刻を保存する。`view-wild.ts` は同じ判定でマップの公開値を作る。サーバー側の要求の再送と報酬の保存は引き続き `world/server/begin-strike.ts`・`advance-strike.ts`・`deliver-strike.ts`・`recover-strikes.ts` が担当し、保存の型は `wild-record.ts` が持つ。
+`hit.ts` が占有と復帰時刻を確かめてから命中を反映する。外れでも占有を始め、別の相手の占有中は元の状態を返して拒む。討伐時には傷と占有を外し、定義された復帰時刻を保存する。`view-wild.ts` は同じ判定でマップの公開値を作る。サーバー側の要求の再送と報酬の保存は引き続き `apps/main/world/server/begin-strike.ts`・`advance-strike.ts`・`deliver-strike.ts`・`recover-strikes.ts` が担当し、保存の型は `wild-record.ts` が持つ。
 
 
 ## 武器の形と金属の組立て
 
-`world/core/items/weapon-shapes.ts` と `remade-weapons.ts` は形の基礎値、`weapon-metals.ts` は金属の係数と呼び名・説明の断片を持つ。`weapon-types.ts` が形と金属から品目 ID を導く。`weapon.ts` が元の丸め順序で品目を作り、`weapons.ts` は全ての組合せを明示した定義表を持つ。形や金属を増やして組合せが欠けた場合は型検査で検出し、途中まで埋めた表を完成した Record として型変換しない。形の資料は `/dev` の品目一覧で展開済みの武器へ対応する。
+`apps/main/world/core/items/weapon-shapes.ts` と `remade-weapons.ts` は形の基礎値、`weapon-metals.ts` は金属の係数と呼び名・説明の断片を持つ。`weapon-types.ts` が形と金属から品目 ID を導く。`weapon.ts` が元の丸め順序で品目を作り、`weapons.ts` は全ての組合せを明示した定義表を持つ。形や金属を増やして組合せが欠けた場合は型検査で検出し、途中まで埋めた表を完成した Record として型変換しない。形の資料は開発アプリの品目一覧で展開済みの武器へ対応する。
 
 `forge-of.ts` と `iron-forge-of.ts` が素材と節目を返し、`weapons-of.ts` は形の名前全体を使って対応する武器を選ぶ。保持する鉄の武器の ID は `iron-weapon-id.ts` で作り、`is-shape-id.ts` と `is-weapon-id.ts` は定義表の所有キーへ型を絞る。識別子・定義順・品目の値・素材の順序を、分割によって変えない。
 
 
 ## 品目の定義を組み立てる入力
 
-`world/core/items/catalog.ts` は各品目の名前付きの入力を持ち、`food.ts`・`dish.ts`・`medicine.ts`・`brewed-medicine.ts`・`tool.ts`・`material.ts`・`gear.ts`・`crafted-gear.ts` へ渡す。関連する入力の型は `factory-types.ts` にまとめる。重さと希少度の省略時の値、回復の式、積み重ねる数、製作品の印と元の use・equip の参照は分離で変えない。
+`apps/main/world/core/items/catalog.ts` は各品目の名前付きの入力を持ち、`food.ts`・`dish.ts`・`medicine.ts`・`brewed-medicine.ts`・`tool.ts`・`material.ts`・`gear.ts`・`crafted-gear.ts` へ渡す。関連する入力の型は `factory-types.ts` にまとめる。重さと希少度の省略時の値、回復の式、積み重ねる数、製作品の印と元の use・equip の参照は分離で変えない。
 
 品目 ID の一覧は `item-ids.ts` で定義表の所有キーへ絞って作り、列挙結果を型変換しない。品目の識別は既存の `is-item-id.ts` に揃える。定義表からこの識別処理へ戻る実行時の循環参照を作らない。
 
 
 ## 部屋の識別と表示・計測の小さな処理
 
-町と定員の定義は `world/channels.ts` に残し、部屋の名前は `room-name.ts` と `parse-room.ts`、故郷は `hometown-of.ts`、入室先の選択は `choose-channel.ts` に置く。通信の形は `protocol.ts` に残し、経路の受入れは `valid-path.ts` と `adjacent-cells.ts`、経過時間による到達範囲は `cells-reached.ts` に分ける。
+町と定員の定義は `apps/main/world/channels.ts` に残し、部屋の名前は `room-name.ts` と `parse-room.ts`、故郷は `hometown-of.ts`、入室先の選択は `choose-channel.ts` に置く。通信の形は `protocol.ts` に残し、経路の受入れは `valid-path.ts` と `adjacent-cells.ts`、経過時間による到達範囲は `cells-reached.ts` に分ける。
 
 会話と画面の状態の型は `state.ts` が持ち、文字の表示量は `revealed.ts` と `fully-shown.ts` が同じ速度で求める。計測の操作は `lap-start.ts`・`lap.ts`・`lap-end.ts` に分け、`diagnostics.ts` の一つの時計を共有する。既存の全体履歴と開発時の場面の公開先は同じグローバルオブジェクトへ結び、`expose-scene.ts` は開発時だけ更新する。
 
 
 ## 町の定義と判定の所有者
 
-建物と世帯の表は `world/town/houses.ts`、品物の実寸は `fit.ts`、日課は `routines.ts`、登録した室内は `interiors.ts` に残す。世帯・階数・寝床・席と入室可否、家具の展開と床への収まり、外観の選択はそれぞれの関数のファイルが持つ。`floorplan/floor-plan.ts` は一度求めた間取りの同じ参照を返し、`plan-of.ts` は個別の建物から求める。外観の選択も元の建物順と近隣の比較順を保ち、一度確定したものを再計算しない。
+建物と世帯の表は `apps/main/world/town/houses.ts`、品物の実寸は `fit.ts`、日課は `routines.ts`、登録した室内は `interiors.ts` に残す。世帯・階数・寝床・席と入室可否、家具の展開と床への収まり、外観の選択はそれぞれの関数のファイルが持つ。`floorplan/floor-plan.ts` は一度求めた間取りの同じ参照を返し、`plan-of.ts` は個別の建物から求める。外観の選択も元の建物順と近隣の比較順を保ち、一度確定したものを再計算しない。
 
 室内の組立ては `interior-plan.ts`、歩けるセルは `is-interior-cell-open.ts` と `interior-rows.ts` が持つ。共有する地図の大きさと投影倍率は `interior-rules.ts` に置き、登録した室内から組立てへ戻る循環参照を作らない。入口・家具・階段の通行条件と寸法を分割で変えない。`slot-at.ts` と `spot-at.ts` は日課の同じ索引と来客順を共有する。活動姿勢の座標変換は `project-activity-pose.ts`、台詞の条件判定と選択は `lines/fit.ts` と `pick.ts` が持つ。棚・炉・持替え・蓋は操作ごとの名前付き入力を使い、関連する形の型だけを元のファイルで共有する。
 
 
 ## 会話と通知・描画用の小さな変換
 
-会話の店の状態・依頼の選択・操作の選択・役目のある人が最初に出す選択肢・台詞の選択は `world/parts/keeping-shop.ts`・`errand-choices.ts`・`choices-for.ts`・`menu-for.ts`・`lines-for.ts` が持つ。台詞には名前付きの入力で状態・住民・既読の保存先と時刻を渡し、既読の読取りは `read-spoken-names.ts` に分ける。出来事の通知は `tell.ts`、交流が終了した理由の文言はそれぞれの `*-closed-text.ts` に置く。分離によって表示文言や通知・履歴の順を変えない。
+会話の店の状態・依頼の選択・操作の選択・役目のある人が最初に出す選択肢・台詞の選択は `apps/main/world/parts/keeping-shop.ts`・`errand-choices.ts`・`choices-for.ts`・`menu-for.ts`・`lines-for.ts` が持つ。台詞には名前付きの入力で状態・住民・既読の保存先と時刻を渡し、既読の読取りは `read-spoken-names.ts` に分ける。出来事の通知は `tell.ts`、交流が終了した理由の文言はそれぞれの `*-closed-text.ts` に置く。分離によって表示文言や通知・履歴の順を変えない。
 
-プロフィールの下書きは `world/client/profile-draft.ts` の同じスキーマで読み、読取りと書込みは `read-profile-draft.ts` と `write-profile-draft.ts` に分ける。敵の更新は `current-creature.ts` と `merge-wild.ts` が同じ個体の版を比較し、遅い更新を捨てても別の個体の新しい情報を失わない。ピクセルの定義表は `world/art/pixel-art.ts` に残し、文字配列の変換と空き装備枠の影は `sprite.ts` と `silhouette.ts`、品目用の色の変換は `items/` の関数の定義元を直接参照する。
+プロフィールの下書きは `apps/main/world/client/profile-draft.ts` の同じスキーマで読み、読取りと書込みは `read-profile-draft.ts` と `write-profile-draft.ts` に分ける。敵の更新は `current-creature.ts` と `merge-wild.ts` が同じ個体の版を比較し、遅い更新を捨てても別の個体の新しい情報を失わない。ピクセルの定義表は `apps/main/world/art/pixel-art.ts` に残し、文字配列の変換と空き装備枠の影は `sprite.ts` と `silhouette.ts`、品目用の色の変換は `items/` の関数の定義元を直接参照する。
 
 
 ## サーバーの操作と保存形式の境界
 
-`world/server/` のコーディネーターの操作は、受付・確定・配送・再試行ごとのファイルに置く。元の `*-coordinator.ts` は保存する相手と呼び出し先の型、再試行の定義を共有する。引数が多い操作は名前付きの入力を受け、Durable Object の入口は従来の RPC 名と保存単位のまま呼び出す。Void が渡す context は入口の第一引数に残し、多い操作入力だけを次のオブジェクトにまとめる。呼び出す側と再試行用の相手の型も同じ入力を使う。DO の定義ファイル・識別子・保存版・インスタンス名はこの分割で動かさない。
+`apps/main/world/server/` のコーディネーターの操作は、受付・確定・配送・再試行ごとのファイルに置く。元の `*-coordinator.ts` は保存する相手と呼び出し先の型、再試行の定義を共有する。引数が多い操作は名前付きの入力を受け、Durable Object の入口は従来の RPC 名と保存単位のまま呼び出す。Void が渡す context は入口の第一引数に残し、多い操作入力だけを次のオブジェクトにまとめる。呼び出す側と再試行用の相手の型も同じ入力を使う。DO の定義ファイル・識別子・保存版・インスタンス名はこの分割で動かさない。
 
 戦闘の支払後の反映は `apply-reserved-strike.ts` が担当し、要求を照合した所有者を明示して渡す。支払の拒否は元の HP と復帰時刻を返し、受入れた命中だけがその対象の状態と公開順を進める。効果のキューは元の命中の結果と一緒に保存してから、別の配送で先頭から受領を確認する。店の再補充の作り手は `shop-maker.ts` が店名を定義の所有キーに絞ってから求め、未定義の店名を通常の作り手へ代用しない。
 
 
 ## ゲーム規則の一括した更新
 
-製作の準備判定は `world/core/prepare-craft.ts` を制作と作業場の表示で共有し、技能・使用料・スタミナ・材料の既存の判定順を保つ。材料選択は `world/core/take-craft-inputs.ts` が品質の低い順と同品質のスロット順で行い、材料が不足したら途中の所持品を返さない。`craft-command.ts` は、準備できた材料へ成功・失敗、手数料と経験を適用する。準備だけでは抽選・支払い・プレイヤーの所持品更新をせず、完成品の空きと重量の判定は実際の制作側に残す。採集用具の摩耗は `wear-gathering-tool.ts` が元の所持品と装備を変更せずに求め、`gather-command.ts` が収穫を入れられたときだけ採用する。配送品は `receive-items.ts` がすべて収まる場合だけ受け入れる。
+製作の準備判定は `apps/main/world/core/prepare-craft.ts` を制作と作業場の表示で共有し、技能・使用料・スタミナ・材料の既存の判定順を保つ。材料選択は `apps/main/world/core/take-craft-inputs.ts` が品質の低い順と同品質のスロット順で行い、材料が不足したら途中の所持品を返さない。`craft-command.ts` は、準備できた材料へ成功・失敗、手数料と経験を適用する。準備だけでは抽選・支払い・プレイヤーの所持品更新をせず、完成品の空きと重量の判定は実際の制作側に残す。採集用具の摩耗は `wear-gathering-tool.ts` が元の所持品と装備を変更せずに求め、`gather-command.ts` が収穫を入れられたときだけ採用する。配送品は `receive-items.ts` がすべて収まる場合だけ受け入れる。
 
 戦闘の支払いの受付と再送の照合は `combat-payment.ts`、支払えるかの判定は `get-strike-payment.ts` が担当する。復帰した生存番号、占有、倒れている状態とスタミナの判定順を保ち、再送で二度支払わない。会話・商売の友好と採集用具の選択も、直前の計算結果を受け取って次の値を返す。
 
@@ -1340,28 +1346,28 @@ React との共有の定義は `components/game/game-context.ts` に一つだけ
 
 符号付き距離の計算は `lib/graphics/ray/limb-sd.ts`・`frame-sd.ts`・`loft-sd.ts`、断面の型は `distance-types.ts` が持つ。ゲームの配置や UI へ依存させず、形状の境界・交差した区間とその位置、同じ入力から返す距離を保つ。
 
-カメラの回転と歩く方向、セルと座標の変換、座った身体の支持とアンカー・原点の変換は、それぞれの関数へ直接参照する。座るアニメーションのフレーム位置は `world/scene/seated-anchor.ts` の非公開の弱い参照のキャッシュで共有し、呼び出しごとに作り直さない。グリッドの定義の照合は座標変換の定義元から参照しても実行する。
+カメラの回転と歩く方向、セルと座標の変換、座った身体の支持とアンカー・原点の変換は、それぞれの関数へ直接参照する。座るアニメーションのフレーム位置は `apps/main/world/scene/seated-anchor.ts` の非公開の弱い参照のキャッシュで共有し、呼び出しごとに作り直さない。グリッドの定義の照合は座標変換の定義元から参照しても実行する。
 
 画素バッファの寸法と保存先の参照は生成後に固定する。RGBA 配列は描画の所有者が更新し、`to-texture.ts` は同じ配列を GPU のテクスチャへ渡す。地面の部分描画は同じ保存先へ帯を合成し、ワーカーが結果を返すときは ArrayBuffer を転送する。照会のたびに写しへ変えるとこの共有と転送の契約が変わるため、図形ビルダーの検査用の写しとは分ける。
 
-屋根・壁・石・木・布のピクセルの生成は `world/scene/textures/` の操作ごとに分ける。多い引数は名前付きにし、省略時の値と色の計算・画素を描く順を保つ。スプライトのアトラスと帯状の並びは `figure/build-sheet.ts` と `build-sheet-strip.ts` が作る。分離を理由に素材や姿勢を変更しない。
+屋根・壁・石・木・布のピクセルの生成は `apps/main/world/scene/textures/` の操作ごとに分ける。多い引数は名前付きにし、省略時の値と色の計算・画素を描く順を保つ。スプライトのアトラスと帯状の並びは `figure/build-sheet.ts` と `build-sheet-strip.ts` が作る。分離を理由に素材や姿勢を変更しない。
 
 
 ## UI 部品と受け渡すプロパティ
 
-ゲームの窓・チャット・申し込みと開発用 UI の部品も、公開する関数の定義元から直接参照する。サイドバーの状態と型・定義は `components/ui/sidebar-data.tsx` の一つの Context を共有し、Provider と利用するフックを別の Context で作らない。ロードの表示と取り外しのタイミングは `components/hud/loading-rules.ts` を共有し、画面の部品へ戻る循環参照を作らない。明朝体のロード用の部品は通常のゲーム画面へ流用しない。
+ゲームの窓・チャット・申し込みと開発用 UI の部品も、公開する関数の定義元から直接参照する。サイドバーの状態と型・定義は `apps/main/components/ui/sidebar-data.tsx` の一つの Context を共有し、Provider と利用するフックを別の Context で作らない。ロードの表示と取り外しのタイミングは `apps/main/components/hud/loading-rules.ts` を共有し、画面の部品へ戻る循環参照を作らない。明朝体のロード用の部品は通常のゲーム画面へ流用しない。
 
 プロパティは名前付きの入力から読み、残る属性は `lib/engine/without-keys.ts` で元を変更せずコピーする。必要な属性と列挙可能な Symbol、内側の値の参照を保つ。props の分離で既存の className を生の値で上書きしたり、子要素・ref・イベントを落としたりしない。CSS 変数はその名前を型に持つ style オブジェクトで渡し、型変換で隠さない。
 
 開発用 UI の生成設定は維持するが、生成された経由モジュールを実行時の依存へ戻さない。クラス名の結合は `cn` の定義元を使い、使われていない `lib/utils.ts` は置かない。生成後もゲームと開発用の見た目を混ぜず、同じコード規約へ揃える。
 
 
-開発用の定義表は `dev/sheet-list.tsx` と `dev/sheet-row.tsx` を入口とする。一覧、行、参照、プレビューはそれぞれの定義元を直接参照する。表の登録は `dev/sheets/registry.ts` に保ち、行索引と逆参照のキャッシュは検索する関数のモジュール内で保持する。アイコンの描画と拡大・切り抜きは `world/art/icons/`、表示用 URL は `world/art/icon-url.ts`・`ui-icon-url.ts`・`portrait-url.ts` に置く。接続開始の共有 Promise は `world/client/load-player-id.ts` の内部に置き、完了時と失敗時に同じ共有先を解放する。
+開発用の定義表は `apps/studio/dev/sheet-list.tsx` と `apps/studio/dev/sheet-row.tsx` を入口とする。一覧、行、参照、プレビューはそれぞれの定義元を直接参照する。表の登録は `apps/studio/dev/sheets/registry.ts` に保ち、行索引と逆参照のキャッシュは検索する関数のモジュール内で保持する。アイコンの描画と拡大・切り抜きは `apps/main/world/art/icons/`、表示用 URL は `apps/main/world/art/icon-url.ts`・`ui-icon-url.ts`・`portrait-url.ts` に置く。接続開始の共有 Promise は `apps/main/world/client/load-player-id.ts` の内部に置き、完了時と失敗時に同じ共有先を解放する。
 
 
-描画の地形の共有バッファと選択中の配置は `world/scene/world.ts` に保持し、配置の切替、計算済みフィールド、地形の参照と通行判定はそれぞれの定義元から呼ぶ。フィールド計算中の道路サンプルは、準備処理へ戻らず生成が所有する道路の配列を読む。保存済みの地面画像の識別子は `ground-version.ts` に列挙した描画依存から作る。`ground-version.test.ts` は描画と地形の入口から依存先をたどり、分離された処理も識別子へ含まれることを確かめる。
+描画の地形の共有バッファと選択中の配置は `apps/main/world/scene/world.ts` に保持し、配置の切替、計算済みフィールド、地形の参照と通行判定はそれぞれの定義元から呼ぶ。フィールド計算中の道路サンプルは、準備処理へ戻らず生成が所有する道路の配列を読む。保存済みの地面画像の識別子は `ground-version.ts` に列挙した描画依存から作る。`ground-version.test.ts` は描画と地形の入口から依存先をたどり、分離された処理も識別子へ含まれることを確かめる。
 
-人物画像の Worker の生成、破棄、要求の処理は `world/scene/helpers/sprite-pool/` に分ける。生成時に完了通知を受け取り、破棄時に代替 Worker の生成方法を受け取ることで、生成と要求の処理を相互 import しない。Worker の素材 URL は生成処理のファイル位置を基準に解決する。既存の失敗時の再試行、重複通知の抑止、遅れて届く結果の破棄は維持する。
+人物画像の Worker の生成、破棄、要求の処理は `apps/main/world/scene/helpers/sprite-pool/` に分ける。生成時に完了通知を受け取り、破棄時に代替 Worker の生成方法を受け取ることで、生成と要求の処理を相互 import しない。Worker の素材 URL は生成処理のファイル位置を基準に解決する。既存の失敗時の再試行、重複通知の抑止、遅れて届く結果の破棄は維持する。
 
 
 `lib/engine/polyline.ts` は入力の点から照会用の区間を作り、private フィールドだけに保持する。元の点列を後で編集しても照会結果は変わらず、区間配列を公開しない。区間レコードとインスタンスを変更不可にし、距離計算はインスタンスと一回限りの入口で同じ処理を使う。曲線の座標列は `lib/engine/get-catmull-path.ts`、各座標の補間は `lib/engine/catmull-coordinate.ts` が受け持つ。空の入力は空の座標列を返し、分割数は正の整数に限る。地面画像の保存識別子にはこの補間処理と整数範囲の生成も含める。

@@ -5,7 +5,7 @@
   "tsx": true,
   "tailwind": {
     "config": "",
-    "css": "dev/dev.css",
+    "css": "apps/studio/dev/dev.css",
     "baseColor": "neutral",
     "cssVariables": true,
     "prefix": ""

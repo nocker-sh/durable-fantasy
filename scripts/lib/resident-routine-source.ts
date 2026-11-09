@@ -13,7 +13,7 @@ export function auditResidentRoutineSources(documents: ReadonlyMap<string, Setti
     if (doc.kind !== "residents") continue
     if (doc.routine !== undefined) errors.push(`${doc.id}: runtime schedule must be referenced, not copied`)
     const source = doc.routine_source as { file: string; export: string; key: string } | undefined
-    if (!source || source.file !== "world/town/routines.ts" || source.export !== "ROUTINES") {
+    if (!source || source.file !== "apps/main/world/town/routines.ts" || source.export !== "ROUTINES") {
       errors.push(`${doc.id}: missing or invalid routine source`)
       continue
     }

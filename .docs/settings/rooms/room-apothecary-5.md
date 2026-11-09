@@ -4,7 +4,7 @@
   "kind": "rooms",
   "title": "イルムガルトの薬屋／2階 薬草の乾燥と仕分け",
   "status": "設計中",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "design_gate": "未通過",
   "town": "town-phanthiet",
   "building": "building-apothecary",

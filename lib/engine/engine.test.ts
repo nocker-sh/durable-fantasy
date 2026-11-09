@@ -38,7 +38,13 @@ describe("map-independent engine", () => {
     const paths = new GridPathfinder({ blocked, size: 5, resolution: 1, clearance: 0.2 })
     const route = paths.find([0.5, 0.5], [2.5, 2.5], true)!
     expect(route.at(-1)).not.toEqual([2.5, 2.5])
-    expect(route.every(([x, z]) => !blocked[Math.floor(z) * 5 + Math.floor(x)])).toBe(true)
+    expect(
+      route.every((entry1) => {
+        const x = entry1[0],
+          z = entry1[1]
+        return !blocked[Math.floor(z) * 5 + Math.floor(x)]
+      }),
+    ).toBe(true)
     expect(paths.find([0.5, 0.5], [4.2, 4.3])?.at(-1)).toEqual([4.2, 4.3])
   })
 

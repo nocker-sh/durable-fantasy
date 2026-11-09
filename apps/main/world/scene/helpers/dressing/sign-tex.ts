@@ -1,0 +1,20 @@
+import { letter } from "#/world/scene/lettering"
+import { signLines } from "#/world/scene/sign-lines"
+import * as THREE from "three"
+
+export function signTex(word: string) {
+  const c = document.createElement("canvas")
+  c.width = 64
+  c.height = 40
+  const g = c.getContext("2d")!
+  g.fillStyle = "#3a2a20"
+  g.fillRect(0, 0, 64, 40)
+  g.fillStyle = "#a88a60"
+  g.fillRect(3, 3, 58, 34)
+  g.fillStyle = "#2a1c14"
+  letter({ g: g, lines: signLines(word), cx: 32, cy: 21, width: 54, px: 14 })
+  const t = new THREE.CanvasTexture(c)
+  t.magFilter = THREE.NearestFilter
+  t.colorSpace = THREE.SRGBColorSpace
+  return t
+}

@@ -3,7 +3,7 @@
   "id": "room-crystal-upper-stairs",
   "kind": "rooms",
   "title": "コンスタンティンの結晶屋／2階 共用通路と階段",
-  "source": "world/town/houses.ts",
+  "source": "apps/main/world/town/houses.ts",
   "town": "town-phanthiet",
   "building": "building-crystal",
   "bed_capacity": 0,
