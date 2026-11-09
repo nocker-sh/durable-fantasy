@@ -61,3 +61,16 @@ it("keeps a shown shop in front when the layout is reset", () => {
   expect(localStorage.getItem("ui-window/skills")).toBeNull()
   expect(JSON.parse(localStorage.getItem(KEY)!)).toEqual(DEFAULT_WINDOWS)
 })
+
+it("still opens, closes and resets windows when the browser refuses to store them", () => {
+  const refuse = () => {
+    throw new Error("QuotaExceededError")
+  }
+  vi.stubGlobal("localStorage", { getItem: () => null, setItem: refuse, removeItem: refuse })
+  const f = fixture([...DEFAULT_WINDOWS])
+  f.windows.toggle("inventory")
+  expect(f.state.get().windows).toContain("inventory")
+  f.windows.close("inventory")
+  expect(f.state.get().windows).not.toContain("inventory")
+  expect(() => f.windows.reset()).not.toThrow()
+})
