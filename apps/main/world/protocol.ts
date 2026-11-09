@@ -242,7 +242,15 @@ export const serverMessage = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("wild"),
     revision: z.number().int().min(0).optional(),
-    monsters: z.record(z.string(), z.object({ hp: z.number(), back: z.number(), combat: z.object({ at: z.number().finite(), until: z.number().finite() }).optional() })),
+    monsters: z.record(
+      z.string(),
+      z.object({
+        hp: z.number(),
+        back: z.number(),
+        combat: z.object({ at: z.number().finite(), until: z.number().finite() }).optional(),
+        run: z.object({ base: z.number().finite(), start: z.number().finite() }).optional(),
+      }),
+    ),
   }),
   /** A blow struck: by whom, at what, how it went, what the creature has left. */
   z.object({
@@ -254,6 +262,7 @@ export const serverMessage = z.discriminatedUnion("type", [
     hp: z.number(),
     back: z.number(),
     combat: z.object({ at: z.number().finite(), until: z.number().finite() }).optional(),
+    run: z.object({ base: z.number().finite(), start: z.number().finite() }).optional(),
   }),
   /** Someone asks to swap muffler threads; or it fell through (DECLINED, TOO_FAR). */
   z.object({ type: z.literal("thread-asked"), from: z.string(), name: z.string() }),

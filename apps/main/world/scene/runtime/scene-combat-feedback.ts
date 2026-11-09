@@ -4,7 +4,7 @@ import type { Walker } from "#/world/scene/runtime/walker"
 import type { SceneHitLabels } from "#/world/scene/runtime/scene-hit-labels"
 import type { HitKind, MonsterStrike } from "#/world/scene/runtime/combat-feedback-types"
 
-type CombatMonster = Pick<MonsterView, "spawn" | "hp" | "back" | "pos" | "combat">
+type CombatMonster = Pick<MonsterView, "spawn" | "hp" | "back" | "pos" | "combat" | "run">
 type DamageWalker = Pick<Walker, "pos"> & { fig: { readonly height: number } }
 type Props<M> = Readonly<{
   monsters: ReadonlyArray<M>
@@ -27,6 +27,7 @@ export class SceneCombatFeedback<M extends CombatMonster> {
       monster.hp = state.hp
       monster.back = state.back
       monster.combat = state.combat
+      monster.run = state.run
     }
   }
 
@@ -36,6 +37,7 @@ export class SceneCombatFeedback<M extends CombatMonster> {
     if (input.hp >= 0) {
       monster.hp = input.hp
       monster.combat = input.combat
+      monster.run = input.run
     }
     if (input.back) monster.back = input.back
     if (input.hp === 0) this.props.defeated(monster)

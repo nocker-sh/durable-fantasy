@@ -10,7 +10,8 @@ export function viewWild(state: WildState, map: string, now: number): Record<str
     spawnsOn(map).map((spawn) => {
       const fight = fightOf(state, spawn.id, now)
       const combat = fight && MONSTER_KINDS[spawn.kind].atk > 0 ? { at: fight.started ?? fight.at, until: fight.at + CLAIM_MS } : undefined
-      return [spawn.id, { hp: hpOf(state, spawn.id, now), back: state.back[spawn.id] ?? 0, ...(combat ? { combat } : {}) }]
+      const run = MONSTER_KINDS[spawn.kind].atk > 0 ? undefined : state.run?.[spawn.id]
+      return [spawn.id, { hp: hpOf(state, spawn.id, now), back: state.back[spawn.id] ?? 0, ...(combat ? { combat } : {}), ...(run ? { run } : {}) }]
     }),
   )
 }

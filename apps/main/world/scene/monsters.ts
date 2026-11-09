@@ -13,6 +13,7 @@ export type MonsterView = {
   groundHeight?: number
   hp: number
   combat?: CreatureHealth["combat"]
+  run?: CreatureHealth["run"]
   back: number
   /** the burst of little slimes, while it plays */
   burst: { bits: THREE.Group[]; until: number } | null

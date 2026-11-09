@@ -7,6 +7,7 @@ import type { SkillId } from "#/world/core/skill-types"
 export type StrikeResult = {
   revision?: number
   combat?: { at: number; until: number }
+  run?: { base: number; start: number }
   hp: number
   beaten: boolean
   back: number

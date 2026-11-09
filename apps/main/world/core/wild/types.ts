@@ -10,15 +10,20 @@ export type Fight = {
   next?: number
 }
 
+/** How far ahead a fleeing creature runs along its own route (get-run-shift.ts): what it had gained, and when it last bolted. */
+export type Run = { base: number; start: number }
+
 export type WildState = {
   hp: Record<string, number>
   back: Record<string, number>
   /** who is fighting it, and when they last struck */
   by: Record<string, Fight>
+  /** creatures that only flee: how far ahead they have run; gone once beaten (optional for older saves) */
+  run?: Record<string, Run>
 }
 
 /** `counters`: how many of the creature's own blows fell due by this strike (none once beaten). */
 export type HitResult = { state: WildState; hp: number; beaten: boolean; counters: number } & ({ refused: true; reason: "TAKEN" | "TARGET_GONE" } | { refused: false; reason?: never })
 
-export type CreatureHealth = { hp: number; back: number; combat?: { at: number; until: number } }
+export type CreatureHealth = { hp: number; back: number; combat?: { at: number; until: number }; run?: Run }
 export type WildSnapshot = { revision: number; monsters: Record<string, CreatureHealth> }

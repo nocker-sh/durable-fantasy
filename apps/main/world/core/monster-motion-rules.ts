@@ -6,3 +6,7 @@ export const MONSTER_NAV_CELLS_PER_TILE = 4
 
 /** Bound resting-cell traversal and the square allocation required by the route finder. */
 export const MONSTER_MAX_NAV_CELLS = 65536
+
+/** A creature that only flees (game-system.md §8) runs this much faster along its route, for this long after each blow. */
+export const FLEE_RATE = 3
+export const FLEE_MS = 4000

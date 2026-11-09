@@ -10,7 +10,15 @@ export function mergeWild(current: WildView, incoming: Record<string, CreatureHe
     const health = entry[1]
     const previous = current[id]
     if (!currentCreature(previous, revision)) continue
-    if (previous?.hp === health.hp && previous.back === health.back && previous.revision === revision && previous.combat?.at === health.combat?.at && previous.combat?.until === health.combat?.until)
+    if (
+      previous?.hp === health.hp &&
+      previous.back === health.back &&
+      previous.revision === revision &&
+      previous.combat?.at === health.combat?.at &&
+      previous.combat?.until === health.combat?.until &&
+      previous.run?.base === health.run?.base &&
+      previous.run?.start === health.run?.start
+    )
       continue
     if (next.view === current) next.view = { ...current }
     next.view[id] = { ...health, ...(revision !== undefined ? { revision } : {}) }

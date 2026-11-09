@@ -26,7 +26,7 @@ export function updateMonsters(props: Props) {
     m.body.visible = !away
     // Motion is clock-based: hidden creatures can catch up directly when they return.
     if (away && !m.burst) continue
-    const time = getMonsterCombatTime({ combat: m.combat, now: props.now })
+    const time = getMonsterCombatTime({ combat: m.combat, run: m.run, now: props.now })
     const position = m.motion.at(time)
     const at = away ? { x: m.pos[0], z: m.pos[1], moving: false } : m.combat && props.now < m.combat.until ? { ...position, moving: false } : position
     if (m.pos[0] !== at.x || m.pos[1] !== at.z) m.groundHeight = undefined

@@ -227,7 +227,13 @@ export class ServerMessages {
         if (message.revision !== undefined && previous?.revision === message.revision) return
         this.target.session.wild = {
           ...this.target.session.wild,
-          [message.monster]: { hp: message.hp, back: message.back, ...(message.combat ? { combat: message.combat } : {}), ...(message.revision !== undefined ? { revision: message.revision } : {}) },
+          [message.monster]: {
+            hp: message.hp,
+            back: message.back,
+            ...(message.combat ? { combat: message.combat } : {}),
+            ...(message.run ? { run: message.run } : {}),
+            ...(message.revision !== undefined ? { revision: message.revision } : {}),
+          },
         }
         if (message.hp === 0 && this.target.session.fighting?.monster === message.monster) this.target.session.fighting = null
         scene?.struck({
@@ -237,6 +243,7 @@ export class ServerMessages {
           hp: message.hp,
           back: message.back,
           ...(message.combat ? { combat: message.combat } : {}),
+          ...(message.run ? { run: message.run } : {}),
         })
         return
       }

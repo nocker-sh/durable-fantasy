@@ -14,6 +14,7 @@ export async function notifyMapStrike(room: { ctx: { room: Pick<Ctx["ctx"]["room
       hp: result.hp,
       back: result.back,
       ...(result.combat ? { combat: result.combat } : {}),
+      ...(result.run ? { run: result.run } : {}),
       ...(result.revision !== undefined ? { revision: result.revision } : {}),
     }),
   )
