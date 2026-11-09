@@ -28,6 +28,7 @@ import { sell } from "#/world/core/sell"
 import type { ShopContext } from "#/world/core/shop-command-types"
 import { takeErrand } from "#/world/core/take-errand"
 import { handErrand } from "#/world/core/hand-errand"
+import { greet } from "#/world/core/greet"
 import { craft } from "#/world/core/craft-command"
 import { accept } from "#/world/core/accept"
 import { reject } from "#/world/core/reject"
@@ -89,6 +90,8 @@ export function apply(before: PlayerState, command: Command | ServerCommand, ctx
       return takeErrand(state, command, now)
     case "errand-hand":
       return handErrand(state, command, now)
+    case "greet":
+      return greet(state, command.to, now)
     case "escrow-sell": {
       const slot = state.bag[command.slot]
       if (!slot) return reject("EMPTY_SLOT")

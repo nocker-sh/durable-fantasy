@@ -8,6 +8,8 @@ import type { npcCell } from "#/world/maps/npc-cell"
 
 const npc = vi.hoisted(() => vi.fn<typeof npcCell>())
 vi.mock("#/world/maps/npc-cell", () => ({ npcCell: npc }))
+const run = vi.hoisted(() => vi.fn())
+vi.mock("#/durable-objects/player", () => ({ Player: { get: () => ({ run }) } }))
 afterEach(() => {
   vi.resetAllMocks()
   vi.useRealTimers()
@@ -15,10 +17,11 @@ afterEach(() => {
 
 function fixture() {
   npc.mockReturnValue([10, 10])
+  run.mockResolvedValue({ ok: false, reason: "TOO_FAR" })
   const me: Presence = { owner: "owner", player: mapPlayer("connection", newPlayer(), [10, 10]), route: [[10, 10]], since: Date.now(), said: [], engaged: "resident" }
   const send = vi.fn(async (_message: ServerMessage) => {})
   const save = vi.fn((_patch: Partial<Presence>) => {})
-  const room = { me, save, map: { id: "map" }, ctx: { connection: { send } } }
+  const room = { me, save, map: { id: "map" }, ctx: { connection: { send, id: "connection" } } }
   return { me, send, save, room }
 }
 
@@ -46,4 +49,13 @@ it.each([null, [80, 80]])("rejects an absent or distant resident", async (cell) 
   await handleEngage(request.room, { type: "engage", npc: "resident" })
   expect(request.send).toHaveBeenCalledExactlyOnceWith({ type: "refused", what: "engage" })
   expect(request.save).not.toHaveBeenCalled()
+})
+
+it("greets the resident on the player's save and shows the new friendship", async () => {
+  const request = fixture()
+  const result = { ok: true, state: newPlayer(), events: [] }
+  run.mockResolvedValue(result)
+  await handleEngage(request.room, { type: "engage", npc: "resident" })
+  expect(run).toHaveBeenCalledExactlyOnceWith({ type: "greet", to: "resident" }, { connection: "connection" })
+  expect(request.send).toHaveBeenCalledWith({ type: "result", seq: -1, result })
 })

@@ -1,3 +1,4 @@
+import { Player } from "#/durable-objects/player"
 import { TALK_CELLS } from "#/world/maps"
 import { npcCell } from "#/world/maps/npc-cell"
 import { timeFor } from "#/world/server/map-room/time-for"
@@ -7,9 +8,9 @@ import { reachable } from "#/world/server/map-room/reachable"
 import type { Cell } from "#/world/protocol"
 import type { Ctx, Message } from "#/world/server/map-room/context"
 
-type Props = Readonly<Pick<Ctx, "me" | "save"> & { map: Pick<Ctx["map"], "id">; ctx: Readonly<{ connection: Pick<Ctx["ctx"]["connection"], "send"> }> }>
+type Props = Readonly<Pick<Ctx, "me" | "save"> & { map: Pick<Ctx["map"], "id">; ctx: Readonly<{ connection: Pick<Ctx["ctx"]["connection"], "send" | "id"> }> }>
 
-/** 会話を始めるときに現在の到達地点で停止し、保存済みの姿にも同じ座標を使う。 */
+/** 会話を始めるときに現在の到達地点で停止し、保存済みの姿にも同じ座標を使う。その日初めて話す住民とは少し親しくなる（core/greet.ts）。 */
 export async function handleEngage(room: Props, message: Message<"engage">) {
   const me = room.me
   if (!me.player) return
@@ -21,4 +22,8 @@ export async function handleEngage(room: Props, message: Message<"engage">) {
   const here: Cell = [reached[0], reached[1]]
   const now = Date.now()
   room.save({ engaged: message.npc, route: [here], since: now, paced: paceTo(me, here, now), player: { ...me.player, at: here } })
+  if (!me.owner) return
+  const result = await Player.get(me.owner).run({ type: "greet", to: message.npc }, { connection: room.ctx.connection.id })
+  // the screen hears of it like a fight's spoils
+  if (result.ok) await room.ctx.connection.send({ type: "result", seq: -1, result })
 }

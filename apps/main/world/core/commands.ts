@@ -103,6 +103,8 @@ export type ServerCommand =
   | { type: "errand-take"; errand: string; from: string }
   /** hand an errand over to the resident the room has checked we are talking to */
   | { type: "errand-hand"; errand: string; to: string }
+  /** begin talking to a resident the room has checked we stand beside (core/greet.ts) */
+  | { type: "greet"; to: string }
   /** a creature struck back (game-system.md §8); at 0 HP they fall */
   | { type: "hurt"; amount: number; by: string }
   /** fallen, they come to in town: half HP, a little experience lost */
