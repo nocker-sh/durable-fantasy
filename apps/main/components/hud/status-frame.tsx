@@ -2,7 +2,6 @@
 import { useGameState } from "#/hooks/use-game-state"
 import { Meter } from "#/components/game/meter"
 import { uiIconUrl } from "#/world/art/ui-icon-url"
-import { REGEN_MS } from "#/world/core/player-rules"
 import { DIGEST_MS } from "#/world/core/player-rules"
 import { MAX_STAMINA } from "#/world/core/player-rules"
 import { fullNow } from "#/world/core/full-now"
@@ -12,6 +11,7 @@ import type { Rest } from "#/world/core/player-types"
 import { useEffect, useState } from "react"
 import { useDeadlineClock } from "#/hooks/use-deadline-clock"
 import { serverNow } from "#/world/client/server-now"
+import { nextRecoveryRedraw } from "#/world/parts/next-recovery-redraw"
 
 export function StatusFrame() {
   const player = useGameState((s) => s.player)
@@ -39,14 +39,12 @@ function HpSp(inputProps: { player: PlayerState; rest: Rest }) {
   const at = serverNow({ clockOffset }, Math.max(now, Date.now()))
   const p = settle(player, rest, at)
   const recovering = p.hp > 0 && (p.hp < rest.maxHp || p.sp < rest.maxSp)
-  // redraw when the next tick lands (settle counts from hpAt / spAt in REGEN_MS steps), so a full rest shows at once
-  const ticks = [p.hp < rest.maxHp ? p.hpAt : null, p.sp < rest.maxSp ? p.spAt : null].filter((tick): tick is number => !!tick)
-  const nextTick = ticks.length ? Math.min(...ticks) + REGEN_MS - at : REGEN_MS / 4
+  const wait = nextRecoveryRedraw(p, rest, at)
   useEffect(() => {
     if (!recovering) return
-    const timer = setTimeout(() => setNow(Date.now()), Math.min(REGEN_MS / 4, Math.max(50, nextTick + 30)))
+    const timer = setTimeout(() => setNow(Date.now()), wait)
     return () => clearTimeout(timer)
-  }, [recovering, now, nextTick])
+  }, [recovering, now, wait])
   return (
     <>
       <Meter tone="hp" value={p.hp} max={rest.maxHp} aria-label="HP" className="h-[6px]" />
