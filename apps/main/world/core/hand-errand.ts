@@ -4,6 +4,8 @@ import { todays } from "#/world/core/todays"
 import { takeCraftInputs } from "#/world/core/take-craft-inputs"
 import { getErrandFriendship } from "#/world/core/get-errand-friendship"
 import { accept } from "#/world/core/accept"
+import { removeItem } from "#/world/core/remove-item"
+import { dropLapsedParcels } from "#/world/core/drop-lapsed-parcels"
 import { reject } from "#/world/core/reject"
 import type { Transition } from "#/world/core/transition"
 import type { ServerCommand } from "#/world/core/commands"
@@ -23,10 +25,25 @@ export function handErrand(state: PlayerState, command: Extract<ServerCommand, {
     if (!bag) return reject("NOT_ENOUGH")
     handed.bag = bag
   }
+  if (errand.kind === "deliver" && errand.carry) {
+    // the letter itself is handed over
+    const bag = removeItem({ bag: state.bag, item: errand.carry, count: 1 })
+    if (!bag) return reject("NOT_ENOUGH")
+    handed.bag = bag
+  }
   const friendship = getErrandFriendship(state.friends, errand)
 
   return accept(
-    { ...state, bag: handed.bag, gold: state.gold + errand.gold, friends: friendship.friends, errands: list.map((taken) => (taken.id === errand.id ? { ...taken, done: true } : taken)) },
+    {
+      ...state,
+      bag: dropLapsedParcels(
+        handed.bag,
+        list.map((taken) => (taken.id === errand.id ? { ...taken, done: true } : taken)),
+      ),
+      gold: state.gold + errand.gold,
+      friends: friendship.friends,
+      errands: list.map((taken) => (taken.id === errand.id ? { ...taken, done: true } : taken)),
+    },
     { type: "errand-done", errand: errand.id, gold: errand.gold, friends: friendship.changed },
   )
 }

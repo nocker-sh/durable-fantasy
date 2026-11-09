@@ -1,3 +1,4 @@
+import { addItem } from "#/world/core/add-item"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import { createGameState } from "#/world/client/initial-state"
 import { apply } from "#/world/core/apply"
@@ -91,7 +92,8 @@ describe("every authored errand through real commands and dialogue", () => {
     if (!taken.ok) throw new Error(`${errand.id}: ${taken.reason}`)
     expect(taken.events).toEqual([{ type: "errand-taken", errand: errand.id }])
     expect(taken.state.errands).toEqual([{ id: errand.id, day: dayOf(plan.ask.now), done: false }])
-    expect(taken.state.bag).toEqual(initial.bag)
+    // a letter to deliver comes into the bag with the errand
+    expect(taken.state.bag).toEqual(errand.kind === "deliver" && errand.carry ? addItem({ bag: initial.bag, item: errand.carry, count: 1 }) : initial.bag)
     expect(taken.state.gold).toBe(initial.gold)
     expect(taken.state.friends).toEqual({})
     expect(apply(taken.state, take, { now: plan.ask.now })).toEqual({ ok: false, reason: "NO_ERRAND" })

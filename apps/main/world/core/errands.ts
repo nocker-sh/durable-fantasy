@@ -168,6 +168,7 @@ export const ERRANDS: readonly Errand[] = [
     from: "オイゲン",
     to: "ブルーノ",
     parcel: "灯り油の注文",
+    carry: "sealed-letter",
     gold: 8,
     ask: "門の灯りの油が切れかけている。この注文の書き付けを、道具屋のブルーノに渡してくれ。番の間は門を離れられんのでな。",
     thanks: "油の注文ですね。毎度どうも。明日の夕方までに揃えておきますよ。",

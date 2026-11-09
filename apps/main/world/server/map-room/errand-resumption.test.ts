@@ -1,3 +1,4 @@
+import { addItem } from "#/world/core/add-item"
 import { afterEach, expect, it, vi } from "vitest"
 import { Player } from "#/durable-objects/player"
 import { ERRANDS } from "#/world/core/errands"
@@ -139,7 +140,8 @@ it.each(ERRANDS.flatMap((errand) => [false, true].map((restart) => ({ errand, re
     expect(ask.reply().ok).toBe(true)
     expect(f.record().player.errands).toEqual([{ id: errand.id, day: dayOf(f.plan.ask.now), done: false }])
     expect(f.record().player.gold).toBe(f.initial.player.gold)
-    expect(f.record().player.bag).toEqual(f.initial.player.bag)
+    // a letter to deliver comes into the bag with the errand
+    expect(f.record().player.bag).toEqual(errand.kind === "deliver" && errand.carry ? addItem({ bag: f.initial.player.bag, item: errand.carry, count: 1 }) : f.initial.player.bag)
     expect(f.record().player.friends).toEqual({})
     const accepted = f.snapshot()
     await ask.request("take")

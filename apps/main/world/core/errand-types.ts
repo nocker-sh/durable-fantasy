@@ -12,7 +12,8 @@ type ErrandDefinition = {
 }
 
 /** Bring materials to the asker, or deliver their parcel to another resident. */
-export type Errand = ErrandDefinition & ({ kind: "bring"; wants: { item: ItemId; count: number } } | { kind: "deliver"; to: string; parcel: string })
+export type Errand = ErrandDefinition &
+  ({ kind: "bring"; wants: { item: ItemId; count: number } } | { kind: "deliver"; to: string; parcel: string; /** a key item put in the bag while it is carried (a sealed letter) */ carry?: ItemId })
 
 /** An errand a player has taken: for today only. */
 export type Taken = {

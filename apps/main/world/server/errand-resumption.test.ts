@@ -1,3 +1,4 @@
+import { addItem } from "#/world/core/add-item"
 import { afterEach, expect, it, vi } from "vitest"
 import { Player } from "#/durable-objects/player"
 import { ERRANDS } from "#/world/core/errands"
@@ -35,7 +36,8 @@ it.each(ERRANDS)("$id: acceptance and handover remain atomic across failed write
   const accepted = await actor.run(take)
   if (!accepted.ok) throw new Error(accepted.reason)
   expect(accepted.state.errands).toEqual([{ id: errand.id, day: dayOf(now!), done: false }])
-  expect(accepted.state.bag).toEqual(initial.player.bag)
+  // a letter to deliver comes into the bag with the errand
+  expect(accepted.state.bag).toEqual(errand.kind === "deliver" && errand.carry ? addItem({ bag: initial.player.bag, item: errand.carry, count: 1 }) : initial.player.bag)
   expect(accepted.state.gold).toBe(initial.player.gold)
   expect(accepted.state.friends).toEqual({})
   const waiting = structuredClone(store.saved.get("__void_durable_state"))
