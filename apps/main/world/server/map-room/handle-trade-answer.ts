@@ -1,3 +1,4 @@
+import { paceTo } from "#/world/server/map-room/pace-to"
 import { presence } from "#/world/server/map-room/presence"
 import { setTrade } from "#/world/server/map-room/set-trade"
 import { showTrade } from "#/world/server/map-room/show-trade"
@@ -18,7 +19,7 @@ export async function handleTradeAnswer(room: TradeAnswerContext, message: Messa
   const decision = getTradeAnswer({ recipient: me, asker: other, accepted: message.yes, now })
   if (!decision.ok) return rejectTradeInvitation({ room, asker: them, message, reason: decision.reason })
   const session = crypto.randomUUID()
-  room.save({ trade: createOpenTradeSide(them.id, session), route: [decision.recipientAt], since: now })
-  setTrade(them, createOpenTradeSide(ctx.connection.id, session), { route: [decision.askerAt], since: now })
+  room.save({ trade: createOpenTradeSide(them.id, session), route: [decision.recipientAt], since: now, paced: paceTo(me, decision.recipientAt, now) })
+  setTrade(them, createOpenTradeSide(ctx.connection.id, session), { route: [decision.askerAt], since: now, paced: paceTo(other, decision.askerAt, now) })
   await showTrade(ctx.connection, them)
 }
