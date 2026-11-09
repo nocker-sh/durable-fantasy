@@ -35,6 +35,7 @@ export function ItemTooltip(inputProps: {
   side?: "top" | "right" | "left" | "bottom"
   /** hold it open (dev previews) */ open?: boolean
   /** why it cannot be used here (a shop that does not buy it), shown under the details */ note?: string
+  /** a recipe's output before it is made: its quality is rolled then, so none is named */ unmade?: boolean
 }) {
   const item = inputProps.item
   const mark = inputProps.mark
@@ -58,7 +59,7 @@ export function ItemTooltip(inputProps: {
         <div className="flex items-baseline justify-between gap-2">
           <span className="font-head text-[13px]" style={{ color: RARITY[d.rarity] === "var(--color-rarity-common)" ? "var(--color-text)" : RARITY[d.rarity] }}>
             {displayName(item, by)}
-            {d.made && <span className="ml-1 text-[11px] text-brass-hi">（{QUALITIES[q]}）</span>}
+            {d.made && !inputProps.unmade && <span className="ml-1 text-[11px] text-brass-hi">（{QUALITIES[q]}）</span>}
           </span>
           <span className="font-head text-[11px] text-text-dim">
             {KIND_NAME[d.kind]}

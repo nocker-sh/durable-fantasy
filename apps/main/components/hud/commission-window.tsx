@@ -77,7 +77,7 @@ export function CommissionWindow() {
           const out = ITEMS[job.output.item]
           return (
             <li key={job.id} className="ui-well flex items-center gap-2.5 p-1.5">
-              <ItemTooltip item={job.output.item} side="left">
+              <ItemTooltip item={job.output.item} side="left" unmade>
                 <Slot icon={game.iconUrl(job.output.item, job.craftsman)} rarity={out.rarity} count={job.output.count} dim={!!reason} aria-label={out.name} />
               </ItemTooltip>
               <div className="min-w-0 flex-1">

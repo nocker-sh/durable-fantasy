@@ -60,7 +60,7 @@ export function CraftWindow() {
           const out = ITEMS[r.output.item]
           return (
             <li key={r.id} className="ui-well flex items-center gap-2.5 p-1.5">
-              <ItemTooltip item={r.output.item} side="left">
+              <ItemTooltip item={r.output.item} side="left" unmade>
                 <Slot icon={game.iconUrl(r.output.item)} rarity={out.rarity} count={r.output.count} dim={!!reason} aria-label={out.name} />
               </ItemTooltip>
               <div className="min-w-0 flex-1">
