@@ -9,7 +9,11 @@ import { blockCircle } from "#/world/scene/block-circle"
 import { M } from "#/world/scene/construction/materials"
 import { animateObject } from "#/world/scene/construction/animate-object"
 
-export function windmill(root: THREE.Group, x: number, z: number, still = false) {
+export function windmill(props: Readonly<{ root: THREE.Group; x: number; z: number; still?: boolean }>) {
+  const root = props.root,
+    x = props.x,
+    z = props.z,
+    still = props.still ?? false
   const y0 = groundH(x, z)
   const gb = new GB()
   gb.cyl({ side: M.ashlar, top: null, centerX: x, centerZ: z, fromY: y0 - 0.3, toY: y0 + 4.2, fromRadius: 1.35, toRadius: 0.95, segments: 10, repeat: 4 })

@@ -59,7 +59,13 @@ export const BOARDS = {
  * Write lines centred on (cx, cy), as large as `px` and no wider than `width`: a line that will not
  * fit is drawn smaller rather than run off the board.
  */
-export function letter(g: CanvasRenderingContext2D, lines: readonly string[], cx: number, cy: number, width: number, px: number) {
+export function letter(props: Readonly<{ g: CanvasRenderingContext2D; lines: readonly string[]; cx: number; cy: number; width: number; px: number }>) {
+  const g = props.g,
+    lines = props.lines,
+    cx = props.cx,
+    cy = props.cy,
+    width = props.width,
+    px = props.px
   for (const l of lines) if (!LETTERS.test(l)) throw new Error(`not the town's letters: ${l}`)
   let size = px
   for (; size > 6; size--) {

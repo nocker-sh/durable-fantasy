@@ -41,8 +41,8 @@ export function buildFields(root: THREE.Group) {
   well(root, 18.1, 25.7)
   const P = L.pigpen,
     Q = L.pasture
-  pen(root, P, [P.x0, P.z0 + 1.2], 0.65)
-  pen(root, Q, [Q.x0 + 1, Q.z0], 0.75)
+  pen({ root: root, r: P, gate: [P.x0, P.z0 + 1.2], h: 0.65 })
+  pen({ root: root, r: Q, gate: [Q.x0 + 1, Q.z0], h: 0.75 })
   const gb = new GB()
   trough({
     gb: gb,

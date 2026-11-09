@@ -358,7 +358,7 @@ export function buildInterior(it: Interior) {
         }
         trace({ root: root, props: props, f: f, y0: y0, seed: seed + k * 11, onTable: (x, z) => (onWall ? y0 + 1.3 : heightAt(x, z)) })
       })
-    if (!it.authored) onTops(props, it, y0, seed)
+    if (!it.authored) onTops({ gb: props, it: it, y0: y0, seed: seed })
     if (!it.authored) dress({ root: root, gb: props, it: it, y0: y0, seed: seed, wd: wood(woodOfPiece("")) })
     const furnishings = props.build()
     furnishings.name = "interior-furniture"

@@ -7,7 +7,11 @@ import { spotOf } from "#/world/scene/helpers/interior/spot-of"
 import { Kit } from "#/world/scene/construction/kit"
 import { hash2 } from "#/lib/engine/hash2"
 import { lying } from "#/world/scene/construction/lying"
-export function onTops(gb: GB, it: Interior, y0: number, seed: number) {
+export function onTops(props: Readonly<{ gb: GB; it: Interior; y0: number; seed: number }>) {
+  const gb = props.gb,
+    it = props.it,
+    y0 = props.y0,
+    seed = props.seed
   const own = goodsOf(it)
   it.furniture.forEach((f, k) => {
     const name = f.name ?? ""

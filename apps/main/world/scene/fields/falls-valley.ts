@@ -34,13 +34,22 @@ export function fallsValley(root: THREE.Group) {
   // boulders at the falls and along the bed, the stream breaking white round them
   rocks(
     root,
-    clusters(2601, 0, 7, 1.4, 0.4, 1.2, (x, z) => offRoad(1)(x, z) || bed.distance(x, z) < 1.4, [
-      [18.4, 22],
-      [21, 23.5],
-      [30.4, 33.6],
-      [32.2, 35],
-      [8, 12.5],
-    ]),
+    clusters({
+      seed: 2601,
+      groups: 0,
+      per: 7,
+      spread: 1.4,
+      s0: 0.4,
+      s1: 1.2,
+      ok: (x, z) => offRoad(1)(x, z) || bed.distance(x, z) < 1.4,
+      near: [
+        [18.4, 22],
+        [21, 23.5],
+        [30.4, 33.6],
+        [32.2, 35],
+        [8, 12.5],
+      ],
+    }),
     M.rockDark,
   )
   rocks(
@@ -97,27 +106,54 @@ export function fallsValley(root: THREE.Group) {
   )
   broadleaves(
     root,
-    clusters(2607, 0, 3, 2.2, 0.7, 1.0, offRoad(2), [
-      [44.5, 40],
-      [33, 45],
-    ]),
+    clusters({
+      seed: 2607,
+      groups: 0,
+      per: 3,
+      spread: 2.2,
+      s0: 0.7,
+      s1: 1.0,
+      ok: offRoad(2),
+      near: [
+        [44.5, 40],
+        [33, 45],
+      ],
+    }),
     M.leaf,
   )
   flowers(
     root,
-    clusters(2608, 0, 12, 1.6, 0.6, 1.0, offRoad(0.9), [
-      [40, 33.5],
-      [26.5, 38],
-    ]),
+    clusters({
+      seed: 2608,
+      groups: 0,
+      per: 12,
+      spread: 1.6,
+      s0: 0.6,
+      s1: 1.0,
+      ok: offRoad(0.9),
+      near: [
+        [40, 33.5],
+        [26.5, 38],
+      ],
+    }),
   )
   mushrooms(
     root,
-    clusters(2609, 0, 5, 1, 0.8, 1.1, offRoad(1.2), [
-      [12.5, 21],
-      [36, 18],
-    ]),
+    clusters({
+      seed: 2609,
+      groups: 0,
+      per: 5,
+      spread: 1,
+      s0: 0.8,
+      s1: 1.1,
+      ok: offRoad(1.2),
+      near: [
+        [12.5, 21],
+        [36, 18],
+      ],
+    }),
   )
-  logs(root, clusters(2610, 0, 2, 1.5, 0.8, 1.1, offRoad(1.6), [[14.5, 24]]), M.woodDark)
+  logs(root, clusters({ seed: 2610, groups: 0, per: 2, spread: 1.5, s0: 0.8, s1: 1.1, ok: offRoad(1.6), near: [[14.5, 24]] }), M.woodDark)
   // where people stop to fill their flasks and rest: a ring of stones on the bench above the lower fall
   fireRing(root, 34.6, 31.2)
 }

@@ -14,7 +14,7 @@ export function rentSign(root: THREE.Group, x: number, z: number) {
   g.fillStyle = "#c8b090"
   g.fillRect(0, 0, 64, 32)
   g.fillStyle = "#2a1e1a"
-  letter(g, signLines(WORDS.toLet), 32, 17, 58, 14)
+  letter({ g: g, lines: signLines(WORDS.toLet), cx: 32, cy: 17, width: 58, px: 14 })
   const tex = new THREE.CanvasTexture(c)
   tex.magFilter = THREE.NearestFilter
   tex.colorSpace = THREE.SRGBColorSpace

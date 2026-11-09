@@ -12,7 +12,7 @@ export function signTex(word: string) {
   g.fillStyle = "#a88a60"
   g.fillRect(3, 3, 58, 34)
   g.fillStyle = "#2a1c14"
-  letter(g, signLines(word), 32, 21, 54, 14)
+  letter({ g: g, lines: signLines(word), cx: 32, cy: 21, width: 54, px: 14 })
   const t = new THREE.CanvasTexture(c)
   t.magFilter = THREE.NearestFilter
   t.colorSpace = THREE.SRGBColorSpace

@@ -24,10 +24,7 @@ import { dryingRack } from "#/world/scene/fields/drying-rack"
 export function grassHighland(root: THREE.Group) {
   const free = offRoad(1.1)
   // the grass in drifts: thick in the swells, thinning out on the knoll and at the road
-  pampas(
-    root,
-    clusters(2401, 40, 22, 3.4, 0.7, 1.2, (x, z) => free(x, z) && Math.hypot(x - 13, z - 13) > 4.5),
-  )
+  pampas(root, clusters({ seed: 2401, groups: 40, per: 22, spread: 3.4, s0: 0.7, s1: 1.2, ok: (x, z) => free(x, z) && Math.hypot(x - 13, z - 13) > 4.5 }))
   pampas(
     root,
     scatter({
@@ -60,34 +57,61 @@ export function grassHighland(root: THREE.Group) {
   )
   // the dead giant on the knoll, its pieces in the grass, a cairn by the trail's end
   rustedMachine(root, 13, 12.4)
-  warLitter(root, 15.5, 14.6, 2405)
+  warLitter({ root: root, x: 15.5, z: 14.6, seed: 2405 })
   cairn(root, 16.6, 16.8)
   rocks(
     root,
-    clusters(2406, 0, 9, 2, 0.3, 1.0, offRoad(1), [
-      [10, 15.5],
-      [36.5, 35],
-      [32, 12.5],
-    ]),
+    clusters({
+      seed: 2406,
+      groups: 0,
+      per: 9,
+      spread: 2,
+      s0: 0.3,
+      s1: 1.0,
+      ok: offRoad(1),
+      near: [
+        [10, 15.5],
+        [36.5, 35],
+        [32, 12.5],
+      ],
+    }),
     M.rockDark,
   )
   // a few wind-bent trees and bushes in the lee of the rises
   broadleaves(
     root,
-    clusters(2407, 0, 3, 2.5, 0.7, 1.0, offRoad(2.5), [
-      [39.5, 39.5],
-      [6, 30],
-    ]),
+    clusters({
+      seed: 2407,
+      groups: 0,
+      per: 3,
+      spread: 2.5,
+      s0: 0.7,
+      s1: 1.0,
+      ok: offRoad(2.5),
+      near: [
+        [39.5, 39.5],
+        [6, 30],
+      ],
+    }),
     M.autumn,
   )
   shrubs(
     root,
-    clusters(2408, 0, 4, 2, 0.6, 1.0, offRoad(1.4), [
-      [38, 36],
-      [7, 31],
-      [30, 10.5],
-      [42, 18],
-    ]),
+    clusters({
+      seed: 2408,
+      groups: 0,
+      per: 4,
+      spread: 2,
+      s0: 0.6,
+      s1: 1.0,
+      ok: offRoad(1.4),
+      near: [
+        [38, 36],
+        [7, 31],
+        [30, 10.5],
+        [42, 18],
+      ],
+    }),
   )
   // the cutters' work: stooks along the south trail, a rack for drying the cut stalks by the road
   for (const p of [

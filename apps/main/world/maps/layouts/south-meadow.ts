@@ -27,9 +27,9 @@ export const SOUTH_MEADOW_LAYOUT: Layout = {
     const d = Math.hypot(dx, dz)
     height.value += 1.8 * (smooth(7.5, 2.2, d) * (1 - ne) + smooth(4.3, 3.7, d) * ne)
     const T = MEADOW_TERRACES
-    height.value += terraced(x, z, T.edges, T.step, T.rampX, T.rampW, 3) * smooth(T.x1 + 2, T.x1 - 3, x) * smooth(T.x0 - 3, T.x0, x)
-    height.value -= hill(x, z, 39.5, 37, 4.5, 1.2, 0.7)
-    return hollow(x, z, height.value, 40.5, 19.5, 4.2, -1.35, 31)
+    height.value += terraced({ x: x, z: z, edges: T.edges, step: T.step, rampX: T.rampX, rampW: T.rampW, seed: 3 }) * smooth(T.x1 + 2, T.x1 - 3, x) * smooth(T.x0 - 3, T.x0, x)
+    height.value -= hill({ x: x, z: z, cx: 39.5, cz: 37, r: 4.5, flat: 1.2, top: 0.7 })
+    return hollow({ x: x, z: z, h: height.value, cx: 40.5, cz: 19.5, r: 4.2, floor: -1.35, seed: 31 })
   },
   // south from the gate, then east to the edge of the forest; a branch on south to the dunes, and one
   // west between the vineyard and the old terraces, up to the silver-grass highland

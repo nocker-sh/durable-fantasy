@@ -1,6 +1,17 @@
 import { fbm } from "#/lib/engine/fbm"
 import { smooth } from "#/lib/engine/smooth"
-export const hollow = (x: number, z: number, h: number, cx: number, cz: number, r: number, floor: number, seed: number) => {
+type Props = Readonly<{ x: number; z: number; h: number; cx: number; cz: number; r: number; floor: number; seed: number }>
+
+/** Ground height `h` with a ragged-edged hollow of radius `r` around (cx, cz) sunk to `floor`. */
+export function hollow(props: Props): number {
+  const x = props.x,
+    z = props.z,
+    h = props.h,
+    cx = props.cx,
+    cz = props.cz,
+    r = props.r,
+    floor = props.floor,
+    seed = props.seed
   const d =
     Math.hypot(x - cx, z - cz) +
     (fbm({

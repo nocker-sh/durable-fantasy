@@ -28,10 +28,7 @@ const open = (x: number, z: number, from: number) => MARSH_PONDS.some((p) => Mat
  */
 export function lilyMarsh(root: THREE.Group) {
   // pads only on open water, in rafts rather than evenly, clear of the shore
-  lilyPads(
-    root,
-    clusters(2501, 30, 10, 1.8, 0.6, 1.1, (x, z) => groundH(x, z) < WATER_Y - 0.25 && open(x, z, 1.2)),
-  )
+  lilyPads(root, clusters({ seed: 2501, groups: 30, per: 10, spread: 1.8, s0: 0.6, s1: 1.1, ok: (x, z) => groundH(x, z) < WATER_Y - 0.25 && open(x, z, 1.2) }))
   reeds(
     root,
     scatter({
@@ -42,10 +39,7 @@ export function lilyMarsh(root: THREE.Group) {
       ok: shore,
     }),
   )
-  reeds(
-    root,
-    clusters(2503, 14, 14, 1.4, 0.8, 1.2, (x, z) => shore(x, z) || (groundH(x, z) < WATER_Y && !open(x, z, 2.2))),
-  )
+  reeds(root, clusters({ seed: 2503, groups: 14, per: 14, spread: 1.4, s0: 0.8, s1: 1.2, ok: (x, z) => shore(x, z) || (groundH(x, z) < WATER_Y && !open(x, z, 2.2)) }))
   tufts(
     root,
     scatter({
@@ -69,16 +63,25 @@ export function lilyMarsh(root: THREE.Group) {
   )
   broadleaves(
     root,
-    clusters(2506, 0, 4, 2.4, 0.7, 1.1, offRoad(2.2), [
-      [5, 27],
-      [42.5, 24],
-      [30.5, 5],
-      [6, 6],
-      [42, 45],
-    ]),
+    clusters({
+      seed: 2506,
+      groups: 0,
+      per: 4,
+      spread: 2.4,
+      s0: 0.7,
+      s1: 1.1,
+      ok: offRoad(2.2),
+      near: [
+        [5, 27],
+        [42.5, 24],
+        [30.5, 5],
+        [6, 6],
+        [42, 45],
+      ],
+    }),
     M.leaf2,
   )
-  shrubs(root, clusters(2507, 6, 4, 1.8, 0.6, 1.0, offRoad(1.4)))
+  shrubs(root, clusters({ seed: 2507, groups: 6, per: 4, spread: 1.8, s0: 0.6, s1: 1.0, ok: offRoad(1.4) }))
   logs(
     root,
     scatter({
@@ -92,17 +95,35 @@ export function lilyMarsh(root: THREE.Group) {
   )
   stumps(
     root,
-    clusters(2509, 0, 3, 1.2, 0.7, 1.0, offRoad(1.4), [
-      [16, 11],
-      [32, 41],
-    ]),
+    clusters({
+      seed: 2509,
+      groups: 0,
+      per: 3,
+      spread: 1.2,
+      s0: 0.7,
+      s1: 1.0,
+      ok: offRoad(1.4),
+      near: [
+        [16, 11],
+        [32, 41],
+      ],
+    }),
   )
   mushrooms(
     root,
-    clusters(2510, 0, 5, 1, 0.8, 1.1, offRoad(1.2), [
-      [6, 26.5],
-      [42, 23.5],
-    ]),
+    clusters({
+      seed: 2510,
+      groups: 0,
+      per: 5,
+      spread: 1,
+      s0: 0.8,
+      s1: 1.1,
+      ok: offRoad(1.2),
+      near: [
+        [6, 26.5],
+        [42, 23.5],
+      ],
+    }),
   )
   // the jetty out into the south-east pond, the punt tied at its end
   jetty({ root: root, x0: 29, z0: 31.6, x1: 32.2, z1: 33.6 })

@@ -98,30 +98,48 @@ function meadow(root: THREE.Group) {
   )
   rocks(
     root,
-    clusters(2010, 0, 9, 1.8, 0.5, 1.3, free, [
-      [38.4, 9.2],
-      [36.2, 7.6],
-      [39.6, 12.4],
-    ]),
+    clusters({
+      seed: 2010,
+      groups: 0,
+      per: 9,
+      spread: 1.8,
+      s0: 0.5,
+      s1: 1.3,
+      ok: free,
+      near: [
+        [38.4, 9.2],
+        [36.2, 7.6],
+        [39.6, 12.4],
+      ],
+    }),
   )
   rocks(
     root,
-    clusters(2009, 0, 12, 2.2, 0.15, 0.4, offRoad(0.8), [
-      [37.8, 9.6],
-      [33, 15.8],
-    ]),
+    clusters({
+      seed: 2009,
+      groups: 0,
+      per: 12,
+      spread: 2.2,
+      s0: 0.15,
+      s1: 0.4,
+      ok: offRoad(0.8),
+      near: [
+        [37.8, 9.6],
+        [33, 15.8],
+      ],
+    }),
   )
   // groves at the edges and a few old trees standing alone in the grass
   broadleaves(
     root,
-    clusters(
-      2011,
-      0,
-      6,
-      3,
-      0.7,
-      1.2,
-      (x, z) =>
+    clusters({
+      seed: 2011,
+      groups: 0,
+      per: 6,
+      spread: 3,
+      s0: 0.7,
+      s1: 1.2,
+      ok: (x, z) =>
         free(x, z) &&
         !inRect({
           x: x,
@@ -133,14 +151,14 @@ function meadow(root: THREE.Group) {
             z1: 24,
           },
         }),
-      [
+      near: [
         [3.5, 27],
         [45, 31],
         [17, 3.5],
         [44.5, 44.5],
         [30, 44.5],
       ],
-    ),
+    }),
     M.leaf2,
   )
   broadleaves(
@@ -156,19 +174,37 @@ function meadow(root: THREE.Group) {
   )
   pines(
     root,
-    clusters(2012, 0, 7, 3.2, 0.8, 1.15, (x, z) => edgeward(5)(x, z) && free(x, z), [
-      [3.5, 3.5],
-      [44.5, 4],
-      [3, 45],
-    ]),
+    clusters({
+      seed: 2012,
+      groups: 0,
+      per: 7,
+      spread: 3.2,
+      s0: 0.8,
+      s1: 1.15,
+      ok: (x, z) => edgeward(5)(x, z) && free(x, z),
+      near: [
+        [3.5, 3.5],
+        [44.5, 4],
+        [3, 45],
+      ],
+    }),
   )
   // the pond: reeds round its edge, a ring of stones where someone sits by the water
   reeds(
     root,
-    clusters(2022, 0, 26, 3.4, 0.7, 1.1, shore, [
-      [40.5, 19.5],
-      [42, 21.5],
-    ]),
+    clusters({
+      seed: 2022,
+      groups: 0,
+      per: 26,
+      spread: 3.4,
+      s0: 0.7,
+      s1: 1.1,
+      ok: shore,
+      near: [
+        [40.5, 19.5],
+        [42, 21.5],
+      ],
+    }),
   )
   fireRing(root, 37.4, 22.2)
   // the old terraces, walled along their tops, a field shrine nobody tends on the first step
@@ -182,22 +218,31 @@ function meadow(root: THREE.Group) {
     fieldWall(root, line(T.x0 + 0.5, T.rampX - T.rampW - 0.6), 2030 + k)
     fieldWall(root, line(T.rampX + T.rampW + 0.6, T.x1 - 1), 2040 + k)
   })
-  windmill(root, 6.5, 40, true)
+  windmill({ root: root, x: 6.5, z: 40, still: true })
   emptyShrine(root, 15.5, 36)
   // the hollow: the engine in the grass, its pieces strewn about
   rustedMachine(root, 41.6, 39.6)
-  warLitter(root, 41, 38.6, 2050)
+  warLitter({ root: root, x: 41, z: 38.6, seed: 2050 })
   cairn(root, 25.6, 30.6)
   // the small things, thickest where the big ones stand: flowers in drifts, tufts, shrubs along the walls
-  flowers(root, clusters(2014, 16, 18, 2.4, 0.6, 1.1, offRoad(0.9)))
+  flowers(root, clusters({ seed: 2014, groups: 16, per: 18, spread: 2.4, s0: 0.6, s1: 1.1, ok: offRoad(0.9) }))
   flowers(
     root,
-    clusters(2015, 0, 14, 1.8, 0.6, 1.0, offRoad(0.9), [
-      [34, 13],
-      [15.5, 37.4],
-      [38.5, 22.8],
-      [12, 30],
-    ]),
+    clusters({
+      seed: 2015,
+      groups: 0,
+      per: 14,
+      spread: 1.8,
+      s0: 0.6,
+      s1: 1.0,
+      ok: offRoad(0.9),
+      near: [
+        [34, 13],
+        [15.5, 37.4],
+        [38.5, 22.8],
+        [12, 30],
+      ],
+    }),
   )
   tufts(
     root,
@@ -209,18 +254,27 @@ function meadow(root: THREE.Group) {
       ok: offRoad(0.9),
     }),
   )
-  tufts(root, clusters(2017, 14, 12, 2, 0.8, 1.3, offRoad(0.9)))
+  tufts(root, clusters({ seed: 2017, groups: 14, per: 12, spread: 2, s0: 0.8, s1: 1.3, ok: offRoad(0.9) }))
   shrubs(
     root,
-    clusters(2018, 0, 5, 2.4, 0.6, 1.0, free, [
-      [5, 33],
-      [17, 37],
-      [8, 37.6],
-      [13, 41.5],
-      [43.5, 17.5],
-      [36.5, 18],
-      [44, 36],
-    ]),
+    clusters({
+      seed: 2018,
+      groups: 0,
+      per: 5,
+      spread: 2.4,
+      s0: 0.6,
+      s1: 1.0,
+      ok: free,
+      near: [
+        [5, 33],
+        [17, 37],
+        [8, 37.6],
+        [13, 41.5],
+        [43.5, 17.5],
+        [36.5, 18],
+        [44, 36],
+      ],
+    }),
   )
   shrubs(
     root,
@@ -245,26 +299,53 @@ function meadow(root: THREE.Group) {
   )
   stumps(
     root,
-    clusters(2024, 0, 4, 1.5, 0.7, 1.0, offRoad(1.4), [
-      [16, 5.5],
-      [42, 29],
-    ]),
+    clusters({
+      seed: 2024,
+      groups: 0,
+      per: 4,
+      spread: 1.5,
+      s0: 0.7,
+      s1: 1.0,
+      ok: offRoad(1.4),
+      near: [
+        [16, 5.5],
+        [42, 29],
+      ],
+    }),
   )
   mushrooms(
     root,
-    clusters(2025, 0, 5, 1.2, 0.8, 1.1, offRoad(1.2), [
-      [3.8, 27.5],
-      [44, 44],
-      [17.5, 4],
-    ]),
+    clusters({
+      seed: 2025,
+      groups: 0,
+      per: 5,
+      spread: 1.2,
+      s0: 0.8,
+      s1: 1.1,
+      ok: offRoad(1.2),
+      near: [
+        [3.8, 27.5],
+        [44, 44],
+        [17.5, 4],
+      ],
+    }),
   )
   branches(
     root,
-    clusters(2026, 0, 5, 2, 0.7, 1.2, offRoad(1.0), [
-      [34, 13.5],
-      [3.5, 27],
-      [45, 31],
-    ]),
+    clusters({
+      seed: 2026,
+      groups: 0,
+      per: 5,
+      spread: 2,
+      s0: 0.7,
+      s1: 1.2,
+      ok: offRoad(1.0),
+      near: [
+        [34, 13.5],
+        [3.5, 27],
+        [45, 31],
+      ],
+    }),
   )
   rocks(
     root,
@@ -309,12 +390,21 @@ function meadow(root: THREE.Group) {
   )
   shrubs(
     root,
-    clusters(2032, 0, 6, 1.6, 0.6, 1.0, verge(1.4, 3), [
-      [28, 24],
-      [35, 28.4],
-      [21.2, 20],
-      [26, 34],
-    ]),
+    clusters({
+      seed: 2032,
+      groups: 0,
+      per: 6,
+      spread: 1.6,
+      s0: 0.6,
+      s1: 1.0,
+      ok: verge(1.4, 3),
+      near: [
+        [28, 24],
+        [35, 28.4],
+        [21.2, 20],
+        [26, 34],
+      ],
+    }),
   )
   cairn(root, 26.4, 23)
   const g = new GB()

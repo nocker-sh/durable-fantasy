@@ -9,8 +9,8 @@ export function getHighlandGroundHeight(input: Props): number {
   const x = input.x,
     z = input.z
   const swell = (Math.sin(x * 0.16 + z * 0.07 + fbm({ x, y: z, scale: 0.06, seed: 41 }) * 3) * 0.5 + 0.5) * 0.9
-  const knoll = hill(x, z, 13, 13, 9, 2.5, 2.4)
-  const rise = hill(x, z, 37, 37, 8, 2, 1.3)
+  const knoll = hill({ x: x, z: z, cx: 13, cz: 13, r: 9, flat: 2.5, top: 2.4 })
+  const rise = hill({ x: x, z: z, cx: 37, cz: 37, r: 8, flat: 2, top: 1.3 })
   const dip = smooth(7, 2, Math.hypot(x - 33, z - 13)) * 0.7
   return input.h + swell + knoll + rise - dip
 }

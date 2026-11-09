@@ -2,7 +2,28 @@ import type { Spot } from "#/world/scene/fields/instancing"
 import { Rng } from "#/lib/engine/random"
 import { scatter } from "#/world/scene/fields/helpers/scatter/scatter"
 import { N } from "#/world/maps/ground/rules"
-export function clusters(seed: number, groups: number, per: number, spread: number, s0: number, s1: number, ok: (x: number, z: number) => boolean, near?: readonly [number, number][]): Spot[] {
+type Props = Readonly<{
+  seed: number
+  /** how many groups to scatter, when `near` does not place them */
+  groups: number
+  per: number
+  spread: number
+  s0: number
+  s1: number
+  ok: (x: number, z: number) => boolean
+  near?: readonly [number, number][]
+}>
+
+/** Groups of things clumped around centres, bigger in the middle of a group. */
+export function clusters(props: Props): Spot[] {
+  const seed = props.seed,
+    groups = props.groups,
+    per = props.per,
+    spread = props.spread,
+    s0 = props.s0,
+    s1 = props.s1,
+    ok = props.ok,
+    near = props.near
   const r = new Rng(seed)
   const centres = near
     ? [...near]

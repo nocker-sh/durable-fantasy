@@ -16,10 +16,7 @@ import { cairn } from "#/world/scene/fields/cairn"
  */
 export function saltFlats(root: THREE.Group) {
   const far = (x: number, z: number) => Math.hypot(x - 36, z - 15) > 9
-  saltPillars(
-    root,
-    clusters(2701, 16, 7, 2.2, 0.6, 1.3, (x, z) => offRoad(1.4)(x, z) && far(x, z)),
-  )
+  saltPillars(root, clusters({ seed: 2701, groups: 16, per: 7, spread: 2.2, s0: 0.6, s1: 1.3, ok: (x, z) => offRoad(1.4)(x, z) && far(x, z) }))
   saltPillars(
     root,
     scatter({

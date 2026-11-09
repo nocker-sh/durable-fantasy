@@ -26,7 +26,7 @@ export function signboard(props: Props) {
   g.fillStyle = "#8a6a48"
   for (const y = { value: 0 }; y.value < 128; y.value += 32) g.fillRect(0, y.value, 256, 3)
   g.fillStyle = "#1e1410"
-  letter(g, props.lines, 128, 64, 236, 30)
+  letter({ g: g, lines: props.lines, cx: 128, cy: 64, width: 236, px: 30 })
   const tex = new THREE.CanvasTexture(c)
   tex.magFilter = THREE.NearestFilter
   tex.colorSpace = THREE.SRGBColorSpace

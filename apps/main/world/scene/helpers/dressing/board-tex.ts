@@ -11,7 +11,7 @@ export function boardTex(text: string, ink: string, ground: string) {
   g.fillStyle = ground
   g.fillRect(3, 3, 90, 38)
   g.fillStyle = ink
-  letter(g, [text], 48, 23, 84, 22)
+  letter({ g: g, lines: [text], cx: 48, cy: 23, width: 84, px: 22 })
   const t = new THREE.CanvasTexture(c)
   t.magFilter = THREE.NearestFilter
   t.colorSpace = THREE.SRGBColorSpace

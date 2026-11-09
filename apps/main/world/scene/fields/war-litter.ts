@@ -5,7 +5,11 @@ import { groundH } from "#/world/scene/ground-h"
 import { rust } from "#/world/scene/fields/rusted-machine"
 import { rustDark } from "#/world/scene/fields/rusted-machine"
 import { blockCircle } from "#/world/scene/block-circle"
-export function warLitter(root: THREE.Group, x: number, z: number, seed: number) {
+export function warLitter(props: Readonly<{ root: THREE.Group; x: number; z: number; seed: number }>) {
+  const root = props.root,
+    x = props.x,
+    z = props.z,
+    seed = props.seed
   const gb = new GB()
   const r = new Rng(seed)
   for (let k = 0; k < 9; k++) {

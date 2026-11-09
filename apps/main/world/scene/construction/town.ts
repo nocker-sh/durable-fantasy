@@ -511,7 +511,7 @@ export function buildTown(root: THREE.Group) {
   places.coop = [39.4, 19.2]
 
   // windmill
-  windmill(root, 45.0, 4.0)
+  windmill({ root: root, x: 45.0, z: 4.0 })
 
   // flowerbeds & bushes around town
   const fl = new Rng(4)
