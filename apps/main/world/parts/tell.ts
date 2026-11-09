@@ -29,7 +29,7 @@ export function tell(event: GameEvent, me: string | undefined): Told {
     const gains = [event.exp ? `経験値 +${event.exp}` : "", what ? `${what}を手に入れた` : ""].filter(Boolean).join("、")
     chat(`${kind ? `${MONSTER_KINDS[kind].name}を` : ""}追い払った。${gains ? `${gains}。` : ""}`)
     if (event.left?.length) notify(`持ちきれず、${event.left.map((i) => ITEMS[i].name).join("、")}を置いてきた。`, "bad")
-    if (event.gained) notify(`レベルが ${event.level} に上がった！`, "good")
+    if (event.gained) notify(`レベルが ${event.level} に上がった！ C で能力を振れる。`, "good")
     return out
   }
   if (event.type === "escrowed") {
@@ -44,7 +44,7 @@ export function tell(event: GameEvent, me: string | undefined): Told {
   if (event.type === "shared") {
     const kind = spawnOf(event.monster)?.kind
     if (event.exp) chat(`仲間が${kind ? `${MONSTER_KINDS[kind].name}を` : ""}追い払った。経験値 +${event.exp}。`)
-    if (event.gained) notify(`レベルが ${event.level} に上がった！`, "good")
+    if (event.gained) notify(`レベルが ${event.level} に上がった！ C で能力を振れる。`, "good")
     return out
   }
   if (event.type === "threaded") {
