@@ -1,5 +1,7 @@
 import { SHIFTS } from "#/world/town/shifts"
-import { DAILY_OUTPUT, PER_HEAD, STORES, TRADE_FIRES, UNITS, made, used, type Good } from "#/world/town/ledger"
+import { DAILY_OUTPUT, PER_HEAD, STORES, TRADE_FIRES, UNITS, type Good } from "#/world/town/ledger"
+import { made } from "#/world/town/made"
+import { used } from "#/world/town/used"
 import { RowLink } from "#/dev/sheets/row-link"
 import { formatTime } from "#/world/core/format-time"
 import { RESIDENTS, RESIDENT_LOOKS } from "#/world/town/residents"

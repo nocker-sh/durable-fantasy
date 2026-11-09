@@ -2,7 +2,8 @@ import { afterEach, expect, it, vi } from "vitest"
 import { BoxGeometry, MeshBasicMaterial, Mesh } from "three"
 import type * as ThreeLibrary from "three"
 import { CleanupStack } from "#/lib/engine/cleanup-stack"
-import { createSceneRenderer, keepPrograms } from "#/world/scene/runtime/create-scene-renderer"
+import { createSceneRenderer } from "#/world/scene/runtime/create-scene-renderer"
+import { keepPrograms } from "#/world/scene/runtime/keep-programs"
 import { createSceneRoot } from "#/world/scene/runtime/create-scene-root"
 
 const trace = vi.hoisted((): string[] => [])

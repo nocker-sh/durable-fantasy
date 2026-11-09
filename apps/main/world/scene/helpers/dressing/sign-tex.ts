@@ -1,4 +1,5 @@
-import { letter, signLines } from "#/world/scene/lettering"
+import { letter } from "#/world/scene/lettering"
+import { signLines } from "#/world/scene/sign-lines"
 import * as THREE from "three"
 
 export function signTex(word: string) {

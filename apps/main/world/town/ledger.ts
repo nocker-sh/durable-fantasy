@@ -2,7 +2,6 @@
 // makes it. ledger.test.ts checks that what is made covers what is used, that every lived house has
 // water within reach, and that every household earns its keep, so a new household or a lost trade
 // that would leave the town short shows up as a failing test before it shows up in the game.
-import { HOUSEHOLDS, HOUSES } from "#/world/town/houses"
 
 /** What the town lives on, in the units it is counted in. */
 export type Good = "パン" | "粉" | "野菜" | "おかず" | "薪" | "炭"
@@ -76,19 +75,3 @@ export const MILLER = "ベルトラム"
 
 /** How far a lived house's door may be from a well or the river (tiles; about forty paces with a bucket). */
 export const WATER_REACH = 20
-
-/** Everyone who lives in the town (members of a household). */
-export const heads = () => HOUSEHOLDS.reduce((n, hh) => n + hh.members.length, 0)
-
-/** The houses whose hearth burns every day: every lived house with one. */
-export const hearths = () => HOUSES.filter((h) => h.kind !== "vacant" && h.household && h.plan.hearth)
-
-/** What the town makes of a good in a day. */
-export const made = (g: Good) => Object.values(DAILY_OUTPUT).reduce((n, o) => n + (o[g] ?? 0), 0)
-
-/** What the town uses of a good in a day. */
-export function used(g: Good): number {
-  if (g === "薪") return hearths().length + Object.values(TRADE_FIRES).reduce((n, f) => n + (f.薪 ?? 0), 0)
-  if (g === "炭") return Object.values(TRADE_FIRES).reduce((n, f) => n + (f.炭 ?? 0), 0)
-  return heads() * (PER_HEAD[g] ?? 0)
-}

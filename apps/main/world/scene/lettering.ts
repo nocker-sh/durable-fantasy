@@ -71,6 +71,3 @@ export function letter(g: CanvasRenderingContext2D, lines: readonly string[], cx
   const step = size * 1.15
   lines.forEach((l, i) => g.fillText(l, cx, cy + (i - (lines.length - 1) / 2) * step))
 }
-
-/** A short sign split onto two lines at its space when that lets it be written larger. */
-export const signLines = (word: string): string[] => (word.includes(" ") && word.length > 6 ? [word.slice(0, word.indexOf(" ")), word.slice(word.indexOf(" ") + 1)] : [word])

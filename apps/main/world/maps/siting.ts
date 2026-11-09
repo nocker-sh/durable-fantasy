@@ -2,6 +2,7 @@
 // clear of the others by an alley one can walk, off the roads and the square, out of the river,
 // the yards and the fields, its door opening onto free ground (town.md「町の並び」).
 import type { HouseDef } from "#/world/town/house-types"
+import { doorStep } from "#/world/maps/door-step"
 import type { Layout, Rect } from "#/world/maps/layout-types"
 import type { Vector2Tuple as V2 } from "#/lib/engine/vector2-types"
 
@@ -32,12 +33,6 @@ function rim(r: Rect): V2[] {
 const off = (r: Rect) => r.x0 < -50
 const overlaps = (a: Rect, b: Rect, m = 0) => a.x0 < b.x1 + m && b.x0 < a.x1 + m && a.z0 < b.z1 + m && b.z0 < a.z1 + m
 const inside = (p: V2, r: Rect) => p[0] > r.x0 && p[0] < r.x1 && p[1] > r.z0 && p[1] < r.z1
-
-/** Where one steps out of a house's door, half a tile out. */
-export function doorStep(h: HouseDef): V2 {
-  const u = h.door.u
-  return h.door.side === "s" ? [h.x0 + u, h.z1 + 0.5] : h.door.side === "n" ? [h.x1 - u, h.z0 - 0.5] : h.door.side === "e" ? [h.x1 + 0.5, h.z1 - u] : [h.x0 - 0.5, h.z0 + u]
-}
 
 /** What is wrong with where the houses of one map stand: empty when nothing is. */
 export function sitingProblems(layout: Layout, houses: readonly HouseDef[], size = 48): string[] {

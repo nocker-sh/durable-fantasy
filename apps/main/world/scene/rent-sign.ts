@@ -1,4 +1,5 @@
-import { letter, signLines, WORDS } from "#/world/scene/lettering"
+import { letter, WORDS } from "#/world/scene/lettering"
+import { signLines } from "#/world/scene/sign-lines"
 import * as THREE from "three"
 import { GeometryBuilder as GB } from "#/lib/graphics/geometry-builder"
 import { M } from "#/world/scene/construction/materials"

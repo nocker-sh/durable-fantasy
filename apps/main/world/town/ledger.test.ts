@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest"
 import { HOUSEHOLDS, HOUSES } from "#/world/town/houses"
 import { RESIDENTS } from "#/world/town/residents"
-import { DAILY_OUTPUT, MILLER, STORES, TRADE_FIRES, WATER_REACH, made, used, type Good } from "#/world/town/ledger"
+import { DAILY_OUTPUT, MILLER, STORES, TRADE_FIRES, WATER_REACH, type Good } from "#/world/town/ledger"
+import { made } from "#/world/town/made"
+import { used } from "#/world/town/used"
 import { MAPS } from "#/world/maps/index"
 import { layoutOf } from "#/world/maps/layouts"
-import { doorStep } from "#/world/maps/siting"
+import { doorStep } from "#/world/maps/door-step"
 import type { Vector2Tuple as V2 } from "#/lib/engine/vector2-types"
 
 const segDist = (p: V2, a: V2, b: V2) => {
