@@ -60,9 +60,22 @@ export function Window(inputProps: {
     } catch {
       saved.value = null
     }
-    const first: Layout = { ...initial(window.innerWidth, window.innerHeight), ...(size ? { w: size.initial[0], h: size.initial[1] } : {}) }
-    setLayout(keep({ ...first, ...saved.value }, ref.current))
-    const onResize = () => setLayout((l) => (l ? keep(l, ref.current) : l))
+    const placeFor = (width: number, height: number): Layout => ({ ...initial(width, height), ...(size ? { w: size.initial[0], h: size.initial[1] } : {}) })
+    setLayout(keep({ ...placeFor(window.innerWidth, window.innerHeight), ...saved.value }, ref.current))
+    // a window nobody has moved goes back to its own corner at the new size (opened narrow, a right-hand window would stay at the left);
+    // one the player placed only stays in view
+    const onResize = () =>
+      setLayout((l) => {
+        if (!l) return l
+        const moved = (() => {
+          try {
+            return localStorage.getItem(key) !== null
+          } catch {
+            return true
+          }
+        })()
+        return keep(moved ? l : { ...placeFor(window.innerWidth, window.innerHeight), folded: l.folded }, ref.current)
+      })
     window.addEventListener("resize", onResize)
     return () => window.removeEventListener("resize", onResize)
     // initial and size are read once, when the window opens
