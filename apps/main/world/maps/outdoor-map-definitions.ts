@@ -20,7 +20,7 @@ import { createOutdoorMap } from "#/world/maps/create-outdoor-map"
 import type { MapDefinition } from "#/world/maps/types"
 
 export const OUTDOOR_MAP_DEFINITIONS: readonly Readonly<MapDefinition>[] = [
-  createOutdoorMap({ id: "phanthiet", name: "ファンティエット ― 広場", grid: town, kind: "town", spawn: [38, 80] }),
+  createOutdoorMap({ id: "phanthiet", name: "ファンティエット ― 広場", grid: town, kind: "town", spawn: [38, 72] }),
   createOutdoorMap({ id: "phanthiet-market", name: "ファンティエット ― 商店通り", grid: market, kind: "town", spawn: [48, 50] }),
   createOutdoorMap({ id: "phanthiet-craft", name: "ファンティエット ― 職人通り", grid: craft, kind: "town", spawn: [40, 46] }),
   createOutdoorMap({ id: "phanthiet-gate", name: "ファンティエット ― 南門", grid: gate, kind: "town", spawn: [48, 40] }),

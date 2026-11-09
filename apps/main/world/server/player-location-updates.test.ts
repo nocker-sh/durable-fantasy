@@ -47,7 +47,7 @@ it("keeps a player out in the wild in the world they followed a thread to instea
 })
 it("does not commit a different world's town fallback until that map is accepted", () => {
   const record = fixture()
-  record.location = { world: 2, map: TOWN_SPAWN.map, route: [[38, 80]], since: 1000, connection: "connection" }
+  record.location = { world: 2, map: TOWN_SPAWN.map, route: [[...TOWN_SPAWN.cell]], since: 1000, connection: "connection" }
   const before = structuredClone(record)
   expect(arrivePlayer(record, { world: 3, map: "south-meadow", connection: "replacement" }, 1250)).toEqual({ map: TOWN_SPAWN.map, at: TOWN_SPAWN.cell, accepted: false })
   expect(record).toEqual(before)
