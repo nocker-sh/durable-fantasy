@@ -59,6 +59,8 @@ export const CELLS_PER_SECOND = 4.8
 
 /** How far (ms) the start of a new path may run ahead of walking speed: the screen walks before the room hears of it, and late moves arrive bunched (pace-path.ts). */
 export const MOVE_LEAD_MS = 1000
+/** How much standing time (ms) the walking clock keeps, so moves held back by a network stall and delivered together are still taken (pace-path.ts). */
+export const MOVE_BANK_MS = 2000
 
 const coordinate = z
   .number()
