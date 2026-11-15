@@ -216,7 +216,7 @@ export const RELATIONS: readonly Relation[] = [
   { a: "ペーター", b: "フリッツ", kind: "友人", note: "広場で遊ぶ仲。ペーターが仕事を覚えてから会う時間が減った" },
   { a: "ペーター", b: "ミア", kind: "友人", note: "" },
   { a: "ディーター", b: "フリッツ", kind: "友人", note: "憧れの衛兵。広場では走るなと言われる" },
-  { a: "ハンス", b: "リーゼル", kind: "幼なじみ", note: "朝、井戸と店先で顔を合わせる。ハンスは何か言いかけてやめる" },
+  { a: "ハンス", b: "リーゼル", kind: "幼なじみ", note: "夜、井戸端の湯売りと店先で顔を合わせる。ハンスは何か言いかけてやめる" },
   { a: "ゾフィー", b: "マグダレーナ", kind: "友人", note: "押し花の飾りを仕立て屋に頼まれる" },
   { a: "コンスタンティン", b: "ベネディクト", kind: "ぎこちない", note: "結晶を売る者と、女神の力を祀る者。互いに礼は尽くすが、話が続かない" },
   { a: "ルドルフ", b: "ゴットフリート", kind: "ぎこちない", note: "若い頃に仕事を取り合った。今は通りで会えば会釈だけする" },
@@ -401,7 +401,7 @@ export const RELATIONS: readonly Relation[] = [
   { a: "ドミニク", b: "リヌス", kind: "親子", note: "" },
   { a: "レア", b: "リヌス", kind: "親子", note: "" },
   { a: "ドミニク", b: "エルザ", kind: "仕事仲間", note: "夜市の屋台が隣どうし" },
-  { a: "マティアス", b: "レージ", kind: "師弟", note: "伯父と姪。羊の数え方を教わる" },
+  { a: "マティアス", b: "レージ", kind: "師弟", note: "伯父と姪。羊の見分け方を教わる" },
   // the children who play together
   { a: "ヴァレンティン", b: "バスティアン", kind: "友人", note: "" },
   { a: "エリーゼ", b: "ピア", kind: "友人", note: "" },
@@ -414,4 +414,7 @@ export const RELATIONS: readonly Relation[] = [
  * part of who they are (lines speak of notes left on the table, of seeing each other asleep). Every
  * other family, friend and old acquaintance meets somewhere in the day (people.test.ts).
  */
-export const APART: readonly { a: string; b: string; why: string }[] = [{ a: "グレーテ", b: "アンナ", why: "妹は夜市、姉は昼の洗濯場。台所の置き手紙でやり取りする姉妹" }]
+export const APART: readonly { a: string; b: string; why: string }[] = [
+  { a: "グレーテ", b: "アンナ", why: "妹は夜市、姉は昼の洗濯場。台所の置き手紙でやり取りする姉妹" },
+  { a: "ブルーノ", b: "ヘレナ", why: "道具屋の夜番と昼番。間にキリアンの引き継ぎが挟まり、顔は合わせず帳簿の字だけで知っている" },
+]
