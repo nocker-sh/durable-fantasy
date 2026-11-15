@@ -85,7 +85,7 @@ try {
   await received(outsider, "残った二人の話")
   await absent(guest, "残った二人の話")
   await say(guest, "脱退後の話")
-  await guest.getByText("パーティに入ってから話そう。", { exact: true }).waitFor()
+  await guest.getByText("パーティに入っていない。", { exact: true }).waitFor()
   await absent(host, "脱退後の話")
   if (errors.length) throw Error(errors.join("\n"))
   console.log("join privacy, reload, deduplication and leaving passed")

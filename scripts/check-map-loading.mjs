@@ -14,7 +14,7 @@ try {
   const errors = []
   page.on("pageerror", (error) => errors.push(String(error)))
   let disabledPrefetch = false
-  await page.route("**/world/scene/ground.ts*", async (route) => {
+  await page.route("**/world/scene/prefetch-ground.ts*", async (route) => {
     const response = await route.fetch()
     const source = await response.text()
     const changed = source.replace(/function prefetchGround\(map\)\s*\{/, "$& return;")
@@ -40,6 +40,7 @@ try {
         window.__loadStart = performance.now()
         window.game.enterMap(id, null)
       }, map)
+      await page.waitForFunction((id) => window.game.state.get().map.id === id, map, { timeout: 180000 })
       await waitReady()
       const result = await page.evaluate(() => ({
         map: window.game.state.get().map.id,
