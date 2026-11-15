@@ -22,7 +22,7 @@ const withDeadline = async (promise) => {
 }
 const pages = []
 try {
-  for (const name of ["エルナ", "フリッツ", "オットー"]) {
+  for (const name of ["ペトラ", "ルッツ", "カリン"]) {
     const context = await browser.newContext({ ignoreHTTPSErrors: true, viewport: { width: 1280, height: 800 } })
     const page = await context.newPage()
     page.on("pageerror", (error) => errors.push(error.message))
@@ -59,14 +59,14 @@ try {
   const absent = async (page, text) => {
     if (await page.evaluate((text) => game.state.get().chat.some((line) => line.text === text), text)) throw Error("Private speech reached an unauthorized recipient")
   }
-  await invite(guest, "フリッツ")
+  await invite(guest, "ルッツ")
   await walkToMap(guest, "phanthiet-gate")
   await say(host, "南門で待ち合わせ")
   await received(guest, "南門で待ち合わせ")
   await received(host, "南門で待ち合わせ")
   await absent(outsider, "南門で待ち合わせ")
   console.log("party chat crossed maps without public delivery")
-  await invite(outsider, "オットー")
+  await invite(outsider, "カリン")
   await say(guest, "仲間が増えたね")
   await received(outsider, "仲間が増えたね")
   await absent(outsider, "南門で待ち合わせ")

@@ -27,11 +27,11 @@ try {
     }
   })
   await page.waitForFunction(() => window.__gatherCamera !== null)
-  await page.evaluate(() => game.scene.walkTo(30.5 / 2, 74.5 / 2))
+  await page.evaluate(() => game.scene.walkTo(30.5 / 2, 64.5 / 2))
   await page.waitForFunction(
     () => {
       const at = game.scene.playerCell()
-      return at && Math.hypot(at[0] - 30, at[1] - 74) <= 1 && !game.scene.player().walking
+      return at && Math.hypot(at[0] - 30, at[1] - 64) <= 1 && !game.scene.player().walking
     },
     null,
     { timeout: 120000 },
