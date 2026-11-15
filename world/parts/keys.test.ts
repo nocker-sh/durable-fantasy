@@ -125,3 +125,36 @@ it("removes state and visibility listeners when unlistened and registers once on
   expect(registrations).toHaveLength(2)
   expect(removed.mock.calls.filter(([event]) => event === "visibilitychange").slice(-2)).toEqual(registrations)
 })
+
+it("keeps digits for the conversation while it is open, and for the hotbar otherwise", () => {
+  const f = fixture()
+  const game = Object.assign(f.game, { useHotbar: vi.fn(), choose: vi.fn(), advanceDialogue: vi.fn() })
+  const digit = (value: string) => {
+    const event = new Event("keydown", { cancelable: true })
+    Object.defineProperties(event, { code: { value: `Digit${value}` }, key: { value: value }, repeat: { value: false }, target: { value: { closest: () => null } } })
+    f.window.dispatchEvent(event)
+    return event
+  }
+  digit("1")
+  expect(game.useHotbar).toHaveBeenCalledExactlyOnceWith(0)
+  const choices = [
+    { label: "頼まれごとを聞く", action: "errand-ask" as const, errand: "marta-firewood" },
+    { label: "さようなら", action: "close" as const },
+  ]
+  const dialogue = { resident: 2, name: "マルタ", job: "パン屋", pages: ["一枚目", "二枚目"], page: 0, choices, shownAt: 0 }
+  game.state.set({ ...game.state.get(), dialogue })
+  // the choices are not up on the first page: the digit is neither a choice nor a hotbar use
+  expect(digit("1").defaultPrevented).toBe(true)
+  expect(game.choose).not.toHaveBeenCalled()
+  game.state.set({ ...game.state.get(), dialogue: { ...dialogue, page: 1 } })
+  digit("2")
+  expect(game.choose).toHaveBeenCalledExactlyOnceWith(1)
+  // a digit past the last choice does nothing either
+  digit("3")
+  digit("0")
+  expect(game.choose).toHaveBeenCalledTimes(1)
+  expect(game.useHotbar).toHaveBeenCalledTimes(1)
+  game.state.set({ ...game.state.get(), dialogue: null })
+  digit("0")
+  expect(game.useHotbar).toHaveBeenLastCalledWith(9)
+})
