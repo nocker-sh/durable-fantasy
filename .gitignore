@@ -12,5 +12,9 @@ dist
 # pictures for /dev, made by scripts/shoot-maps.ts (kept out of the deployed assets)
 public/dev/
 
-# Generated temporary assets
-public/tmp/
+# Generated temporary assets. The baked resident sprites are kept in Git for now, so a
+# deploy from a fresh checkout serves them; they move to object storage later.
+public/tmp/*
+!public/tmp/sprites/
+public/tmp/sprites/.bake-plan.json
+public/tmp/sprites/*.pending

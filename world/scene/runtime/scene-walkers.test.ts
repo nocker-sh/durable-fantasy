@@ -22,6 +22,7 @@ vi.mock("#/world/scene/figure/figure", async () => {
         this.item = item
       })
       readonly prefetch = vi.fn()
+      readonly foreground = vi.fn()
       readonly dispose = vi.fn(() => this.root.removeFromParent())
       readonly pose = vi.fn()
       readonly face = vi.fn()
@@ -175,4 +176,15 @@ it("still releases remote players when releasing the local figure fails", () => 
   expect(person.fig.dispose).toHaveBeenCalledOnce()
   expect(person.label.remove).toHaveBeenCalledOnce()
   expect(f.walkers.remotes.size).toBe(0)
+})
+
+it("keeps the local figure ahead of other sprite requests across appearance replacement", () => {
+  const f = fixture()
+  const first = f.walkers.me.fig
+  expect(first.foreground).toHaveBeenCalledTimes(1)
+  f.walkers.setAvatar({ ...f.avatar, look: LOOKS[1].look })
+  expect(f.walkers.me.fig).not.toBe(first)
+  expect(f.walkers.me.fig.foreground).toHaveBeenCalledTimes(1)
+  f.walkers.addRemote("other", f.avatar, [1, 1])
+  expect(remote(f.walkers).fig.foreground).not.toHaveBeenCalled()
 })

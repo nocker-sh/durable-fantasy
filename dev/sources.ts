@@ -41,6 +41,8 @@ export const SOURCES: Record<string, readonly string[]> = {
 
 /** Exported constants that are not tables of things in the game. */
 export const NOT_TABLES: readonly string[] = [
+  // Which keys walk which way, an input binding and not a world data table.
+  "MOVE_KEYS",
   // Default furnishing patterns and decoration pools, not independent game entities.
   "ESSENTIALS",
   "TOPS",
@@ -48,6 +50,8 @@ export const NOT_TABLES: readonly string[] = [
   "LETTERS",
   // Server command dispatch, not a world data table.
   "HANDLERS",
+  // Keyboard input bindings for walking, not a world data table.
+  "MOVE_KEYS",
   // where a map's landform runs, shared by its ground and its scene
   "MEADOW_TERRACES",
   "MARSH_PONDS",

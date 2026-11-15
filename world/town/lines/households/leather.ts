@@ -2,6 +2,7 @@ import type { Line } from "#/world/town/lines/line"
 
 const lines = {
   ルドルフ: [
+    { text: "ラインホルトと一杯だぞ。あいつの拾い物の話は、半分で聞くんだ。", doing: "ラインホルトと" },
     { text: "冬毛は三つだぞ。革とは別だ。靴の中で足に当たるところに使うんだ。", errand: { id: "rudolf-fur", state: "taken" } },
     { text: "冬毛が揃ったか。寄せる前に草を払うから、こっちへ渡してくれ。", errand: { id: "rudolf-fur", state: "ready" } },
     { text: "あの冬毛があれば、靴の内張りを厚くできる。足先の冷えが違うんだぞ。", errand: { id: "rudolf-fur", state: "done" } },
