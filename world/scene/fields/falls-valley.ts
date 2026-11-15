@@ -11,8 +11,8 @@ import { spray } from "#/world/scene/fields/spray"
 import { reeds } from "#/world/scene/fields/reeds"
 import { tufts } from "#/world/scene/fields/tufts"
 import { rocks } from "#/world/scene/fields/rocks"
-import { pines } from "#/world/scene/fields/pines"
-import { broadleaves } from "#/world/scene/fields/broadleaves"
+import { woods } from "#/world/scene/fields/woods"
+import { birches } from "#/world/scene/fields/birches"
 import { shrubs } from "#/world/scene/fields/shrubs"
 import { logs } from "#/world/scene/fields/logs"
 import { mushrooms } from "#/world/scene/fields/mushrooms"
@@ -85,7 +85,7 @@ export function fallsValley(root: THREE.Group) {
       ok: (x, z) => nearWater(x, z) && bed.distance(x, z) > 1.1 && offRoad(1.2)(x, z),
     }),
   )
-  pines(
+  woods(
     root,
     scatter({
       seed: 2606,
@@ -95,13 +95,13 @@ export function fallsValley(root: THREE.Group) {
       ok: (x, z) => offRoad(2.4)(x, z) && bed.distance(x, z) > 3,
     }),
   )
-  broadleaves(
+  birches(
     root,
-    clusters(2607, 0, 3, 2.2, 0.7, 1.0, offRoad(2), [
+    clusters(2607, 0, 4, 2.2, 0.8, 1.1, offRoad(2), [
       [44.5, 40],
       [33, 45],
     ]),
-    M.leaf,
+    false,
   )
   flowers(
     root,

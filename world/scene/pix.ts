@@ -7,6 +7,9 @@ const RAMPS_HEX: Record<string, string[]> = {
   leaf: ["#253038", "#33463e", "#465f42", "#5f7a47", "#7f964f", "#a8b062"],
   leaf2: ["#2a3040", "#38454a", "#4a5e50", "#62785a", "#839468"],
   autumn: ["#3a2c3c", "#6a3f44", "#985a4a", "#c08052", "#dca866"],
+  // trees in flower (apple and plum) and the larch's needles before they fall
+  blossom: ["#6e4a62", "#a8748e", "#d69cb2", "#f0c4d0", "#fce6ea"],
+  larch: ["#4e3c2c", "#80622e", "#b08c38", "#d6b84c", "#eedb80"],
   stone: ["#3d3a4a", "#5a5562", "#7a7272", "#9a8f84", "#bbae98", "#d9cbae"],
   sand: ["#4c4452", "#6f6268", "#94837a", "#b6a28a", "#d4c09e", "#ebdcb8"],
   redsand: ["#4a2e32", "#74403c", "#9a5846", "#bc7858", "#d69c78", "#ecc6a6"],
@@ -42,6 +45,10 @@ const RAMPS_HEX: Record<string, string[]> = {
   steel: ["#1c2230", "#2e3a4e", "#4a5c72", "#7890a6", "#c4d2dc"],
   engine: ["#1a161e", "#2e2630", "#4a3c40", "#7a6458", "#c8a874"],
   fire: ["#5a2030", "#a8402c", "#e07a2c", "#f6b84a", "#fff0a0"],
+  // what two hundred years in the open leave of iron, bronze and bone (scene/fields/ruin-materials.ts)
+  rust: ["#2a1a20", "#4a2a26", "#733f2e", "#9a5a36", "#bf8046", "#d9a866"],
+  verdigris: ["#1c302e", "#2c4c44", "#44705e", "#6a987c", "#9cc09c"],
+  bone: ["#5a524e", "#8a8072", "#b2a892", "#d4cab0", "#ece4cc"],
   // people
   skin1: ["#6a4448", "#9a6658", "#c48e74", "#e0b896", "#f2d4b4"],
   skin2: ["#4e3438", "#7a5048", "#a06e56", "#c08e6c", "#dcb08a"],

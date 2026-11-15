@@ -71,6 +71,7 @@ export const NOT_TABLES: readonly string[] = [
   "WATER_JAR_SHAPE", // Normalized ceramic geometry, not a table of placed objects.
   "WINDMILL_ROTOR_SHAPE", // Shared rotor dimensions; the placed mill belongs to the facility settings.
   "FURNITURE_KINDS", // Renderer identifiers; placed furniture is listed under objects and houses.
+  "FLOWER_KINDS", // How each wild flower is drawn; where drifts grow is decided by the land.
   "GATHER_SKILLS",
   "CRAFT_SKILLS",
   "GRADES",
