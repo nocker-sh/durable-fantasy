@@ -41,6 +41,8 @@ export const SOURCES: Record<string, readonly string[]> = {
 
 /** Exported constants that are not tables of things in the game. */
 export const NOT_TABLES: readonly string[] = [
+  // Which keys walk which way, an input binding and not a world data table.
+  "MOVE_KEYS",
   // Default furnishing patterns and decoration pools, not independent game entities.
   "ESSENTIALS",
   "TOPS",

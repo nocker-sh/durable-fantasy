@@ -751,7 +751,7 @@ const baseRoutines: Record<string, readonly Slot[]> = {
   コンラート: [
     at({ from: "02:30", where: "home", doing: "起きて支度" }),
     at({ from: "03:00", where: "work", doing: "朝番で門に立つ" }),
-    at({ from: "09:00", where: { map: "phanthiet-market", tile: [5.6, 37.4] }, doing: "朝の食堂で粥を食べる" }),
+    at({ from: "09:00", where: { map: "phanthiet-market", tile: [5.4, 35.6] }, doing: "朝の食堂で粥を食べる" }),
     at({ from: "10:00", where: "work", doing: "通った者を帳面に書き写す" }),
     at({ from: "13:00", where: "home", doing: "寝る前の食事" }),
     at({ from: "14:00", where: "home", doing: "眠る" }),
