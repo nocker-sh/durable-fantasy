@@ -2,6 +2,7 @@ import type { Line } from "#/world/town/lines/line"
 
 const lines = {
   ゴットフリート: [
+    { text: "エマの家の戸だ。灰で敷居が歪む。……鉋をかければ済む。", doing: "戸を直" },
     { text: "頼んだ原木は三本だ。斧が傷んでいたら、無理に振るうな。", errand: { id: "gottfried-logs", state: "taken" } },
     { text: "原木が揃ったな。こちらへ渡してくれ。木目を見て、板を取る。", errand: { id: "gottfried-logs", state: "ready" } },
     { text: "持ってきてくれた原木は、板に挽く分へ回す。端も柄に使える。", errand: { id: "gottfried-logs", state: "done" } },
@@ -45,7 +46,7 @@ const lines = {
     { text: "今日みたいな日に切った木が、いちばん締まる。", event: "寒波" },
     { text: "寒波の夜は弓の弦が縮む。張り直してから売る。", event: "寒波" },
     { text: "霧の日は木が湿気を吸う。弓は売らん。", event: "霧" },
-    { text: "霧で樹海が見えん日は、ヨーゼフも森に入らない。", event: "霧" },
+    { text: "霧の日は、ヨーゼフも森の奥には入らん。原木が一日遅れる。", event: "霧" },
     { text: "祭りの灯りを吊るす竿を頼まれた。まっすぐなのを選んだ。", event: "祭りの前日" },
     { text: "明日は祭りか。……削る手は止めん。", event: "祭りの前日" },
     { text: "灯りの火は、木の燃える色に似てる。", event: "灯りの祭り" },

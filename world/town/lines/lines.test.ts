@@ -6,7 +6,7 @@ import { fit } from "#/world/town/lines/fit"
 import { pick } from "#/world/town/lines/pick"
 import type { Line, Situation } from "#/world/town/lines/line"
 import { ALL_LINES } from "#/world/town/lines/index"
-import { RELATIONS } from "#/world/town/people"
+import { APART, RELATIONS } from "#/world/town/people"
 import { ROUTINES } from "#/world/town/routines"
 import { slotAt } from "#/world/town/slot-at"
 
@@ -76,6 +76,42 @@ describe("what residents say", () => {
       const justUp = EVERY.some((m) => when(m) && !asleep(name, m) && [60, 120, 180, 240, 300].some((d) => asleep(name, m - d)))
       expect(justUp, `${name} [${l.phase}]: ${l.text}`).toBe(true)
     }
+  })
+
+  it("every doing out of doors has a line of its own, so nobody at work only makes small talk", () => {
+    for (const r of RESIDENTS) {
+      const lines = ALL_LINES[r.name] ?? []
+      const doings = new Set((ROUTINES[r.name] ?? []).filter((s) => s.where !== "home").map((s) => s.doing))
+      for (const d of doings) expect(lines.some((l) => l.doing && d.includes(l.doing)), `${r.name}: ${d}`).toBe(true)
+    }
+  })
+
+  it("names only people and things of this town: a name in katakana is a resident, an animal or a known word", () => {
+    const names = new Set(RESIDENTS.map((r) => r.name))
+    // animals the residents have named, the two other towns, and the everyday words written in katakana
+    const known = new Set([
+      ...["フロッケ", "ブレッセ", "ヴォルケ", "フレッケ", "シュネー", "クレー", "グルンツ", "シュヌッフェル", "クノレ"],
+      ...["クイニョン"],
+      ...["インク", "カミツレ", "カラーン", "キャベツ", "グラス", "ケンカ", "ケーキ", "ゴールド", "シチュー", "シーツ", "スカーフ", "スキップ"],
+      ...["ストール", "スライム", "スープ", "ズボン", "ゼリー", "タマネギ", "チクチク", "チーズ", "トネリコ", "ドレス", "ニシン", "ニンジン"],
+      ...["ハリネズミ", "バター", "ピンク", "ベンチ", "ベーコン", "ページ", "ボタン", "ポケット", "マフラー", "ミミズ", "ランタン", "ラード", "リボン"],
+    ])
+    for (const { name, l } of all)
+      for (const m of l.text.matchAll(/[ァ-ヴー]{3,}/g)) expect(names.has(m[0]) || known.has(m[0]), `${name}: ${m[0]} in 「${l.text}」`).toBe(true)
+  })
+
+  it("the festival of lights comes every month, so nobody calls it a yearly thing", () => {
+    for (const { name, l } of all)
+      if (l.event === "灯りの祭り" || l.event === "祭りの前日") expect(/毎年|年に一度|一年で|一年に/.test(l.text), `${name}: ${l.text}`).toBe(false)
+  })
+
+  it("pairs kept apart on purpose have no line for standing next to each other", () => {
+    for (const { name, l } of all)
+      if (l.near) expect(APART.some((p) => (p.a === name && p.b === l.near) || (p.b === name && p.a === l.near)), `${name} → ${l.near}`).toBe(false)
+  })
+
+  it("keeps to what the world is: ash that started long before anyone alive, crystals that are not used up, no orphanage", () => {
+    for (const { name, l } of all) for (const bad of [/孤児院/, /結晶(が|は|を)?(減|すり減|使い切|なくな)/, /灰が降り始めた頃/]) expect(bad.test(l.text), `${name}: ${l.text}`).toBe(false)
   })
 
   it("the best-fitting line comes first, and a conversation never repeats itself", () => {
