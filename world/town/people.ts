@@ -414,6 +414,7 @@ export const RELATIONS: readonly Relation[] = [
  * part of who they are (lines speak of notes left on the table, of seeing each other asleep). Every
  * other family, friend and old acquaintance meets somewhere in the day (people.test.ts).
  */
-export const APART: readonly { a: string; b: string; why: string }[] = [{ a: "グレーテ", b: "アンナ", why: "妹は夜市、姉は昼の洗濯場。台所の置き手紙でやり取りする姉妹" },
+export const APART: readonly { a: string; b: string; why: string }[] = [
+  { a: "グレーテ", b: "アンナ", why: "妹は夜市、姉は昼の洗濯場。台所の置き手紙でやり取りする姉妹" },
   { a: "ブルーノ", b: "ヘレナ", why: "道具屋の夜番と昼番。間にキリアンの引き継ぎが挟まり、顔は合わせず帳簿の字だけで知っている" },
 ]

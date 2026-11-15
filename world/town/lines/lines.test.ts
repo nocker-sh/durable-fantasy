@@ -82,7 +82,11 @@ describe("what residents say", () => {
     for (const r of RESIDENTS) {
       const lines = ALL_LINES[r.name] ?? []
       const doings = new Set((ROUTINES[r.name] ?? []).filter((s) => s.where !== "home").map((s) => s.doing))
-      for (const d of doings) expect(lines.some((l) => l.doing && d.includes(l.doing)), `${r.name}: ${d}`).toBe(true)
+      for (const d of doings)
+        expect(
+          lines.some((l) => l.doing && d.includes(l.doing)),
+          `${r.name}: ${d}`,
+        ).toBe(true)
     }
   })
 
@@ -90,24 +94,68 @@ describe("what residents say", () => {
     const names = new Set(RESIDENTS.map((r) => r.name))
     // animals the residents have named, the two other towns, and the everyday words written in katakana
     const known = new Set([
-      ...["フロッケ", "ブレッセ", "ヴォルケ", "フレッケ", "シュネー", "クレー", "グルンツ", "シュヌッフェル", "クノレ"],
-      ...["クイニョン"],
-      ...["インク", "カミツレ", "カラーン", "キャベツ", "グラス", "ケンカ", "ケーキ", "ゴールド", "シチュー", "シーツ", "スカーフ", "スキップ"],
-      ...["ストール", "スライム", "スープ", "ズボン", "ゼリー", "タマネギ", "チクチク", "チーズ", "トネリコ", "ドレス", "ニシン", "ニンジン"],
-      ...["ハリネズミ", "バター", "ピンク", "ベンチ", "ベーコン", "ページ", "ボタン", "ポケット", "マフラー", "ミミズ", "ランタン", "ラード", "リボン"],
+      "フロッケ",
+      "ブレッセ",
+      "ヴォルケ",
+      "フレッケ",
+      "シュネー",
+      "クレー",
+      "グルンツ",
+      "シュヌッフェル",
+      "クノレ",
+      "クイニョン",
+      "インク",
+      "カミツレ",
+      "カラーン",
+      "キャベツ",
+      "グラス",
+      "ケンカ",
+      "ケーキ",
+      "ゴールド",
+      "シチュー",
+      "シーツ",
+      "スカーフ",
+      "スキップ",
+      "ストール",
+      "スライム",
+      "スープ",
+      "ズボン",
+      "ゼリー",
+      "タマネギ",
+      "チクチク",
+      "チーズ",
+      "トネリコ",
+      "ドレス",
+      "ニシン",
+      "ニンジン",
+      "ハリネズミ",
+      "バター",
+      "ピンク",
+      "ベンチ",
+      "ベーコン",
+      "ページ",
+      "ボタン",
+      "ポケット",
+      "マフラー",
+      "ミミズ",
+      "ランタン",
+      "ラード",
+      "リボン",
     ])
-    for (const { name, l } of all)
-      for (const m of l.text.matchAll(/[ァ-ヴー]{3,}/g)) expect(names.has(m[0]) || known.has(m[0]), `${name}: ${m[0]} in 「${l.text}」`).toBe(true)
+    for (const { name, l } of all) for (const m of l.text.matchAll(/[ァ-ヴー]{3,}/g)) expect(names.has(m[0]) || known.has(m[0]), `${name}: ${m[0]} in 「${l.text}」`).toBe(true)
   })
 
   it("the festival of lights comes every month, so nobody calls it a yearly thing", () => {
-    for (const { name, l } of all)
-      if (l.event === "灯りの祭り" || l.event === "祭りの前日") expect(/毎年|年に一度|一年で|一年に/.test(l.text), `${name}: ${l.text}`).toBe(false)
+    for (const { name, l } of all) if (l.event === "灯りの祭り" || l.event === "祭りの前日") expect(/毎年|年に一度|一年で|一年に/.test(l.text), `${name}: ${l.text}`).toBe(false)
   })
 
   it("pairs kept apart on purpose have no line for standing next to each other", () => {
     for (const { name, l } of all)
-      if (l.near) expect(APART.some((p) => (p.a === name && p.b === l.near) || (p.b === name && p.a === l.near)), `${name} → ${l.near}`).toBe(false)
+      if (l.near)
+        expect(
+          APART.some((p) => (p.a === name && p.b === l.near) || (p.b === name && p.a === l.near)),
+          `${name} → ${l.near}`,
+        ).toBe(false)
   })
 
   it("keeps to what the world is: ash that started long before anyone alive, crystals that are not used up, no orphanage", () => {
