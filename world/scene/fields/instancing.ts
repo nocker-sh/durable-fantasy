@@ -9,7 +9,8 @@ const m4 = new THREE.Matrix4(),
   q = new THREE.Quaternion(),
   e = new THREE.Euler(),
   v = new THREE.Vector3(),
-  sc = new THREE.Vector3()
+  sc = new THREE.Vector3(),
+  tint = new THREE.Color()
 
 function instanced(inputProps: {
   root: THREE.Group
@@ -17,6 +18,10 @@ function instanced(inputProps: {
   material: THREE.Material
   spots: Spot[]
   place: (s: Spot) => [V2 | [number, number, number], [number, number, number], [number, number, number]]
+  /** a tint per instance, multiplied with the material's colour, so no two trees are quite alike */
+  tint?: (s: Spot, i: number) => number
+  /** small things (grass, ferns) cast no shadow worth its cost */
+  shadow?: boolean
 }) {
   const root = inputProps.root
   const geo = inputProps.geo
@@ -35,8 +40,9 @@ function instanced(inputProps: {
     q.setFromEuler(e.set(rot[0], rot[1], rot[2]))
     m4.compose(v, q, sc.set(scale[0], scale[1], scale[2]))
     im.setMatrixAt(i, m4)
+    if (inputProps.tint) im.setColorAt(i, tint.setHex(inputProps.tint(s, i)))
   })
-  im.castShadow = true
+  im.castShadow = inputProps.shadow ?? true
   im.receiveShadow = true
   root.add(im)
 }

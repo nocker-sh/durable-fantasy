@@ -13,4 +13,4 @@ export type SceneLight = Readonly<{
   azimuth: number
   elevation: number
 }>
-export type SceneWaterUniforms = { sky: { value: Color }; t: { value: number } }
+export type SceneWaterUniforms = { sky: { value: Color }; t: { value: number }; tint?: { value: Color }; day?: { value: number } }

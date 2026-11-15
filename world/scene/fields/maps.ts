@@ -56,6 +56,8 @@ import { grassHighland } from "#/world/scene/fields/grass-highland"
 import { lilyMarsh } from "#/world/scene/fields/lily-marsh"
 import { fallsValley } from "#/world/scene/fields/falls-valley"
 import { saltFlats } from "#/world/scene/fields/salt-flats"
+import { wildGrowth } from "#/world/scene/fields/wild-growth"
+import { sunbeams } from "#/world/scene/fields/sunbeams"
 
 // ---------------------------------------------------------------- builders
 function meadow(root: THREE.Group) {
@@ -1045,6 +1047,46 @@ function rim(root: THREE.Group, id: string, seed: number) {
     id !== "deep-forest",
   )
 }
+/**
+ * Where the sun breaks through onto each field's sights by day (landscape.md「マップごとのテーマ」): the
+ * lone tree, the stopped windmill, the engines in the grass, the clearings, the shrines, the tower.
+ */
+const BEAMS: Record<string, readonly (readonly [number, number, number])[]> = {
+  "south-meadow": [
+    [34, 13, 3.2],
+    [6.5, 40, 2.6],
+    [41.6, 39.6, 2.4],
+  ],
+  "red-dunes": [
+    [34, 33, 2.6],
+    [12, 12, 2.4],
+  ],
+  "sea-cliff": [[30.5, 24, 3]],
+  "net-sheds": [[32, 31, 3]],
+  "forest-edge": [
+    [17, 26.5, 3],
+    [31, 14, 2],
+  ],
+  "deep-forest": [
+    [14, 32.6, 2.4],
+    [36, 12.8, 2.4],
+    [24, 23, 1.8],
+  ],
+  "mountain-pass": [
+    [20.6, 12, 2.4],
+    [30.8, 20.8, 2],
+  ],
+  "grass-highland": [
+    [13, 12.4, 3],
+    [32, 32, 2.4],
+  ],
+  "lily-marsh": [
+    [26.2, 18.5, 2.4],
+    [33.4, 32.4, 2.2],
+  ],
+  "falls-valley": [[34.6, 31.2, 2.6]],
+  "salt-flats": [[34, 15, 2.8]],
+}
 const BUILDERS: Record<string, (root: THREE.Group) => void> = {
   "south-meadow": meadow,
   "red-dunes": dunes,
@@ -1069,6 +1111,8 @@ export const FIELD_BUILDERS: Record<string, (root: THREE.Group) => void> = Objec
       (root: THREE.Group) => {
         b(root)
         rim(root, id, 3000 + i * 10)
+        wildGrowth(root, LAYOUTS[id]?.biome, 5000 + i * 10)
+        sunbeams(root, BEAMS[id] ?? [])
       },
     ]
   }),

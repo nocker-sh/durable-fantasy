@@ -78,7 +78,7 @@ it("keeps GPU surface construction after the asynchronous loading yield", async 
   f.resources.dispose()
 })
 
-it("releases both geometries, both materials and shader-only textures if adding water fails", async () => {
+it("releases both geometries, both materials, the shader-only textures and the water depth if adding water fails", async () => {
   const geometries = vi.spyOn(BufferGeometry.prototype, "dispose")
   const materials = vi.spyOn(Material.prototype, "dispose")
   const textures = vi.spyOn(Texture.prototype, "dispose")
@@ -97,5 +97,5 @@ it("releases both geometries, both materials and shader-only textures if adding 
   ).rejects.toThrow(failure)
   expect(geometries).toHaveBeenCalledTimes(2)
   expect(materials).toHaveBeenCalledTimes(2)
-  expect(textures).toHaveBeenCalledTimes(2)
+  expect(textures).toHaveBeenCalledTimes(3)
 })

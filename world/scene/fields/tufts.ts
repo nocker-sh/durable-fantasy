@@ -42,12 +42,13 @@ const tuftMat = (() => {
 
 import type { Spot } from "#/world/scene/fields/instancing"
 import { instanced } from "#/world/scene/fields/instancing"
+import { sway } from "#/world/scene/fields/sway"
 
 export function tufts(root: THREE.Group, spots: Spot[]) {
   instanced({
     root: root,
     geo: tuftGeo,
-    material: tuftMat,
+    material: sway(tuftMat, 0.05),
     spots: spots,
     place: (s) => [
       [s.x, s.z],
