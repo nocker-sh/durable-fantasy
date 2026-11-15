@@ -150,6 +150,8 @@ export const NOT_TABLES: readonly string[] = [
   "FIG_DOT", // Pixel reduction factor, not a game table.
   "TEXEL_PPU", // Shared texture pixel density, not a game table.
   "SCENE_LIGHT_PALETTES", // Rendering keyframes blended by the clock, not placed world records.
+  "AMBIENT_KINDS", // Drawn-only swarms (butterflies, birds, leaves) by kind of land, not creatures of the game.
+  "MOVE_KEYS", // Keyboard codes to walking directions, an input mapping.
   "OUT",
   "FR",
   "PARENT",
