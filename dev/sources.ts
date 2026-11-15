@@ -48,6 +48,8 @@ export const NOT_TABLES: readonly string[] = [
   "LETTERS",
   // Server command dispatch, not a world data table.
   "HANDLERS",
+  // Keyboard input bindings for walking, not a world data table.
+  "MOVE_KEYS",
   // where a map's landform runs, shared by its ground and its scene
   "MEADOW_TERRACES",
   "MARSH_PONDS",
