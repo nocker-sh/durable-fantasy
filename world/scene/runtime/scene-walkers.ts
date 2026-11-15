@@ -26,6 +26,7 @@ export class SceneWalkers {
   constructor(private readonly props: Props) {
     this.appearance = new WalkerAppearance({ makeFigure: this.makeFigure })
     this.me = this.createMe()
+    this.me.fig.foreground()
     const me = this.me
     this.movement = createWalkerMovement(me)
     this.motion = new WalkerMotion({ me, speed: STEP_SPEED, heightAt: walkH })
@@ -64,6 +65,7 @@ export class SceneWalkers {
 
   readonly setAvatar = (avatar: Avatar): void => {
     this.appearance.update(this.me, avatar)
+    this.me.fig.foreground()
   }
 
   readonly addRemote = (id: string, avatar: Avatar, at: Readonly<Cell>): void => {

@@ -17,6 +17,9 @@ const DW = FW / FIG_DOT,
 
 const MAX_STRIPS = 16
 
+/** Above any score the frame clock reaches (sprite-frame.ts), so the queue takes these first. */
+const FOREGROUND = 1e12
+
 const tmpV = new THREE.Vector3()
 const DAYLIGHT = new THREE.Color(1, 1, 1)
 import { FIG } from "#/world/scene/figure/display-scale"
@@ -49,6 +52,11 @@ export class Figure {
   private lift = 0
   lighten(amount: number) {
     this.lift = amount
+  }
+  /** added to every request's urgency: the player's own figure is drawn before anyone else's frames */
+  private boost = 0
+  foreground() {
+    this.boost = FOREGROUND
   }
   /** a silhouette drawn through walls, while something we cannot see into stands in front */
   private ghost: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial> | null = null
@@ -185,16 +193,20 @@ export class Figure {
     return s.value
   }
   /** Request one frame; it is drawn into its strip when it arrives. */
-  private want(inputProps: { anim: Anim; item: Item; v: number; f: number; urgency: number }) {
+  private want(inputProps: { anim: Anim; item: Item; v: number; f: number; urgency: number; again?: boolean }) {
     const anim = inputProps.anim
     const item = inputProps.item
     const v = inputProps.v
     const f = inputProps.f
-    const urgency = inputProps.urgency
+    const urgency = inputProps.urgency + this.boost
 
     if (this.disposed) return
     const s = this.strip(anim, item, v)
-    if (s.ready[f] || s.requested[f] || s.baked === "loading") return
+    if (s.ready[f] || s.baked === "loading") return
+    // The frame on show is asked for again while it waits: an old request neither sinks below
+    // newer ones nor stays lost after its worker failed. Its first request keeps the listener.
+    const first = !s.requested[f]
+    if (!first && !inputProps.again) return
     // a baked strip brings every frame at once
     const url = s.baked !== "failed" && this.baked?.item === item ? this.baked.url(anim, v) : null
     if (url) {
@@ -220,7 +232,7 @@ export class Figure {
       s.ready[f] = 1
       s.tex.needsUpdate = true
     }
-    const data = spriteFrame({ look: this.look, item: item, anim: anim, view: v, f: f, urgency: urgency, onReady: done, id: this.id + "|" + item })
+    const data = spriteFrame({ look: this.look, item: item, anim: anim, view: v, f: f, urgency: urgency, onReady: first ? done : undefined, id: this.id + "|" + item })
     if (data) done(data)
   }
   groundOffset(height: number) {
@@ -252,7 +264,7 @@ export class Figure {
     const f = Math.floor(((((this.t / (Math.PI * 2)) % 1) + 1) % 1) * n) % n
     // on screen: this frame first, then the rest of the loop; off screen: just this frame, last
     if (seen) {
-      this.want({ anim: this.anim, item: this.item, v: v, f: f, urgency: 400 - dist })
+      this.want({ anim: this.anim, item: this.item, v: v, f: f, urgency: 400 - dist, again: true })
       for (const k = { value: 1 }; k.value < n; k.value++) this.want({ anim: this.anim, item: this.item, v: v, f: (f + k.value) % n, urgency: 200 - dist - k.value })
     } else this.want({ anim: this.anim, item: this.item, v: v, f: f, urgency: -1000 - dist })
     const show: { value: Strip | null } = { value: null },
