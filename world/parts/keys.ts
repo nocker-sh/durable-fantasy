@@ -165,6 +165,11 @@ export class Keys {
         event.preventDefault()
         return
       }
+      // A digit pressed for a choice that is not up yet must not eat what is on the hotbar (ui.md §4).
+      if (/^[0-9]$/.test(event.key)) {
+        event.preventDefault()
+        return
+      }
     }
     // WASD and the arrows walk, a cell at a time, while held; not while talking or trading
     if (event.code in MOVE_KEYS && !event.shiftKey && !event.altKey) {

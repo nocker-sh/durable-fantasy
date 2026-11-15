@@ -73,6 +73,42 @@ describe("figure resource lifetime", () => {
     release.mockRestore()
   })
 
+  it("asks again for the frame on show without a second listener, so a lost request recovers", () => {
+    const draw = canvasDocument()
+    const figure = new Figure(look)
+    figure.refresh()
+    const calls = vi.mocked(spriteFrame).mock.calls
+    const count = calls.length
+    const shown = calls[0][0]
+    expect(shown.onReady).toBeTypeOf("function")
+    figure.refresh()
+    // only the frame on show is repeated; the rest of the loop is requested once
+    expect(calls).toHaveLength(count + 1)
+    expect(calls[count][0]).toMatchObject({ anim: shown.anim, view: shown.view, f: shown.f, onReady: undefined })
+    // the worker's reply was lost and a later request finds the decoded frame
+    vi.mocked(spriteFrame).mockReturnValueOnce({} as ImageBitmap)
+    figure.refresh()
+    expect(draw).toHaveBeenCalledTimes(1)
+    figure.refresh()
+    expect(calls).toHaveLength(count + 2)
+    figure.dispose()
+  })
+
+  it("puts the foreground figure's requests ahead of every other figure's", () => {
+    canvasDocument()
+    const other = new Figure(look)
+    other.refresh()
+    const usual = Math.max(...vi.mocked(spriteFrame).mock.calls.map((call) => call[0].urgency ?? 0))
+    vi.mocked(spriteFrame).mockClear()
+    const mine = new Figure(look)
+    mine.foreground()
+    mine.prefetch("idle", null)
+    mine.refresh()
+    for (const call of vi.mocked(spriteFrame).mock.calls) expect(call[0].urgency).toBeGreaterThan(usual + 1e9)
+    other.dispose()
+    mine.dispose()
+  })
+
   it("bounds retained strips and ignores evicted frame completions", () => {
     const draw = canvasDocument()
     const figure = new Figure(look)

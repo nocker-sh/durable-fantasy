@@ -26,13 +26,13 @@ try {
     if (!(await page.evaluate(() => !!document.activeElement?.closest(".character-creation")))) throw Error("Keyboard focus escaped character creation")
   }
   if (!(await page.getByRole("button", { name: "はじめる" }).isDisabled())) throw Error("Blank name accepted")
-  await page.getByRole("textbox", { name: "名前", exact: true }).fill("エルナ")
+  await page.getByRole("textbox", { name: "名前", exact: true }).fill("ペトラ")
   await page.getByRole("button", { name: "次の姿", exact: true }).click()
   await page.getByRole("button", { name: "スカーフ", exact: true }).click()
   await page.getByRole("button", { name: "水色", exact: true }).click()
   await page.reload()
   await page.getByRole("dialog", { name: "キャラクターを作る" }).waitFor({ timeout: 180000 })
-  if ((await page.getByRole("textbox", { name: "名前", exact: true }).inputValue()) !== "エルナ") throw Error("Creation draft lost")
+  if ((await page.getByRole("textbox", { name: "名前", exact: true }).inputValue()) !== "ペトラ") throw Error("Creation draft lost")
   if (
     (await page.getByRole("button", { name: "スカーフ", exact: true }).getAttribute("aria-pressed")) !== "true" ||
     (await page.getByRole("button", { name: "水色", exact: true }).getAttribute("aria-pressed")) !== "true"
@@ -40,10 +40,10 @@ try {
     throw Error("Creation selection draft lost")
   await page.getByRole("button", { name: "はじめる" }).click()
   await page.waitForFunction(() => window.game?.state.get().player?.profileComplete === true)
-  await page.getByRole("dialog", { name: "操作", exact: true }).waitFor()
+  // 作成の成功後はそのまま町に立ち、操作の案内は出さない（ui.md「キャラクター作成」）。
+  await page.getByRole("dialog", { name: "キャラクターを作る" }).waitFor({ state: "hidden" })
   await mkdir("public/tmp", { recursive: true })
-  await page.screenshot({ path: "public/tmp/first-play-welcome.png" })
-  await page.getByRole("button", { name: "町を歩く", exact: true }).click()
+  await page.screenshot({ path: "public/tmp/first-play-town.png" })
   const before = await page.evaluate(() => game.scene.playerCell())
   await page.keyboard.down("ArrowRight")
   try {
@@ -73,8 +73,8 @@ try {
   await page.reload()
   await page.waitForFunction(() => window.game?.state.get().player?.profileComplete === true && window.game?.state.get().loading === null, null, { timeout: 180000 })
   const restored = await page.evaluate(() => game.state.get().player)
-  if (restored.name !== "エルナ" || restored.look !== 1 || restored.neck !== "scarf" || restored.neckRamp !== "cSky") throw Error("Saved character differs")
-  if (await page.getByRole("dialog", { name: "操作", exact: true }).count()) throw Error("Welcome repeated on resume")
+  if (restored.name !== "ペトラ" || restored.look !== 1 || restored.neck !== "scarf" || restored.neckRamp !== "cSky") throw Error("Saved character differs")
+  if (await page.getByRole("dialog", { name: "操作", exact: true }).count()) throw Error("Guidance shown on resume")
   console.log("restored", await page.evaluate(() => ({ name: game.state.get().player.name, online: game.state.get().online })))
   await page.keyboard.press("Escape")
   await page.getByRole("button", { name: "ゲームを閉じる", exact: true }).click()
