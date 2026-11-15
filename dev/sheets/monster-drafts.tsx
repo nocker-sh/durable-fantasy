@@ -87,7 +87,9 @@ const monsterDrafts = sheet({
       {
         title: "ブロック（休みの姿勢、拡大前）",
         head: ["骨", "形", "色", "大きさ"],
-        rows: kind.model.blocks.map((block) => ("to" in block ? [`${block.bone} → ${block.to}`, "box", block.paint, `${block.width}, ${block.height}`] : [block.bone, block.shape, block.paint, block.size.join(", ")])),
+        rows: kind.model.blocks.map((block) =>
+          "to" in block ? [`${block.bone} → ${block.to}`, "box", block.paint, `${block.width}, ${block.height}`] : [block.bone, block.shape, block.paint, block.size.join(", ")],
+        ),
       },
     ]
   },

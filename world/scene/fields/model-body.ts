@@ -116,5 +116,8 @@ function blockMesh(props: { block: RigBlock; at: (bone: string) => THREE.Vector3
 function restAt(props: { bones: Map<string, THREE.Bone>; name: string; toBody: THREE.Matrix4 }): THREE.Vector3 {
   const bone = props.bones.get(props.name)
   if (!bone) throw new Error(`No bone ${props.name}`)
-  return new THREE.Vector3().setFromMatrixPosition(bone.matrixWorld).applyMatrix4(props.toBody).sub(new THREE.Vector3(0, GROUND, 0))
+  return new THREE.Vector3()
+    .setFromMatrixPosition(bone.matrixWorld)
+    .applyMatrix4(props.toBody)
+    .sub(new THREE.Vector3(0, GROUND, 0))
 }
