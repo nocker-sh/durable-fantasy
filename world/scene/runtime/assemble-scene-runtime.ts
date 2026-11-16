@@ -48,6 +48,7 @@ import { critters } from "#/world/scene/critters"
 import { spawnAnimals } from "#/world/scene/spawn-animals"
 import { lap } from "#/world/lap"
 import { Ashfall } from "#/world/scene/ashfall"
+import { AmbientLife } from "#/world/scene/ambient-life"
 import { dustAll } from "#/world/scene/dust-all"
 import { MAP_SCENES } from "#/world/scene/runtime/definitions"
 import { diorama } from "#/world/scene/runtime/settings"
@@ -273,6 +274,9 @@ export async function assembleSceneRuntime(props: SceneBuildProps & { resources:
     dustAll(scene, (o) => o === terrain)
     scene.add(ashfall!.points)
   }
+  // butterflies, birds, leaves and what the wind carries over the fields outside town
+  const ambientLife = world.indoor || !world.layout.biome ? null : resources.use(new AmbientLife(world.layout.biome))
+  if (ambientLife) scene.add(ambientLife.group)
 
   const frameRenderer = new SceneFrameRenderer({
     world,
@@ -300,6 +304,7 @@ export async function assembleSceneRuntime(props: SceneBuildProps & { resources:
     residentNames,
     speech,
     ashfall,
+    ambientLife,
     lighting,
     record: frameLoop.record,
   })

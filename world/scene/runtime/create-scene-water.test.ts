@@ -12,7 +12,10 @@ it("keeps the plane, animated palette and cleanup order of the water surface", (
   expect(water.material.transparent).toBe(true)
   expect(water.material.uniforms.t.value).toBe(0)
   expect(water.material.uniforms.sky.value.getHex()).toBe(0xa6c2c2)
-  expect(water.material.fragmentShader).toContain("vec4(c, v > 0.78 ? 0.95 : 0.78)")
+  expect(water.material.uniforms.tint.value.getHex()).toBe(0xffffff)
+  expect(water.material.uniforms.day.value).toBe(1)
+  expect(water.material.uniforms.depthMap.value.image.width).toBe(1)
+  expect(water.material.fragmentShader).toContain("c * tint * mix(0.62, 1.0, day) * cloudShade(vP)")
   expect(water.material.fragmentShader).toContain("#include <colorspace_fragment>")
   const events: string[] = []
   water.geometry.addEventListener("dispose", () => events.push("geometry"))

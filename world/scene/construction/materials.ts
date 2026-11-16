@@ -30,6 +30,8 @@ const M = {
   leaf: mat(leafTex("leaf", 5)),
   leaf2: mat(leafTex("leaf2", 6)),
   autumn: mat(leafTex("autumn", 7)),
+  blossom: mat(leafTex("blossom", 8)),
+  gold: mat(leafTex("larch", 9)),
   iron: mat(plainTex({ ramp: "iron", light: 0.45, noise: 0.2, seed: 3 })),
   plaster: mat(plainTex({ ramp: "plaster", light: 0.7, noise: 0.12, seed: 4 })),
   hay: mat(thatchTex(9), {}),

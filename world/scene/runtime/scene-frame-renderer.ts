@@ -10,6 +10,7 @@ import type { BillboardBatch } from "#/lib/graphics/billboards"
 import type { Layout } from "#/world/maps/layout-types"
 import type { MonsterView } from "#/world/scene/monsters"
 import type { Ashfall } from "#/world/scene/ashfall"
+import type { AmbientLife } from "#/world/scene/ambient-life"
 import type { MotionWalker } from "#/world/scene/runtime/walker-motion-types"
 import type { WalkerMotion } from "#/world/scene/runtime/walker-motion"
 import type { SceneFrame } from "#/world/scene/runtime/scene-frame-types"
@@ -50,6 +51,7 @@ type Props<P> = Readonly<{
   residentNames: { update(hovered: P | null): void }
   speech: { update(now: number): void }
   ashfall: Pick<Ashfall, "update"> | null
+  ambientLife?: Pick<AmbientLife, "update"> | null
   lighting: { readonly minutes: number }
   record(now: number): void
 }>
@@ -101,7 +103,9 @@ export class SceneFrameRenderer<P> {
     this.props.residentNames.update(this.props.pointer.hovered)
     const now = performance.now()
     this.props.speech.update(now)
-    this.props.ashfall?.update({ dt: frame.dt, t: frame.time, focus: this.props.camera.focus, night: 1 - daylight(this.props.lighting.minutes) })
+    const night = 1 - daylight(this.props.lighting.minutes)
+    this.props.ashfall?.update({ dt: frame.dt, t: frame.time, focus: this.props.camera.focus, night })
+    this.props.ambientLife?.update({ dt: frame.dt, t: frame.time, focus: this.props.camera.focus, night })
     this.props.record(now)
   }
 

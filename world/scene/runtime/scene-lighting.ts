@@ -8,6 +8,7 @@ import { updateSceneLightTint } from "#/world/scene/runtime/update-scene-light-t
 import { updateSceneFlames } from "#/world/scene/runtime/update-scene-flames"
 import { updateSceneLamps } from "#/world/scene/runtime/update-scene-lamps"
 import { updateSceneSmoke } from "#/world/scene/runtime/update-scene-smoke"
+import { skyUniforms } from "#/world/scene/runtime/sky-uniforms"
 import type { Scene } from "three"
 import type { SceneDefinition } from "#/world/scene/runtime/definitions"
 import type { SceneEnvironment } from "#/world/scene/runtime/scene-environment-types"
@@ -45,6 +46,11 @@ export class SceneLighting {
     updateSceneLamps(this.lampOrder, this.clock.minute, time)
     updateSceneSmoke({ environment: this.props.environment, dt })
     this.props.wm.uniforms.t.value = time
+    // the clouds' shadows drift over the land by day; at night there is no sun for them to hide
+    skyUniforms.cloudTime.value = time
+    const sun = this.props.world.indoor ? 0 : daylight(this.clock.minute) * (1 - this.clock.light.night)
+    skyUniforms.cloud.value = 0.26 * sun
+    skyUniforms.sun.value = sun
   }
 
   get minutes(): number {

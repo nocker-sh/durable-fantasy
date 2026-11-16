@@ -14,4 +14,6 @@ export function updateSceneLightTint(props: Props): void {
   for (const material of litSprites) material.color.copy(view.tint)
   props.sun.position.set(N / 2 + Math.cos(light.azimuth) * 30 * Math.cos(light.elevation), Math.sin(light.elevation) * 30, N / 2 + Math.sin(light.azimuth) * 30 * Math.cos(light.elevation))
   props.water.sky.value.set(light.sky).lerp(new Color(0xffffff), 0.35)
+  props.water.tint?.value.set(light.tint)
+  if (props.water.day) props.water.day.value = 1 - light.night
 }

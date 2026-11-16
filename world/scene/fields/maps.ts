@@ -39,7 +39,7 @@ import { cityWall } from "#/world/scene/fields/city-wall"
 import { emptyShrine } from "#/world/scene/fields/empty-shrine"
 import { broadleaves } from "#/world/scene/fields/broadleaves"
 import { rocks } from "#/world/scene/fields/rocks"
-import { pines } from "#/world/scene/fields/pines"
+import { woods } from "#/world/scene/fields/woods"
 import { tufts } from "#/world/scene/fields/tufts"
 import { logs } from "#/world/scene/fields/logs"
 import { stumps } from "#/world/scene/fields/stumps"
@@ -56,6 +56,10 @@ import { grassHighland } from "#/world/scene/fields/grass-highland"
 import { lilyMarsh } from "#/world/scene/fields/lily-marsh"
 import { fallsValley } from "#/world/scene/fields/falls-valley"
 import { saltFlats } from "#/world/scene/fields/salt-flats"
+import { wildGrowth } from "#/world/scene/fields/wild-growth"
+import { sunbeams } from "#/world/scene/fields/sunbeams"
+import { fallenPetals } from "#/world/scene/fields/fallen-petals"
+import { relics } from "#/world/scene/fields/relics"
 
 // ---------------------------------------------------------------- builders
 function meadow(root: THREE.Group) {
@@ -83,7 +87,8 @@ function meadow(root: THREE.Group) {
     rot: 0.2,
   })
   const free = offRoad(1.2)
-  // the lone old tree on top of its hill, rocks breaking out of the scarp below it to the north-east
+  // the lone old tree on top of its hill, in flower, its petals lying round it; rocks breaking
+  // out of the scarp below it to the north-east
   broadleaves(
     root,
     [
@@ -94,8 +99,9 @@ function meadow(root: THREE.Group) {
         r: 0.4,
       },
     ],
-    M.leaf,
+    M.blossom,
   )
+  fallenPetals(root, 34, 13)
   rocks(
     root,
     clusters(2010, 0, 9, 1.8, 0.5, 1.3, free, [
@@ -154,7 +160,7 @@ function meadow(root: THREE.Group) {
     }),
     M.leaf,
   )
-  pines(
+  woods(
     root,
     clusters(2012, 0, 7, 3.2, 0.8, 1.15, (x, z) => edgeward(5)(x, z) && free(x, z), [
       [3.5, 3.5],
@@ -402,7 +408,7 @@ function dunes(root: THREE.Group) {
 }
 function cliff(root: THREE.Group) {
   brokenTower(root, 30.5, 24)
-  pines(
+  woods(
     root,
     scatter({
       seed: 2031,
@@ -561,7 +567,7 @@ function sheds(root: THREE.Group) {
       ok: (x, z) => x < 28 && offRoad(0.9)(x, z),
     }),
   )
-  pines(
+  woods(
     root,
     scatter({
       seed: 2043,
@@ -626,7 +632,7 @@ function forestEdge(root: THREE.Group) {
     lines: BOARDS.kilns,
     rot: 0.3,
   })
-  pines(
+  woods(
     root,
     scatter({
       seed: 2052,
@@ -755,7 +761,7 @@ function deepForest(root: THREE.Group) {
     ],
     62,
   )
-  pines(
+  woods(
     root,
     scatter({
       seed: 2061,
@@ -866,7 +872,7 @@ function quynhonGate(root: THREE.Group) {
     lines: BOARDS.crossroads,
     rot: 0.4,
   })
-  pines(
+  woods(
     root,
     scatter({
       seed: 2071,
@@ -935,7 +941,7 @@ function pass(root: THREE.Group) {
     }),
     M.rockDark,
   )
-  pines(
+  woods(
     root,
     scatter({
       seed: 2082,
@@ -973,7 +979,7 @@ function hueGate(root: THREE.Group) {
     gx: 24,
     chimneysBehind: true,
   })
-  pines(
+  woods(
     root,
     scatter({
       seed: 2091,
@@ -1033,7 +1039,7 @@ function rim(root: THREE.Group, id: string, seed: number) {
     )
     return
   }
-  pines(
+  woods(
     root,
     scatter({
       seed: seed,
@@ -1044,6 +1050,59 @@ function rim(root: THREE.Group, id: string, seed: number) {
     }),
     id !== "deep-forest",
   )
+}
+/**
+ * Where the sun breaks through onto each field's sights by day (landscape.md「マップごとのテーマ」): the
+ * lone tree, the stopped windmill, the engines in the grass, the clearings, the shrines, the tower.
+ */
+const BEAMS: Record<string, readonly (readonly [number, number, number])[]> = {
+  "south-meadow": [
+    [34, 13, 3.2],
+    [6.5, 40, 2.6],
+    [41.6, 39.6, 2.4],
+  ],
+  "red-dunes": [
+    [34, 33, 2.6],
+    [12, 12, 2.4],
+    [15.4, 33.4, 3.2],
+  ],
+  "sea-cliff": [
+    [30.5, 24, 3],
+    [13, 20.4, 2.8],
+  ],
+  "net-sheds": [
+    [32, 31, 3],
+    [31.2, 12, 3],
+  ],
+  "forest-edge": [
+    [17, 26.5, 3],
+    [31.5, 9.6, 2.4],
+  ],
+  "deep-forest": [
+    [14, 32.6, 2.4],
+    [36, 12.8, 2.4],
+    [23.4, 20.2, 3.4],
+  ],
+  "mountain-pass": [
+    [20.6, 12, 2.4],
+    [30.8, 20.8, 2],
+    [29.2, 9.6, 2.4],
+  ],
+  "grass-highland": [
+    [13, 12.4, 3],
+    [32, 32, 2.4],
+    [37, 10.6, 3.4],
+  ],
+  "lily-marsh": [
+    [26.2, 18.5, 2.4],
+    [33.4, 32.4, 2.2],
+    [10, 8, 2.6],
+  ],
+  "falls-valley": [[34.6, 31.2, 2.6]],
+  "salt-flats": [
+    [34, 15, 2.8],
+    [17, 37, 3],
+  ],
 }
 const BUILDERS: Record<string, (root: THREE.Group) => void> = {
   "south-meadow": meadow,
@@ -1069,6 +1128,9 @@ export const FIELD_BUILDERS: Record<string, (root: THREE.Group) => void> = Objec
       (root: THREE.Group) => {
         b(root)
         rim(root, id, 3000 + i * 10)
+        relics(root, id)
+        wildGrowth(root, LAYOUTS[id]?.biome, 5000 + i * 10)
+        sunbeams(root, BEAMS[id] ?? [])
       },
     ]
   }),

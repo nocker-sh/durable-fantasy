@@ -33,6 +33,8 @@ export function sway(material: THREE.Material, amp: number): THREE.Material {
         }`,
       )
     }
+    // the patch's source text is the same for every amount, so tell the program cache apart by it
+    m.customProgramCacheKey = () => `sway${amp}|${m.onBeforeCompile.toString()}`
     m.needsUpdate = true
   }
   const time = m.userData.swayTime

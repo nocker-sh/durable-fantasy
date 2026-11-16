@@ -75,6 +75,7 @@ export const NOT_TABLES: readonly string[] = [
   "WATER_JAR_SHAPE", // Normalized ceramic geometry, not a table of placed objects.
   "WINDMILL_ROTOR_SHAPE", // Shared rotor dimensions; the placed mill belongs to the facility settings.
   "FURNITURE_KINDS", // Renderer identifiers; placed furniture is listed under objects and houses.
+  "FLOWER_KINDS", // How each wild flower is drawn; where drifts grow is decided by the land.
   "GATHER_SKILLS",
   "CRAFT_SKILLS",
   "GRADES",
@@ -154,6 +155,8 @@ export const NOT_TABLES: readonly string[] = [
   "FIG_DOT", // Pixel reduction factor, not a game table.
   "TEXEL_PPU", // Shared texture pixel density, not a game table.
   "SCENE_LIGHT_PALETTES", // Rendering keyframes blended by the clock, not placed world records.
+  "AMBIENT_KINDS", // Drawn-only swarms (butterflies, birds, leaves) by kind of land, not creatures of the game.
+  "MOVE_KEYS", // Keyboard codes to walking directions, an input mapping.
   "OUT",
   "FR",
   "PARENT",

@@ -3,12 +3,13 @@ import * as THREE from "three"
 import { flowerMats } from "#/world/scene/fields/vegetation"
 import { instanced } from "#/world/scene/fields/instancing"
 import { tuftGeo } from "#/world/scene/fields/tufts"
+import { sway } from "#/world/scene/fields/sway"
 export function flowers(root: THREE.Group, spots: Spot[]) {
   flowerMats.forEach((m, k) =>
     instanced({
       root: root,
       geo: tuftGeo,
-      material: m,
+      material: sway(m, 0.06),
       spots: spots.filter((_, i) => i % flowerMats.length === k),
       place: (s) => [
         [s.x, s.z],

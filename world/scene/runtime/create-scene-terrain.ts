@@ -1,6 +1,8 @@
 import { createGroundCanvas } from "#/world/scene/runtime/create-ground-canvas"
 import { createGroundSurface } from "#/world/scene/runtime/create-ground-surface"
 import { createSceneWater } from "#/world/scene/runtime/create-scene-water"
+import { createWaterDepthTexture } from "#/world/scene/runtime/create-water-depth-texture"
+import { groundH } from "#/world/scene/ground-h"
 import { lap } from "#/world/lap"
 import type { Scene } from "three"
 import type { CleanupStack } from "#/lib/engine/cleanup-stack"
@@ -17,7 +19,7 @@ export async function createSceneTerrain(props: Props) {
   await props.tick()
   const terrain = createGroundSurface(props.ground, props.resources)
   props.scene.add(terrain)
-  const water = createSceneWater(props.resources)
+  const water = createSceneWater(props.resources, props.world.indoor ? undefined : createWaterDepthTexture(groundH))
   props.scene.add(water)
   if (props.world.indoor) {
     terrain.visible = false
